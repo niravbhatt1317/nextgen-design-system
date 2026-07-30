@@ -3,18 +3,18 @@
 A running list of everything known to be wrong or missing, so nothing gets lost while other work
 takes priority. **Most of this is deliberately not urgent.** The point of the file is that it exists.
 
-**Owner:** Pranjal · **Started:** 30 July 2026 · **Last updated:** 30 July 2026
+**Owner:** Pranjal · **Started:** 30 July 2026 · **Last updated:** 31 July 2026
 
 ---
 
 ## Progress
 
-|             |                |
-| ----------- | -------------- |
-| Total items | **19**         |
-| Done        | **0**          |
-| Left        | **19**         |
-| In progress | Badge, TagPill |
+|             |                               |
+| ----------- | ----------------------------- |
+| Total items | **21**                        |
+| Done        | **1**                         |
+| Left        | **20**                        |
+| In progress | TagPill — in review as PR #17 |
 
 **When you tick something, update those four numbers.** A count that has to be recalculated by
 reading the whole file is a count nobody trusts.
@@ -23,10 +23,11 @@ reading the whole file is a count nobody trusts.
 
 ## In progress now
 
-One parallel copy each — they ship independently, so they never share a branch.
+One branch each — they ship independently, so they never share one.
 
-- [ ] **Badge** — `pranjal/badge-…`
-- [ ] **TagPill** — `pranjal/tagpill-…` · **absorbs item 1 below**
+- [x] **Badge** — merged, PR #14. Gained an emphasis axis, a square shape and count content.
+- [ ] **TagPill** — in review, PR #17. Rebuilt as the removable tag, neutral only.
+      **Closes item 1 below**, and turned up items 10 and 11.
 
 ---
 
@@ -34,11 +35,12 @@ One parallel copy each — they ship independently, so they never share a branch
 
 These came out of a read-through on 30 July 2026 and are not tracked anywhere else yet.
 
-### 1 · TagPill's colours are not from this design system
+### 1 · TagPill's colours were not from this design system — DONE
 
-- [ ] Put TagPill's ten tones on the palette
+- [x] Put TagPill's tones on the palette
 
-**Being handled inside the TagPill work above.** Kept here so the reason survives.
+**Fixed in PR #17.** The ten colour-named tones are gone and TagPill is neutral until the colour
+question is answered. Kept here so the reason survives.
 
 Badge's red compiles to `hsl(var(--mdt-red-80))` — it points at the palette. TagPill's red compiles
 to `rgb(185 28 28)`, a fixed value that is the CSS framework's own stock red. All ten tones are built
@@ -148,6 +150,43 @@ impact: spacing first, then type scale.
 
 **Estimate:** the largest thing on this page. Spacing alone is a half-day once decided, and it touches
 every component.
+
+### 10 · The palette has no light, genuinely grey step
+
+- [ ] Add a light neutral that is actually neutral
+
+The neutral ramp **gains a blue tint as it lightens**. neutral-30 sits at 30% saturation, but
+neutral-20 and neutral-10 sit at 52% and 50%. So the lighter you go, the bluer it gets, and there is
+no quiet grey to reach for.
+
+Found while lightening TagPill's chip: the request was for something lighter _and_ more neutral, and
+the palette can only offer one of those at a time.
+
+**Affects anything wanting a quiet grey surface** — hover states, empty rows, disabled backgrounds,
+not only tags.
+
+**Estimate:** the change itself is minutes. Deciding the value is a colour decision.
+
+### 11 · Colours cannot be used at partial strength
+
+- [ ] Give every colour an opacity setting
+
+Figma gives every fill an opacity slider. This palette has the colours but not the slider — every
+colour is only available at full strength.
+
+That matters when the value you need sits _between_ two steps on a ramp. TagPill's hover wants about
+1.15 against its rest state; the palette offers 1.07 or 1.32 and nothing in between, so the hover
+ships knowingly weak.
+
+Colours are declared as `hsl(var(--x))` without the alpha placeholder Tailwind needs, so
+`mdt-bg-neutral-40/50` compiles to nothing. Verified by compiling it, not assumed. No shipped
+component uses that pattern, which is consistent with it never having worked.
+
+**Also blocks the ordinary way of building** overlays behind dialogs, faded disabled states, and soft
+hover surfaces — each currently has to jump a whole step or hardcode a value and break the token rule.
+
+**Estimate:** 20–40 min including proving nothing moves. One line per colour family, and it should
+not change a single existing pixel.
 
 ---
 
