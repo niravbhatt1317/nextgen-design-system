@@ -1,0 +1,1157 @@
+{
+  "generatedFrom": "src/components (CVA definitions)",
+  "componentCount": 33,
+  "variantGroupCount": 109,
+  "variantValueCount": 386,
+  "components": [
+    {
+      "component": "Avatar",
+      "file": "src/components/Avatar/Avatar.tsx",
+      "definitions": [
+        {
+          "name": "avatarVariants",
+          "variants": {
+            "tone": [
+              "slate",
+              "blue",
+              "green",
+              "amber",
+              "rose",
+              "purple"
+            ],
+            "size": [
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "shape": [
+              "circle",
+              "rounded"
+            ],
+            "ring": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "tone": "slate",
+            "size": "md",
+            "shape": "circle",
+            "ring": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Badge",
+      "file": "src/components/Badge/Badge.tsx",
+      "definitions": [
+        {
+          "name": "badgeVariants",
+          "variants": {
+            "tone": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "purple"
+            ],
+            "shape": [
+              "pill",
+              "tag",
+              "bare"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "tone": "neutral",
+            "shape": "pill",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Button",
+      "file": "src/components/Button/Button.tsx",
+      "definitions": [
+        {
+          "name": "ButtonVariants",
+          "variants": {
+            "variant": [
+              "primary",
+              "secondary",
+              "outline",
+              "ghost",
+              "link",
+              "destructive",
+              "destructiveSoft",
+              "destructiveOutline",
+              "destructiveGhost",
+              "success",
+              "successSoft",
+              "successOutline",
+              "successGhost",
+              "ai"
+            ],
+            "size": [
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              "icon"
+            ],
+            "fullWidth": [
+              "true",
+              "false"
+            ],
+            "shape": [
+              "square",
+              "rounded",
+              "pill",
+              "circle"
+            ],
+            "elevation": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "active": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "primary",
+            "size": "md",
+            "fullWidth": "false",
+            "shape": "rounded",
+            "elevation": "0",
+            "active": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "ButtonGroup",
+      "file": "src/components/ButtonGroup/ButtonGroup.tsx",
+      "definitions": [
+        {
+          "name": "buttonGroupVariants",
+          "variants": {
+            "orientation": [
+              "horizontal",
+              "vertical"
+            ],
+            "variant": [
+              "default",
+              "attached"
+            ],
+            "size": [
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "fullWidth": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "orientation": "horizontal",
+            "variant": "attached",
+            "size": "md",
+            "fullWidth": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Checkbox",
+      "file": "src/components/Checkbox/Checkbox.tsx",
+      "definitions": [
+        {
+          "name": "checkboxVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "card",
+              "card-with-checkbox"
+            ]
+          },
+          "defaults": {
+            "variant": "default"
+          }
+        }
+      ]
+    },
+    {
+      "component": "CodeWell",
+      "file": "src/components/CodeWell/CodeWell.tsx",
+      "definitions": [
+        {
+          "name": "codeWellVariants",
+          "variants": {
+            "truncate": [
+              "true",
+              "false"
+            ],
+            "surface": [
+              "light",
+              "dark"
+            ],
+            "padded": [
+              "true",
+              "false"
+            ],
+            "controls": [
+              "none",
+              "one",
+              "two"
+            ]
+          },
+          "defaults": {
+            "surface": "light",
+            "padded": "true",
+            "controls": "none",
+            "truncate": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Combobox",
+      "file": "src/components/Combobox/Combobox.tsx",
+      "definitions": [
+        {
+          "name": "comboboxTriggerVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "outline"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "hasError": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md",
+            "hasError": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Container",
+      "file": "src/components/Container/Container.tsx",
+      "definitions": [
+        {
+          "name": "containerVariants",
+          "variants": {
+            "maxWidth": [
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              "2xl",
+              "full"
+            ],
+            "padding": [
+              "none",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "paddingY": [
+              "none",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "centered": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "maxWidth": "lg",
+            "padding": "md",
+            "paddingY": "none",
+            "centered": "true"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Flex",
+      "file": "src/components/Flex/Flex.tsx",
+      "definitions": [
+        {
+          "name": "flexVariants",
+          "variants": {
+            "direction": [
+              "row",
+              "row-reverse",
+              "col",
+              "col-reverse"
+            ],
+            "wrap": [
+              "wrap",
+              "nowrap",
+              "wrap-reverse"
+            ],
+            "justify": [
+              "start",
+              "end",
+              "center",
+              "between",
+              "around",
+              "evenly"
+            ],
+            "align": [
+              "start",
+              "end",
+              "center",
+              "baseline",
+              "stretch"
+            ],
+            "gap": [],
+            "gapX": [],
+            "gapY": []
+          },
+          "defaults": {
+            "direction": "row",
+            "wrap": "nowrap"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Form",
+      "file": "src/components/Form/FormDescription.tsx",
+      "definitions": [
+        {
+          "name": "formDescriptionVariants",
+          "variants": {
+            "color": [
+              "default",
+              "muted",
+              "foreground",
+              "primary",
+              "secondary",
+              "destructive",
+              "success",
+              "warning",
+              "info"
+            ]
+          },
+          "defaults": {
+            "color": "default"
+          }
+        },
+        {
+          "name": "formLabelVariants",
+          "variants": {
+            "weight": [
+              "normal",
+              "medium",
+              "semibold",
+              "bold"
+            ],
+            "color": [
+              "default",
+              "muted",
+              "primary",
+              "secondary",
+              "destructive",
+              "success",
+              "warning",
+              "info"
+            ]
+          },
+          "defaults": {
+            "weight": "normal",
+            "color": "default"
+          }
+        },
+        {
+          "name": "formMessageVariants",
+          "variants": {
+            "color": [
+              "default",
+              "muted",
+              "destructive",
+              "success",
+              "warning",
+              "info",
+              "primary",
+              "secondary"
+            ]
+          },
+          "defaults": {
+            "color": "default"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Grid",
+      "file": "src/components/Grid/Grid.tsx",
+      "definitions": [
+        {
+          "name": "gridVariants",
+          "variants": {
+            "columns": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "auto"
+            ],
+            "rows": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "auto"
+            ],
+            "gap": [],
+            "gapX": [],
+            "gapY": [],
+            "justify": [
+              "start",
+              "end",
+              "center",
+              "stretch"
+            ],
+            "align": [],
+            "justifyContent": [
+              "start",
+              "end",
+              "center",
+              "between",
+              "around",
+              "evenly"
+            ],
+            "alignContent": [
+              "start",
+              "end",
+              "center",
+              "between",
+              "around",
+              "evenly"
+            ],
+            "autoFlow": [
+              "row",
+              "col",
+              "dense",
+              "rowDense",
+              "colDense"
+            ]
+          },
+          "defaults": {
+            "gap": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Icon",
+      "file": "src/components/Icon/Icon.tsx",
+      "definitions": [
+        {
+          "name": "iconVariants",
+          "variants": {
+            "size": [
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "color": [
+              "current",
+              "primary",
+              "secondary",
+              "success",
+              "destructive",
+              "warning",
+              "info",
+              "muted",
+              "foreground"
+            ]
+          },
+          "defaults": {
+            "size": "md",
+            "color": "current"
+          }
+        }
+      ]
+    },
+    {
+      "component": "IconTile",
+      "file": "src/components/IconTile/IconTile.tsx",
+      "definitions": [
+        {
+          "name": "iconTileVariants",
+          "variants": {
+            "tone": [
+              "slate",
+              "blue",
+              "green",
+              "amber",
+              "rose",
+              "purple"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "shape": [
+              "square",
+              "circle"
+            ]
+          },
+          "defaults": {
+            "tone": "slate",
+            "size": "md",
+            "shape": "square"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Input",
+      "file": "src/components/Input/Input.tsx",
+      "definitions": [
+        {
+          "name": "InputVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "hasError": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "size": "md",
+            "hasError": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Item",
+      "file": "src/components/Item/Item.tsx",
+      "definitions": [
+        {
+          "name": "itemVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "ghost",
+              "active",
+              "destructive"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "clickable": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md",
+            "clickable": "true"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Label",
+      "file": "src/components/Label/Label.tsx",
+      "definitions": [
+        {
+          "name": "labelVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md"
+            ]
+          },
+          "defaults": {
+            "size": "sm"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Pagination",
+      "file": "src/components/Pagination/Pagination.tsx",
+      "definitions": [
+        {
+          "name": "paginationLinkVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "outline",
+              "active"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Progress",
+      "file": "src/components/Progress/Progress.tsx",
+      "definitions": [
+        {
+          "name": "progressVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Radio",
+      "file": "src/components/Radio/Radio.tsx",
+      "definitions": [
+        {
+          "name": "radioGroupItemVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "card",
+              "card-with-radio"
+            ]
+          },
+          "defaults": {
+            "variant": "default"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Select",
+      "file": "src/components/Select/Select.tsx",
+      "definitions": [
+        {
+          "name": "selectTriggerVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "borderless"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "hasError": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md",
+            "hasError": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Separator",
+      "file": "src/components/Separator/Separator.tsx",
+      "definitions": [
+        {
+          "name": "separatorVariants",
+          "variants": {
+            "orientation": [
+              "horizontal",
+              "vertical"
+            ],
+            "variant": [
+              "solid",
+              "dashed",
+              "dotted"
+            ],
+            "thickness": [
+              "thin",
+              "medium",
+              "thick"
+            ],
+            "spacing": [
+              "none",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ]
+          },
+          "defaults": {
+            "orientation": "horizontal",
+            "variant": "solid",
+            "thickness": "thin",
+            "spacing": "none"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Sheet",
+      "file": "src/components/Sheet/Sheet.tsx",
+      "definitions": [
+        {
+          "name": "sheetVariants",
+          "variants": {
+            "side": [
+              "top",
+              "bottom",
+              "left",
+              "right"
+            ]
+          },
+          "defaults": {
+            "side": "right"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Sidebar",
+      "file": "src/components/Sidebar/Sidebar.tsx",
+      "definitions": [
+        {
+          "name": "sidebarVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "compact",
+              "wide"
+            ]
+          },
+          "defaults": {
+            "variant": "default"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Skeleton",
+      "file": "src/components/Skeleton/Skeleton.tsx",
+      "definitions": [
+        {
+          "name": "skeletonVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "lighter",
+              "darker"
+            ]
+          },
+          "defaults": {
+            "variant": "default"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Spinner",
+      "file": "src/components/Spinner/Spinner.tsx",
+      "definitions": [
+        {
+          "name": "spinnerVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "primary",
+              "secondary",
+              "success",
+              "destructive"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Stack",
+      "file": "src/components/Stack/Stack.tsx",
+      "definitions": [
+        {
+          "name": "stackVariants",
+          "variants": {
+            "direction": [
+              "vertical",
+              "horizontal"
+            ],
+            "gap": [
+              "none",
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              "2xl",
+              "3xl"
+            ],
+            "justify": [
+              "start",
+              "center",
+              "end",
+              "between",
+              "around",
+              "evenly"
+            ],
+            "align": [
+              "start",
+              "center",
+              "end",
+              "stretch",
+              "baseline"
+            ],
+            "wrap": [
+              "true",
+              "false"
+            ],
+            "fullWidth": [
+              "true",
+              "false"
+            ],
+            "divider": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "direction": "vertical",
+            "gap": "md",
+            "justify": "start",
+            "align": "stretch",
+            "wrap": "false",
+            "fullWidth": "false",
+            "divider": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Switch",
+      "file": "src/components/Switch/Switch.tsx",
+      "definitions": [
+        {
+          "name": "motadataSwitchRootVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "size": "md"
+          }
+        },
+        {
+          "name": "motadataSwitchThumbVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "TagPill",
+      "file": "src/components/TagPill/TagPill.tsx",
+      "definitions": [
+        {
+          "name": "tagPillVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "yellow",
+              "blue",
+              "green",
+              "red",
+              "purple",
+              "orange",
+              "pink",
+              "teal",
+              "cyan"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Textarea",
+      "file": "src/components/Textarea/Textarea.tsx",
+      "definitions": [
+        {
+          "name": "textareaVariants",
+          "variants": {
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "variant": [
+              "default",
+              "filled"
+            ],
+            "hasError": [
+              "true",
+              "false"
+            ],
+            "resize": [
+              "none",
+              "vertical",
+              "both"
+            ]
+          },
+          "defaults": {
+            "size": "md",
+            "variant": "default",
+            "hasError": "false",
+            "resize": "vertical"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Toast",
+      "file": "src/components/Toast/ToastBody.tsx",
+      "definitions": [
+        {
+          "name": "toastVariants",
+          "variants": {
+            "tone": [
+              "info",
+              "warning",
+              "danger",
+              "success",
+              "ai",
+              "neutral"
+            ],
+            "size": [
+              "sm",
+              "md"
+            ]
+          },
+          "defaults": {
+            "tone": "neutral",
+            "size": "sm"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Toggle",
+      "file": "src/components/Toggle/Toggle.tsx",
+      "definitions": [
+        {
+          "name": "toggleVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "outline"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "ToggleGroup",
+      "file": "src/components/ToggleGroup/ToggleGroup.tsx",
+      "definitions": [
+        {
+          "name": "toggleGroupVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "outline"
+            ],
+            "orientation": [
+              "horizontal",
+              "vertical"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "fullWidth": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "orientation": "horizontal",
+            "size": "md",
+            "fullWidth": "false"
+          }
+        },
+        {
+          "name": "toggleGroupItemVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "outline"
+            ],
+            "size": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "fullWidth": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "md",
+            "fullWidth": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Toolbar",
+      "file": "src/components/Toolbar/Toolbar.tsx",
+      "definitions": [
+        {
+          "name": "toolbarVariants",
+          "variants": {
+            "variant": [
+              "default",
+              "compact",
+              "spacious"
+            ],
+            "border": [
+              "true",
+              "false"
+            ],
+            "noPaddingLeft": [
+              "true",
+              "false"
+            ],
+            "noPaddingRight": [
+              "true",
+              "false"
+            ],
+            "noPaddingTop": [
+              "true",
+              "false"
+            ],
+            "noPaddingBottom": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "border": "true",
+            "noPaddingLeft": "false",
+            "noPaddingRight": "false",
+            "noPaddingTop": "false",
+            "noPaddingBottom": "false"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+export const WavesIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M2 12q2.5 2 5 0t5 0 5 0 5 0" />
+    <path d="M2 19q2.5 2 5 0t5 0 5 0 5 0" />
+    <path d="M2 5q2.5 2 5 0t5 0 5 0 5 0" />
+  </svg>
+);

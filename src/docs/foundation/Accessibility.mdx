@@ -1,0 +1,321 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Accessibility" />
+
+# Accessibility
+
+Motadata React Library is built with accessibility as a core principle. All components are designed to be WCAG 2.1 AA compliant.
+
+---
+
+## Our Accessibility Commitment
+
+We are committed to making our components accessible to everyone, including:
+
+- People using screen readers
+- People using keyboard-only navigation
+- People with visual impairments
+- People with motor disabilities
+- People using assistive technologies
+
+---
+
+## WCAG 2.1 Compliance
+
+All components meet **WCAG 2.1 Level AA** standards, including:
+
+### Perceivable
+
+- Sufficient color contrast (4.5:1 for normal text, 3:1 for large text)
+- Text alternatives for non-text content
+- Adaptable layouts that work in different orientations
+- Distinguishable content with clear visual hierarchy
+
+### Operable
+
+- Full keyboard accessibility
+- Sufficient time for interactions
+- No content that could cause seizures
+- Clear navigation and focus indicators
+
+### Understandable
+
+- Readable and understandable text
+- Predictable component behavior
+- Input assistance and error prevention
+- Clear error messages
+
+### Robust
+
+- Compatible with current and future assistive technologies
+- Valid, semantic HTML
+- ARIA attributes when needed
+
+---
+
+## Keyboard Navigation
+
+All components support full keyboard navigation:
+
+| Key           | Action                             |
+| ------------- | ---------------------------------- |
+| Tab           | Move focus forward                 |
+| Shift + Tab   | Move focus backward                |
+| Enter / Space | Activate buttons, toggle switches  |
+| Escape        | Close dialogs, dismiss menus       |
+| Arrow Keys    | Navigate within lists, menus, tabs |
+| Home / End    | Jump to first/last item            |
+
+### Testing Keyboard Navigation
+
+```bash
+# Try navigating your app without a mouse
+# All interactive elements should be:
+# 1. Reachable via Tab key
+# 2. Have visible focus indicators
+# 3. Activate with Enter or Space
+```
+
+---
+
+## Screen Reader Support
+
+All components include proper ARIA attributes and semantic HTML:
+
+### ARIA Labels
+
+```tsx
+// Button with descriptive label
+<Button aria-label="Close dialog">
+  <X />
+</Button>
+
+// Input with associated label
+<Input
+  id="email"
+  aria-describedby="email-help"
+  aria-invalid={hasError}
+/>
+```
+
+### Live Regions
+
+```tsx
+// Announce dynamic content to screen readers
+<div role="status" aria-live="polite">
+  Item added to cart
+</div>
+
+<div role="alert" aria-live="assertive">
+  Error: Please fix the form errors
+</div>
+```
+
+---
+
+## Color Contrast
+
+All color combinations meet WCAG AA standards:
+
+### Text Contrast
+
+- **Normal text** (< 18pt): 4.5:1 minimum
+- **Large text** (≥ 18pt or 14pt bold): 3:1 minimum
+
+### UI Components
+
+- **Borders, icons, focus indicators**: 3:1 minimum
+
+### Testing Contrast
+
+Use browser DevTools or online tools:
+
+- Chrome DevTools Contrast Ratio checker
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- [Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/)
+
+---
+
+## Focus Management
+
+### Visible Focus Indicators
+
+All interactive elements have clear focus styles:
+
+```css
+/* Default focus ring */
+.mdt-focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: 2px;
+}
+```
+
+### Focus Trapping
+
+Dialogs and modals trap focus within them:
+
+```tsx
+// Focus is trapped within dialog
+<Dialog>
+  <DialogContent>
+    {/* Tab cycles through these elements only */}
+    <input />
+    <button>Save</button>
+    <button>Cancel</button>
+  </DialogContent>
+</Dialog>
+```
+
+---
+
+## Semantic HTML
+
+We use proper semantic HTML elements:
+
+```tsx
+// ✅ Good: Semantic button
+<button onClick={handleClick}>Click me</button>
+
+// ❌ Bad: Div styled as button
+<div onClick={handleClick}>Click me</div>
+
+// ✅ Good: Proper heading hierarchy
+<h1>Page Title</h1>
+<h2>Section Title</h2>
+<h3>Subsection</h3>
+
+// ✅ Good: Form labels
+<label htmlFor="name">Name</label>
+<input id="name" />
+```
+
+---
+
+## Component-Specific Accessibility
+
+### Buttons
+
+- Uses `<button>` element
+- Has accessible name (text or aria-label)
+- Disabled state communicated to screen readers
+- Keyboard accessible
+
+### Inputs
+
+- Associated with `<label>` using htmlFor/id
+- Error messages linked with aria-describedby
+- Invalid state indicated with aria-invalid
+- Required fields marked with aria-required
+
+### Dialogs
+
+- Focus trapped within dialog
+- Escape key closes dialog
+- Focus returns to trigger element on close
+- Proper role="dialog" and aria-modal
+
+### Dropdown Menus
+
+- Keyboard navigable with arrow keys
+- Proper role="menu" and role="menuitem"
+- Screen reader announcements
+- Focus management
+
+---
+
+## Testing for Accessibility
+
+### Automated Testing
+
+```bash
+# Install axe-core for automated testing
+npm install -D @axe-core/react
+
+# Run accessibility tests
+npm run test:a11y
+```
+
+### Manual Testing Checklist
+
+- [ ] Navigate entire app using only keyboard
+- [ ] Test with screen reader (NVDA, JAWS, VoiceOver)
+- [ ] Check color contrast with DevTools
+- [ ] Test at 200% zoom level
+- [ ] Test in high contrast mode
+- [ ] Verify all images have alt text
+- [ ] Check form validation errors are announced
+- [ ] Ensure focus indicators are visible
+
+### Screen Readers
+
+- **Windows:** NVDA (free), JAWS
+- **Mac:** VoiceOver (built-in)
+- **Linux:** Orca
+
+---
+
+## Accessibility Tools
+
+### Browser Extensions
+
+- **axe DevTools** - Automated accessibility testing
+- **WAVE** - Visual feedback on accessibility
+- **Lighthouse** - Accessibility audits in Chrome
+
+### Testing Tools
+
+- **Pa11y** - Automated accessibility testing
+- **jest-axe** - Accessibility testing in Jest
+- **Storybook a11y addon** - Built into this Storybook
+
+---
+
+## Common Accessibility Patterns
+
+### Skip Links
+
+Allow keyboard users to skip to main content:
+
+```tsx
+<a href="#main-content" className="skip-link">
+  Skip to main content
+</a>
+
+<main id="main-content">
+  {/* Page content */}
+</main>
+```
+
+### Error Messages
+
+Announce errors to screen readers:
+
+```tsx
+<Input
+  aria-invalid={hasError}
+  aria-describedby={hasError ? "error-message" : undefined}
+/>
+{hasError && (
+  <div id="error-message" role="alert">
+    This field is required
+  </div>
+)}
+```
+
+---
+
+## Resources
+
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Radix UI Accessibility](https://www.radix-ui.com/primitives/docs/overview/accessibility)
+- [WebAIM](https://webaim.org/)
+- [A11y Project](https://www.a11yproject.com/)
+- [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+
+---
+
+## Related
+
+- [Colors](?path=/docs/foundation-colors--docs) - Accessible color system
+- [Typography](?path=/docs/foundation-typography--docs) - Readable typography
+- [Components](?path=/docs/catalog--docs) - All accessible components

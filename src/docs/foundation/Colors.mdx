@@ -1,0 +1,1160 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Colors" />
+
+# Colors
+
+The Motadata color system provides a comprehensive palette designed for accessibility, consistency, and flexibility.
+
+---
+
+## Color Philosophy
+
+Our color system is built on these principles:
+
+- **Accessible:** All color combinations meet WCAG 2.1 AA standards
+- **Consistent:** Semantic naming for predictable usage
+- **Flexible:** CSS variables for easy theming
+- **Mode-aware:** Automatic dark mode support
+
+---
+
+## Complete Color Palette
+
+### Core Colors
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '32px' }}>
+  <div>
+    <div style={{ padding: '32px', background: 'rgba(255, 255, 255, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, color: '#111827', marginBottom: '8px' }}>White</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', fontFamily: 'monospace' }}>
+      <div><strong>HEX:</strong> #FFFFFF</div>
+      <div><strong>RGB:</strong> rgb(255, 255, 255)</div>
+      <div><strong>HSL:</strong> hsl(0, 0%, 100%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '32px', background: 'rgba(7, 16, 31, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, color: '#ffffff', marginBottom: '8px' }}>Black</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', fontFamily: 'monospace' }}>
+      <div><strong>HEX:</strong> #07101F</div>
+      <div><strong>RGB:</strong> rgb(7, 16, 31)</div>
+      <div><strong>HSL:</strong> hsl(218, 63%, 7%)</div>
+    </div>
+  </div>
+</div>
+
+### Neutral Scale
+
+Our neutral scale provides 16 carefully crafted shades from lightest to darkest, perfect for text, borders, and backgrounds.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(246, 249, 252, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#111827', marginBottom: '4px' }}>10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#F6F9FC</div>
+      <div>rgb(246, 249, 252)</div>
+      <div>hsl(210, 50%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(236, 241, 249, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#111827', marginBottom: '4px' }}>20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#ECF1F9</div>
+      <div>rgb(236, 241, 249)</div>
+      <div>hsl(217, 52%, 95%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(227, 232, 242, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#111827', marginBottom: '4px' }}>30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#E3E8F2</div>
+      <div>rgb(227, 232, 242)</div>
+      <div>hsl(220, 30%, 92%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(202, 211, 226, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#111827', marginBottom: '4px' }}>40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#CAD3E2</div>
+      <div>rgb(202, 211, 226)</div>
+      <div>hsl(218, 27%, 84%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(142, 159, 188, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#8E9FBC</div>
+      <div>rgb(142, 159, 188)</div>
+      <div>hsl(218, 26%, 65%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(113, 134, 168, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#7186A8</div>
+      <div>rgb(113, 134, 168)</div>
+      <div>hsl(217, 24%, 55%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(105, 127, 160, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#697FA0</div>
+      <div>rgb(105, 127, 160)</div>
+      <div>hsl(216, 24%, 52%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(90, 109, 140, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#5A6D8C</div>
+      <div>rgb(90, 109, 140)</div>
+      <div>hsl(217, 22%, 45%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(81, 99, 129, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#516381</div>
+      <div>rgb(81, 99, 129)</div>
+      <div>hsl(218, 23%, 41%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(72, 89, 117, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#485975</div>
+      <div>rgb(72, 89, 117)</div>
+      <div>hsl(218, 24%, 37%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(43, 57, 79, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>110</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#2B394F</div>
+      <div>rgb(43, 57, 79)</div>
+      <div>hsl(217, 30%, 24%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(36, 49, 71, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>120</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#243147</div>
+      <div>rgb(36, 49, 71)</div>
+      <div>hsl(218, 33%, 21%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(29, 42, 62, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>130</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#1D2A3E</div>
+      <div>rgb(29, 42, 62)</div>
+      <div>hsl(216, 36%, 18%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(23, 35, 54, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>140</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#172336</div>
+      <div>rgb(23, 35, 54)</div>
+      <div>hsl(217, 40%, 15%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(17, 28, 44, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>150</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#111C2C</div>
+      <div>rgb(17, 28, 44)</div>
+      <div>hsl(216, 44%, 12%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '20px', background: 'rgba(11, 22, 40, 1)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '8px' }}>
+      <div style={{ fontWeight: 600, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>160</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '10px', fontFamily: 'monospace' }}>
+      <div>#0B1628</div>
+      <div>rgb(11, 22, 40)</div>
+      <div>hsl(217, 57%, 10%)</div>
+    </div>
+  </div>
+</div>
+
+### Usage Guidelines
+
+**Light Shades (10-40):** Backgrounds, borders, subtle highlights
+**Mid Shades (50-80):** Secondary text, icons, disabled states
+**Dark Shades (90-160):** Primary text, headings, high-contrast elements
+
+**Example:**
+```css
+/* Light mode */
+.card {
+  background: rgba(246, 249, 252, 1); /* Neutral 10 */
+  border: 1px solid rgba(227, 232, 242, 1); /* Neutral 30 */
+  color: rgba(23, 35, 54, 1); /* Neutral 140 */
+}
+
+/* Dark mode */
+.dark .card {
+  background: rgba(23, 35, 54, 1); /* Neutral 140 */
+  border: 1px solid rgba(43, 57, 79, 1); /* Neutral 110 */
+  color: rgba(246, 249, 252, 1); /* Neutral 10 */
+}
+```
+
+---
+
+## Accent Colors
+
+Our accent color palette provides vibrant colors for status indicators, alerts, success states, and visual emphasis.
+
+### Red Scale
+
+Destructive actions, errors, critical alerts.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#fef5f5', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>red-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fef5f5</div>
+      <div>rgb(254, 245, 245)</div>
+      <div>hsl(0, 75%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#feecec', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>red-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#feecec</div>
+      <div>rgb(254, 236, 236)</div>
+      <div>hsl(0, 82%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fccfcf', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>red-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fccfcf</div>
+      <div>rgb(252, 207, 207)</div>
+      <div>hsl(0, 88%, 90%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#f6b1b1', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>red-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#f6b1b1</div>
+      <div>rgb(246, 177, 177)</div>
+      <div>hsl(0, 80%, 83%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#f58a8a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#f58a8a</div>
+      <div>rgb(245, 138, 138)</div>
+      <div>hsl(0, 84%, 75%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ec5b5b', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ec5b5b</div>
+      <div>rgb(236, 91, 91)</div>
+      <div>hsl(0, 79%, 64%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#db132a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#db132a</div>
+      <div>rgb(219, 19, 42)</div>
+      <div>hsl(353, 84%, 47%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#c72323', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-65</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#c72323</div>
+      <div>rgb(199, 35, 35)</div>
+      <div>hsl(0, 70%, 46%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ad1111', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ad1111</div>
+      <div>rgb(173, 17, 17)</div>
+      <div>hsl(0, 82%, 37%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#750c0c', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#750c0c</div>
+      <div>rgb(117, 12, 12)</div>
+      <div>hsl(0, 81%, 25%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#4a090b', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#4a090b</div>
+      <div>rgb(74, 11, 11)</div>
+      <div>hsl(0, 74%, 17%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#310c0c', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>red-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#310c0c</div>
+      <div>rgb(49, 12, 12)</div>
+      <div>hsl(0, 61%, 12%)</div>
+    </div>
+  </div>
+</div>
+
+### Orange Scale
+
+Warnings, pending states, important notices.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#fdf7f4', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>orange-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fdf7f4</div>
+      <div>rgb(253, 247, 244)</div>
+      <div>hsl(20, 60%, 97%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fef5ee', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>orange-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fef5ee</div>
+      <div>rgb(254, 245, 238)</div>
+      <div>hsl(26, 84%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fddcc4', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>orange-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fddcc4</div>
+      <div>rgb(253, 220, 196)</div>
+      <div>hsl(25, 93%, 88%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fac2a0', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>orange-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fac2a0</div>
+      <div>rgb(250, 194, 160)</div>
+      <div>hsl(23, 90%, 80%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ffb37a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>orange-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ffb37a</div>
+      <div>rgb(255, 179, 122)</div>
+      <div>hsl(26, 100%, 74%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fa9950', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fa9950</div>
+      <div>rgb(250, 153, 80)</div>
+      <div>hsl(26, 95%, 65%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#d47c42', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#d47c42</div>
+      <div>rgb(212, 124, 66)</div>
+      <div>hsl(24, 62%, 55%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#e56b19', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-65</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#e56b19</div>
+      <div>rgb(229, 107, 25)</div>
+      <div>hsl(24, 80%, 50%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#c35323', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#c35323</div>
+      <div>rgb(195, 83, 35)</div>
+      <div>hsl(18, 70%, 45%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#8d3118', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#8d3118</div>
+      <div>rgb(141, 49, 24)</div>
+      <div>hsl(13, 71%, 32%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#541914', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#541914</div>
+      <div>rgb(84, 25, 20)</div>
+      <div>hsl(5, 62%, 20%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#40130f', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>orange-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#40130f</div>
+      <div>rgb(64, 19, 15)</div>
+      <div>hsl(5, 62%, 15%)</div>
+    </div>
+  </div>
+</div>
+
+### Yellow Scale
+
+Caution, highlights, information states.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#fffdf4', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fffdf4</div>
+      <div>rgb(255, 253, 244)</div>
+      <div>hsl(49, 100%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fffbea', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fffbea</div>
+      <div>rgb(255, 251, 234)</div>
+      <div>hsl(49, 100%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fff1b3', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fff1b3</div>
+      <div>rgb(255, 241, 179)</div>
+      <div>hsl(49, 100%, 85%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ffe980', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ffe980</div>
+      <div>rgb(255, 233, 128)</div>
+      <div>hsl(50, 100%, 75%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ffdd35', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ffdd35</div>
+      <div>rgb(255, 221, 53)</div>
+      <div>hsl(50, 100%, 60%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#fad100', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#fad100</div>
+      <div>rgb(250, 209, 0)</div>
+      <div>hsl(50, 100%, 49%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#e8b407', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>yellow-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#e8b407</div>
+      <div>rgb(232, 180, 7)</div>
+      <div>hsl(46, 94%, 47%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#c28e00', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>yellow-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#c28e00</div>
+      <div>rgb(194, 142, 0)</div>
+      <div>hsl(44, 100%, 38%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#855c15', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>yellow-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#855c15</div>
+      <div>rgb(133, 92, 21)</div>
+      <div>hsl(38, 73%, 30%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#543308', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>yellow-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#543308</div>
+      <div>rgb(84, 51, 8)</div>
+      <div>hsl(34, 83%, 18%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#3d2106', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>yellow-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#3d2106</div>
+      <div>rgb(61, 33, 6)</div>
+      <div>hsl(29, 82%, 13%)</div>
+    </div>
+  </div>
+</div>
+
+### Green Scale
+
+Success states, confirmations, positive feedback.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#f5fdf8', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>green-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#f5fdf8</div>
+      <div>rgb(245, 253, 248)</div>
+      <div>hsl(143, 60%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#edfdf3', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>green-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#edfdf3</div>
+      <div>rgb(237, 253, 243)</div>
+      <div>hsl(143, 76%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#d1fae0', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>green-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#d1fae0</div>
+      <div>rgb(209, 250, 224)</div>
+      <div>hsl(143, 83%, 90%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#a2f6c3', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>green-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#a2f6c3</div>
+      <div>rgb(162, 246, 195)</div>
+      <div>hsl(144, 83%, 80%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#7beaa5', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>green-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#7beaa5</div>
+      <div>rgb(123, 234, 165)</div>
+      <div>hsl(143, 73%, 70%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#36d576', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#36d576</div>
+      <div>rgb(54, 213, 118)</div>
+      <div>hsl(144, 66%, 52%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#14b053', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#14b053</div>
+      <div>rgb(20, 176, 83)</div>
+      <div>hsl(144, 80%, 38%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#0e7c3a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#0e7c3a</div>
+      <div>rgb(14, 124, 58)</div>
+      <div>hsl(144, 80%, 27%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#0b602d', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#0b602d</div>
+      <div>rgb(11, 96, 45)</div>
+      <div>hsl(144, 80%, 21%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#0d3a1f', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#0d3a1f</div>
+      <div>rgb(13, 58, 31)</div>
+      <div>hsl(144, 63%, 14%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#052912', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>green-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#052912</div>
+      <div>rgb(5, 41, 18)</div>
+      <div>hsl(144, 78%, 9%)</div>
+    </div>
+  </div>
+</div>
+
+### Blue Scale
+
+Information, links, primary actions.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#f4f9ff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>blue-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#f4f9ff</div>
+      <div>rgb(244, 249, 255)</div>
+      <div>hsl(207, 100%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#ebf4ff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>blue-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#ebf4ff</div>
+      <div>rgb(235, 244, 255)</div>
+      <div>hsl(207, 100%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#cce4ff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>blue-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#cce4ff</div>
+      <div>rgb(204, 228, 255)</div>
+      <div>hsl(208, 100%, 90%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#99cdff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>blue-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#99cdff</div>
+      <div>rgb(153, 205, 255)</div>
+      <div>hsl(209, 100%, 80%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#66b3ff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>blue-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#66b3ff</div>
+      <div>rgb(102, 179, 255)</div>
+      <div>hsl(210, 100%, 70%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#008cff', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#008cff</div>
+      <div>rgb(0, 140, 255)</div>
+      <div>hsl(207, 100%, 50%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#006dfa', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-55</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#006dfa</div>
+      <div>rgb(0, 109, 250)</div>
+      <div>hsl(214, 100%, 49%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#0263e0', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#0263e0</div>
+      <div>rgb(2, 99, 224)</div>
+      <div>hsl(214, 98%, 44%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#043cb5', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#043cb5</div>
+      <div>rgb(4, 60, 181)</div>
+      <div>hsl(221, 96%, 36%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#001489', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#001489</div>
+      <div>rgb(0, 20, 137)</div>
+      <div>hsl(231, 100%, 27%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#030b5d', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#030b5d</div>
+      <div>rgb(3, 11, 93)</div>
+      <div>hsl(235, 94%, 19%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#06033a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>blue-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#06033a</div>
+      <div>rgb(6, 3, 58)</div>
+      <div>hsl(243, 90%, 12%)</div>
+    </div>
+  </div>
+</div>
+
+### Purple Scale
+
+Creative, premium, special features.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+  <div>
+    <div style={{ padding: '16px', background: '#faf7fd', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>purple-05</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#faf7fd</div>
+      <div>rgb(250, 247, 253)</div>
+      <div>hsl(270, 43%, 98%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#f5f0fc', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>purple-10</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#f5f0fc</div>
+      <div>rgb(245, 240, 252)</div>
+      <div>hsl(265, 60%, 96%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#e7dcfa', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>purple-20</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#e7dcfa</div>
+      <div>rgb(231, 220, 250)</div>
+      <div>hsl(262, 75%, 92%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#c8aff0', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#111827', marginBottom: '4px' }}>purple-30</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#c8aff0</div>
+      <div>rgb(200, 175, 240)</div>
+      <div>hsl(263, 69%, 81%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#a67fe3', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-40</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#a67fe3</div>
+      <div>rgb(166, 127, 227)</div>
+      <div>hsl(263, 62%, 69%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#8c5bd8', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-50</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#8c5bd8</div>
+      <div>rgb(140, 91, 216)</div>
+      <div>hsl(264, 62%, 60%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#6d2ed1', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-60</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#6d2ed1</div>
+      <div>rgb(109, 46, 209)</div>
+      <div>hsl(263, 64%, 50%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#5817bd', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-70</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#5817bd</div>
+      <div>rgb(88, 23, 189)</div>
+      <div>hsl(263, 78%, 42%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#380e78', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-80</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#380e78</div>
+      <div>rgb(56, 14, 120)</div>
+      <div>hsl(264, 79%, 26%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#22094a', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-90</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#22094a</div>
+      <div>rgb(34, 9, 74)</div>
+      <div>hsl(263, 78%, 16%)</div>
+    </div>
+  </div>
+  <div>
+    <div style={{ padding: '16px', background: '#160433', border: '1px solid #e5e7eb', borderRadius: '6px', marginBottom: '6px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: '#ffffff', marginBottom: '4px' }}>purple-100</div>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '9px', fontFamily: 'monospace' }}>
+      <div>#160433</div>
+      <div>rgb(22, 4, 51)</div>
+      <div>hsl(263, 85%, 11%)</div>
+    </div>
+  </div>
+</div>
+
+---
+
+## Color Tokens
+
+### Primary Colors
+
+Used for primary actions, links, and focus states.
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-primary` | hsl(221.2, 83.2%, 53.3%) | hsl(217.2, 91.2%, 59.8%) | Primary actions, links |
+| `--mdt-primary-foreground` | hsl(210, 40%, 98%) | hsl(222.2, 47.4%, 11.2%) | Text on primary background |
+
+**Usage:**
+```css
+.button-primary {
+  background: hsl(var(--mdt-primary));
+  color: hsl(var(--mdt-primary-foreground));
+}
+```
+
+### Secondary Colors
+
+Used for secondary actions and less prominent elements.
+
+| Token | Light Mode | Dark Mode |
+| --- | --- | --- |
+| `--mdt-secondary` | hsl(210, 40%, 96.1%) | hsl(217.2, 32.6%, 17.5%) |
+| `--mdt-secondary-foreground` | hsl(222.2, 47.4%, 11.2%) | hsl(210, 40%, 98%) |
+
+### Semantic Colors
+
+#### Destructive (Error/Danger)
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-destructive` | hsl(0, 84.2%, 60.2%) | hsl(0, 62.8%, 30.6%) | Errors, delete actions |
+| `--mdt-destructive-foreground` | hsl(210, 40%, 98%) | hsl(210, 40%, 98%) | Text on destructive background |
+
+#### Muted
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-muted` | hsl(210, 40%, 96.1%) | hsl(217.2, 32.6%, 17.5%) | Disabled states, backgrounds |
+| `--mdt-muted-foreground` | hsl(215.4, 16.3%, 46.9%) | hsl(215, 20.2%, 65.1%) | Muted text |
+
+#### Accent
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-accent` | hsl(210, 40%, 96.1%) | hsl(217.2, 32.6%, 17.5%) | Hover states, highlights |
+| `--mdt-accent-foreground` | hsl(222.2, 47.4%, 11.2%) | hsl(210, 40%, 98%) | Text on accent background |
+
+### Surface Colors
+
+Background and card colors for different elevation levels.
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-background` | hsl(0, 0%, 100%) | hsl(222.2, 84%, 4.9%) | Page background |
+| `--mdt-foreground` | hsl(222.2, 84%, 4.9%) | hsl(210, 40%, 98%) | Main text color |
+| `--mdt-card` | hsl(0, 0%, 100%) | hsl(222.2, 84%, 4.9%) | Card background |
+| `--mdt-card-foreground` | hsl(222.2, 84%, 4.9%) | hsl(210, 40%, 98%) | Card text color |
+| `--mdt-popover` | hsl(0, 0%, 100%) | hsl(222.2, 84%, 4.9%) | Popover background |
+| `--mdt-popover-foreground` | hsl(222.2, 84%, 4.9%) | hsl(210, 40%, 98%) | Popover text color |
+
+### Border & Input Colors
+
+| Token | Light Mode | Dark Mode | Usage |
+| --- | --- | --- | --- |
+| `--mdt-border` | hsl(214.3, 31.8%, 91.4%) | hsl(217.2, 32.6%, 17.5%) | Border color |
+| `--mdt-input` | hsl(214.3, 31.8%, 91.4%) | hsl(217.2, 32.6%, 17.5%) | Input border color |
+| `--mdt-ring` | hsl(221.2, 83.2%, 53.3%) | hsl(224.3, 76.3%, 48%) | Focus ring color |
+
+---
+
+## Dark Mode
+
+All colors automatically adapt to dark mode when the `.dark` class is applied to the root element.
+
+### How to Enable Dark Mode
+
+```tsx
+// Toggle dark mode
+document.documentElement.classList.toggle('dark');
+```
+
+---
+
+## Customization
+
+### Override Colors
+
+Create a custom theme by overriding CSS variables:
+
+```css
+:root {
+  /* Custom primary color */
+  --mdt-primary: 142 71% 45%;  /* Green */
+  --mdt-primary-foreground: 0 0% 100%;
+
+  /* Custom destructive color */
+  --mdt-destructive: 24 92% 55%;  /* Orange */
+  --mdt-destructive-foreground: 0 0% 100%;
+}
+
+.dark {
+  --mdt-primary: 142 71% 55%;
+  --mdt-destructive: 24 82% 60%;
+}
+```
+
+### Color Format
+
+Use HSL format for all custom colors:
+
+```
+hsl(hue, saturation%, lightness%)
+```
+
+**Tips:**
+- Keep saturation between 60-90% for vibrant colors
+- Lightness 40-60% for dark mode backgrounds
+- Lightness 90-98% for light mode backgrounds
+
+---
+
+## Accessibility
+
+### Contrast Ratios
+
+All default color combinations meet WCAG 2.1 AA standards:
+
+- **Normal text:** 4.5:1 minimum contrast ratio
+- **Large text:** 3:1 minimum contrast ratio
+- **UI components:** 3:1 minimum contrast ratio
+
+**Important:** Always test custom colors for accessibility before using them in production.
+
+---
+
+## Usage Examples
+
+### In Components
+
+```tsx
+import { Button } from 'motadata-react-library';
+
+// Uses primary color automatically
+<Button variant="primary">Primary</Button>
+
+// Uses destructive color
+<Button variant="destructive">Delete</Button>
+```
+
+### In Custom CSS
+
+```css
+.my-custom-element {
+  background: hsl(var(--mdt-primary));
+  color: hsl(var(--mdt-primary-foreground));
+  border-color: hsl(var(--mdt-border));
+}
+
+.my-custom-element:hover {
+  background: hsl(var(--mdt-accent));
+}
+```
+
+### With Tailwind
+
+```tsx
+<div className="mdt-bg-primary mdt-text-primary-foreground mdt-p-4">
+  Primary styled box
+</div>
+```
+
+---
+
+## Related
+
+- [Typography](?path=/docs/foundation-typography--docs) - Font styles and scales
+- [Spacing](?path=/docs/foundation-spacing--docs) - Spacing system
+- [Accessibility](?path=/docs/foundation-accessibility--docs) - Accessibility guidelines

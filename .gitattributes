@@ -1,0 +1,38 @@
+# Line endings
+#
+# Two people on two operating systems will otherwise produce phantom diffs: git
+# stores whatever line endings your machine wrote, so a file saved on Windows
+# and then touched on a Mac shows up as *every line changed* even when one word
+# moved. Reviewing that is impossible, and it has already happened here - the
+# repository arrived from Windows with mixed CRLF and LF in the same file.
+#
+# `text=auto eol=lf` normalises everything to LF inside git, whatever either of
+# us is running locally. Set once, never think about it again.
+* text=auto eol=lf
+
+# Files that must keep CRLF to work on Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary - never touch, never diff
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+
+# Generated - collapse in pull requests so review stays readable.
+# These are real files under review, just not ones anyone reads line by line.
+package-lock.json    linguist-generated=true
+component-catalog.json linguist-generated=true
+src/components/Icon/icons/** linguist-generated=true
+
+# SVG is text, but treat it as data rather than code in language stats
+*.svg -linguist-detectable

@@ -1,0 +1,25 @@
+{
+  "recommendations": [
+    // Required - Core Development
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+
+    // Required - Testing
+    "vitest.explorer",
+
+    // Recommended - Enhanced DX
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors",
+    "streetsidesoftware.code-spell-checker",
+
+    // Recommended - React/TypeScript
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+
+    // Optional - Code Quality
+    "sonarsource.sonarlint-vscode"
+  ],
+  "unwantedRecommendations": []
+}

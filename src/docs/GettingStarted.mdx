@@ -1,0 +1,250 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting Started" />
+
+# Getting Started
+
+Get up and running with Motadata React Library in just a few minutes.
+
+---
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- **Node.js** 22.0 or later
+- **React** 18.0 or later
+- **npm** package manager
+
+---
+
+## Installation
+
+### Step 1: Install the Package
+
+```bash
+npm install motadata-react-library
+```
+
+### Step 2: Import Global Styles
+
+Import the library CSS file in your application entry point (e.g., `main.tsx` or `App.tsx`):
+
+```tsx
+import 'motadata-react-library/styles.css';
+```
+
+> **Note:** The library uses **system fonts by default** (San Francisco on Mac, Segoe UI on Windows, etc.)
+> for optimal performance. No font loading required! If you want to use a custom font,
+> see [Typography](?path=/docs/foundation-typography--docs) for customization options.
+
+### Step 3: Use Components
+
+You are ready to start using components!
+
+```tsx
+import { Button, Input, Card } from 'motadata-react-library';
+
+function App() {
+  return (
+    <Card>
+      <h2>Welcome to Motadata</h2>
+      <Input placeholder="Enter your name" />
+      <Button variant="primary">Submit</Button>
+    </Card>
+  );
+}
+```
+
+---
+
+## Tailwind CSS Setup (Optional but Recommended)
+
+If you are using Tailwind CSS in your project, configure it to work seamlessly with Motadata React Library.
+
+### 1. Configure Tailwind
+
+Update your `tailwind.config.js`:
+
+```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/motadata-react-library/**/*.{js,ts,jsx,tsx}', // Add this line
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+```
+
+### 2. Extend the Theme (Optional)
+
+Customize the library design tokens:
+
+```js
+theme: {
+  extend: {
+    colors: {
+      primary: {
+        DEFAULT: '#3B82F6',
+        foreground: '#FFFFFF',
+      },
+    },
+  },
+}
+```
+
+---
+
+## Theming with CSS Variables
+
+Motadata React Library uses CSS variables for theming. All variables use the `--mdt-` prefix.
+
+### Override Colors
+
+```css
+:root {
+  /* Primary colors */
+  --mdt-primary: 221.2 83.2% 53.3%;
+  --mdt-primary-foreground: 210 40% 98%;
+
+  /* Background colors */
+  --mdt-background: 0 0% 100%;
+  --mdt-foreground: 222.2 84% 4.9%;
+}
+```
+
+### Dark Mode
+
+Enable dark mode by adding CSS variables for a `.dark` class:
+
+```css
+.dark {
+  --mdt-background: 222.2 84% 4.9%;
+  --mdt-foreground: 210 40% 98%;
+  --mdt-primary: 217.2 91.2% 59.8%;
+}
+```
+
+---
+
+## Component Naming Convention
+
+All components use simple, intuitive names:
+
+| Component Export Name | Usage              |
+| --------------------- | ------------------ |
+| `Button`              | `<Button />`       |
+| `Input`               | `<Input />`        |
+| `Card`                | `<Card />`         |
+| `Dialog`              | `<Dialog />`       |
+| `DropdownMenu`        | `<DropdownMenu />` |
+
+---
+
+## TypeScript Support
+
+Motadata React Library is written in TypeScript and provides full type definitions.
+
+### Importing Types
+
+```tsx
+import type { ButtonProps } from 'motadata-react-library';
+
+const CustomButton: React.FC<ButtonProps> = (props) => {
+  return <Button {...props} />;
+};
+```
+
+### Type Safety
+
+All component props are fully typed:
+
+```tsx
+import { Button } from 'motadata-react-library';
+
+// TypeScript will autocomplete and validate props
+<Button
+  variant="primary"  // Type-checked: "primary" | "secondary" | "outline" | "ghost"
+  size="md"          // Type-checked: "sm" | "md" | "lg"
+  disabled={false}
+/>
+```
+
+---
+
+## Troubleshooting
+
+### Styles Not Appearing
+
+**Problem:** Components render but have no styles.
+
+**Solution:** Ensure you have imported the CSS file:
+
+```tsx
+import 'motadata-react-library/styles.css';
+```
+
+### Tailwind Classes Not Working
+
+**Problem:** Tailwind utility classes from the library do not work.
+
+**Solution:** Add the library to your Tailwind content configuration:
+
+```js
+content: [
+  './node_modules/motadata-react-library/**/*.{js,ts,jsx,tsx}',
+],
+```
+
+### TypeScript Errors
+
+**Problem:** TypeScript cannot find module types.
+
+**Solution:** Ensure `"moduleResolution": "node"` is set in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "node"
+  }
+}
+```
+
+### Using Custom Fonts
+
+**Note:** The library uses **system fonts by default** for optimal performance (zero load time, smaller bundle).
+
+If you want to use a custom font like Inter, override the CSS variable:
+
+```css
+:root {
+  --mdt-font-sans: 'Inter', system-ui, sans-serif;
+}
+```
+
+Then load the font via Google Fonts, @fontsource, or Next.js font optimization.
+
+See [Typography](?path=/docs/foundation-typography--docs) for more details on font customization.
+
+---
+
+## Next Steps
+
+Now that you are set up, explore the library:
+
+- [Learn Design Foundations](?path=/docs/foundation-colors--docs) - Colors, typography, spacing, and more
+- [See Component Examples](?path=/docs/components-button--docs) - Interactive component demos
+- [View on GitHub](https://github.com/motadata/motadata-react-library) - Source code and examples
+
+---
+
+## Need Help?
+
+- **GitHub Issues:** [Report bugs or request features](https://github.com/motadata/motadata-react-library/issues)
+- **GitHub Discussions:** [Ask questions and share ideas](https://github.com/motadata/motadata-react-library/discussions)
+- **Documentation:** Browse this Storybook for comprehensive guides

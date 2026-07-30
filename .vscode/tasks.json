@@ -1,0 +1,79 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Storybook",
+      "type": "npm",
+      "script": "storybook",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Run Tests",
+      "type": "npm",
+      "script": "test",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run Tests (Watch)",
+      "type": "npm",
+      "script": "test:watch",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Run Tests (Coverage)",
+      "type": "npm",
+      "script": "test:coverage",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Library",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build Storybook",
+      "type": "npm",
+      "script": "build-storybook",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Lint & Fix",
+      "type": "npm",
+      "script": "lint:fix",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Type Check",
+      "type": "npm",
+      "script": "typecheck",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Format Code",
+      "type": "npm",
+      "script": "format",
+      "problemMatcher": []
+    }
+  ]
+}

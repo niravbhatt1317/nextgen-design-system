@@ -1,0 +1,107 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Motadata React Library
+
+Welcome to the Motadata React Library documentation. This library provides a set of production-ready, accessible UI components for building SaaS platforms and custom applications.
+
+## Features
+
+- **Accessible** - Built on Radix UI primitives with full keyboard navigation and screen reader support
+- **Customizable** - Tailwind CSS-based styling with CSS variables for theming
+- **Type-Safe** - Written in TypeScript with strict mode enabled
+- **Tree-Shakeable** - Only import what you need
+- **Well-Documented** - Comprehensive documentation with examples
+
+## Installation
+
+```bash
+npm install motadata-react-library
+```
+
+## Quick Start
+
+### 1. Import Styles
+
+```tsx
+import 'motadata-react-library/styles.css';
+```
+
+### 2. Load Inter Font
+
+The library uses **Inter** as the default font. Add it to your HTML head:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+```
+
+Or install via npm for self-hosting:
+
+```bash
+npm install @fontsource/inter
+```
+
+```tsx
+// In your app entry point
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+```
+
+### 3. Use Components
+
+```tsx
+import { Button } from 'motadata-react-library';
+
+function App() {
+  return <Button variant="primary">Click me</Button>;
+}
+```
+
+## Design Principles
+
+### Accessibility First
+
+All components are built with accessibility in mind, using Radix UI primitives that handle keyboard navigation, focus management, and ARIA attributes automatically.
+
+### Consistent Styling
+
+Components use a consistent design language with CSS variables for easy theming. The `mdt-` prefix ensures no conflicts with your existing styles.
+
+### TypeScript Native
+
+Full TypeScript support with exported types for all component props, ensuring type safety across your application.
+
+## Naming Convention
+
+All components in this library use simple, intuitive names:
+
+- `Button` - Button component
+- `Input` - Input component
+- `Dialog` - Dialog component
+- `DropdownMenu` - Dropdown menu component
+
+## Customization
+
+### CSS Variables
+
+Override the default theme by setting CSS variables:
+
+```css
+:root {
+  --mdt-primary: 221.2 83.2% 53.3%;
+  --mdt-primary-foreground: 210 40% 98%;
+  /* ... */
+}
+```
+
+### Tailwind Integration
+
+If you're using Tailwind CSS in your project, you can extend the library's theme in your `tailwind.config.js`.

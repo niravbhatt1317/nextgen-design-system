@@ -1,0 +1,217 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Typography" />
+
+# Typography
+
+The Motadata typography system provides a consistent, scalable type system for all components.
+
+---
+
+## Font Families
+
+The library uses **system fonts by default** for optimal performance and native user experience.
+
+### Why System Fonts?
+
+| Benefit | Description |
+| --- | --- |
+| **Zero Load Time** | No font files to download |
+| **Smaller Bundle** | No font assets shipped with the library |
+| **Native OS Feel** | Users see familiar fonts from their platform |
+| **No FOUT/FOIT** | No flash of unstyled or invisible text |
+| **Better Accessibility** | Respects user font size preferences |
+
+### Sans-Serif (Default)
+
+```css
+--mdt-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  'Segoe UI', 'Noto Sans', 'Liberation Sans', Arial, sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+```
+
+Used for body text, headings, and UI components.
+
+### Monospace
+
+```css
+--mdt-font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+```
+
+Used for code blocks, technical content, and data display.
+
+### Platform-Specific Fonts
+
+| Font | Platform |
+| --- | --- |
+| San Francisco | macOS, iOS |
+| Segoe UI | Windows 7+ |
+| Noto Sans | Android, Linux |
+| Liberation Sans | Linux (fallback) |
+| Arial | Universal fallback |
+
+---
+
+## Type Scale
+
+### Headings
+
+| Level | Size | Line Height | Usage |
+| --- | --- | --- | --- |
+| H1 | 2.25rem (36px) | 2.5rem (40px) | Page titles |
+| H2 | 1.875rem (30px) | 2.25rem (36px) | Section headings |
+| H3 | 1.5rem (24px) | 2rem (32px) | Subsection headings |
+| H4 | 1.25rem (20px) | 1.75rem (28px) | Card titles |
+| H5 | 1.125rem (18px) | 1.75rem (28px) | Component titles |
+| H6 | 1rem (16px) | 1.5rem (24px) | Small headings |
+
+### Body Text
+
+| Size | Line Height | Usage |
+| --- | --- | --- |
+| Base (1rem / 16px) | 1.5rem (24px) | Standard body text |
+| Small (0.875rem / 14px) | 1.25rem (20px) | Helper text, captions |
+| Extra Small (0.75rem / 12px) | 1rem (16px) | Labels, metadata |
+
+---
+
+## Font Weights
+
+| Weight | Value | Usage |
+| --- | --- | --- |
+| Normal | 400 | Body text |
+| Medium | 500 | Emphasized text |
+| Semibold | 600 | Headings, buttons |
+| Bold | 700 | Strong emphasis |
+
+---
+
+## Usage Examples
+
+### In HTML/JSX
+
+```tsx
+<h1>Page Title</h1>
+<h2>Section Heading</h2>
+<p>This is body text with normal weight.</p>
+<p className="mdt-text-sm">This is small text.</p>
+<code className="mdt-font-mono">const code = true;</code>
+```
+
+### With Tailwind CSS
+
+```tsx
+<div>
+  <h1 className="mdt-text-4xl mdt-font-bold">Heading 1</h1>
+  <h2 className="mdt-text-3xl mdt-font-semibold">Heading 2</h2>
+  <p className="mdt-text-base">Body text</p>
+  <p className="mdt-text-sm mdt-text-muted-foreground">Helper text</p>
+</div>
+```
+
+### Custom Styles
+
+```css
+.custom-heading {
+  font-family: var(--mdt-font-sans);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+}
+
+.code-snippet {
+  font-family: var(--mdt-font-mono);
+  font-size: 0.875rem;
+}
+```
+
+---
+
+## Responsive Typography
+
+Font sizes automatically scale on different screen sizes using Tailwind's responsive prefixes:
+
+```tsx
+<h1 className="mdt-text-2xl md:mdt-text-3xl lg:mdt-text-4xl">
+  Responsive Heading
+</h1>
+```
+
+---
+
+## Best Practices
+
+### Do
+- Use semantic HTML tags (h1, h2, p) for proper structure
+- Maintain consistent hierarchy (don't skip heading levels)
+- Use medium/semibold for emphasis instead of bold
+- Keep line length between 50-75 characters for readability
+
+### Don't
+- Use all caps for long passages of text
+- Stack multiple font weights in the same block
+- Use italic for large amounts of text
+- Override line heights without testing readability
+
+---
+
+## Accessibility
+
+- **Contrast:** All text meets WCAG 2.1 AA standards (4.5:1 for normal text, 3:1 for large text)
+- **Sizing:** Minimum font size is 12px (0.75rem)
+- **Responsive:** Text scales appropriately on all devices
+- **Semantic:** Use proper HTML tags for screen readers
+
+---
+
+## Customizing Fonts
+
+Consumers can override the default system fonts using CSS variables.
+
+### Option 1: CSS Variables (Recommended)
+
+```css
+/* In your application's global CSS */
+:root {
+  --mdt-font-sans: 'Inter', 'Poppins', system-ui, sans-serif;
+  --mdt-font-mono: 'Fira Code', 'JetBrains Mono', monospace;
+}
+```
+
+### Option 2: Tailwind Config Override
+
+```typescript
+// tailwind.config.ts
+import defaultTheme from 'tailwindcss/defaultTheme';
+
+export default {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        mono: ['Fira Code', ...defaultTheme.fontFamily.mono],
+      },
+    },
+  },
+};
+```
+
+### Option 3: CSS Class Override
+
+```css
+/* Target library components specifically */
+.my-app [class*='mdt-'] {
+  font-family: 'Your Custom Font', system-ui, sans-serif;
+}
+```
+
+> **Note:** When using custom fonts, you must load the font files in your application
+> (via `@font-face`, Google Fonts, Adobe Fonts, or self-hosting).
+
+---
+
+## Related
+
+- [Colors](?path=/docs/foundation-colors--docs) - Color system
+- [Spacing](?path=/docs/foundation-spacing--docs) - Spacing tokens
+- [Accessibility](?path=/docs/foundation-accessibility--docs) - Accessibility guidelines

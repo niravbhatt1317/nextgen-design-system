@@ -1,0 +1,148 @@
+/**
+ * Dark mode for Storybook's Docs pages.
+ *
+ * Storybook renders Docs pages (autodocs) with its own styling, which hardcodes
+ * a white page background. The Theme toolbar puts `.dark` on the root and flips
+ * every design token, but Storybook's white panel sits on top of it — leaving
+ * near-white text on a white background, which is unreadable.
+ *
+ * These overrides make the Docs page follow the design system instead, using
+ * the same tokens as the components on it. Scoped entirely to `.dark`, so light
+ * mode is untouched.
+ *
+ * Storybook-only. Nothing here ships in the library.
+ */
+
+.dark .sbdocs-wrapper {
+  background-color: hsl(var(--mdt-background));
+}
+
+.dark .sbdocs-content {
+  background-color: transparent;
+}
+
+/* --- Text ---------------------------------------------------------------- */
+
+.dark .sbdocs,
+.dark .sbdocs-p,
+.dark .sbdocs-li,
+.dark .sbdocs-td,
+.dark .sbdocs-th {
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark .sbdocs-title,
+.dark .sbdocs-h1,
+.dark .sbdocs-h2,
+.dark .sbdocs-h3,
+.dark .sbdocs-h4,
+.dark .sbdocs-h5,
+.dark .sbdocs-h6 {
+  color: hsl(var(--mdt-foreground));
+  border-bottom-color: hsl(var(--mdt-border));
+}
+
+.dark .sbdocs-subtitle {
+  color: hsl(var(--mdt-muted-foreground));
+}
+
+.dark .sbdocs-a {
+  color: hsl(var(--mdt-info));
+}
+
+/* --- The live component preview box -------------------------------------- */
+
+.dark .docs-story,
+.dark .sbdocs-preview,
+.dark .sb-story {
+  background-color: hsl(var(--mdt-background));
+}
+
+.dark .sbdocs-preview,
+.dark .docblock-preview {
+  border-color: hsl(var(--mdt-border));
+  box-shadow: none;
+}
+
+/* Zoom / reset toolbar sitting above each preview.
+   Storybook injects these styles at runtime, after this stylesheet loads, so
+   they win at equal specificity. `!important` is the only reliable lever. */
+.dark .sb-bar,
+.dark .docblock-code-toggle {
+  background-color: hsl(var(--mdt-card)) !important;
+  color: hsl(var(--mdt-foreground)) !important;
+  border-color: hsl(var(--mdt-border)) !important;
+}
+
+/* --- Props table --------------------------------------------------------- */
+
+.dark .docblock-argstable {
+  background-color: transparent !important;
+}
+
+.dark .docblock-argstable-head th {
+  color: hsl(var(--mdt-muted-foreground)) !important;
+  background-color: transparent !important;
+  border-bottom-color: hsl(var(--mdt-border)) !important;
+}
+
+.dark .docblock-argstable-body {
+  background-color: hsl(var(--mdt-card)) !important;
+  border-color: hsl(var(--mdt-border)) !important;
+  box-shadow: none !important;
+}
+
+.dark .docblock-argstable-body tr {
+  background-color: transparent !important;
+  border-bottom-color: hsl(var(--mdt-border)) !important;
+}
+
+/* The cells carry a hardcoded white from Storybook. Without this the table is
+   light text on white - invisible. This is the fix that actually matters. */
+.dark .docblock-argstable-body td,
+.dark .docblock-argstable-body th {
+  color: hsl(var(--mdt-foreground)) !important;
+  background-color: transparent !important;
+}
+
+/* Prop name, type chips and default values */
+.dark .docblock-argstable-body td span,
+.dark .docblock-argstable-body td code,
+.dark .docblock-argstable-body td div {
+  color: inherit;
+  background-color: transparent;
+}
+
+/* --- Code ---------------------------------------------------------------- */
+
+.dark .sbdocs-pre,
+.dark .docblock-source,
+.dark .sbdocs-code {
+  background-color: hsl(var(--mdt-card));
+  border-color: hsl(var(--mdt-border));
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark code.sbdocs {
+  background-color: hsl(var(--mdt-muted));
+  color: hsl(var(--mdt-foreground));
+  border-color: hsl(var(--mdt-border));
+}
+
+/* --- Dividers ------------------------------------------------------------ */
+
+.dark .sbdocs-hr,
+.dark .docblock-argstable + hr {
+  border-color: hsl(var(--mdt-border));
+}
+
+/* --- Form controls in the props table ------------------------------------ */
+
+.dark .docblock-argstable input,
+.dark .docblock-argstable select,
+.dark .docblock-argstable textarea,
+.dark .docblock-argstable button {
+  background-color: hsl(var(--mdt-background));
+  color: hsl(var(--mdt-foreground));
+  border-color: hsl(var(--mdt-input));
+}

@@ -1,0 +1,100 @@
+{
+  // ============================================
+  // Editor Settings
+  // ============================================
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "on",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // ============================================
+  // File Settings
+  // ============================================
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // ============================================
+  // TypeScript Settings
+  // ============================================
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.suggest.autoImports": true,
+
+  // ============================================
+  // ESLint Settings
+  // ============================================
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  // ============================================
+  // Prettier Settings (per language)
+  // ============================================
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ============================================
+  // Tailwind CSS IntelliSense
+  // ============================================
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["clsx\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.emmetCompletions": true,
+
+  // ============================================
+  // Vitest Settings
+  // ============================================
+  "vitest.enable": true,
+  "vitest.commandLine": "npm run test:watch",
+  "testing.automaticallyOpenPeekView": "failureInVisibleDocument",
+
+  // ============================================
+  // Search Settings
+  // ============================================
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/storybook-static": true,
+    "**/.storybook/__image_snapshots__": true
+  },
+
+  // ============================================
+  // Explorer Settings (File Nesting)
+  // ============================================
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.tsx": "${capture}.types.ts, ${capture}.test.tsx, ${capture}.stories.tsx",
+    "*.ts": "${capture}.test.ts, ${capture}.spec.ts",
+    "package.json": "package-lock.json, .npmrc, .nvmrc"
+  }
+}

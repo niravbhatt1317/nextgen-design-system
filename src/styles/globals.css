@@ -1,0 +1,391 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ============================================
+       CORE COLORS
+       ============================================ */
+    /* White - hsl(0, 0%, 100%) */
+    --mdt-white: 0 0% 100%;
+
+    /* Black - hsl(218, 63%, 7%) */
+    --mdt-black: 218 63% 7%;
+
+    /* ============================================
+       NEUTRAL SCALE (16 shades)
+       ============================================ */
+    --mdt-neutral-10: 210 50% 98%; /* #F6F9FC - Lightest */
+    --mdt-neutral-20: 217 52% 95%; /* #ECF1F9 */
+    --mdt-neutral-30: 220 30% 92%; /* #E3E8F2 */
+    --mdt-neutral-40: 218 27% 84%; /* #CAD3E2 */
+    --mdt-neutral-50: 218 26% 65%; /* #8E9FBC */
+    --mdt-neutral-60: 217 24% 55%; /* #7186A8 */
+    --mdt-neutral-70: 216 24% 52%; /* #697FA0 */
+    --mdt-neutral-80: 217 22% 45%; /* #5A6D8C */
+    --mdt-neutral-90: 218 23% 41%; /* #516381 */
+    --mdt-neutral-100: 218 24% 37%; /* #485975 */
+    --mdt-neutral-110: 217 30% 24%; /* #2B394F */
+    --mdt-neutral-120: 218 33% 21%; /* #243147 */
+    --mdt-neutral-130: 216 36% 18%; /* #1D2A3E */
+    --mdt-neutral-140: 217 40% 15%; /* #172336 */
+    --mdt-neutral-150: 216 44% 12%; /* #111C2C */
+    --mdt-neutral-160: 217 57% 10%; /* #0B1628 - Darkest */
+
+    /* ============================================
+       RED SCALE (Destructive/Error)
+       ============================================ */
+    --mdt-red-05: 0 75% 98%; /* #fef5f5 */
+    --mdt-red-10: 0 82% 96%; /* #feecec */
+    --mdt-red-20: 0 88% 90%; /* #fccfcf */
+    --mdt-red-30: 0 80% 83%; /* #f6b1b1 */
+    --mdt-red-40: 0 84% 75%; /* #f58a8a */
+    --mdt-red-50: 0 79% 64%; /* #ec5b5b - Primary red */
+    --mdt-red-60: 353 84% 47%; /* #db132a */
+    --mdt-red-65: 0 70% 46%; /* #c72323 */
+    --mdt-red-70: 0 82% 37%; /* #ad1111 */
+    --mdt-red-80: 0 81% 25%; /* #750c0c */
+    --mdt-red-90: 0 74% 17%; /* #4a090b */
+    --mdt-red-100: 0 61% 12%; /* #310c0c */
+
+    /* ============================================
+       ORANGE SCALE (Warning)
+       ============================================ */
+    --mdt-orange-05: 20 60% 97%; /* #fdf7f4 */
+    --mdt-orange-10: 26 84% 96%; /* #fef5ee */
+    --mdt-orange-20: 27 100% 90%; /* #ffe8cc */
+    --mdt-orange-30: 27 100% 82%; /* #ffd199 */
+    --mdt-orange-40: 27 100% 74%; /* #ffbb66 */
+    --mdt-orange-50: 26 100% 58%; /* #ff8329 - Primary orange */
+    --mdt-orange-60: 26 100% 50%; /* #ff6600 */
+    --mdt-orange-65: 26 100% 45%; /* #e65c00 */
+    --mdt-orange-70: 26 100% 40%; /* #cc5200 */
+    --mdt-orange-80: 26 100% 30%; /* #993d00 */
+    --mdt-orange-90: 26 100% 20%; /* #662900 */
+    --mdt-orange-100: 26 100% 10%; /* #331400 */
+
+    /* ============================================
+       YELLOW SCALE (Caution)
+       ============================================ */
+    --mdt-yellow-05: 46 100% 97%; /* #fffbf0 */
+    --mdt-yellow-10: 48 100% 93%; /* #fff6d9 */
+    --mdt-yellow-20: 46 100% 85%; /* #ffecb3 */
+    --mdt-yellow-30: 46 100% 77%; /* #ffe28c */
+    --mdt-yellow-40: 45 100% 70%; /* #ffd866 */
+    --mdt-yellow-50: 45 100% 63%; /* #ffce40 */
+    --mdt-yellow-60: 45 89% 53%; /* #f5c71a */
+    --mdt-yellow-70: 50 100% 40%; /* #ccab00 */
+    --mdt-yellow-80: 50 100% 30%; /* #998000 */
+    --mdt-yellow-90: 50 100% 20%; /* #665600 */
+    --mdt-yellow-100: 50 100% 10%; /* #332b00 */
+
+    /* ============================================
+       GREEN SCALE (Success)
+       ============================================ */
+    --mdt-green-05: 150 55% 95%; /* #e6f7f0 */
+    --mdt-green-10: 150 55% 89%; /* #ccefe0 */
+    --mdt-green-20: 150 55% 77%; /* #99dfc2 */
+    --mdt-green-30: 150 55% 66%; /* #66cfa3 */
+    --mdt-green-40: 151 56% 55%; /* #33bf85 */
+    --mdt-green-50: 151 56% 49%; /* #37b97d - Primary green */
+    --mdt-green-60: 151 59% 41%; /* #2b9a69 */
+    --mdt-green-70: 151 60% 33%; /* #248055 */
+    --mdt-green-80: 150 58% 25%; /* #1b6040 */
+    --mdt-green-90: 150 59% 17%; /* #12402b */
+    --mdt-green-100: 150 56% 9%; /* #092015 */
+
+    /* ============================================
+       BLUE SCALE (Info/Primary)
+       ============================================ */
+    --mdt-blue-05: 217 100% 98%; /* #f0f6ff */
+    --mdt-blue-10: 213 100% 96%; /* #e8f1ff */
+    --mdt-blue-20: 213 100% 82%; /* #a8c8ff */
+    --mdt-blue-30: 214 100% 76%; /* #85b3ff */
+    --mdt-blue-40: 215 100% 69%; /* #619eff */
+    --mdt-blue-50: 218 100% 60%; /* #3d7dff - Primary blue */
+    --mdt-blue-55: 218 100% 57%; /* #2970ff */
+    --mdt-blue-60: 218 100% 50%; /* #0052ff */
+    --mdt-blue-65: 218 100% 45%; /* #0047e6 */
+    --mdt-blue-70: 218 100% 40%; /* #003dcc */
+    --mdt-blue-80: 218 100% 30%; /* #002e99 */
+    --mdt-blue-90: 218 100% 20%; /* #001f66 */
+    --mdt-blue-100: 218 100% 10%; /* #000f33 */
+
+    /* ============================================
+       PURPLE SCALE (Creative/Premium)
+       ============================================ */
+    --mdt-purple-05: 270 100% 98%; /* #f8f3ff */
+    --mdt-purple-10: 270 100% 95%; /* #f0e6ff */
+    --mdt-purple-20: 270 100% 90%; /* #e1ccff */
+    --mdt-purple-30: 270 100% 85%; /* #d1b3ff */
+    --mdt-purple-40: 270 100% 80%; /* #c299ff */
+    --mdt-purple-50: 270 100% 75%; /* #b380ff */
+    --mdt-purple-60: 270 100% 70%; /* #a366ff */
+    --mdt-purple-70: 270 100% 65%; /* #8a4dff */
+    --mdt-purple-80: 270 60% 50%; /* #6633cc */
+    --mdt-purple-90: 270 63% 40%; /* #442299 */
+    --mdt-purple-100: 270 50% 25%; /* #221166 */
+
+    /* ============================================
+       SEMANTIC COLORS - LIGHT MODE
+       All semantic colors extend from the color palette
+       Primary uses core color (Black)
+       ============================================ */
+    --mdt-background: var(--mdt-white);
+    --mdt-foreground: var(--mdt-black);
+
+    --mdt-card: var(--mdt-white);
+    --mdt-card-foreground: var(--mdt-black);
+
+    --mdt-popover: var(--mdt-white);
+    --mdt-popover-foreground: var(--mdt-black);
+
+    --mdt-primary: var(--mdt-black);
+    --mdt-primary-foreground: var(--mdt-white);
+
+    --mdt-secondary: var(--mdt-neutral-20);
+    --mdt-secondary-foreground: var(--mdt-black);
+
+    --mdt-muted: var(--mdt-neutral-30);
+    --mdt-muted-foreground: var(--mdt-neutral-100);
+
+    --mdt-accent: var(--mdt-blue-10);
+    --mdt-accent-foreground: var(--mdt-blue-50);
+
+    --mdt-destructive: var(--mdt-red-65);
+    --mdt-destructive-foreground: var(--mdt-white);
+
+    --mdt-warning: var(--mdt-orange-50);
+    --mdt-warning-foreground: var(--mdt-black);
+
+    /* Green 70, not the brighter green 50 this used to point at. A solid success
+       button carries white text, matching destructive, and white on green 50
+       measures 2.5:1 - unreadable. Green 70 measures 4.9:1 and also fixes green
+       *text* against a white page, which failed at 2.5:1 everywhere it was used. */
+    --mdt-success: var(--mdt-green-70);
+    --mdt-success-foreground: var(--mdt-white);
+
+    --mdt-info: var(--mdt-blue-50);
+    --mdt-info-foreground: var(--mdt-white);
+
+    --mdt-border: var(--mdt-neutral-40);
+    --mdt-input: var(--mdt-neutral-40);
+    --mdt-ring: var(--mdt-black);
+
+    /* ============================================
+       FEEDBACK SURFACE - the tinted background behind a Toast or a Banner
+
+       Every value here points at a step on a ramp we already own. Nothing new
+       is defined: this set gives the surface its own names so a component can
+       ask for "the danger tint" rather than "red 10", but the colours are the
+       same ones a Badge or a Button uses.
+
+       Modelled on Org Mgmt's banner, and the rule that makes it work is Om's:
+       the text stays one colour in every tone, and only the icon and the
+       border carry the tone. That rule is what makes six tones read as a
+       family - not the particular hexes, which is why swapping them for ours
+       costs nothing.
+
+       Measured against Om's originals: sixteen of these twenty are within a
+       hair of his, close enough that nobody can tell. Four of the icons shift
+       a little - his amber is browner, his green purer. Every tone still
+       clears the readability minimum by a wide margin.
+       ============================================ */
+    --mdt-feedback-info-bg: var(--mdt-blue-05);
+    --mdt-feedback-info-border: var(--mdt-blue-20);
+    --mdt-feedback-info-icon: var(--mdt-blue-60);
+
+    --mdt-feedback-warning-bg: var(--mdt-yellow-10);
+    --mdt-feedback-warning-border: var(--mdt-orange-20);
+    --mdt-feedback-warning-icon: var(--mdt-orange-80);
+
+    --mdt-feedback-danger-bg: var(--mdt-red-10);
+    --mdt-feedback-danger-border: var(--mdt-red-20);
+    --mdt-feedback-danger-icon: var(--mdt-red-70);
+
+    --mdt-feedback-success-bg: var(--mdt-green-10);
+    --mdt-feedback-success-border: var(--mdt-green-20);
+    --mdt-feedback-success-icon: var(--mdt-green-70);
+
+    --mdt-feedback-ai-bg: var(--mdt-purple-10);
+    --mdt-feedback-ai-border: var(--mdt-purple-20);
+    --mdt-feedback-ai-icon: var(--mdt-purple-80);
+
+    --mdt-feedback-neutral-bg: var(--mdt-neutral-10);
+    --mdt-feedback-neutral-border: var(--mdt-neutral-30);
+    --mdt-feedback-neutral-icon: var(--mdt-neutral-130);
+
+    --mdt-feedback-title: var(--mdt-neutral-150);
+    --mdt-feedback-text: var(--mdt-neutral-130);
+
+    --mdt-radius: 0.5rem;
+
+    /* How wide a toast is. The promotional toast sits on its own layer outside
+       the toaster, so both need to read the width from the same place or they
+       drift apart. */
+    --mdt-toast-width: 356px;
+    /* System font stack - no custom fonts required, consumers can override via CSS variables */
+    --mdt-font-sans:
+      ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans',
+      'Liberation Sans', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+      'Segoe UI Symbol', 'Noto Color Emoji';
+    --mdt-font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  .dark {
+    /* ============================================
+       SEMANTIC COLORS - DARK MODE
+       All semantic colors extend from the color palette
+       Primary uses core color (White)
+       ============================================ */
+    --mdt-background: var(--mdt-neutral-160);
+    --mdt-foreground: var(--mdt-neutral-10);
+
+    --mdt-card: var(--mdt-neutral-150);
+    --mdt-card-foreground: var(--mdt-neutral-10);
+
+    --mdt-popover: var(--mdt-neutral-150);
+    --mdt-popover-foreground: var(--mdt-neutral-10);
+
+    --mdt-primary: var(--mdt-white);
+    --mdt-primary-foreground: var(--mdt-black);
+
+    --mdt-secondary: var(--mdt-neutral-130);
+    --mdt-secondary-foreground: var(--mdt-neutral-10);
+
+    --mdt-muted: var(--mdt-neutral-120);
+    --mdt-muted-foreground: var(--mdt-neutral-40);
+
+    --mdt-accent: var(--mdt-blue-90);
+    --mdt-accent-foreground: var(--mdt-blue-20);
+
+    --mdt-destructive: var(--mdt-red-60);
+    --mdt-destructive-foreground: var(--mdt-white);
+
+    --mdt-warning: var(--mdt-orange-60);
+    --mdt-warning-foreground: var(--mdt-black);
+
+    /* Same green 70 as light mode, so there is one success fill to remember
+       rather than two. White on it measures 4.9:1 here as well.
+       Green 70 as *text* on the dark page only reaches 3.7:1, so anything using
+       success as a text colour flips to green 40 with a `dark:` utility - the
+       same pattern Badge uses, and the same missing token pair it logs. */
+    --mdt-success: var(--mdt-green-70);
+    --mdt-success-foreground: var(--mdt-white);
+
+    --mdt-info: var(--mdt-blue-50);
+    --mdt-info-foreground: var(--mdt-black);
+
+    --mdt-border: var(--mdt-neutral-90);
+    --mdt-input: var(--mdt-neutral-90);
+    --mdt-ring: var(--mdt-neutral-50);
+
+    /* ============================================
+       FEEDBACK SURFACE - dark
+
+       Om's banner is light-only, as are all four product systems, so there is
+       nothing exact to copy here. Rather than invent a second dark palette,
+       these come off our own ramps at the same steps Badge already uses - so
+       a dark toast and a dark badge belong to each other even though the light
+       ones came from different places.
+       ============================================ */
+    --mdt-feedback-info-bg: var(--mdt-blue-90);
+    --mdt-feedback-info-border: var(--mdt-blue-70);
+    --mdt-feedback-info-icon: var(--mdt-blue-30);
+
+    --mdt-feedback-warning-bg: var(--mdt-orange-90);
+    --mdt-feedback-warning-border: var(--mdt-orange-70);
+    --mdt-feedback-warning-icon: var(--mdt-orange-30);
+
+    --mdt-feedback-danger-bg: var(--mdt-red-90);
+    --mdt-feedback-danger-border: var(--mdt-red-70);
+    --mdt-feedback-danger-icon: var(--mdt-red-30);
+
+    --mdt-feedback-success-bg: var(--mdt-green-90);
+    --mdt-feedback-success-border: var(--mdt-green-70);
+    --mdt-feedback-success-icon: var(--mdt-green-30);
+
+    --mdt-feedback-ai-bg: var(--mdt-purple-100);
+    --mdt-feedback-ai-border: var(--mdt-purple-80);
+    --mdt-feedback-ai-icon: var(--mdt-purple-30);
+
+    --mdt-feedback-neutral-bg: var(--mdt-neutral-140);
+    --mdt-feedback-neutral-border: var(--mdt-neutral-120);
+    --mdt-feedback-neutral-icon: var(--mdt-neutral-30);
+
+    --mdt-feedback-title: var(--mdt-neutral-10);
+    --mdt-feedback-text: var(--mdt-neutral-30);
+  }
+}
+
+@layer base {
+  * {
+    @apply mdt-border-border;
+  }
+
+  body {
+    @apply mdt-bg-background mdt-text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Remove default browser focus outlines */
+  *:focus {
+    outline: none;
+  }
+
+  /* Remove default Radix UI focus styles */
+  *:focus-visible {
+    outline: none;
+  }
+
+  /* Remove blue border from all input elements */
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* Remove Radix UI default focus-visible outline */
+  [data-radix-focus-guard] {
+    outline: none !important;
+  }
+}
+
+@layer utilities {
+  .mdt-scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .mdt-scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* cmdk overrides for Combobox */
+[cmdk-root] {
+  opacity: 1 !important;
+}
+
+[cmdk-list] {
+  opacity: 1 !important;
+}
+
+[cmdk-item] {
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
+[cmdk-item]:not([data-disabled='true']) {
+  opacity: 1 !important;
+}
+
+[cmdk-item][data-disabled='true'] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
