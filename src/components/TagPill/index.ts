@@ -1,2 +1,2 @@
 export { TagPill, tagPillVariants } from './TagPill';
-export type { TagPillProps, TagPillVariants } from './TagPill.types';
+export type { TagPillProps, TagPillOwnProps, TagPillVariants, TagPillShape } from './TagPill.types';

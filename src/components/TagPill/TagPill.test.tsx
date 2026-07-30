@@ -1,142 +1,278 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import { createRef } from 'react';
 import { TagPill } from './TagPill';
+import type { TagPillShape } from './TagPill.types';
+
+const TEXT = 'Infrastructure';
+const TAG = 'tag';
+const LABEL = 'tag-label';
+const REMOVE = 'tag-remove';
+const ICON = 'tag-icon';
+const AVATAR = 'tag-avatar';
+
+const getTag = () => screen.getByTestId(TAG);
 
 describe('TagPill', () => {
-  it('renders correctly with default props', () => {
-    render(<TagPill>Tag</TagPill>);
-    expect(screen.getByText('Tag')).toBeInTheDocument();
-  });
+  describe('rendering', () => {
+    it('renders its label', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(screen.getByText(TEXT)).toBeInTheDocument();
+    });
 
-  it('applies default variant classes', () => {
-    render(<TagPill variant="default">Default</TagPill>);
-    const element = screen.getByText('Default').parentElement as HTMLElement;
-    expect(element).toHaveClass('mdt-bg-muted/5', 'mdt-text-muted-foreground', 'mdt-border-border');
-  });
+    it('wraps the label so it can be cut off independently of the chip', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(screen.getByTestId(LABEL)).toHaveTextContent(TEXT);
+    });
 
-  it('applies blue variant classes', () => {
-    render(<TagPill variant="blue">Blue</TagPill>);
-    const element = screen.getByText('Blue').parentElement as HTMLElement;
-    expect(element).toHaveClass(
-      'mdt-bg-blue-400/10',
-      'mdt-text-blue-700',
-      'mdt-border-blue-300/50'
-    );
-  });
+    it('merges a custom className', () => {
+      render(<TagPill className="mdt-ml-2">{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-ml-2');
+    });
 
-  it('applies green variant classes', () => {
-    render(<TagPill variant="green">Green</TagPill>);
-    const element = screen.getByText('Green').parentElement as HTMLElement;
-    expect(element).toHaveClass(
-      'mdt-bg-green-400/10',
-      'mdt-text-green-700',
-      'mdt-border-green-300/50'
-    );
-  });
+    it('forwards a ref', () => {
+      const ref = createRef<HTMLSpanElement>();
+      render(<TagPill ref={ref}>{TEXT}</TagPill>);
+      expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+    });
 
-  it('applies yellow variant classes', () => {
-    render(<TagPill variant="yellow">Yellow</TagPill>);
-    const element = screen.getByText('Yellow').parentElement as HTMLElement;
-    expect(element).toHaveClass(
-      'mdt-bg-yellow-400/10',
-      'mdt-text-yellow-700',
-      'mdt-border-yellow-300/50'
-    );
-  });
+    it('passes through native span attributes', () => {
+      render(<TagPill title="A tag">{TEXT}</TagPill>);
+      expect(getTag()).toHaveAttribute('title', 'A tag');
+    });
 
-  it('applies red variant classes', () => {
-    render(<TagPill variant="red">Red</TagPill>);
-    const element = screen.getByText('Red').parentElement as HTMLElement;
-    expect(element).toHaveClass('mdt-bg-red-400/10', 'mdt-text-red-700', 'mdt-border-red-300/50');
-  });
+    it('lets a caller override the test id', () => {
+      render(<TagPill data-testid="mine">{TEXT}</TagPill>);
+      expect(screen.getByTestId('mine')).toBeInTheDocument();
+    });
 
-  it('applies size variants correctly', () => {
-    const { rerender } = render(<TagPill size="sm">Small</TagPill>);
-    const smallElement = screen.getByText('Small').parentElement as HTMLElement;
-    expect(smallElement).toHaveClass('mdt-px-1.5', 'mdt-py-0.5');
+    // A remove control needs a 24 x 24 target, and a shorter chip cannot hold
+    // one. That is why there is exactly one size.
+    it('is one fixed height', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-h-6');
+    });
 
-    rerender(<TagPill size="lg">Large</TagPill>);
-    const largeElement = screen.getByText('Large').parentElement as HTMLElement;
-    expect(largeElement).toHaveClass('mdt-px-2.5', 'mdt-py-1');
-  });
-
-  it('accepts custom className', () => {
-    render(<TagPill className="custom-class">Test</TagPill>);
-    const element = screen.getByText('Test').parentElement as HTMLElement;
-    expect(element).toHaveClass('custom-class');
-  });
-
-  it('forwards ref correctly', () => {
-    const ref = { current: null };
-    render(<TagPill ref={ref}>Test</TagPill>);
-    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
-  });
-
-  it('renders with custom children', () => {
-    render(
-      <TagPill>
-        <span>Custom Content</span>
-      </TagPill>
-    );
-    expect(screen.getByText('Custom Content')).toBeInTheDocument();
-  });
-
-  it('applies all color variants correctly', () => {
-    const variants = [
-      { variant: 'default' as const, text: 'Default' },
-      { variant: 'blue' as const, text: 'Blue' },
-      { variant: 'green' as const, text: 'Green' },
-      { variant: 'yellow' as const, text: 'Yellow' },
-      { variant: 'red' as const, text: 'Red' },
-      { variant: 'purple' as const, text: 'Purple' },
-      { variant: 'orange' as const, text: 'Orange' },
-      { variant: 'pink' as const, text: 'Pink' },
-      { variant: 'teal' as const, text: 'Teal' },
-      { variant: 'cyan' as const, text: 'Cyan' },
-    ];
-
-    render(
-      <div>
-        {variants.map((v) => (
-          <TagPill key={v.variant} variant={v.variant}>
-            {v.text}
-          </TagPill>
-        ))}
-      </div>
-    );
-
-    variants.forEach((v) => {
-      expect(screen.getByText(v.text)).toBeInTheDocument();
+    it('tints neutral in both themes', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-bg-neutral-30');
+      expect(getTag()).toHaveClass('dark:mdt-bg-neutral-120');
     });
   });
 
-  it('has border by default', () => {
-    render(<TagPill>Bordered</TagPill>);
-    const element = screen.getByText('Bordered').parentElement as HTMLElement;
-    expect(element).toHaveClass('mdt-border');
+  describe('shapes', () => {
+    const cases: Array<[TagPillShape, string]> = [
+      ['pill', 'mdt-rounded-full'],
+      ['square', 'mdt-rounded-sm'],
+    ];
+
+    it.each(cases)('applies the %s shape', (shape, expected) => {
+      render(<TagPill shape={shape}>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass(expected);
+    });
+
+    it('is a pill by default', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-rounded-full');
+    });
   });
 
-  it('renders with icon', () => {
-    const icon = <svg data-testid="test-icon" />;
-    render(<TagPill icon={icon}>With Icon</TagPill>);
-    expect(screen.getByTestId('test-icon')).toBeInTheDocument();
-    expect(screen.getByText('With Icon')).toBeInTheDocument();
+  describe('removing', () => {
+    it('has no cross without a handler', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(screen.queryByTestId(REMOVE)).not.toBeInTheDocument();
+    });
+
+    it('shows the cross when a handler is given', () => {
+      render(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(REMOVE)).toBeInTheDocument();
+    });
+
+    it('calls the handler when clicked', async () => {
+      const onRemove = vi.fn();
+      render(<TagPill onRemove={onRemove}>{TEXT}</TagPill>);
+      await userEvent.click(screen.getByTestId(REMOVE));
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
+    // The cross is a real button, so Tab reaches it and Enter fires it. That is
+    // why dropping the Backspace shortcut costs nothing.
+    it('is reachable and firable from the keyboard', async () => {
+      const onRemove = vi.fn();
+      render(<TagPill onRemove={onRemove}>{TEXT}</TagPill>);
+      await userEvent.tab();
+      expect(screen.getByTestId(REMOVE)).toHaveFocus();
+      await userEvent.keyboard('{Enter}');
+      expect(onRemove).toHaveBeenCalled();
+    });
+
+    it('carries a spoken label, since the cross has no text', () => {
+      render(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
+      expect(screen.getByLabelText('Remove')).toBeInTheDocument();
+    });
+
+    // The chip only lifts on hover when there is something to act on.
+    it('gains a hover state only when it is removable', () => {
+      const { rerender } = render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+      rerender(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('hover:mdt-bg-neutral-40');
+    });
+
+    it('tightens the right inset when the cross is there', () => {
+      const { rerender } = render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-pr-2.5');
+      rerender(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-pr-0.5');
+    });
   });
 
-  it('renders with close button when onClose provided', () => {
-    const onClose = vi.fn();
-    render(<TagPill onClose={onClose}>Closable</TagPill>);
-    const closeButton = screen.getByLabelText('Remove tag');
-    expect(closeButton).toBeInTheDocument();
+  describe('read-only', () => {
+    it('renders no cross even when a handler is given', () => {
+      render(
+        <TagPill readOnly onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(screen.queryByTestId(REMOVE)).not.toBeInTheDocument();
+    });
+
+    it('is skipped by Tab, because there is nothing to act on', async () => {
+      render(
+        <TagPill readOnly onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      await userEvent.tab();
+      expect(screen.queryByTestId(REMOVE)).not.toBeInTheDocument();
+      expect(document.body).toHaveFocus();
+    });
+
+    it('does not lift on hover', () => {
+      render(<TagPill readOnly>{TEXT}</TagPill>);
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+    });
+
+    it('keeps the roomier right inset, having no cross to make space for', () => {
+      render(
+        <TagPill readOnly onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(getTag()).toHaveClass('mdt-pr-2.5');
+    });
   });
 
-  it('calls onClose when close button clicked', async () => {
-    const onClose = vi.fn();
-    const user = userEvent.setup();
-    render(<TagPill onClose={onClose}>Closable</TagPill>);
-    const closeButton = screen.getByLabelText('Remove tag');
-    await user.click(closeButton);
-    expect(onClose).toHaveBeenCalledTimes(1);
+  describe('disabled', () => {
+    it('dims the chip', () => {
+      render(
+        <TagPill disabled onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(getTag()).toHaveClass('mdt-opacity-50');
+    });
+
+    it('still shows the cross, because it is yours - just not now', () => {
+      render(
+        <TagPill disabled onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(screen.getByTestId(REMOVE)).toBeInTheDocument();
+    });
+
+    it('disables the cross', () => {
+      render(
+        <TagPill disabled onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(screen.getByTestId(REMOVE)).toBeDisabled();
+    });
+
+    it('does not fire the handler', async () => {
+      const onRemove = vi.fn();
+      render(
+        <TagPill disabled onRemove={onRemove}>
+          {TEXT}
+        </TagPill>
+      );
+      await userEvent.click(screen.getByTestId(REMOVE), { pointerEventsCheck: 0 });
+      expect(onRemove).not.toHaveBeenCalled();
+    });
+
+    it('does not lift on hover', () => {
+      render(
+        <TagPill disabled onRemove={vi.fn()}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+    });
+  });
+
+  describe('the leading slot', () => {
+    it('renders an icon before the label', () => {
+      render(<TagPill icon={<svg data-testid="glyph" />}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(ICON)).toBeInTheDocument();
+      expect(screen.getByTestId('glyph')).toBeInTheDocument();
+    });
+
+    it('sizes the icon itself, so the caller never picks one', () => {
+      render(<TagPill icon={<svg data-testid="glyph" />}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(ICON)).toHaveClass('[&_svg]:mdt-size-3');
+    });
+
+    it('renders an avatar before the label', () => {
+      render(<TagPill avatar={<span data-testid="face" />}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(AVATAR)).toBeInTheDocument();
+      expect(screen.getByTestId('face')).toBeInTheDocument();
+    });
+
+    // A filled circle carries no air, so padding it like a word reads lopsided.
+    it('pulls the chip in for an avatar and holds it back for anything else', () => {
+      const { rerender } = render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-pl-2.5');
+      rerender(<TagPill icon={<svg />}>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-pl-2.5');
+      rerender(<TagPill avatar={<span />}>{TEXT}</TagPill>);
+      expect(getTag()).toHaveClass('mdt-pl-0.5');
+    });
+
+    // A tag has one leading mark, not two.
+    it('drops the icon when an avatar is also given', () => {
+      render(
+        <TagPill avatar={<span data-testid="face" />} icon={<svg data-testid="glyph" />}>
+          {TEXT}
+        </TagPill>
+      );
+      expect(screen.getByTestId(AVATAR)).toBeInTheDocument();
+      expect(screen.queryByTestId(ICON)).not.toBeInTheDocument();
+    });
+
+    it('hides both from screen readers, since the label already says it', () => {
+      const { rerender } = render(<TagPill icon={<svg />}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(ICON)).toHaveAttribute('aria-hidden', 'true');
+      rerender(<TagPill avatar={<span />}>{TEXT}</TagPill>);
+      expect(screen.getByTestId(AVATAR)).toHaveAttribute('aria-hidden', 'true');
+    });
+  });
+
+  describe('truncation', () => {
+    it('is off by default', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(screen.getByTestId(LABEL)).not.toHaveClass('mdt-truncate');
+    });
+
+    it('caps the chip width when asked for', () => {
+      render(<TagPill truncate>Infrastructure and platform</TagPill>);
+      expect(getTag()).toHaveClass('mdt-max-w-32');
+    });
+
+    it('cuts the label rather than the chip', () => {
+      render(<TagPill truncate>Infrastructure and platform</TagPill>);
+      expect(screen.getByTestId(LABEL)).toHaveClass('mdt-truncate');
+    });
   });
 });
