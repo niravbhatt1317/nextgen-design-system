@@ -64,6 +64,17 @@ npm install
 
 `npm install` takes a few minutes the first time. It only needs doing again when dependencies change.
 
+**Then install the browser Playwright drives.** This is a separate download that `npm install` does
+not do for you:
+
+```bash
+npx playwright install chromium
+```
+
+Skip it and anything that opens a real browser — the `e2e/` tests, or screenshotting a story to
+check it — fails with `Executable doesn't exist at .../chrome-headless-shell`. It looks like a
+broken project; it is a missing download. Once per machine.
+
 **Every time you work:**
 
 ```bash
@@ -204,17 +215,44 @@ cn('mdt-px-3', closable && 'mdt-pr-9'); // ✅ narrower rule last
 Tests pass while the pixels are wrong. Badge text once measured 2.0:1 contrast — unreadable, every
 test green. After any visual change, open the story in both themes and actually look.
 
+**If you check stories automatically, check the built site — never the dev server.**
+
+`npm run storybook` compiles each story the first time something asks for it. That is exactly what
+you want while working, and exactly wrong for a script: ask it for hundreds of stories at once and
+compilation queues up behind itself, so stories report as broken when they are merely still
+building. A sweep of all 522 stories against the dev server reported **467 of them empty**. Every
+one was fine. The only stories that "passed" were the handful already compiled by being looked at a
+minute earlier — which is the dangerous half, because a sweep that only visits what it already
+warmed up will happily report all-clear.
+
+Build it first, serve the output, and point the script at that:
+
+```bash
+npm run build-storybook                       # produces storybook-static/
+npx http-server storybook-static -p 6007      # serve it
+```
+
+Re-run against `localhost:6007` and the same sweep reports **522 of 522, zero failures** — because
+nothing is compiling on demand. This is also what CI builds and what GitHub Pages serves, so it is
+the honest target.
+
+One more trap: **some surfaces render nothing until you click.** Dialogs, toasts and popovers are
+empty until something opens them. "0 changed pixels" on those stories means you photographed an
+empty page, not that nothing changed.
+
 ---
 
 ## When something goes wrong
 
-| What you see                                   | What it means                                     | What to do                                     |
-| ---------------------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
-| `Permission denied` on any npm command         | `node_modules` came from another operating system | `rm -rf node_modules && npm install`           |
-| Red X on your pull request                     | A check failed                                    | Click **Details** — it names the file and line |
-| Storybook shows a spinner forever              | It compiles pages on demand                       | Wait ~10s on first load of a page              |
-| A `dark:` class does nothing                   | Probably the config trap — see `CLAUDE.md`        | Don't "simplify" `tailwind.config.ts`          |
-| Changed `tailwind.config.ts`, nothing happened | Tailwind config needs a restart                   | Stop Storybook, start it again on 6006         |
+| What you see                                            | What it means                                              | What to do                                     |
+| ------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| `Permission denied` on any npm command                  | `node_modules` came from another operating system          | `rm -rf node_modules && npm install`           |
+| `Executable doesn't exist at .../chrome-headless-shell` | Playwright's browser was never downloaded                  | `npx playwright install chromium`              |
+| A sweep says most stories are empty                     | You pointed it at the dev server, which compiles on demand | Build first, serve `storybook-static`          |
+| Red X on your pull request                              | A check failed                                             | Click **Details** — it names the file and line |
+| Storybook shows a spinner forever                       | It compiles pages on demand                                | Wait ~10s on first load of a page              |
+| A `dark:` class does nothing                            | Probably the config trap — see `CLAUDE.md`                 | Don't "simplify" `tailwind.config.ts`          |
+| Changed `tailwind.config.ts`, nothing happened          | Tailwind config needs a restart                            | Stop Storybook, start it again on 6006         |
 
 ---
 
