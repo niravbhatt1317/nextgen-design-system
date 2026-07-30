@@ -121,9 +121,9 @@ describe('TagPill', () => {
     // The chip only lifts on hover when there is something to act on.
     it('gains a hover state only when it is removable', () => {
       const { rerender } = render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
       rerender(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('hover:mdt-bg-neutral-40');
+      expect(getTag()).toHaveClass('hover:mdt-bg-neutral-30');
     });
 
     it('tightens the right inset when the cross is there', () => {
@@ -157,7 +157,7 @@ describe('TagPill', () => {
 
     it('does not lift on hover', () => {
       render(<TagPill readOnly>{TEXT}</TagPill>);
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
     });
 
     it('keeps the roomier right inset, having no cross to make space for', () => {
@@ -215,7 +215,7 @@ describe('TagPill', () => {
           {TEXT}
         </TagPill>
       );
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-40');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
     });
   });
 

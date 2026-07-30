@@ -60,13 +60,12 @@ export const tagPillVariants = cva(
        * The chip lifts on hover. It does not change width; a tag that grows
        * shoves its neighbours sideways while you are aiming at them.
        *
-       * It skips a step - neutral-20 to neutral-40 rather than to neutral-30 -
-       * because the palette has no even spacing at the light end. The next step
-       * up measures 1.07 against the rest state, less than half the strength of
-       * a hover anyone would notice. Skipping to 40 measures 1.32.
+       * It lifts one palette step, which measures 1.07 against the rest state -
+       * deliberately quiet. Two steps measures 1.32 and reads as a press rather
+       * than a hover. The palette has nothing between them.
        */
       interactive: {
-        true: 'hover:mdt-bg-neutral-40 dark:hover:mdt-bg-neutral-110',
+        true: 'hover:mdt-bg-neutral-30 dark:hover:mdt-bg-neutral-110',
         false: '',
       },
       disabled: {
@@ -103,7 +102,9 @@ const REMOVE_CLASSES = [
   'mdt-inline-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
   'mdt-rounded-[inherit] mdt-border-0 mdt-bg-transparent mdt-p-0',
   'mdt-text-muted-foreground mdt-transition-colors',
-  'hover:mdt-bg-neutral-50 hover:mdt-text-neutral-110',
+  // One step above the hovered chip. Two steps measured 2.18 against it and
+  // read as a hard grey blob rather than a surface.
+  'hover:mdt-bg-neutral-40 hover:mdt-text-neutral-110',
   'dark:hover:mdt-bg-neutral-100 dark:hover:mdt-text-neutral-30',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
   'disabled:mdt-pointer-events-none',
