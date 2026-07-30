@@ -75,8 +75,21 @@ Storybook opens at http://localhost:6006.
 > `node_modules` built on one operating system does not work on another. If you copied the folder
 > and nothing runs, delete `node_modules` and run `npm install` again.
 
-New to the repo? Start with **[docs/DESIGNER-GUIDE.md](./docs/DESIGNER-GUIDE.md)** — it covers
-making a change without touching a terminal, and setting up locally when you're ready.
+### New here?
+
+Start with **[docs/ONBOARDING.md](./docs/ONBOARDING.md)** — nothing to nothing-to-first-merged-change.
+
+If you use Claude Code, the whole setup is one command. Clone, open the folder, start a session and
+type:
+
+```text
+/onboard
+```
+
+It installs what's missing, verifies the project runs, reads the entire rulebook, and briefs you on
+what this system is and what's missing from it — then waits for you to pick something to build.
+
+After that, **[docs/DESIGNER-GUIDE.md](./docs/DESIGNER-GUIDE.md)** is the day-to-day working guide.
 
 ---
 
