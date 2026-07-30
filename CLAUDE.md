@@ -731,12 +731,43 @@ identical. Nothing regressed, but only a full sweep could prove that.
 
 ## Git Workflow
 
-This repository is owned by the design team, and the owner directs commits and pushes in
-conversation. Follow their lead: when they ask you to commit or push, do it; otherwise leave git
-alone.
+This repository is owned by the design team. Claude runs git - staging, committing, pushing,
+branches, pull requests - when asked. Ask first before anything outward-facing or hard to undo:
+pushing to `main`, changing repository visibility, rewriting published history, adding
+collaborators, publishing to npm.
 
 Use a message file (`git commit -F <file>`) rather than an inline message. Long messages passed
 inline get mis-parsed by the shell here - git reads part of the message as a file path and fails.
+
+### `main` is protected
+
+Never commit to `main` directly. Every change goes through a branch and a pull request, and CI has
+to be green before it merges. One-word documentation fixes included.
+
+### Branch naming: `person/what-changed`
+
+```
+nirav/banner                 pranjal/stat-tile
+nirav/banner-spacing         pranjal/stat-tile-no-data
+nirav/banner-dark-border     pranjal/fix-toast-gap
+```
+
+**Name the branch after the change, not the component.** A component gets touched many times - the
+first build, a spacing fix three weeks later, a dark-mode border after that. Calling all three
+`nirav/banner` collides with your own deleted branch names and makes the history unreadable.
+
+**One branch per thing you would merge or revert as a unit.** Usually that is one component, but not
+always: a component plus the token it needs plus its stories is one branch, while Banner and Card
+are always two, because they ship independently.
+
+**Branches are disposable, and nothing of value lives only in one.** A merged branch has done its
+whole job and gets deleted - the work is in `main` now. To change something later, cut a _new_
+branch from current `main`; it will contain that component plus everything merged since. Never
+reopen an old branch, which is stale by definition.
+
+Note that squash-merging makes git report a merged branch as "not fully merged" on delete. That is a
+false alarm - the content landed as a new commit. Confirm with `git diff <branch> main` (empty means
+landed), then `git branch -D`.
 
 Your role: implement solutions, run tests/builds/lint, create code changes.
 

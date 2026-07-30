@@ -30,12 +30,23 @@ too — the thirty seconds it costs is the whole safety net for a two-person tea
 
 ```bash
 git checkout main && git pull
-git checkout -b short-descriptive-name
+git checkout -b nirav/banner        # person/what-changed
 # ... work ...
 git add -A && git commit -F msg.txt
-git push -u origin short-descriptive-name
+git push -u origin nirav/banner
 gh pr create
 ```
+
+**Branch naming is `person/what-changed`** — `nirav/banner`, `nirav/banner-spacing`,
+`pranjal/stat-tile`. Named after the change, not the component, because a component gets touched
+many times and three branches all called `nirav/banner` make the history unreadable.
+
+**Branches are disposable.** A merged branch is deleted; its work lives in `main`. To change
+something later, cut a new branch from current `main` rather than reopening the old one — the old
+one is stale by definition and missing everything merged since.
+
+Squash-merging makes git report a merged branch as "not fully merged" when deleting. It is a false
+alarm: verify with `git diff <branch> main` (empty = landed), then `git branch -D`.
 
 ## My Role
 
