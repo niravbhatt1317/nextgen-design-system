@@ -6,10 +6,24 @@ on:
   pull_request:
     branches: [main]
 
-# Cancel superseded runs on the same branch
+# Cancel superseded runs on a pull request branch, but never on `main`.
+#
+# On a pull request, cancelling is what you want: push three times while working
+# and only the last run matters, so the first two are wasted minutes.
+#
+# On `main` it is actively harmful. Every push to `main` shares one group, so two
+# merges close together mean the second cancels the first - and the first commit
+# is left showing a red cross that reads as "this person's work failed CI" when
+# it did nothing of the sort. That happened to the Badge merge: two merges three
+# minutes apart, and the earlier one was killed at 3m23s.
+#
+# Nothing goes unverified either way, because history here is linear and the
+# later commit contains the earlier one. But a commit on `main` should carry its
+# own green tick, and `main` is only ever pushed to by a merge, so completing
+# every run costs almost nothing.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   HUSKY: 0
