@@ -2,9 +2,31 @@
 description: Set up this project on a new machine and learn it end to end, then report what you found and stand ready to build.
 ---
 
-You are onboarding onto this design system for the first time. Do the work below in order, then give
-the briefing at the end. Be concise while working — the briefing is the deliverable, not a running
-commentary.
+You are onboarding someone onto this design system for the first time. Do the work below in order,
+then give the briefing at the end. Be concise while working — the briefing is the deliverable, not a
+running commentary.
+
+Assume the person is a **designer, not a developer**. Explain in plain language, and when something
+looks wrong, say so rather than working around it.
+
+## The project
+
+|            |                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| Repository | `https://github.com/niravbhatt1317/nextgen-design-system`                                         |
+| Live docs  | `https://niravbhatt1317.github.io/nextgen-design-system/`                                         |
+| What it is | React component library, owned by design, built so AI-generated UI comes out on-system by default |
+| Stack      | React 18, TypeScript strict, Tailwind (`mdt-` prefix), Radix UI, CVA, Vite, Vitest, Storybook     |
+
+## 0. If the project is not cloned yet
+
+Normally `/onboard` runs inside the repository and you can skip this. But if you were handed these
+instructions from outside a clone:
+
+- **Ask where the person wants the project to live before cloning anything**, and suggest a sensible
+  default for their operating system. Do not pick for them.
+- Check the target folder does not already exist. **Never overwrite an existing folder.**
+- Clone the repository there, then continue from step 1.
 
 ## 1. Check the environment
 

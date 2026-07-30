@@ -11,24 +11,55 @@ on every change, so it is always current.
 
 ## The short version
 
-```bash
-git clone https://github.com/niravbhatt1317/nextgen-design-system.git
-cd nextgen-design-system
-code .
+### Starting from nothing — no folder, nothing cloned
+
+Open Claude Code anywhere on your machine and paste this. It is the whole setup:
+
+```text
+Set me up to work on the NextGen Design System.
+
+Repository:  https://github.com/niravbhatt1317/nextgen-design-system
+Live docs:   https://niravbhatt1317.github.io/nextgen-design-system/
+
+Please do all of this, in order:
+
+1. ASK ME FIRST where I want the project to live, and suggest a sensible default
+   for my operating system. Do not clone anything until I answer. Check the
+   folder does not already exist, and never overwrite an existing one.
+2. Clone the repository there.
+3. Check I have Node 20 or newer. If not, stop and tell me.
+4. Install: npm install, then npx playwright install chromium (the second is a
+   separate download that npm install does not perform).
+5. Check my git user.name and user.email are set to me, and tell me if they are
+   not - commits attributed to the wrong person are tedious to fix later.
+6. ASK before setting anything global, then optionally add the git alias
+   "start" and fetch.prune, as described in the repo's docs/ONBOARDING.md.
+7. Read the file .claude/commands/onboard.md in the cloned repo and follow it
+   exactly. That is this project's own onboarding routine - it will tell you
+   which files to read to understand the design system, which to skip, and what
+   to check.
+8. Brief me on what you found, then STOP. Do not start building anything.
+
+I am a designer, not a developer. Explain what you are doing in plain language,
+and tell me if anything looks wrong rather than working around it.
 ```
 
-Then start Claude in that folder and type:
+Claude will ask where to put it, clone it, set everything up, learn the whole design system, and
+brief you. Then it waits for you to pick something to build.
+
+### If you already have the project cloned
+
+Start a Claude session in the project folder and type:
 
 ```text
 /onboard
 ```
 
-That one command installs what is missing, checks the project actually runs, reads the entire
-rulebook, and reports back what this system is and what is missing from it. When it finishes, Claude
-understands the project and you can start building.
+Same routine, minus the cloning.
 
-The rest of this page explains what that command is doing and what to do if you would rather do it
-by hand.
+---
+
+The rest of this page explains what those are doing, and how to do it by hand if you would rather.
 
 ---
 
