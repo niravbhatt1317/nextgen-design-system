@@ -68,16 +68,30 @@ npm install
 
 `npm install` takes a few minutes the first time. It only needs doing again when dependencies change.
 
-**Then install the browser Playwright drives.** This is a separate download that `npm install` does
-not do for you:
+**Test browsers are optional — install them when you need them, not now.**
+
+Playwright uses its own private browser builds, kept in a cache folder. They are **not** your
+everyday browser: installing them changes nothing about the Chrome, Firefox, Edge, Arc or Safari you
+already use, and you will never see one open unless a test runs it. They are also large, so take
+only what you need:
+
+| What you want to do                                        | What you need     | Rough size |
+| ---------------------------------------------------------- | ----------------- | ---------- |
+| Unit tests, lint, typecheck, Storybook — the everyday work | **Nothing**       | —          |
+| Screenshot stories to check a visual change                | Chromium          | ~500 MB    |
+| Run the full `npm run test:e2e` suite                      | All three engines | Over 1 GB  |
 
 ```bash
-npx playwright install chromium
+npx playwright install --dry-run                 # what you already have
+npx playwright install chromium                  # visual checks only
+npx playwright install chromium firefox webkit   # the whole e2e suite
 ```
 
-Skip it and anything that opens a real browser — the `e2e/` tests, or screenshotting a story to
-check it — fails with `Executable doesn't exist at .../chrome-headless-shell`. It looks like a
-broken project; it is a missing download. Once per machine.
+`playwright.config.ts` defines chromium, firefox **and** webkit projects, with 13 committed snapshots
+each — so chromium alone leaves two thirds of the e2e suite failing on a missing executable.
+
+You'll know you need them when you see `Executable doesn't exist at .../chrome-headless-shell`. That
+is a missing download, not a broken project.
 
 **Every time you work:**
 
@@ -318,17 +332,17 @@ empty page, not that nothing changed.
 
 ## When something goes wrong
 
-| What you see                                            | What it means                                              | What to do                                         |
-| ------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
-| `Permission denied` on any npm command                  | `node_modules` came from another operating system          | `rm -rf node_modules && npm install`               |
-| `Executable doesn't exist at .../chrome-headless-shell` | Playwright's browser was never downloaded                  | `npx playwright install chromium`                  |
-| A sweep says most stories are empty                     | You pointed it at the dev server, which compiles on demand | Build first, serve `storybook-static`              |
-| Red X on your pull request                              | A check failed                                             | Click **Details** — it names the file and line     |
-| Storybook shows a spinner forever                       | It compiles pages on demand                                | Wait ~10s on first load of a page                  |
-| A `dark:` class does nothing                            | Probably the config trap — see `CLAUDE.md`                 | Don't "simplify" `tailwind.config.ts`              |
-| Changed `tailwind.config.ts`, nothing happened          | Tailwind config needs a restart                            | Stop Storybook, start it again on 6006             |
-| `the branch is not fully merged` when deleting          | False alarm — squash-merge lands work as a new commit      | `git diff <branch> main`; if empty `git branch -D` |
-| A deleted branch still appears in `git branch -a`       | Stale remote-tracking ref                                  | `git fetch --prune`                                |
+| What you see                                            | What it means                                              | What to do                                                       |
+| ------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| `Permission denied` on any npm command                  | `node_modules` came from another operating system          | `rm -rf node_modules && npm install`                             |
+| `Executable doesn't exist at .../chrome-headless-shell` | No Playwright test browser installed — optional, see above | `npx playwright install chromium` (add `firefox webkit` for e2e) |
+| A sweep says most stories are empty                     | You pointed it at the dev server, which compiles on demand | Build first, serve `storybook-static`                            |
+| Red X on your pull request                              | A check failed                                             | Click **Details** — it names the file and line                   |
+| Storybook shows a spinner forever                       | It compiles pages on demand                                | Wait ~10s on first load of a page                                |
+| A `dark:` class does nothing                            | Probably the config trap — see `CLAUDE.md`                 | Don't "simplify" `tailwind.config.ts`                            |
+| Changed `tailwind.config.ts`, nothing happened          | Tailwind config needs a restart                            | Stop Storybook, start it again on 6006                           |
+| `the branch is not fully merged` when deleting          | False alarm — squash-merge lands work as a new commit      | `git diff <branch> main`; if empty `git branch -D`               |
+| A deleted branch still appears in `git branch -a`       | Stale remote-tracking ref                                  | `git fetch --prune`                                              |
 
 ---
 
