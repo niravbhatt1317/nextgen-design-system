@@ -305,13 +305,15 @@ export const Content: Story = {
         </Row>
       </div>
       <div>
-        <Label>A long label, cut off rather than widening its column</Label>
-        <Row>
+        <Label>
+          A long label, cut off rather than widening its column — truncated above, loose below
+        </Label>
+        <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-2">
           <Badge tone="info" truncate>
-            Partially reconciled
+            Partially reconciled, pending review
           </Badge>
-          <Badge tone="info">Partially reconciled</Badge>
-        </Row>
+          <Badge tone="info">Partially reconciled, pending review</Badge>
+        </div>
       </div>
     </Group>
   ),
