@@ -6,6 +6,10 @@ ourselves rather than filing a ticket.
 
 This guide is how you do that. It assumes no terminal experience and builds up from there.
 
+> **Setting up for the first time?** Go to **[ONBOARDING.md](./ONBOARDING.md)** first — it takes you
+> from nothing to your first merged change. If you use Claude Code, the whole setup is one command:
+> start a session in the project folder and type `/onboard`.
+
 ---
 
 ## First: just look at it
