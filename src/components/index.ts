@@ -23,13 +23,15 @@ export type {
 } from './Avatar';
 
 // Badge — one atom covering status pills, chips, counts, protocol pills and
-// bare icon+text labels, which the source systems built as five components
+// icon-only status marks, which the source systems built as five components.
+// Four switches: what it means, how loud it is, its corner radius and its size.
 export { Badge, badgeVariants } from './Badge';
 export type {
   BadgeProps,
   BadgeOwnProps,
   BadgeVariantsType,
   BadgeTone,
+  BadgeEmphasis,
   BadgeShape,
   BadgeSize,
 } from './Badge';

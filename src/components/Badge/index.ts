@@ -4,6 +4,7 @@ export type {
   BadgeOwnProps,
   BadgeVariantsType,
   BadgeTone,
+  BadgeEmphasis,
   BadgeShape,
   BadgeSize,
 } from './Badge.types';
