@@ -35,14 +35,47 @@ instructions from outside a clone:
   between operating systems produces `Permission denied` on every binary; the fix is
   `rm -rf node_modules && npm install`, not debugging.
 
-## 2. Install what is missing
+## 2. Install dependencies
 
-- `npm install` if `node_modules` is absent or broken.
-- `npx playwright install chromium` unless the browser is already present. This is a separate
-  download `npm install` does not perform, and without it every browser check fails with
-  `Executable doesn't exist at .../chrome-headless-shell`.
+`npm install` if `node_modules` is absent or broken. Skip it if it is already fine — do not
+reinstall for the sake of it.
 
-Skip either step if it is already done. Do not reinstall for the sake of it.
+## 2b. Browsers for testing — ASK, never just install
+
+**Do not download a browser without asking.** These are large, and whether the person needs them at
+all depends on what they intend to do.
+
+First find out what is already there, which downloads nothing:
+
+```bash
+npx playwright install --dry-run
+```
+
+Then explain, and **let them choose**:
+
+> Playwright uses its own private browser builds, kept in a cache folder. They are **not** your
+> everyday browser — installing them does not change your default browser, does not touch the Chrome,
+> Firefox, Edge, Arc or Safari you already use, and you will never see them open unless a test runs
+> one. Whichever browser you personally browse with is irrelevant here.
+
+| What they want to do                                       | What they need                            | Rough size |
+| ---------------------------------------------------------- | ----------------------------------------- | ---------- |
+| Unit tests, lint, typecheck, Storybook — the everyday work | **Nothing.** Skip this entirely           | —          |
+| Look at or screenshot stories to check a visual change     | Chromium only                             | ~500 MB    |
+| Run the full `npm run test:e2e` suite                      | **All three** — chromium, firefox, webkit | Over 1 GB  |
+
+The e2e suite is not chromium-only: `playwright.config.ts` defines three projects and the repository
+carries 13 committed snapshots for each engine. Installing only chromium means two thirds of
+`npm run test:e2e` fails on a missing executable.
+
+```bash
+npx playwright install chromium                  # visual checks only
+npx playwright install chromium firefox webkit   # the whole e2e suite
+```
+
+If they decline, that is a perfectly good answer — say clearly that everything except browser-based
+checks still works, and that they can install later with the same command. Note the symptom so they
+recognise it: `Executable doesn't exist at .../chrome-headless-shell`.
 
 ## 3. Offer the git conveniences
 

@@ -28,17 +28,22 @@ Please do all of this, in order:
    folder does not already exist, and never overwrite an existing one.
 2. Clone the repository there.
 3. Check I have Node 20 or newer. If not, stop and tell me.
-4. Install: npm install, then npx playwright install chromium (the second is a
-   separate download that npm install does not perform).
-5. Check my git user.name and user.email are set to me, and tell me if they are
+4. Run npm install.
+5. Do NOT download any test browser without asking me. Run
+   "npx playwright install --dry-run" to see what is already there, explain that
+   these are Playwright's own private builds and have nothing to do with whatever
+   browser I personally use, tell me the sizes, and let me choose: nothing at all
+   (everyday work needs none), chromium only for visual checks, or all three
+   engines if I want the full e2e suite.
+6. Check my git user.name and user.email are set to me, and tell me if they are
    not - commits attributed to the wrong person are tedious to fix later.
-6. ASK before setting anything global, then optionally add the git alias
+7. ASK before setting anything global, then optionally add the git alias
    "start" and fetch.prune, as described in the repo's docs/ONBOARDING.md.
-7. Read the file .claude/commands/onboard.md in the cloned repo and follow it
+8. Read the file .claude/commands/onboard.md in the cloned repo and follow it
    exactly. That is this project's own onboarding routine - it will tell you
    which files to read to understand the design system, which to skip, and what
    to check.
-8. Brief me on what you found, then STOP. Do not start building anything.
+9. Brief me on what you found, then STOP. Do not start building anything.
 
 I am a designer, not a developer. Explain what you are doing in plain language,
 and tell me if anything looks wrong rather than working around it.
@@ -128,7 +133,7 @@ context about a different repository will keep reaching for paths that no longer
 It will:
 
 1. Check your Node version and whether the installed dependencies actually work
-2. Run `npm install` and `npx playwright install chromium` if they are needed
+2. Run `npm install` if needed, and **ask** before downloading any test browser
 3. Offer to set up two git conveniences (asking first, since they are global)
 4. Read the rulebook — `CLAUDE.md`, the designer guide, the token files, the component gap
 5. Run typecheck, lint, the full test suite and the token check, and report the **real** numbers
@@ -140,13 +145,41 @@ Then it stops and waits. It will not start building anything on its own.
 
 ```bash
 npm install
-npx playwright install chromium
 ```
 
-That second line is a separate download `npm install` does not perform. Skip it and anything opening
-a real browser — the `e2e/` tests, or screenshotting a story — fails with
-`Executable doesn't exist at .../chrome-headless-shell`, which looks like a broken project but is
-just a missing file. Once per machine.
+### Test browsers — optional, and probably not yet
+
+**Playwright's browsers are not your browser.** They are private builds kept in a cache folder.
+Installing them does not change your default browser, does not touch the Chrome, Firefox, Edge, Arc
+or Safari you already use, and you will never see one open unless a test runs it. Whatever you
+personally browse with makes no difference here.
+
+They are also large, so only install what you actually need:
+
+| What you want to do                                        | What you need     | Rough size |
+| ---------------------------------------------------------- | ----------------- | ---------- |
+| Unit tests, lint, typecheck, Storybook — the everyday work | **Nothing**       | —          |
+| Screenshot stories to check a visual change                | Chromium          | ~500 MB    |
+| Run the full `npm run test:e2e` suite                      | All three engines | Over 1 GB  |
+
+```bash
+npx playwright install --dry-run                 # see what you already have
+npx playwright install chromium                  # visual checks only
+npx playwright install chromium firefox webkit   # the whole e2e suite
+```
+
+The e2e suite genuinely needs all three: `playwright.config.ts` defines chromium, firefox and webkit
+projects, and the repository carries 13 committed snapshots for each. Chromium alone leaves two
+thirds of it failing.
+
+**You can skip this entirely for now.** Everything else works without it. You will know when you
+need it, because you will see:
+
+```text
+Executable doesn't exist at .../chrome-headless-shell
+```
+
+That is a missing download, not a broken project. Once per machine.
 
 Two git conveniences, also once per machine:
 
