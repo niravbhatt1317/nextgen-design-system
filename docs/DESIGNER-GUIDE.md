@@ -102,7 +102,7 @@ All three should pass silently. Silence is success.
 
 ## Working together without stepping on each other
 
-### One component, one branch, one pull request
+### One change, one branch, one pull request
 
 **Never commit straight to `main`.** `main` is what's live, and it is protected — a direct push is
 rejected. Every change goes through a branch and a pull request, even a one-word fix. It costs about
@@ -110,16 +110,86 @@ thirty seconds and it is the whole safety net for a two-person team.
 
 ```bash
 git checkout main && git pull     # always start from current main
-git checkout -b banner            # one component per branch
+git checkout -b nirav/banner      # your name, then what's changing
 npm run storybook                 # build it, and look at it in both themes
 npm test && npm run lint          # the same checks CI will run
 git add -A
 git commit -F msg.txt             # message in a file - see below
-git push -u origin banner
+git push -u origin nirav/banner
 gh pr create
 ```
 
 CI runs on the pull request. Merge when it's green.
+
+### Naming a branch: `your-name/what-changed`
+
+```text
+nirav/banner                 pranjal/stat-tile
+nirav/banner-spacing         pranjal/stat-tile-no-data
+nirav/banner-dark-border     pranjal/fix-toast-gap
+```
+
+The name prefix means the branch list tells you at a glance who is on what — which is the genuinely
+useful half of "a branch each".
+
+**Name it after the change, not the component.** You will touch Banner many times: the first build,
+a spacing fix three weeks later, a dark border after that. If all three are called `nirav/banner`
+you collide with your own deleted branch names, and six months of history reads as one word.
+
+### Starting a branch in one command
+
+Set these up once per machine:
+
+```bash
+git config --global alias.start '!f() { if [ -z "$1" ]; then echo "usage: git start <name>/<what-changed>"; return 1; fi; git checkout main && git pull --prune && git checkout -b "$1"; }; f'
+git config --global fetch.prune true
+```
+
+Then starting work is one line, and it always pulls latest `main` first — so you can't forget:
+
+```bash
+git start nirav/banner
+```
+
+`fetch.prune` makes deleted branches disappear from your local list instead of lingering as stale
+references.
+
+### Branches are disposable — this is the part that trips people up
+
+A merged branch is finished. Its work is in `main` now, permanently. That is why the branch gets
+deleted straight after merging.
+
+**So what if Banner needs changing after five more components have shipped?** You do _not_ go back
+to the old `nirav/banner` branch. That branch is stale, and deleted. You cut a **new** one from
+current `main`:
+
+```bash
+git checkout main && git pull
+git checkout -b nirav/banner-spacing
+```
+
+That branch has Banner **and** all five later components, because `main` has all of it.
+
+|           |                                                                                 |
+| --------- | ------------------------------------------------------------------------------- |
+| Day 1     | `nirav/banner` → pull request → merge. **Banner is in `main`.** Branch deleted. |
+| Days 2–10 | Five more components merge. `main` = Banner + 5.                                |
+| Day 11    | `nirav/banner-spacing` cut from `main` — contains Banner **and** all 5.         |
+
+A branch is not a shelf where a component lives; it is a shopping trip. Once the shopping is put
+away, the trip is over. You do not return to Tuesday's trip to buy milk on Friday.
+
+The staleness worry is real — but it is what a **long-lived** branch causes, and what cutting a
+fresh one every time prevents. This is also exactly why a single permanent branch per person does
+not work: your finished Banner would be stuck behind your half-written Card, unable to ship.
+
+### One branch per thing you'd merge or revert as a unit
+
+Usually that is one component. Not always:
+
+- Three small documentation fixes → one branch is fine
+- Banner, plus the token it needs, plus its stories → one branch, it's all one thing
+- Banner and Card → always two, because they ship independently
 
 ### Divide the work by component, not by file
 
@@ -244,15 +314,17 @@ empty page, not that nothing changed.
 
 ## When something goes wrong
 
-| What you see                                            | What it means                                              | What to do                                     |
-| ------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------- |
-| `Permission denied` on any npm command                  | `node_modules` came from another operating system          | `rm -rf node_modules && npm install`           |
-| `Executable doesn't exist at .../chrome-headless-shell` | Playwright's browser was never downloaded                  | `npx playwright install chromium`              |
-| A sweep says most stories are empty                     | You pointed it at the dev server, which compiles on demand | Build first, serve `storybook-static`          |
-| Red X on your pull request                              | A check failed                                             | Click **Details** — it names the file and line |
-| Storybook shows a spinner forever                       | It compiles pages on demand                                | Wait ~10s on first load of a page              |
-| A `dark:` class does nothing                            | Probably the config trap — see `CLAUDE.md`                 | Don't "simplify" `tailwind.config.ts`          |
-| Changed `tailwind.config.ts`, nothing happened          | Tailwind config needs a restart                            | Stop Storybook, start it again on 6006         |
+| What you see                                            | What it means                                              | What to do                                         |
+| ------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| `Permission denied` on any npm command                  | `node_modules` came from another operating system          | `rm -rf node_modules && npm install`               |
+| `Executable doesn't exist at .../chrome-headless-shell` | Playwright's browser was never downloaded                  | `npx playwright install chromium`                  |
+| A sweep says most stories are empty                     | You pointed it at the dev server, which compiles on demand | Build first, serve `storybook-static`              |
+| Red X on your pull request                              | A check failed                                             | Click **Details** — it names the file and line     |
+| Storybook shows a spinner forever                       | It compiles pages on demand                                | Wait ~10s on first load of a page                  |
+| A `dark:` class does nothing                            | Probably the config trap — see `CLAUDE.md`                 | Don't "simplify" `tailwind.config.ts`              |
+| Changed `tailwind.config.ts`, nothing happened          | Tailwind config needs a restart                            | Stop Storybook, start it again on 6006             |
+| `the branch is not fully merged` when deleting          | False alarm — squash-merge lands work as a new commit      | `git diff <branch> main`; if empty `git branch -D` |
+| A deleted branch still appears in `git branch -a`       | Stale remote-tracking ref                                  | `git fetch --prune`                                |
 
 ---
 
