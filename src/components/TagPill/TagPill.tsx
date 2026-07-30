@@ -28,10 +28,13 @@ export const tagPillVariants = cva(
     'mdt-inline-flex mdt-shrink-0 mdt-items-center',
     'mdt-h-6 mdt-gap-2',
     'mdt-whitespace-nowrap mdt-text-xs mdt-font-medium',
-    'mdt-border mdt-border-solid',
+    // No border. The edge sat a full step darker than the fill, which made the
+    // chip read as a dark-edged object rather than a soft one - and on a white
+    // page that is heavier still. The fill alone carries the shape at 1.22
+    // against the page, which is what a subtle chip is supposed to do.
     // Neutral only. Colour is a separate decision - see TagPill.types.ts.
-    'mdt-border-neutral-40 mdt-bg-neutral-30 mdt-text-neutral-110',
-    'dark:mdt-border-neutral-110 dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
+    'mdt-bg-neutral-30 mdt-text-neutral-110',
+    'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
   {

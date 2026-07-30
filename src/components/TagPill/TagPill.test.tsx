@@ -53,6 +53,13 @@ describe('TagPill', () => {
       expect(getTag()).toHaveClass('mdt-h-6');
     });
 
+    // The edge sat a full step darker than the fill, so the chip read as a
+    // dark-edged object. The fill alone carries the shape.
+    it('has no border', () => {
+      render(<TagPill>{TEXT}</TagPill>);
+      expect(getTag().className).not.toMatch(/mdt-border/);
+    });
+
     it('tints neutral in both themes', () => {
       render(<TagPill>{TEXT}</TagPill>);
       expect(getTag()).toHaveClass('mdt-bg-neutral-30');
