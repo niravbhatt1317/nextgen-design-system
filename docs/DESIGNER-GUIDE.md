@@ -91,27 +91,76 @@ All three should pass silently. Silence is success.
 
 ## Working together without stepping on each other
 
-**Never commit straight to `main`.** `main` is what's live. Every change goes through a branch and a
-pull request, even a one-word fix. It costs about thirty seconds and it means a mistake is caught by
-CI instead of by whoever opens the Storybook next.
+### One component, one branch, one pull request
+
+**Never commit straight to `main`.** `main` is what's live, and it is protected — a direct push is
+rejected. Every change goes through a branch and a pull request, even a one-word fix. It costs about
+thirty seconds and it is the whole safety net for a two-person team.
 
 ```bash
-git checkout main
-git pull                          # get the other person's work first
-git checkout -b add-card-component
-# ... make changes ...
-git add .
-git commit -m "add Card component"
-git push -u origin add-card-component
+git checkout main && git pull     # always start from current main
+git checkout -b banner            # one component per branch
+npm run storybook                 # build it, and look at it in both themes
+npm test && npm run lint          # the same checks CI will run
+git add -A
+git commit -F msg.txt             # message in a file - see below
+git push -u origin banner
+gh pr create
 ```
 
-Then open the pull request from the link GitHub prints.
+CI runs on the pull request. Merge when it's green.
 
-**Pull before you start, every time.** The most common way two people collide is one of them working
-from a copy that's two days old.
+### Divide the work by component, not by file
 
-**If you're both touching the same component, say so first.** Git can merge two edits to different
-files all day; two edits to the same twenty lines need a human.
+A component is a self-contained folder:
+
+```text
+src/components/Card/
+├── Card.tsx  Card.types.ts  Card.test.tsx  Card.stories.tsx  index.ts
+```
+
+If one of us builds `Card` and the other builds `Banner`, we touch **no files in common** and git
+merges the two without a word. So the unit of work is a whole component, and we claim one before
+starting it — a GitHub Issue each, so it's visible rather than remembered.
+
+### The one file that always collides
+
+`src/components/index.ts`. Every new component adds an export line there, so it is the single file
+both of us are guaranteed to edit.
+
+**It is sorted alphabetically, and that is deliberate.** Add your component in its alphabetical
+place — never append to the end. When the list was in append-order, both of us wrote at the last
+line and conflicted on every pull request. Alphabetical insertion puts two new components hundreds
+of lines apart, and git merges them silently.
+
+### The one thing to talk about first
+
+`src/styles/globals.css`. If either of us needs a **new token**, that is a design decision, not an
+implementation detail — so agree it before writing it. Two people adding tokens in parallel is how a
+palette grows a second green, and then "which green" becomes a live question on every component
+after it. See the token rule below.
+
+### Three habits that matter more than the commands
+
+- **Pull `main` before starting anything.** The commonest two-person collision is one of us working
+  from a copy that is three days old.
+- **Merge small and often.** A branch that lives a week diverges from everything. One component,
+  merged, then the next.
+- **Review each other's pull requests for _design_, not correctness.** CI already checks that it
+  works. What CI cannot check: does this match the system, does it need a token we don't have, is
+  that icon already being used for something else.
+
+### Commit messages
+
+Write the message in a file and pass it with `-F`:
+
+```bash
+git commit -F msg.txt
+```
+
+A long message passed inline gets mis-parsed by the shell here and git fails with
+_"'/' is outside repository"_. Conventional prefixes (`feat:`, `fix:`, `docs:`) are suggested but
+never enforced — your commit will not be rejected for its wording.
 
 ---
 

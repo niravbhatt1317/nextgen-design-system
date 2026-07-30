@@ -1,10 +1,13 @@
-// Button
-export { Button, ButtonVariants } from './Button';
-export type { ButtonProps, ButtonVariantsType } from './Button';
-
-// ButtonGroup
-export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
-export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
+// Every component this library exports.
+//
+// ORDER IS ALPHABETICAL, AND THAT IS LOAD-BEARING. Add your component in its
+// alphabetical place - do not append to the end.
+//
+// This file is the one file every new component has to touch, so it is the one
+// place two people working in parallel are guaranteed to collide. When the list
+// was in append-order, both of us added at the last line and conflicted on
+// every single pull request. Alphabetical insertion puts two new components
+// hundreds of lines apart, and git merges them without a word.
 
 // Avatar — circle or rounded square, photo or initials. The colour is derived
 // from the name, so one person is always one colour.
@@ -19,40 +22,6 @@ export type {
   AvatarShape,
 } from './Avatar';
 
-// CodeWell — read-only monospace surface. Both Org Mgmt and Agent Fleet asked
-// for exactly this in their audits.
-export { CodeWell, codeWellVariants } from './CodeWell';
-export type { CodeWellProps, CodeWellVariantsType, CodeWellSurface } from './CodeWell';
-
-// IconTile — tinted container for a single icon. Org Mgmt's most duplicated
-// inline pattern.
-export { IconTile, iconTileVariants } from './IconTile';
-export type {
-  IconTileProps,
-  IconTileVariantsType,
-  IconTileTone,
-  IconTileSize,
-  IconTileShape,
-} from './IconTile';
-
-// Label — the uppercase micro-heading, settling three competing letter-spacings
-export { Label, labelVariants } from './Label';
-export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
-
-// Progress — value fill with optional baseline and floor markers
-export { Progress, progressVariants } from './Progress';
-export type {
-  ProgressProps,
-  ProgressOwnProps,
-  ProgressVariantsType,
-  ProgressTone,
-  ProgressSize,
-} from './Progress';
-
-// SecretDots — a masked secret, at a fixed length so it leaks nothing
-export { SecretDots, BULLET_COUNT } from './SecretDots';
-export type { SecretDotsProps, SecretDotsSize } from './SecretDots';
-
 // Badge — one atom covering status pills, chips, counts, protocol pills and
 // bare icon+text labels, which the source systems built as five components
 export { Badge, badgeVariants } from './Badge';
@@ -65,27 +34,59 @@ export type {
   BadgeSize,
 } from './Badge';
 
-// Input
-export { Input, InputVariants } from './Input';
-export type { InputProps, InputVariantsType } from './Input';
+// Button
+export { Button, ButtonVariants } from './Button';
+export type { ButtonProps, ButtonVariantsType } from './Button';
 
-// InputGroup
-export {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-  InputGroupButton,
-  InputGroupTextarea,
-} from './InputGroup';
+// ButtonGroup
+export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
+export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
+
+// Checkbox
+export * from './Checkbox';
+
+// CodeWell — read-only monospace surface. Both Org Mgmt and Agent Fleet asked
+// for exactly this in their audits.
+export { CodeWell, codeWellVariants } from './CodeWell';
+export type { CodeWellProps, CodeWellVariantsType, CodeWellSurface } from './CodeWell';
+
+// Combobox
+export { Combobox, comboboxTriggerVariants } from './Combobox';
 export type {
-  InputGroupProps,
-  InputGroupAddonProps,
-  InputGroupInputProps,
-  InputGroupTextProps,
-  InputGroupButtonProps,
-  InputGroupTextareaProps,
-} from './InputGroup';
+  ComboboxProps,
+  ComboboxOption,
+  ComboboxTriggerVariants,
+  RenderOptionProps,
+  RenderTriggerProps,
+} from './Combobox';
+
+// Command
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from './Command';
+export type {
+  CommandProps,
+  CommandDialogProps,
+  CommandInputProps,
+  CommandListProps,
+  CommandEmptyProps,
+  CommandGroupProps,
+  CommandItemProps,
+  CommandSeparatorProps,
+  CommandShortcutProps,
+} from './Command';
+
+// Container
+export { Container, containerVariants } from './Container';
+export type { ContainerProps, ContainerVariants } from './Container';
 
 // Dialog
 export {
@@ -153,6 +154,25 @@ export type {
 /** @deprecated Use DropdownMenu instead. Will be removed in v2.0.0 */
 export { DropdownMenu as Dropdown } from './DropdownMenu';
 
+// Flex
+export { Flex, flexVariants } from './Flex';
+export type { FlexProps, FlexVariants } from './Flex';
+
+// Form
+export { Form, FormField, FormLabel, FormControl, FormMessage, FormDescription } from './Form';
+export type {
+  FormProps,
+  FormFieldProps,
+  FormLabelProps,
+  FormControlProps,
+  FormMessageProps,
+  FormDescriptionProps,
+} from './Form';
+
+// Grid
+export { Grid, gridVariants } from './Grid';
+export type { GridProps, GridVariants } from './Grid';
+
 // HoverCard
 export {
   HoverCard,
@@ -168,176 +188,54 @@ export type {
   HoverCardArrowProps,
 } from './HoverCard';
 
-// Popover
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose } from './Popover';
-export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
+// Icon
+export { Icon, iconVariants, iconRegistry, iconNames } from './Icon';
+export type { IconProps, IconVariants, IconName, IconSize, IconColor } from './Icon';
 
-// Select
-export { Select, selectTriggerVariants } from './Select';
+// IconTile — tinted container for a single icon. Org Mgmt's most duplicated
+// inline pattern.
+export { IconTile, iconTileVariants } from './IconTile';
 export type {
-  SelectProps,
-  SelectOption,
-  SelectOptionGroup,
-  SelectMode,
-  SelectSize,
-} from './Select';
+  IconTileProps,
+  IconTileVariantsType,
+  IconTileTone,
+  IconTileSize,
+  IconTileShape,
+} from './IconTile';
 
-// TagPill
-export { TagPill, tagPillVariants } from './TagPill';
-export type { TagPillProps, TagPillVariants } from './TagPill';
+// Input
+export { Input, InputVariants } from './Input';
+export type { InputProps, InputVariantsType } from './Input';
 
-// Toolbar
-export { Toolbar, ToolbarSection, ToolbarSpacer, toolbarVariants } from './Toolbar';
-export type { ToolbarProps, ToolbarVariants } from './Toolbar';
-
-// Sidebar
+// InputGroup
 export {
-  Sidebar,
-  SidebarHeader,
-  SidebarSearch,
-  SidebarContent,
-  SidebarSection,
-  SidebarLabel,
-  SidebarCollapse,
-  SidebarItem,
-  SidebarFooter,
-  sidebarVariants,
-} from './Sidebar';
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupButton,
+  InputGroupTextarea,
+} from './InputGroup';
 export type {
-  SidebarProps,
-  SidebarVariants,
-  SidebarHeaderProps,
-  SidebarSearchProps,
-  SidebarContentProps,
-  SidebarSectionProps,
-  SidebarLabelProps,
-  SidebarCollapseProps,
-  SidebarItemProps,
-  SidebarFooterProps,
-} from './Sidebar';
+  InputGroupProps,
+  InputGroupAddonProps,
+  InputGroupInputProps,
+  InputGroupTextProps,
+  InputGroupButtonProps,
+  InputGroupTextareaProps,
+} from './InputGroup';
 
-// Form
-export { Form, FormField, FormLabel, FormControl, FormMessage, FormDescription } from './Form';
-export type {
-  FormProps,
-  FormFieldProps,
-  FormLabelProps,
-  FormControlProps,
-  FormMessageProps,
-  FormDescriptionProps,
-} from './Form';
+// Item
+export { Item, itemVariants } from './Item';
+export type { ItemProps, ItemVariants } from './Item';
 
-// Container
-export { Container, containerVariants } from './Container';
-export type { ContainerProps, ContainerVariants } from './Container';
-
-// Stack
-export { Stack, stackVariants } from './Stack';
-export type { StackProps, StackVariants } from './Stack';
-
-// Separator
-export { Separator, separatorVariants } from './Separator';
-export type { SeparatorProps, SeparatorVariants } from './Separator';
-
-// Grid
-export { Grid, gridVariants } from './Grid';
-export type { GridProps, GridVariants } from './Grid';
-
-// Flex
-export { Flex, flexVariants } from './Flex';
-export type { FlexProps, FlexVariants } from './Flex';
-
-// Checkbox
-export * from './Checkbox';
-
-// Radio
-export * from './Radio';
-
-// Switch
-export { MotadataSwitch, motadataSwitchRootVariants, motadataSwitchThumbVariants } from './Switch';
-export type { MotadataSwitchProps, MotadataSwitchVariants } from './Switch';
-
-// Tabs
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
-export type {
-  TabsProps,
-  TabsListProps,
-  TabsTriggerProps,
-  TabsContentProps,
-  TabsVariant,
-} from './Tabs';
-
-// Combobox
-export { Combobox, comboboxTriggerVariants } from './Combobox';
-export type {
-  ComboboxProps,
-  ComboboxOption,
-  ComboboxTriggerVariants,
-  RenderOptionProps,
-  RenderTriggerProps,
-} from './Combobox';
-
-// Command
-export {
-  Command,
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandSeparator,
-  CommandShortcut,
-} from './Command';
-export type {
-  CommandProps,
-  CommandDialogProps,
-  CommandInputProps,
-  CommandListProps,
-  CommandEmptyProps,
-  CommandGroupProps,
-  CommandItemProps,
-  CommandSeparatorProps,
-  CommandShortcutProps,
-} from './Command';
+// Label — the uppercase micro-heading, settling three competing letter-spacings
+export { Label, labelVariants } from './Label';
+export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
 
 // OTPInput
 export { OTPInput } from './OTPInput';
 export type { OTPInputProps } from './OTPInput';
-
-// Spinner
-export { Spinner, spinnerVariants } from './Spinner';
-export type { SpinnerProps, SpinnerVariants } from './Spinner';
-
-// Textarea
-export { Textarea, textareaVariants } from './Textarea';
-export type { TextareaProps, TextareaVariants } from './Textarea';
-
-// Toggle
-export { Toggle, toggleVariants } from './Toggle';
-export type { ToggleProps, ToggleVariants } from './Toggle';
-
-// Toast
-export { Toast, toast } from './Toast';
-export type {
-  ToastProps,
-  ToastPosition,
-  ToastTheme,
-  ToastType,
-  ToasterProps,
-  ToastFunction,
-  PromiseToastOptions,
-} from './Toast';
-
-// Tooltip
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
-export type {
-  TooltipProps,
-  TooltipTriggerProps,
-  TooltipContentProps,
-  TooltipContentRef,
-  TooltipProviderProps,
-} from './Tooltip';
 
 // Pagination
 export {
@@ -358,55 +256,22 @@ export type {
   PaginationEllipsisProps,
 } from './Pagination';
 
-// Skeleton
-export { Skeleton, skeletonVariants } from './Skeleton';
-export type { SkeletonProps, SkeletonVariants } from './Skeleton';
+// Popover
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose } from './Popover';
+export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
 
-// Table
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableCaption,
-} from './Table';
+// Progress — value fill with optional baseline and floor markers
+export { Progress, progressVariants } from './Progress';
 export type {
-  TableProps,
-  TableHeaderProps,
-  TableBodyProps,
-  TableFooterProps,
-  TableRowProps,
-  TableHeadProps,
-  TableCellProps,
-  TableCaptionProps,
-} from './Table';
+  ProgressProps,
+  ProgressOwnProps,
+  ProgressVariantsType,
+  ProgressTone,
+  ProgressSize,
+} from './Progress';
 
-// Item
-export { Item, itemVariants } from './Item';
-export type { ItemProps, ItemVariants } from './Item';
-
-// Icon
-export { Icon, iconVariants, iconRegistry, iconNames } from './Icon';
-export type { IconProps, IconVariants, IconName, IconSize, IconColor } from './Icon';
-
-// ToggleGroup
-export {
-  ToggleGroup,
-  ToggleGroupItem,
-  toggleGroupVariants,
-  toggleGroupItemVariants,
-} from './ToggleGroup';
-export type {
-  ToggleGroupProps,
-  ToggleGroupSingleProps,
-  ToggleGroupMultipleProps,
-  ToggleGroupItemProps,
-  ToggleGroupVariants,
-  ToggleGroupItemVariants,
-} from './ToggleGroup';
+// Radio
+export * from './Radio';
 
 // Resizable
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './Resizable';
@@ -425,6 +290,24 @@ export type {
   ScrollAreaCornerProps,
   ScrollOrientation,
 } from './ScrollArea';
+
+// SecretDots — a masked secret, at a fixed length so it leaks nothing
+export { SecretDots, BULLET_COUNT } from './SecretDots';
+export type { SecretDotsProps, SecretDotsSize } from './SecretDots';
+
+// Select
+export { Select, selectTriggerVariants } from './Select';
+export type {
+  SelectProps,
+  SelectOption,
+  SelectOptionGroup,
+  SelectMode,
+  SelectSize,
+} from './Select';
+
+// Separator
+export { Separator, separatorVariants } from './Separator';
+export type { SeparatorProps, SeparatorVariants } from './Separator';
 
 // Sheet
 export {
@@ -454,3 +337,131 @@ export type {
   SheetSide,
   SheetVariants,
 } from './Sheet';
+
+// Sidebar
+export {
+  Sidebar,
+  SidebarHeader,
+  SidebarSearch,
+  SidebarContent,
+  SidebarSection,
+  SidebarLabel,
+  SidebarCollapse,
+  SidebarItem,
+  SidebarFooter,
+  sidebarVariants,
+} from './Sidebar';
+export type {
+  SidebarProps,
+  SidebarVariants,
+  SidebarHeaderProps,
+  SidebarSearchProps,
+  SidebarContentProps,
+  SidebarSectionProps,
+  SidebarLabelProps,
+  SidebarCollapseProps,
+  SidebarItemProps,
+  SidebarFooterProps,
+} from './Sidebar';
+
+// Skeleton
+export { Skeleton, skeletonVariants } from './Skeleton';
+export type { SkeletonProps, SkeletonVariants } from './Skeleton';
+
+// Spinner
+export { Spinner, spinnerVariants } from './Spinner';
+export type { SpinnerProps, SpinnerVariants } from './Spinner';
+
+// Stack
+export { Stack, stackVariants } from './Stack';
+export type { StackProps, StackVariants } from './Stack';
+
+// Switch
+export { MotadataSwitch, motadataSwitchRootVariants, motadataSwitchThumbVariants } from './Switch';
+export type { MotadataSwitchProps, MotadataSwitchVariants } from './Switch';
+
+// Table
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from './Table';
+export type {
+  TableProps,
+  TableHeaderProps,
+  TableBodyProps,
+  TableFooterProps,
+  TableRowProps,
+  TableHeadProps,
+  TableCellProps,
+  TableCaptionProps,
+} from './Table';
+
+// Tabs
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+export type {
+  TabsProps,
+  TabsListProps,
+  TabsTriggerProps,
+  TabsContentProps,
+  TabsVariant,
+} from './Tabs';
+
+// TagPill
+export { TagPill, tagPillVariants } from './TagPill';
+export type { TagPillProps, TagPillVariants } from './TagPill';
+
+// Textarea
+export { Textarea, textareaVariants } from './Textarea';
+export type { TextareaProps, TextareaVariants } from './Textarea';
+
+// Toast
+export { Toast, toast } from './Toast';
+export type {
+  ToastProps,
+  ToastPosition,
+  ToastTheme,
+  ToastType,
+  ToasterProps,
+  ToastFunction,
+  PromiseToastOptions,
+} from './Toast';
+
+// Toggle
+export { Toggle, toggleVariants } from './Toggle';
+export type { ToggleProps, ToggleVariants } from './Toggle';
+
+// ToggleGroup
+export {
+  ToggleGroup,
+  ToggleGroupItem,
+  toggleGroupVariants,
+  toggleGroupItemVariants,
+} from './ToggleGroup';
+export type {
+  ToggleGroupProps,
+  ToggleGroupSingleProps,
+  ToggleGroupMultipleProps,
+  ToggleGroupItemProps,
+  ToggleGroupVariants,
+  ToggleGroupItemVariants,
+} from './ToggleGroup';
+
+// Toolbar
+export { Toolbar, ToolbarSection, ToolbarSpacer, toolbarVariants } from './Toolbar';
+export type { ToolbarProps, ToolbarVariants } from './Toolbar';
+
+// Tooltip
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
+export type {
+  TooltipProps,
+  TooltipTriggerProps,
+  TooltipContentProps,
+  TooltipContentRef,
+  TooltipProviderProps,
+} from './Tooltip';
