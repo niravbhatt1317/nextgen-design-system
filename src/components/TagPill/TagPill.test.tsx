@@ -62,7 +62,7 @@ describe('TagPill', () => {
 
     it('tints neutral in both themes', () => {
       render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-bg-neutral-30');
+      expect(getTag()).toHaveClass('mdt-bg-neutral-20');
       expect(getTag()).toHaveClass('dark:mdt-bg-neutral-120');
     });
   });

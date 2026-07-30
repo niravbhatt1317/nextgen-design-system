@@ -33,7 +33,7 @@ export const tagPillVariants = cva(
     // page that is heavier still. The fill alone carries the shape at 1.22
     // against the page, which is what a subtle chip is supposed to do.
     // Neutral only. Colour is a separate decision - see TagPill.types.ts.
-    'mdt-bg-neutral-30 mdt-text-neutral-110',
+    'mdt-bg-neutral-20 mdt-text-neutral-110',
     'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
@@ -57,8 +57,13 @@ export const tagPillVariants = cva(
         false: 'mdt-pr-2.5',
       },
       /**
-       * The chip lifts one step on hover. It does not change width; a tag that
-       * grows shoves its neighbours sideways while you are aiming at them.
+       * The chip lifts on hover. It does not change width; a tag that grows
+       * shoves its neighbours sideways while you are aiming at them.
+       *
+       * It skips a step - neutral-20 to neutral-40 rather than to neutral-30 -
+       * because the palette has no even spacing at the light end. The next step
+       * up measures 1.07 against the rest state, less than half the strength of
+       * a hover anyone would notice. Skipping to 40 measures 1.32.
        */
       interactive: {
         true: 'hover:mdt-bg-neutral-40 dark:hover:mdt-bg-neutral-110',
