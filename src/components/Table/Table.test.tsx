@@ -994,4 +994,105 @@ describe('Table', () => {
       expect(td).not.toHaveClass('group-data-[scrolled-top=true]:mdt-border-border/30');
     });
   });
+
+  describe('frozen columns', () => {
+    it('pins a header cell to the left on the upper sticky plane', () => {
+      // A frozen body cell and the frozen header cell cross at the top-left
+      // corner. Equal z-index would let the body cell paint over the header,
+      // because tbody comes after thead in the DOM.
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableHeader>
+            <TableRow>
+              <TableHead frozen>Name</TableHead>
+              <TableHead>Email</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      const [first, second] = [...container.querySelectorAll('th')];
+      expect(first).toHaveClass('mdt-sticky');
+      expect(first).toHaveClass('mdt-left-0');
+      expect(first).toHaveClass('mdt-z-sticky-header');
+      expect(second).not.toHaveClass('mdt-sticky');
+    });
+
+    it('pins a body cell on the lower sticky plane', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell frozen>Name</TableCell>
+              <TableCell>Email</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const [first, second] = [...container.querySelectorAll('td')];
+      expect(first).toHaveClass('mdt-z-sticky');
+      expect(first).not.toHaveClass('mdt-z-sticky-header');
+      expect(second).not.toHaveClass('mdt-sticky');
+    });
+
+    it('leaves cells unfrozen by default', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>Plain</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('td')).not.toHaveClass('mdt-left-0');
+    });
+
+    it('reveals its edge only once something has slid underneath', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell frozen>Name</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      // full-weight edge at rest, lighter once scrolled, band fades in
+      expect(td).toHaveClass('mdt-border-r');
+      expect(td).toHaveClass('group-data-[scrolled-x=true]:mdt-border-border/30');
+      expect(td).toHaveClass('group-data-[scrolled-x=true]:before:mdt-opacity-100');
+    });
+
+    it('uses ::before so a frozen cell inside a pinned row can use both', () => {
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="top">
+              <TableCell frozen>Corner</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).toHaveClass('group-data-[scrolled-x=true]:before:mdt-opacity-100');
+      expect(td).toHaveClass('group-data-[scrolled-top=true]:after:mdt-opacity-100');
+    });
+
+    it('tracks horizontal scroll on the container', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell frozen>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('[data-scrolled-x]')).toHaveAttribute(
+        'data-scrolled-x',
+        'false'
+      );
+    });
+  });
 });

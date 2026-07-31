@@ -256,6 +256,7 @@ const config: Config = {
       zIndex: {
         base: 'var(--mdt-z-base)',
         sticky: 'var(--mdt-z-sticky)',
+        'sticky-header': 'var(--mdt-z-sticky-header)',
         overlay: 'var(--mdt-z-overlay)',
         modal: 'var(--mdt-z-modal)',
         dropdown: 'var(--mdt-z-dropdown)',
