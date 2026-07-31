@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -7,6 +7,8 @@ import {
   TableBody,
   TableFooter,
   TableRow,
+  TableGroupRow,
+  TableExpandTrigger,
   TableHead,
   TableCell,
   TableCaption,
@@ -162,7 +164,8 @@ describe('Table', () => {
 
   describe('density', () => {
     const cases: [TableDensity, string, string][] = [
-      ['condensed', 'mdt-h-8', 'mdt-px-2'],
+      ['short', 'mdt-h-8', 'mdt-px-2'],
+      ['compact', 'mdt-h-10', 'mdt-px-3'],
       ['default', 'mdt-h-12', 'mdt-p-4'],
       ['relaxed', 'mdt-h-14', 'mdt-px-6'],
     ];
@@ -186,7 +189,7 @@ describe('Table', () => {
       expect(container.querySelector('td')).toHaveClass(cellClass);
     });
 
-    it('defaults to `default` density when not given', () => {
+    it('defaults to compact density when not given', () => {
       const { container } = render(
         <Table>
           <TableBody>
@@ -196,7 +199,8 @@ describe('Table', () => {
           </TableBody>
         </Table>
       );
-      expect(container.querySelector('td')).toHaveClass('mdt-p-4');
+      expect(container.querySelector('td')).toHaveClass('mdt-px-3');
+      expect(container.querySelector('td')).toHaveClass('mdt-py-2');
     });
   });
 
@@ -463,6 +467,531 @@ describe('Table', () => {
     it('does not reverse for a left-aligned column', () => {
       renderSortable({ align: 'left' });
       expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('mdt-flex-row-reverse');
+    });
+  });
+
+  describe('summary rows', () => {
+    it('gives a summary row its own weight and tint', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow summary>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveClass('mdt-font-medium');
+      expect(row).toHaveClass('mdt-bg-muted/50');
+    });
+
+    it('does not offer hover feedback - a total is not selectable', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow summary>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('tbody tr')).not.toHaveClass('hover:mdt-bg-muted/50');
+    });
+
+    it('is never striped, even in a striped table', () => {
+      const { container } = render(
+        <Table striped>
+          <TableBody>
+            <TableRow summary>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('tbody tr')).not.toHaveClass('odd:mdt-bg-muted/50');
+    });
+  });
+
+  describe('indentation', () => {
+    it.each([
+      [1, 'mdt-pl-8'],
+      [2, 'mdt-pl-14'],
+      [3, 'mdt-pl-20'],
+    ] as const)('indents a cell to level %i', (indent, expected) => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell indent={indent}>Child</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('td')).toHaveClass(expected);
+    });
+
+    it('adds no indent at level 0', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>Top level</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).not.toHaveClass('mdt-pl-8');
+      expect(td).not.toHaveClass('mdt-pl-14');
+      expect(td).not.toHaveClass('mdt-pl-20');
+    });
+  });
+
+  describe('group rows', () => {
+    it('spans the whole table', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={4}>Mobile App</TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('td')).toHaveAttribute('colspan', '4');
+      expect(screen.getByText('Mobile App')).toBeInTheDocument();
+    });
+
+    it('shows a count when given one', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2} count={12}>
+              Platform
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.getByText('12')).toBeInTheDocument();
+    });
+
+    it('omits the count when not given', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2}>Platform</TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.queryByText('12')).not.toBeInTheDocument();
+    });
+
+    it('renders no control at all for a static group', () => {
+      // A dead control is worse than none - it invites a click that does nothing.
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2}>Static</TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('renders a disclosure control when collapsible, with aria-expanded', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2} expanded onToggle={() => undefined}>
+              Mobile App
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.getByRole('button', { name: 'Mobile App' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+    });
+
+    it('reports aria-expanded false when collapsed', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2} expanded={false} onToggle={() => undefined}>
+              Mobile App
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.getByRole('button', { name: 'Mobile App' })).toHaveAttribute(
+        'aria-expanded',
+        'false'
+      );
+    });
+
+    it('calls onToggle when the control is used', async () => {
+      const onToggle = vi.fn();
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2} onToggle={onToggle}>
+              Mobile App
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Mobile App' }));
+      expect(onToggle).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to a generic label when the heading is not plain text', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow colSpan={2} onToggle={() => undefined}>
+              <strong>Rich</strong>
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.getByRole('button', { name: 'Toggle group' })).toBeInTheDocument();
+    });
+
+    it('accepts an explicit toggle label', () => {
+      render(
+        <Table>
+          <TableBody>
+            <TableGroupRow
+              colSpan={2}
+              toggleLabel="Open the mobile group"
+              onToggle={() => undefined}
+            >
+              Mobile App
+            </TableGroupRow>
+          </TableBody>
+        </Table>
+      );
+      expect(screen.getByRole('button', { name: 'Open the mobile group' })).toBeInTheDocument();
+    });
+  });
+
+  describe('expand trigger', () => {
+    it('reports aria-expanded and a default label', () => {
+      render(<TableExpandTrigger expanded={false} onToggle={() => undefined} />);
+      const button = screen.getByRole('button', { name: 'Toggle row' });
+      expect(button).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('reports aria-expanded when open', () => {
+      render(<TableExpandTrigger expanded onToggle={() => undefined} />);
+      expect(screen.getByRole('button', { name: 'Toggle row' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+    });
+
+    it('accepts a custom label', () => {
+      render(<TableExpandTrigger expanded onToggle={() => undefined} label="Show time entries" />);
+      expect(screen.getByRole('button', { name: 'Show time entries' })).toBeInTheDocument();
+    });
+
+    it('calls onToggle when clicked', async () => {
+      const onToggle = vi.fn();
+      render(<TableExpandTrigger expanded={false} onToggle={onToggle} />);
+      await userEvent.click(screen.getByRole('button'));
+      expect(onToggle).toHaveBeenCalledTimes(1);
+    });
+
+    it('is operable by keyboard', async () => {
+      const onToggle = vi.fn();
+      render(<TableExpandTrigger expanded={false} onToggle={onToggle} />);
+      screen.getByRole('button').focus();
+      await userEvent.keyboard('{Enter}');
+      expect(onToggle).toHaveBeenCalled();
+    });
+  });
+
+  describe('sticky rows and scroll state', () => {
+    it('pins a row to the top through its cells, not the row itself', () => {
+      // `position: sticky` on a <tr> is unreliable, and a box-shadow on one does
+      // not render under border-collapse. Both have to land on the cells.
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="top" summary>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).toHaveClass('mdt-sticky');
+      expect(td).toHaveClass('mdt-top-0');
+      expect(td).toHaveClass('mdt-z-sticky');
+      expect(container.querySelector('tbody tr')).not.toHaveClass('mdt-sticky');
+    });
+
+    it('pins a row to the bottom', () => {
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="bottom" summary>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).toHaveClass('mdt-bottom-0');
+      expect(td).not.toHaveClass('mdt-top-0');
+    });
+
+    it('leaves cells unpinned by default', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>Plain</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('td')).not.toHaveClass('mdt-sticky');
+    });
+
+    it('shows the shadow only while something is scrolled underneath', () => {
+      // The shadow is conditioned on the container's scroll state, so a pinned
+      // total sitting at the true end of the data stays flat.
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="top">
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      // A gradient band, not a box-shadow: under border-separate a box-shadow
+      // casts on all four sides of every cell and stacks into vertical seams
+      // between the columns.
+      expect(container.querySelector('td')).toHaveClass(
+        'group-data-[scrolled-top=true]:after:mdt-opacity-100'
+      );
+      // Nothing is scrolled in jsdom, so the container reports both edges false.
+      const scroller = container.querySelector('[data-scrolled-top]');
+      expect(scroller).toHaveAttribute('data-scrolled-top', 'false');
+      expect(scroller).toHaveAttribute('data-scrolled-bottom', 'false');
+    });
+
+    it('applies maxHeight to the scroll container', () => {
+      const { container } = render(
+        <Table maxHeight="12rem">
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('[data-scrolled-top]')).toHaveStyle({ maxHeight: '12rem' });
+    });
+
+    it('sets no max-height when not asked', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const el = container.querySelector('[data-scrolled-top]') as HTMLElement;
+      expect(el.style.maxHeight).toBe('');
+    });
+  });
+
+  describe('layout', () => {
+    it('uses fixed layout when asked, so columns stop moving as rows appear', () => {
+      const { container } = render(
+        <Table layout="fixed">
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('table')).toHaveClass('mdt-table-fixed');
+    });
+
+    it('defaults to auto layout', () => {
+      const { container } = render(
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('table')).not.toHaveClass('mdt-table-fixed');
+    });
+  });
+
+  describe('scroll state tracking', () => {
+    /** jsdom has no real layout, so the container's metrics have to be faked. */
+    const fakeMetrics = (el: HTMLElement, scrollTop: number, clientH: number, scrollH: number) => {
+      Object.defineProperty(el, 'scrollTop', { value: scrollTop, configurable: true });
+      Object.defineProperty(el, 'clientHeight', { value: clientH, configurable: true });
+      Object.defineProperty(el, 'scrollHeight', { value: scrollH, configurable: true });
+    };
+
+    const renderScroller = () => {
+      const { container } = render(
+        <Table maxHeight="10rem" stickyHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead>H</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      return container.querySelector('[data-scrolled-top]') as HTMLElement;
+    };
+
+    it('reports content above once scrolled down', async () => {
+      const el = renderScroller();
+      fakeMetrics(el, 40, 100, 400);
+      fireEvent.scroll(el);
+      await waitFor(() => {
+        expect(el).toHaveAttribute('data-scrolled-top', 'true');
+      });
+      expect(el).toHaveAttribute('data-scrolled-bottom', 'true');
+    });
+
+    it('reports nothing below once scrolled to the end', async () => {
+      const el = renderScroller();
+      fakeMetrics(el, 300, 100, 400);
+      fireEvent.scroll(el);
+      await waitFor(() => {
+        expect(el).toHaveAttribute('data-scrolled-bottom', 'false');
+      });
+      expect(el).toHaveAttribute('data-scrolled-top', 'true');
+    });
+
+    it('reports both edges clear when the content fits', async () => {
+      const el = renderScroller();
+      fakeMetrics(el, 0, 400, 400);
+      fireEvent.scroll(el);
+      await waitFor(() => {
+        expect(el).toHaveAttribute('data-scrolled-top', 'false');
+      });
+      expect(el).toHaveAttribute('data-scrolled-bottom', 'false');
+    });
+  });
+
+  describe('the stuck edge is visible', () => {
+    it('gives a top-pinned cell its own border', () => {
+      // A sticky cell leaves its row behind, and under border-collapse the row's
+      // border does not travel with it - so without this a pinned header has no
+      // edge at all.
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="top">
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      expect(container.querySelector('td')).toHaveClass('mdt-border-b');
+    });
+
+    it('gives a bottom-pinned cell a border on the other edge', () => {
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="bottom">
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).toHaveClass('mdt-border-t');
+      expect(td).not.toHaveClass('mdt-border-b');
+    });
+
+    it('puts containerClassName on the scroll container, which is what clips', () => {
+      const { container } = render(
+        <Table containerClassName="mdt-rounded-md mdt-border" maxHeight="10rem">
+          <TableBody>
+            <TableRow>
+              <TableCell>A</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const scroller = container.querySelector('[data-scrolled-top]');
+      expect(scroller).toHaveClass('mdt-rounded-md');
+      expect(scroller).toHaveClass('mdt-overflow-auto');
+    });
+  });
+
+  describe('the pinned edge only lightens once pinned', () => {
+    it('carries a full-strength border at rest and a lighter one when scrolled', () => {
+      const { container } = render(
+        <Table maxHeight="10rem" stickyHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead>H</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      const th = container.querySelector('th');
+      // At rest it matches an ordinary header edge...
+      expect(th).toHaveClass('mdt-border-border');
+      // ...and steps back only once content is underneath it.
+      expect(th).toHaveClass('group-data-[scrolled-top=true]:mdt-border-border/30');
+    });
+
+    it('keeps the dark edge at full weight even when pinned', () => {
+      // The dark wash reaches about four luminance points, so the border has to
+      // carry the boundary there.
+      const { container } = render(
+        <Table maxHeight="10rem" stickyHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead>H</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      expect(container.querySelector('th')).toHaveClass(
+        'dark:group-data-[scrolled-top=true]:mdt-border-border'
+      );
+    });
+
+    it('applies the same rule to a bottom-pinned row, on its own edge', () => {
+      const { container } = render(
+        <Table maxHeight="10rem">
+          <TableBody>
+            <TableRow sticky="bottom">
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const td = container.querySelector('td');
+      expect(td).toHaveClass('group-data-[scrolled-bottom=true]:mdt-border-border/30');
+      expect(td).not.toHaveClass('group-data-[scrolled-top=true]:mdt-border-border/30');
     });
   });
 });

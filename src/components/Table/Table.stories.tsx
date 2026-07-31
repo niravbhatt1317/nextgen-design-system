@@ -1,12 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
-import { Button } from '../Button';
+import { Fragment, useState } from 'react';
 import { Checkbox } from '../Checkbox';
 import { Icon } from '../Icon';
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -19,6 +17,8 @@ import {
   TableCaption,
   TableCell,
   TableFooter,
+  TableExpandTrigger,
+  TableGroupRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -42,12 +42,51 @@ const meta: Meta<typeof Table> = {
     },
   },
   argTypes: {
+    density: {
+      control: 'inline-radio',
+      options: ['short', 'compact', 'default', 'relaxed'],
+      description:
+        'Row height and cell padding. Four steps, following Airtable — the only reference that ships a row-height picker to the user rather than fixing it at design time.',
+      table: {
+        type: { summary: "'short' | 'compact' | 'default' | 'relaxed'" },
+        defaultValue: { summary: 'compact' },
+      },
+    },
+    striped: {
+      control: 'boolean',
+      description:
+        'Zebra-stripe alternate body rows. Off by default — a single row divider carries the structure in most tables, but long dense ones read better striped.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    stickyHeader: {
+      control: 'boolean',
+      description:
+        'Keep the header visible while the body scrolls. **Needs `maxHeight`** — sticky positions against the nearest scrolling ancestor, and without a height the table never scrolls.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    maxHeight: {
+      control: 'text',
+      description:
+        'Caps the height and makes the table scroll internally. This is what a sticky header and a pinned summary row hold onto. Accepts anything CSS does.',
+      table: { type: { summary: 'string | number' } },
+    },
+    layout: {
+      control: 'inline-radio',
+      options: ['auto', 'fixed'],
+      description:
+        'How column widths are decided. Use `fixed` when rows appear and disappear — collapsing a group in an `auto` table visibly resizes every column.',
+      table: { type: { summary: "'auto' | 'fixed'" }, defaultValue: { summary: 'auto' } },
+    },
+    containerClassName: {
+      control: 'text',
+      description:
+        'Classes for the scroll container. A border radius has to go here rather than on a wrapper of your own — the scroll container is what clips, so a radius outside it gets painted over by the sticky header.',
+      table: { type: { summary: 'string' } },
+    },
     className: {
       control: 'text',
-      description: 'Additional CSS classes to apply',
-      table: {
-        type: { summary: 'string' },
-      },
+      description: 'Additional CSS classes applied to the `<table>` element',
+      table: { type: { summary: 'string' } },
     },
   },
 };
@@ -113,8 +152,9 @@ const users = [
  * Default table with basic invoice data.
  */
 export const Default: Story = {
-  render: () => (
-    <Table>
+  args: { density: 'compact', striped: false, layout: 'auto' },
+  render: (args) => (
+    <Table {...args}>
       <TableHeader>
         <TableRow>
           <TableHead className="mdt-w-[100px]">Invoice</TableHead>
@@ -238,7 +278,7 @@ export const StripedRows: Story = {
 export const Density: Story = {
   render: () => (
     <div className="mdt-flex mdt-flex-col mdt-gap-8">
-      {(['condensed', 'default', 'relaxed'] as const).map((density) => (
+      {(['short', 'compact', 'default', 'relaxed'] as const).map((density) => (
         <div key={density}>
           <p className="mdt-mb-2 mdt-text-sm mdt-font-medium mdt-text-muted-foreground">
             density=&quot;{density}&quot;
@@ -252,7 +292,7 @@ export const Density: Story = {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.slice(0, 3).map((user) => (
+              {users.slice(0, 2).map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="mdt-font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -315,28 +355,31 @@ export const Alignment: Story = {
  */
 export const StickyHeader: Story = {
   render: () => (
-    <div className="mdt-h-64 mdt-overflow-auto mdt-rounded-md mdt-border">
-      <Table stickyHeader density="condensed">
-        <TableHeader>
-          <TableRow>
-            <TableHead>#</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead align="right">Score</TableHead>
+    <Table
+      stickyHeader
+      maxHeight="16rem"
+      density="short"
+      containerClassName="mdt-rounded-md mdt-border"
+    >
+      <TableHeader>
+        <TableRow>
+          <TableHead>#</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead align="right">Score</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 30 }, (_, i) => (
+          <TableRow key={i}>
+            <TableCell>{i + 1}</TableCell>
+            <TableCell className="mdt-font-medium">Row {i + 1}</TableCell>
+            <TableCell>row{i + 1}@example.com</TableCell>
+            <TableCell align="right">{(i + 1) * 7}</TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 30 }, (_, i) => (
-            <TableRow key={i}>
-              <TableCell>{i + 1}</TableCell>
-              <TableCell className="mdt-font-medium">Row {i + 1}</TableCell>
-              <TableCell>row{i + 1}@example.com</TableCell>
-              <TableCell align="right">{(i + 1) * 7}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        ))}
+      </TableBody>
+    </Table>
   ),
 };
 
@@ -486,13 +529,13 @@ export const SelectableRows: Story = {
 };
 
 /**
- * The same table at `density="condensed"`. This used to be hand-written padding
+ * The same table at `density="short"`. This used to be hand-written padding
  * on every single cell — the story demonstrated a capability the component did
  * not actually have, so every product rebuilt it slightly differently.
  */
 export const CompactDense: Story = {
   render: () => (
-    <Table density="condensed">
+    <Table density="short">
       <TableCaption>One prop on the table, not a class on every cell.</TableCaption>
       <TableHeader>
         <TableRow>
@@ -666,53 +709,41 @@ export const EmptyState: Story = {
 };
 
 /**
- * Full-featured table with sorting, selection, and pagination.
+ * Everything at once — density, sorting, selection, a sticky header and
+ * pagination — built entirely from the component's own props.
+ *
+ * This story used to hand-assemble its sorting: a bespoke `SortIcon`, stacked
+ * chevrons, and every header wrapped in a `Button`. About fifty lines of
+ * scaffolding, none of it reusable, and no `aria-sort` for screen readers.
+ * It is six lines now, and it is the story people copy from.
  */
 export const FullFeatured: Story = {
   render: function FullFeaturedTable() {
     type SortKey = 'name' | 'email' | 'role' | 'status';
-    type SortOrder = 'asc' | 'desc' | null;
 
     const [sortKey, setSortKey] = useState<SortKey | null>(null);
-    const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+    const [sortOrder, setSortOrder] = useState<TableSortOrder>(null);
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3;
 
     const handleSort = (key: SortKey) => {
-      if (sortKey === key) {
-        if (sortOrder === 'asc') {
-          setSortOrder('desc');
-        } else if (sortOrder === 'desc') {
-          setSortKey(null);
-          setSortOrder(null);
-        } else {
-          setSortOrder('asc');
-        }
-      } else {
+      if (sortKey !== key) {
         setSortKey(key);
-        setSortOrder('asc');
+        setSortOrder('ascend');
+        return;
       }
+      if (sortOrder === 'ascend') {
+        setSortOrder('descend');
+        return;
+      }
+      setSortKey(null);
+      setSortOrder(null);
     };
 
     const sortedUsers = [...users].sort((a, b) => {
       if (!sortKey || !sortOrder) return 0;
-
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
-
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
+      const direction = sortOrder === 'ascend' ? 1 : -1;
+      return a[sortKey] > b[sortKey] ? direction : -direction;
     });
-
-    const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
-    const paginatedUsers = sortedUsers.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    );
 
     const toggleRow = (id: number) => {
       setSelectedRows((prev) =>
@@ -720,123 +751,54 @@ export const FullFeatured: Story = {
       );
     };
 
-    const toggleAll = () => {
-      const currentPageIds = paginatedUsers.map((u) => u.id);
-      const allCurrentSelected = currentPageIds.every((id) => selectedRows.includes(id));
+    const allSelected = selectedRows.length === users.length;
 
-      if (allCurrentSelected) {
-        setSelectedRows((prev) => prev.filter((id) => !currentPageIds.includes(id)));
-      } else {
-        setSelectedRows((prev) => [...new Set([...prev, ...currentPageIds])]);
-      }
-    };
-
-    const SortIcon = ({ active, order }: { active: boolean; order: SortOrder }) => (
-      <span className="mdt-ml-2 mdt-inline-flex mdt-flex-col">
-        <Icon
-          name="chevron-up"
-          size="xs"
-          className={
-            active && order === 'asc' ? 'mdt-text-foreground' : 'mdt-text-muted-foreground/40'
-          }
-        />
-        <Icon
-          name="chevron-down"
-          size="xs"
-          className={`mdt--mt-1 ${active && order === 'desc' ? 'mdt-text-foreground' : 'mdt-text-muted-foreground/40'}`}
-        />
-      </span>
-    );
+    const columns: { key: SortKey; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+      { key: 'status', label: 'Status' },
+    ];
 
     return (
-      <div className="mdt-space-y-4">
-        <div className="mdt-text-sm mdt-text-muted-foreground">
+      <div className="mdt-flex mdt-flex-col mdt-gap-4">
+        <p className="mdt-text-sm mdt-text-muted-foreground">
           {selectedRows.length} of {users.length} row(s) selected.
-        </div>
+        </p>
 
-        <Table>
-          <TableCaption>Full-featured table with sorting, selection, and pagination.</TableCaption>
+        <Table
+          stickyHeader
+          maxHeight="18rem"
+          layout="fixed"
+          containerClassName="mdt-rounded-md mdt-border"
+        >
           <TableHeader>
             <TableRow>
-              <TableHead className="mdt-w-[50px]">
+              <TableHead className="mdt-w-12">
                 <Checkbox
-                  checked={paginatedUsers.every((u) => selectedRows.includes(u.id))}
-                  onCheckedChange={toggleAll}
-                  aria-label="Select all rows on this page"
+                  checked={allSelected}
+                  onCheckedChange={() => {
+                    setSelectedRows(allSelected ? [] : users.map((u) => u.id));
+                  }}
+                  aria-label="Select all rows"
                 />
               </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    handleSort('name');
+              {columns.map((column) => (
+                <TableHead
+                  key={column.key}
+                  sortable
+                  sortOrder={sortKey === column.key ? sortOrder : null}
+                  onSort={() => {
+                    handleSort(column.key);
                   }}
-                  className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                  aria-label="Sort by name"
                 >
-                  Name
-                  <SortIcon
-                    active={sortKey === 'name'}
-                    order={sortKey === 'name' ? sortOrder : null}
-                  />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    handleSort('email');
-                  }}
-                  className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                  aria-label="Sort by email"
-                >
-                  Email
-                  <SortIcon
-                    active={sortKey === 'email'}
-                    order={sortKey === 'email' ? sortOrder : null}
-                  />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    handleSort('role');
-                  }}
-                  className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                  aria-label="Sort by role"
-                >
-                  Role
-                  <SortIcon
-                    active={sortKey === 'role'}
-                    order={sortKey === 'role' ? sortOrder : null}
-                  />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    handleSort('status');
-                  }}
-                  className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                  aria-label="Sort by status"
-                >
-                  Status
-                  <SortIcon
-                    active={sortKey === 'status'}
-                    order={sortKey === 'status' ? sortOrder : null}
-                  />
-                </Button>
-              </TableHead>
+                  {column.label}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.map((user) => (
+            {sortedUsers.map((user) => (
               <TableRow key={user.id} selected={selectedRows.includes(user.id)}>
                 <TableCell>
                   <Checkbox
@@ -859,42 +821,235 @@ export const FullFeatured: Story = {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentPage((prev) => Math.max(1, prev - 1));
-                }}
-              />
+              <PaginationPrevious href="#" />
             </PaginationItem>
-            {[...Array(totalPages)].map((_, i) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <PaginationItem key={i + 1}>
-                <PaginationLink
-                  href="#"
-                  isActive={currentPage === i + 1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(i + 1);
-                  }}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            {totalPages > 5 && <PaginationEllipsis />}
             <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-                }}
-              />
+              <PaginationLink href="#" isActive>
+                1
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
     );
   },
+};
+
+/**
+ * Grouped rows were the commonest structure across the reference tables — Jira,
+ * Height, ClickUp, GitHub Projects, Attio and bank statements all use them.
+ *
+ * `TableGroupRow` spans the whole table. Pass `onToggle` to make it collapsible;
+ * leave it off and no control is rendered, rather than a dead one.
+ */
+export const GroupedRows: Story = {
+  render: function Grouped() {
+    const groups = [
+      { name: 'Mobile App', rows: users.slice(0, 2) },
+      { name: 'Platform', rows: users.slice(2, 5) },
+    ];
+    const [collapsed, setCollapsed] = useState<string[]>([]);
+
+    const toggle = (name: string) => {
+      setCollapsed((prev) =>
+        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+      );
+    };
+
+    return (
+      <Table layout="fixed">
+        <TableCaption>
+          Click a group heading to collapse it. `layout=&quot;fixed&quot;` keeps the columns still —
+          without it the browser re-measures from whatever rows are left and every column jumps.
+        </TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="mdt-w-1/3">Name</TableHead>
+            <TableHead className="mdt-w-1/2">Email</TableHead>
+            <TableHead>Role</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {groups.map((group) => (
+            <Fragment key={group.name}>
+              <TableGroupRow
+                colSpan={3}
+                count={group.rows.length}
+                expanded={!collapsed.includes(group.name)}
+                onToggle={() => {
+                  toggle(group.name);
+                }}
+              >
+                {group.name}
+              </TableGroupRow>
+              {!collapsed.includes(group.name) &&
+                group.rows.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="mdt-font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                  </TableRow>
+                ))}
+            </Fragment>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  },
+};
+
+/**
+ * A row that reveals child rows beneath it. `TableExpandTrigger` is a control you
+ * place in a cell rather than a prop on the row — where the chevron belongs
+ * differs from table to table, and the component has no business owning your
+ * tree state.
+ *
+ * Child rows use `indent` on their **first cell only**. Indenting every cell
+ * shifts the whole row and breaks the column alignment that makes a table
+ * readable.
+ */
+export const ExpandableRows: Story = {
+  render: function Expandable() {
+    const [open, setOpen] = useState<number[]>([1]);
+    const entries: Record<number, { label: string; hours: string }[]> = {
+      1: [
+        { label: '06:51 – 09:21', hours: '2h 30m' },
+        { label: '09:20 – 09:21', hours: '0h' },
+      ],
+      2: [{ label: '10:00 – 10:39', hours: '38m' }],
+    };
+
+    const toggle = (id: number) => {
+      setOpen((prev) => (prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]));
+    };
+
+    return (
+      <Table>
+        <TableCaption>Expand a task to see its time entries.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Task</TableHead>
+            <TableHead align="right">Total</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {[1, 2].map((id) => (
+            <Fragment key={id}>
+              <TableRow>
+                <TableCell>
+                  <span className="mdt-inline-flex mdt-items-center mdt-gap-2">
+                    <TableExpandTrigger
+                      expanded={open.includes(id)}
+                      onToggle={() => {
+                        toggle(id);
+                      }}
+                      label={`Show entries for task ${String(id)}`}
+                    />
+                    <span className="mdt-font-medium">Feature {id === 1 ? 'A' : 'B'}</span>
+                  </span>
+                </TableCell>
+                <TableCell align="right">{id === 1 ? '2h 30m' : '38m'}</TableCell>
+              </TableRow>
+              {open.includes(id) &&
+                entries[id]?.map((entry) => (
+                  <TableRow key={entry.label}>
+                    <TableCell indent={1} className="mdt-text-muted-foreground">
+                      {entry.label}
+                    </TableCell>
+                    <TableCell align="right">{entry.hours}</TableCell>
+                  </TableRow>
+                ))}
+            </Fragment>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  },
+};
+
+/**
+ * A total that sits somewhere other than the table foot. `TableFooter` already
+ * treats its rows as summaries — `summary` is for a subtotal inside the body, or
+ * a total row at the top, which is what the analytics references do.
+ */
+export const SummaryRows: Story = {
+  render: () => (
+    <Table striped>
+      <TableCaption>
+        A summary row is never striped and offers no hover — it is a conclusion, not a record.
+      </TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Post</TableHead>
+          <TableHead align="right">Impressions</TableHead>
+          <TableHead align="right">Engagements</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow summary>
+          <TableCell>3 posts</TableCell>
+          <TableCell align="right">53</TableCell>
+          <TableCell align="right">11</TableCell>
+        </TableRow>
+        {[
+          { post: 'Launch announcement', impressions: 29, engagements: 5 },
+          { post: 'Design system update', impressions: 13, engagements: 5 },
+          { post: 'Hiring: product designer', impressions: 11, engagements: 1 },
+        ].map((row) => (
+          <TableRow key={row.post}>
+            <TableCell>{row.post}</TableCell>
+            <TableCell align="right">{row.impressions}</TableCell>
+            <TableCell align="right">{row.engagements}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+};
+
+/**
+ * A summary row pinned to the top or bottom of the scroll area.
+ *
+ * The shadow appears **only while something is scrolled underneath** the pinned
+ * row. Scroll the table and watch the top row gain a shadow; scroll to the very
+ * bottom and the pinned total loses its own, because at that point it is not
+ * floating over anything.
+ */
+export const StickySummaryRows: Story = {
+  render: () => (
+    <Table maxHeight="16rem" layout="fixed" containerClassName="mdt-rounded-md mdt-border">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Post</TableHead>
+          <TableHead align="right">Impressions</TableHead>
+          <TableHead align="right">Engagements</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow summary sticky="top">
+          <TableCell>20 posts</TableCell>
+          <TableCell align="right">1,204</TableCell>
+          <TableCell align="right">318</TableCell>
+        </TableRow>
+        {Array.from({ length: 20 }, (_, i) => (
+          <TableRow key={i}>
+            <TableCell>Post {i + 1}</TableCell>
+            <TableCell align="right">{(i + 1) * 13}</TableCell>
+            <TableCell align="right">{(i + 1) * 3}</TableCell>
+          </TableRow>
+        ))}
+        <TableRow summary sticky="bottom">
+          <TableCell>Average</TableCell>
+          <TableCell align="right">60</TableCell>
+          <TableCell align="right">16</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
 };

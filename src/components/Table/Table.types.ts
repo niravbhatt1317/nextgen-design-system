@@ -3,12 +3,17 @@ import type { ComponentPropsWithoutRef } from 'react';
 /**
  * How much vertical room a row takes.
  *
- * Named after Nord and Ant rather than invented here, so anyone who has used
- * another design system already knows what to expect. `default` is exactly the
- * spacing this table had before density existed, so nothing moves unless you
- * ask it to.
+ * Four steps, following Airtable - the only reference that ships a row-height
+ * picker to the user rather than fixing it at design time.
+ *
+ * `compact` exists because the scale was lopsided without it: the jump from
+ * `short` to `default` was 24px while `default` to `relaxed` was 8px, so three
+ * quarters of the range sat at one end.
+ *
+ * `default` is exactly the spacing this table had before density existed, so
+ * nothing moves unless you ask it to.
  */
-export type TableDensity = 'condensed' | 'default' | 'relaxed';
+export type TableDensity = 'short' | 'compact' | 'default' | 'relaxed';
 
 /**
  * Which edge the content of a cell sits against.
@@ -45,6 +50,22 @@ export interface TableContextValue {
 }
 
 /**
+ * How the browser decides column widths.
+ *
+ * `auto` sizes columns to their content, which is what a table normally wants.
+ * `fixed` sizes them from the first row alone - slower to look right, but the
+ * widths then stop moving when rows appear or disappear. Collapsing a group in
+ * an `auto` table visibly resizes every column, because the browser re-measures
+ * from whatever is left.
+ */
+export type TableLayout = 'auto' | 'fixed';
+
+/**
+ * Which edge a row pins itself to while the table scrolls.
+ */
+export type TableStickyEdge = 'top' | 'bottom';
+
+/**
  * Which part of the table a row or cell is in.
  *
  * Striping applies to body rows only - a striped header or footer reads as a
@@ -58,7 +79,7 @@ export type TableSection = 'header' | 'body' | 'footer';
 export interface TableProps extends ComponentPropsWithoutRef<'table'> {
   /**
    * Row height and cell padding.
-   * @default 'default'
+   * @default 'compact'
    */
   density?: TableDensity;
 
@@ -79,9 +100,43 @@ export interface TableProps extends ComponentPropsWithoutRef<'table'> {
    * Becomes necessary the moment a table is tall enough that the column titles
    * scroll out of view.
    *
+   * **Needs `maxHeight` to do anything.** Sticky positions against the nearest
+   * scrolling ancestor, and without a height the table's own scroll container
+   * never scrolls, so the header has nothing to stick within.
+   *
    * @default false
    */
   stickyHeader?: boolean;
+
+  /**
+   * Caps the table's height and makes it scroll internally.
+   *
+   * This is what `stickyHeader` and a sticky summary row pin against. Accepts
+   * anything CSS does - `'24rem'`, `'50vh'`, `400`.
+   */
+  maxHeight?: string | number;
+
+  /**
+   * Classes for the scroll container that wraps the table.
+   *
+   * This is the element that actually clips, so a border radius has to go here
+   * rather than on a wrapper of your own - put it outside and the sticky header
+   * paints straight over the rounded corner.
+   *
+   * @example containerClassName="mdt-rounded-md mdt-border"
+   */
+  containerClassName?: string;
+
+  /**
+   * How column widths are decided.
+   *
+   * Use `fixed` for a table whose rows appear and disappear - collapsing a group
+   * in an `auto` table visibly resizes every column, because the browser
+   * re-measures from the rows that are left.
+   *
+   * @default 'auto'
+   */
+  layout?: TableLayout;
 }
 
 /**
@@ -103,6 +158,14 @@ export interface TableBodyProps extends ComponentPropsWithoutRef<'tbody'> {}
 export interface TableFooterProps extends ComponentPropsWithoutRef<'tfoot'> {}
 
 /**
+ * How deeply a cell's content is indented, for rows nested under a parent.
+ *
+ * Capped at three levels on purpose. A table that needs a fourth is telling you
+ * it wants to be a tree, and a tree is a different component.
+ */
+export type TableIndent = 0 | 1 | 2 | 3;
+
+/**
  * Props for the TableRow component
  */
 export interface TableRowProps extends ComponentPropsWithoutRef<'tr'> {
@@ -115,6 +178,76 @@ export interface TableRowProps extends ComponentPropsWithoutRef<'tr'> {
    * @default false
    */
   selected?: boolean;
+
+  /**
+   * Pins the row to the top or bottom of the scroll area.
+   *
+   * Needs `maxHeight` on the table, same as `stickyHeader`. The row picks up a
+   * shadow only while there is content scrolled underneath it, so a pinned
+   * total sitting at the true end of the data stays flat.
+   */
+  sticky?: TableStickyEdge;
+
+  /**
+   * Marks the row as a total or subtotal.
+   *
+   * `TableFooter` already treats its rows this way, so this is for a summary
+   * that sits somewhere else - at the top of the table, or at the foot of a
+   * group rather than the foot of the table.
+   *
+   * @default false
+   */
+  summary?: boolean;
+}
+
+/**
+ * Props for the TableGroupRow component
+ */
+export interface TableGroupRowProps extends ComponentPropsWithoutRef<'tr'> {
+  /**
+   * How many columns the group header spans. Set it to the number of columns in
+   * the table, or the heading will not reach across it.
+   */
+  colSpan: number;
+
+  /**
+   * How many rows are in the group. Rendered after the label, quietly.
+   */
+  count?: number;
+
+  /**
+   * Whether the group is open. Leave `onToggle` off for a group that is always
+   * open - the control is then not rendered at all, rather than rendered dead.
+   *
+   * @default true
+   */
+  expanded?: boolean;
+
+  /** Called when the disclosure control is used. Omit for a static group. */
+  onToggle?: () => void;
+
+  /**
+   * What a screen reader says for the disclosure control. Falls back to
+   * "Toggle group" when the label is not plain text.
+   */
+  toggleLabel?: string;
+}
+
+/**
+ * Props for the TableExpandTrigger component
+ */
+export interface TableExpandTriggerProps extends ComponentPropsWithoutRef<'button'> {
+  /** Whether the row this controls is currently open. */
+  expanded: boolean;
+
+  /** Called when the control is used. */
+  onToggle: () => void;
+
+  /**
+   * What a screen reader says. There is no visible text - it is a chevron.
+   * @default 'Toggle row'
+   */
+  label?: string;
 }
 
 /**
@@ -156,6 +289,15 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
    * @default 'left'
    */
   align?: TableAlign;
+
+  /**
+   * Indents the content, for a row nested under a parent. Use it on the first
+   * cell only - indenting every cell shifts the whole row and breaks the
+   * column alignment that makes a table readable.
+   *
+   * @default 0
+   */
+  indent?: TableIndent;
 }
 
 /**

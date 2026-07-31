@@ -389,12 +389,15 @@ export {
   TableBody,
   TableFooter,
   TableRow,
+  TableGroupRow,
+  TableExpandTrigger,
   TableHead,
   TableCell,
   TableCaption,
   tableHeadVariants,
   tableCellVariants,
   tableRowVariants,
+  tableGroupRowVariants,
 } from './Table';
 export type {
   TableProps,
@@ -405,9 +408,12 @@ export type {
   TableHeadProps,
   TableCellProps,
   TableCaptionProps,
+  TableGroupRowProps,
+  TableExpandTriggerProps,
   TableDensity,
   TableAlign,
   TableSortOrder,
+  TableIndent,
 } from './Table';
 
 // Tabs
