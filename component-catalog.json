@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
   "componentCount": 34,
-  "variantGroupCount": 122,
-  "variantValueCount": 407,
+  "variantGroupCount": 124,
+  "variantValueCount": 415,
   "components": [
     {
       "component": "Avatar",
@@ -598,23 +598,25 @@
         {
           "name": "tableHeadVariants",
           "variants": {
-            "density": ["condensed", "default", "relaxed"],
+            "density": ["short", "compact", "default", "relaxed"],
             "align": ["left", "center", "right"]
           },
           "defaults": {
-            "density": "default",
+            "density": "compact",
             "align": "left"
           }
         },
         {
           "name": "tableCellVariants",
           "variants": {
-            "density": ["condensed", "default", "relaxed"],
-            "align": ["left", "center", "right"]
+            "density": ["short", "compact", "default", "relaxed"],
+            "align": ["left", "center", "right"],
+            "indent": ["0", "1", "2", "3"]
           },
           "defaults": {
-            "density": "default",
-            "align": "left"
+            "density": "compact",
+            "align": "left",
+            "indent": "0"
           }
         },
         {
@@ -622,12 +624,14 @@
           "variants": {
             "interactive": ["true", "false"],
             "striped": ["true", "false"],
-            "selected": ["true", "false"]
+            "selected": ["true", "false"],
+            "summary": ["true", "false"]
           },
           "defaults": {
             "interactive": "false",
             "striped": "false",
-            "selected": "false"
+            "selected": "false",
+            "summary": "false"
           }
         }
       ]

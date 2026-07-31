@@ -174,6 +174,24 @@
     --mdt-ring: var(--mdt-black);
 
     /* ============================================
+       RAISED SURFACE - a surface sitting above the page
+
+       Deliberately the SAME white as the page in light mode, and that is not an
+       oversight. The light page is pure white, which is the ceiling: nothing can
+       be lighter than it, so a raised surface in light mode has to be separated
+       by its edge and its shadow rather than by tone.
+
+       Atlassian's popover measures identically - page 255, surface 255 - and
+       carries its whole separation on a border and a shadow. Dark mode is where
+       tone takes over; see the dark block below.
+
+       No new colour: this is the white and the neutral-140 the palette already
+       has, named once so Dialog, Popover, Sheet and a pinned table header stop
+       each choosing a surface for themselves.
+       ============================================ */
+    --mdt-surface-raised: var(--mdt-white);
+
+    /* ============================================
        FEEDBACK SURFACE - the tinted background behind a Toast or a Banner
 
        Every value here points at a step on a ramp we already own. Nothing new
@@ -359,6 +377,21 @@
 
     --mdt-feedback-title: var(--mdt-neutral-10);
     --mdt-feedback-text: var(--mdt-neutral-30);
+
+    /* ============================================
+       RAISED SURFACE - DARK
+
+       Here tone does the work that a shadow cannot. A dark page is already close
+       to black, so darkening beneath a raised surface has nowhere to go - the
+       palette's own black is rgb(7,15,29) against a page of rgb(11,22,40), four
+       points apart.
+
+       neutral-140 sits +13 luminance above the page, which is exactly the step
+       Atlassian's popover uses (31 -> 44). `--mdt-card` was the obvious
+       candidate and is only +6 - half the separation - because `card` means
+       "this is a card", not "this is raised".
+       ============================================ */
+    --mdt-surface-raised: var(--mdt-neutral-140);
 
     /* ============================================
        ELEVATION - DARK

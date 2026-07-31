@@ -110,6 +110,13 @@ const config: Config = {
           text: 'hsl(var(--mdt-feedback-text) / <alpha-value>)',
         },
 
+        // A surface sitting above the page. The same white as the page in light
+        // mode - white is the ceiling, nothing can be lighter - and a genuine
+        // step lighter in dark, which is where tone does the separating.
+        surface: {
+          raised: 'hsl(var(--mdt-surface-raised) / <alpha-value>)',
+        },
+
         // Core colors
         white: 'hsl(var(--mdt-white) / <alpha-value>)',
         black: 'hsl(var(--mdt-black) / <alpha-value>)',
