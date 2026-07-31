@@ -365,7 +365,10 @@ describe('Table', () => {
       );
       const th = container.querySelector('th');
       expect(th).toHaveClass('mdt-sticky');
-      expect(th).toHaveClass('mdt-z-sticky');
+      // A pinned row sits above any frozen column: equal z-index resolves by DOM
+      // order, and tbody comes after thead, so a frozen body cell would
+      // otherwise paint its shadow straight over the header.
+      expect(th).toHaveClass('mdt-z-sticky-header');
       // Without an opaque background the body scrolls visibly under the header.
       expect(th).toHaveClass('mdt-bg-background');
     });
@@ -727,7 +730,7 @@ describe('Table', () => {
       const td = container.querySelector('td');
       expect(td).toHaveClass('mdt-sticky');
       expect(td).toHaveClass('mdt-top-0');
-      expect(td).toHaveClass('mdt-z-sticky');
+      expect(td).toHaveClass('mdt-z-sticky-header');
       expect(container.querySelector('tbody tr')).not.toHaveClass('mdt-sticky');
     });
 
@@ -996,6 +999,41 @@ describe('Table', () => {
   });
 
   describe('frozen columns', () => {
+    it('drops the right band on the corner cell, keeping the edge', () => {
+      // A frozen column and a sticky header each cast their own wash, and two
+      // straight gradients cannot join smoothly where they cross. The corner is
+      // resolved by leaving the vertical band out of it rather than blending.
+      const { container } = render(
+        <Table maxHeight="10rem" stickyHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead frozen>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      const th = container.querySelector('th');
+      expect(th).toHaveClass('mdt-left-0');
+      expect(th).toHaveClass('mdt-border-r');
+      expect(th).not.toHaveClass('group-data-[scrolled-x=true]:before:mdt-opacity-100');
+    });
+
+    it('keeps the band on a frozen header when there is no sticky header', () => {
+      // No sticky header means no horizontal wash, so no corner to resolve.
+      const { container } = render(
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead frozen>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      expect(container.querySelector('th')).toHaveClass(
+        'group-data-[scrolled-x=true]:before:mdt-opacity-100'
+      );
+    });
+
     it('pins a header cell to the left on the upper sticky plane', () => {
       // A frozen body cell and the frozen header cell cross at the top-left
       // corner. Equal z-index would let the body cell paint over the header,
@@ -1013,6 +1051,8 @@ describe('Table', () => {
       const [first, second] = [...container.querySelectorAll('th')];
       expect(first).toHaveClass('mdt-sticky');
       expect(first).toHaveClass('mdt-left-0');
+      // No sticky header here, so no corner - the frozen header sits on the
+      // header plane, above any frozen body cell.
       expect(first).toHaveClass('mdt-z-sticky-header');
       expect(second).not.toHaveClass('mdt-sticky');
     });
@@ -1075,6 +1115,7 @@ describe('Table', () => {
         </Table>
       );
       const td = container.querySelector('td');
+      // A body cell is not the corner - it keeps both.
       expect(td).toHaveClass('group-data-[scrolled-x=true]:before:mdt-opacity-100');
       expect(td).toHaveClass('group-data-[scrolled-top=true]:after:mdt-opacity-100');
     });
@@ -1093,6 +1134,37 @@ describe('Table', () => {
         'data-scrolled-x',
         'false'
       );
+    });
+  });
+
+  describe('the three sticky planes', () => {
+    it('layers frozen column below pinned header below the corner', () => {
+      // All three pin, and all three can overlap. Equal z-index resolves by DOM
+      // order and tbody comes after thead, so without distinct planes a frozen
+      // body cell paints its shadow straight over the header.
+      const { container } = render(
+        <Table maxHeight="10rem" stickyHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead frozen>Market</TableHead>
+              <TableHead>Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell frozen>PAIR-1</TableCell>
+              <TableCell>90,000</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      );
+      const [corner, header] = [...container.querySelectorAll('th')];
+      const [frozenBody, plainBody] = [...container.querySelectorAll('td')];
+
+      expect(frozenBody).toHaveClass('mdt-z-sticky'); //        frozen column
+      expect(header).toHaveClass('mdt-z-sticky-header'); //     pinned header, above it
+      expect(corner).toHaveClass('mdt-z-sticky-corner'); //     the crossing, above both
+      expect(plainBody).not.toHaveClass('mdt-sticky'); //       ordinary content
     });
   });
 });

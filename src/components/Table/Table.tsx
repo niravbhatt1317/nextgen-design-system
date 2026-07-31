@@ -66,7 +66,7 @@ const TableStickyRowContext = createContext<TableStickyEdge | undefined>(undefin
 // The pinned surface matches the page in BOTH themes. No tonal lift: a header
 // that changes colour when it pins reads as a different surface rather than the
 // same one held in place.
-const STUCK_BASE = 'mdt-sticky mdt-z-sticky mdt-bg-background';
+const STUCK_BASE = 'mdt-sticky mdt-z-sticky-header mdt-bg-background';
 
 // The border is not decoration. A sticky cell leaves its row behind, and the
 // row's own border does not travel with it - so a pinned header had no edge.
@@ -147,19 +147,71 @@ const STUCK_BOTTOM = [
 // body cell and the frozen header cell cross at the top-left corner, and equal
 // z-index would let the body cell paint over the header, because tbody comes
 // after thead in the DOM.
-const FROZEN_BASE = [
+const FROZEN_EDGE = [
   'mdt-sticky mdt-left-0 mdt-bg-background',
   'mdt-border-r mdt-border-border',
   'group-data-[scrolled-x=true]:mdt-border-border/30',
   'dark:group-data-[scrolled-x=true]:mdt-border-border',
-  "before:mdt-pointer-events-none before:mdt-absolute before:mdt-inset-y-0 before:mdt-left-full before:mdt-w-4 before:mdt-opacity-0 before:mdt-transition-opacity before:mdt-content-['']",
+].join(' ');
+
+// The band is separate from the edge because the corner cell wants the edge
+// without it.
+//
+// A frozen column and a sticky header each cast their own wash, and where they
+// cross there is no way to join two straight gradients smoothly - one fades
+// down, the other fades right, and they meet at a hard step. Extending either
+// one over the corner just stacks two gradients into a darker patch.
+//
+// MUI sidesteps this by rendering a single scroll-shadow element spanning the
+// whole pinned boundary, but it can do that because its grid is built from
+// divs. In a real `<table>` you cannot place an overlay at a column edge
+// without measuring column widths at runtime, so the wash has to live on the
+// cells - and the corner has to be resolved rather than blended.
+//
+// It is resolved by leaving it out: the corner cell keeps its edge and its
+// header wash, and the vertical band simply starts below the header.
+const FROZEN_BAND = [
+  "before:mdt-pointer-events-none before:mdt-absolute before:mdt-top-0 before:mdt-bottom-0 before:mdt-left-full before:mdt-w-4 before:mdt-opacity-0 before:mdt-transition-opacity before:mdt-content-['']",
   'before:mdt-bg-gradient-to-r before:mdt-to-transparent',
   'before:mdt-from-black/5 dark:before:mdt-from-black/70',
   'group-data-[scrolled-x=true]:before:mdt-opacity-100',
 ].join(' ');
 
-const FROZEN_CELL = `${FROZEN_BASE} mdt-z-sticky`;
-const FROZEN_HEAD = `${FROZEN_BASE} mdt-z-sticky-header`;
+const FROZEN_CELL = `${FROZEN_EDGE} ${FROZEN_BAND} mdt-z-sticky`;
+const FROZEN_HEAD = `${FROZEN_EDGE} ${FROZEN_BAND} mdt-z-sticky-header`;
+
+/**
+ * A frozen cell inside a sticky header, written out in full rather than layered.
+ *
+ * Composing `STUCK_TOP` and a frozen class would put two z-index utilities on
+ * one element, and `cn()` cannot merge them: tailwind-merge recognises
+ * `z-{number}`, not two custom names like `z-sticky-header` and
+ * `z-sticky-corner`. Both survived, CSS source order picked the lower one, and
+ * the corner ended up level with the header cells beside it - which come later
+ * in the DOM, so they painted straight over the pinned column.
+ *
+ * It also drops the vertical band. Two straight gradients cannot join smoothly
+ * where they cross, so the corner is resolved by leaving one out rather than
+ * blending.
+ */
+const FROZEN_STICKY_CORNER = [
+  'mdt-sticky mdt-top-0 mdt-left-0 mdt-z-sticky-corner mdt-bg-background',
+  'mdt-border-b mdt-border-r mdt-border-border',
+  'group-data-[scrolled-top=true]:mdt-border-border/30',
+  'dark:group-data-[scrolled-top=true]:mdt-border-border',
+  STUCK_SHADOW_BASE,
+  'after:mdt-top-full after:mdt-bg-gradient-to-b after:mdt-to-transparent',
+  STUCK_WASH,
+  // Only while nothing has scrolled behind it.
+  //
+  // Once the table scrolls sideways, an ordinary header cell slides underneath
+  // the pinned corner and casts its own wash across the same strip. Two washes
+  // at 5% stack to about 10%, and the header's shadow reads visibly darker over
+  // the frozen column than anywhere else - measured at 237 against 246.
+  //
+  // At rest the corner is the only thing there, so it has to draw its own.
+  'group-data-[corner-wash=true]:after:mdt-opacity-100',
+].join(' ');
 
 /**
  * `default` is exactly the spacing this table had before density existed, so an
@@ -368,6 +420,11 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
           data-scrolled-top={scrolled.top ? 'true' : 'false'}
           data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
           data-scrolled-x={scrolled.x ? 'true' : 'false'}
+          // Whether the pinned corner should draw its own header wash. Two
+          // `group-data-*` variants cannot be chained - Tailwind nests them into
+          // a selector that never matches - so the condition is computed once
+          // here instead.
+          data-corner-wash={scrolled.top && !scrolled.x ? 'true' : 'false'}
           style={maxHeight === undefined ? undefined : { maxHeight }}
         >
           {/*
@@ -639,8 +696,11 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
           tableHeadVariants({ density, align }),
           // The background is required, not decoration: without it the body
           // scrolls visibly underneath the header instead of behind it.
-          stickyHeader && STUCK_TOP,
-          frozen && FROZEN_HEAD,
+          // Never both: layering them would emit two z-index utilities that
+          // `cn()` cannot merge.
+          frozen && stickyHeader && FROZEN_STICKY_CORNER,
+          !frozen && stickyHeader && STUCK_TOP,
+          frozen && !stickyHeader && FROZEN_HEAD,
           className
         )}
         {...props}
