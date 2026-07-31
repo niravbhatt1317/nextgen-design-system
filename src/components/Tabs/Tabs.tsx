@@ -114,7 +114,7 @@ const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, T
           variant === 'card' &&
             cn(
               'mdt-rounded-md',
-              'data-[state=active]:mdt-bg-primary data-[state=active]:mdt-text-primary-foreground data-[state=active]:mdt-shadow',
+              'data-[state=active]:mdt-bg-primary data-[state=active]:mdt-text-primary-foreground data-[state=active]:mdt-shadow-sm',
               'hover:mdt-bg-muted/50'
             ),
           variant === 'pills' &&

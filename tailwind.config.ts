@@ -230,6 +230,32 @@ const config: Config = {
         md: 'calc(var(--mdt-radius) - 2px)',
         sm: 'calc(var(--mdt-radius) - 4px)',
       },
+      // Elevation. These REPLACE Tailwind's defaults rather than extending
+      // them, so `mdt-shadow-md` now reads our token instead of a value nobody
+      // chose. The light values are identical to what Tailwind shipped, so
+      // nothing moves on screen; dark mode gains a much stronger shadow and a
+      // hairline edge. See globals.css.
+      boxShadow: {
+        none: 'var(--mdt-shadow-none)',
+        xs: 'var(--mdt-shadow-xs)',
+        sm: 'var(--mdt-shadow-sm)',
+        DEFAULT: 'var(--mdt-shadow-sm)',
+        md: 'var(--mdt-shadow-md)',
+        lg: 'var(--mdt-shadow-lg)',
+        xl: 'var(--mdt-shadow-xl)',
+      },
+      // Layering. Named intent instead of `z-50` everywhere - see globals.css
+      // for why a tooltip sits above a modal.
+      zIndex: {
+        base: 'var(--mdt-z-base)',
+        sticky: 'var(--mdt-z-sticky)',
+        overlay: 'var(--mdt-z-overlay)',
+        modal: 'var(--mdt-z-modal)',
+        dropdown: 'var(--mdt-z-dropdown)',
+        popover: 'var(--mdt-z-popover)',
+        tooltip: 'var(--mdt-z-tooltip)',
+        toast: 'var(--mdt-z-toast)',
+      },
       fontFamily: {
         sans: ['var(--mdt-font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--mdt-font-mono)', 'monospace'],
