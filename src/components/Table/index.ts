@@ -15,8 +15,20 @@ export {
   tableGroupRowVariants,
 } from './Table';
 
+export { TableColumnMenu } from './TableColumnMenu';
+export { TableColumnBoundary } from './TableColumnBoundary';
+
 export { useColumnWidths } from './useColumnWidths';
 export type { ColumnWidths, UseColumnWidths, UseColumnWidthsOptions } from './useColumnWidths';
+
+export { useTableColumns } from './useTableColumns';
+export type {
+  TableColumnDef,
+  TableColumnView,
+  TableColumnsState,
+  UseTableColumns,
+  UseTableColumnsOptions,
+} from './useTableColumns';
 
 export type {
   TableProps,
@@ -33,4 +45,6 @@ export type {
   TableAlign,
   TableSortOrder,
   TableIndent,
+  TableColumnMenuProps,
+  TableColumnBoundaryProps,
 } from './Table.types';

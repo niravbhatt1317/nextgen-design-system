@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 /**
  * How much vertical room a row takes.
@@ -189,6 +189,23 @@ export interface TableRowProps extends ComponentPropsWithoutRef<'tr'> {
   sticky?: TableStickyEdge;
 
   /**
+   * Whether the row responds to hover.
+   *
+   * Body rows offer hover feedback by default, because most of them are
+   * targets. A row that is not a record should say so: an expanded detail
+   * panel, a spacer, a row holding a chart. Hover feedback on one of those
+   * says "click me" about something that does nothing.
+   *
+   * A `summary` row already opts out on its own. This is the same thing for
+   * every other case, and it exists because the alternative - a
+   * `hover:bg-transparent` override at the call site - relies on knowing what
+   * the row set in the first place.
+   *
+   * Leave it unset for the default: on for body rows, off everywhere else.
+   */
+  interactive?: boolean;
+
+  /**
    * Marks the row as a total or subtotal.
    *
    * `TableFooter` already treats its rows this way, so this is for a summary
@@ -330,7 +347,29 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
   resizeLabel?: string;
 
   /**
+   * Columns that can be added at this column's trailing boundary.
+   *
+   * Passing these puts a `+` above the table on that boundary, on the same
+   * line you drag to resize. One line, both jobs - two controls on the same
+   * pixels cannot be told apart.
+   */
+  insertColumns?: { key: string; label: string }[];
+
+  /** Keys to lift into a Suggested group in the insert picker. */
+  insertSuggested?: string[];
+
+  /** Called with the chosen column's key. Omit it and no `+` appears. */
+  onInsert?: (key: string) => void;
+
+  /** What a screen reader calls the `+`. Names the position, not the action. */
+  insertLabel?: string;
+
+  /**
    * Pins this column to the left edge while the table scrolls sideways.
+   *
+   * `true` pins it as the first frozen column. Pass an index to pin more than
+   * one - `frozen={1}` is the second, and it sits at the measured width of the
+   * first rather than at a width you have to work out yourself.
    *
    * Put it on the same column in every row, header included, or the column will
    * pin in some rows and not others. Needs the table to actually scroll
@@ -342,7 +381,7 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
    *
    * @default false
    */
-  frozen?: boolean;
+  frozen?: boolean | number;
 }
 
 /**
@@ -367,6 +406,10 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
   /**
    * Pins this column to the left edge while the table scrolls sideways.
    *
+   * `true` pins it as the first frozen column. Pass an index to pin more than
+   * one - `frozen={1}` is the second, and it sits at the measured width of the
+   * first rather than at a width you have to work out yourself.
+   *
    * Put it on the same column in every row, header included, or the column will
    * pin in some rows and not others. Needs the table to actually scroll
    * horizontally - a table narrower than its container has nothing to pin
@@ -377,7 +420,7 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
    *
    * @default false
    */
-  frozen?: boolean;
+  frozen?: boolean | number;
 }
 
 /**
@@ -385,3 +428,111 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TableCaptionProps extends ComponentPropsWithoutRef<'caption'> {}
+
+/**
+ * Props for TableColumnMenu - the controls belonging to one column.
+ */
+export interface TableColumnMenuProps {
+  /** The column's name. Used as the trigger's label and its accessible name. */
+  label: string;
+
+  /** Adds a Filter item. Omit it and no Filter item appears. */
+  onFilter?: () => void;
+
+  /** Adds a Group item. */
+  onGroup?: () => void;
+
+  /** Adds a Sort item. */
+  onSort?: () => void;
+
+  /** Whether this column is currently pinned. Switches the item's wording. */
+  frozen?: boolean;
+
+  /**
+   * Whether pinning is available here at all.
+   *
+   * False hides the item rather than disabling it. Past the freeze limit
+   * "pin this column" is not a thing that could happen - there would be
+   * unpinned columns to its left - so offering it greyed out explains nothing.
+   *
+   * @default false
+   */
+  canFreeze?: boolean;
+
+  /** Called when Freeze or Unfreeze is chosen. */
+  onToggleFreeze?: () => void;
+
+  /** Adds a Move to start item. */
+  onMoveToStart?: () => void;
+
+  /** Adds a Move to end item. */
+  onMoveToEnd?: () => void;
+
+  /** Adds a Hide this column item. */
+  onHide?: () => void;
+
+  /**
+   * Content above the items.
+   *
+   * Where the active sort stack goes once multi-column sorting lands: a
+   * statement of what is already true, which is why it sits above the list of
+   * things you can do rather than inside it.
+   */
+  header?: ReactNode;
+
+  /** Which edge of the trigger the menu lines up with. @default 'start' */
+  align?: 'start' | 'center' | 'end';
+
+  /** Extra classes for the trigger. */
+  className?: string;
+
+  /** Trigger content, when the column header is more than its name. */
+  children?: ReactNode;
+}
+
+/**
+ * Props for TableColumnBoundary - the line between two columns.
+ */
+export interface TableColumnBoundaryProps {
+  /** Whether the line can be dragged to resize the column on its left. */
+  resizable?: boolean;
+
+  /** The column's current width in pixels. Reported to a screen reader. */
+  width?: number;
+
+  /** Called while the line is dragged or nudged. */
+  onResize?: (width: number) => void;
+
+  /** How narrow the column may get. @default 64 */
+  minWidth?: number;
+
+  /** How wide the column may get. @default 720 */
+  maxWidth?: number;
+
+  /** What a screen reader calls the line when it resizes. */
+  resizeLabel?: string;
+
+  /**
+   * The columns available to add here. Usually `useTableColumns().hidden`.
+   *
+   * Empty means no `+` appears. An insertion point that opens an empty list
+   * teaches people it is broken.
+   */
+  columns?: { key: string; label: string }[];
+
+  /** Keys to lift into a Suggested group above the full list. */
+  suggested?: string[];
+
+  /** Called with the chosen column's key. Omit it and no `+` appears. */
+  onInsert?: (key: string) => void;
+
+  /**
+   * What a screen reader calls the `+`.
+   *
+   * A table has one at every boundary, so it has to name the position.
+   */
+  insertLabel?: string;
+
+  /** Extra classes for the line. */
+  className?: string;
+}

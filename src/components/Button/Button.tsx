@@ -322,15 +322,37 @@ function computeButtonClasses(props: {
     className,
   } = props;
 
+  /**
+   * An icon-only button squared off at the size you asked for.
+   *
+   * `iconOnly` used to force `size: 'icon'`, which is a fixed 36px - so a
+   * labelled button and an icon button beside it could never line up at any size
+   * but `md`. In a table row or a toolbar that mismatch is glaring, and the only
+   * workaround was overriding width and padding at the call site.
+   *
+   * `size="icon"` still means 36px, so nothing that already uses it moves.
+   */
+  const iconOnlySizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
+    xs: 'mdt-h-7 mdt-w-7 mdt-p-0',
+    sm: 'mdt-h-8 mdt-w-8 mdt-p-0',
+    md: 'mdt-h-9 mdt-w-9 mdt-p-0',
+    lg: 'mdt-h-10 mdt-w-10 mdt-p-0',
+    xl: 'mdt-h-12 mdt-w-12 mdt-p-0',
+    icon: 'mdt-h-9 mdt-w-9 mdt-p-0',
+  };
+
   const baseClasses = ButtonVariants({
     variant: color ? undefined : variant,
-    size: iconOnly ? 'icon' : size,
+    size,
     fullWidth,
     shape: iconOnly && shape === 'rounded' ? 'circle' : shape,
     elevation,
     active,
   });
 
+  // Applied after the size variant so the square wins the height and padding.
+  // `md` matches the old behaviour: `iconOnly` used to force a 36px square.
+  const iconOnlyClass = iconOnly ? iconOnlySizeClasses[size ?? 'md'] : '';
   const colorClass = color ? colorClasses[color] : '';
   const iconSpacingClass = iconOnly ? '' : iconSpacingClasses[iconSpacing];
   const iconSizeClass = iconSize ? iconSizeClasses[iconSize] : undefined;
@@ -338,6 +360,7 @@ function computeButtonClasses(props: {
   return {
     classes: cn(
       baseClasses,
+      iconOnlyClass,
       colorClass,
       uppercase && 'mdt-uppercase',
       error && 'mdt-bg-destructive mdt-text-destructive-foreground hover:mdt-bg-destructive/90',

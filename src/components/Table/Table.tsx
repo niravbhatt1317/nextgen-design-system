@@ -1,9 +1,4 @@
 import { cva } from 'class-variance-authority';
-import type {
-  KeyboardEvent as ReactKeyboardEvent,
-  PointerEvent as ReactPointerEvent,
-  Ref,
-} from 'react';
 import {
   createContext,
   forwardRef,
@@ -15,6 +10,18 @@ import {
   useState,
 } from 'react';
 import { cn } from '@/utils';
+import { TableColumnBoundary } from './TableColumnBoundary';
+import {
+  FROZEN_BAND,
+  FROZEN_CELL,
+  FROZEN_HEAD,
+  FROZEN_LAST,
+  FROZEN_LAST_EDGE,
+  FROZEN_STICKY_CORNER,
+  STUCK_BOTTOM,
+  STUCK_TOP,
+} from './Table.classes';
+
 import { Icon } from '../Icon';
 import type {
   TableProps,
@@ -61,206 +68,42 @@ const TableSectionContext = createContext<TableSection>('body');
 const TableStickyRowContext = createContext<TableStickyEdge | undefined>(undefined);
 
 /**
- * The shadow a pinned element casts, and only while something is under it.
+ * Where each pinned column sits, measured from the real table.
  *
- * `mdt-group` on the scroll container plus these `group-data-*` variants keep
- * the rule on the cell's own class list. A descendant selector would outrank
- * the cell's classes - the same specificity trap density avoids by using
- * context.
+ * The first pinned column is at zero; the second starts at whatever the first
+ * turned out to be. That is a runtime measurement, not a design value - the
+ * width depends on content, on `layout`, and on whatever the user dragged it
+ * to - so it cannot be a class and has to be measured and applied inline.
+ *
+ * `count` is here so a cell can tell whether it is the last pinned one, which
+ * is the only one that draws the boundary and the shadow band.
  */
-// The pinned surface matches the page in BOTH themes. No tonal lift: a header
-// that changes colour when it pins reads as a different surface rather than the
-// same one held in place.
-const STUCK_BASE = 'mdt-sticky mdt-z-sticky-header mdt-bg-background';
+interface TableFrozenValue {
+  offsets: number[];
+  count: number;
+}
 
-// The border is not decoration. A sticky cell leaves its row behind, and the
-// row's own border does not travel with it - so a pinned header had no edge.
-//
-// The depth cue is a gradient band drawn by `::after`, NOT a `box-shadow`. Under
-// `border-separate` every cell is its own box, so a box-shadow casts on all four
-// sides and the left and right halves of adjacent cells stack into visible
-// vertical seams between every column. A band pinned to the cell's full width
-// only ever fades downward, and neighbouring bands butt together into one
-// continuous edge.
-// 16px. Long enough to read as depth rather than a second border line - 6px did
-// read as a line - without the 24px reach that made the dark band look heavy.
-const STUCK_SHADOW_BASE =
-  "after:mdt-pointer-events-none after:mdt-absolute after:mdt-inset-x-0 after:mdt-h-4 after:mdt-opacity-0 after:mdt-transition-opacity after:mdt-content-['']";
+const TableFrozenContext = createContext<TableFrozenValue>({ offsets: [], count: 0 });
 
-// The edge only lightens once the row is actually pinned.
-//
-// At rest a sticky header should be indistinguishable from an ordinary one - a
-// third-weight edge under a header that is not doing anything yet reads as
-// disconnected from the table. The moment content scrolls underneath, the wash
-// arrives and the border steps back to let it carry the separation.
-//
-// Light mode only. In dark the wash can reach about four luminance points, so
-// the edge has to keep its full weight or the pinned row loses its boundary
-// altogether.
-const STUCK_BORDER_TOP =
-  'mdt-border-border group-data-[scrolled-top=true]:mdt-border-border/30 dark:group-data-[scrolled-top=true]:mdt-border-border';
-const STUCK_BORDER_BOTTOM =
-  'mdt-border-border group-data-[scrolled-bottom=true]:mdt-border-border/30 dark:group-data-[scrolled-bottom=true]:mdt-border-border';
-
-// One wash, darkening, in both themes. The band is the same 24px height in each
-// - only the opacity differs, and only because the two backgrounds give it very
-// different amounts of room.
-//
-// Light has the whole page to fall through. Dark does not: the page is
-// luminance 21 and `--mdt-black` is 14, about seven points of range. But a small
-// absolute dip near black is a large RELATIVE change, so dark needs far less
-// opacity than the raw numbers suggest, not more. At full strength it read as a
-// heavy band. Seven luminance points is the hard ceiling here - `--mdt-black` is
-// lum 14 against a page of lum 21 - so 70% lands at about five, which is as much
-// depth as this palette can give a dark surface without a tonal lift.
-//
-// This cannot be a `box-shadow`, and so cannot reuse the --mdt-shadow-* tokens:
-// on a table cell a box-shadow casts on all four sides, and on a `<tr>` browsers
-// still render it per cell. Either way the left and right halves stack into a
-// visible seam at every column boundary. A gradient band pinned across the
-// cell's width only ever fades one way, and adjacent bands butt together.
-const STUCK_WASH = 'after:mdt-from-black/5 dark:after:mdt-from-black/70';
-
-const STUCK_TOP = [
-  STUCK_BASE,
-  'mdt-top-0 mdt-border-b',
-  STUCK_BORDER_TOP,
-  STUCK_SHADOW_BASE,
-  'after:mdt-top-full after:mdt-bg-gradient-to-b after:mdt-to-transparent',
-  STUCK_WASH,
-  'group-data-[scrolled-top=true]:after:mdt-opacity-100',
-].join(' ');
-
-const STUCK_BOTTOM = [
-  STUCK_BASE,
-  'mdt-bottom-0 mdt-border-t',
-  STUCK_BORDER_BOTTOM,
-  STUCK_SHADOW_BASE,
-  'after:mdt-bottom-full after:mdt-bg-gradient-to-t after:mdt-to-transparent',
-  STUCK_WASH,
-  'group-data-[scrolled-bottom=true]:after:mdt-opacity-100',
-].join(' ');
-
-// A column pinned to the left edge.
-//
-// The same shape as the row treatment above, turned ninety degrees: an edge, and
-// a band that only appears once something has slid underneath. The band is drawn
-// by `::before` because `::after` already carries the row's wash - a frozen cell
-// inside a pinned row uses both at once.
-//
-// The header variant sits on `z-sticky-header` rather than `z-sticky`. A frozen
-// body cell and the frozen header cell cross at the top-left corner, and equal
-// z-index would let the body cell paint over the header, because tbody comes
-// after thead in the DOM.
 /**
- * Lets a component keep its own ref while still honouring the caller's.
+ * Resolves a `frozen` prop into a position.
  *
- * `TableHead` measures its own width during a drag, so it needs a ref of its
- * own - but forwarding one is part of its contract.
+ * `frozen` is a boolean or an index because one pinned column - by far the
+ * common case - should not have to say `frozen={0}`.
  */
-const mergeRefs =
-  <T,>(...refs: (Ref<T> | undefined)[]) =>
-  (node: T) => {
-    for (const ref of refs) {
-      if (typeof ref === 'function') ref(node);
-      else if (ref) (ref as { current: T | null }).current = node;
-    }
+const useFrozenPlacement = (frozen: boolean | number) => {
+  const { offsets, count } = useContext(TableFrozenContext);
+  const isFrozen = frozen !== false;
+  const index = typeof frozen === 'number' ? frozen : 0;
+  return {
+    isFrozen,
+    index,
+    // With no measurement yet, `count` is 0 and a single pinned column is
+    // still the last one. Without this the boundary flickers in on first paint.
+    isLast: isFrozen && (count === 0 ? index === 0 : index === count - 1),
+    left: isFrozen ? (offsets[index] ?? 0) : undefined,
   };
-
-/** How far one arrow-key press moves a column edge. */
-const RESIZE_STEP = 16;
-
-/**
- * The drag handle on a column's trailing edge.
- *
- * `role="separator"` with `aria-valuenow` rather than a button, because that is
- * what a moveable boundary is - the same pattern as a window splitter. It has to
- * be focusable and it has to carry a name, since a table always has more than
- * one of them.
- *
- * Wide enough to grab (8px) but drawn as a hairline, and it only shows its line
- * on hover or focus so a resting header is not a row of dividers.
- */
-// The grab area stays wholly inside its own cell. Straddling the boundary is
-// the prettier arrangement and it does not work: every `th` is `position:
-// relative`, so the *next* header paints over the half that overhangs, and the
-// centre of the handle - where you aim - belongs to the neighbouring cell. It
-// swallowed every pointer event silently.
-const RESIZE_HANDLE = [
-  'mdt-absolute mdt-right-0 mdt-top-0 mdt-h-full mdt-w-2',
-  'mdt-cursor-col-resize mdt-touch-none mdt-select-none',
-  'focus-visible:mdt-outline-none',
-  // The visible line lives in ::after so the grab area can stay wider than it.
-  "after:mdt-absolute after:mdt-inset-y-1 after:mdt-right-0 after:mdt-w-px after:mdt-bg-border after:mdt-opacity-0 after:mdt-transition-opacity after:mdt-content-['']",
-  'hover:after:mdt-opacity-100 focus-visible:after:mdt-opacity-100',
-  'focus-visible:after:mdt-bg-ring focus-visible:after:mdt-w-0.5',
-].join(' ');
-
-const FROZEN_EDGE = [
-  'mdt-sticky mdt-left-0 mdt-bg-background',
-  'mdt-border-r mdt-border-border',
-  'group-data-[scrolled-x=true]:mdt-border-border/30',
-  'dark:group-data-[scrolled-x=true]:mdt-border-border',
-].join(' ');
-
-// The band is separate from the edge because the corner cell wants the edge
-// without it.
-//
-// A frozen column and a sticky header each cast their own wash, and where they
-// cross there is no way to join two straight gradients smoothly - one fades
-// down, the other fades right, and they meet at a hard step. Extending either
-// one over the corner just stacks two gradients into a darker patch.
-//
-// MUI sidesteps this by rendering a single scroll-shadow element spanning the
-// whole pinned boundary, but it can do that because its grid is built from
-// divs. In a real `<table>` you cannot place an overlay at a column edge
-// without measuring column widths at runtime, so the wash has to live on the
-// cells - and the corner has to be resolved rather than blended.
-//
-// It is resolved by leaving it out: the corner cell keeps its edge and its
-// header wash, and the vertical band simply starts below the header.
-const FROZEN_BAND = [
-  "before:mdt-pointer-events-none before:mdt-absolute before:mdt-top-0 before:mdt-bottom-0 before:mdt-left-full before:mdt-w-4 before:mdt-opacity-0 before:mdt-transition-opacity before:mdt-content-['']",
-  'before:mdt-bg-gradient-to-r before:mdt-to-transparent',
-  'before:mdt-from-black/5 dark:before:mdt-from-black/70',
-  'group-data-[scrolled-x=true]:before:mdt-opacity-100',
-].join(' ');
-
-const FROZEN_CELL = `${FROZEN_EDGE} ${FROZEN_BAND} mdt-z-sticky`;
-const FROZEN_HEAD = `${FROZEN_EDGE} ${FROZEN_BAND} mdt-z-sticky-header`;
-
-/**
- * A frozen cell inside a sticky header, written out in full rather than layered.
- *
- * Composing `STUCK_TOP` and a frozen class would put two z-index utilities on
- * one element, and `cn()` cannot merge them: tailwind-merge recognises
- * `z-{number}`, not two custom names like `z-sticky-header` and
- * `z-sticky-corner`. Both survived, CSS source order picked the lower one, and
- * the corner ended up level with the header cells beside it - which come later
- * in the DOM, so they painted straight over the pinned column.
- *
- * It also drops the vertical band. Two straight gradients cannot join smoothly
- * where they cross, so the corner is resolved by leaving one out rather than
- * blending.
- */
-const FROZEN_STICKY_CORNER = [
-  'mdt-sticky mdt-top-0 mdt-left-0 mdt-z-sticky-corner mdt-bg-background',
-  'mdt-border-b mdt-border-r mdt-border-border',
-  'group-data-[scrolled-top=true]:mdt-border-border/30',
-  'dark:group-data-[scrolled-top=true]:mdt-border-border',
-  STUCK_SHADOW_BASE,
-  'after:mdt-top-full after:mdt-bg-gradient-to-b after:mdt-to-transparent',
-  STUCK_WASH,
-  // Only while nothing has scrolled behind it.
-  //
-  // Once the table scrolls sideways, an ordinary header cell slides underneath
-  // the pinned corner and casts its own wash across the same strip. Two washes
-  // at 5% stack to about 10%, and the header's shadow reads visibly darker over
-  // the frozen column than anywhere else - measured at 237 against 246.
-  //
-  // At rest the corner is the only thing there, so it has to draw its own.
-  'group-data-[corner-wash=true]:after:mdt-opacity-100',
-].join(' ');
+};
 
 /**
  * `default` is exactly the spacing this table had before density existed, so an
@@ -276,7 +119,7 @@ const FROZEN_STICKY_CORNER = [
  * over saving three lines.
  */
 export const tableHeadVariants = cva(
-  'mdt-border-border mdt-align-middle mdt-font-medium mdt-text-muted-foreground [&:has([role=checkbox])]:mdt-pr-0',
+  'mdt-relative mdt-border-border mdt-align-middle mdt-font-medium mdt-text-muted-foreground [&:has([role=checkbox])]:mdt-pr-0',
   {
     variants: {
       density: {
@@ -428,6 +271,8 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
     // not floating over anything, and a shadow there is a lie about depth.
     const scrollRef = useRef<HTMLDivElement>(null);
     const [scrolled, setScrolled] = useState({ top: false, bottom: false, x: false });
+    // Cumulative left offsets for the pinned columns, measured off the header.
+    const [frozen, setFrozen] = useState<TableFrozenValue>({ offsets: [], count: 0 });
 
     const measure = useCallback(() => {
       const el = scrollRef.current;
@@ -443,6 +288,27 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
         prev.top === !atTop && prev.bottom === !atBottom && prev.x === scrolledX
           ? prev
           : { top: !atTop, bottom: !atBottom, x: scrolledX }
+      );
+
+      // Measure off the header row rather than the body: it is the row that is
+      // always present, and its cells are the ones the widths come from.
+      const cells = el.querySelectorAll<HTMLElement>('thead tr:first-child > [data-frozen-index]');
+      const widths: number[] = [];
+      cells.forEach((cell) => {
+        const index = Number(cell.dataset.frozenIndex);
+        if (Number.isNaN(index)) return;
+        widths[index] = cell.getBoundingClientRect().width;
+      });
+      const offsets: number[] = [];
+      let running = 0;
+      for (let i = 0; i < widths.length; i += 1) {
+        offsets[i] = running;
+        running += widths[i] ?? 0;
+      }
+      setFrozen((prev) =>
+        prev.count === offsets.length && prev.offsets.every((value, i) => value === offsets[i])
+          ? prev
+          : { offsets, count: offsets.length }
       );
     }, []);
 
@@ -461,44 +327,49 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
 
     return (
       <TableContext.Provider value={context}>
-        <div
-          ref={scrollRef}
-          // `group` is what lets a sticky cell react to the scroll state without
-          // a descendant selector, which would outrank the cell's own classes.
-          className={cn('mdt-group mdt-relative mdt-w-full mdt-overflow-auto', containerClassName)}
-          data-scrolled-top={scrolled.top ? 'true' : 'false'}
-          data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
-          data-scrolled-x={scrolled.x ? 'true' : 'false'}
-          // Whether the pinned corner should draw its own header wash. Two
-          // `group-data-*` variants cannot be chained - Tailwind nests them into
-          // a selector that never matches - so the condition is computed once
-          // here instead.
-          data-corner-wash={scrolled.top && !scrolled.x ? 'true' : 'false'}
-          style={maxHeight === undefined ? undefined : { maxHeight }}
-        >
-          {/*
+        <TableFrozenContext.Provider value={frozen}>
+          <div
+            ref={scrollRef}
+            // `group` is what lets a sticky cell react to the scroll state without
+            // a descendant selector, which would outrank the cell's own classes.
+            className={cn(
+              'mdt-group mdt-relative mdt-w-full mdt-overflow-auto',
+              containerClassName
+            )}
+            data-scrolled-top={scrolled.top ? 'true' : 'false'}
+            data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
+            data-scrolled-x={scrolled.x ? 'true' : 'false'}
+            // Whether the pinned corner should draw its own header wash. Two
+            // `group-data-*` variants cannot be chained - Tailwind nests them into
+            // a selector that never matches - so the condition is computed once
+            // here instead.
+            data-corner-wash={scrolled.top && !scrolled.x ? 'true' : 'false'}
+            style={maxHeight === undefined ? undefined : { maxHeight }}
+          >
+            {/*
             Table is a compound component - headers are provided via TableHeader/TableHead children.
             Accessibility: Users must include <TableHeader> with <TableHead> cells for proper a11y.
           */}
-          <table
-            ref={ref}
-            className={cn(
-              // `border-separate` rather than the usual `collapse`, and this is
-              // load-bearing: browsers do not paint `box-shadow` on a table cell
-              // under the collapsed border model. A sticky header's shadow was
-              // being reported by getComputedStyle and rendered by nothing.
-              //
-              // The cost is that borders on a `<tr>` stop rendering entirely, so
-              // every row divider below sits on the cells instead.
-              'mdt-w-full mdt-caption-bottom mdt-border-separate mdt-border-spacing-0 mdt-text-sm',
-              layout === 'fixed' && 'mdt-table-fixed',
-              className
-            )}
-            {...props}
-          >
-            {children}
-          </table>
-        </div>
+            <table
+              ref={ref}
+              className={cn(
+                // `border-separate` rather than the usual `collapse`, and this is
+                // load-bearing: browsers do not paint `box-shadow` on a table cell
+                // under the collapsed border model. A sticky header's shadow was
+                // being reported by getComputedStyle and rendered by nothing.
+                //
+                // The cost is that borders on a `<tr>` stop rendering entirely, so
+                // every row divider below sits on the cells instead.
+                'mdt-w-full mdt-caption-bottom mdt-border-separate mdt-border-spacing-0 mdt-text-sm',
+                layout === 'fixed' && 'mdt-table-fixed',
+                className
+              )}
+              {...props}
+            >
+              {children}
+            </table>
+          </div>
+        </TableFrozenContext.Provider>
       </TableContext.Provider>
     );
   }
@@ -586,12 +457,14 @@ TableFooter.displayName = 'TableFooter';
  * ```
  */
 const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
-  ({ className, selected = false, summary = false, sticky, ...props }, ref) => {
+  ({ className, selected = false, summary = false, sticky, interactive, ...props }, ref) => {
     const { striped } = useContext(TableContext);
     const section = useContext(TableSectionContext);
     // A summary row is a conclusion, not a record - it should not offer hover
     // feedback as though it were selectable.
-    const isBody = section === 'body' && !summary;
+    // `interactive` overrides the default when the caller has an opinion; a
+    // summary row is a conclusion rather than a record, so it never offers it.
+    const isBody = interactive ?? (section === 'body' && !summary);
 
     return (
       <TableStickyRowContext.Provider value={sticky}>
@@ -735,6 +608,10 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       minWidth = 64,
       maxWidth = 720,
       resizeLabel,
+      insertColumns,
+      insertSuggested,
+      onInsert,
+      insertLabel,
       children,
       style,
       ...props
@@ -742,73 +619,39 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
     ref
   ) => {
     const { density, stickyHeader } = useContext(TableContext);
+    const pinned = useFrozenPlacement(frozen);
     const key = sortKey(sortOrder);
-
-    // The drag reads the width off the element rather than trusting `width`,
-    // so a column that has never been resized still starts from whatever the
-    // browser gave it instead of jumping to a default.
-    const cellRef = useRef<HTMLTableCellElement | null>(null);
-    const drag = useRef<{ startX: number; startWidth: number } | null>(null);
-
-    const applyWidth = useCallback(
-      (next: number) => {
-        onResize?.(Math.round(Math.min(Math.max(next, minWidth), maxWidth)));
-      },
-      [onResize, minWidth, maxWidth]
-    );
-
-    const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-      const cell = cellRef.current;
-      if (!cell) return;
-      // Pointer capture keeps the drag alive when the cursor leaves the 8px
-      // handle, which it does immediately.
-      event.currentTarget.setPointerCapture(event.pointerId);
-      drag.current = { startX: event.clientX, startWidth: cell.getBoundingClientRect().width };
-    };
-
-    const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (!drag.current) return;
-      applyWidth(drag.current.startWidth + (event.clientX - drag.current.startX));
-    };
-
-    const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-      drag.current = null;
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId);
-      }
-    };
-
-    const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-      const current = width ?? cellRef.current?.getBoundingClientRect().width ?? minWidth;
-      const moves: Record<string, number> = {
-        ArrowLeft: current - RESIZE_STEP,
-        ArrowRight: current + RESIZE_STEP,
-        Home: minWidth,
-        End: maxWidth,
-      };
-      const next = moves[event.key];
-      if (next === undefined) return;
-      event.preventDefault();
-      applyWidth(next);
-    };
 
     return (
       <th
-        ref={mergeRefs(ref, cellRef)}
+        ref={ref}
         aria-sort={sortable ? ARIA_SORT[key] : undefined}
-        style={width === undefined ? style : { ...style, width }}
+        // The measurement finds pinned columns by this attribute.
+        data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
+        style={{
+          ...style,
+          ...(width === undefined ? null : { width }),
+          ...(pinned.left === undefined ? null : { left: pinned.left }),
+        }}
         className={cn(
           tableHeadVariants({ density, align }),
-          // The handle is absolutely positioned; without this it would resolve
-          // against the scroll container and sit at the table's edge.
-          resizable && 'mdt-relative',
+          // `relative` is in the base class now rather than here: the resize
+          // handle, the insertion point and anything else absolute inside a
+          // header all need a positioned ancestor, and a caller adding
+          // `mdt-relative` themselves would silently beat the `sticky` a frozen
+          // column depends on - `className` merges last, and last wins.
           // The background is required, not decoration: without it the body
           // scrolls visibly underneath the header instead of behind it.
           // Never both: layering them would emit two z-index utilities that
           // `cn()` cannot merge.
-          frozen && stickyHeader && FROZEN_STICKY_CORNER,
-          !frozen && stickyHeader && STUCK_TOP,
-          frozen && !stickyHeader && FROZEN_HEAD,
+          pinned.isFrozen && stickyHeader && FROZEN_STICKY_CORNER,
+          !pinned.isFrozen && stickyHeader && STUCK_TOP,
+          pinned.isFrozen && !stickyHeader && FROZEN_HEAD,
+          // Only the last pinned column carries the boundary...
+          pinned.isLast && FROZEN_LAST_EDGE,
+          // ...and the band, except on the corner, which resolves the crossing
+          // of two gradients by leaving one out rather than blending them.
+          pinned.isLast && !stickyHeader && FROZEN_BAND,
           className
         )}
         {...props}
@@ -835,33 +678,25 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
         ) : (
           children
         )}
-        {resizable && (
-          /*
-            A focusable separator IS a widget - ARIA defines exactly this for a
-            moveable boundary, and the window-splitter pattern requires it to
-            take focus and handle arrow keys. jsx-a11y only knows the static
-            `<hr>` sense of the role, so it reads the tabIndex and the handlers
-            as mistakes. Rendering a button instead would be the real mistake:
-            it is not a button, and a screen reader would lose aria-valuenow.
-          */
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-          <div
-            role="separator"
-            aria-orientation="vertical"
-            aria-label={
+        {(resizable || onInsert !== undefined) && (
+          <TableColumnBoundary
+            resizable={resizable}
+            {...(width === undefined ? {} : { width })}
+            {...(onResize === undefined ? {} : { onResize })}
+            minWidth={minWidth}
+            maxWidth={maxWidth}
+            resizeLabel={
               resizeLabel ?? (typeof children === 'string' ? `Resize ${children}` : 'Resize column')
             }
-            aria-valuenow={Math.round(width ?? 0)}
-            aria-valuemin={minWidth}
-            aria-valuemax={maxWidth}
-            /* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */
-            tabIndex={0}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            onKeyDown={handleKeyDown}
-            className={RESIZE_HANDLE}
+            {...(insertColumns === undefined ? {} : { columns: insertColumns })}
+            {...(insertSuggested === undefined ? {} : { suggested: insertSuggested })}
+            {...(onInsert === undefined ? {} : { onInsert })}
+            insertLabel={
+              insertLabel ??
+              (typeof children === 'string'
+                ? `Insert a column after ${children}`
+                : 'Insert a column here')
+            }
           />
         )}
       </th>
@@ -880,17 +715,21 @@ TableHead.displayName = 'TableHead';
  * ```
  */
 const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, align = 'left', indent = 0, frozen = false, ...props }, ref) => {
+  ({ className, align = 'left', indent = 0, frozen = false, style, ...props }, ref) => {
     const { density } = useContext(TableContext);
     const sticky = useContext(TableStickyRowContext);
+    const pinned = useFrozenPlacement(frozen);
     return (
       <td
         ref={ref}
+        data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
+        style={pinned.left === undefined ? style : { ...style, left: pinned.left }}
         className={cn(
           tableCellVariants({ density, align, indent }),
           sticky === 'top' && STUCK_TOP,
           sticky === 'bottom' && STUCK_BOTTOM,
-          frozen && FROZEN_CELL,
+          pinned.isFrozen && FROZEN_CELL,
+          pinned.isLast && FROZEN_LAST,
           className
         )}
         {...props}
