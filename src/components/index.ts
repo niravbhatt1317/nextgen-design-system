@@ -382,7 +382,7 @@ export type { StackProps, StackVariants } from './Stack';
 export { MotadataSwitch, motadataSwitchRootVariants, motadataSwitchThumbVariants } from './Switch';
 export type { MotadataSwitchProps, MotadataSwitchVariants } from './Switch';
 
-// Table
+// Table — density, striping, sticky header, alignment, sort and selection state
 export {
   Table,
   TableHeader,
@@ -392,6 +392,9 @@ export {
   TableHead,
   TableCell,
   TableCaption,
+  tableHeadVariants,
+  tableCellVariants,
+  tableRowVariants,
 } from './Table';
 export type {
   TableProps,
@@ -402,6 +405,9 @@ export type {
   TableHeadProps,
   TableCellProps,
   TableCaptionProps,
+  TableDensity,
+  TableAlign,
+  TableSortOrder,
 } from './Table';
 
 // Tabs

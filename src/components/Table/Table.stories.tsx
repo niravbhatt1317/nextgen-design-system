@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from './Table';
+import type { TableSortOrder } from './Table.types';
 
 const meta: Meta<typeof Table> = {
   title: 'Components/Table',
@@ -204,8 +205,10 @@ export const WithFooter: Story = {
  */
 export const StripedRows: Story = {
   render: () => (
-    <Table>
-      <TableCaption>User list with striped rows for better readability.</TableCaption>
+    <Table striped>
+      <TableCaption>
+        One prop. Striping applies to body rows only — a striped header reads as a mistake.
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
@@ -215,8 +218,8 @@ export const StripedRows: Story = {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map((user, index) => (
-          <TableRow key={user.id} className={index % 2 === 0 ? 'mdt-bg-muted/50' : undefined}>
+        {users.map((user) => (
+          <TableRow key={user.id}>
             <TableCell className="mdt-font-medium">{user.name}</TableCell>
             <TableCell>{user.email}</TableCell>
             <TableCell>{user.role}</TableCell>
@@ -229,135 +232,179 @@ export const StripedRows: Story = {
 };
 
 /**
- * Interactive table with sortable headers.
+ * All three densities, side by side. `default` is exactly the spacing this table
+ * had before density existed, so an existing table does not move.
+ */
+export const Density: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-8">
+      {(['condensed', 'default', 'relaxed'] as const).map((density) => (
+        <div key={density}>
+          <p className="mdt-mb-2 mdt-text-sm mdt-font-medium mdt-text-muted-foreground">
+            density=&quot;{density}&quot;
+          </p>
+          <Table density={density}>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.slice(0, 3).map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="mdt-font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * Alignment follows the **data type**, not preference: text left, numbers right
+ * so digits line up by place value and magnitudes compare at a glance.
+ */
+export const Alignment: Story = {
+  render: () => (
+    <Table>
+      <TableCaption>
+        Numbers on the right. This one rule fixes most “messy table” complaints.
+      </TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Item</TableHead>
+          <TableHead align="center">Qty</TableHead>
+          <TableHead align="right">Unit price</TableHead>
+          <TableHead align="right">Total</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[
+          { item: 'Annual licence', qty: 12, unit: '1,204.00', total: '14,448.00' },
+          { item: 'Support hours', qty: 3, unit: '95.50', total: '286.50' },
+          { item: 'Onboarding', qty: 1, unit: '2,000.00', total: '2,000.00' },
+        ].map((row) => (
+          <TableRow key={row.item}>
+            <TableCell className="mdt-font-medium">{row.item}</TableCell>
+            <TableCell align="center">{row.qty}</TableCell>
+            <TableCell align="right">{row.unit}</TableCell>
+            <TableCell align="right">{row.total}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell align="right">16,734.50</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  ),
+};
+
+/**
+ * A sticky header becomes necessary the moment a table is tall enough that the
+ * column titles scroll out of view. Scroll the area below to see it hold.
+ */
+export const StickyHeader: Story = {
+  render: () => (
+    <div className="mdt-h-64 mdt-overflow-auto mdt-rounded-md mdt-border">
+      <Table stickyHeader density="condensed">
+        <TableHeader>
+          <TableRow>
+            <TableHead>#</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead align="right">Score</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TableRow key={i}>
+              <TableCell>{i + 1}</TableCell>
+              <TableCell className="mdt-font-medium">Row {i + 1}</TableCell>
+              <TableCell>row{i + 1}@example.com</TableCell>
+              <TableCell align="right">{(i + 1) * 7}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  ),
+};
+
+/**
+ * Sorting is a contract, not an implementation. `TableHead` renders the control
+ * and the affordance and sets `aria-sort`; the sorting itself stays yours, so
+ * you can sort locally, on a server, or through TanStack Table without the
+ * component getting in the way.
+ *
+ * A column that is sortable but not currently sorted shows a neutral
+ * double-arrow rather than an arrow pointing somewhere arbitrary — an arrow with
+ * no state is the commonest sort bug there is.
  */
 export const SortableHeaders: Story = {
   render: function SortableTable() {
     type SortKey = 'name' | 'email' | 'role' | 'status';
-    type SortOrder = 'asc' | 'desc' | null;
 
     const [sortKey, setSortKey] = useState<SortKey | null>(null);
-    const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+    const [sortOrder, setSortOrder] = useState<TableSortOrder>(null);
 
+    // Ascending, then descending, then off. Cycling back to unsorted matters:
+    // without it there is no way back to the data's natural order.
     const handleSort = (key: SortKey) => {
-      if (sortKey === key) {
-        if (sortOrder === 'asc') {
-          setSortOrder('desc');
-        } else if (sortOrder === 'desc') {
-          setSortKey(null);
-          setSortOrder(null);
-        } else {
-          setSortOrder('asc');
-        }
-      } else {
+      if (sortKey !== key) {
         setSortKey(key);
-        setSortOrder('asc');
+        setSortOrder('ascend');
+        return;
       }
+      if (sortOrder === 'ascend') {
+        setSortOrder('descend');
+        return;
+      }
+      setSortKey(null);
+      setSortOrder(null);
     };
 
     const sortedUsers = [...users].sort((a, b) => {
       if (!sortKey || !sortOrder) return 0;
-
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
-
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
+      const direction = sortOrder === 'ascend' ? 1 : -1;
+      return a[sortKey] > b[sortKey] ? direction : -direction;
     });
 
-    const SortIcon = ({ active, order }: { active: boolean; order: SortOrder }) => (
-      <span className="mdt-ml-2 mdt-inline-flex mdt-flex-col">
-        <Icon
-          name="chevron-up"
-          size="xs"
-          className={
-            active && order === 'asc' ? 'mdt-text-foreground' : 'mdt-text-muted-foreground/40'
-          }
-        />
-        <Icon
-          name="chevron-down"
-          size="xs"
-          className={`mdt--mt-1 ${active && order === 'desc' ? 'mdt-text-foreground' : 'mdt-text-muted-foreground/40'}`}
-        />
-      </span>
-    );
+    const columns: { key: SortKey; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+      { key: 'status', label: 'Status' },
+    ];
 
     return (
       <Table>
-        <TableCaption>Click on column headers to sort the data.</TableCaption>
+        <TableCaption>
+          Click a header to sort. Third click returns to the unsorted order.
+        </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  handleSort('name');
+            {columns.map((column) => (
+              <TableHead
+                key={column.key}
+                sortable
+                sortOrder={sortKey === column.key ? sortOrder : null}
+                onSort={() => {
+                  handleSort(column.key);
                 }}
-                className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                aria-label="Sort by name"
               >
-                Name
-                <SortIcon
-                  active={sortKey === 'name'}
-                  order={sortKey === 'name' ? sortOrder : null}
-                />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  handleSort('email');
-                }}
-                className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                aria-label="Sort by email"
-              >
-                Email
-                <SortIcon
-                  active={sortKey === 'email'}
-                  order={sortKey === 'email' ? sortOrder : null}
-                />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  handleSort('role');
-                }}
-                className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                aria-label="Sort by role"
-              >
-                Role
-                <SortIcon
-                  active={sortKey === 'role'}
-                  order={sortKey === 'role' ? sortOrder : null}
-                />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  handleSort('status');
-                }}
-                className="mdt-flex mdt-items-center mdt-font-medium hover:mdt-text-foreground"
-                aria-label="Sort by status"
-              >
-                Status
-                <SortIcon
-                  active={sortKey === 'status'}
-                  order={sortKey === 'status' ? sortOrder : null}
-                />
-              </Button>
-            </TableHead>
+                {column.label}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -415,10 +462,7 @@ export const SelectableRows: Story = {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow
-                key={user.id}
-                data-state={selectedRows.includes(user.id) ? 'selected' : undefined}
-              >
+              <TableRow key={user.id} selected={selectedRows.includes(user.id)}>
                 <TableCell>
                   <Checkbox
                     checked={selectedRows.includes(user.id)}
@@ -442,27 +486,29 @@ export const SelectableRows: Story = {
 };
 
 /**
- * Compact/dense table with reduced padding.
+ * The same table at `density="condensed"`. This used to be hand-written padding
+ * on every single cell — the story demonstrated a capability the component did
+ * not actually have, so every product rebuilt it slightly differently.
  */
 export const CompactDense: Story = {
   render: () => (
-    <Table>
-      <TableCaption>Compact table with reduced cell padding.</TableCaption>
+    <Table density="condensed">
+      <TableCaption>One prop on the table, not a class on every cell.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="mdt-h-8 mdt-px-2">ID</TableHead>
-          <TableHead className="mdt-h-8 mdt-px-2">Name</TableHead>
-          <TableHead className="mdt-h-8 mdt-px-2">Email</TableHead>
-          <TableHead className="mdt-h-8 mdt-px-2">Role</TableHead>
+          <TableHead align="right">ID</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Role</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell className="mdt-px-2 mdt-py-2">{user.id}</TableCell>
-            <TableCell className="mdt-px-2 mdt-py-2 mdt-font-medium">{user.name}</TableCell>
-            <TableCell className="mdt-px-2 mdt-py-2">{user.email}</TableCell>
-            <TableCell className="mdt-px-2 mdt-py-2">{user.role}</TableCell>
+            <TableCell align="right">{user.id}</TableCell>
+            <TableCell className="mdt-font-medium">{user.name}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell>{user.role}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -791,10 +837,7 @@ export const FullFeatured: Story = {
           </TableHeader>
           <TableBody>
             {paginatedUsers.map((user) => (
-              <TableRow
-                key={user.id}
-                data-state={selectedRows.includes(user.id) ? 'selected' : undefined}
-              >
+              <TableRow key={user.id} selected={selectedRows.includes(user.id)}>
                 <TableCell>
                   <Checkbox
                     checked={selectedRows.includes(user.id)}
