@@ -15,6 +15,9 @@ export {
   tableGroupRowVariants,
 } from './Table';
 
+export { useColumnWidths } from './useColumnWidths';
+export type { ColumnWidths, UseColumnWidths, UseColumnWidthsOptions } from './useColumnWidths';
+
 export type {
   TableProps,
   TableHeaderProps,

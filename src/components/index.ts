@@ -429,8 +429,12 @@ export {
   tableCellVariants,
   tableRowVariants,
   tableGroupRowVariants,
+  useColumnWidths,
 } from './Table';
 export type {
+  ColumnWidths,
+  UseColumnWidths,
+  UseColumnWidthsOptions,
   TableProps,
   TableHeaderProps,
   TableBodyProps,

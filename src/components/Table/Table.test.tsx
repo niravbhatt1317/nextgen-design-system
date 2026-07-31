@@ -1167,4 +1167,129 @@ describe('Table', () => {
       expect(plainBody).not.toHaveClass('mdt-sticky'); //       ordinary content
     });
   });
+
+  describe('column resizing', () => {
+    const renderResizable = (props: Record<string, unknown> = {}) =>
+      render(
+        <Table layout="fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead resizable width={200} {...props}>
+                Name
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+
+    it('renders a focusable separator, not a button', () => {
+      // A moveable boundary is a separator - the window-splitter pattern - and it
+      // has to be focusable to be usable without a mouse.
+      renderResizable();
+      const handle = screen.getByRole('separator');
+      expect(handle).toHaveAttribute('aria-orientation', 'vertical');
+      expect(handle).toHaveAttribute('tabindex', '0');
+    });
+
+    it('reports its current width and bounds to a screen reader', () => {
+      renderResizable({ minWidth: 80, maxWidth: 500 });
+      const handle = screen.getByRole('separator');
+      expect(handle).toHaveAttribute('aria-valuenow', '200');
+      expect(handle).toHaveAttribute('aria-valuemin', '80');
+      expect(handle).toHaveAttribute('aria-valuemax', '500');
+    });
+
+    it('names each handle, since a table always has more than one', () => {
+      renderResizable();
+      expect(screen.getByRole('separator', { name: 'Resize Name' })).toBeInTheDocument();
+    });
+
+    it('falls back to a generic name when the header is not plain text', () => {
+      render(
+        <Table layout="fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead resizable width={200}>
+                <strong>Rich</strong>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      expect(screen.getByRole('separator', { name: 'Resize column' })).toBeInTheDocument();
+    });
+
+    it('accepts an explicit handle name', () => {
+      renderResizable({ resizeLabel: 'Widen the name column' });
+      expect(screen.getByRole('separator', { name: 'Widen the name column' })).toBeInTheDocument();
+    });
+
+    it('applies the width as an inline style', () => {
+      const { container } = renderResizable();
+      expect(container.querySelector('th')).toHaveStyle({ width: '200px' });
+    });
+
+    it('positions the cell so the handle lands on its own edge', () => {
+      // Without this the handle resolves against the scroll container and sits
+      // at the table's edge rather than the column's.
+      const { container } = renderResizable();
+      expect(container.querySelector('th')).toHaveClass('mdt-relative');
+    });
+
+    it('renders no handle when not resizable', () => {
+      render(
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      expect(screen.queryByRole('separator')).not.toBeInTheDocument();
+    });
+
+    describe('keyboard', () => {
+      it('widens on ArrowRight and narrows on ArrowLeft', async () => {
+        const onResize = vi.fn();
+        renderResizable({ onResize });
+        const handle = screen.getByRole('separator');
+        handle.focus();
+        await userEvent.keyboard('{ArrowRight}');
+        expect(onResize).toHaveBeenLastCalledWith(216);
+        await userEvent.keyboard('{ArrowLeft}');
+        expect(onResize).toHaveBeenLastCalledWith(184);
+      });
+
+      it('jumps to the bounds on Home and End', async () => {
+        const onResize = vi.fn();
+        renderResizable({ onResize, minWidth: 80, maxWidth: 500 });
+        const handle = screen.getByRole('separator');
+        handle.focus();
+        await userEvent.keyboard('{Home}');
+        expect(onResize).toHaveBeenLastCalledWith(80);
+        await userEvent.keyboard('{End}');
+        expect(onResize).toHaveBeenLastCalledWith(500);
+      });
+
+      it('clamps rather than passing a width past the bounds', async () => {
+        const onResize = vi.fn();
+        renderResizable({ onResize, width: 70, minWidth: 64 });
+        const handle = screen.getByRole('separator');
+        handle.focus();
+        await userEvent.keyboard('{ArrowLeft}');
+        expect(onResize).toHaveBeenLastCalledWith(64);
+      });
+
+      it('ignores keys that are not resize keys', async () => {
+        const onResize = vi.fn();
+        renderResizable({ onResize });
+        const handle = screen.getByRole('separator');
+        handle.focus();
+        await userEvent.keyboard('{Enter}');
+        await userEvent.keyboard('a');
+        expect(onResize).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
