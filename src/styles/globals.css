@@ -221,6 +221,49 @@
 
     --mdt-radius: 0.5rem;
 
+    /* ============================================
+       ELEVATION - how a surface reads as lifted off the page
+
+       These six steps replace `mdt-shadow-sm/md/lg`, which were Tailwind's
+       defaults rather than our decisions - 37 uses across 18 components, none
+       of them chosen by anybody here.
+
+       The light values are deliberately IDENTICAL to the Tailwind defaults the
+       components already resolve to, so migrating a component from
+       `mdt-shadow-md` to the token changes nothing on screen. The migration is
+       a rename, not a restyle. `xs` and `xl` are new - nothing uses them yet.
+       ============================================ */
+    --mdt-shadow-none: none;
+    --mdt-shadow-xs: 0 1px 1px 0 rgb(0 0 0 / 0.04);
+    --mdt-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --mdt-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --mdt-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --mdt-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+    /* ============================================
+       LAYERING - which floating thing wins when two are open at once
+
+       Almost everything floating used `mdt-z-50`, so the winner was decided by
+       DOM order rather than intent: a dropdown inside a dialog, or a tooltip
+       over a sheet, was a coin toss.
+
+       The order answers the open question in MISSING-TOKENS.md - yes, a tooltip
+       sits above a modal. Anything triggered FROM something else has to render
+       above it, or it is clipped by the very surface that opened it. That is
+       why dropdown, popover and tooltip all sit above `modal`, not below it.
+
+       Toast is last because a toast reports on the whole application, not on
+       whatever happens to be open.
+       ============================================ */
+    --mdt-z-base: 0;
+    --mdt-z-sticky: 10;
+    --mdt-z-overlay: 1000;
+    --mdt-z-modal: 1010;
+    --mdt-z-dropdown: 1020;
+    --mdt-z-popover: 1030;
+    --mdt-z-tooltip: 1040;
+    --mdt-z-toast: 1050;
+
     /* How wide a toast is. The promotional toast sits on its own layer outside
        the toaster, so both need to read the width from the same place or they
        drift apart. */
@@ -316,6 +359,38 @@
 
     --mdt-feedback-title: var(--mdt-neutral-10);
     --mdt-feedback-text: var(--mdt-neutral-30);
+
+    /* ============================================
+       ELEVATION - DARK
+
+       A black shadow at 10% opacity is invisible on a dark surface, so in dark
+       mode every elevated component was reading as flat: a dialog and the page
+       behind it were separated only by their background colours.
+
+       Two things fix it, and both are needed. The drop shadow keeps its
+       geometry but roughly quadruples in opacity, and a hairline light edge is
+       baked into the token as a `0 0 0 1px` ring. The ring is written FIRST so
+       it paints on top of the blur and stays crisp.
+
+       Putting the hairline inside the token matters: no component has to
+       remember to add a border in dark mode, and no component can forget. A
+       component asks for `mdt-shadow-md` and gets the right treatment in both
+       themes.
+
+       `none` stays truly none - flat means flat, with no edge.
+       ============================================ */
+    --mdt-shadow-none: none;
+    --mdt-shadow-xs: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 1px 0 rgb(0 0 0 / 0.3);
+    --mdt-shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px 0 rgb(0 0 0 / 0.35);
+    --mdt-shadow-md:
+      0 0 0 1px rgb(255 255 255 / 0.08), 0 4px 6px -1px rgb(0 0 0 / 0.45),
+      0 2px 4px -2px rgb(0 0 0 / 0.45);
+    --mdt-shadow-lg:
+      0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 15px -3px rgb(0 0 0 / 0.5),
+      0 4px 6px -4px rgb(0 0 0 / 0.5);
+    --mdt-shadow-xl:
+      0 0 0 1px rgb(255 255 255 / 0.1), 0 20px 25px -5px rgb(0 0 0 / 0.55),
+      0 8px 10px -6px rgb(0 0 0 / 0.55);
   }
 }
 
