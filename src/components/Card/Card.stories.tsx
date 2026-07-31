@@ -127,13 +127,18 @@ export const HeaderBodyFooter: Story = {
       <Card>
         <CardHeader
           leading={<IconTile icon={<Icon name="server" aria-hidden />} tone="blue" />}
-          eyebrow="Change request"
           heading="Firewall rule update, DC-West"
-          meta="Raised by Riya Kulkarni, 2 days ago"
-          trailing={<Badge tone="warning">Awaiting CAB</Badge>}
+          supporting="Raised by Riya Kulkarni, 2 days ago"
         />
         <CardBody>
-          Nine rules affected across two clusters. Rollback plan attached and verified in staging.
+          {/* items-start, or the badge stretches to the column's full width */}
+          <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-3">
+            <Badge tone="warning">Awaiting CAB</Badge>
+            <p className="mdt-m-0">
+              Nine rules affected across two clusters. Rollback plan attached and verified in
+              staging.
+            </p>
+          </div>
         </CardBody>
         <CardFooter
           meta="3 approvals needed"
@@ -167,10 +172,8 @@ export const WithMedia: Story = {
           <div className="mdt-h-32 mdt-w-full mdt-bg-gradient-to-br mdt-from-blue-70 mdt-to-purple-80" />
         </CardMedia>
         <CardHeader
-          eyebrow="Change request"
           heading="Firewall rule update, DC-West"
           supporting="Nine rules affected across two clusters. Rollback plan attached and verified in staging."
-          meta="Raised by Riya Kulkarni, 2 days ago"
         />
         <CardFooter
           meta="3 approvals needed"
@@ -262,8 +265,7 @@ export const AnInsetPanel: Story = {
         <CardHeader
           leading={<IconTile icon={<Icon name="shield-check" aria-hidden />} tone="green" />}
           heading="Identity provider"
-          meta="Checked 4 minutes ago"
-          trailing={<Badge tone="success">Healthy</Badge>}
+          supporting="Checked 4 minutes ago"
         />
         <CardBody>
           <div className="mdt-flex mdt-flex-col mdt-gap-2 mdt-rounded-md mdt-bg-secondary mdt-p-3">
@@ -312,7 +314,7 @@ export const Clickable: Story = {
         ['INC-4470', 'SSO login loop after update', 'Identity'],
       ].map(([id, title, team]) => (
         <ClickableCard key={id} onClick={(args as { onClick?: () => void }).onClick}>
-          <CardHeader eyebrow={id} heading={title} />
+          <CardHeader heading={title} supporting={id} />
           <CardBody>
             <Badge tone="neutral">{team}</Badge>
           </CardBody>
@@ -329,7 +331,9 @@ export const Clickable: Story = {
 export const Collapsible: Story = {
   args: { onOpenChange: fn() } as never,
   render: (args) => (
-    <Grid>
+    // Stacked, not side by side: a shut card is 67px and an open one is 207px,
+    // so putting them in a row leaves a dead strip beside the shut one.
+    <Grid cols={1}>
       <CollapsibleCard
         header={{ heading: 'Related changes', supporting: '3 linked to this incident' }}
         onOpenChange={(args as { onOpenChange?: (o: boolean) => void }).onOpenChange}

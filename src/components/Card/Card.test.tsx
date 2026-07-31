@@ -119,25 +119,26 @@ describe('Card', () => {
       expect(screen.getByTestId(HEADER)).toHaveClass('last:mdt-border-b-0');
     });
 
-    it('renders every slot it is given', () => {
+    it('holds three things and no more: a mark, a title, a sentence', () => {
       render(
         <Card>
           <CardHeader
             leading={<span>tile</span>}
-            eyebrow="Incident"
             heading="Mail relay queue backing up"
             supporting="Two of four nodes refusing connections."
-            meta="Raised 2 days ago"
-            trailing={<span>P1</span>}
           />
         </Card>
       );
       expect(screen.getByTestId('card-header-leading')).toBeInTheDocument();
-      expect(screen.getByText('Incident')).toBeInTheDocument();
       expect(screen.getByText('Mail relay queue backing up')).toBeInTheDocument();
       expect(screen.getByText('Two of four nodes refusing connections.')).toBeInTheDocument();
-      expect(screen.getByText('Raised 2 days ago')).toBeInTheDocument();
-      expect(screen.getByTestId('card-header-trailing')).toBeInTheDocument();
+      // An eyebrow, a metadata line and a right-hand slot were all tried and
+      // cut. A header that can carry six things is a header every team fills
+      // differently, and the card stops looking like one component. Anything
+      // richer is a custom card.
+      expect(screen.queryByTestId('card-header-eyebrow')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('card-header-meta')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('card-header-trailing')).not.toBeInTheDocument();
     });
 
     it('draws the heading as a real heading on a static card', () => {

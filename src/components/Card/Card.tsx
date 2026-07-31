@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority';
 import { createContext, forwardRef, useCallback, useContext, useId, useState } from 'react';
-import type { ComponentPropsWithoutRef, Ref } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type {
@@ -145,19 +145,26 @@ const CardMedia = forwardRef<HTMLDivElement, CardMediaProps>(
 CardMedia.displayName = 'CardMedia';
 
 /**
+ * `trailing` is not part of the public header. The header holds a mark, a title
+ * and a sentence; anything richer is a custom card. The one exception lives in
+ * this file: CollapsibleCard has to put its chevron somewhere, and a chevron is
+ * chrome rather than content.
+ */
+type CardHeaderInternalProps = CardHeaderProps & { trailing?: ReactNode | undefined };
+
+/**
  * The header - a region with its own edge, not a label.
  *
- * The line is on by default. A header with nothing after it drops it on its own,
- * which is also what makes a collapsed card come out right for free.
+ * Three things and no more: a mark, a title, a sentence. The line is on by
+ * default; a header with nothing after it drops it on its own, which is also
+ * what makes a collapsed card come out right for free.
  */
-const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
+const CardHeader = forwardRef<HTMLDivElement, CardHeaderInternalProps>(
   (
     {
       leading,
-      eyebrow,
       heading,
       supporting,
-      meta,
       trailing,
       plain = false,
       headingAs,
@@ -199,14 +206,6 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
             button or leading tile. On a multi-line header it is the tallest
             thing in the row, so centring changes nothing. */}
         <div className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col mdt-gap-1 mdt-self-center">
-          {eyebrow !== undefined ? (
-            <p
-              className="mdt-m-0 mdt-text-xs mdt-font-semibold mdt-uppercase mdt-tracking-wider mdt-text-muted-foreground"
-              data-testid="card-header-eyebrow"
-            >
-              {eyebrow}
-            </p>
-          ) : null}
           {heading !== undefined ? (
             <HeadingTag
               className="mdt-m-0 mdt-text-base mdt-font-semibold mdt-leading-tight mdt-tracking-tight"
@@ -221,14 +220,6 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
               data-testid="card-header-supporting"
             >
               {supporting}
-            </p>
-          ) : null}
-          {meta !== undefined ? (
-            <p
-              className="mdt-m-0 mdt-text-xs mdt-text-muted-foreground"
-              data-testid="card-header-meta"
-            >
-              {meta}
             </p>
           ) : null}
           {children}

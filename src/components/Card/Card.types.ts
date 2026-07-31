@@ -44,29 +44,24 @@ export interface CardOwnProps {
 
 export type CardProps = CardOwnProps & Omit<ComponentPropsWithoutRef<'div'>, 'className'>;
 
+/**
+ * The header holds three things and no more: a mark, a title, and a sentence.
+ *
+ * An eyebrow, a metadata line and a right-hand slot were all tried and cut. A
+ * header that can carry six things is a header every team fills differently,
+ * and the card stops looking like one component. **When a screen genuinely needs
+ * a richer header - a status chip, a menu, a timestamp - it builds a custom card
+ * rather than stretching this one.**
+ */
 export interface CardHeaderOwnProps {
-  /** A mark before the titles - an icon tile or an avatar. Sits at the top. */
+  /** A mark before the title - an icon tile or an avatar. */
   leading?: ReactNode | undefined;
-
-  /** A short uppercase label above the heading. */
-  eyebrow?: ReactNode | undefined;
 
   /** The card's title. */
   heading?: ReactNode | undefined;
 
   /** A sentence under the heading. */
   supporting?: ReactNode | undefined;
-
-  /** Quieter detail under the supporting text - who, when. */
-  meta?: ReactNode | undefined;
-
-  /**
-   * The right-hand slot. **One** thing: a badge, a link, or one icon button.
-   *
-   * It sits on the header's vertical middle, not its first line - a chip or a
-   * menu button belongs to the whole header rather than to the title.
-   */
-  trailing?: ReactNode | undefined;
 
   /**
    * Removes the dividing line.
@@ -174,8 +169,8 @@ export type ClickableCardProps = ClickableCardOwnProps &
  * nothing left underneath for it to divide.
  */
 export interface CollapsibleCardOwnProps extends Omit<CardOwnProps, 'children'> {
-  /** Everything the header shows. */
-  header: Omit<CardHeaderOwnProps, 'trailing' | 'plain' | 'headingAs'>;
+  /** Everything the header shows: a mark, a title, a sentence. */
+  header: Omit<CardHeaderOwnProps, 'plain' | 'headingAs'>;
   /** What is revealed. */
   children?: ReactNode | undefined;
   /** Open to begin with, when the card manages its own state. @default false */
