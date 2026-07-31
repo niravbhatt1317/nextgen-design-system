@@ -1053,3 +1053,55 @@ export const StickySummaryRows: Story = {
     </Table>
   ),
 };
+
+/**
+ * A first column pinned while the rest scrolls sideways — the pattern Jira,
+ * crypto exchanges and booking tables all use when a row has more columns than
+ * fit.
+ *
+ * Put `frozen` on the same column in **every** row, header included, or it will
+ * pin in some rows and not others. Like a pinned row, the edge only asserts
+ * itself once something has actually slid underneath: at rest it looks like any
+ * other column.
+ */
+export const FrozenColumn: Story = {
+  render: () => (
+    <Table
+      stickyHeader
+      maxHeight="18rem"
+      containerClassName="mdt-rounded-md mdt-border"
+      // `w-full` on the table would squeeze the columns to fit and there would be
+      // nothing to scroll. `min-w-max` lets it take the width its columns want.
+      className="mdt-min-w-max"
+    >
+      <TableHeader>
+        <TableRow>
+          <TableHead frozen className="mdt-w-44">
+            Market
+          </TableHead>
+          {['Base', 'Quote', 'Price', '24h low', '24h high', '24h change', 'Funding'].map((h) => (
+            <TableHead key={h} align="right" className="mdt-w-32">
+              {h}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 14 }, (_, i) => (
+          <TableRow key={i}>
+            <TableCell frozen className="mdt-font-medium">
+              PAIR-{i + 1}
+            </TableCell>
+            <TableCell align="right">Bitcoin</TableCell>
+            <TableCell align="right">US Dollar</TableCell>
+            <TableCell align="right">{(90000 + i * 137).toLocaleString()}</TableCell>
+            <TableCell align="right">{(87000 + i * 91).toLocaleString()}</TableCell>
+            <TableCell align="right">{(91000 + i * 113).toLocaleString()}</TableCell>
+            <TableCell align="right">{(i * 0.13).toFixed(2)}%</TableCell>
+            <TableCell align="right">0.000{i}%</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+};

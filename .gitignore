@@ -110,5 +110,11 @@ sonar-report.xml
 # JUnit reports
 junit.xml
 
+# Scratch scripts
+# Node resolves `playwright` from the project's node_modules, so a throwaway
+# measuring script has to live in the project root to run at all - and then
+# `git add -A` picks it up. One did reach a commit before being caught.
+.tmp-*
+
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json

@@ -136,6 +136,31 @@ const STUCK_BOTTOM = [
   'group-data-[scrolled-bottom=true]:after:mdt-opacity-100',
 ].join(' ');
 
+// A column pinned to the left edge.
+//
+// The same shape as the row treatment above, turned ninety degrees: an edge, and
+// a band that only appears once something has slid underneath. The band is drawn
+// by `::before` because `::after` already carries the row's wash - a frozen cell
+// inside a pinned row uses both at once.
+//
+// The header variant sits on `z-sticky-header` rather than `z-sticky`. A frozen
+// body cell and the frozen header cell cross at the top-left corner, and equal
+// z-index would let the body cell paint over the header, because tbody comes
+// after thead in the DOM.
+const FROZEN_BASE = [
+  'mdt-sticky mdt-left-0 mdt-bg-background',
+  'mdt-border-r mdt-border-border',
+  'group-data-[scrolled-x=true]:mdt-border-border/30',
+  'dark:group-data-[scrolled-x=true]:mdt-border-border',
+  "before:mdt-pointer-events-none before:mdt-absolute before:mdt-inset-y-0 before:mdt-left-full before:mdt-w-4 before:mdt-opacity-0 before:mdt-transition-opacity before:mdt-content-['']",
+  'before:mdt-bg-gradient-to-r before:mdt-to-transparent',
+  'before:mdt-from-black/5 dark:before:mdt-from-black/70',
+  'group-data-[scrolled-x=true]:before:mdt-opacity-100',
+].join(' ');
+
+const FROZEN_CELL = `${FROZEN_BASE} mdt-z-sticky`;
+const FROZEN_HEAD = `${FROZEN_BASE} mdt-z-sticky-header`;
+
 /**
  * `default` is exactly the spacing this table had before density existed, so an
  * existing table does not move unless it asks to.
@@ -301,7 +326,7 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
     // scrolled underneath it. A total sitting at the true end of the data is
     // not floating over anything, and a shadow there is a lie about depth.
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [scrolled, setScrolled] = useState({ top: false, bottom: false });
+    const [scrolled, setScrolled] = useState({ top: false, bottom: false, x: false });
 
     const measure = useCallback(() => {
       const el = scrollRef.current;
@@ -310,8 +335,13 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
       // One pixel of slack: fractional scroll heights on high-density displays
       // otherwise leave `bottom` permanently true.
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      // Horizontal is one flag, not two: a frozen column only ever pins to the
+      // left, so all it needs to know is whether anything has slid under it.
+      const scrolledX = el.scrollLeft > 0;
       setScrolled((prev) =>
-        prev.top === !atTop && prev.bottom === !atBottom ? prev : { top: !atTop, bottom: !atBottom }
+        prev.top === !atTop && prev.bottom === !atBottom && prev.x === scrolledX
+          ? prev
+          : { top: !atTop, bottom: !atBottom, x: scrolledX }
       );
     }, []);
 
@@ -337,6 +367,7 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
           className={cn('mdt-group mdt-relative mdt-w-full mdt-overflow-auto', containerClassName)}
           data-scrolled-top={scrolled.top ? 'true' : 'false'}
           data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
+          data-scrolled-x={scrolled.x ? 'true' : 'false'}
           style={maxHeight === undefined ? undefined : { maxHeight }}
         >
           {/*
@@ -585,7 +616,16 @@ TableExpandTrigger.displayName = 'TableExpandTrigger';
  */
 const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
   (
-    { className, align = 'left', sortable = false, sortOrder = null, onSort, children, ...props },
+    {
+      className,
+      align = 'left',
+      sortable = false,
+      sortOrder = null,
+      onSort,
+      frozen = false,
+      children,
+      ...props
+    },
     ref
   ) => {
     const { density, stickyHeader } = useContext(TableContext);
@@ -600,6 +640,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
           // The background is required, not decoration: without it the body
           // scrolls visibly underneath the header instead of behind it.
           stickyHeader && STUCK_TOP,
+          frozen && FROZEN_HEAD,
           className
         )}
         {...props}
@@ -642,7 +683,7 @@ TableHead.displayName = 'TableHead';
  * ```
  */
 const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, align = 'left', indent = 0, ...props }, ref) => {
+  ({ className, align = 'left', indent = 0, frozen = false, ...props }, ref) => {
     const { density } = useContext(TableContext);
     const sticky = useContext(TableStickyRowContext);
     return (
@@ -652,6 +693,7 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
           tableCellVariants({ density, align, indent }),
           sticky === 'top' && STUCK_TOP,
           sticky === 'bottom' && STUCK_BOTTOM,
+          frozen && FROZEN_CELL,
           className
         )}
         {...props}

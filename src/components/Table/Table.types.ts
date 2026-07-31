@@ -278,6 +278,21 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
 
   /** Called when the sort control is used. Ignored unless `sortable` is set. */
   onSort?: () => void;
+
+  /**
+   * Pins this column to the left edge while the table scrolls sideways.
+   *
+   * Put it on the same column in every row, header included, or the column will
+   * pin in some rows and not others. Needs the table to actually scroll
+   * horizontally - a table narrower than its container has nothing to pin
+   * against.
+   *
+   * Like the row's `sticky`, the edge only asserts itself once something has
+   * slid underneath: at rest a frozen column looks like any other.
+   *
+   * @default false
+   */
+  frozen?: boolean;
 }
 
 /**
@@ -298,6 +313,21 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
    * @default 0
    */
   indent?: TableIndent;
+
+  /**
+   * Pins this column to the left edge while the table scrolls sideways.
+   *
+   * Put it on the same column in every row, header included, or the column will
+   * pin in some rows and not others. Needs the table to actually scroll
+   * horizontally - a table narrower than its container has nothing to pin
+   * against.
+   *
+   * Like the row's `sticky`, the edge only asserts itself once something has
+   * slid underneath: at rest a frozen column looks like any other.
+   *
+   * @default false
+   */
+  frozen?: boolean;
 }
 
 /**

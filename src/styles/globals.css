@@ -275,6 +275,12 @@
        ============================================ */
     --mdt-z-base: 0;
     --mdt-z-sticky: 10;
+    /* A second sticky plane, for when two pinned things overlap.
+       A frozen first column and a sticky header both pin, and they cross at the
+       top-left corner. Equal z-index means the later element in the DOM wins -
+       tbody comes after thead - so a frozen body cell would scroll up and paint
+       over the header. The header sits one step higher so the corner resolves. */
+    --mdt-z-sticky-header: 11;
     --mdt-z-overlay: 1000;
     --mdt-z-modal: 1010;
     --mdt-z-dropdown: 1020;
