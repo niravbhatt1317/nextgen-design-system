@@ -257,6 +257,7 @@ const config: Config = {
         base: 'var(--mdt-z-base)',
         sticky: 'var(--mdt-z-sticky)',
         'sticky-header': 'var(--mdt-z-sticky-header)',
+        'sticky-corner': 'var(--mdt-z-sticky-corner)',
         overlay: 'var(--mdt-z-overlay)',
         modal: 'var(--mdt-z-modal)',
         dropdown: 'var(--mdt-z-dropdown)',

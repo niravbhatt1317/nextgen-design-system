@@ -1069,9 +1069,12 @@ export const FrozenColumn: Story = {
     <Table
       stickyHeader
       maxHeight="18rem"
-      containerClassName="mdt-rounded-md mdt-border"
-      // `w-full` on the table would squeeze the columns to fit and there would be
-      // nothing to scroll. `min-w-max` lets it take the width its columns want.
+      // The scroll container is capped so the demo overflows at any viewport. On
+      // a wide screen the table simply fitted, so there was nothing to scroll
+      // and the frozen column had nothing to prove - it worked in the docs page,
+      // where the container is narrow, and looked broken in the story canvas.
+      containerClassName="mdt-max-w-2xl mdt-rounded-md mdt-border"
+      // `w-full` alone would squeeze the columns back to the container width.
       className="mdt-min-w-max"
     >
       <TableHeader>
