@@ -25,6 +25,17 @@ export const checkboxVariants = cva([], {
     variant: {
       default: [
         'mdt-peer mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-rounded-sm mdt-border mdt-border-primary',
+        // `inline-flex` and `align-middle` are load-bearing, not tidying.
+        //
+        // A button is `inline-block` sitting on the text baseline by default.
+        // The tick indicator only exists while the box is checked, so ticking it
+        // added a child, moved the box's baseline, and grew the surrounding line
+        // box - a table row measurably jumped 53px to 55px on every click.
+        //
+        // `align-middle` takes the box off the baseline so its content cannot
+        // move it, and `inline-flex` centres the tick so the box's own size
+        // never depends on what is inside it.
+        'mdt-inline-flex mdt-items-center mdt-justify-center mdt-align-middle',
         'mdt-ring-offset-background',
         FOCUS_RING_CLASSES,
         DISABLED_CLASSES,

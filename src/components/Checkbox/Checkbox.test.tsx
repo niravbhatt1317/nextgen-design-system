@@ -153,4 +153,28 @@ describe('Checkbox', () => {
       expect(screen.getByRole('checkbox')).toBeDisabled();
     });
   });
+
+  describe('stable layout', () => {
+    it('sits off the text baseline so ticking it cannot move the line box', () => {
+      // The tick indicator only exists while checked. On a baseline-aligned
+      // inline-block that meant checking the box grew the surrounding line box -
+      // a table row measurably jumped from 53px to 55px on every click.
+      const { container } = render(<Checkbox aria-label="Select" />);
+      const root = container.querySelector('[role="checkbox"]');
+      expect(root).toHaveClass('mdt-align-middle');
+      expect(root).toHaveClass('mdt-inline-flex');
+    });
+
+    it('keeps the same classes checked and unchecked', () => {
+      const { container: off } = render(<Checkbox aria-label="a" />);
+      const { container: on } = render(<Checkbox aria-label="b" checked />);
+      const cls = (c: HTMLElement) =>
+        (c.querySelector('[role="checkbox"]') as HTMLElement).className
+          .split(' ')
+          .filter((x) => !x.includes('data-'))
+          .sort()
+          .join(' ');
+      expect(cls(off)).toBe(cls(on));
+    });
+  });
 });
