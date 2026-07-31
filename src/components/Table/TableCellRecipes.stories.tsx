@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
@@ -13,15 +13,7 @@ import {
 } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import { Progress } from '../Progress';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableExpandTrigger,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './Table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 import type { BadgeTone } from '../Badge/Badge.types';
 
 /**
@@ -49,10 +41,7 @@ import type { BadgeTone } from '../Badge/Badge.types';
  * problems: **Editable status tag** for a value you change in place, and
  * **In-cell actions** for actions that belong beside their subject rather than
  * in a column of their own.
- *
- * **Expanded row content** is here for the same reason. The Table stories show
- * a row expanding into more rows of the same columns; this shows it opening
- * into a panel with a layout of its own, which has different rules.
+
  */
 const meta: Meta = {
   title: 'Components/Table/Cell Recipes',
@@ -935,182 +924,6 @@ export const InCellActions: Story = {
           {fired === null ? 'Hover a row, then use an action.' : `Fired: ${fired}`}
         </p>
       </div>
-    );
-  },
-};
-
-/**
- * **Expanded row content** - the panel behind a chevron, and what may live in
- * it.
- *
- * The Expandable rows story shows one shape: expanding into **more rows of the
- * same columns**, a parent with children. That is not the only shape, and the
- * other one has different rules. Here the row opens into a **panel spanning
- * every column**, holding a layout of its own - key/value pairs, an activity
- * trail, a status block. The columns above it mean nothing to it.
- *
- * Four things this arrangement has to get right, and three of them are easy to
- * miss:
- *
- * - **One cell, `colSpan` across the lot.** The panel is not a row of cells. If
- *   you build it as cells it inherits the column widths, and a detail layout
- *   has no reason to agree with them.
- * - **It is not a record, so it must not behave like one.** Every body row gets
- *   hover feedback, which on a panel says "click me" about something that does
- *   nothing. It is switched off here. `TableRow` has no prop for this - a
- *   `summary` row opts out the same way and *does* have one, so this is a gap
- *   worth closing rather than a class worth copying.
- * - **It breaks striping.** A panel row is a row, so in a striped table it
- *   takes a stripe of its own and flips the odd/even parity of everything
- *   below it. Stripes and expandable panels do not combine; pick one.
- * - **`aria-controls` both ways.** The chevron says which panel it opens and
- *   the panel says nothing on its own, so the two need wiring by id. The
- *   trigger already handles `aria-expanded`.
- *
- * The panel indents to the first *content* column rather than the chevron, so
- * the detail lines up with the thing it belongs to.
- */
-export const ExpandedRowContent: Story = {
-  render: function ExpandedRowContentRecipe() {
-    const [open, setOpen] = useState<string[]>(['DAL03']);
-    const toggle = (id: string) => {
-      setOpen((prev) => (prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]));
-    };
-
-    const sites = [
-      { id: 'DAL03', name: 'Dallas-03', provider: 'Equinix', kind: 'Connect', status: 'inProcess' },
-      { id: 'LON01', name: 'London-01', provider: 'Telehouse', kind: 'Direct', status: 'resolved' },
-    ] as const;
-
-    const detail = [
-      ['Date created', 'Mon, 15 Jul 2019 17:52:57 GMT'],
-      ['User IP address', '10.123.11/29'],
-      ['BGP ASN', '63888'],
-      ['Router', 'ZCV-DRK-TZ-03'],
-    ];
-
-    const activity = [
-      {
-        icon: 'info' as const,
-        tone: 'mdt-text-muted-foreground',
-        when: '10/23/2018 9:30AM',
-        what: 'LOA awaiting action',
-      },
-      {
-        icon: 'check-circle' as const,
-        tone: 'mdt-text-success',
-        when: '10/23/2018 9:31AM',
-        what: 'LOA approved',
-      },
-    ];
-
-    return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Site</TableHead>
-            <TableHead>Provider</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sites.map((site) => {
-            const isOpen = open.includes(site.id);
-            const panelId = `panel-${site.id}`;
-            return (
-              <Fragment key={site.id}>
-                <TableRow>
-                  <TableCell>
-                    <span className="mdt-inline-flex mdt-items-center mdt-gap-2">
-                      <TableExpandTrigger
-                        expanded={isOpen}
-                        onToggle={() => {
-                          toggle(site.id);
-                        }}
-                        label={`Show details for ${site.name}`}
-                        aria-controls={panelId}
-                      />
-                      <span className="mdt-font-medium">{site.name}</span>
-                    </span>
-                  </TableCell>
-                  <TableCell>{site.id}</TableCell>
-                  <TableCell>{site.provider}</TableCell>
-                  <TableCell>
-                    <Badge tone={TICKET_TONE[site.status]} shape="square" size="sm" dot>
-                      {TICKET_LABEL[site.status]}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-                {isOpen && (
-                  <TableRow
-                    // Not a record: no hover feedback, and a quiet surface so it
-                    // reads as a drawer behind the row rather than another one.
-                    className="hover:mdt-bg-transparent"
-                  >
-                    <TableCell
-                      colSpan={4}
-                      id={panelId}
-                      className="mdt-bg-muted/30 mdt-p-6 mdt-pl-14"
-                    >
-                      <div className="mdt-grid mdt-gap-8 md:mdt-grid-cols-3">
-                        <dl className="mdt-grid mdt-grid-cols-[auto_1fr] mdt-gap-x-6 mdt-gap-y-2 mdt-text-sm">
-                          {detail.map(([label, value]) => (
-                            <Fragment key={label}>
-                              <dt className="mdt-font-medium">{label}</dt>
-                              <dd className="mdt-text-muted-foreground">{value}</dd>
-                            </Fragment>
-                          ))}
-                        </dl>
-
-                        <div>
-                          <h4 className="mdt-mb-3 mdt-text-sm mdt-font-medium">Latest activity</h4>
-                          <ol className="mdt-space-y-3">
-                            {activity.map((item, index) => (
-                              <li key={item.what} className="mdt-flex mdt-gap-3">
-                                <div className="mdt-flex mdt-flex-col mdt-items-center">
-                                  <Icon
-                                    name={item.icon}
-                                    size="sm"
-                                    className={item.tone}
-                                    aria-hidden
-                                  />
-                                  {/* The connector stops after the last entry. */}
-                                  {index < activity.length - 1 && (
-                                    <span className="mdt-mt-1 mdt-w-px mdt-flex-1 mdt-bg-border" />
-                                  )}
-                                </div>
-                                <div className="mdt-text-sm mdt-leading-tight">
-                                  <div>{item.when}</div>
-                                  <div className="mdt-text-muted-foreground">{item.what}</div>
-                                </div>
-                              </li>
-                            ))}
-                          </ol>
-                        </div>
-
-                        <div>
-                          <h4 className="mdt-mb-3 mdt-text-sm mdt-font-medium">Provision status</h4>
-                          <p className="mdt-text-sm mdt-leading-snug mdt-text-muted-foreground">
-                            Case{' '}
-                            <a
-                              href="#case"
-                              className="mdt-font-medium mdt-text-foreground mdt-underline mdt-underline-offset-2"
-                            >
-                              #00001
-                            </a>
-                            , created by RJ Smithson on 02/09/2019 9:30AM
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </Fragment>
-            );
-          })}
-        </TableBody>
-      </Table>
     );
   },
 };
