@@ -999,6 +999,38 @@ describe('Table', () => {
   });
 
   describe('frozen columns', () => {
+    it('is positioned by default, so an absolute child resolves against it', () => {
+      const { container } = render(
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      expect(container.querySelector('th')).toHaveClass('mdt-relative');
+    });
+
+    it('upgrades that to sticky when pinned, rather than keeping both', () => {
+      // `relative` in the base and `sticky` from the frozen classes are the same
+      // tailwind-merge group, so the later one has to win. If both survived, the
+      // pinned column would stop pinning and its `left` offset would shove it
+      // sideways instead - which is exactly what happened.
+      const { container } = render(
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead frozen>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      );
+      const th = container.querySelector('th');
+      expect(th).toHaveClass('mdt-sticky');
+      expect(th).not.toHaveClass('mdt-relative');
+    });
+
     it('drops the right band on the corner cell, keeping the edge', () => {
       // A frozen column and a sticky header each cast their own wash, and two
       // straight gradients cannot join smoothly where they cross. The corner is
@@ -1013,7 +1045,9 @@ describe('Table', () => {
         </Table>
       );
       const th = container.querySelector('th');
-      expect(th).toHaveClass('mdt-left-0');
+      // `left` is a measured value now, not a class: with two pinned columns
+      // the second sits at the first's real width.
+      expect(th).toHaveStyle({ left: '0px' });
       expect(th).toHaveClass('mdt-border-r');
       expect(th).not.toHaveClass('group-data-[scrolled-x=true]:before:mdt-opacity-100');
     });
@@ -1050,7 +1084,7 @@ describe('Table', () => {
       );
       const [first, second] = [...container.querySelectorAll('th')];
       expect(first).toHaveClass('mdt-sticky');
-      expect(first).toHaveClass('mdt-left-0');
+      expect(first).toHaveStyle({ left: '0px' });
       // No sticky header here, so no corner - the frozen header sits on the
       // header plane, above any frozen body cell.
       expect(first).toHaveClass('mdt-z-sticky-header');

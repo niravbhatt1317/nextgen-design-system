@@ -429,7 +429,10 @@ export {
   tableCellVariants,
   tableRowVariants,
   tableGroupRowVariants,
+  TableColumnMenu,
+  TableColumnBoundary,
   useColumnWidths,
+  useTableColumns,
 } from './Table';
 export type {
   ColumnWidths,
@@ -449,6 +452,12 @@ export type {
   TableAlign,
   TableSortOrder,
   TableIndent,
+  TableColumnMenuProps,
+  TableColumnBoundaryProps,
+  TableColumnDef,
+  TableColumnView,
+  TableColumnsState,
+  UseTableColumns,
 } from './Table';
 
 // Tabs
