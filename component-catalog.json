@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 34,
-  "variantGroupCount": 124,
-  "variantValueCount": 415,
+  "componentCount": 35,
+  "variantGroupCount": 126,
+  "variantValueCount": 422,
   "components": [
     {
       "component": "Avatar",
@@ -105,6 +105,23 @@
             "variant": "attached",
             "size": "md",
             "fullWidth": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Card",
+      "file": "src/components/Card/Card.tsx",
+      "definitions": [
+        {
+          "name": "cardVariants",
+          "variants": {
+            "surface": ["filled", "secondary", "outline", "elevated"],
+            "padding": ["normal", "compact", "none"]
+          },
+          "defaults": {
+            "surface": "filled",
+            "padding": "normal"
           }
         }
       ]

@@ -280,6 +280,56 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
   onSort?: () => void;
 
   /**
+   * Adds a drag handle on the column's trailing edge.
+   *
+   * Resizing is a contract, not an implementation: the handle and its keyboard
+   * behaviour are provided here, the width itself stays yours. `useColumnWidths`
+   * holds the arithmetic if you want it.
+   *
+   * **Needs `layout="fixed"` on the table.** Under the default `auto` layout the
+   * browser re-derives column widths from content and will fight whatever you
+   * set.
+   *
+   * @default false
+   */
+  resizable?: boolean;
+
+  /**
+   * The column's current width in pixels. Applied as an inline width.
+   *
+   * **Leave one column unsized.** A fixed-layout table still fills its
+   * container, and if every column carries a width the browser scales all of
+   * them to make up the difference - a column set to 200 paints at 346, and the
+   * handle no longer tracks the cursor. Give the last column no `width` and it
+   * absorbs the slack instead, so every other column is exactly the pixels you
+   * asked for.
+   */
+  width?: number;
+
+  /** Called while the handle is dragged or nudged, with the new width. */
+  onResize?: (width: number) => void;
+
+  /**
+   * How narrow the column may get. A column that can reach zero cannot be
+   * grabbed again.
+   * @default 64
+   */
+  minWidth?: number;
+
+  /**
+   * How wide the column may get.
+   * @default 720
+   */
+  maxWidth?: number;
+
+  /**
+   * What a screen reader calls the handle. There is always more than one
+   * resizer in a table, so each needs its own name.
+   * Falls back to "Resize <label>" when the header is plain text.
+   */
+  resizeLabel?: string;
+
+  /**
    * Pins this column to the left edge while the table scrolls sideways.
    *
    * Put it on the same column in every row, header included, or the column will

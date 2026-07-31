@@ -1,4 +1,9 @@
 import { cva } from 'class-variance-authority';
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+  Ref,
+} from 'react';
 import {
   createContext,
   forwardRef,
@@ -147,6 +152,50 @@ const STUCK_BOTTOM = [
 // body cell and the frozen header cell cross at the top-left corner, and equal
 // z-index would let the body cell paint over the header, because tbody comes
 // after thead in the DOM.
+/**
+ * Lets a component keep its own ref while still honouring the caller's.
+ *
+ * `TableHead` measures its own width during a drag, so it needs a ref of its
+ * own - but forwarding one is part of its contract.
+ */
+const mergeRefs =
+  <T,>(...refs: (Ref<T> | undefined)[]) =>
+  (node: T) => {
+    for (const ref of refs) {
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as { current: T | null }).current = node;
+    }
+  };
+
+/** How far one arrow-key press moves a column edge. */
+const RESIZE_STEP = 16;
+
+/**
+ * The drag handle on a column's trailing edge.
+ *
+ * `role="separator"` with `aria-valuenow` rather than a button, because that is
+ * what a moveable boundary is - the same pattern as a window splitter. It has to
+ * be focusable and it has to carry a name, since a table always has more than
+ * one of them.
+ *
+ * Wide enough to grab (8px) but drawn as a hairline, and it only shows its line
+ * on hover or focus so a resting header is not a row of dividers.
+ */
+// The grab area stays wholly inside its own cell. Straddling the boundary is
+// the prettier arrangement and it does not work: every `th` is `position:
+// relative`, so the *next* header paints over the half that overhangs, and the
+// centre of the handle - where you aim - belongs to the neighbouring cell. It
+// swallowed every pointer event silently.
+const RESIZE_HANDLE = [
+  'mdt-absolute mdt-right-0 mdt-top-0 mdt-h-full mdt-w-2',
+  'mdt-cursor-col-resize mdt-touch-none mdt-select-none',
+  'focus-visible:mdt-outline-none',
+  // The visible line lives in ::after so the grab area can stay wider than it.
+  "after:mdt-absolute after:mdt-inset-y-1 after:mdt-right-0 after:mdt-w-px after:mdt-bg-border after:mdt-opacity-0 after:mdt-transition-opacity after:mdt-content-['']",
+  'hover:after:mdt-opacity-100 focus-visible:after:mdt-opacity-100',
+  'focus-visible:after:mdt-bg-ring focus-visible:after:mdt-w-0.5',
+].join(' ');
+
 const FROZEN_EDGE = [
   'mdt-sticky mdt-left-0 mdt-bg-background',
   'mdt-border-r mdt-border-border',
@@ -680,7 +729,14 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       sortOrder = null,
       onSort,
       frozen = false,
+      resizable = false,
+      width,
+      onResize,
+      minWidth = 64,
+      maxWidth = 720,
+      resizeLabel,
       children,
+      style,
       ...props
     },
     ref
@@ -688,12 +744,64 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
     const { density, stickyHeader } = useContext(TableContext);
     const key = sortKey(sortOrder);
 
+    // The drag reads the width off the element rather than trusting `width`,
+    // so a column that has never been resized still starts from whatever the
+    // browser gave it instead of jumping to a default.
+    const cellRef = useRef<HTMLTableCellElement | null>(null);
+    const drag = useRef<{ startX: number; startWidth: number } | null>(null);
+
+    const applyWidth = useCallback(
+      (next: number) => {
+        onResize?.(Math.round(Math.min(Math.max(next, minWidth), maxWidth)));
+      },
+      [onResize, minWidth, maxWidth]
+    );
+
+    const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+      const cell = cellRef.current;
+      if (!cell) return;
+      // Pointer capture keeps the drag alive when the cursor leaves the 8px
+      // handle, which it does immediately.
+      event.currentTarget.setPointerCapture(event.pointerId);
+      drag.current = { startX: event.clientX, startWidth: cell.getBoundingClientRect().width };
+    };
+
+    const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!drag.current) return;
+      applyWidth(drag.current.startWidth + (event.clientX - drag.current.startX));
+    };
+
+    const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+      drag.current = null;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      const current = width ?? cellRef.current?.getBoundingClientRect().width ?? minWidth;
+      const moves: Record<string, number> = {
+        ArrowLeft: current - RESIZE_STEP,
+        ArrowRight: current + RESIZE_STEP,
+        Home: minWidth,
+        End: maxWidth,
+      };
+      const next = moves[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      applyWidth(next);
+    };
+
     return (
       <th
-        ref={ref}
+        ref={mergeRefs(ref, cellRef)}
         aria-sort={sortable ? ARIA_SORT[key] : undefined}
+        style={width === undefined ? style : { ...style, width }}
         className={cn(
           tableHeadVariants({ density, align }),
+          // The handle is absolutely positioned; without this it would resolve
+          // against the scroll container and sit at the table's edge.
+          resizable && 'mdt-relative',
           // The background is required, not decoration: without it the body
           // scrolls visibly underneath the header instead of behind it.
           // Never both: layering them would emit two z-index utilities that
@@ -726,6 +834,35 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
           </button>
         ) : (
           children
+        )}
+        {resizable && (
+          /*
+            A focusable separator IS a widget - ARIA defines exactly this for a
+            moveable boundary, and the window-splitter pattern requires it to
+            take focus and handle arrow keys. jsx-a11y only knows the static
+            `<hr>` sense of the role, so it reads the tabIndex and the handlers
+            as mistakes. Rendering a button instead would be the real mistake:
+            it is not a button, and a screen reader would lose aria-valuenow.
+          */
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={
+              resizeLabel ?? (typeof children === 'string' ? `Resize ${children}` : 'Resize column')
+            }
+            aria-valuenow={Math.round(width ?? 0)}
+            aria-valuemin={minWidth}
+            aria-valuemax={maxWidth}
+            /* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */
+            tabIndex={0}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            onKeyDown={handleKeyDown}
+            className={RESIZE_HANDLE}
+          />
         )}
       </th>
     );

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useState } from 'react';
+import { Button } from '../Button';
 import { Checkbox } from '../Checkbox';
 import { Icon } from '../Icon';
 import {
@@ -24,6 +25,7 @@ import {
   TableRow,
 } from './Table';
 import type { TableSortOrder } from './Table.types';
+import { useColumnWidths } from './useColumnWidths';
 
 const meta: Meta<typeof Table> = {
   title: 'Components/Table',
@@ -1107,4 +1109,73 @@ export const FrozenColumn: Story = {
       </TableBody>
     </Table>
   ),
+};
+
+/**
+ * Drag any column edge, or focus a handle and use the arrow keys — `Home` and
+ * `End` jump to the bounds.
+ *
+ * Resizing is a contract, not an implementation: `TableHead` provides the handle
+ * and its keyboard behaviour, the width stays yours. `useColumnWidths` holds the
+ * arithmetic if you want it, the same way `useEditableTabs` holds the rules for
+ * an editable tab bar.
+ *
+ * **`layout="fixed"` is required.** Under the default `auto` layout the browser
+ * re-derives widths from content and fights whatever you set.
+ */
+export const ResizableColumns: Story = {
+  render: function Resizable() {
+    // Status carries no width on purpose. A fixed-layout table still fills its
+    // container, so if every column is sized the browser scales all of them to
+    // cover the difference and the handle stops tracking the cursor. One
+    // unsized column absorbs the slack instead.
+    const { widths, setWidth, reset, isResized } = useColumnWidths({
+      name: 200,
+      email: 260,
+      role: 140,
+    });
+
+    const columns: { key: keyof typeof widths; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+    ];
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-3">
+        <Button variant="outline" size="sm" onClick={reset} disabled={!isResized}>
+          Reset widths
+        </Button>
+        <Table layout="fixed" containerClassName="mdt-rounded-md mdt-border">
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => (
+                <TableHead
+                  key={column.key}
+                  resizable
+                  width={widths[column.key]}
+                  onResize={(w) => {
+                    setWidth(column.key, w);
+                  }}
+                >
+                  {column.label}
+                </TableHead>
+              ))}
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="mdt-truncate mdt-font-medium">{user.name}</TableCell>
+                <TableCell className="mdt-truncate">{user.email}</TableCell>
+                <TableCell className="mdt-truncate">{user.role}</TableCell>
+                <TableCell className="mdt-truncate">{user.status}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  },
 };
