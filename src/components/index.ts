@@ -44,6 +44,37 @@ export type { ButtonProps, ButtonVariantsType } from './Button';
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
 export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
 
+// Card — a surface that holds related content in the page. It does not open,
+// close, float or freeze the page behind it; those are Modal and Popover, which
+// borrow this surface and add their own behaviour. Clickable and collapsible
+// ship as separate components so a control inside a control cannot be written.
+export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  ClickableCard,
+  CollapsibleCard,
+  cardVariants,
+} from './Card';
+export type {
+  CardProps,
+  CardOwnProps,
+  CardSurface,
+  CardPadding,
+  CardMediaProps,
+  CardHeaderProps,
+  CardHeaderOwnProps,
+  CardBodyProps,
+  CardFooterProps,
+  CardFooterOwnProps,
+  ClickableCardProps,
+  ClickableCardOwnProps,
+  CollapsibleCardProps,
+  CollapsibleCardOwnProps,
+} from './Card';
+
 // Checkbox
 export * from './Checkbox';
 
