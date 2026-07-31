@@ -7,6 +7,9 @@ export {
   TableHead,
   TableCell,
   TableCaption,
+  tableHeadVariants,
+  tableCellVariants,
+  tableRowVariants,
 } from './Table';
 
 export type {
@@ -18,4 +21,7 @@ export type {
   TableHeadProps,
   TableCellProps,
   TableCaptionProps,
+  TableDensity,
+  TableAlign,
+  TableSortOrder,
 } from './Table.types';
