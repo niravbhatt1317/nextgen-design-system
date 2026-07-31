@@ -117,8 +117,49 @@ export const Surfaces: Story = {
   ),
 };
 
-/** Media, header, body and footer. All optional, always in that order. */
-export const AllFourParts: Story = {
+/**
+ * Header, body and footer. Three regions, so two lines: each one marks where a
+ * region ends and the next begins.
+ */
+export const HeaderBodyFooter: Story = {
+  render: () => (
+    <div className="mdt-max-w-md">
+      <Card>
+        <CardHeader
+          leading={<IconTile icon={<Icon name="server" aria-hidden />} tone="blue" />}
+          eyebrow="Change request"
+          heading="Firewall rule update, DC-West"
+          meta="Raised by Riya Kulkarni, 2 days ago"
+          trailing={<Badge tone="warning">Awaiting CAB</Badge>}
+        />
+        <CardBody>
+          Nine rules affected across two clusters. Rollback plan attached and verified in staging.
+        </CardBody>
+        <CardFooter
+          meta="3 approvals needed"
+          actions={
+            <>
+              <Button variant="outline" size="sm">
+                Details
+              </Button>
+              <Button size="sm">Approve</Button>
+            </>
+          }
+        />
+      </Card>
+    </div>
+  ),
+};
+
+/**
+ * **Media and the block under it are one unit.** The image already separates the
+ * top of the card, so the header after it drops its line automatically. Without
+ * that you get four stacked bands and the card reads as a stack of strips.
+ *
+ * There is nothing to remember and no prop to set: the four-band version cannot
+ * be built by accident.
+ */
+export const WithMedia: Story = {
   render: () => (
     <div className="mdt-max-w-md">
       <Card>
@@ -126,16 +167,11 @@ export const AllFourParts: Story = {
           <div className="mdt-h-32 mdt-w-full mdt-bg-gradient-to-br mdt-from-blue-70 mdt-to-purple-80" />
         </CardMedia>
         <CardHeader
-          leading={<IconTile icon={<Icon name="server" aria-hidden />} tone="blue" />}
           eyebrow="Change request"
           heading="Firewall rule update, DC-West"
-          supporting="Scheduled maintenance window, Saturday 02:00 to 04:00 IST."
+          supporting="Nine rules affected across two clusters. Rollback plan attached and verified in staging."
           meta="Raised by Riya Kulkarni, 2 days ago"
-          trailing={<Badge tone="warning">Awaiting CAB</Badge>}
         />
-        <CardBody>
-          Nine rules affected across two clusters. Rollback plan attached and verified in staging.
-        </CardBody>
         <CardFooter
           meta="3 approvals needed"
           actions={

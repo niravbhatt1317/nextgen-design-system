@@ -44,8 +44,16 @@ export const cardVariants = cva(
     'mdt-border mdt-border-solid',
     'mdt-transition-[background-color,border-color,box-shadow] mdt-duration-150',
     // A header sitting straight on top of a footer would otherwise draw the
-    // line twice, 1px apart.
-    '[&>[data-slot=card-header]+[data-slot=card-footer]]:mdt-border-t-0',
+    // line twice, 1px apart. The HEADER gives way, not the footer - drop the
+    // footer's line instead and a header that had no line of its own (after
+    // media, or `plain`) leaves the two with no seam between them at all.
+    '[&>[data-slot=card-header]:has(+[data-slot=card-footer])]:mdt-border-b-0',
+    // Media and the block under it are ONE unit. The image already separates
+    // the top of the card, so a line under the title as well chops it into four
+    // stacked bands. The header after media therefore goes plain on its own -
+    // no prop to remember, and no way to get the four-band version by accident.
+    '[&>[data-slot=card-media]+[data-slot=card-header]]:mdt-border-b-0',
+    '[&>[data-slot=card-media]+[data-slot=card-header]]:mdt-pb-0',
   ],
   {
     variants: {

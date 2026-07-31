@@ -194,6 +194,43 @@ describe('Card', () => {
       );
       expect(screen.getByTestId('card-media')).toHaveClass('mdt-w-full');
     });
+
+    it('makes the block under it one unit with it, rather than four stacked bands', () => {
+      // The image already separates the top of the card. A line under the title
+      // as well chops it again, so the card reads as a stack of strips.
+      render(
+        <Card>
+          <CardMedia>
+            <img src="/x.png" alt="" />
+          </CardMedia>
+          <CardHeader heading="Firewall rule update" />
+          <CardFooter meta="3 approvals needed" />
+        </Card>
+      );
+      expect(getCard()).toHaveClass(
+        '[&>[data-slot=card-media]+[data-slot=card-header]]:mdt-border-b-0'
+      );
+      expect(getCard()).toHaveClass('[&>[data-slot=card-media]+[data-slot=card-header]]:mdt-pb-0');
+    });
+
+    it('keeps the footer line when a header sits straight on top of it', () => {
+      // The header gives way, not the footer. Dropping the footer's line
+      // instead would leave a media card with no seam above its actions at all,
+      // because the header after media has no line of its own to fall back on.
+      render(
+        <Card>
+          <CardMedia>
+            <img src="/x.png" alt="" />
+          </CardMedia>
+          <CardHeader heading="Firewall rule update" />
+          <CardFooter meta="3 approvals needed" />
+        </Card>
+      );
+      expect(getCard()).toHaveClass(
+        '[&>[data-slot=card-header]:has(+[data-slot=card-footer])]:mdt-border-b-0'
+      );
+      expect(screen.getByTestId(FOOTER)).toHaveClass('mdt-border-t');
+    });
   });
 });
 

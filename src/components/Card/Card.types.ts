@@ -132,7 +132,15 @@ export type CardFooterProps = CardFooterOwnProps &
   Omit<ComponentPropsWithoutRef<'div'>, 'className' | 'children'>;
 
 export interface CardMediaOwnProps {
-  /** An image, an illustration, a chart. Runs edge to edge, ignoring the inset. */
+  /**
+   * An image, an illustration, a chart. Runs edge to edge, ignoring the inset.
+   *
+   * **Media and the block under it are one unit.** A header placed straight
+   * after media drops its dividing line automatically: the image already
+   * separates the top of the card, and a second line under the title as well
+   * chops the card into four stacked bands. Nothing to remember, and no way to
+   * build the four-band version by accident.
+   */
   children?: ReactNode | undefined;
   /** Extra classes. Must use the `mdt-` prefix. */
   className?: string | undefined;
