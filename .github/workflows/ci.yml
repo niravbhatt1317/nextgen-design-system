@@ -5,6 +5,16 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Lets you redeploy the current `main` from the Actions tab without an empty
+  # commit - the one thing the separate deploy workflow was still useful for.
+  workflow_dispatch:
+
+# Needed by the deploy job. `contents: read` is everything the checks require;
+# `pages` and `id-token` are what publishing to GitHub Pages needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 # Cancel superseded runs on a pull request branch, but never on `main`.
 #
@@ -30,6 +40,9 @@ env:
 
 jobs:
   quality:
+    # DO NOT RENAME. This exact string is the required status check on `main`
+    # (branch protection matches the job name). Renaming it makes every pull
+    # request wait forever for a check that no longer reports.
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
 
@@ -66,6 +79,10 @@ jobs:
       - name: Build library
         run: npm run build
 
+      # Built ONCE, here, and the output is handed to the deploy job below.
+      # This used to run twice - once to prove it compiles, and again in a
+      # separate deploy workflow to publish it - which cost about two and a half
+      # minutes on every merge for no benefit.
       - name: Build Storybook
         run: npm run build-storybook
 
@@ -77,3 +94,41 @@ jobs:
           path: coverage/
           if-no-files-found: ignore
           retention-days: 7
+
+      # Only a push to `main` publishes. A pull request builds Storybook to prove
+      # it compiles, then throws it away.
+      - name: Configure Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Storybook for Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: storybook-static
+
+  deploy:
+    name: Deploy to GitHub Pages
+    # `needs` is the point of this merge: the site cannot publish unless lint,
+    # types, tests and both builds passed. Previously the deploy ran as its own
+    # workflow in parallel with the checks, so a `main` that failed CI would
+    # still have gone live.
+    needs: quality
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    # GitHub Pages allows one deployment at a time, and a run that is mid-publish
+    # must never be cancelled. This is scoped to the job so it does not interfere
+    # with the workflow-level group above.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
