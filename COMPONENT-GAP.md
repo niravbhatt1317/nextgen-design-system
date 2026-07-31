@@ -6,12 +6,12 @@ Storybook today.
 **Source:** the merged comparison library at `design-systems/merged/` — every component from four
 systems, matched by type:
 
-| System | Owner |
-| --- | --- |
-| Org Mgmt | Om Vekariya |
-| IAM | Kaivalya Pandit |
-| Agent Fleet | Keertan Zala |
-| Credential | Harshil Thesia |
+| System      | Owner           |
+| ----------- | --------------- |
+| Org Mgmt    | Om Vekariya     |
+| IAM         | Kaivalya Pandit |
+| Agent Fleet | Keertan Zala    |
+| Credential  | Harshil Thesia  |
 
 **Audited:** 28 July 2026. Foundations (colour, typography, radius/elevation/spacing, icons) are
 excluded — this is components only, from Button onwards.
@@ -20,12 +20,12 @@ excluded — this is components only, from Button onwards.
 
 ## The short version
 
-| | Count |
-| --- | --- |
-| Component rows in the merged library | 42 |
-| Fully covered in Storybook | **16** |
-| Partially covered | **4** |
-| Missing entirely | **22** |
+|                                      | Count  |
+| ------------------------------------ | ------ |
+| Component rows in the merged library | 42     |
+| Fully covered in Storybook           | **16** |
+| Partially covered                    | **4**  |
+| Missing entirely                     | **22** |
 
 **Storybook covers about 38% of what the four teams actually built.**
 
@@ -39,34 +39,34 @@ feedback are almost empty.**
 The most useful signal in this data: **how many of the four teams independently built the same
 thing.** If all four built it without talking to each other, it is not optional.
 
-| Built by | Meaning |
-| --- | --- |
-| 4 of 4 | Universal need. Build first. |
-| 3 of 4 | Strong need. |
+| Built by | Meaning                              |
+| -------- | ------------------------------------ |
+| 4 of 4   | Universal need. Build first.         |
+| 3 of 4   | Strong need.                         |
 | 1–2 of 4 | Product-specific. Probably not core. |
 
 ---
 
 ## ✅ Covered — 16
 
-| Merged row | Built by | Storybook component |
-| --- | --- | --- |
-| Button | 4 | `Button`, `ButtonGroup` |
-| Icon button | 3 | `Button` (`size="icon"`) |
-| Field wrapper | 3 | `Form` + `FormField` / `FormLabel` / `FormMessage` |
-| Text input | 2 | `Input`, `InputGroup` |
-| Select · Search input · Textarea | 3 | `Select`, `Combobox`, `Input`, `Textarea` |
-| Checkbox · Radio · Switch | 4 | `Checkbox`, `Radio`, `Switch` |
-| Status pill | 4 | `TagPill` |
-| Chip / meta pill | 4 | `TagPill` |
-| Data table | 4 | `Table` |
-| Pagination bar | 1 | `Pagination` |
-| Toast | 2 | `Toast` |
-| Tabs | 3 | `Tabs` |
-| Sidebar navigation | 4 | `Sidebar` |
-| Menu / popover | 3 | `DropdownMenu`, `Popover`, `HoverCard` |
-| Modal | 4 | `Dialog` |
-| Drawer | 3 | `Sheet` |
+| Merged row                       | Built by | Storybook component                                |
+| -------------------------------- | -------- | -------------------------------------------------- |
+| Button                           | 4        | `Button`, `ButtonGroup`                            |
+| Icon button                      | 3        | `Button` (`size="icon"`)                           |
+| Field wrapper                    | 3        | `Form` + `FormField` / `FormLabel` / `FormMessage` |
+| Text input                       | 2        | `Input`, `InputGroup`                              |
+| Select · Search input · Textarea | 3        | `Select`, `Combobox`, `Input`, `Textarea`          |
+| Checkbox · Radio · Switch        | 4        | `Checkbox`, `Radio`, `Switch`                      |
+| Status pill                      | 4        | `TagPill`                                          |
+| Chip / meta pill                 | 4        | `TagPill`                                          |
+| Data table                       | 4        | `Table`                                            |
+| Pagination bar                   | 1        | `Pagination`                                       |
+| Toast                            | 2        | `Toast`                                            |
+| Tabs                             | 3        | `Tabs`                                             |
+| Sidebar navigation               | 4        | `Sidebar`                                          |
+| Menu / popover                   | 3        | `DropdownMenu`, `Popover`, `HoverCard`             |
+| Modal                            | 4        | `Dialog`                                           |
+| Drawer                           | 3        | `Sheet`                                            |
 
 ---
 
@@ -74,12 +74,12 @@ thing.** If all four built it without talking to each other, it is not optional.
 
 Something close exists, but it is not the same component and would need work.
 
-| Merged row | Built by | What exists | What's missing |
-| --- | --- | --- | --- |
-| Choice chip group | 2 | `ToggleGroup` | Chip styling and multi-select behaviour |
-| Segmented control | 2 | `ToggleGroup`, `Tabs` | The segmented visual treatment |
-| Card · Section header · Divider | 2 | `Separator` only | **`Card` and section header do not exist** |
-| Key-value rows | 2 | `Item` | The label/value pairing layout |
+| Merged row                      | Built by | What exists           | What's missing                             |
+| ------------------------------- | -------- | --------------------- | ------------------------------------------ |
+| Choice chip group               | 2        | `ToggleGroup`         | Chip styling and multi-select behaviour    |
+| Segmented control               | 2        | `ToggleGroup`, `Tabs` | The segmented visual treatment             |
+| Card · Section header · Divider | 2        | `Separator` only      | **`Card` and section header do not exist** |
+| Key-value rows                  | 2        | `Item`                | The label/value pairing layout             |
 
 > **Correction:** an earlier version of this file listed **Radio card** as missing. It is not —
 > `Radio` ships `variant: card` and `card-with-radio`, and `Checkbox` ships the same. That was a
@@ -97,73 +97,73 @@ Ordered by how many teams built it.
 
 ### Built by all four — build these first
 
-| Merged row | Notes |
-| --- | --- |
-| **KPI / stat tile** | Every team built one. Dashboards are core to all four products. |
-| **Banner** | Every team built one. Only `_internal/DeprecationBanner` exists, and it is not exported. |
+| Merged row          | Notes                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| **KPI / stat tile** | Every team built one. Dashboards are core to all four products.                          |
+| **Banner**          | Every team built one. Only `_internal/DeprecationBanner` exists, and it is not exported. |
 
 ### Built by three
 
-| Merged row | Notes |
-| --- | --- |
-| **Avatar & avatar stack** | No avatar of any kind in Storybook |
-| **Micro-label & count badges** | `TagPill` is not a count badge |
-| **Empty state** | Nothing exists |
-| **Wizard stepper** | Nothing exists |
+| Merged row                     | Notes                              |
+| ------------------------------ | ---------------------------------- |
+| **Avatar & avatar stack**      | No avatar of any kind in Storybook |
+| **Micro-label & count badges** | `TagPill` is not a count badge     |
+| **Empty state**                | Nothing exists                     |
+| **Wizard stepper**             | Nothing exists                     |
 
 ### Built by two
 
-| Merged row | Notes |
-| --- | --- |
-| Progress meters & bars | `Skeleton` and `Spinner` are loading, not progress |
-| Code / mono wells | Font tokens exist; the component does not |
-| Contextual strip | Inline contextual messaging |
-| High-risk action gate | Confirm-before-destructive pattern |
-| Tag input / removable chip | `TagPill` renders a pill but cannot be typed into |
+| Merged row                 | Notes                                              |
+| -------------------------- | -------------------------------------------------- |
+| Progress meters & bars     | `Skeleton` and `Spinner` are loading, not progress |
+| Code / mono wells          | Font tokens exist; the component does not          |
+| Contextual strip           | Inline contextual messaging                        |
+| High-risk action gate      | Confirm-before-destructive pattern                 |
+| Tag input / removable chip | `TagPill` renders a pill but cannot be typed into  |
 
 ### Built by one
 
-| Merged row |
-| --- |
-| Toggle setting row |
-| Test status label |
+| Merged row              |
+| ----------------------- |
+| Toggle setting row      |
+| Test status label       |
 | Protocol & store badges |
-| Icon tile |
-| Secret dots |
-| Inline editable field |
-| Activity timeline |
-| Tree row |
-| Unsaved changes bar |
-| Page header |
+| Icon tile               |
+| Secret dots             |
+| Inline editable field   |
+| Activity timeline       |
+| Tree row                |
+| Unsaved changes bar     |
+| Page header             |
 
-*(Two further rows — "Zero-drift extraction wins" and "Module component layer" — are audit
-findings rather than components, and are not counted.)*
+_(Two further rows — "Zero-drift extraction wins" and "Module component layer" — are audit
+findings rather than components, and are not counted.)_
 
 ---
 
 ## Variant gaps — the component exists, the variant doesn't
 
 A component counting as "covered" does not mean it can do what the four teams needed. These gaps
-sit *inside* components Storybook already has, and they are the easiest kind to miss.
+sit _inside_ components Storybook already has, and they are the easiest kind to miss.
 
 Storybook's variants were read straight out of the CVA definitions
 (`node scripts/extract-variants.mjs`) — 26 components, 91 variant groups, 317 values.
 
 ### Button — 5 missing variants
 
-| Variant | Org Mgmt | IAM | Agent Fleet | Credential | Storybook |
-| --- | :-: | :-: | :-: | :-: | :-: |
-| primary | ✅ | ✅ | ✅ | ✅ | ✅ |
-| secondary | ✅ | ✅ | ✅ | ✅ | ✅ |
-| ghost | ✅ | ✅ | ✅ | ✅ | ✅ |
-| danger / destructive | ✅ | ✅ | ✅ | ✅ | ✅ |
-| link | ✅ | — | ✅ | — | ✅ |
-| **ai** | ✅ | — | ✅ | ✅ | ❌ |
-| **tertiary** | ✅ | — | ✅ | ✅ | ❌ |
-| **dangerGhost** | ✅ | — | ✅ | — | ❌ |
-| **warning** | ✅ | — | ✅ | — | ❌ |
-| **mono** | — | — | ✅ | — | ❌ |
-| outline | — | — | — | — | ✅ *(only here)* |
+| Variant              | Org Mgmt | IAM | Agent Fleet | Credential |    Storybook     |
+| -------------------- | :------: | :-: | :---------: | :--------: | :--------------: |
+| primary              |    ✅    | ✅  |     ✅      |     ✅     |        ✅        |
+| secondary            |    ✅    | ✅  |     ✅      |     ✅     |        ✅        |
+| ghost                |    ✅    | ✅  |     ✅      |     ✅     |        ✅        |
+| danger / destructive |    ✅    | ✅  |     ✅      |     ✅     |        ✅        |
+| link                 |    ✅    |  —  |     ✅      |     —      |        ✅        |
+| **ai**               |    ✅    |  —  |     ✅      |     ✅     |        ❌        |
+| **tertiary**         |    ✅    |  —  |     ✅      |     ✅     |        ❌        |
+| **dangerGhost**      |    ✅    |  —  |     ✅      |     —      |        ❌        |
+| **warning**          |    ✅    |  —  |     ✅      |     —      |        ❌        |
+| **mono**             |    —     |  —  |     ✅      |     —      |        ❌        |
+| outline              |    —     |  —  |      —      |     —      | ✅ _(only here)_ |
 
 **`ai` and `tertiary` were each built by three of four teams independently.** Those are not
 product quirks — they are missing from the library.
@@ -177,10 +177,10 @@ sizes `xs`/`xl`/`icon` and an `active` state appear in none of the four systems.
 
 ### TagPill — variants are colours, not meanings
 
-| | |
-| --- | --- |
-| Storybook | `default, yellow, blue, green, red, purple, orange, pink, teal, cyan` |
-| The four systems | success, warning, danger, info, neutral — **semantic tones** |
+|                  |                                                                       |
+| ---------------- | --------------------------------------------------------------------- |
+| Storybook        | `default, yellow, blue, green, red, purple, orange, pink, teal, cyan` |
+| The four systems | success, warning, danger, info, neutral — **semantic tones**          |
 
 This is the most structurally significant gap in the file. Colour-named variants cannot be
 re-themed and carry no meaning: `red` does not tell an AI tool, or a developer, that this is an
@@ -192,11 +192,11 @@ label; `TagPill` has no dot.
 
 ### Input
 
-| Variant | Systems | Storybook |
-| --- | --- | :-: |
-| invalid | Credential | ✅ as `hasError` |
+| Variant   | Systems    |      Storybook      |
+| --------- | ---------- | :-----------------: |
+| invalid   | Credential |  ✅ as `hasError`   |
 | with icon | Credential | ✅ via `InputGroup` |
-| **mono** | Credential | ❌ |
+| **mono**  | Credential |         ❌          |
 
 `mono` also appears on Agent Fleet's status pill and table cells — it looks like a system-wide
 need for monospaced data display, not a one-off.
@@ -215,16 +215,16 @@ The one gap: `Switch` exposes only `size`. The systems show explicit on/off/disa
 
 Not everything is a gap in one direction. These exist here and appear in none of the four systems:
 
-| Component | Why it matters |
-| --- | --- |
-| `Command` | Command palette |
-| `OTPInput` | One-time code entry |
-| `Tooltip` | Notably absent from all four systems |
-| `ScrollArea`, `Resizable` | Layout primitives |
-| `Container`, `Flex`, `Grid`, `Stack` | Layout system |
-| `Skeleton`, `Spinner` | Loading states |
-| `Toolbar`, `Item`, `Toggle` | — |
-| `Icon` | 500+ icons, already tokenised |
+| Component                            | Why it matters                       |
+| ------------------------------------ | ------------------------------------ |
+| `Command`                            | Command palette                      |
+| `OTPInput`                           | One-time code entry                  |
+| `Tooltip`                            | Notably absent from all four systems |
+| `ScrollArea`, `Resizable`            | Layout primitives                    |
+| `Container`, `Flex`, `Grid`, `Stack` | Layout system                        |
+| `Skeleton`, `Spinner`                | Loading states                       |
+| `Toolbar`, `Item`, `Toggle`          | —                                    |
+| `Icon`                               | 500+ icons, already tokenised        |
 
 This is real ground already won. The merged library is four product teams' needs; Storybook is a
 library. It is reasonable for it to hold primitives none of them named.
@@ -233,19 +233,42 @@ library. It is reasonable for it to hold primitives none of them named.
 
 ## Recommended order
 
-| Order | Component | Why |
-| --- | --- | --- |
-| 1 | **Card** + section header | Blocks the most other work, and the README already claims it exists |
-| 2 | **Banner / Alert** | All four teams built one |
-| 3 | **KPI / stat tile** | All four teams built one |
-| 4 | **Avatar** + stack | Three teams; nothing close exists |
-| 5 | **Badge** (count / micro-label) | Three teams; `TagPill` does not cover it |
-| 6 | **Empty state** | Three teams; cheap to build |
-| 7 | **Wizard stepper** | Three teams; more involved |
-| 8 | Progress | Two teams |
+| Order | Component                       | Why                                                                 |
+| ----- | ------------------------------- | ------------------------------------------------------------------- |
+| 1     | **Card** + section header       | Blocks the most other work, and the README already claims it exists |
+| 2     | **Banner / Alert**              | All four teams built one                                            |
+| 3     | **KPI / stat tile**             | All four teams built one                                            |
+| 4     | **Avatar** + stack              | Three teams; nothing close exists                                   |
+| 5     | **Badge** (count / micro-label) | Three teams; `TagPill` does not cover it                            |
+| 6     | **Empty state**                 | Three teams; cheap to build                                         |
+| 7     | **Wizard stepper**              | Three teams; more involved                                          |
+| 8     | Progress                        | Two teams                                                           |
 
 **Cards first.** Almost every other missing component — stat tile, empty state, key-value rows,
 activity timeline — sits inside one.
+
+---
+
+## From the table references — a separate source
+
+The 27 real product tables reviewed while building the Table component turned up eight cell
+patterns. All eight are now documented as recipes (Storybook → Components → Table → **Cell
+Recipes**). Six are built from components that already exist. Two are built against **throwaway
+placeholders**, because the pattern is agreed but the component underneath it is missing.
+
+| Pattern                      | Seen in | Placeholder stands in for                                                                                                                    |
+| ---------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sparkline / inline chart** | 3 of 27 | A chart component — owns the scale, the empty and single-point cases, and the tones. The recipe draws one polyline and nothing else.         |
+| **Media thumbnail**          | 3 of 27 | A thumbnail component — owns the aspect ratio, the loading state, and what happens when the image fails. The recipe draws the fallback only. |
+
+The placeholders live in the stories file, are not exported, and are not in `src/components`. When
+the real components land, the two definitions are deleted and the recipes keep working. Until then
+a product copying either recipe is copying a stand-in, which is what the **Still missing** story
+says on the page itself.
+
+These are **not** counted in the totals at the top of this file, which compare only against the four
+product design systems. This is a different source and a smaller claim: three teams' tables wanted
+them, not four teams' component libraries.
 
 ---
 

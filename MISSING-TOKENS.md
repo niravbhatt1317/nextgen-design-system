@@ -16,24 +16,47 @@ decision we made on purpose.
 
 ## Summary
 
-| Category                            | Status        | Where it leaks                    |
-| ----------------------------------- | ------------- | --------------------------------- |
-| **Colour — the quiet-variant pair** | ❌ Missing    | Badge, Button (7 variants)        |
-| Border radius                       | ⚠️ Partial    | One base value only, no scale     |
-| Typography — family                 | ✅ Complete   | —                                 |
-| Elevation / shadow                  | ✅ Complete   | —                                 |
-| Layering / z-index                  | ✅ Complete   | —                                 |
-| **Spacing**                         | ❌ Missing    | Every component                   |
-| **Type scale (size)**               | ❌ Missing    | Every component                   |
-| **Font weight**                     | ❌ Missing    | Most components                   |
-| **Letter spacing**                  | ❌ Missing    | Command                           |
-| **Opacity**                         | ❌ Missing    | ~25 components                    |
-| **Border width**                    | ❌ Missing    | ~10 components                    |
-| **Motion — duration & easing**      | ❌ Missing    | ~8 components + all 14 animations |
-| **Breakpoints**                     | ❌ Missing    | Container only                    |
-| **Hardcoded sizes**                 | ❌ Violations | 10 shipped components             |
+| Category                             | Status        | Where it leaks                     |
+| ------------------------------------ | ------------- | ---------------------------------- |
+| **Colour — the quiet-variant pair**  | ❌ Missing    | Badge, Button (7 variants)         |
+| **Colour — status tones beyond six** | ⚠️ Decision   | Table cell recipes (status column) |
+| Border radius                        | ⚠️ Partial    | One base value only, no scale      |
+| Typography — family                  | ✅ Complete   | —                                  |
+| Elevation / shadow                   | ✅ Complete   | —                                  |
+| Layering / z-index                   | ✅ Complete   | —                                  |
+| **Spacing**                          | ❌ Missing    | Every component                    |
+| **Type scale (size)**                | ❌ Missing    | Every component                    |
+| **Font weight**                      | ❌ Missing    | Most components                    |
+| **Letter spacing**                   | ❌ Missing    | Command                            |
+| **Opacity**                          | ❌ Missing    | ~25 components                     |
+| **Border width**                     | ❌ Missing    | ~10 components                     |
+| **Motion — duration & easing**       | ❌ Missing    | ~8 components + all 14 animations  |
+| **Breakpoints**                      | ❌ Missing    | Container only                     |
+| **Hardcoded sizes**                  | ❌ Violations | 10 shipped components              |
 
 **12 categories missing, 1 partial, 1 set of live violations.**
+
+---
+
+## Colour — status tones beyond six
+
+`BadgeTone` ships six values: `neutral`, `info`, `success`, `warning`, `danger`, `ai`. One of them,
+`ai`, is named for what it is for, so borrowing its purple for an unrelated state would make the
+name a lie. **Five are usable for status.**
+
+A service-desk lifecycle needs seven distinct states, and the reference design gives each its own
+colour — blue, amber, orange, green, grey, purple, red. Per the token rule this was mapped to the
+nearest tones we own rather than a seventh colour being invented, and two pairs now share:
+
+| State    | Tone given | Shares with                                      |
+| -------- | ---------- | ------------------------------------------------ |
+| Reopened | `info`     | Open — defensible: it _is_ open again            |
+| On Hold  | `neutral`  | Closed — defensible: nobody is working on either |
+
+So colour carries the _class_ of state and the label carries which one. That is a workable position,
+not a bug — but whether a seventh tone should exist is a **palette decision for the design owner**,
+not something to settle in a story. Live example: Storybook → Components → Table → Cell Recipes →
+**Editable status tag**.
 
 ---
 
