@@ -414,9 +414,10 @@ export type {
   TabsVariant,
 } from './Tabs';
 
-// TagPill
+// TagPill — a label a person put there and can take away. Badge is the other
+// half of the pair: a label the system applies, which nobody removes.
 export { TagPill, tagPillVariants } from './TagPill';
-export type { TagPillProps, TagPillVariants } from './TagPill';
+export type { TagPillProps, TagPillOwnProps, TagPillVariants, TagPillShape } from './TagPill';
 
 // Textarea
 export { Textarea, textareaVariants } from './Textarea';
