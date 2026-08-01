@@ -382,6 +382,7 @@ export {
   LeftNavExpandable,
   LeftNavItem,
   LeftNavFooter,
+  DataLeftNav,
   leftNavItemVariants,
   useLeftNavLevels,
 } from './LeftNav';
@@ -395,6 +396,9 @@ export type {
   LeftNavExpandableProps,
   LeftNavItemProps,
   LeftNavFooterProps,
+  DataLeftNavProps,
+  LeftNavConfig,
+  LeftNavConfigItem,
   UseLeftNavLevels,
   UseLeftNavLevelsOptions,
 } from './LeftNav';

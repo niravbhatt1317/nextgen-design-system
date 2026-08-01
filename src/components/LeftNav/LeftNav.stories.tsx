@@ -16,7 +16,9 @@ import {
   LeftNavSearch,
   LeftNavSection,
 } from './LeftNav';
+import { DataLeftNav } from './DataLeftNav';
 import { useLeftNavLevels } from './useLeftNavLevels';
+import type { LeftNavConfig } from './LeftNav.types';
 
 const meta: Meta<typeof LeftNav> = {
   title: 'Components/LeftNav',
@@ -419,4 +421,98 @@ export const GroupsAndExpanding: Story = {
       <div className="mdt-flex-1" />
     </div>
   ),
+};
+
+/**
+ * The same navigation, from one object.
+ *
+ * `LeftNav` is parts; `DataLeftNav` is what you reach for when the navigation is
+ * data rather than markup — which it usually is. Permissions decide what a
+ * person sees, a plan decides what a workspace includes, and neither belongs in
+ * JSX.
+ *
+ * **The configuration below is JSON.** Icons are names, not React nodes, so a
+ * whole navigation can come from an API, sit in a database, be diffed in a pull
+ * request, or be written by a model. That last one is the point of this
+ * library, and it is the thing `DataDrivenSidebar` could never do: it took
+ * `ReactNode` icons, so its config could only ever be written by hand in
+ * TypeScript.
+ *
+ * Everything the composed version does, this does — two levels, groups, a page
+ * that folds open in place, search across the whole tree, the 8px slip. The
+ * readout underneath shows what it reported.
+ */
+export const FromConfig: Story = {
+  render: function FromConfigDemo() {
+    const [page, setPage] = useState('profile');
+
+    const config: LeftNavConfig = {
+      home: { label: 'Go to home' },
+      search: {},
+      items: [
+        { key: 'profile', label: 'Profile', icon: 'user', group: 'Personal' },
+        { key: 'notifications', label: 'Notifications', icon: 'bell', group: 'Personal' },
+        { key: 'members', label: 'Members', icon: 'users', group: 'Workspace' },
+        { key: 'billing', label: 'Billing', icon: 'credit-card', group: 'Workspace' },
+        {
+          key: 'observability',
+          label: 'Observability',
+          icon: 'activity',
+          group: 'Platform',
+          items: [
+            { key: 'overview', label: 'Overview', icon: 'layout-grid' },
+            { key: 'query', label: 'Query', icon: 'line-chart' },
+            {
+              key: 'alerts',
+              label: 'Alerts',
+              icon: 'alert-triangle',
+              items: [
+                { key: 'alert-rules', label: 'Rules' },
+                { key: 'alert-channels', label: 'Channels' },
+              ],
+            },
+            { key: 'functions', label: 'Functions', icon: 'function-square', group: 'Compute' },
+            { key: 'sandboxes', label: 'Sandboxes', icon: 'terminal', group: 'Compute' },
+            { key: 'edge', label: 'Edge requests', icon: 'globe', group: 'CDN' },
+            { key: 'isr', label: 'ISR', icon: 'file-stack', group: 'CDN' },
+          ],
+        },
+        {
+          key: 'integrations',
+          label: 'Integrations',
+          icon: 'puzzle',
+          group: 'Platform',
+          badge: 'Beta',
+          items: [
+            { key: 'installed', label: 'Installed', icon: 'package' },
+            { key: 'api-keys', label: 'API keys', icon: 'key', group: 'Developer' },
+          ],
+        },
+        { key: 'domains', label: 'Domains', icon: 'globe', group: 'Platform' },
+      ],
+    };
+
+    return (
+      <div className="mdt-flex mdt-h-screen">
+        <DataLeftNav
+          config={config}
+          activeKey={page}
+          onSelect={(key) => {
+            setPage(key);
+          }}
+          footer={
+            <div className="mdt-flex mdt-items-center mdt-gap-2">
+              <Avatar size="sm" name="Nirav Bhatt" />
+              <span className="mdt-flex-1 mdt-truncate mdt-text-sm mdt-font-medium">Nirav</span>
+            </div>
+          }
+        />
+        <div className="mdt-flex-1 mdt-p-8">
+          <p className="mdt-text-sm mdt-text-muted-foreground">
+            Reported: <span className="mdt-font-medium mdt-text-foreground">{page}</span>
+          </p>
+        </div>
+      </div>
+    );
+  },
 };
