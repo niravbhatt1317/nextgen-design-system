@@ -28,7 +28,19 @@ const withTheme: Decorator = (Story, context) => {
 // setting, so the interface, the Docs pages and the canvas all agree on load.
 const startingTheme = getInitialTheme();
 
-const preview: Preview = {
+/**
+ * Exported inline, on purpose.
+ *
+ * `options.storySort` is not read at runtime — Storybook parses this file as
+ * *text* before anything runs, and its parser cannot follow a variable. Written
+ * as `const preview = {...}; export default preview` the sort is silently
+ * ignored: no error, no warning, and a sidebar that is alphabetical for forty
+ * entries and not for the last two. Its own message says the parameter "should
+ * be defined inline".
+ *
+ * `satisfies` keeps the type checking; the parser strips it before reading.
+ */
+export default {
   parameters: {
     controls: {
       matchers: {
@@ -47,6 +59,23 @@ const preview: Preview = {
     // design system's own `--mdt-background` token via the theme toggle above.
     // Re-adding it would hardcode colours that live in globals.css.
     layout: 'centered',
+    // A to Z, and nothing else.
+    //
+    // Without this the sidebar follows the order the files happened to be
+    // indexed in, which is alphabetical right up until it is not — Radio and
+    // LeftNav both landed after Tooltip, and Table's own pages came out in the
+    // order they were written. A list that is sorted for forty entries and
+    // random for three is worse than one that is plainly unsorted, because you
+    // stop trusting it and start scanning the whole thing.
+    //
+    // `locales` is set so the order does not shift with whatever language the
+    // machine running Storybook happens to be in.
+    options: {
+      storySort: {
+        method: 'alphabetical',
+        locales: 'en-US',
+      },
+    },
   },
   globalTypes: {
     // Deliberately no `toolbar` here. Storybook's built-in toolbar control can
@@ -60,6 +89,4 @@ const preview: Preview = {
   },
   decorators: [withDeprecationWarning, withTheme],
   tags: ['autodocs'],
-};
-
-export default preview;
+} satisfies Preview;
