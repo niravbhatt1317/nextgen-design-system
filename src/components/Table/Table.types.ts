@@ -674,3 +674,58 @@ export interface TableBulkActionProps extends ComponentPropsWithoutRef<'button'>
   /** The glyph, before the label. */
   icon?: ReactNode;
 }
+
+/**
+ * Props for TableFilterMenu - choose an attribute, then choose its values.
+ */
+export interface TableFilterMenuProps {
+  /** What can be filtered, and the values each one offers. */
+  attributes: { key: string; label: string; values: string[] }[];
+
+  /** The values currently chosen for an attribute. */
+  valuesFor: (attribute: string) => string[];
+
+  /** Called with the attribute and the value that was ticked or unticked. */
+  onToggleValue: (attribute: string, value: string) => void;
+
+  /** Adds a Clear all control. Omit it and none appears. */
+  onClear?: () => void;
+
+  /**
+   * How many attributes are filtered.
+   *
+   * Attributes, not values: "3" beside the button should mean three things are
+   * narrowing the table, not that one attribute has three values ticked.
+   *
+   * @default 0
+   */
+  count?: number;
+
+  /** The trigger's label. @default 'Filters' */
+  label?: string;
+
+  /** Extra classes for the trigger. */
+  className?: string;
+}
+
+/**
+ * Props for TableFilterChips - what is currently narrowing the table.
+ */
+export interface TableFilterChipsProps extends ComponentPropsWithoutRef<'div'> {
+  /** The active filters. */
+  filters: { attribute: string; values: string[] }[];
+
+  /** Turns an attribute key into the name a person would recognise. */
+  labelFor: (attribute: string) => string;
+
+  /** Called with the attribute whose chip was removed. */
+  onRemove: (attribute: string) => void;
+
+  /**
+   * Adds a Clear all control, shown only past one filter.
+   *
+   * With a single chip it would be a second way to do what the chip's own cross
+   * already does, sitting right beside it.
+   */
+  onClear?: () => void;
+}

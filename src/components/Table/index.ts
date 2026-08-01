@@ -19,6 +19,8 @@ export { TableToolbar, TableToolbarActions } from './TableToolbar';
 export { TableSortMenu } from './TableSortMenu';
 export { TableViewMenu } from './TableViewMenu';
 export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
+export { TableFilterMenu } from './TableFilterMenu';
+export { TableFilterChips } from './TableFilterChips';
 export { TableColumnMenu } from './TableColumnMenu';
 export { TableColumnBoundary } from './TableColumnBoundary';
 
@@ -31,6 +33,12 @@ export type {
   UseColumnReorderOptions,
   ColumnGripProps,
 } from './useColumnReorder';
+
+export { toCsv } from './toCsv';
+export type { CsvColumn, ToCsvOptions } from './toCsv';
+
+export { useTableFilters } from './useTableFilters';
+export type { TableFilter, UseTableFilters, UseTableFiltersOptions } from './useTableFilters';
 
 export { useTableSelection } from './useTableSelection';
 export type {
@@ -72,6 +80,8 @@ export type {
   TableViewMenuProps,
   TableBulkBarProps,
   TableBulkActionProps,
+  TableFilterMenuProps,
+  TableFilterChipsProps,
   TableColumnMenuProps,
   TableColumnBoundaryProps,
 } from './Table.types';
