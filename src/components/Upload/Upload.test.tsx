@@ -552,3 +552,62 @@ describe('Upload · the buttons on top of a picture', () => {
     expect(opened).toHaveBeenCalled();
   });
 });
+
+describe('Upload · the action inside the box can be hit', () => {
+  const layers = (c: HTMLElement) => [
+    ...c.querySelectorAll('[data-slot="upload-box"] > span[aria-hidden="true"]'),
+  ];
+
+  it('takes the painted layers out of hit-testing entirely', () => {
+    // They are decoration. A layer at opacity 0 gets its own stacking context,
+    // paints above the label, and silently eats every click aimed at the box.
+    const { container } = render(<Upload label="Pick" />);
+    const found = layers(container);
+    expect(found).toHaveLength(2);
+    found.forEach((l) => {
+      expect(l).toHaveClass('mdt-pointer-events-none');
+    });
+  });
+
+  it('states the stacking order rather than leaving it to paint order', () => {
+    const { container } = render(<Upload label="Pick" />);
+    const cover = container.querySelector('[data-slot="upload-box"] > label');
+    expect(cover).toHaveClass('mdt-z-10');
+    layers(container).forEach((l) => {
+      expect(l).toHaveClass('mdt-z-20');
+    });
+  });
+
+  it('makes the visible action its own label for the same input', () => {
+    // Not a button: a button inside the label covering the box would be a
+    // control inside a control. A second label is valid and opens the picker.
+    const { container } = render(<Upload label="Pick" actionLabel="Upload file" />);
+    const input = container.querySelector('input[type=file]') as HTMLInputElement;
+    const action = screen.getByText('Upload file').closest('label');
+    expect(action).not.toBeNull();
+    expect(action).toHaveAttribute('for', input.id);
+    expect(action).toHaveClass('mdt-pointer-events-auto');
+  });
+
+  it('gives the action a hover of its own, not one borrowed from the box', () => {
+    render(<Upload label="Pick" actionLabel="Upload file" />);
+    const action = screen.getByText('Upload file').closest('label');
+    expect(action).toHaveClass('hover:mdt-bg-muted');
+    expect(action).not.toHaveClass('group-hover:mdt-bg-muted');
+  });
+
+  it('routes both the action and the rest of the box to the same input', () => {
+    // jsdom does not forward a label click to its input, so the click itself is
+    // checked in a real browser. What is checked here is the wiring that makes
+    // it possible: two labels, one input, and neither of them a nested control.
+    const { container } = render(<Upload label="Pick" actionLabel="Upload file" />);
+    const input = container.querySelector('input[type=file]') as HTMLInputElement;
+    const cover = container.querySelector('[data-slot="upload-box"] > label');
+    const action = screen.getByText('Upload file').closest('label');
+
+    expect(cover).toHaveAttribute('for', input.id);
+    expect(action).toHaveAttribute('for', input.id);
+    expect(action).not.toBe(cover);
+    expect(container.querySelectorAll('[data-slot="upload-box"] button')).toHaveLength(0);
+  });
+});

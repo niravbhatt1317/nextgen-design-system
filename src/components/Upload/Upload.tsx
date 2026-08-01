@@ -388,9 +388,28 @@ function UploadBox({
         <span className={cn(LAYER, 'mdt-gap-3')}>{resting}</span>
       ) : (
         <>
+          {/*
+            ── Who is allowed to be hit, and in what order ──
+
+            An element with an opacity between 0 and 1 gets its own stacking
+            context and is painted with the positioned elements; at exactly 0 or
+            exactly 1 it does not, and it drops back below them. Two layers that
+            cross-fade therefore swap places with this label *twice per hover*,
+            which is not a thing anyone should have to reason about.
+
+            The symptom was precise: the action took a hover for the ~150ms the
+            fade was running, lost it the instant opacity reached 1, and a click
+            did nothing at all - because the resting layer, sitting at opacity 0
+            and so in its own stacking context above the label, was quietly
+            eating every one.
+
+            So the ordering is stated rather than inferred, and the two painted
+            layers are taken out of hit-testing entirely. They are `aria-hidden`
+            decoration; they were never meant to be targets.
+          */}
           <label
             htmlFor={inputId}
-            className="mdt-absolute mdt-inset-0 mdt-cursor-pointer mdt-rounded-md"
+            className="mdt-absolute mdt-inset-0 mdt-z-10 mdt-cursor-pointer mdt-rounded-md"
           >
             <span className="mdt-sr-only">
               {typeof label === 'string' ? label : 'Choose a file'}
@@ -405,7 +424,7 @@ function UploadBox({
             aria-hidden="true"
             className={cn(
               LAYER,
-              'mdt-gap-3 mdt-transition-opacity mdt-duration-150',
+              'mdt-pointer-events-none mdt-z-20 mdt-gap-3 mdt-transition-opacity mdt-duration-150',
               dragging ? 'mdt-opacity-100' : 'group-hover:mdt-opacity-0'
             )}
           >
@@ -415,14 +434,24 @@ function UploadBox({
             aria-hidden="true"
             className={cn(
               LAYER,
-              'mdt-opacity-0 mdt-transition-opacity mdt-duration-150',
+              'mdt-pointer-events-none mdt-z-20 mdt-opacity-0 mdt-transition-opacity mdt-duration-150',
               dragging ? '' : 'group-hover:mdt-opacity-100'
             )}
           >
-            <span className={ACTION_LOOK}>
+            {/*
+              A second label for the same input, not a button. One input may
+              have as many labels as it likes, so the visible action opens the
+              picker on its own - which is what gives it a hover of its own,
+              and a click that lands, without nesting a control inside the
+              label that covers the rest of the box.
+            */}
+            <label
+              htmlFor={inputId}
+              className={cn(ACTION_LOOK, 'mdt-pointer-events-auto mdt-cursor-pointer')}
+            >
               <Icon name="upload" size="sm" />
               {actionLabel}
-            </span>
+            </label>
           </span>
         </>
       )}
