@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type {
@@ -92,69 +93,106 @@ const PaginationItem = forwardRef<HTMLLIElement, PaginationItemProps>(
 PaginationItem.displayName = 'PaginationItem';
 
 /**
- * PaginationLink - clickable link for pagination.
+ * PaginationLink - one page control.
+ *
+ * **An anchor with an `href`, a button without one.** Both kinds of pager are
+ * real: `/tickets?page=3` is an address worth having - openable in a new tab,
+ * bookmarkable, crawlable - while a table that pages in place has nowhere to
+ * go, and its controls are state.
+ *
+ * Rendering an anchor for both is the version of this that looks fine and is
+ * not: an `<a>` with no `href` is neither focusable nor announced as a link,
+ * one with `href="#"` navigates, and no anchor can be disabled - which a pager
+ * needs at both ends.
  *
  * @example
  * ```tsx
- * <PaginationLink href="#" isActive>
- *   1
- * </PaginationLink>
+ * <PaginationLink href="/tickets?page=2">2</PaginationLink>
+ * <PaginationLink onClick={() => { goTo(2); }} isActive>2</PaginationLink>
  * ```
  */
-const PaginationLink = forwardRef<HTMLAnchorElement, PaginationLinkProps>(
-  ({ className, isActive, size = 'md', children, ...props }, ref) => (
-    <a
-      ref={ref}
-      aria-current={isActive ? 'page' : undefined}
-      className={cn(
-        paginationLinkVariants({
-          variant: isActive ? 'active' : 'default',
-          size,
-        }),
+const PaginationLink = forwardRef<HTMLAnchorElement | HTMLButtonElement, PaginationLinkProps>(
+  ({ className, isActive, size = 'md', href, disabled = false, children, ...props }, ref) => {
+    const shared = {
+      'aria-current': isActive ? ('page' as const) : undefined,
+      className: cn(
+        paginationLinkVariants({ variant: isActive ? 'active' : 'default', size }),
+        // The CVA base disables through `:disabled`, which an anchor never
+        // matches. Both paths need the same look, so the state carries it.
+        disabled && 'mdt-pointer-events-none mdt-opacity-50',
         className
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  )
+      ),
+    };
+
+    if (href === undefined) {
+      return (
+        <button
+          ref={ref as React.Ref<HTMLButtonElement>}
+          type="button"
+          disabled={disabled}
+          {...shared}
+          {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+        >
+          {children}
+        </button>
+      );
+    }
+
+    return (
+      <a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href}
+        // HTML has no disabled link. Taking it out of the tab order and saying
+        // so is the whole of what can be done, and it is what a screen reader
+        // needs anyway.
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        {...shared}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
 );
 PaginationLink.displayName = 'PaginationLink';
 
 /**
  * PaginationPrevious - previous page button.
  */
-const PaginationPrevious = forwardRef<HTMLAnchorElement, PaginationLinkProps & { label?: string }>(
-  ({ className, label = 'Previous', ...props }, ref) => (
-    <PaginationLink
-      ref={ref}
-      aria-label="Go to previous page"
-      className={cn('mdt-gap-1 mdt-pl-2.5', className)}
-      {...props}
-    >
-      <Icon name="chevron-left" size="sm" aria-hidden />
-      <span>{label}</span>
-    </PaginationLink>
-  )
-);
+const PaginationPrevious = forwardRef<
+  HTMLAnchorElement | HTMLButtonElement,
+  PaginationLinkProps & { label?: string }
+>(({ className, label = 'Previous', ...props }, ref) => (
+  <PaginationLink
+    ref={ref}
+    aria-label="Go to previous page"
+    className={cn('mdt-gap-1 mdt-pl-2.5', className)}
+    {...props}
+  >
+    <Icon name="chevron-left" size="sm" aria-hidden />
+    <span>{label}</span>
+  </PaginationLink>
+));
 PaginationPrevious.displayName = 'PaginationPrevious';
 
 /**
  * PaginationNext - next page button.
  */
-const PaginationNext = forwardRef<HTMLAnchorElement, PaginationLinkProps & { label?: string }>(
-  ({ className, label = 'Next', ...props }, ref) => (
-    <PaginationLink
-      ref={ref}
-      aria-label="Go to next page"
-      className={cn('mdt-gap-1 mdt-pr-2.5', className)}
-      {...props}
-    >
-      <span>{label}</span>
-      <Icon name="chevron-right" size="sm" aria-hidden />
-    </PaginationLink>
-  )
-);
+const PaginationNext = forwardRef<
+  HTMLAnchorElement | HTMLButtonElement,
+  PaginationLinkProps & { label?: string }
+>(({ className, label = 'Next', ...props }, ref) => (
+  <PaginationLink
+    ref={ref}
+    aria-label="Go to next page"
+    className={cn('mdt-gap-1 mdt-pr-2.5', className)}
+    {...props}
+  >
+    <span>{label}</span>
+    <Icon name="chevron-right" size="sm" aria-hidden />
+  </PaginationLink>
+));
 PaginationNext.displayName = 'PaginationNext';
 
 /**

@@ -373,3 +373,89 @@ export const Disabled: Story = {
     </Pagination>
   ),
 };
+
+/**
+ * A link when it has somewhere to go, a button when it has not.
+ *
+ * **Both kinds of pager are real.** `/tickets?page=3` is an address worth
+ * having - it can be opened in a new tab, bookmarked, sent to a colleague and
+ * read by a crawler. A table that pages in place has nowhere to go, and its
+ * controls are state.
+ *
+ * Rendering an anchor for both is the version of this that looks fine and is
+ * not. An `<a>` with no `href` is neither focusable nor announced as a link;
+ * one with `href="#"` navigates and puts a stray `#` in the address bar; and no
+ * anchor can be disabled, which is exactly what a pager needs at both ends.
+ *
+ * So `href` decides. Tab through both rows below: the top one is three links
+ * and the disabled control is still reachable, marked `aria-disabled`, because
+ * that is the whole of what HTML allows. The bottom one is buttons, and the
+ * disabled control is genuinely inert.
+ */
+export const LinksOrButtons: Story = {
+  render: function LinksOrButtonsDemo() {
+    const [page, setPage] = useState(2);
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-6">
+        <div className="mdt-flex mdt-flex-col mdt-gap-2">
+          <p className="mdt-text-sm mdt-font-medium">With an href - anchors</p>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#page1" disabled />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#page1" isActive>
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#page2">2</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#page2" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+
+        <div className="mdt-flex mdt-flex-col mdt-gap-2">
+          <p className="mdt-text-sm mdt-font-medium">Without one - buttons, page {page}</p>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  disabled={page === 1}
+                  onClick={() => {
+                    setPage((current) => Math.max(1, current - 1));
+                  }}
+                />
+              </PaginationItem>
+              {[1, 2, 3].map((number) => (
+                <PaginationItem key={number}>
+                  <PaginationLink
+                    isActive={number === page}
+                    onClick={() => {
+                      setPage(number);
+                    }}
+                  >
+                    {number}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  disabled={page === 3}
+                  onClick={() => {
+                    setPage((current) => Math.min(3, current + 1));
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      </div>
+    );
+  },
+};

@@ -864,6 +864,19 @@ export interface DataTableProps<Row> extends Omit<ComponentPropsWithoutRef<'div'
   onLoadMore?: () => void;
 
   /**
+   * Adds the rows-per-page control to the pager.
+   *
+   * Off by default because it is a real decision rather than a default: a table
+   * backed by an expensive query may not want to offer 100 rows at all.
+   *
+   * @default false
+   */
+  rowsPerPage?: boolean;
+
+  /** What that control offers. @default [10, 25, 50, 100] */
+  pageSizes?: number[];
+
+  /**
    * Shows the saved views control in the toolbar.
    *
    * Off by default: a table with one way of looking at it does not need a
@@ -963,4 +976,36 @@ export interface DataTableViewState {
   sort: SortRule[];
   filters: TableFilter[];
   query: string;
+}
+
+export interface TablePaginationProps extends Omit<ComponentPropsWithoutRef<'div'>, 'children'> {
+  /** The page being shown, 1-based. */
+  page: number;
+
+  /** How many pages there are. The numbers hide when this is 1. */
+  pageCount: number;
+
+  /** The 0-based index of the first row on this page, and one past the last. */
+  from: number;
+  to: number;
+
+  /** How many rows there are altogether. What the count is counting. */
+  total: number;
+
+  /** Rows per page. */
+  pageSize: number;
+
+  /** What the rows-per-page control offers. @default [10, 25, 50, 100] */
+  pageSizes?: number[];
+
+  /** Called with the page that was asked for. Clamping is the caller's business. */
+  onPageChange: (page: number) => void;
+
+  /**
+   * Adds the rows-per-page control. Omit it and none appears.
+   *
+   * Optional because it is a real decision, not a default: a table backed by an
+   * expensive query may not want to offer 100 at all.
+   */
+  onPageSizeChange?: (size: number) => void;
 }

@@ -88,6 +88,10 @@ const filterAttributes = [
  * its own menu, drag grip, resize line and insertion point, and `selectable`
  * brings the checkbox column and the bulk bar.
  *
+ * The pager is `TablePagination`, which is the shared `Pagination` component
+ * plus the two things a table needs and a general pager does not: the count
+ * that says how big the table is, and rows per page.
+ *
  * Worth trying: sort by two columns, drag a column sideways, hide one from its
  * own header menu, shift-click a range of rows, then search - all of it works
  * without a line of wiring, and the pagination follows the filtered count and
@@ -102,6 +106,8 @@ export const Simple: Story = {
       getRowId={(row) => row.id}
       filterAttributes={filterAttributes}
       pageSize={8}
+      rowsPerPage
+      pageSizes={[8, 16, 24]}
       renderCell={(row, key) =>
         key === 'status' ? (
           <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>

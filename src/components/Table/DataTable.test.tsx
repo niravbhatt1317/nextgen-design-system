@@ -346,16 +346,16 @@ describe('DataTable', () => {
           onPageChange={onPageChange}
         />
       );
-      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Go to next page' }));
       expect(onPageChange).toHaveBeenCalled();
       expect(screen.getByText('6–10 of 12')).toBeInTheDocument();
-      await userEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Go to previous page' }));
       expect(screen.getByText('1–5 of 12')).toBeInTheDocument();
     });
 
     it('hides the controls when everything fits on one page', () => {
       render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} pageSize={25} />);
-      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Go to next page' })).not.toBeInTheDocument();
     });
 
     it('shows every row and no controls when paging is handed back', () => {
@@ -369,7 +369,7 @@ describe('DataTable', () => {
         />
       );
       expect(bodyText()).toHaveLength(12);
-      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Go to next page' })).not.toBeInTheDocument();
     });
   });
 
@@ -654,7 +654,7 @@ describe('DataTable', () => {
       );
       expect(screen.getByRole('button', { name: 'Load more' })).toBeInTheDocument();
       // One way through a list, not two that disagree about which rows exist.
-      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Go to next page' })).not.toBeInTheDocument();
       // And no slicing: all three rows show despite a page size of two. The
       // sentinel is a row of its own, so it is taken back out of the count.
       const data = bodyText().filter((row) => !row.includes('Load more'));
@@ -711,6 +711,45 @@ describe('DataTable', () => {
         <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} infinite hasMore />
       );
       expect(screen.queryByRole('button', { name: /Load more/ })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('rows per page', () => {
+    const many: Row[] = Array.from({ length: 30 }, (_, index) => ({
+      id: `r${String(index)}`,
+      name: `item ${String(index)}`,
+      score: index,
+      team: 'Red',
+    }));
+
+    it('is not offered unless asked for', () => {
+      render(<DataTable columns={columns} rows={many} getRowId={(row) => row.id} pageSize={10} />);
+      expect(screen.queryByText('Rows per page')).not.toBeInTheDocument();
+    });
+
+    it('changes the page size and keeps the first row on screen', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable
+          columns={columns}
+          rows={many}
+          getRowId={(row) => row.id}
+          pageSize={10}
+          rowsPerPage
+          pageSizes={[10, 25]}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Go to page 3' }));
+      expect(screen.getByText('21–30 of 30')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('combobox', { name: 'Rows per page' }));
+      await user.click(screen.getByRole('option', { name: '25' }));
+      // Row 21 was the first on screen and is still on screen - it falls
+      // inside the new range rather than the table jumping to a page that does
+      // not contain it. That is what `setPageSize` was written for, and what
+      // nothing called until this control existed.
+      expect(screen.getByText('1–25 of 30')).toBeInTheDocument();
+      expect(screen.getByText('item 20')).toBeInTheDocument();
     });
   });
 });

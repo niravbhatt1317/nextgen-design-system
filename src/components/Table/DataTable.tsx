@@ -9,6 +9,7 @@ import { Spinner } from '../Spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 import { TableBulkBar } from './TableBulkBar';
 import { TableColumnMenu } from './TableColumnMenu';
+import { TablePagination } from './TablePagination';
 import { TableFilterChips } from './TableFilterChips';
 import { TableFilterMenu } from './TableFilterMenu';
 import { TableSortMenu } from './TableSortMenu';
@@ -133,6 +134,8 @@ export function DataTable<Row>({
   hasMore = false,
   loadingMore = false,
   onLoadMore,
+  rowsPerPage = false,
+  pageSizes,
   savedViews = false,
   initialViews,
   initialViewId,
@@ -603,41 +606,28 @@ export function DataTable<Row>({
         </TableBulkBar>
       )}
 
-      {!paged && pagination.pageCount > 1 && (
-        <div className="mdt-flex mdt-items-center mdt-justify-between mdt-text-sm">
-          <span className="mdt-text-muted-foreground">
-            {pagination.from + 1}–{pagination.to} of {total ?? sorted.length}
-          </span>
-          <span className="mdt-flex mdt-items-center mdt-gap-1">
-            <button
-              type="button"
-              aria-label="Previous page"
-              disabled={!pagination.hasPrevious}
-              onClick={() => {
-                pagination.previous();
-                onPageChange?.(pagination.page - 1, pagination.pageSize);
-              }}
-              className="mdt-flex mdt-h-8 mdt-w-8 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border mdt-border-border disabled:mdt-opacity-50"
-            >
-              <Icon name="chevron-left" size="sm" aria-hidden />
-            </button>
-            <span className="mdt-px-2 mdt-tabular-nums">
-              {pagination.page} / {pagination.pageCount}
-            </span>
-            <button
-              type="button"
-              aria-label="Next page"
-              disabled={!pagination.hasNext}
-              onClick={() => {
-                pagination.next();
-                onPageChange?.(pagination.page + 1, pagination.pageSize);
-              }}
-              className="mdt-flex mdt-h-8 mdt-w-8 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border mdt-border-border disabled:mdt-opacity-50"
-            >
-              <Icon name="chevron-right" size="sm" aria-hidden />
-            </button>
-          </span>
-        </div>
+      {!paged && (
+        <TablePagination
+          page={pagination.page}
+          pageCount={pagination.pageCount}
+          from={pagination.from}
+          to={pagination.to}
+          total={total ?? sorted.length}
+          pageSize={pagination.pageSize}
+          {...(pageSizes ? { pageSizes } : {})}
+          onPageChange={(next) => {
+            pagination.goTo(next);
+            onPageChange?.(next, pagination.pageSize);
+          }}
+          {...(rowsPerPage
+            ? {
+                onPageSizeChange: (size: number) => {
+                  pagination.setPageSize(size);
+                  onPageChange?.(pagination.page, size);
+                },
+              }
+            : {})}
+        />
       )}
     </div>
   );

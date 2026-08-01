@@ -19,6 +19,9 @@ export { TableToolbar, TableToolbarActions } from './TableToolbar';
 export { TableSortMenu } from './TableSortMenu';
 export { TableViewMenu } from './TableViewMenu';
 export { TableViewSwitcher } from './TableViewSwitcher';
+export { TablePagination } from './TablePagination';
+export { pageList, PAGE_GAP } from './pageList';
+export type { PageSlot } from './pageList';
 export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 export { DataTable } from './DataTable';
 export { TableFilterMenu } from './TableFilterMenu';
@@ -82,6 +85,7 @@ export type {
   TableGroupRowProps,
   TableExpandTriggerProps,
   TableViewSwitcherProps,
+  TablePaginationProps,
   TableViewSummary,
   TableViewNamePanelProps,
   DataTableViewState,
