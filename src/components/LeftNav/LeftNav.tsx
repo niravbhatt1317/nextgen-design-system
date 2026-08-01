@@ -28,6 +28,26 @@ import type {
 /** One row height for everything clickable, so the rhythm never breaks. */
 const ROW = 'mdt-h-8 mdt-rounded-md mdt-px-2';
 
+/**
+ * The panel's own colour, going transparent.
+ *
+ * Every fade in here is the surface dissolving rather than a grey laid over
+ * the rows, which is why they all reach for the same pair.
+ */
+/** Every fade is the same strip in a different direction. */
+const FADE_STRIP = 'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-transition-opacity';
+
+/** The height of a fade at the top of a list, and at the head of a section. */
+const FADE_TOP = 'mdt-top-0 mdt-h-4';
+
+/** A fade with nothing behind it says there is more when there is not. */
+const FADE_OFF = 'mdt-opacity-0';
+
+const FADE_DOWN =
+  'mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150';
+const FADE_UP =
+  'mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150';
+
 /** How far you scroll before the header has finished folding. */
 const COLLAPSE_DISTANCE = 56;
 
@@ -43,6 +63,16 @@ interface LeftNavScrollState {
   atTop: boolean;
   atBottom: boolean;
   report: (state: { progress: number; atTop: boolean; atBottom: boolean }) => void;
+
+  /**
+   * Whether a section header is pinned to the top of the list.
+   *
+   * The body's own top fade and a sticky header both want to be the thing rows
+   * disappear under, and stacked they fade the header itself. When a section is
+   * showing, the header takes the job and brings its own fade.
+   */
+  pinned: boolean;
+  setPinned: (pinned: boolean) => void;
 }
 
 /**
@@ -61,6 +91,8 @@ const LeftNavScroll = createContext<LeftNavScrollState>({
   atTop: true,
   atBottom: true,
   report: () => undefined,
+  pinned: false,
+  setPinned: () => undefined,
 });
 
 const FOCUS =
@@ -167,7 +199,11 @@ const LeftNav = forwardRef<HTMLElement, LeftNavProps>(
           : next
       );
     }, []);
-    const value = useMemo(() => ({ ...scroll, report }), [scroll, report]);
+    const [pinned, setPinned] = useState(false);
+    const value = useMemo(
+      () => ({ ...scroll, report, pinned, setPinned }),
+      [scroll, report, pinned]
+    );
 
     return (
       <LeftNavScroll.Provider value={value}>
@@ -228,23 +264,14 @@ const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExi
         className
       ),
       style: {
-        // `left`, not `translateX`. A percentage in a transform resolves
-        // against the element's own width - the button is as wide as its
-        // content, so the disc walked 83px and stopped a third of the way
-        // across. A percentage in `left` resolves against the containing
-        // block, which is the panel's content width, which is the distance it
-        // actually has to travel.
+        // It does not move. An earlier version walked it across to the right
+        // as the header folded, and it read as a thing escaping rather than a
+        // panel tidying itself - the one fixed point on the screen was the one
+        // that moved. The search comes up beside it instead.
         //
-        // Vertically it barely moves. The search rises to meet it as the row
-        // above collapses - the first attempt dropped the disc by the same
-        // 44px the search was climbing, and the two passed each other. The 6px
-        // is the difference between a 32px disc and the 36px field it lands
-        // beside.
-        // From the gutter to the far gutter: 12px in, and 12px + the disc's
-        // own 32px off the right. `left` on an absolutely positioned element
-        // resolves against the containing block's *padding* box, so the panel's
-        // own padding has to be added back by hand.
-        left: `calc(0.75rem + ${String(progress)} * (100% - 3.5rem))`,
+        // The 6px is the difference between a 32px tile and the 36px field it
+        // ends up next to.
+        left: '0.75rem',
         top: `calc(0.75rem + ${String(progress)} * 0.375rem)`,
       },
     };
@@ -254,10 +281,13 @@ const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExi
         <span
           className={cn(
             'mdt-flex mdt-h-8 mdt-w-8 mdt-shrink-0 mdt-items-center mdt-justify-center',
-            // No border. The shadow is what lifts it off the panel; a ring as
-            // well made it a component sitting in a box rather than an object
-            // resting on a surface.
-            'mdt-rounded-full mdt-bg-background mdt-text-muted-foreground mdt-shadow-sm',
+            // Square, with the same radius as every row and the search field.
+            // A disc was the odd shape out in a panel of soft rectangles, and
+            // one shape repeated is what makes the set look drawn rather than
+            // collected. No border: the shadow is what lifts it, and a ring as
+            // well made it a component in a box rather than an object on a
+            // surface.
+            'mdt-rounded-md mdt-bg-background mdt-text-muted-foreground mdt-shadow-sm',
             'mdt-transition-shadow group-hover/exit:mdt-text-foreground group-hover/exit:mdt-shadow-md',
             'group-focus-visible/exit:mdt-ring-2 group-focus-visible/exit:mdt-ring-ring'
           )}
@@ -328,7 +358,7 @@ const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
         // Room on the right for the disc to land in. It rises on its own as the
         // row above collapses - that is layout, not a transform - and only the
         // width has to be animated.
-        style={{ paddingRight: `${String(12 + progress * DISC_LANDING)}px` }}
+        style={{ paddingLeft: `${String(12 + progress * DISC_LANDING)}px` }}
       >
         <Input
           ref={ref}
@@ -368,14 +398,20 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
   ({ className, level = 1, children, onScroll, ...props }, ref) => {
-    const { atTop, atBottom, report } = useContext(LeftNavScroll);
+    const { atTop, atBottom, report, pinned } = useContext(LeftNavScroll);
     const scroller = useRef<HTMLDivElement | null>(null);
 
     const measure = useCallback(
       (element: HTMLDivElement) => {
         const { scrollTop, scrollHeight, clientHeight } = element;
+        // A list barely taller than the panel can scroll 20px and no further,
+        // which left the header stopped a third of the way through folding -
+        // the disc parked in the middle of nowhere and staying there. The
+        // header only folds when there is enough scroll to finish the job.
+        const room = scrollHeight - clientHeight;
         report({
-          progress: Math.min(1, Math.max(0, scrollTop / COLLAPSE_DISTANCE)),
+          progress:
+            room < COLLAPSE_DISTANCE ? 0 : Math.min(1, Math.max(0, scrollTop / COLLAPSE_DISTANCE)),
           atTop: scrollTop <= 0,
           // A pixel of slack: sub-pixel layout means the sum rarely lands
           // exactly on the height, and without it the bottom fade never quite
@@ -430,19 +466,11 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
         */}
         <div
           aria-hidden
-          className={cn(
-            'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-0 mdt-h-4 mdt-transition-opacity',
-            'mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150',
-            atTop && 'mdt-opacity-0'
-          )}
+          className={cn(FADE_STRIP, FADE_TOP, FADE_DOWN, (atTop || pinned) && FADE_OFF)}
         />
         <div
           aria-hidden
-          className={cn(
-            'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-bottom-0 mdt-h-6 mdt-transition-opacity',
-            'mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150',
-            atBottom && 'mdt-opacity-0'
-          )}
+          className={cn(FADE_STRIP, 'mdt-bottom-0 mdt-h-6', FADE_UP, atBottom && FADE_OFF)}
         />
       </div>
     );
@@ -459,46 +487,79 @@ LeftNavBody.displayName = 'LeftNavBody';
  * so it cannot be mistaken for the exit two rows up.
  */
 const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
-  ({ className, title, onBack, backLabel = 'Back to all settings', children, ...props }, ref) => (
-    <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
-      <div className="mdt-mb-2 mdt-flex mdt-items-center mdt-gap-1">
-        <button
-          type="button"
-          aria-label={backLabel}
-          onClick={onBack}
+  ({ className, title, onBack, backLabel = 'Back to all settings', children, ...props }, ref) => {
+    const { atTop, setPinned } = useContext(LeftNavScroll);
+
+    // Tells the body to stand its own top fade down for as long as this is
+    // showing: two fades stacked at the same edge fade the header itself.
+    useEffect(() => {
+      setPinned(true);
+      return () => {
+        setPinned(false);
+      };
+    }, [setPinned]);
+
+    return (
+      <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
+        <div
           className={cn(
-            'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
-            'mdt-rounded-md mdt-text-muted-foreground mdt-transition-colors',
-            // `muted`, not `secondary` - the panel itself is lighter than
-            // `secondary` now, so the old hover was invisible against it.
-            'hover:mdt-bg-muted hover:mdt-text-foreground',
-            FOCUS
+            // Pinned, so the name of the section you are in survives scrolling
+            // forty rows of it. Opaque, because rows pass underneath.
+            'mdt-sticky mdt-top-0 mdt-z-10 mdt-mb-2 mdt-flex mdt-items-center mdt-gap-1',
+            'mdt-bg-neutral-10 dark:mdt-bg-neutral-150'
           )}
         >
-          <Icon name="chevron-left" size="sm" aria-hidden />
-        </button>
-        {/*
+          <button
+            type="button"
+            aria-label={backLabel}
+            onClick={onBack}
+            className={cn(
+              'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
+              'mdt-rounded-md mdt-text-muted-foreground mdt-transition-colors',
+              // `muted`, not `secondary` - the panel itself is lighter than
+              // `secondary` now, so the old hover was invisible against it.
+              'hover:mdt-bg-muted hover:mdt-text-foreground',
+              FOCUS
+            )}
+          >
+            <Icon name="chevron-left" size="sm" aria-hidden />
+          </button>
+          {/*
           A real heading. Screen readers navigate settings by heading, and this
           is the only thing on the panel that says which section forty rows
           below belong to.
         */}
-        {/*
+          {/*
           Quiet. It is a label for where you are, not the thing you came to
           read - the rows below it are. At medium weight in full black it
           out-shouted every one of them.
         */}
-        <h2 className="mdt-truncate mdt-text-sm mdt-font-normal mdt-text-muted-foreground">
-          {title}
-        </h2>
-      </div>
-      {/*
+          <h2 className="mdt-truncate mdt-text-sm mdt-font-normal mdt-text-muted-foreground">
+            {title}
+          </h2>
+
+          {/*
+          Its own fade, hung below it. The body's top fade stands down while a
+          header is pinned - stacked, the two of them fade the header itself.
+        */}
+          <div
+            aria-hidden
+            className={cn(
+              'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-full mdt-h-4 mdt-transition-opacity',
+              FADE_DOWN,
+              atTop && FADE_OFF
+            )}
+          />
+        </div>
+        {/*
         Wrapped, so `first:pt-0` on the first group actually fires. Without it
         the header is the first child, the first group is the second, and it
         keeps its 16px - which put 22px between a heading and the rows it names.
       */}
-      <div className="mdt-flex mdt-flex-col mdt-gap-0.5">{children}</div>
-    </div>
-  )
+        <div className="mdt-flex mdt-flex-col mdt-gap-0.5">{children}</div>
+      </div>
+    );
+  }
 );
 LeftNavSection.displayName = 'LeftNavSection';
 

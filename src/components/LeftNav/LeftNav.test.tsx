@@ -339,57 +339,79 @@ describe('LeftNav', () => {
       </LeftNav>
     );
 
-    it('leaves the header alone at the top', () => {
+    it('stays put - the disc never travels', () => {
       const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
       const home = screen.getByRole('button', { name: 'Go to home' });
-      // 0.75rem is the panel's own gutter: at rest the disc sits where every
-      // other row starts.
-      expect(home.style.left).toContain('0 * (100% - 3.5rem)');
+
+      expect(home.style.left).toBe('0.75rem');
+      scrollTo(scroller, 56);
+      // An earlier version walked it to the right as the header folded, and it
+      // read as a thing escaping rather than a panel tidying itself: the one
+      // fixed point on the screen was the one that moved.
+      expect(home.style.left).toBe('0.75rem');
     });
 
-    it('walks the disc across and lifts the search as you go', () => {
+    it('gives up the row above so the search rises into it', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       const home = screen.getByRole('button', { name: 'Go to home' });
       const wrapper = home.parentElement as HTMLElement;
 
+      expect(wrapper.style.height).toBe('56px');
       scrollTo(scroller, 56);
-      // Fully folded: the row above has given up its height, so the search
-      // rises by layout, and the disc has travelled the width of the panel.
-      expect(home.style.left).toContain('1 * (100% - 3.5rem)');
+      // Only the 12px of padding left: the search is on the home row now.
       expect(wrapper.style.height).toBe('12px');
     });
 
-    it('takes it halfway at half the distance, and puts it back', () => {
+    it('goes halfway at half the distance, and comes back', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       const home = screen.getByRole('button', { name: 'Go to home' });
+      const wrapper = home.parentElement as HTMLElement;
 
       scrollTo(scroller, 28);
-      expect(home.style.left).toContain('0.5 * (100% - 3.5rem)');
-      // And reverses on the way back up, which is the half people notice.
+      expect(wrapper.style.height).toBe('34px');
+      // Reversing is the half people notice.
       scrollTo(scroller, 0);
-      expect(home.style.left).toContain('0 * (100% - 3.5rem)');
+      expect(wrapper.style.height).toBe('56px');
     });
 
     it('never folds further than it can unfold', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const home = screen.getByRole('button', { name: 'Go to home' });
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
       scrollTo(scroller, 4000);
-      expect(home.style.left).toContain('1 * (100% - 3.5rem)');
+      expect(wrapper.style.height).toBe('12px');
     });
 
-    it('makes room on the right for the disc to land in', () => {
+    it('does not fold at all when there is barely anything to scroll', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
+
+      // A list 20px taller than the panel can scroll 20px and no further, which
+      // used to leave the header stopped a third of the way through folding -
+      // parked in the middle of nowhere and staying there.
+      Object.defineProperty(scroller, 'scrollHeight', { value: 420, configurable: true });
+      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', { value: 20, configurable: true });
+      fireEvent.scroll(scroller);
+      expect(wrapper.style.height).toBe('56px');
+    });
+
+    it('makes room on the left, where the tile already is', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       // The padded wrapper, found by the thing under test rather than by
       // counting parents - `Input` wraps itself and the count would be a
       // hostage to its internals.
-      const field = container.querySelector('[style*="padding-right"]') as HTMLElement;
-      expect(field.style.paddingRight).toBe('12px');
+      const field = container.querySelector('[style*="padding-left"]') as HTMLElement;
+      expect(field.style.paddingLeft).toBe('12px');
       scrollTo(scroller, 56);
-      expect(field.style.paddingRight).toBe('52px');
+      expect(field.style.paddingLeft).toBe('52px');
     });
   });
 

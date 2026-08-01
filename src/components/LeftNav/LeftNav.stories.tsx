@@ -218,7 +218,7 @@ export const Settings: Story = {
                       hasChildren={entry.pages !== undefined}
                       meta={
                         entry.meta === undefined ? undefined : (
-                          <Badge tone="info" size="sm" shape="pill">
+                          <Badge tone="neutral" size="sm" shape="pill">
                             {entry.meta}
                           </Badge>
                         )
