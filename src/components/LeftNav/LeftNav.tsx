@@ -572,7 +572,13 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           className={cn(
             // Pinned, so the name of the section you are in survives scrolling
             // forty rows of it. Opaque, because rows pass underneath.
-            'mdt-sticky mdt-top-0 mdt-z-10 mdt-mb-2 mdt-flex mdt-items-center mdt-gap-1',
+            //
+            // The room below it is *padding*, not the margin it used to be. A
+            // margin sits outside the sticky box, so it scrolls away the moment
+            // the header pins and the next row arrives at the heading's chin -
+            // 2px of clear space, measured. Padding is inside the box and stays.
+            'mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-items-center mdt-gap-1',
+            'mdt-pb-4 mdt-pt-2',
             'mdt-bg-neutral-10 dark:mdt-bg-neutral-150'
           )}
         >
@@ -612,7 +618,10 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           <div
             aria-hidden
             className={cn(
-              'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-full mdt-h-4 mdt-transition-opacity',
+              FADE_STRIP,
+              // 24px, the same as the fade at the foot of the list. At 16px it
+              // was visibly a different fade from the two either side of it.
+              'mdt-top-full mdt-h-6',
               FADE_DOWN,
               atTop && FADE_OFF
             )}
