@@ -359,7 +359,11 @@ const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
 
     return (
       <div
-        className="mdt-shrink-0 mdt-px-3 mdt-pb-3"
+        // 8px, because this is what a sticky section header clamps against. It
+        // pins at the scroller's top edge and cannot be pulled above it, so the
+        // gap below the field is the floor for how close that header can sit -
+        // a -8px margin on the section did nothing until this came down to match.
+        className="mdt-shrink-0 mdt-px-3 mdt-pb-2"
         // Room on the right for the disc to land in. It rises on its own as the
         // row above collapses - that is layout, not a transform - and only the
         // width has to be animated.
@@ -518,7 +522,12 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
           className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
           {...props}
         >
-          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
+          {/*
+            8px on top, so a group heading still sits 16px below the search
+            where it always did. The section header undoes it with a negative
+            margin to reach the 8px it wants; nothing else has to know.
+          */}
+          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-1 mdt-pt-2">{children}</div>
         </div>
 
         {/*
@@ -569,10 +578,10 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
     return (
       <div
         ref={ref}
-        // Pulled up 4px, so the gap from the search is 12px here rather than the
+        // Pulled up 8px, so the gap from the search is 8px here rather than the
         // 16px a group heading sits at. A section header is a heavier thing than
-        // a group label and wants to sit closer to the field above it.
-        className={cn('-mdt-mt-1 mdt-flex mdt-flex-col mdt-gap-0.5', className)}
+        // a group label and belongs to the field above it more than a label does.
+        className={cn('-mdt-mt-2 mdt-flex mdt-flex-col mdt-gap-0.5', className)}
         {...props}
       >
         <div
