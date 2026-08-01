@@ -73,6 +73,38 @@ describe('Checkbox', () => {
     expect(checkbox.getAttribute('data-state')).toBe('indeterminate');
   });
 
+  describe('the mark', () => {
+    // Radix shows the indicator for `indeterminate` as well as `checked`, so a
+    // half-selected box painted a full tick until the glyph was swapped. A
+    // header checkbox is the one place that is always wrong and never obvious.
+    const marks = (container: HTMLElement) =>
+      [...container.querySelectorAll('svg')].map((svg) => svg.getAttribute('class') ?? '');
+
+    it('hides the dash and shows the tick until the state says otherwise', () => {
+      const { container } = render(<Checkbox checked aria-label="Test checkbox" />);
+      const [tick, dash] = marks(container);
+      expect(tick).toContain('group-data-[state=indeterminate]/mark:mdt-hidden');
+      expect(dash).toContain('mdt-hidden');
+      expect(dash).toContain('group-data-[state=indeterminate]/mark:mdt-block');
+    });
+
+    it('fills the box in both marked states', () => {
+      render(<Checkbox checked="indeterminate" aria-label="Test checkbox" />);
+      const checkbox = screen.getByRole('checkbox');
+      expect(checkbox).toHaveClass('data-[state=indeterminate]:mdt-bg-primary');
+      expect(checkbox).toHaveClass('data-[state=checked]:mdt-bg-primary');
+    });
+
+    it('carries both marks in the card variant too', () => {
+      const { container } = render(
+        <Checkbox variant="card-with-checkbox" checked="indeterminate" aria-label="Card checkbox">
+          Card
+        </Checkbox>
+      );
+      expect(marks(container)).toHaveLength(2);
+    });
+  });
+
   it('handles id attribute', () => {
     render(<Checkbox id="test-id" aria-label="Test checkbox" />);
     const checkbox = screen.getByRole('checkbox');

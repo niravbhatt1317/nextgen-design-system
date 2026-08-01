@@ -729,3 +729,98 @@ export interface TableFilterChipsProps extends ComponentPropsWithoutRef<'div'> {
    */
   onClear?: () => void;
 }
+
+/**
+ * Props for DataTable - the whole table, assembled.
+ */
+export interface DataTableProps<Row> extends Omit<ComponentPropsWithoutRef<'div'>, 'children'> {
+  /** The columns, in display order. */
+  columns: { key: string; label: string; locked?: boolean }[];
+
+  /** The rows. */
+  rows: Row[];
+
+  /** A stable identity per row, for React keys and for selection later. */
+  getRowId: (row: Row) => string | number;
+
+  /**
+   * How to draw one cell. Without it the value is printed as text.
+   *
+   * This is where the cell recipes go - a status badge, a two-line cell, an
+   * avatar. `DataTable` knows the shape of a table, not the meaning of your
+   * data.
+   */
+  renderCell?: (row: Row, columnKey: string) => ReactNode;
+
+  /** What can be filtered, and the values each attribute offers. */
+  filterAttributes?: { key: string; label: string; values: string[] }[];
+
+  /** Whether to show the search field. @default true */
+  searchable?: boolean;
+
+  /** The search field's placeholder and accessible name. @default 'Search' */
+  searchPlaceholder?: string;
+
+  /**
+   * Hand each job back to the product.
+   *
+   * A table backed by a paged API turns all four on and passes the rows it was
+   * given; `DataTable` becomes a renderer and reports what the user asked for
+   * through the `on*Change` callbacks.
+   */
+  manualSort?: boolean;
+  manualFilter?: boolean;
+  manualSearch?: boolean;
+  manualPagination?: boolean;
+
+  /** Rows per page. @default 25 */
+  pageSize?: number;
+
+  /** Total rows, when the browser does not have them all. */
+  total?: number;
+
+  /** Told what the user asked for, whether or not this component acts on it. */
+  onSortChange?: (rules: { column: string; direction: 'ascend' | 'descend' }[]) => void;
+  onFilterChange?: (filters: { attribute: string; values: string[] }[]) => void;
+  onSearchChange?: (query: string) => void;
+  onPageChange?: (page: number, pageSize: number) => void;
+
+  /** Extra controls for the toolbar's trailing group. */
+  toolbarActions?: ReactNode;
+
+  /**
+   * Adds a checkbox column and the bulk bar.
+   *
+   * @default false
+   */
+  selectable?: boolean;
+
+  /**
+   * The actions on the bulk bar, given the selected row ids.
+   *
+   * A function rather than a node because what you can do usually depends on
+   * what is selected - one row offers Rename, thirty do not.
+   */
+  bulkActions?: (selected: string[]) => ReactNode;
+
+  /**
+   * Whether each header carries its own menu, drag grip, resize line and
+   * insertion point.
+   *
+   * On by default: they are what makes a table someone's own rather than a
+   * fixed report. Turn them off for a table that is a fixed report.
+   *
+   * @default true
+   */
+  columnControls?: boolean;
+
+  /**
+   * What an empty table says.
+   *
+   * Two messages, because they are different situations: nothing exists yet, or
+   * nothing matches. Telling them apart is the difference between someone
+   * creating a record and someone clearing a filter.
+   */
+  emptyMessage?: string;
+  filteredEmptyMessage?: string;
+}

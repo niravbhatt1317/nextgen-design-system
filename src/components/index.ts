@@ -436,6 +436,7 @@ export {
   TableBulkBar,
   TableBulkAction,
   TableBulkSeparator,
+  DataTable,
   TableFilterMenu,
   TableFilterChips,
   TableColumnMenu,
@@ -445,6 +446,7 @@ export {
   useTableColumns,
   toCsv,
   useTableFilters,
+  useTablePagination,
   useTableSelection,
   useTableSort,
 } from './Table';
@@ -474,6 +476,7 @@ export type {
   TableBulkActionProps,
   TableFilterMenuProps,
   TableFilterChipsProps,
+  DataTableProps,
   TableColumnMenuProps,
   TableColumnBoundaryProps,
   TableColumnDef,

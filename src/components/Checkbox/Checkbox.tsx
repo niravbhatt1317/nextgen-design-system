@@ -15,6 +15,28 @@ const CARD_CHECKED_CLASSES =
   'data-[state=checked]:mdt-border-primary data-[state=checked]:mdt-bg-accent';
 
 /**
+ * A half-selection looks like a selection unless both of these are set.
+ *
+ * Radix shows the indicator for `indeterminate` as well as `checked`, so a box
+ * that only styles `checked` renders a full tick on an unfilled box - a header
+ * checkbox claiming every row is selected when four of eight are. The fill
+ * comes from the same pair as `checked`, because it is the same box in a
+ * different state, not a third kind of box.
+ */
+const MARKED_CLASSES =
+  'data-[state=checked]:mdt-bg-primary data-[state=checked]:mdt-text-primary-foreground data-[state=indeterminate]:mdt-bg-primary data-[state=indeterminate]:mdt-text-primary-foreground';
+
+/**
+ * The indicator carries the group name, so the glyph inside it can read the
+ * state Radix puts on it. Swapped in CSS rather than from the `checked` prop:
+ * an uncontrolled checkbox never tells the component which state it is in.
+ */
+const INDICATOR_CLASSES =
+  'mdt-group/mark mdt-flex mdt-items-center mdt-justify-center mdt-text-current';
+const TICK_CLASSES = 'group-data-[state=indeterminate]/mark:mdt-hidden';
+const DASH_CLASSES = 'mdt-hidden group-data-[state=indeterminate]/mark:mdt-block';
+
+/**
  * Checkbox variants using Class Variance Authority (CVA)
  */
 export const checkboxVariants = cva([], {
@@ -39,7 +61,7 @@ export const checkboxVariants = cva([], {
         'mdt-ring-offset-background',
         FOCUS_RING_CLASSES,
         DISABLED_CLASSES,
-        'data-[state=checked]:mdt-bg-primary data-[state=checked]:mdt-text-primary-foreground',
+        MARKED_CLASSES,
       ],
       card: [
         'mdt-peer mdt-w-full mdt-cursor-pointer mdt-rounded-lg mdt-border-2 mdt-border-input',
@@ -107,11 +129,16 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
           className={cn(checkboxVariants({ variant }), className)}
           {...props}
         >
-          <div className="mdt-mt-0.5 mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border mdt-border-primary mdt-bg-background data-[state=checked]:mdt-bg-primary data-[state=checked]:mdt-text-primary-foreground">
-            <CheckboxPrimitive.Indicator
-              className={cn('mdt-flex mdt-items-center mdt-justify-center mdt-text-current')}
-            >
-              <Icon name="check" size="xs" aria-hidden />
+          <div
+            className={cn(
+              'mdt-mt-0.5 mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
+              'mdt-rounded-sm mdt-border mdt-border-primary mdt-bg-background',
+              MARKED_CLASSES
+            )}
+          >
+            <CheckboxPrimitive.Indicator className={INDICATOR_CLASSES}>
+              <Icon name="check" size="xs" aria-hidden className={TICK_CLASSES} />
+              <Icon name="minus" size="xs" aria-hidden className={DASH_CLASSES} />
             </CheckboxPrimitive.Indicator>
           </div>
           {children}
@@ -125,10 +152,9 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
         className={cn(checkboxVariants({ variant }), className)}
         {...props}
       >
-        <CheckboxPrimitive.Indicator
-          className={cn('mdt-flex mdt-items-center mdt-justify-center mdt-text-current')}
-        >
-          <Icon name="check" size="sm" aria-hidden />
+        <CheckboxPrimitive.Indicator className={INDICATOR_CLASSES}>
+          <Icon name="check" size="sm" aria-hidden className={TICK_CLASSES} />
+          <Icon name="minus" size="sm" aria-hidden className={DASH_CLASSES} />
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
     );

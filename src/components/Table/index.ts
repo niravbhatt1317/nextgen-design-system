@@ -19,6 +19,7 @@ export { TableToolbar, TableToolbarActions } from './TableToolbar';
 export { TableSortMenu } from './TableSortMenu';
 export { TableViewMenu } from './TableViewMenu';
 export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
+export { DataTable } from './DataTable';
 export { TableFilterMenu } from './TableFilterMenu';
 export { TableFilterChips } from './TableFilterChips';
 export { TableColumnMenu } from './TableColumnMenu';
@@ -36,6 +37,9 @@ export type {
 
 export { toCsv } from './toCsv';
 export type { CsvColumn, ToCsvOptions } from './toCsv';
+
+export { useTablePagination } from './useTablePagination';
+export type { UseTablePagination, UseTablePaginationOptions } from './useTablePagination';
 
 export { useTableFilters } from './useTableFilters';
 export type { TableFilter, UseTableFilters, UseTableFiltersOptions } from './useTableFilters';
@@ -82,6 +86,7 @@ export type {
   TableBulkActionProps,
   TableFilterMenuProps,
   TableFilterChipsProps,
+  DataTableProps,
   TableColumnMenuProps,
   TableColumnBoundaryProps,
 } from './Table.types';

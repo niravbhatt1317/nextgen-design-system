@@ -1,0 +1,500 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import { DataTable } from './DataTable';
+
+interface Row {
+  id: string;
+  name: string;
+  score: number;
+  team: string;
+}
+
+/**
+ * Deliberately arranged so the input order matches neither sort. A fixture that
+ * arrives already sorted cannot tell a working sort from a broken one.
+ */
+const rows: Row[] = [
+  { id: 'a', name: 'item 10', score: 30, team: 'Red' },
+  { id: 'b', name: 'item 2', score: 100, team: 'Blue' },
+  { id: 'c', name: 'item 1', score: 2, team: 'Red' },
+];
+
+const columns = [
+  { key: 'id', label: 'ID', locked: true },
+  { key: 'name', label: 'Name' },
+  { key: 'score', label: 'Score' },
+  { key: 'team', label: 'Team' },
+];
+
+const bodyText = () =>
+  within(screen.getByRole('table'))
+    .getAllByRole('row')
+    .slice(1)
+    .map((row) => row.textContent ?? '');
+
+const firstColumn = () => bodyText().map((text) => text.slice(0, 1));
+
+describe('DataTable', () => {
+  describe('rendering', () => {
+    it('renders a row per record and a column per definition', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(bodyText()).toHaveLength(3);
+      expect(screen.getByRole('columnheader', { name: /Name/ })).toBeInTheDocument();
+    });
+
+    it('prints values as text without a renderer', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.getByText('item 10')).toBeInTheDocument();
+    });
+
+    it('uses renderCell when given one', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          renderCell={(row, key) => (key === 'team' ? <b>{row.team}!</b> : row[key as keyof Row])}
+        />
+      );
+      expect(screen.getAllByText('Red!')).toHaveLength(2);
+    });
+
+    it('says nothing is here when there are no rows at all', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={[]}
+          getRowId={(row: Row) => row.id}
+          emptyMessage="No records."
+        />
+      );
+      expect(screen.getByText('No records.')).toBeInTheDocument();
+    });
+  });
+
+  describe('sorting', () => {
+    it('sorts numerically rather than alphabetically', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Sort by Score' }));
+      // Scores 2, 30, 100 -> c, a, b. A string sort would give 100, 2, 30.
+      expect(firstColumn()).toEqual(['c', 'a', 'b']);
+    });
+
+    it('sorts text naturally, so item 2 precedes item 10', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Sort by Name' }));
+      // item 1, item 2, item 10 -> c, b, a. A plain compare puts 10 before 2.
+      expect(firstColumn()).toEqual(['c', 'b', 'a']);
+    });
+
+    it('leaves the rows alone when sorting is handed back', async () => {
+      const onSortChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          manualSort
+          onSortChange={onSortChange}
+        />
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Sort by Score' }));
+      // Reported, not applied: that is the whole contract of `manualSort`.
+      expect(onSortChange).toHaveBeenCalled();
+      expect(firstColumn()).toEqual(['a', 'b', 'c']);
+    });
+  });
+
+  describe('searching', () => {
+    it('narrows the rows', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.type(screen.getByRole('searchbox'), 'Blue');
+      expect(bodyText()).toHaveLength(1);
+    });
+
+    it('says nothing matches rather than nothing exists', async () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          emptyMessage="No records."
+          filteredEmptyMessage="Nothing matches."
+        />
+      );
+      await userEvent.type(screen.getByRole('searchbox'), 'zzzz');
+      // Telling these apart is the difference between someone creating a record
+      // and someone clearing a filter.
+      expect(screen.getByText('Nothing matches.')).toBeInTheDocument();
+      expect(screen.queryByText('No records.')).not.toBeInTheDocument();
+    });
+
+    it('reports but does not apply when searching is handed back', async () => {
+      const onSearchChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          manualSearch
+          onSearchChange={onSearchChange}
+        />
+      );
+      await userEvent.type(screen.getByRole('searchbox'), 'Blue');
+      expect(onSearchChange).toHaveBeenCalled();
+      expect(bodyText()).toHaveLength(3);
+    });
+
+    it('can be turned off entirely', () => {
+      render(
+        <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} searchable={false} />
+      );
+      expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('filtering', () => {
+    const attributes = [{ key: 'team', label: 'Team', values: ['Red', 'Blue'] }];
+
+    it('shows no filter control without attributes', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.queryByRole('button', { name: /Filters/ })).not.toBeInTheDocument();
+    });
+
+    it('narrows the rows and shows a chip', async () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          filterAttributes={attributes}
+        />
+      );
+      await userEvent.click(screen.getByRole('button', { name: /Filters/ }));
+      await userEvent.click(screen.getByRole('option', { name: /Team/ }));
+      await userEvent.click(screen.getByRole('option', { name: 'Red' }));
+      await userEvent.keyboard('{Escape}');
+      expect(bodyText()).toHaveLength(2);
+      expect(screen.getByText(/Team: Red/)).toBeInTheDocument();
+    });
+  });
+
+  describe('the sort menu', () => {
+    const openSort = async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Sort' }));
+    };
+
+    it('sorts from the menu as well as the header', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await openSort();
+      await userEvent.click(screen.getByRole('option', { name: 'Score' }));
+      await userEvent.keyboard('{Escape}');
+      expect(firstColumn()).toEqual(['c', 'a', 'b']);
+    });
+
+    it('reverses a direction from the menu', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await openSort();
+      await userEvent.click(screen.getByRole('option', { name: 'Score' }));
+      await userEvent.click(screen.getByRole('button', { name: /Score is ascending/ }));
+      await userEvent.keyboard('{Escape}');
+      expect(firstColumn()).toEqual(['b', 'a', 'c']);
+    });
+
+    it('stops sorting from the menu', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await openSort();
+      await userEvent.click(screen.getByRole('option', { name: 'Score' }));
+      await userEvent.click(screen.getByRole('button', { name: /Stop sorting by Score/ }));
+      await userEvent.keyboard('{Escape}');
+      expect(firstColumn()).toEqual(['a', 'b', 'c']);
+    });
+  });
+
+  describe('filter chips and callbacks', () => {
+    const attributes = [{ key: 'team', label: 'Team', values: ['Red', 'Blue'] }];
+
+    const applyRed = async () => {
+      await userEvent.click(screen.getByRole('button', { name: /Filters/ }));
+      await userEvent.click(screen.getByRole('option', { name: /Team/ }));
+      await userEvent.click(screen.getByRole('option', { name: 'Red' }));
+      await userEvent.keyboard('{Escape}');
+    };
+
+    it('removes a filter from its chip', async () => {
+      const onFilterChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          filterAttributes={attributes}
+          onFilterChange={onFilterChange}
+        />
+      );
+      await applyRed();
+      expect(bodyText()).toHaveLength(2);
+      await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+      expect(bodyText()).toHaveLength(3);
+      expect(onFilterChange).toHaveBeenCalled();
+    });
+
+    it('clears every filter from the menu', async () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          filterAttributes={attributes}
+        />
+      );
+      await applyRed();
+      await userEvent.click(screen.getByRole('button', { name: /Filters/ }));
+      await userEvent.click(screen.getByRole('button', { name: /Clear all filters/ }));
+      await userEvent.keyboard('{Escape}');
+      expect(bodyText()).toHaveLength(3);
+    });
+
+    it('reports but does not apply when filtering is handed back', async () => {
+      const onFilterChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          filterAttributes={attributes}
+          manualFilter
+          onFilterChange={onFilterChange}
+        />
+      );
+      await applyRed();
+      expect(onFilterChange).toHaveBeenCalled();
+      expect(bodyText()).toHaveLength(3);
+    });
+  });
+
+  describe('awkward values', () => {
+    interface Odd {
+      id: string;
+      when: Date;
+      thing: { deep: string };
+      missing: string | null;
+    }
+
+    const odd: Odd[] = [
+      { id: 'x', when: new Date('2026-02-01'), thing: { deep: 'a' }, missing: null },
+      { id: 'y', when: new Date('2026-01-01'), thing: { deep: 'b' }, missing: 'here' },
+    ];
+    const oddColumns = [
+      { key: 'id', label: 'ID' },
+      { key: 'when', label: 'When' },
+      { key: 'thing', label: 'Thing' },
+      { key: 'missing', label: 'Missing' },
+    ];
+
+    it('prints a date rather than [object Object]', () => {
+      render(<DataTable columns={oddColumns} rows={odd} getRowId={(row) => row.id} />);
+      expect(screen.getByText(/2026-02-01/)).toBeInTheDocument();
+    });
+
+    it('prints nothing for an object, rather than something that looks like data', () => {
+      render(<DataTable columns={oddColumns} rows={odd} getRowId={(row) => row.id} />);
+      // A column of objects needs `renderCell`; "[object Object]" would hide
+      // that behind text that looks deliberate.
+      expect(screen.queryByText(/object Object/)).not.toBeInTheDocument();
+    });
+
+    it('sorts dates by their real order', async () => {
+      render(<DataTable columns={oddColumns} rows={odd} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Sort by When' }));
+      expect(firstColumn()).toEqual(['y', 'x']);
+    });
+
+    it('puts empty values at one end rather than scattering them', async () => {
+      // A separate render on purpose: clicking a second column *adds* to the
+      // sort stack rather than replacing it, so reusing the previous one would
+      // measure two sorts and call it one.
+      render(<DataTable columns={oddColumns} rows={odd} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Sort by Missing' }));
+      expect(firstColumn()).toEqual(['x', 'y']);
+    });
+  });
+
+  describe('paging', () => {
+    const many = Array.from({ length: 12 }, (_, i) => ({
+      id: `r${String(i)}`,
+      name: `row ${String(i)}`,
+      score: i,
+      team: 'Red',
+    }));
+
+    it('shows one page at a time', () => {
+      render(<DataTable columns={columns} rows={many} getRowId={(row) => row.id} pageSize={5} />);
+      expect(bodyText()).toHaveLength(5);
+      expect(screen.getByText('1–5 of 12')).toBeInTheDocument();
+    });
+
+    it('moves between pages and reports it', async () => {
+      const onPageChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={many}
+          getRowId={(row) => row.id}
+          pageSize={5}
+          onPageChange={onPageChange}
+        />
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(onPageChange).toHaveBeenCalled();
+      expect(screen.getByText('6–10 of 12')).toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+      expect(screen.getByText('1–5 of 12')).toBeInTheDocument();
+    });
+
+    it('hides the controls when everything fits on one page', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} pageSize={25} />);
+      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+    });
+
+    it('shows every row and no controls when paging is handed back', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={many}
+          getRowId={(row) => row.id}
+          manualPagination
+          total={430}
+        />
+      );
+      expect(bodyText()).toHaveLength(12);
+      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('columns', () => {
+    it('hides a column through the view menu', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'View settings' }));
+      await userEvent.click(screen.getByRole('button', { name: /^Columns/ }));
+      await userEvent.click(screen.getByRole('option', { name: /Team/ }));
+      await userEvent.keyboard('{Escape}');
+      expect(screen.queryByRole('columnheader', { name: /Team/ })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('selection', () => {
+    it('shows no checkboxes unless asked', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.queryByRole('checkbox', { name: 'Select all rows' })).not.toBeInTheDocument();
+    });
+
+    it('selects a row and shows the bar', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} selectable />);
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select a' }));
+      expect(screen.getByRole('toolbar', { name: 'Selected rows' })).toBeInTheDocument();
+      expect(screen.getByText('1 selected')).toBeInTheDocument();
+    });
+
+    it('selects a range with shift', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} selectable />);
+      // One session, because `userEvent.keyboard` and `userEvent.click` each
+      // create their own instance otherwise - and a Shift held by one is not
+      // held by the other, so the modifier never reaches the handler and the
+      // test passes for the wrong reason.
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('checkbox', { name: 'Select a' }));
+      await user.keyboard('{Shift>}');
+      await user.click(screen.getByRole('checkbox', { name: 'Select c' }));
+      await user.keyboard('{/Shift}');
+      expect(screen.getByText('3 selected')).toBeInTheDocument();
+    });
+
+    it('selects everything from the header', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} selectable />);
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+      expect(screen.getByText('3 selected')).toBeInTheDocument();
+    });
+
+    it('renders bulk actions with the selected ids', async () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          selectable
+          bulkActions={(selected) => <button type="button">Delete {selected.length}</button>}
+        />
+      );
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select b' }));
+      expect(screen.getByRole('button', { name: 'Delete 1' })).toBeInTheDocument();
+    });
+
+    it('spans the checkbox column in the empty state', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} selectable />);
+      await userEvent.type(screen.getByRole('searchbox'), 'zzzz');
+      const cell = screen.getByText(/Nothing matches/).closest('td');
+      // Four columns plus the checkbox: a short colSpan leaves a gap where the
+      // checkbox column is.
+      expect(cell).toHaveAttribute('colspan', '5');
+    });
+  });
+
+  describe('column controls', () => {
+    it('gives each header its own menu, sort control and grip', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.getByRole('button', { name: 'Name column' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Sort by Name' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^Reorder Name/ })).toBeInTheDocument();
+    });
+
+    it('hides a column from its own header menu', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Team column' }));
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Hide this column' }));
+      expect(screen.queryByRole('button', { name: 'Team column' })).not.toBeInTheDocument();
+    });
+
+    it('leaves a locked column without move or hide', async () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      await userEvent.click(screen.getByRole('button', { name: 'ID column' }));
+      expect(screen.queryByRole('menuitem', { name: 'Hide this column' })).not.toBeInTheDocument();
+    });
+
+    it('can be turned off for a table that is a fixed report', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          columnControls={false}
+        />
+      );
+      expect(screen.queryByRole('button', { name: 'Name column' })).not.toBeInTheDocument();
+      // Sorting stays - it is not a column control, it is what a header is for.
+      expect(screen.getByRole('button', { name: 'Sort by Name' })).toBeInTheDocument();
+    });
+  });
+
+  describe('extras', () => {
+    it('renders toolbar actions it was given', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          toolbarActions={<button type="button">Export</button>}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+    });
+
+    it('accepts extra classes', () => {
+      const { container } = render(
+        <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} className="custom" />
+      );
+      expect(container.firstChild).toHaveClass('custom');
+    });
+  });
+});
