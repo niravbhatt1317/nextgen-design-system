@@ -48,6 +48,9 @@ const FADE_DOWN =
 const FADE_UP =
   'mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150';
 
+/** How long the header takes to unfold when the level changes under it. */
+const UNFOLD_MS = 200;
+
 /** How far you scroll before the header has finished folding. */
 const COLLAPSE_DISTANCE = 56;
 
@@ -63,6 +66,18 @@ interface LeftNavScrollState {
   atTop: boolean;
   atBottom: boolean;
   report: (state: { progress: number; atTop: boolean; atBottom: boolean }) => void;
+
+  /**
+   * Whether the header should ease rather than track.
+   *
+   * The fold follows the wheel one-to-one, so it must not be animated - a
+   * transition there lags behind your fingers. But it is also reset when the
+   * level changes, and *that* move has no wheel behind it: it snapped open in
+   * a single frame and read as a jolt at the top of the panel. This is true
+   * only for that reset, and only for as long as it takes.
+   */
+  smooth: boolean;
+  setSmooth: (smooth: boolean) => void;
 
   /**
    * Whether a section header is pinned to the top of the list.
@@ -91,6 +106,8 @@ const LeftNavScroll = createContext<LeftNavScrollState>({
   atTop: true,
   atBottom: true,
   report: () => undefined,
+  smooth: false,
+  setSmooth: () => undefined,
   pinned: false,
   setPinned: () => undefined,
 });
@@ -200,9 +217,10 @@ const LeftNav = forwardRef<HTMLElement, LeftNavProps>(
       );
     }, []);
     const [pinned, setPinned] = useState(false);
+    const [smooth, setSmooth] = useState(false);
     const value = useMemo(
-      () => ({ ...scroll, report, pinned, setPinned }),
-      [scroll, report, pinned]
+      () => ({ ...scroll, report, pinned, setPinned, smooth, setSmooth }),
+      [scroll, report, pinned, smooth]
     );
 
     return (
@@ -254,7 +272,7 @@ LeftNav.displayName = 'LeftNav';
  */
 const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExitProps>(
   ({ className, href, children = 'Go to home', ...props }, ref) => {
-    const { progress } = useContext(LeftNavScroll);
+    const { progress, smooth } = useContext(LeftNavScroll);
 
     const shared = {
       className: cn(
@@ -323,7 +341,12 @@ const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExi
     // to travel, which is why the height is here and not on the control.
     return (
       <div
-        className="mdt-relative mdt-shrink-0 mdt-px-3"
+        className={cn(
+          'mdt-relative mdt-shrink-0 mdt-px-3',
+          // Only while unfolding. Under the wheel this has to track exactly.
+          smooth && 'mdt-transition-all mdt-duration-200 mdt-ease-out',
+          'motion-reduce:mdt-transition-none'
+        )}
         style={{ height: `${String(12 + (1 - progress) * EXIT_HEIGHT)}px` }}
       >
         {href === undefined ? (
@@ -355,7 +378,7 @@ LeftNavExit.displayName = 'LeftNavExit';
  */
 const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
   ({ className, label = 'Search', ...props }, ref) => {
-    const { progress } = useContext(LeftNavScroll);
+    const { progress, smooth } = useContext(LeftNavScroll);
 
     return (
       <div
@@ -363,7 +386,11 @@ const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
         // pins at the scroller's top edge and cannot be pulled above it, so the
         // gap below the field is the floor for how close that header can sit -
         // a -8px margin on the section did nothing until this came down to match.
-        className="mdt-shrink-0 mdt-px-3 mdt-pb-2"
+        className={cn(
+          'mdt-shrink-0 mdt-px-3 mdt-pb-2',
+          smooth && 'mdt-transition-all mdt-duration-200 mdt-ease-out',
+          'motion-reduce:mdt-transition-none'
+        )}
         // Room on the right for the disc to land in. It rises on its own as the
         // row above collapses - that is layout, not a transform - and only the
         // width has to be animated.
@@ -407,11 +434,12 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
   ({ className, level = 1, direction = null, viewKey, children, onScroll, ...props }, ref) => {
-    const { atTop, atBottom, report, pinned } = useContext(LeftNavScroll);
+    const { atTop, atBottom, report, pinned, setSmooth } = useContext(LeftNavScroll);
     const scroller = useRef<HTMLDivElement | null>(null);
     // How far through the fold the wheel has taken us. A ref rather than state
     // because the listener that writes it is native and runs on every notch.
     const folded = useRef(0);
+    const first = useRef(true);
 
     const measure = useCallback(
       (element: HTMLDivElement) => {
@@ -494,11 +522,31 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
     // scroll belongs to the list, and this is a different list.
     useEffect(() => {
       const node = scroller.current;
-      if (!node) return;
+      if (!node) return undefined;
+
+      // Not on the first run. This effect fires on mount as well as on a change
+      // of level, and asking for the easing there leaves a 200ms window after
+      // the panel appears in which the wheel is animated instead of tracked.
+      if (first.current) {
+        first.current = false;
+        return undefined;
+      }
+
+      // Eased, not snapped. Going back from a scrolled second level unfolds the
+      // header, and doing that in one frame is a jolt at the top of the panel -
+      // the tile and the field arriving before you have finished pressing back.
+      setSmooth(true);
       node.scrollTop = 0;
       folded.current = 0;
       measure(node);
-    }, [level, measure]);
+
+      const settle = setTimeout(() => {
+        setSmooth(false);
+      }, UNFOLD_MS);
+      return () => {
+        clearTimeout(settle);
+      };
+    }, [level, measure, setSmooth]);
 
     const attach = useCallback(
       (node: HTMLDivElement | null) => {

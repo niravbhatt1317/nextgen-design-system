@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -364,7 +364,11 @@ describe('LeftNav', () => {
     const scrollTo = (scroller: HTMLElement, scrollTop: number) => {
       Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
       Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', { value: scrollTop, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', {
+        value: scrollTop,
+        configurable: true,
+        writable: true,
+      });
       fireEvent.scroll(scroller);
     };
 
@@ -407,7 +411,11 @@ describe('LeftNav', () => {
     const wheel = (scroller: HTMLElement, deltaY: number, scrollTop = 0) => {
       Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
       Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', { value: scrollTop, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', {
+        value: scrollTop,
+        configurable: true,
+        writable: true,
+      });
       fireEvent.wheel(scroller, { deltaY });
     };
 
@@ -476,6 +484,48 @@ describe('LeftNav', () => {
       expect(wrapper.style.height).toBe('12px');
     });
 
+    it('eases open when the level changes, and never while the wheel is on it', async () => {
+      const { container, rerender } = render(
+        <LeftNav>
+          <LeftNavExit onClick={() => undefined} />
+          <LeftNavSearch />
+          <LeftNavBody level={2}>
+            <LeftNavItem>Overview</LeftNavItem>
+          </LeftNavBody>
+        </LeftNav>
+      );
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
+
+      wheel(scroller, 56);
+      // Under the wheel the fold must track exactly. A transition here lags
+      // behind your fingers.
+      expect(wrapper.className).not.toContain('mdt-transition-all');
+
+      rerender(
+        <LeftNav>
+          <LeftNavExit onClick={() => undefined} />
+          <LeftNavSearch />
+          <LeftNavBody level={1}>
+            <LeftNavItem>General</LeftNavItem>
+          </LeftNavBody>
+        </LeftNav>
+      );
+      // Going back from a scrolled second level unfolds the header, and doing
+      // it in one frame is a jolt at the top of the panel.
+      const after = screen.getByRole('button', { name: 'Go to home' }).parentElement as HTMLElement;
+      expect(after.className).toContain('mdt-transition-all');
+      expect(after.className).toContain('motion-reduce:mdt-transition-none');
+
+      await waitFor(() => {
+        expect(
+          (screen.getByRole('button', { name: 'Go to home' }).parentElement as HTMLElement)
+            .className
+        ).not.toContain('mdt-transition-all');
+      });
+    });
+
     it('does not fold at all when there is barely anything to scroll', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
@@ -487,7 +537,11 @@ describe('LeftNav', () => {
       // parked in the middle of nowhere and staying there.
       Object.defineProperty(scroller, 'scrollHeight', { value: 420, configurable: true });
       Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', { value: 20, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', {
+        value: 20,
+        configurable: true,
+        writable: true,
+      });
       fireEvent.scroll(scroller);
       expect(wrapper.style.height).toBe('56px');
     });
@@ -534,7 +588,11 @@ describe('LeftNav', () => {
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
       Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', { value: 100, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', {
+        value: 100,
+        configurable: true,
+        writable: true,
+      });
       fireEvent.scroll(scroller);
       expect(fades(container)).toEqual([true, true]);
     });
@@ -550,7 +608,11 @@ describe('LeftNav', () => {
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
       Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', {
+        value: 400,
+        configurable: true,
+        writable: true,
+      });
       fireEvent.scroll(scroller);
       expect(fades(container)).toEqual([true, false]);
     });
