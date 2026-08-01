@@ -14,7 +14,70 @@ import type {
 } from './Dialog.types';
 
 /**
- * Dialog root component - controls open/close state.
+ * Dialog - a task that interrupts, in the middle of the screen.
+ *
+ * ## Dialog or Sheet
+ *
+ * They are built from the same primitive and share an overlay, a focus trap,
+ * escape handling and an animation. The mechanics will not tell you which to
+ * reach for. One question does:
+ *
+ * > **Does the task need the thing behind it?**
+ *
+ * **No — a Dialog.** It interrupts, and the background is dimmed because it has
+ * stopped mattering. **Yes — a `Sheet`.** It attends to something on screen,
+ * which stays legible because you are going back to it.
+ *
+ * | | |
+ * | --- | --- |
+ * | Destructive confirm | **Dialog**, always. You must not be able to work around the decision. |
+ * | Blocking - session expired, forced upgrade | **Dialog** |
+ * | Compare options side by side | **Dialog** |
+ * | Pick from a grid | **Dialog**, `size="full"` |
+ * | Settings | **Dialog**, `size="full"` - an app inside an app needs nav *and* content |
+ * | Wizard or onboarding sequence | **Dialog** |
+ * | Inspect a record you clicked in a list | `Sheet` |
+ * | Filters | `Sheet` |
+ * | A long form of stacked fields | `Sheet` |
+ *
+ * **Shape follows content**, and it decides more cases than any principle. A
+ * Dialog is wide, so it suits horizontal composition - three plan cards, a
+ * grid, a form beside a live preview. A `Sheet` is tall and narrow, so it suits
+ * a vertical stack. Three pricing tiers physically do not fit in a drawer.
+ *
+ * **Creating something new depends on where you came from.** From a list, a
+ * `Sheet` keeps the list visible while the new row appears in it. From a global
+ * "New" button there is no context to preserve, so a Dialog is right. Linear's
+ * new issue is a modal; Attio's new record is a drawer. Both are correct.
+ *
+ * **Frequency decides how violent it should be.** Something opened dozens of
+ * times a session should slide in from the edge. Something opened once - delete,
+ * upgrade - can take the centre.
+ *
+ * ### Never
+ *
+ * - A destructive confirm in a `Sheet`.
+ * - A wizard in a `Sheet`: step chrome and back/next read wrong on a narrow
+ *   vertical surface.
+ * - Sheet stacked on Sheet. A **Dialog over a Sheet** is the one legitimate
+ *   stack - a confirmation interrupting a panel.
+ *
+ * @example
+ * ```tsx
+ * <Dialog>
+ *   <DialogTrigger asChild><Button>Delete</Button></DialogTrigger>
+ *   <DialogContent>
+ *     <DialogHeader>
+ *       <DialogTitle>Delete connection</DialogTitle>
+ *       <DialogDescription>This cannot be undone.</DialogDescription>
+ *     </DialogHeader>
+ *     <DialogFooter>
+ *       <Button variant="outline">Cancel</Button>
+ *       <Button variant="destructive">Delete</Button>
+ *     </DialogFooter>
+ *   </DialogContent>
+ * </Dialog>
+ * ```
  */
 const Dialog = DialogPrimitive.Root;
 
