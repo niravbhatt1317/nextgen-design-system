@@ -188,7 +188,7 @@ export const Settings: Story = {
             }}
           />
 
-          <LeftNavBody level={levels.level}>
+          <LeftNavBody level={levels.level} direction={levels.direction} viewKey={levels.viewKey}>
             {matches !== null ? (
               <LeftNavGroup
                 label={`${String(matches.length)} ${matches.length === 1 ? 'result' : 'results'}`}

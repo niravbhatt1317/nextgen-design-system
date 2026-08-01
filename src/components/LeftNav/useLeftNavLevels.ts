@@ -23,6 +23,24 @@ export interface UseLeftNavLevels {
 
   /** Whether a given section is the one being shown. */
   isOpen: (section: string) => boolean;
+
+  /**
+   * Which way the last move went, or `null` before anything has moved.
+   *
+   * What the panel animates on. Opening a section is `forward` and going back
+   * is `back` - including switching sections at the second level, which is
+   * sideways in the hierarchy but forward in the story you are telling.
+   */
+  direction: 'forward' | 'back' | null;
+
+  /**
+   * A stable name for the view being shown, for React to key on.
+   *
+   * `level` is not enough: moving from one second-level section to another
+   * leaves the level at 2, and a key that does not change means a subtree that
+   * does not remount, which means an animation that never replays.
+   */
+  viewKey: string;
 }
 
 /**
@@ -55,10 +73,12 @@ export function useLeftNavLevels({
 }: UseLeftNavLevelsOptions = {}): UseLeftNavLevels {
   const [start] = useState<string | null>(initial);
   const [section, setSection] = useState<string | null>(start);
+  const [direction, setDirection] = useState<'forward' | 'back' | null>(null);
 
   const open = useCallback(
     (next: string) => {
       setSection(next);
+      setDirection('forward');
       onChange?.(next);
     },
     [onChange]
@@ -66,6 +86,7 @@ export function useLeftNavLevels({
 
   const back = useCallback(() => {
     setSection(null);
+    setDirection('back');
     onChange?.(null);
   }, [onChange]);
 
@@ -78,7 +99,9 @@ export function useLeftNavLevels({
       open,
       back,
       isOpen,
+      direction,
+      viewKey: section ?? 'root',
     }),
-    [section, open, back, isOpen]
+    [section, open, back, isOpen, direction]
   );
 }

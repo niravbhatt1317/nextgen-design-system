@@ -320,6 +320,22 @@ Searched before building the settings navigation, 1 August 2026.
 
 **Icons:** `notebook` and `blocks` are not in the frozen registry — `book-open` and `puzzle` used instead. `eye` was the obvious glyph for Observability and is already "show password" in `InputGroup`, so `activity` was used: one icon, one meaning.
 
+## Nothing in the library answers `prefers-reduced-motion`
+
+Searched on 1 August 2026 across every component, every stylesheet and the Tailwind config:
+`prefers-reduced-motion`, `motion-safe`, `motion-reduce` — **zero matches**. Meanwhile the config
+ships twelve animations and `Dialog`, `Sheet`, `Toast`, `Accordion`, `Tooltip`, `Popover` and
+`DropdownMenu` all use them, several with a full-surface `translateX(100%)`.
+
+`LeftNav` is the first component to honour it: the level-change animation keeps its fade and drops
+its travel under `motion-reduce`. The rest still move regardless of what the person asked their
+operating system for.
+
+This is not a component gap and not a token gap — it is a practice the library never adopted. The
+cheap fix is a rule in `globals.css` that shortens every animation to near-zero under the media
+query, which would cover all seven at once without touching them. Worth doing deliberately rather
+than one component at a time.
+
 ## A note on method
 
 This compares component **types**, not implementations. Where four teams built the same type, they

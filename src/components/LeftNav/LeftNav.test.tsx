@@ -62,6 +62,45 @@ describe('useLeftNavLevels', () => {
     expect(result.current.level).toBe(1);
   });
 
+  it('reports which way it went', () => {
+    const { result } = renderHook(() => useLeftNavLevels());
+    expect(result.current.direction).toBeNull();
+    act(() => {
+      result.current.open('billing');
+    });
+    expect(result.current.direction).toBe('forward');
+    act(() => {
+      result.current.back();
+    });
+    expect(result.current.direction).toBe('back');
+  });
+
+  it('calls a sideways move forward, because that is the story', () => {
+    const { result } = renderHook(() => useLeftNavLevels());
+    act(() => {
+      result.current.open('one');
+    });
+    act(() => {
+      result.current.open('two');
+    });
+    expect(result.current.direction).toBe('forward');
+  });
+
+  it('names the view, so a section change remounts even at the same level', () => {
+    const { result } = renderHook(() => useLeftNavLevels());
+    expect(result.current.viewKey).toBe('root');
+    act(() => {
+      result.current.open('billing');
+    });
+    expect(result.current.viewKey).toBe('billing');
+    act(() => {
+      result.current.open('security');
+    });
+    // Both are level 2. Keying on the level alone would not remount, and an
+    // animation on a subtree that only re-rendered has already played.
+    expect(result.current.viewKey).toBe('security');
+  });
+
   it('ignores a later change to the starting section', () => {
     const { result, rerender } = renderHook(({ initial }) => useLeftNavLevels({ initial }), {
       initialProps: { initial: 'billing' as string | null },
@@ -529,6 +568,33 @@ describe('LeftNav', () => {
     it('takes a different search label', () => {
       render(<LeftNavSearch label="Find a setting" />);
       expect(screen.getByRole('searchbox', { name: 'Find a setting' })).toBeInTheDocument();
+    });
+
+    it('slips in the direction of travel, and keeps the fade for anyone who asked for less', () => {
+      const { container, rerender } = render(
+        <LeftNavBody level={2} direction="forward" viewKey="billing">
+          <LeftNavItem>Invoices</LeftNavItem>
+        </LeftNavBody>
+      );
+      const inner = () => container.querySelector('[data-level] > div');
+      expect(inner()?.className).toContain('mdt-animate-nav-in-from-right');
+      expect(inner()?.className).toContain('motion-reduce:mdt-animate-fade-in');
+
+      rerender(
+        <LeftNavBody level={1} direction="back" viewKey="root">
+          <LeftNavItem>General</LeftNavItem>
+        </LeftNavBody>
+      );
+      expect(inner()?.className).toContain('mdt-animate-nav-in-from-left');
+    });
+
+    it('does not animate a panel that has never changed level', () => {
+      const { container } = render(
+        <LeftNavBody>
+          <LeftNavItem>General</LeftNavItem>
+        </LeftNavBody>
+      );
+      expect(container.querySelector('[data-level] > div')?.className).not.toContain('mdt-animate');
     });
 
     it('publishes the level, and does not pretend to animate it', () => {

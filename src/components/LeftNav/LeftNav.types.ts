@@ -38,6 +38,23 @@ export interface LeftNavBodyProps extends ComponentPropsWithoutRef<'div'> {
    * hang a transition off `data-level`, where the mechanism is visible.
    */
   level?: 1 | 2;
+
+  /**
+   * Which way the last move went, from `useLeftNavLevels`.
+   *
+   * Drives an 8px slip in the direction of travel. Omit it and the list simply
+   * appears, which is what a panel that never changes level should do.
+   */
+  direction?: 'forward' | 'back' | null;
+
+  /**
+   * A name for the view being shown, so React remounts on a change.
+   *
+   * `level` is not enough on its own: moving between two second-level sections
+   * leaves it at 2, and without a remount the animation never replays.
+   * `useLeftNavLevels` reports one as `viewKey`.
+   */
+  viewKey?: string | number;
 }
 
 export interface LeftNavSectionProps extends Omit<ComponentPropsWithoutRef<'div'>, 'title'> {

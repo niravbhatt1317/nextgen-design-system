@@ -406,7 +406,7 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  * implied by a prop that appears to do it.
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
-  ({ className, level = 1, children, onScroll, ...props }, ref) => {
+  ({ className, level = 1, direction = null, viewKey, children, onScroll, ...props }, ref) => {
     const { atTop, atBottom, report, pinned } = useContext(LeftNavScroll);
     const scroller = useRef<HTMLDivElement | null>(null);
     // How far through the fold the wheel has taken us. A ref rather than state
@@ -526,8 +526,28 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
             8px on top, so a group heading still sits 16px below the search
             where it always did. The section header undoes it with a negative
             margin to reach the 8px it wants; nothing else has to know.
+
+            Keyed, so the subtree is torn down and rebuilt on a change of view -
+            a CSS animation on a node that was only re-rendered has already
+            played and will not play again.
           */}
-          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-1 mdt-pt-2">{children}</div>
+          <div
+            key={viewKey ?? level}
+            className={cn(
+              'mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-1 mdt-pt-2',
+              // 8px of travel in the direction you went: right on the way in,
+              // left on the way back, so going back reads as undo rather than
+              // as another step forward. The header above does not move - it is
+              // the fixed thing the list changes underneath.
+              direction === 'forward' && 'mdt-animate-nav-in-from-right',
+              direction === 'back' && 'mdt-animate-nav-in-from-left',
+              // Anyone who has asked for less movement keeps the fade and loses
+              // the travel. The change still registers; it just does not slide.
+              direction !== null && 'motion-reduce:mdt-animate-fade-in'
+            )}
+          >
+            {children}
+          </div>
         </div>
 
         {/*

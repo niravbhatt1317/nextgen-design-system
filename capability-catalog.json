@@ -3758,8 +3758,8 @@
       "area": "LeftNav",
       "summary": "The part that scrolls, and the only part that changes with the level.",
       "doc": "The part that scrolls, and the only part that changes with the level. **It does not animate the move, and `level` is not doing it secretly.** The first version keyed the inner element on the level, on the assumption that a changed key remounts the subtree and restarts a CSS animation. It does not: measured, React reuses the same DOM node and swaps the contents, so the key bought nothing and the comment explaining it was false. `level` is published as `data-level` instead. A product that wants the panel to slide can drive it from there, where the mechanism is visible rather than implied by a prop that appears to do it.",
-      "props": ["level"],
-      "propDocs": "Which level is showing. Published as `data-level`, and nothing else. The component does not animate the move. A product that wants it to can hang a transition off `data-level`, where the mechanism is visible."
+      "props": ["level", "direction", "viewKey"],
+      "propDocs": "Which level is showing. Published as `data-level`, and nothing else. The component does not animate the move. A product that wants it to can hang a transition off `data-level`, where the mechanism is visible. Which way the last move went, from `useLeftNavLevels`. Drives an 8px slip in the direction of travel. Omit it and the list simply appears, which is what a panel that never changes level should do. A name for the view being shown, so React remounts on a change. `level` is not enough on its own: moving between two second-level sections leaves it at 2, and without a remount the animation never replays. `useLeftNavLevels` reports one as `viewKey`."
     },
     {
       "name": "LeftNavExit",
