@@ -577,8 +577,11 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
             // margin sits outside the sticky box, so it scrolls away the moment
             // the header pins and the next row arrives at the heading's chin -
             // 2px of clear space, measured. Padding is inside the box and stays.
+            //
+            // 10px of it, which measures 12px clear: the heading's line box is
+            // 2px taller than the text it holds.
             'mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-items-center mdt-gap-1',
-            'mdt-pb-4 mdt-pt-2',
+            'mdt-pb-2.5 mdt-pt-2',
             'mdt-bg-neutral-10 dark:mdt-bg-neutral-150'
           )}
         >
@@ -607,7 +610,12 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           read - the rows below it are. At medium weight in full black it
           out-shouted every one of them.
         */}
-          <h2 className="mdt-truncate mdt-text-sm mdt-font-normal mdt-text-muted-foreground">
+          {/*
+          The same ink as a group heading. Both are labels for a run of rows
+          rather than rows themselves, and two different greys for the same job
+          is the kind of thing nobody can name and everybody can see.
+        */}
+          <h2 className="mdt-truncate mdt-text-sm mdt-font-normal mdt-text-muted-foreground/70">
             {title}
           </h2>
 
