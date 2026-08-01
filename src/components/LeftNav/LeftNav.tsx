@@ -359,7 +359,7 @@ const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
 
     return (
       <div
-        className="mdt-shrink-0 mdt-px-3 mdt-pb-3 mdt-pt-1"
+        className="mdt-shrink-0 mdt-px-3 mdt-pb-3"
         // Room on the right for the disc to land in. It rises on its own as the
         // row above collapses - that is layout, not a transform - and only the
         // width has to be animated.
@@ -403,20 +403,25 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
   ({ className, level = 1, children, onScroll, ...props }, ref) => {
-    const { atTop, atBottom, report, pinned, progress } = useContext(LeftNavScroll);
+    const { atTop, atBottom, report, pinned } = useContext(LeftNavScroll);
     const scroller = useRef<HTMLDivElement | null>(null);
+    // How far through the fold the wheel has taken us. A ref rather than state
+    // because the listener that writes it is native and runs on every notch.
+    const folded = useRef(0);
 
     const measure = useCallback(
       (element: HTMLDivElement) => {
         const { scrollTop, scrollHeight, clientHeight } = element;
         // A list barely taller than the panel can scroll 20px and no further,
         // which left the header stopped a third of the way through folding -
-        // the disc parked in the middle of nowhere and staying there. The
+        // the tile parked in the middle of nowhere and staying there. The
         // header only folds when there is enough scroll to finish the job.
         const room = scrollHeight - clientHeight;
         report({
-          progress:
-            room < COLLAPSE_DISTANCE ? 0 : Math.min(1, Math.max(0, scrollTop / COLLAPSE_DISTANCE)),
+          // The wheel drives the fold; this only reads it back. Scrolling by
+          // any other means - a keyboard, a dragged scrollbar - folds it at
+          // once, rather than leaving it half open with no way to finish.
+          progress: room < COLLAPSE_DISTANCE ? 0 : scrollTop > 0 ? 1 : folded.current,
           atTop: scrollTop <= 0,
           // A pixel of slack: sub-pixel layout means the sum rarely lands
           // exactly on the height, and without it the bottom fade never quite
@@ -434,6 +439,49 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
       if (scroller.current) measure(scroller.current);
     }, [children, measure]);
 
+    /**
+     * The header folds first, and the list waits its turn.
+     *
+     * The rows have to travel up by the 44px the header gives back - that space
+     * is being reclaimed, and nothing can hold them still without opening a
+     * 44px hole where the row used to be. What they must not do is *scroll*
+     * while it happens: a row disappearing under the search before the search
+     * has finished arriving is the thing that reads as broken.
+     *
+     * So the first 56px of wheel are spent on the fold and never reach the
+     * list. Once it is folded the wheel goes through untouched, and at the top
+     * of the list an upward wheel unfolds it again before the list can move.
+     *
+     * A native listener because React registers `wheel` as passive, and a
+     * passive listener cannot call `preventDefault` - which is the whole
+     * mechanism.
+     */
+    useEffect(() => {
+      const node = scroller.current;
+      if (!node) return undefined;
+
+      const onWheel = (event: WheelEvent) => {
+        const room = node.scrollHeight - node.clientHeight;
+        if (room < COLLAPSE_DISTANCE) return;
+
+        const down = event.deltaY > 0;
+        const folding = down ? folded.current < 1 : node.scrollTop <= 0 && folded.current > 0;
+        if (!folding) return;
+
+        event.preventDefault();
+        folded.current = Math.min(
+          1,
+          Math.max(0, folded.current + event.deltaY / COLLAPSE_DISTANCE)
+        );
+        measure(node);
+      };
+
+      node.addEventListener('wheel', onWheel, { passive: false });
+      return () => {
+        node.removeEventListener('wheel', onWheel);
+      };
+    }, [measure]);
+
     // A new level starts at its top.
     //
     // Without this you arrive in a section already scrolled, at whatever
@@ -444,6 +492,7 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
       const node = scroller.current;
       if (!node) return;
       node.scrollTop = 0;
+      folded.current = 0;
       measure(node);
     }, [level, measure]);
 
@@ -469,21 +518,7 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
           className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
           {...props}
         >
-          {/*
-            Padded by exactly what the header gives up.
-
-            Without this the list moves twice as you scroll: once because you
-            scrolled it, and again because the row above collapsed and pulled
-            everything up by another 44px. It read as the list bolting. Now the
-            header folds against this padding and the rows travel at the speed
-            of the wheel, which is the only speed anybody expects.
-          */}
-          <div
-            className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-1"
-            style={{ paddingTop: `${String(4 + progress * EXIT_HEIGHT)}px` }}
-          >
-            {children}
-          </div>
+          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
         </div>
 
         {/*

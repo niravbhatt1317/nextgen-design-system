@@ -339,7 +339,7 @@ describe('LeftNav', () => {
       </LeftNav>
     );
 
-    it('stays put - the disc never travels', () => {
+    it('stays put - the tile never travels', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
       const home = screen.getByRole('button', { name: 'Go to home' });
@@ -360,21 +360,72 @@ describe('LeftNav', () => {
 
       expect(wrapper.style.height).toBe('56px');
       scrollTo(scroller, 56);
-      // Only the 12px of padding left: the search is on the home row now.
+      // Only the 12px of gutter left: the search is on the home row now.
       expect(wrapper.style.height).toBe('12px');
     });
 
-    it('goes halfway at half the distance, and comes back', () => {
+    /** A wheel notch, which is what actually drives the fold. */
+    const wheel = (scroller: HTMLElement, deltaY: number, scrollTop = 0) => {
+      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
+      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', { value: scrollTop, configurable: true });
+      fireEvent.wheel(scroller, { deltaY });
+    };
+
+    it('spends the first wheel on the fold, and never on the list', () => {
       const { container } = render(panel);
       const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const home = screen.getByRole('button', { name: 'Go to home' });
-      const wrapper = home.parentElement as HTMLElement;
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
 
-      scrollTo(scroller, 28);
+      // Half a fold's worth of wheel: the header is halfway and the list has
+      // not been asked to move. A row sliding under the search before the
+      // search has finished arriving is the thing that reads as broken.
+      wheel(scroller, 28);
       expect(wrapper.style.height).toBe('34px');
-      // Reversing is the half people notice.
-      scrollTo(scroller, 0);
+      wheel(scroller, 28);
+      expect(wrapper.style.height).toBe('12px');
+    });
+
+    it('unfolds on the way back up before the list moves', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
+
+      wheel(scroller, 56);
+      expect(wrapper.style.height).toBe('12px');
+      // At the top of the list, an upward wheel is spent on the header.
+      wheel(scroller, -56, 0);
       expect(wrapper.style.height).toBe('56px');
+    });
+
+    it('lets the wheel through once the header is folded', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const onWheel = vi.fn();
+      scroller.addEventListener('wheel', onWheel);
+
+      wheel(scroller, 56);
+      const [folding] = onWheel.mock.calls.at(-1) as [WheelEvent];
+      expect(folding.defaultPrevented).toBe(true);
+
+      wheel(scroller, 56, 100);
+      const [through] = onWheel.mock.calls.at(-1) as [WheelEvent];
+      // Nothing intercepted: the list scrolls the way lists scroll.
+      expect(through.defaultPrevented).toBe(false);
+    });
+
+    it('folds at once for a keyboard or a dragged scrollbar', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const wrapper = screen.getByRole('button', { name: 'Go to home' })
+        .parentElement as HTMLElement;
+
+      // No wheel involved. Half a header with no way to finish it is worse
+      // than a folded one.
+      scrollTo(scroller, 120);
+      expect(wrapper.style.height).toBe('12px');
     });
 
     it('never folds further than it can unfold', () => {
