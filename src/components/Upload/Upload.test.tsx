@@ -501,3 +501,54 @@ describe('Upload · driving a sender', () => {
     expect(signal?.aborted).toBe(true);
   });
 });
+
+describe('Upload · the buttons on top of a picture', () => {
+  const withImage = (extra = {}) =>
+    render(
+      <Upload
+        kind="image"
+        defaultItems={[{ id: 'i1', name: 'logo.png', status: 'done', previewUrl: 'data:,x' }]}
+        {...extra}
+      />
+    );
+
+  it('puts the actions above the picture rather than trusting paint order', () => {
+    const { container } = withImage();
+    const img = container.querySelector('[data-slot="upload-preview"] img');
+    const overlay = container.querySelector('[data-slot="upload-preview"] > div');
+    expect(img).toHaveClass('mdt-z-0');
+    expect(overlay).toHaveClass('mdt-z-10');
+  });
+
+  it('does not let invisible buttons swallow a click on the picture', () => {
+    const { container } = withImage();
+    const overlay = container.querySelector('[data-slot="upload-preview"] > div');
+    expect(overlay).toHaveClass('mdt-pointer-events-none');
+    expect(overlay).toHaveClass('group-hover:mdt-pointer-events-auto');
+    // and a keyboard, which never hovers, still reaches them
+    expect(overlay).toHaveClass('focus-within:mdt-pointer-events-auto');
+  });
+
+  it('moves the edge as well as the fill, because the fill is competing with a photo', () => {
+    withImage();
+    const change = screen.getByRole('button', { name: 'Change image' });
+    expect(change).toHaveClass('mdt-shadow-sm');
+    expect(change).toHaveClass('hover:mdt-border-neutral-100');
+    expect(change).toHaveClass('hover:mdt-bg-muted');
+  });
+
+  it('removes the picture when Remove is pressed, with no state of your own', () => {
+    const { container } = withImage();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image' }));
+    expect(container.querySelector('[data-slot="upload-preview"]')).not.toBeInTheDocument();
+    expect(container.querySelector(BOX)).toBeInTheDocument();
+  });
+
+  it('opens the picker when Change is pressed', () => {
+    withImage();
+    const input = document.querySelector('input[type=file]') as HTMLInputElement;
+    const opened = vi.spyOn(input, 'click');
+    fireEvent.click(screen.getByRole('button', { name: 'Change image' }));
+    expect(opened).toHaveBeenCalled();
+  });
+});

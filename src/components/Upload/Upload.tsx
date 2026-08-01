@@ -96,6 +96,28 @@ const ACTION_LOOK = cn(
 );
 
 /**
+ * The same button, but standing on a photograph.
+ *
+ * On a plain field a pale fill going one step paler is a perfectly good hover.
+ * Over a blurred picture it is invisible - the picture is already every colour,
+ * so a two-percent change in a button sitting on it registers as nothing, and
+ * the button reads as decoration you cannot press.
+ *
+ * So it gets a shadow, which gives it a ground of its own to change against,
+ * and the hover moves the **edge** as well as the fill. Two cues, because one
+ * of them is competing with whatever the picture happens to be.
+ */
+const OVERLAY_ACTION = cn(
+  'mdt-inline-flex mdt-h-9 mdt-items-center mdt-gap-2 mdt-px-4',
+  'mdt-rounded-md mdt-border mdt-border-input mdt-bg-background',
+  'mdt-text-sm mdt-font-medium mdt-text-foreground mdt-shadow-sm',
+  'mdt-transition-[background-color,border-color,box-shadow] mdt-duration-150',
+  'hover:mdt-border-neutral-100 hover:mdt-bg-muted hover:mdt-shadow-md',
+  'dark:hover:mdt-border-neutral-40',
+  'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-2'
+);
+
+/**
  * Which failures are worth offering a Retry for.
  *
  * A row saying "Storage full" or "Blocked by scan" gets the cross alone.
@@ -437,13 +459,25 @@ function UploadImagePreview({ item, minHeight, onChange, onRemove }: UploadImage
       )}
       style={{ minHeight, height: minHeight }}
     >
+      {/*
+        The picture is pinned to the bottom layer and the actions to the one
+        above it. Paint order alone would do it here, but `blur()` promotes the
+        image to its own compositing layer, and leaving two positioned siblings
+        to argue about who is on top is the kind of thing that behaves in one
+        browser and not the next. Say it once, explicitly.
+      */}
       <img
         src={item.previewUrl}
         alt={item.name}
-        className="mdt-absolute mdt-inset-5 mdt-h-[calc(100%-40px)] mdt-w-[calc(100%-40px)] mdt-rounded-sm mdt-object-contain mdt-transition-[filter] mdt-duration-200 group-hover:mdt-blur-[5px]"
+        className="mdt-absolute mdt-inset-5 mdt-z-0 mdt-h-[calc(100%-40px)] mdt-w-[calc(100%-40px)] mdt-rounded-sm mdt-object-contain mdt-transition-[filter] mdt-duration-200 group-hover:mdt-blur-[5px]"
       />
-      <div className="mdt-absolute mdt-inset-0 mdt-flex mdt-items-center mdt-justify-center mdt-gap-3 mdt-opacity-0 mdt-transition-opacity mdt-duration-150 focus-within:mdt-opacity-100 group-hover:mdt-opacity-100">
-        <button type="button" onClick={onChange} className={ACTION_LOOK}>
+      {/*
+        `pointer-events-none` while it is invisible. Without it two buttons you
+        cannot see still cover the middle of the picture and swallow the click
+        that was meant for it.
+      */}
+      <div className="mdt-pointer-events-none mdt-absolute mdt-inset-0 mdt-z-10 mdt-flex mdt-items-center mdt-justify-center mdt-gap-3 mdt-opacity-0 mdt-transition-opacity mdt-duration-150 focus-within:mdt-pointer-events-auto focus-within:mdt-opacity-100 group-hover:mdt-pointer-events-auto group-hover:mdt-opacity-100">
+        <button type="button" onClick={onChange} className={OVERLAY_ACTION}>
           <Icon name="upload" size="sm" />
           Change image
         </button>
@@ -453,9 +487,10 @@ function UploadImagePreview({ item, minHeight, onChange, onRemove }: UploadImage
             onRemove?.(item.id);
           }}
           className={cn(
-            'mdt-inline-flex mdt-h-9 mdt-items-center mdt-gap-2 mdt-rounded-md mdt-border mdt-px-4 mdt-text-sm mdt-font-medium',
-            'mdt-border-destructive mdt-bg-background mdt-text-destructive',
-            'hover:mdt-bg-red-10 dark:mdt-border-red-30 dark:mdt-text-red-30 dark:hover:mdt-bg-red-90'
+            OVERLAY_ACTION,
+            'mdt-border-destructive mdt-text-destructive',
+            'hover:mdt-border-red-70 hover:mdt-bg-red-10',
+            'dark:mdt-border-red-30 dark:mdt-text-red-30 dark:hover:mdt-border-red-20 dark:hover:mdt-bg-red-90'
           )}
         >
           <Icon name="trash-2" size="sm" />

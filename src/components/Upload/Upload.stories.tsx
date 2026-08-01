@@ -350,13 +350,19 @@ export const FieldError: Story = {
   ),
 };
 
-/** A picture is worth a frame, so the 180px stays and the image sits 20px in from every side. */
+/**
+ * A picture is worth a frame, so the 180px stays and the image sits 20px in from
+ * every side.
+ *
+ * This one starts with a logo already in it, and **it works** - hover the
+ * picture, then press Change or Remove.
+ */
 export const OneImage: Story = {
   args: {
     kind: 'image',
     accept: 'image/*',
     hint: 'company-logo.svg · 48 KB · PNG, JPG or SVG up to 2 MB',
-    items: [
+    defaultItems: [
       {
         id: '1',
         name: 'company-logo.svg',
@@ -379,7 +385,8 @@ export const OneImage: Story = {
       <Upload {...args} />
       <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
         Hover the picture: it blurs and offers Change and Remove. The blur is the whole treatment -
-        no dark panel over the top.
+        no dark panel over the top. Both buttons work: Remove clears the field, Change opens the
+        picker.
       </p>
     </div>
   ),
