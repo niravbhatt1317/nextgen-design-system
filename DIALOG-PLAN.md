@@ -10,7 +10,12 @@ and written into both components — see their JSDoc.
 
 ## 0 · The opening is broken — fix this first
 
-- [ ] **The dialog animates in from the wrong place and snaps to centre.**
+- [x] **The dialog animates in from the wrong place and snaps to centre.** ✅
+
+      Measured before and after, in a browser: the dialog sat **256px right and 119px down**
+      of centre for the first ~180ms and then snapped. 256 is half of `max-w-lg`, 119 is half
+      its height — the box hanging by its own top-left corner at the viewport centre, which is
+      exactly what a clobbered `translate(-50%, -50%)` does. Worst drift is now **0px**.
 
 **Cause, confirmed in the source rather than guessed.** `DialogContent` centres itself with a
 transform:
@@ -40,9 +45,13 @@ nothing to clobber.
 child leaves `transform` free for the animation, and pays for itself twice over: it gives padding
 against the viewport edge on small screens, and a place for a tall dialog to scroll.
 
-- [ ] Fix `Command` the same way, or log it in PLAN.md if it is out of scope here.
-- [ ] A test that would have caught it — the animation must not be the only thing setting
-      `transform` on a centred element.
+- [x] Fix `Command` the same way. ✅ It centres with a transform but has no animation, so it
+      never jolted — it was one `animate-*` class away from it.
+- [ ] `CommandDialog` is not a dialog: no portal, no focus trap, no escape, no overlay dismiss.
+      Out of scope here, logged in PLAN.md.
+- [x] A test that would have caught it. ✅ Three of them: nothing may carry both a `translate-*`
+      and an `animate-*` class, the centring belongs to a parent, and the dialog keeps `p-4`
+      off the edge of a small screen.
 
 ---
 
@@ -56,7 +65,8 @@ against the viewport edge on small screens, and a place for a tall dialog to scr
 - [ ] **Stacked.** A confirm over a form. There is already a `NestedDialogs` story, so it has been
       tried — decide whether it is supported or a trap, and make the answer true in the code.
 - [ ] **Small screens.** Panel and Workspace become full-screen below a breakpoint, or they are
-      unusable. Falls out of the fix in §0.
+      unusable. Half of this landed with §0 — the dialog is now inset by 16px and scrolls when it
+      is taller than the viewport, instead of growing past it.
 - [ ] **⌘↵ to submit**, with the hint rendered in the button, as Conductor does.
 
 ---

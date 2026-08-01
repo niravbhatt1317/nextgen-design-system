@@ -242,3 +242,13 @@ Not oversights. Recorded so nobody re-raises them.
 - **If a token you need does not exist, stop and say so.** Do not hardcode, do not approximate with a
   nearby token, and never add a colour.
 - **Look at it in a real browser, in both themes.** Tests pass while pixels are wrong.
+
+## `CommandDialog` is not a dialog
+
+It renders its own fixed overlay and a centred box by hand: no portal, no focus trap, no escape
+key, no overlay dismiss, and nothing that returns focus to whatever opened it. A command palette
+is one of the few surfaces where all of that matters, since it is opened by keyboard and dismissed
+by keyboard.
+
+Its centring was fixed alongside `Dialog` (1 Aug 2026) so it cannot inherit the transform bug, but
+the component still needs rebuilding on the same Radix primitive `Dialog` uses.

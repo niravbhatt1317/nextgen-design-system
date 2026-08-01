@@ -150,36 +150,54 @@ const DialogContent = forwardRef<
 >(({ className, children, showCloseButton = true, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'mdt-fixed mdt-left-[50%] mdt-top-[50%] mdt-z-50',
-        'mdt-grid mdt-w-full mdt-max-w-lg mdt-translate-x-[-50%] mdt-translate-y-[-50%]',
-        'mdt-gap-4 mdt-border mdt-border-border mdt-bg-background mdt-p-6 mdt-shadow-lg',
-        'mdt-duration-200 mdt-ease-in-out',
-        'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
-        'sm:mdt-rounded-lg',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {showCloseButton && (
-        <DialogPrimitive.Close
+    {/*
+      Centred by layout, not by a transform.
+
+      It used to sit at `left: 50%; top: 50%` and pull itself back with
+      `translate(-50%, -50%)` - and the open animation's keyframe sets
+      `transform: scale(0.95)`. A keyframe's transform *replaces* the element's,
+      so for those 200ms the centring did not exist: the box hung with its own
+      top-left corner at the middle of the screen, down and to the right of
+      where it belonged, and snapped into place when the animation ended. That
+      was the jolt on every open, and the same on close.
+
+      Centring with a flex parent leaves `transform` free for the animation, and
+      pays for itself twice more: `p-4` keeps the dialog off the edge of a small
+      screen, and `overflow-y-auto` with `min-h-full` gives a tall one somewhere
+      to scroll instead of growing past the viewport.
+    */}
+    <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto mdt-p-4">
+      <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
+        <DialogPrimitive.Content
+          ref={ref}
           className={cn(
-            'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
-            'mdt-ring-offset-background mdt-transition-opacity',
-            'hover:mdt-opacity-100',
-            'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-            'disabled:mdt-pointer-events-none',
-            'data-[state=open]:mdt-bg-accent data-[state=open]:mdt-text-muted-foreground'
+            'mdt-relative mdt-grid mdt-w-full mdt-max-w-lg',
+            'mdt-gap-4 mdt-rounded-lg mdt-border mdt-border-border mdt-bg-background mdt-p-6 mdt-shadow-lg',
+            'mdt-duration-200 mdt-ease-in-out',
+            'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
+            className
           )}
+          {...props}
         >
-          <CloseIcon />
-          <span className="mdt-sr-only">Close</span>
-        </DialogPrimitive.Close>
-      )}
-    </DialogPrimitive.Content>
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              className={cn(
+                'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
+                'mdt-ring-offset-background mdt-transition-opacity',
+                'hover:mdt-opacity-100',
+                'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
+                'disabled:mdt-pointer-events-none',
+                'data-[state=open]:mdt-bg-accent data-[state=open]:mdt-text-muted-foreground'
+              )}
+            >
+              <CloseIcon />
+              <span className="mdt-sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </div>
+    </div>
   </DialogPortal>
 ));
 DialogContent.displayName = 'DialogContent';

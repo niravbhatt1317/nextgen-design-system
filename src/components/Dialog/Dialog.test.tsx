@@ -288,4 +288,51 @@ describe('Dialog', () => {
       });
     });
   });
+
+  describe('how it is centred', () => {
+    const open = (
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle>Centred</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+
+    it('does not put a transform and an animation on the same element', () => {
+      render(open);
+      const content = screen.getByRole('dialog');
+      const classes = content.getAttribute('class') ?? '';
+
+      // The bug this guards: the dialog used to centre itself with
+      // `translate(-50%, -50%)` and animate with a keyframe whose `from` sets
+      // `transform: scale(0.95)`. A keyframe's transform *replaces* the
+      // element's, so for 200ms the centring did not exist - the box hung with
+      // its own top-left corner at the middle of the screen and snapped into
+      // place when the animation ended.
+      //
+      // Anything that animates must leave `transform` alone.
+      expect(classes).toContain('mdt-animate-zoom-in');
+      expect(classes).not.toMatch(/mdt-translate-[xy]/);
+    });
+
+    it('is centred by a parent instead', () => {
+      const { baseElement } = render(open);
+      const content = screen.getByRole('dialog');
+      const centring = content.parentElement;
+
+      expect(centring?.className).toContain('mdt-items-center');
+      expect(centring?.className).toContain('mdt-justify-center');
+      // `min-h-full` inside a scrolling parent: a dialog taller than the
+      // viewport scrolls rather than being centred past its own top edge.
+      expect(centring?.className).toContain('mdt-min-h-full');
+      expect(centring?.parentElement?.className).toContain('mdt-overflow-y-auto');
+      expect(baseElement).toBeTruthy();
+    });
+
+    it('keeps the dialog off the edge of a small screen', () => {
+      render(open);
+      const scroller = screen.getByRole('dialog').parentElement?.parentElement;
+      expect(scroller?.className).toContain('mdt-p-4');
+    });
+  });
 });
