@@ -9,6 +9,7 @@ import {
   LeftNavBody,
   LeftNavExit,
   LeftNavFooter,
+  LeftNavExpandable,
   LeftNavGroup,
   LeftNavItem,
   LeftNavSearch,
@@ -32,30 +33,44 @@ interface Page {
   icon: IconName;
   group?: string;
   disabled?: boolean;
+  /** Pages of its own. Folds open in place - it never becomes a third level. */
+  pages?: { key: string; label: string }[];
 }
 
 interface Entry {
   key: string;
   label: string;
   icon: IconName;
+  /** Which block of the root list it belongs to. */
+  group: string;
   meta?: string;
   pages?: Page[];
 }
 
 /** The root list. Anything with `pages` opens a second level instead of a page. */
 const SETTINGS: Entry[] = [
-  { key: 'general', label: 'General', icon: 'settings' },
-  { key: 'members', label: 'Members', icon: 'users' },
-  { key: 'notifications', label: 'Notifications', icon: 'bell' },
+  { key: 'general', label: 'General', icon: 'settings', group: 'Workspace' },
+  { key: 'members', label: 'Members', icon: 'users', group: 'Workspace' },
+  { key: 'notifications', label: 'Notifications', icon: 'bell', group: 'Personal' },
   {
     key: 'observability',
     label: 'Observability',
     icon: 'activity',
+    group: 'Platform',
     pages: [
       { key: 'overview', label: 'Overview', icon: 'layout-grid' },
       { key: 'query', label: 'Query', icon: 'line-chart' },
       { key: 'notebooks', label: 'Notebooks', icon: 'book-open' },
-      { key: 'alerts', label: 'Alerts', icon: 'alert-triangle' },
+      {
+        key: 'alerts',
+        label: 'Alerts',
+        icon: 'alert-triangle',
+        pages: [
+          { key: 'alert-rules', label: 'Rules' },
+          { key: 'alert-channels', label: 'Channels' },
+          { key: 'alert-history', label: 'History' },
+        ],
+      },
       { key: 'functions', label: 'Functions', icon: 'function-square', group: 'Compute' },
       { key: 'agent-runs', label: 'Agent runs', icon: 'workflow', group: 'Compute' },
       { key: 'sandboxes', label: 'Sandboxes', icon: 'terminal', group: 'Compute' },
@@ -65,12 +80,13 @@ const SETTINGS: Entry[] = [
       { key: 'origins', label: 'External origins', icon: 'shuffle', group: 'CDN', disabled: true },
     ],
   },
-  { key: 'security', label: 'Security', icon: 'shield' },
-  { key: 'domains', label: 'Domains', icon: 'globe' },
+  { key: 'security', label: 'Security', icon: 'shield', group: 'Personal' },
+  { key: 'domains', label: 'Domains', icon: 'globe', group: 'Platform' },
   {
     key: 'integrations',
     label: 'Integrations',
     icon: 'puzzle',
+    group: 'Platform',
     meta: 'Beta',
     pages: [
       { key: 'installed', label: 'Installed', icon: 'package' },
@@ -80,8 +96,11 @@ const SETTINGS: Entry[] = [
       { key: 'oauth', label: 'OAuth apps', icon: 'lock', group: 'Developer' },
     ],
   },
-  { key: 'billing', label: 'Billing', icon: 'credit-card' },
+  { key: 'billing', label: 'Billing', icon: 'credit-card', group: 'Workspace' },
 ];
+
+/** The root list's blocks, in the order they are shown. */
+const ROOT_GROUPS = ['Personal', 'Workspace', 'Platform'];
 
 /** The groups a section's pages fall into, in the order they first appear. */
 const groupsOf = (pages: Page[]) => {
@@ -105,10 +124,10 @@ const groupsOf = (pages: Page[]) => {
  * way out, and the second level needs a way up, and two back arrows in one
  * panel is a coin toss. They are separated on every axis at once:
  *
- * | | Back to app | Observability |
+ * | | Go to home | Observability |
  * | --- | --- | --- |
  * | Where | above the search, never moves | below it, with the content it belongs to |
- * | Glyph | a long arrow | a chevron |
+ * | Glyph | a house on a raised white disc | a flat chevron |
  * | Says | the destination | where you are |
  * | Weight | small, muted, chrome | a heading |
  *
@@ -144,7 +163,7 @@ export const Settings: Story = {
     return (
       <div className="mdt-flex mdt-h-screen mdt-bg-muted/30">
         <LeftNav>
-          <LeftNavExit onClick={() => undefined}>Back to app</LeftNavExit>
+          <LeftNavExit onClick={() => undefined} />
           <LeftNavSearch
             value={query}
             onChange={(event) => {
@@ -180,47 +199,75 @@ export const Settings: Story = {
                 ))}
               </LeftNavGroup>
             ) : section === undefined ? (
-              SETTINGS.map((entry) => (
-                <LeftNavItem
-                  key={entry.key}
-                  icon={<Icon name={entry.icon} size="sm" aria-hidden />}
-                  active={current === entry.key}
-                  hasChildren={entry.pages !== undefined}
-                  meta={
-                    entry.meta === undefined ? undefined : (
-                      <Badge tone="info" size="sm" shape="pill">
-                        {entry.meta}
-                      </Badge>
-                    )
-                  }
-                  onClick={() => {
-                    if (entry.pages) levels.open(entry.key);
-                    else setCurrent(entry.key);
-                  }}
-                >
-                  {entry.label}
-                </LeftNavItem>
+              ROOT_GROUPS.map((group) => (
+                <LeftNavGroup key={group} label={group}>
+                  {SETTINGS.filter((entry) => entry.group === group).map((entry) => (
+                    <LeftNavItem
+                      key={entry.key}
+                      icon={<Icon name={entry.icon} size="sm" aria-hidden />}
+                      active={current === entry.key}
+                      hasChildren={entry.pages !== undefined}
+                      meta={
+                        entry.meta === undefined ? undefined : (
+                          <Badge tone="info" size="sm" shape="pill">
+                            {entry.meta}
+                          </Badge>
+                        )
+                      }
+                      onClick={() => {
+                        if (entry.pages) levels.open(entry.key);
+                        else setCurrent(entry.key);
+                      }}
+                    >
+                      {entry.label}
+                    </LeftNavItem>
+                  ))}
+                </LeftNavGroup>
               ))
             ) : (
               <LeftNavSection title={section.label} onBack={levels.back}>
                 {groupsOf(section.pages ?? []).map(({ group, pages }) => (
                   <LeftNavGroup
                     key={group ?? 'ungrouped'}
-                    {...(group === undefined ? {} : { label: group, collapsible: true })}
+                    {...(group === undefined ? {} : { label: group })}
                   >
-                    {pages.map((page) => (
-                      <LeftNavItem
-                        key={page.key}
-                        icon={<Icon name={page.icon} size="sm" aria-hidden />}
-                        active={current === page.key}
-                        disabled={page.disabled ?? false}
-                        onClick={() => {
-                          setCurrent(page.key);
-                        }}
-                      >
-                        {page.label}
-                      </LeftNavItem>
-                    ))}
+                    {pages.map((page) =>
+                      page.pages ? (
+                        // One setting with pages of its own, folding open in
+                        // place. The group heading above it does not fold -
+                        // that would hide the map rather than the detail.
+                        <LeftNavExpandable
+                          key={page.key}
+                          icon={<Icon name={page.icon} size="sm" aria-hidden />}
+                          label={page.label}
+                          defaultOpen={page.pages.some((child) => child.key === current)}
+                        >
+                          {page.pages.map((child) => (
+                            <LeftNavItem
+                              key={child.key}
+                              active={current === child.key}
+                              onClick={() => {
+                                setCurrent(child.key);
+                              }}
+                            >
+                              {child.label}
+                            </LeftNavItem>
+                          ))}
+                        </LeftNavExpandable>
+                      ) : (
+                        <LeftNavItem
+                          key={page.key}
+                          icon={<Icon name={page.icon} size="sm" aria-hidden />}
+                          active={current === page.key}
+                          disabled={page.disabled ?? false}
+                          onClick={() => {
+                            setCurrent(page.key);
+                          }}
+                        >
+                          {page.label}
+                        </LeftNavItem>
+                      )
+                    )}
                   </LeftNavGroup>
                 ))}
               </LeftNavSection>
@@ -260,7 +307,7 @@ export const LeavingVersusGoingUp: Story = {
     return (
       <div className="mdt-flex mdt-h-screen">
         <LeftNav>
-          <LeftNavExit onClick={() => undefined}>Back to app</LeftNavExit>
+          <LeftNavExit onClick={() => undefined} />
           <LeftNavSearch />
           <LeftNavBody level={2}>
             <LeftNavSection title="Observability" onBack={() => undefined}>
@@ -287,14 +334,19 @@ export const LeavingVersusGoingUp: Story = {
 };
 
 /**
- * Groups: a plain heading, or one that folds.
+ * Group headings, and the one thing that folds.
  *
- * A control that hides four rows costs a click and saves nothing, so a static
- * heading is the default. `collapsible` is for a group long enough that
- * scrolling past it is the problem — and once a group can close, its children
- * carry a guide line, because you need to see where it ends.
+ * **A heading never folds.** "Workspace" labels a run of settings; hiding it
+ * takes away the map rather than the detail, and a control that hides four rows
+ * costs a click and saves nothing.
+ *
+ * **A setting with pages of its own does.** *Voice* is one setting; its three
+ * pages belong to it, and folding them hides detail you asked for rather than
+ * the structure you navigate by. It carries a chevron that turns downward,
+ * where an item opening a second level carries one pointing sideways — two
+ * different promises, two different glyphs.
  */
-export const Groups: Story = {
+export const GroupsAndExpanding: Story = {
   render: () => (
     <div className="mdt-flex mdt-h-screen">
       <LeftNav>
@@ -308,17 +360,19 @@ export const Groups: Story = {
             </LeftNavItem>
           </LeftNavGroup>
 
-          <LeftNavGroup label="Workspace" collapsible>
+          <LeftNavGroup label="Workspace">
             <LeftNavItem icon={<Icon name="users" size="sm" aria-hidden />}>Members</LeftNavItem>
-            <LeftNavItem icon={<Icon name="shield" size="sm" aria-hidden />}>Security</LeftNavItem>
+            <LeftNavExpandable
+              icon={<Icon name="mic" size="sm" aria-hidden />}
+              label="Voice"
+              defaultOpen
+            >
+              <LeftNavItem>Voice agent</LeftNavItem>
+              <LeftNavItem>Text to speech</LeftNavItem>
+              <LeftNavItem>Speech to text</LeftNavItem>
+            </LeftNavExpandable>
             <LeftNavItem icon={<Icon name="credit-card" size="sm" aria-hidden />}>
               Billing
-            </LeftNavItem>
-          </LeftNavGroup>
-
-          <LeftNavGroup label="Archived" collapsible defaultOpen={false}>
-            <LeftNavItem icon={<Icon name="archive" size="sm" aria-hidden />}>
-              Old project
             </LeftNavItem>
           </LeftNavGroup>
         </LeftNavBody>

@@ -54,19 +54,16 @@ export interface LeftNavSectionProps extends Omit<ComponentPropsWithoutRef<'div'
 export interface LeftNavGroupProps extends ComponentPropsWithoutRef<'div'> {
   /** The heading above the group. Omit it for an unlabelled block. */
   label?: ReactNode;
+}
 
-  /**
-   * Lets the group fold away.
-   *
-   * For a handful of items a plain heading is better: a control that hides four
-   * things costs a click and saves nothing. Reach for this when a group is long
-   * enough that scrolling past it is the problem.
-   *
-   * @default false
-   */
-  collapsible?: boolean;
+export interface LeftNavExpandableProps extends Omit<ComponentPropsWithoutRef<'div'>, 'onChange'> {
+  /** The glyph on the trigger row. */
+  icon?: ReactNode;
 
-  /** Whether a collapsible group starts open. @default true */
+  /** The setting's name. */
+  label: ReactNode;
+
+  /** Whether it starts open. @default false */
   defaultOpen?: boolean;
 
   /** Controlled open state. Pass `onOpenChange` with it. */

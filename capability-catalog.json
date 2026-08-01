@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 759,
+  "capabilityCount": 760,
   "counts": {
     "story": 558,
-    "component": 180,
+    "component": 181,
     "utility": 9,
     "hook": 12
   },
@@ -2974,12 +2974,12 @@
       "propDocs": ""
     },
     {
-      "name": "Groups",
+      "name": "GroupsAndExpanding",
       "kind": "story",
       "file": "src/components/LeftNav/LeftNav.stories.tsx",
       "area": "LeftNav",
-      "summary": "Story: Components/LeftNav / Groups",
-      "doc": "Components/LeftNav Groups",
+      "summary": "Story: Components/LeftNav / GroupsAndExpanding",
+      "doc": "Components/LeftNav GroupsAndExpanding",
       "props": [],
       "propDocs": ""
     },
@@ -3767,9 +3767,19 @@
       "file": "src/components/LeftNav/LeftNav.tsx",
       "area": "LeftNav",
       "summary": "The way out of settings, back to the app.",
-      "doc": "The way out of settings, back to the app. Above the search and pinned there. It is the only control in the panel that does not change with the level, and it reads as chrome rather than as a nav item: no pill, muted text, a long arrow. **It names where it goes.** \"Back to app\" is a destination; a bare \"Back\" would be indistinguishable from the section back further down, which is the exact confusion this arrangement exists to prevent.",
+      "doc": "The way out of settings, back to the app. **A white disc on a grey panel.** Nothing else in the navigation looks like this: the rows are flat, and this one is a raised object sitting on the surface. That is what separates it from the section back further down - not a different label, a different physics. **A house, not an arrow.** An arrow means \"one step back\" and the section header uses one; a house means the place you started, which is where this actually goes. And it names the destination - \"Go to home\" - because a bare \"Back\" would be the same sentence as the control below it.",
       "props": ["href", "children"],
       "propDocs": "Where it goes. An anchor with one, a button without. The same rule `PaginationLink` follows: leaving settings is usually a real address worth opening in a new tab, and sometimes it is a router call. What it says. Names the destination, never just \"Back\". @default 'Back to app'"
+    },
+    {
+      "name": "LeftNavExpandable",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "One setting that has pages of its own, folding open in place.",
+      "doc": "One setting that has pages of its own, folding open in place. **This is the collapsing thing, not the group heading.** The distinction is the whole point: a group heading labels a run of unrelated settings, while this is one setting whose pages belong to it. Folding the first hides the map; folding the second hides detail you asked for. **A chevron that turns, not one that points sideways.** `LeftNavItem`'s trailing `chevron-right` means \"this opens a second level and the panel will move\". This one points down and rotates, which everywhere else in software means \"this opens underneath\". Two different promises need two different glyphs, or the panel becomes a guessing game.",
+      "props": ["icon", "label", "defaultOpen", "open", "onOpenChange"],
+      "propDocs": "The glyph on the trigger row. The setting's name. Whether it starts open. @default false Controlled open state. Pass `onOpenChange` with it."
     },
     {
       "name": "LeftNavFooter",
@@ -3786,10 +3796,10 @@
       "kind": "component",
       "file": "src/components/LeftNav/LeftNav.tsx",
       "area": "LeftNav",
-      "summary": "A labelled block of items, optionally one that folds away.",
-      "doc": "A labelled block of items, optionally one that folds away. **A plain heading by default.** A control that hides four rows costs a click and saves nothing; `collapsible` is for a group long enough that scrolling past it is the problem. The children of a collapsible group carry a guide line down their left edge, because once a group can be open or shut you need to see where it ends.",
-      "props": ["label", "collapsible", "defaultOpen", "open", "onOpenChange"],
-      "propDocs": "The heading above the group. Omit it for an unlabelled block. Lets the group fold away. For a handful of items a plain heading is better: a control that hides four things costs a click and saves nothing. Reach for this when a group is long enough that scrolling past it is the problem. Whether a collapsible group starts open. @default true Controlled open state. Pass `onOpenChange` with it."
+      "summary": "A labelled block of items.",
+      "doc": "A labelled block of items. A heading, and nothing more. **It does not fold.** The first version let the heading collapse its group, which is the wrong thing to hide behind a control: a heading like \"Compute\" is a label for where you are in a list, and collapsing it takes away the map rather than the detail. What people actually want to fold is one *setting* that has pages of its own - see `LeftNavExpandable`. Two collapsing mechanisms in one panel is one too many, so this one lost.",
+      "props": ["label"],
+      "propDocs": "The heading above the group. Omit it for an unlabelled block."
     },
     {
       "name": "LeftNavItem",

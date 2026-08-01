@@ -5,6 +5,7 @@ export {
   LeftNavBody,
   LeftNavSection,
   LeftNavGroup,
+  LeftNavExpandable,
   LeftNavItem,
   LeftNavFooter,
   leftNavItemVariants,
@@ -17,6 +18,7 @@ export type {
   LeftNavBodyProps,
   LeftNavSectionProps,
   LeftNavGroupProps,
+  LeftNavExpandableProps,
   LeftNavItemProps,
   LeftNavFooterProps,
 } from './LeftNav.types';

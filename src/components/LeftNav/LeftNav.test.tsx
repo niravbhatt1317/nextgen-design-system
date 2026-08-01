@@ -7,6 +7,7 @@ import {
   LeftNavBody,
   LeftNavExit,
   LeftNavFooter,
+  LeftNavExpandable,
   LeftNavGroup,
   LeftNavItem,
   LeftNavSearch,
@@ -88,7 +89,7 @@ describe('LeftNav', () => {
     // the same kind of thing.
     const both = (
       <LeftNav>
-        <LeftNavExit href="/app">Back to app</LeftNavExit>
+        <LeftNavExit href="/app">Go to home</LeftNavExit>
         <LeftNavBody level={2}>
           <LeftNavSection title="Observability" onBack={() => undefined}>
             <LeftNavItem>Overview</LeftNavItem>
@@ -99,7 +100,7 @@ describe('LeftNav', () => {
 
     it('the exit names its destination and is a link when it has one', () => {
       render(both);
-      const exit = screen.getByRole('link', { name: 'Back to app' });
+      const exit = screen.getByRole('link', { name: 'Go to home' });
       expect(exit).toHaveAttribute('href', '/app');
     });
 
@@ -124,7 +125,7 @@ describe('LeftNav', () => {
       const onClick = vi.fn();
       render(<LeftNavExit onClick={onClick} />);
       // Defaults to naming the destination rather than a bare "Back".
-      await user.click(screen.getByRole('button', { name: 'Back to app' }));
+      await user.click(screen.getByRole('button', { name: 'Go to home' }));
       expect(onClick).toHaveBeenCalledTimes(1);
     });
 
@@ -230,42 +231,18 @@ describe('LeftNav', () => {
       expect(screen.getByText('Profile')).toBeInTheDocument();
     });
 
-    it('folds away when it is long enough to be worth it', async () => {
+    it('does not fold, because a heading is the map', async () => {
       const user = userEvent.setup();
       render(
-        <LeftNavGroup label="Workspace" collapsible>
+        <LeftNavGroup label="Workspace">
           <LeftNavItem>Members</LeftNavItem>
         </LeftNavGroup>
       );
-      const toggle = screen.getByRole('button', { name: /Workspace/ });
-      expect(toggle).toHaveAttribute('aria-expanded', 'true');
-      await user.click(toggle);
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
-      expect(screen.queryByText('Members')).not.toBeInTheDocument();
-    });
-
-    it('starts shut when told to', () => {
-      render(
-        <LeftNavGroup label="Archived" collapsible defaultOpen={false}>
-          <LeftNavItem>Old project</LeftNavItem>
-        </LeftNavGroup>
-      );
-      expect(screen.queryByText('Old project')).not.toBeInTheDocument();
-    });
-
-    it('can be driven from outside', async () => {
-      const user = userEvent.setup();
-      const onOpenChange = vi.fn();
-      render(
-        <LeftNavGroup label="Workspace" collapsible open={false} onOpenChange={onOpenChange}>
-          <LeftNavItem>Members</LeftNavItem>
-        </LeftNavGroup>
-      );
-      expect(screen.queryByText('Members')).not.toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: /Workspace/ }));
-      expect(onOpenChange).toHaveBeenCalledWith(true);
-      // Controlled, so it did not move on its own.
-      expect(screen.queryByText('Members')).not.toBeInTheDocument();
+      // Collapsing a heading hides where you are in the list rather than the
+      // detail. What folds is one setting with pages of its own.
+      expect(screen.queryByRole('button', { name: /Workspace/ })).not.toBeInTheDocument();
+      await user.click(screen.getByText('Workspace'));
+      expect(screen.getByText('Members')).toBeVisible();
     });
 
     it('takes an unlabelled block', () => {
@@ -275,6 +252,58 @@ describe('LeftNav', () => {
         </LeftNavGroup>
       );
       expect(screen.getByText('Loose item')).toBeInTheDocument();
+    });
+  });
+
+  describe('a setting that folds open', () => {
+    it('starts shut, and opens in place', async () => {
+      const user = userEvent.setup();
+      render(
+        <LeftNavExpandable label="Voice">
+          <LeftNavItem>Voice agent</LeftNavItem>
+        </LeftNavExpandable>
+      );
+      expect(screen.queryByText('Voice agent')).not.toBeInTheDocument();
+      const trigger = screen.getByRole('button', { name: /Voice/ });
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await user.click(trigger);
+      expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByText('Voice agent')).toBeVisible();
+    });
+
+    it('starts open when told to', () => {
+      render(
+        <LeftNavExpandable label="Voice" defaultOpen>
+          <LeftNavItem>Voice agent</LeftNavItem>
+        </LeftNavExpandable>
+      );
+      expect(screen.getByText('Voice agent')).toBeVisible();
+    });
+
+    it('can be driven from outside', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      render(
+        <LeftNavExpandable label="Voice" open={false} onOpenChange={onOpenChange}>
+          <LeftNavItem>Voice agent</LeftNavItem>
+        </LeftNavExpandable>
+      );
+      await user.click(screen.getByRole('button', { name: /Voice/ }));
+      expect(onOpenChange).toHaveBeenCalledWith(true);
+      // Controlled, so it did not move on its own.
+      expect(screen.queryByText('Voice agent')).not.toBeInTheDocument();
+    });
+
+    it('turns a chevron down, where an item that opens a level points sideways', () => {
+      const { container } = render(
+        <LeftNavExpandable label="Voice">
+          <LeftNavItem>Voice agent</LeftNavItem>
+        </LeftNavExpandable>
+      );
+      // Two different promises need two different glyphs: this one opens
+      // underneath, the other moves the whole panel.
+      expect(container.querySelector('[name="chevron-down"]')).toBeInTheDocument();
+      expect(container.querySelector('[name="chevron-right"]')).not.toBeInTheDocument();
     });
   });
 

@@ -8,6 +8,7 @@ import type {
   LeftNavBodyProps,
   LeftNavExitProps,
   LeftNavFooterProps,
+  LeftNavExpandableProps,
   LeftNavGroupProps,
   LeftNavItemProps,
   LeftNavProps,
@@ -22,18 +23,21 @@ const FOCUS =
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-1 focus-visible:mdt-ring-offset-background';
 
 /**
- * Item states, and why they are grey rather than blue.
+ * How the row you are on is marked.
  *
- * The selected page is a grey pill, not a coloured one. In a settings menu of
- * forty rows the accent colour is needed for the thing you are being asked to
- * notice - a Beta tag, a count, an upgrade - and spending it on "you are here"
- * leaves nothing for any of them. Every reference that holds up at forty rows
- * does the same: Vercel, Linear, Grok. The ones that colour the selection are
- * the ones with eight rows.
+ * **A tinted pill and a bar down its left edge.** The bar is the part that
+ * survives a glance: a fill alone has to be strong enough to spot from the
+ * corner of your eye, and at that strength forty rows of menu turn into a
+ * chessboard. A 2px rule at the leading edge is unmistakable at any tint,
+ * which is why it lets the fill stay quiet.
+ *
+ * It is drawn as a real element rather than a `before:` pseudo-class, so it can
+ * be seen in the DOM and tested. Both use `accent`, the pair the system already
+ * has for a selected surface.
  */
 export const leftNavItemVariants = cva(
   [
-    'mdt-group/nav-item mdt-flex mdt-w-full mdt-items-center mdt-gap-2',
+    'mdt-group/nav-item mdt-relative mdt-flex mdt-w-full mdt-items-center mdt-gap-2',
     ROW,
     'mdt-text-sm mdt-text-foreground mdt-transition-colors',
     FOCUS,
@@ -41,8 +45,12 @@ export const leftNavItemVariants = cva(
   {
     variants: {
       active: {
-        true: 'mdt-bg-secondary mdt-font-medium',
-        false: 'hover:mdt-bg-secondary/60',
+        true: 'mdt-bg-accent mdt-font-medium mdt-text-accent-foreground',
+        // One step darker than the panel, not a weaker accent. A faint tint of
+        // the selected colour reads as "this is nearly selected", and every row
+        // you sweep past claims to be the one you are on. `muted` sits one step
+        // off `secondary` in both themes - darker on white, lighter on black.
+        false: 'hover:mdt-bg-muted',
       },
       disabled: {
         true: 'mdt-pointer-events-none mdt-opacity-50',
@@ -104,7 +112,15 @@ const LeftNav = forwardRef<HTMLElement, LeftNavProps>(
         // A column that owns its height, so the search pins at the top and the
         // footer at the bottom while only the middle scrolls.
         'mdt-flex mdt-h-full mdt-w-64 mdt-shrink-0 mdt-flex-col',
-        'mdt-border-r mdt-border-border mdt-bg-background',
+        // Grey, and the page beside it white. A navigation that matches the
+        // content it sits next to has to be drawn with a border to exist at
+        // all; one that is a shade back from it simply is a different surface,
+        // which is what every reference here does.
+        //
+        // `secondary` rather than `muted` - the lightest grey surface the
+        // system has. `muted` is one step darker and turns the panel into a
+        // slab; the references sit barely off white.
+        'mdt-border-r mdt-border-border mdt-bg-secondary',
         className
       )}
       {...props}
@@ -116,36 +132,43 @@ LeftNav.displayName = 'LeftNav';
 /**
  * The way out of settings, back to the app.
  *
- * Above the search and pinned there. It is the only control in the panel that
- * does not change with the level, and it reads as chrome rather than as a nav
- * item: no pill, muted text, a long arrow.
+ * **A white disc on a grey panel.** Nothing else in the navigation looks like
+ * this: the rows are flat, and this one is a raised object sitting on the
+ * surface. That is what separates it from the section back further down - not a
+ * different label, a different physics.
  *
- * **It names where it goes.** "Back to app" is a destination; a bare "Back"
- * would be indistinguishable from the section back further down, which is the
- * exact confusion this arrangement exists to prevent.
+ * **A house, not an arrow.** An arrow means "one step back" and the section
+ * header uses one; a house means the place you started, which is where this
+ * actually goes. And it names the destination - "Go to home" - because a bare
+ * "Back" would be the same sentence as the control below it.
  */
 const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExitProps>(
-  ({ className, href, children = 'Back to app', ...props }, ref) => {
+  ({ className, href, children = 'Go to home', ...props }, ref) => {
     const shared = {
       className: cn(
-        // Its own margin rather than a wrapper: the exit is a fixed part of the
+        // Its own padding rather than a wrapper: the exit is a fixed part of the
         // anatomy, and a caller who has to remember to pad it will forget.
-        'mdt-mx-2 mdt-mt-2 mdt-flex mdt-items-center mdt-gap-1.5',
-        ROW,
-        'mdt-text-sm mdt-text-muted-foreground mdt-transition-colors',
-        'hover:mdt-text-foreground',
-        FOCUS,
+        'mdt-group/exit mdt-flex mdt-items-center mdt-gap-2 mdt-px-3 mdt-pb-3 mdt-pt-3',
+        'mdt-text-sm mdt-font-medium mdt-text-foreground',
+        'focus-visible:mdt-outline-none',
         className
       ),
     };
     const content = (
       <>
-        {/*
-          An arrow, not a chevron. The section header one row down uses a
-          chevron, and the difference between "leave" and "up one" has to
-          survive being glanced at.
-        */}
-        <Icon name="arrow-left" size="sm" aria-hidden />
+        <span
+          className={cn(
+            'mdt-flex mdt-h-8 mdt-w-8 mdt-shrink-0 mdt-items-center mdt-justify-center',
+            // The one raised object on the panel. `background` rather than a
+            // literal white, so it is still the raised surface in dark mode
+            // instead of a hole punched in the page.
+            'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background mdt-shadow-sm',
+            'mdt-transition-shadow group-hover/exit:mdt-shadow-md',
+            'group-focus-visible/exit:mdt-ring-2 group-focus-visible/exit:mdt-ring-ring'
+          )}
+        >
+          <Icon name="home" size="sm" aria-hidden />
+        </span>
         <span className="mdt-truncate">{children}</span>
       </>
     );
@@ -181,14 +204,19 @@ LeftNavExit.displayName = 'LeftNavExit';
  */
 const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
   ({ className, label = 'Search', ...props }, ref) => (
-    <div className="mdt-px-2 mdt-pb-2">
+    <div className="mdt-px-3 mdt-pb-4">
       <Input
         ref={ref}
         type="search"
         size="sm"
         aria-label={label}
         placeholder={label}
+        // The magnifier inside the field, which is what makes it read as a
+        // search rather than as the first form field on the page. `Input`
+        // already takes it; a bare box was the lazier half of reusing `Input`.
+        startAdornment={<Icon name="search" size="sm" aria-hidden />}
         className={cn('mdt-w-full', className)}
+        wrapperClassName="mdt-w-full"
         {...props}
       />
     </div>
@@ -214,7 +242,7 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
     <div
       ref={ref}
       data-level={level}
-      className={cn('mdt-flex-1 mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-2', className)}
+      className={cn('mdt-flex-1 mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
       {...props}
     >
       <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-2">{children}</div>
@@ -262,27 +290,54 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
 LeftNavSection.displayName = 'LeftNavSection';
 
 /**
- * A labelled block of items, optionally one that folds away.
+ * A labelled block of items. A heading, and nothing more.
  *
- * **A plain heading by default.** A control that hides four rows costs a click
- * and saves nothing; `collapsible` is for a group long enough that scrolling
- * past it is the problem.
- *
- * The children of a collapsible group carry a guide line down their left edge,
- * because once a group can be open or shut you need to see where it ends.
+ * **It does not fold.** The first version let the heading collapse its group,
+ * which is the wrong thing to hide behind a control: a heading like "Compute"
+ * is a label for where you are in a list, and collapsing it takes away the map
+ * rather than the detail. What people actually want to fold is one *setting*
+ * that has pages of its own - see `LeftNavExpandable`. Two collapsing
+ * mechanisms in one panel is one too many, so this one lost.
  */
 const LeftNavGroup = forwardRef<HTMLDivElement, LeftNavGroupProps>(
+  ({ className, label, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      // Space above the heading, none for the first one. A group that follows
+      // other rows needs the gap to read as a new block; the first group in a
+      // panel or under a section header already has one above it, and adding a
+      // second leaves the header floating away from what it names.
+      className={cn('mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pt-4 first:mdt-pt-0', className)}
+      {...props}
+    >
+      {label !== undefined && (
+        <div className="mdt-flex mdt-h-6 mdt-items-center mdt-px-2 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
+          {label}
+        </div>
+      )}
+      {children}
+    </div>
+  )
+);
+LeftNavGroup.displayName = 'LeftNavGroup';
+
+/**
+ * One setting that has pages of its own, folding open in place.
+ *
+ * **This is the collapsing thing, not the group heading.** The distinction is
+ * the whole point: a group heading labels a run of unrelated settings, while
+ * this is one setting whose pages belong to it. Folding the first hides the
+ * map; folding the second hides detail you asked for.
+ *
+ * **A chevron that turns, not one that points sideways.** `LeftNavItem`'s
+ * trailing `chevron-right` means "this opens a second level and the panel will
+ * move". This one points down and rotates, which everywhere else in software
+ * means "this opens underneath". Two different promises need two different
+ * glyphs, or the panel becomes a guessing game.
+ */
+const LeftNavExpandable = forwardRef<HTMLDivElement, LeftNavExpandableProps>(
   (
-    {
-      className,
-      label,
-      collapsible = false,
-      defaultOpen = true,
-      open,
-      onOpenChange,
-      children,
-      ...props
-    },
+    { className, icon, label, defaultOpen = false, open, onOpenChange, children, ...props },
     ref
   ) => {
     const [uncontrolled, setUncontrolled] = useState(defaultOpen);
@@ -294,48 +349,37 @@ const LeftNavGroup = forwardRef<HTMLDivElement, LeftNavGroupProps>(
       onOpenChange?.(next);
     };
 
-    const heading = 'mdt-px-2 mdt-text-xs mdt-font-medium mdt-text-muted-foreground';
-
     return (
-      <div
-        ref={ref}
-        className={cn('mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pt-3', className)}
-        {...props}
-      >
-        {label !== undefined &&
-          (collapsible ? (
-            <button
-              type="button"
-              onClick={toggle}
-              aria-expanded={isOpen}
-              className={cn(
-                'mdt-flex mdt-h-6 mdt-w-full mdt-items-center mdt-justify-between mdt-gap-2',
-                'mdt-rounded-md mdt-transition-colors hover:mdt-text-foreground',
-                heading,
-                FOCUS
-              )}
-            >
-              <span className="mdt-truncate">{label}</span>
-              <Icon
-                name="chevron-down"
-                size="sm"
-                aria-hidden
-                className={cn('mdt-transition-transform', !isOpen && '-mdt-rotate-90')}
-              />
-            </button>
-          ) : (
-            <div className={cn('mdt-flex mdt-h-6 mdt-items-center', heading)}>{label}</div>
-          ))}
-
-        {(!collapsible || isOpen) && (
-          <div
+      <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={isOpen}
+          className={cn(leftNavItemVariants({ active: false, disabled: false }))}
+        >
+          {icon !== undefined && (
+            <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-text-muted-foreground">
+              {icon}
+            </span>
+          )}
+          <span className="mdt-flex-1 mdt-truncate mdt-text-left">{label}</span>
+          <Icon
+            name="chevron-down"
+            size="sm"
+            aria-hidden
             className={cn(
-              'mdt-flex mdt-flex-col mdt-gap-0.5',
-              // The guide line only earns its place once the group can close -
-              // on a static heading it is decoration on every group in the panel.
-              collapsible && 'mdt-ml-3 mdt-border-l mdt-border-border mdt-pl-2'
+              'mdt-text-muted-foreground mdt-transition-transform',
+              !isOpen && '-mdt-rotate-90'
             )}
-          >
+          />
+        </button>
+
+        {isOpen && (
+          // A guide line down the children, because once a thing can be open
+          // you need to see where it ends. Indented to sit under the label
+          // rather than under the icon, so the nesting reads as belonging to
+          // the words rather than to the glyph.
+          <div className="mdt-ml-4 mdt-flex mdt-flex-col mdt-gap-0.5 mdt-border-l mdt-border-border mdt-pl-2">
             {children}
           </div>
         )}
@@ -343,7 +387,7 @@ const LeftNavGroup = forwardRef<HTMLDivElement, LeftNavGroupProps>(
     );
   }
 );
-LeftNavGroup.displayName = 'LeftNavGroup';
+LeftNavExpandable.displayName = 'LeftNavExpandable';
 
 /**
  * One row: a page to open, or a section to descend into.
@@ -379,13 +423,19 @@ const LeftNavItem = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavIte
 
     const content = (
       <>
+        {active && (
+          <span
+            aria-hidden
+            className="mdt-absolute mdt-bottom-1.5 mdt-left-0 mdt-top-1.5 mdt-w-0.5 mdt-rounded-full mdt-bg-accent-foreground"
+          />
+        )}
         {icon !== undefined && (
           <span
             className={cn(
               'mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
               // The glyph sits back from the label until the row matters, which
               // is what stops forty icons reading as forty things to look at.
-              active ? 'mdt-text-foreground' : 'mdt-text-muted-foreground'
+              active ? 'mdt-text-accent-foreground' : 'mdt-text-muted-foreground'
             )}
           >
             {icon}
@@ -448,6 +498,7 @@ export {
   LeftNavBody,
   LeftNavSection,
   LeftNavGroup,
+  LeftNavExpandable,
   LeftNavItem,
   LeftNavFooter,
 };
