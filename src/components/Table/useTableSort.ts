@@ -57,6 +57,17 @@ export interface UseTableSort<K extends string = string> {
   /** Drops every rule. */
   clear: () => void;
 
+  /**
+   * Replaces the whole stack in one go.
+   *
+   * What a saved view applies through. Every other method describes a change
+   * someone made at the table; this one puts the table into a state that was
+   * decided somewhere else - a stored view, a URL, another user's link - where
+   * replaying those changes one at a time would fire a callback per rule and
+   * briefly show sorts nobody asked for.
+   */
+  restore: (rules: SortRule<K>[]) => void;
+
   /** Which way a column is sorted, or `null` if it is not. */
   directionOf: (column: K) => SortDirection | null;
 
@@ -124,6 +135,13 @@ export function useTableSort<K extends string>({
     [multiple]
   );
 
+  const restore = useCallback((next: SortRule<K>[]) => {
+    // Copied, so a stored view cannot be edited through the table it was
+    // applied to - a saved view that drifts every time someone sorts is worse
+    // than no saved view.
+    setRules([...next]);
+  }, []);
+
   const remove = useCallback((column: K) => {
     setRules((prev) => prev.filter((rule) => rule.column !== column));
   }, []);
@@ -188,6 +206,7 @@ export function useTableSort<K extends string>({
     remove,
     move,
     clear,
+    restore,
     directionOf,
     orderOf,
     isSorted,

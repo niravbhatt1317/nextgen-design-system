@@ -497,4 +497,111 @@ describe('DataTable', () => {
       expect(container.firstChild).toHaveClass('custom');
     });
   });
+
+  describe('saved views', () => {
+    const openViews = async (user: ReturnType<typeof userEvent.setup>, name = 'Views') => {
+      await user.click(screen.getByRole('button', { name: new RegExp(name) }));
+    };
+
+    it('shows no switcher unless asked for one', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.queryByRole('button', { name: /Views/ })).not.toBeInTheDocument();
+    });
+
+    it('saves the table as a view and reports it', async () => {
+      const user = userEvent.setup();
+      const onViewsChange = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          savedViews
+          onViewsChange={onViewsChange}
+        />
+      );
+      await user.type(screen.getByRole('searchbox'), 'item 1');
+      await openViews(user);
+      await user.click(screen.getByRole('button', { name: 'Save as new view' }));
+      await user.type(screen.getByLabelText('Save this view'), 'Ones{Enter}');
+
+      const saved = onViewsChange.mock.calls[0]?.[0] as {
+        name: string;
+        state: { query: string };
+      }[];
+      expect(saved[0]?.name).toBe('Ones');
+      // The search is part of the view, so reopening it narrows the table the
+      // same way rather than to everything.
+      expect(saved[0]?.state.query).toBe('item 1');
+    });
+
+    it('applies a stored view to the table', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          savedViews
+          initialViews={[
+            {
+              id: 'red',
+              name: 'Red team',
+              state: {
+                columns: {
+                  order: ['id', 'name', 'score', 'team'],
+                  hidden: ['score'],
+                  frozenCount: 0,
+                },
+                sort: [{ column: 'name', direction: 'ascend' }],
+                filters: [{ attribute: 'team', values: ['Red'] }],
+                query: '',
+              },
+            },
+          ]}
+        />
+      );
+      await openViews(user);
+      await user.click(screen.getByText('Red team'));
+
+      expect(firstColumn()).toEqual(['c', 'a']);
+      expect(screen.queryByRole('columnheader', { name: /Score/ })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Red team/ })).toBeInTheDocument();
+    });
+
+    it('marks the view once the table moves away from it, and clears the mark on discard', async () => {
+      const user = userEvent.setup();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          savedViews
+          initialViewId="all"
+          initialViews={[
+            {
+              id: 'all',
+              name: 'Everything',
+              state: {
+                columns: { order: ['id', 'name', 'score', 'team'], hidden: [], frozenCount: 0 },
+                sort: [],
+                filters: [],
+                query: '',
+              },
+            },
+          ]}
+        />
+      );
+      expect(screen.queryByLabelText('Unsaved changes')).not.toBeInTheDocument();
+
+      await user.type(screen.getByRole('searchbox'), 'item 2');
+      expect(screen.getByLabelText('Unsaved changes')).toBeInTheDocument();
+
+      await openViews(user, 'Everything');
+      await user.click(screen.getByRole('button', { name: 'Discard changes' }));
+      expect(screen.getByRole('searchbox')).toHaveValue('');
+      expect(screen.queryByLabelText('Unsaved changes')).not.toBeInTheDocument();
+      expect(bodyText()).toHaveLength(3);
+    });
+  });
 });

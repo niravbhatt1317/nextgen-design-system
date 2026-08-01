@@ -18,6 +18,7 @@ export {
 export { TableToolbar, TableToolbarActions } from './TableToolbar';
 export { TableSortMenu } from './TableSortMenu';
 export { TableViewMenu } from './TableViewMenu';
+export { TableViewSwitcher } from './TableViewSwitcher';
 export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 export { DataTable } from './DataTable';
 export { TableFilterMenu } from './TableFilterMenu';
@@ -54,6 +55,9 @@ export type {
 export { useTableSort } from './useTableSort';
 export type { SortDirection, SortRule, UseTableSort, UseTableSortOptions } from './useTableSort';
 
+export { useSavedViews } from './useSavedViews';
+export type { TableView, UseSavedViews, UseSavedViewsOptions } from './useSavedViews';
+
 export { useTableColumns } from './useTableColumns';
 export type {
   TableColumnDef,
@@ -74,6 +78,10 @@ export type {
   TableCaptionProps,
   TableGroupRowProps,
   TableExpandTriggerProps,
+  TableViewSwitcherProps,
+  TableViewSummary,
+  TableViewNamePanelProps,
+  DataTableViewState,
   TableDensity,
   TableAlign,
   TableSortOrder,

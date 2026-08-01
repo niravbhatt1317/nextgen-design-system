@@ -186,45 +186,82 @@ export const ServerSide: Story = {
 };
 
 /**
- * A saved view is just the state of the hooks, written down.
+ * A view is a name for a table you have already set up.
  *
- * Nothing extra was built for this: `useTableColumns` already serialises to
- * `state` and takes it back through `restore`, and sort and filters are plain
- * arrays that go in as `initial`. A view is those three objects with a name on
- * top - a database row, a URL, a `localStorage` key, whatever the product
- * wants.
+ * The columns you kept, the sort you chose, the filters you applied, the search
+ * you typed - saved together, so tomorrow is one click rather than six. This is
+ * what everything from 5a to 5f was for: each control already reported its
+ * state, and nothing new had to be invented to write it down.
  *
- * That is the argument for keeping the state in hooks rather than inside a
- * component: the feature that would have been hardest to add turned out to
- * already exist.
+ * **Try it.** Open "My open tickets" - the assignee column goes, status filters
+ * to Open, and the sort changes. Then sort by something else and watch the dot
+ * appear on the trigger: the view is marked, not overwritten. Save the change,
+ * or discard it and land exactly back where the view was.
+ *
+ * **Nothing is stored here.** `onViewsChange` reports the whole list and this
+ * story prints it. A product writes it to `localStorage`, to a URL, or to an
+ * API where a colleague can open the same view - the third of which is the main
+ * reason to have saved views, and impossible for a component that assumed the
+ * first.
  */
 export const SavedViews: Story = {
   render: function SavedViewsDemo() {
-    const [saved] = useState([
-      {
-        name: 'My open tickets',
-        json: '{"filters":[{"attribute":"status","values":["Open"]}],"sort":[{"column":"priority","direction":"ascend"}],"columns":{"hidden":["assignee"]}}',
-      },
-      {
-        name: 'Everything, newest first',
-        json: '{"filters":[],"sort":[{"column":"id","direction":"descend"}],"columns":{"hidden":[]}}',
-      },
-    ]);
+    const [written, setWritten] = useState('Nothing saved yet.');
 
     return (
       <div className="mdt-flex mdt-flex-col mdt-gap-3">
-        <div className="mdt-flex mdt-flex-col mdt-gap-2">
-          {saved.map((view) => (
-            <div key={view.name} className="mdt-rounded-md mdt-border mdt-border-border mdt-p-3">
-              <p className="mdt-text-sm mdt-font-medium">{view.name}</p>
-              <pre className="mdt-mt-1 mdt-overflow-x-auto mdt-text-xs mdt-text-muted-foreground">
-                {view.json}
-              </pre>
-            </div>
-          ))}
-        </div>
-        <p className="mdt-text-xs mdt-text-muted-foreground">
-          Three objects and a name. Storing and restoring them needs no new API.
+        <DataTable
+          columns={columns}
+          rows={tickets}
+          getRowId={(row) => row.id}
+          filterAttributes={filterAttributes}
+          pageSize={6}
+          savedViews
+          initialViews={[
+            {
+              id: 'open',
+              name: 'My open tickets',
+              state: {
+                columns: {
+                  order: ['id', 'subject', 'status', 'priority', 'assignee'],
+                  hidden: ['assignee'],
+                  frozenCount: 0,
+                },
+                sort: [{ column: 'priority', direction: 'ascend' }],
+                filters: [{ attribute: 'status', values: ['Open'] }],
+                query: '',
+              },
+            },
+            {
+              id: 'newest',
+              name: 'Everything, newest first',
+              state: {
+                columns: {
+                  order: ['id', 'subject', 'status', 'priority', 'assignee'],
+                  hidden: [],
+                  frozenCount: 0,
+                },
+                sort: [{ column: 'id', direction: 'descend' }],
+                filters: [],
+                query: '',
+              },
+            },
+          ]}
+          onViewsChange={(views) => {
+            setWritten(views.map((view) => view.name).join(' · ') || 'No views left.');
+          }}
+          renderCell={(row, key) =>
+            key === 'status' ? (
+              <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
+                {row.status}
+              </Badge>
+            ) : (
+              row[key as keyof Ticket]
+            )
+          }
+        />
+        <p className="mdt-font-mono mdt-text-xs mdt-text-muted-foreground">
+          Written out: {written}
         </p>
       </div>
     );

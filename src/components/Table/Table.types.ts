@@ -1,4 +1,8 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { TableColumnsState } from './useTableColumns';
+import type { TableFilter } from './useTableFilters';
+import type { TableView } from './useSavedViews';
+import type { SortRule } from './useTableSort';
 
 /**
  * How much vertical room a row takes.
@@ -823,4 +827,105 @@ export interface DataTableProps<Row> extends Omit<ComponentPropsWithoutRef<'div'
    */
   emptyMessage?: string;
   filteredEmptyMessage?: string;
+
+  /**
+   * Shows the saved views control in the toolbar.
+   *
+   * Off by default: a table with one way of looking at it does not need a
+   * control for choosing between them, and an empty views list is a button
+   * that does nothing.
+   *
+   * @default false
+   */
+  savedViews?: boolean;
+
+  /** The views to start with - from storage, an API, a URL. */
+  initialViews?: TableView<DataTableViewState>[];
+
+  /** Which view to open on. */
+  initialViewId?: string | null;
+
+  /**
+   * Called with the whole list whenever it changes.
+   *
+   * Where persistence happens. `DataTable` deliberately writes nothing itself;
+   * views shared between colleagues and views in a URL are both impossible for
+   * a component that assumed `localStorage`.
+   */
+  onViewsChange?: (views: TableView<DataTableViewState>[]) => void;
+}
+
+/** One row of the switcher's list. The state a view holds is not its business. */
+export interface TableViewSummary {
+  id: string;
+  name: string;
+}
+
+export interface TableViewNamePanelProps {
+  /** What the panel is for - "Rename view" or "Save this view". */
+  title: string;
+
+  /** What the field starts with. Empty for a new view. */
+  initialName: string;
+
+  /** Called with the trimmed name. Never called with an empty one. */
+  onCommit: (name: string) => void;
+
+  /** Called on Cancel and on Escape. */
+  onCancel: () => void;
+}
+
+export interface TableViewSwitcherProps {
+  /** The saved views, in the order to list them. */
+  views: TableViewSummary[];
+
+  /** Which one is being looked at. */
+  activeId?: string | null;
+
+  /**
+   * Whether the table has been changed since that view was applied.
+   *
+   * Drives the dot on the trigger and the save and discard controls. Work it
+   * out by comparing state rather than by setting a flag on every change -
+   * `useSavedViews` does exactly that.
+   *
+   * @default false
+   */
+  dirty?: boolean;
+
+  /** Called with the view to switch to. */
+  onApply: (id: string) => void;
+
+  /** Overwrites the active view. Omit it and no Save control appears. */
+  onSave?: () => void;
+
+  /** Called with a name for a new view. Required: without it the list can only shrink. */
+  onSaveAs: (name: string) => void;
+
+  /** Omit either one and that control disappears from every row. */
+  onRename?: (id: string, name: string) => void;
+  onRemove?: (id: string) => void;
+
+  /** Puts the table back to the active view. Omit it and no Discard appears. */
+  onReset?: () => void;
+
+  /** Shown on the trigger when no view is active. @default 'Views' */
+  label?: string;
+
+  /** Extra classes for the trigger. */
+  className?: string;
+}
+
+/**
+ * What a `DataTable` saves when you save a view.
+ *
+ * Four things the toolbar can change, and nothing else. The page is left out
+ * because a view is a way of looking at a table rather than a place in it, and
+ * the selection because it belongs to the rows.
+ */
+export interface DataTableViewState {
+  columns: TableColumnsState;
+  sort: SortRule[];
+  filters: TableFilter[];
+  query: string;
 }

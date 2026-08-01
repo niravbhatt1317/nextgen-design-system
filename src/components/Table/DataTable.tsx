@@ -12,13 +12,15 @@ import { TableFilterMenu } from './TableFilterMenu';
 import { TableSortMenu } from './TableSortMenu';
 import { TableToolbar, TableToolbarActions } from './TableToolbar';
 import { TableViewMenu } from './TableViewMenu';
+import { TableViewSwitcher } from './TableViewSwitcher';
 import { useColumnReorder } from './useColumnReorder';
+import { useSavedViews } from './useSavedViews';
 import { useTableColumns } from './useTableColumns';
 import { useTableFilters } from './useTableFilters';
 import { useTablePagination } from './useTablePagination';
 import { useTableSelection } from './useTableSelection';
 import { useTableSort } from './useTableSort';
-import type { DataTableProps } from './Table.types';
+import type { DataTableProps, DataTableViewState } from './Table.types';
 
 /** One cell's raw value. */
 const cellValue = (row: unknown, key: string): unknown => (row as Record<string, unknown>)[key];
@@ -110,6 +112,10 @@ export function DataTable<Row>({
   selectable = false,
   bulkActions,
   columnControls = true,
+  savedViews = false,
+  initialViews,
+  initialViewId,
+  onViewsChange,
   emptyMessage = 'Nothing to show.',
   filteredEmptyMessage = 'Nothing matches the current filters.',
   className,
@@ -174,6 +180,35 @@ export function DataTable<Row>({
 
   const selection = useTableSelection({ rowIds: sorted.map((row) => String(getRowId(row))) });
 
+  // What a saved view is, here: the four things the toolbar can change.
+  //
+  // Not the page - a view is a way of looking at the table, and reopening one
+  // on page 7 because that is where you were when you saved it is a surprise
+  // rather than a convenience. Not the selection either, which belongs to the
+  // rows rather than to the view.
+  const viewState: DataTableViewState = useMemo(
+    () => ({ columns: cols.state, sort: sort.rules, filters: filters.filters, query }),
+    [cols.state, sort.rules, filters.filters, query]
+  );
+
+  const views = useSavedViews<DataTableViewState>({
+    current: viewState,
+    ...(initialViews ? { initial: initialViews } : {}),
+    ...(initialViewId === undefined ? {} : { initialActiveId: initialViewId }),
+    ...(onViewsChange ? { onChange: onViewsChange } : {}),
+  });
+
+  // One place that puts the table into a state, so applying a view and
+  // discarding changes cannot drift apart - they are the same act aimed at the
+  // same stored state.
+  const restoreView = (state: DataTableViewState | null) => {
+    if (state === null) return;
+    cols.restore(state.columns);
+    sort.restore(state.sort);
+    filters.restore(state.filters);
+    setQuery(state.query);
+  };
+
   const visible = manualPagination ? sorted : pagination.slice(sorted);
 
   // "Nothing here" and "nothing matches" are different sentences, and telling
@@ -217,6 +252,23 @@ export function DataTable<Row>({
 
         <TableToolbarActions>
           {toolbarActions}
+          {savedViews && (
+            <TableViewSwitcher
+              views={views.views.map((view) => ({ id: view.id, name: view.name }))}
+              activeId={views.activeId}
+              dirty={views.dirty}
+              onApply={(id) => {
+                restoreView(views.apply(id));
+              }}
+              onSave={views.save}
+              onSaveAs={views.saveAs}
+              onRename={views.rename}
+              onRemove={views.remove}
+              onReset={() => {
+                restoreView(views.reset());
+              }}
+            />
+          )}
           <TableSortMenu
             columns={cols.visible}
             rules={sort.rules}

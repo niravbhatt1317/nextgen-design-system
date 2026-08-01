@@ -194,4 +194,43 @@ describe('useTableSort', () => {
       expect(columns(result.current.rules)).toEqual(['status']);
     });
   });
+
+  describe('restore', () => {
+    it('replaces the whole stack', () => {
+      const { result } = renderHook(() => useTableSort<Key>());
+      act(() => {
+        result.current.sortBy('status', 'ascend');
+      });
+      act(() => {
+        result.current.restore([
+          { column: 'created', direction: 'descend' },
+          { column: 'status', direction: 'ascend' },
+        ]);
+      });
+      expect(columns(result.current.rules)).toEqual(['created', 'status']);
+    });
+
+    it('empties the stack', () => {
+      const { result } = renderHook(() => useTableSort<Key>());
+      act(() => {
+        result.current.sortBy('status', 'ascend');
+      });
+      act(() => {
+        result.current.restore([]);
+      });
+      expect(result.current.isSorted).toBe(false);
+    });
+
+    it('copies, so the table cannot rewrite the view it came from', () => {
+      const { result } = renderHook(() => useTableSort<Key>());
+      const saved = [{ column: 'status' as Key, direction: 'ascend' as const }];
+      act(() => {
+        result.current.restore(saved);
+      });
+      act(() => {
+        result.current.sortBy('created', 'ascend');
+      });
+      expect(saved).toHaveLength(1);
+    });
+  });
 });

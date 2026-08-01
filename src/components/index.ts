@@ -433,6 +433,7 @@ export {
   TableToolbarActions,
   TableSortMenu,
   TableViewMenu,
+  TableViewSwitcher,
   TableBulkBar,
   TableBulkAction,
   TableBulkSeparator,
@@ -449,6 +450,7 @@ export {
   useTablePagination,
   useTableSelection,
   useTableSort,
+  useSavedViews,
 } from './Table';
 export type {
   ColumnWidths,
@@ -472,6 +474,8 @@ export type {
   TableToolbarActionsProps,
   TableSortMenuProps,
   TableViewMenuProps,
+  TableViewSwitcherProps,
+  TableViewSummary,
   TableBulkBarProps,
   TableBulkActionProps,
   TableFilterMenuProps,
@@ -483,6 +487,10 @@ export type {
   TableColumnView,
   TableColumnsState,
   UseTableColumns,
+  DataTableViewState,
+  TableView,
+  UseSavedViews,
+  UseSavedViewsOptions,
 } from './Table';
 
 // Tabs

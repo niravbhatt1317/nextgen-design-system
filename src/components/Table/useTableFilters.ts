@@ -45,6 +45,15 @@ export interface UseTableFilters<K extends string = string> {
   /** Drops everything. */
   clear: () => void;
 
+  /**
+   * Replaces every filter in one go.
+   *
+   * What a saved view applies through, for the same reason `useTableSort` has
+   * one: a state decided elsewhere arrives whole, and rebuilding it value by
+   * value would fire a callback per value and re-fetch a table per keystroke.
+   */
+  restore: (filters: TableFilter<K>[]) => void;
+
   /** How many attributes are filtered. Not how many values. */
   count: number;
 
@@ -131,6 +140,13 @@ export function useTableFilters<K extends string>({
     setFilters([]);
   }, []);
 
+  const restore = useCallback((next: TableFilter<K>[]) => {
+    // Deep enough to matter: the values array is what a chip edits, and sharing
+    // it with a stored view lets the table rewrite the view it was applied
+    // from.
+    setFilters(next.map((filter) => ({ ...filter, values: [...filter.values] })));
+  }, []);
+
   return {
     filters,
     valuesFor,
@@ -139,6 +155,7 @@ export function useTableFilters<K extends string>({
     setValues,
     remove,
     clear,
+    restore,
     count: filters.length,
     isActive: useMemo(() => filters.length > 0, [filters]),
   };
