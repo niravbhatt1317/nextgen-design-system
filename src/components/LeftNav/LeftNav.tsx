@@ -264,15 +264,15 @@ const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExi
         className
       ),
       style: {
-        // It does not move. An earlier version walked it across to the right
-        // as the header folded, and it read as a thing escaping rather than a
-        // panel tidying itself - the one fixed point on the screen was the one
-        // that moved. The search comes up beside it instead.
+        // It does not move, in either direction. An earlier version walked it
+        // right as the header folded, and it read as a thing escaping rather
+        // than a panel tidying itself; a later one nudged it 6px down to centre
+        // it against the field, which is a smaller version of the same mistake.
+        // The one fixed point on the screen should be fixed. The search comes
+        // up beside it.
         //
-        // The 6px is the difference between a 32px tile and the 36px field it
-        // ends up next to.
         left: '0.75rem',
-        top: `calc(0.75rem + ${String(progress)} * 0.375rem)`,
+        top: '0.75rem',
       },
     };
 
@@ -287,8 +287,13 @@ const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExi
             // collected. No border: the shadow is what lifts it, and a ring as
             // well made it a component in a box rather than an object on a
             // surface.
-            'mdt-rounded-md mdt-bg-background mdt-text-muted-foreground mdt-shadow-sm',
-            'mdt-transition-shadow group-hover/exit:mdt-text-foreground group-hover/exit:mdt-shadow-md',
+            'mdt-rounded-md mdt-bg-background mdt-text-muted-foreground',
+            // The shadow lifts it off the panel while it is alone up there. Beside
+            // the search - which has its own - two raised objects touching read as
+            // one lumpy surface, so it settles flat and lets the field be the
+            // raised thing.
+            'mdt-transition-shadow group-hover/exit:mdt-text-foreground',
+            progress < 1 && 'mdt-shadow-sm group-hover/exit:mdt-shadow-md',
             'group-focus-visible/exit:mdt-ring-2 group-focus-visible/exit:mdt-ring-ring'
           )}
         >
@@ -398,7 +403,7 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
   ({ className, level = 1, children, onScroll, ...props }, ref) => {
-    const { atTop, atBottom, report, pinned } = useContext(LeftNavScroll);
+    const { atTop, atBottom, report, pinned, progress } = useContext(LeftNavScroll);
     const scroller = useRef<HTMLDivElement | null>(null);
 
     const measure = useCallback(
@@ -429,6 +434,19 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
       if (scroller.current) measure(scroller.current);
     }, [children, measure]);
 
+    // A new level starts at its top.
+    //
+    // Without this you arrive in a section already scrolled, at whatever
+    // position the list you left happened to be at - halfway down a list you
+    // have never seen, with the header folded, wondering what you missed. The
+    // scroll belongs to the list, and this is a different list.
+    useEffect(() => {
+      const node = scroller.current;
+      if (!node) return;
+      node.scrollTop = 0;
+      measure(node);
+    }, [level, measure]);
+
     const attach = useCallback(
       (node: HTMLDivElement | null) => {
         scroller.current = node;
@@ -451,7 +469,21 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
           className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
           {...props}
         >
-          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
+          {/*
+            Padded by exactly what the header gives up.
+
+            Without this the list moves twice as you scroll: once because you
+            scrolled it, and again because the row above collapsed and pulled
+            everything up by another 44px. It read as the list bolting. Now the
+            header folds against this padding and the rows travel at the speed
+            of the wheel, which is the only speed anybody expects.
+          */}
+          <div
+            className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-1"
+            style={{ paddingTop: `${String(4 + progress * EXIT_HEIGHT)}px` }}
+          >
+            {children}
+          </div>
         </div>
 
         {/*

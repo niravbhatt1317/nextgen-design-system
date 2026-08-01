@@ -224,8 +224,16 @@ export const Settings: Story = {
                         )
                       }
                       onClick={() => {
-                        if (entry.pages) levels.open(entry.key);
-                        else setCurrent(entry.key);
+                        if (entry.pages) {
+                          levels.open(entry.key);
+                          // Land on the first page rather than on a list with
+                          // nothing chosen. A second level that opens with no
+                          // selection asks you to pick again having just picked.
+                          const first = entry.pages[0];
+                          if (first) setCurrent(first.pages?.[0]?.key ?? first.key);
+                        } else {
+                          setCurrent(entry.key);
+                        }
                       }}
                     >
                       {entry.label}
