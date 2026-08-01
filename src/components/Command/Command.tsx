@@ -63,14 +63,23 @@ Command.displayName = CommandPrimitive.displayName;
  */
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
-    <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-bg-background/80 mdt-backdrop-blur-sm">
-      <div className="mdt-fixed mdt-left-[50%] mdt-top-[50%] mdt-z-50 mdt-grid mdt-w-full mdt-max-w-lg mdt-translate-x-[-50%] mdt-translate-y-[-50%] mdt-gap-4 mdt-border mdt-bg-background mdt-p-6 mdt-shadow-lg mdt-duration-200">
-        <Command
-          className="[&_[cmdk-group-heading]]:mdt-px-2 [&_[cmdk-group-heading]]:mdt-font-medium [&_[cmdk-group-heading]]:mdt-text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:mdt-pt-0 [&_[cmdk-group]]:mdt-px-2 [&_[cmdk-input-wrapper]_svg]:mdt-h-5 [&_[cmdk-input-wrapper]_svg]:mdt-w-5 [&_[cmdk-input]]:mdt-h-12 [&_[cmdk-item]]:mdt-px-2 [&_[cmdk-item]]:mdt-py-3 [&_[cmdk-item]_svg]:mdt-h-5 [&_[cmdk-item]_svg]:mdt-w-5"
-          {...props}
-        >
-          {children}
-        </Command>
+    <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto mdt-bg-background/80 mdt-p-4 mdt-backdrop-blur-sm">
+      {/*
+        Centred by layout rather than by `translate(-50%, -50%)`, for the same
+        reason `Dialog` is: a keyframe's transform replaces the element's, so a
+        centring transform and an animation cannot share one element. This one
+        has no animation today and so never jolted - it was one `animate-*`
+        class away from doing so.
+      */}
+      <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
+        <div className="mdt-grid mdt-w-full mdt-max-w-lg mdt-gap-4 mdt-rounded-lg mdt-border mdt-bg-background mdt-p-6 mdt-shadow-lg mdt-duration-200">
+          <Command
+            className="[&_[cmdk-group-heading]]:mdt-px-2 [&_[cmdk-group-heading]]:mdt-font-medium [&_[cmdk-group-heading]]:mdt-text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:mdt-pt-0 [&_[cmdk-group]]:mdt-px-2 [&_[cmdk-input-wrapper]_svg]:mdt-h-5 [&_[cmdk-input-wrapper]_svg]:mdt-w-5 [&_[cmdk-input]]:mdt-h-12 [&_[cmdk-item]]:mdt-px-2 [&_[cmdk-item]]:mdt-py-3 [&_[cmdk-item]_svg]:mdt-h-5 [&_[cmdk-item]_svg]:mdt-w-5"
+            {...props}
+          >
+            {children}
+          </Command>
+        </div>
       </div>
     </div>
   );

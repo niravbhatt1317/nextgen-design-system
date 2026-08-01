@@ -2028,8 +2028,8 @@
       "kind": "component",
       "file": "src/components/Dialog/Dialog.tsx",
       "area": "Dialog",
-      "summary": "Dialog root component - controls open/close state.",
-      "doc": "Dialog root component - controls open/close state.",
+      "summary": "Dialog - a task that interrupts, in the middle of the screen.",
+      "doc": "Dialog - a task that interrupts, in the middle of the screen. ## Dialog or Sheet They are built from the same primitive and share an overlay, a focus trap, escape handling and an animation. The mechanics will not tell you which to reach for. One question does: > **Does the task need the thing behind it?** **No — a Dialog.** It interrupts, and the background is dimmed because it has stopped mattering. **Yes — a `Sheet`.** It attends to something on screen, which stays legible because you are going back to it. | | | | --- | --- | | Destructive confirm | **Dialog**, always. You must not be able to work around the decision. | | Blocking - session expired, forced upgrade | **Dialog** | | Compare options side by side | **Dialog** | | Pick from a grid | **Dialog**, `size=\"full\"` | | Settings | **Dialog**, `size=\"full\"` - an app inside an app needs nav *and* content | | Wizard or onboarding sequence | **Dialog** | | Inspect a record you clicked in a list | `Sheet` | | Filters | `Sheet` | | A long form of stacked fields | `Sheet` | **Shape follows content**, and it decides more cases than any principle. A Dialog is wide, so it suits horizontal composition - three plan cards, a grid, a form ",
       "props": [],
       "propDocs": ""
     },
@@ -5234,8 +5234,8 @@
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
-      "summary": "Sheet root component - controls open/close state.",
-      "doc": "Sheet root component - controls open/close state.",
+      "summary": "Sheet - a task that attends to something on screen, from the edge.",
+      "doc": "Sheet - a task that attends to something on screen, from the edge. A drawer, in most people's vocabulary. The word is here so that searching for it finds this. ## Sheet or Dialog They are built from the same primitive and share an overlay, a focus trap, escape handling and an animation. The mechanics will not tell you which to reach for. One question does: > **Does the task need the thing behind it?** **Yes — a Sheet.** You came from a list, a record, a canvas, and you are going back to it; it stays legible behind you. **No — a `Dialog`.** It interrupts, and the background is dimmed because it has stopped mattering. | | | | --- | --- | | Inspect a record you clicked in a list | **Sheet** | | Filters | **Sheet** | | A long form of stacked fields | **Sheet** | | Anything you open dozens of times a session | **Sheet** - it is the gentler interruption | | Destructive confirm | `Dialog`, always | | Blocking - session expired, forced upgrade | `Dialog` | | Compare options side by side | `Dialog` | | Settings, or picking from a grid | `Dialog` at full size | | Wizard or onboarding sequence | `Dialog` | **Shape follows content**, and it decides more cases than any principle. A Sheet is tal",
       "props": [],
       "propDocs": ""
     },
