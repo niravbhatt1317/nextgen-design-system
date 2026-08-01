@@ -150,4 +150,41 @@ describe('useTableFilters', () => {
     rerender();
     expect(result.current.valuesFor('status')).toEqual(['Open']);
   });
+
+  describe('restore', () => {
+    it('replaces every filter', () => {
+      const { result } = renderHook(() => useTableFilters<Key>());
+      act(() => {
+        result.current.toggleValue('status', 'Open');
+      });
+      act(() => {
+        result.current.restore([{ attribute: 'assignee', values: ['Ada', 'Grace'] }]);
+      });
+      expect(result.current.isFiltered('status')).toBe(false);
+      expect(result.current.valuesFor('assignee')).toEqual(['Ada', 'Grace']);
+    });
+
+    it('empties them', () => {
+      const { result } = renderHook(() => useTableFilters<Key>());
+      act(() => {
+        result.current.toggleValue('status', 'Open');
+      });
+      act(() => {
+        result.current.restore([]);
+      });
+      expect(result.current.isActive).toBe(false);
+    });
+
+    it('copies the values, so a chip cannot edit the view it came from', () => {
+      const { result } = renderHook(() => useTableFilters<Key>());
+      const saved = [{ attribute: 'status' as Key, values: ['Open'] }];
+      act(() => {
+        result.current.restore(saved);
+      });
+      act(() => {
+        result.current.toggleValue('status', 'Resolved');
+      });
+      expect(saved[0]?.values).toEqual(['Open']);
+    });
+  });
 });

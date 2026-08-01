@@ -1,4 +1,8 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { TableColumnsState } from './useTableColumns';
+import type { TableFilter } from './useTableFilters';
+import type { TableView } from './useSavedViews';
+import type { SortRule } from './useTableSort';
 
 /**
  * How much vertical room a row takes.
@@ -728,4 +732,280 @@ export interface TableFilterChipsProps extends ComponentPropsWithoutRef<'div'> {
    * already does, sitting right beside it.
    */
   onClear?: () => void;
+}
+
+/**
+ * Props for DataTable - the whole table, assembled.
+ */
+export interface DataTableProps<Row> extends Omit<ComponentPropsWithoutRef<'div'>, 'children'> {
+  /** The columns, in display order. */
+  columns: { key: string; label: string; locked?: boolean }[];
+
+  /** The rows. */
+  rows: Row[];
+
+  /** A stable identity per row, for React keys and for selection later. */
+  getRowId: (row: Row) => string | number;
+
+  /**
+   * How to draw one cell. Without it the value is printed as text.
+   *
+   * This is where the cell recipes go - a status badge, a two-line cell, an
+   * avatar. `DataTable` knows the shape of a table, not the meaning of your
+   * data.
+   */
+  renderCell?: (row: Row, columnKey: string) => ReactNode;
+
+  /** What can be filtered, and the values each attribute offers. */
+  filterAttributes?: { key: string; label: string; values: string[] }[];
+
+  /** Whether to show the search field. @default true */
+  searchable?: boolean;
+
+  /** The search field's placeholder and accessible name. @default 'Search' */
+  searchPlaceholder?: string;
+
+  /**
+   * Hand each job back to the product.
+   *
+   * A table backed by a paged API turns all four on and passes the rows it was
+   * given; `DataTable` becomes a renderer and reports what the user asked for
+   * through the `on*Change` callbacks.
+   */
+  manualSort?: boolean;
+  manualFilter?: boolean;
+  manualSearch?: boolean;
+  manualPagination?: boolean;
+
+  /** Rows per page. @default 25 */
+  pageSize?: number;
+
+  /** Total rows, when the browser does not have them all. */
+  total?: number;
+
+  /** Told what the user asked for, whether or not this component acts on it. */
+  onSortChange?: (rules: { column: string; direction: 'ascend' | 'descend' }[]) => void;
+  onFilterChange?: (filters: { attribute: string; values: string[] }[]) => void;
+  onSearchChange?: (query: string) => void;
+  onPageChange?: (page: number, pageSize: number) => void;
+
+  /** Extra controls for the toolbar's trailing group. */
+  toolbarActions?: ReactNode;
+
+  /**
+   * Adds a checkbox column and the bulk bar.
+   *
+   * @default false
+   */
+  selectable?: boolean;
+
+  /**
+   * The actions on the bulk bar, given the selected row ids.
+   *
+   * A function rather than a node because what you can do usually depends on
+   * what is selected - one row offers Rename, thirty do not.
+   */
+  bulkActions?: (selected: string[]) => ReactNode;
+
+  /**
+   * Whether each header carries its own menu, drag grip, resize line and
+   * insertion point.
+   *
+   * On by default: they are what makes a table someone's own rather than a
+   * fixed report. Turn them off for a table that is a fixed report.
+   *
+   * @default true
+   */
+  columnControls?: boolean;
+
+  /**
+   * What an empty table says.
+   *
+   * Two messages, because they are different situations: nothing exists yet, or
+   * nothing matches. Telling them apart is the difference between someone
+   * creating a record and someone clearing a filter.
+   */
+  emptyMessage?: string;
+  filteredEmptyMessage?: string;
+
+  /**
+   * Whether rows are on their way.
+   *
+   * With nothing on screen yet it draws skeleton rows, which hold the table's
+   * shape rather than collapsing the page to a spinner and pushing everything
+   * below it around when the rows land. With rows already there it dims them
+   * and marks the body busy instead: replacing a table someone is reading with
+   * placeholders on every keystroke of a search is a flicker, and throws away
+   * rows that were probably still right.
+   *
+   * @default false
+   */
+  loading?: boolean;
+
+  /**
+   * Loads more rows as you reach the end, instead of paging.
+   *
+   * One or the other, never both - two ways to reach row 300 that disagree
+   * about which rows are loaded is a bug waiting to be filed. Turning this on
+   * hides the pager and stops slicing: a list that grows as you scroll has
+   * already been paged by whoever is fetching it, so pass the rows you have.
+   *
+   * @default false
+   */
+  infinite?: boolean;
+
+  /** Whether there is anything left to fetch. The stop condition. @default false */
+  hasMore?: boolean;
+
+  /** Whether the next batch is in flight. Pauses the observer, so page 2 is asked for once. @default false */
+  loadingMore?: boolean;
+
+  /** Called when the end of the list comes into view, or when Load more is pressed. */
+  onLoadMore?: () => void;
+
+  /**
+   * Adds the rows-per-page control to the pager.
+   *
+   * Off by default because it is a real decision rather than a default: a table
+   * backed by an expensive query may not want to offer 100 rows at all.
+   *
+   * @default false
+   */
+  rowsPerPage?: boolean;
+
+  /** What that control offers. @default [10, 25, 50, 100] */
+  pageSizes?: number[];
+
+  /**
+   * Shows the saved views control in the toolbar.
+   *
+   * Off by default: a table with one way of looking at it does not need a
+   * control for choosing between them, and an empty views list is a button
+   * that does nothing.
+   *
+   * @default false
+   */
+  savedViews?: boolean;
+
+  /** The views to start with - from storage, an API, a URL. */
+  initialViews?: TableView<DataTableViewState>[];
+
+  /** Which view to open on. */
+  initialViewId?: string | null;
+
+  /**
+   * Called with the whole list whenever it changes.
+   *
+   * Where persistence happens. `DataTable` deliberately writes nothing itself;
+   * views shared between colleagues and views in a URL are both impossible for
+   * a component that assumed `localStorage`.
+   */
+  onViewsChange?: (views: TableView<DataTableViewState>[]) => void;
+}
+
+/** One row of the switcher's list. The state a view holds is not its business. */
+export interface TableViewSummary {
+  id: string;
+  name: string;
+}
+
+export interface TableViewNamePanelProps {
+  /** What the panel is for - "Rename view" or "Save this view". */
+  title: string;
+
+  /** What the field starts with. Empty for a new view. */
+  initialName: string;
+
+  /** Called with the trimmed name. Never called with an empty one. */
+  onCommit: (name: string) => void;
+
+  /** Called on Cancel and on Escape. */
+  onCancel: () => void;
+}
+
+export interface TableViewSwitcherProps {
+  /** The saved views, in the order to list them. */
+  views: TableViewSummary[];
+
+  /** Which one is being looked at. */
+  activeId?: string | null;
+
+  /**
+   * Whether the table has been changed since that view was applied.
+   *
+   * Drives the dot on the trigger and the save and discard controls. Work it
+   * out by comparing state rather than by setting a flag on every change -
+   * `useSavedViews` does exactly that.
+   *
+   * @default false
+   */
+  dirty?: boolean;
+
+  /** Called with the view to switch to. */
+  onApply: (id: string) => void;
+
+  /** Overwrites the active view. Omit it and no Save control appears. */
+  onSave?: () => void;
+
+  /** Called with a name for a new view. Required: without it the list can only shrink. */
+  onSaveAs: (name: string) => void;
+
+  /** Omit either one and that control disappears from every row. */
+  onRename?: (id: string, name: string) => void;
+  onRemove?: (id: string) => void;
+
+  /** Puts the table back to the active view. Omit it and no Discard appears. */
+  onReset?: () => void;
+
+  /** Shown on the trigger when no view is active. @default 'Views' */
+  label?: string;
+
+  /** Extra classes for the trigger. */
+  className?: string;
+}
+
+/**
+ * What a `DataTable` saves when you save a view.
+ *
+ * Four things the toolbar can change, and nothing else. The page is left out
+ * because a view is a way of looking at a table rather than a place in it, and
+ * the selection because it belongs to the rows.
+ */
+export interface DataTableViewState {
+  columns: TableColumnsState;
+  sort: SortRule[];
+  filters: TableFilter[];
+  query: string;
+}
+
+export interface TablePaginationProps extends Omit<ComponentPropsWithoutRef<'div'>, 'children'> {
+  /** The page being shown, 1-based. */
+  page: number;
+
+  /** How many pages there are. The numbers hide when this is 1. */
+  pageCount: number;
+
+  /** The 0-based index of the first row on this page, and one past the last. */
+  from: number;
+  to: number;
+
+  /** How many rows there are altogether. What the count is counting. */
+  total: number;
+
+  /** Rows per page. */
+  pageSize: number;
+
+  /** What the rows-per-page control offers. @default [10, 25, 50, 100] */
+  pageSizes?: number[];
+
+  /** Called with the page that was asked for. Clamping is the caller's business. */
+  onPageChange: (page: number) => void;
+
+  /**
+   * Adds the rows-per-page control. Omit it and none appears.
+   *
+   * Optional because it is a real decision, not a default: a table backed by an
+   * expensive query may not want to offer 100 at all.
+   */
+  onPageSizeChange?: (size: number) => void;
 }
