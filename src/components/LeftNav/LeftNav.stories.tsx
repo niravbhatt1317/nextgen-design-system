@@ -101,10 +101,18 @@ const SETTINGS: Entry[] = [
 ];
 
 /** The raised disc the home button uses, for the footer's controls. */
+/**
+ * The footer's controls: the avatar's size, and flat.
+ *
+ * 24px to match the avatar beside them, so the row reads as three things of one
+ * size rather than a face between two larger buttons. No shadow either - the
+ * search is the raised thing on this panel, and a footer that also lifts turns
+ * a quiet strip into a second header.
+ */
 const DISC = [
-  'mdt-flex mdt-h-8 mdt-w-8 mdt-shrink-0 mdt-items-center mdt-justify-center',
-  'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background mdt-shadow-sm',
-  'mdt-text-muted-foreground mdt-transition-shadow hover:mdt-shadow-md hover:mdt-text-foreground',
+  'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
+  'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background',
+  'mdt-text-muted-foreground mdt-transition-colors hover:mdt-text-foreground',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
 ].join(' ');
 
@@ -301,13 +309,13 @@ export const Settings: Story = {
                 so the chrome and the content never argue.
               */}
               <button type="button" aria-label="More" className={DISC}>
-                <Icon name="more-horizontal" size="sm" aria-hidden />
+                <Icon name="more-horizontal" size="xs" aria-hidden />
               </button>
               <button type="button" aria-label="Notifications" className={cn(DISC, 'mdt-relative')}>
-                <Icon name="bell" size="sm" aria-hidden />
+                <Icon name="bell" size="xs" aria-hidden />
                 <span
                   aria-hidden
-                  className="mdt-absolute mdt-right-0 mdt-top-0 mdt-h-2.5 mdt-w-2.5 mdt-rounded-full mdt-border-2 mdt-border-background mdt-bg-accent-foreground"
+                  className="mdt-absolute -mdt-right-0.5 -mdt-top-0.5 mdt-h-2 mdt-w-2 mdt-rounded-full mdt-border-2 mdt-border-background mdt-bg-foreground"
                 />
               </button>
             </div>

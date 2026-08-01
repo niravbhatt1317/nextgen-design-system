@@ -868,7 +868,11 @@ const LeftNavFooter = forwardRef<HTMLDivElement, LeftNavFooterProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('mdt-mt-auto mdt-shrink-0 mdt-border-t mdt-border-border mdt-p-2', className)}
+      // No rule above it: the fade at the foot of the list already says the
+      // rows end there, and a border as well draws a box round a thing that is
+      // not a box. 12px of gutter, the same as every other part - it was on
+      // `p-2`, which is 8px, and read as a different component bolted on.
+      className={cn('mdt-mt-auto mdt-shrink-0 mdt-px-3 mdt-pb-3 mdt-pt-2', className)}
       {...props}
     />
   )
