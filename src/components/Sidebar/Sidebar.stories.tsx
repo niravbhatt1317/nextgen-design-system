@@ -17,15 +17,37 @@ import {
 import type { SidebarConfig } from './Sidebar.types';
 
 const meta: Meta<typeof Sidebar> = {
-  title: 'Components/Sidebar',
+  // Out of `Components`. A deprecated thing sitting in the same list as
+  // everything current is a thing somebody will pick, and the JSDoc that warns
+  // them is invisible to anyone browsing rather than writing code.
+  title: 'Deprecated/Sidebar',
   component: Sidebar,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Sidebar component for navigation and content organization. Features search, collapsible sections, nested items, and customizable actions.',
+        component: [
+          '## ⚠️ Deprecated — use `LeftNav`',
+          '',
+          '`LeftNav` is the navigation this library ships. This one predates it and speaks a',
+          'different visual language: a `muted` fill for the selected row with no leading',
+          'indicator, 20px icons, rows sized to their content rather than to a fixed rhythm,',
+          'and no sunken panel behind any of it. Neither is broken — they are from different',
+          'moments, and shipping both means products get two navigations that do not read as',
+          'siblings.',
+          '',
+          'It stays only until the app-navigation arrangement of `LeftNav` lands. **Do not',
+          'build on it.** For a navigation defined as data, use `DataLeftNav`.',
+          '',
+          'What `LeftNav` still does not do: collapse to a rail of icons. Logged in',
+          'COMPONENT-GAP.md.',
+          '',
+          '---',
+          '',
+          'Sidebar component for navigation and content organization. Features search,',
+          'collapsible sections, nested items, and customizable actions.',
+        ].join('\n'),
       },
     },
     // Disable nested-interactive rule - SidebarItem uses button with action buttons inside
