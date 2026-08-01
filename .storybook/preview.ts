@@ -28,8 +28,20 @@ const withTheme: Decorator = (Story, context) => {
 // setting, so the interface, the Docs pages and the canvas all agree on load.
 const startingTheme = getInitialTheme();
 
-const preview: Preview = {
+// Exported as the object itself rather than through a `preview` variable, and
+// that is not a style choice. Storybook reads `options.storySort` by parsing
+// this file as TEXT before anything runs, and its parser cannot follow a
+// variable - so behind one, the sort is silently ignored. No error, no warning;
+// the sidebar just falls back to the order the files happened to be walked in,
+// which puts the most recently touched component at the very bottom.
+//
+// `satisfies` keeps the type checking and the parser strips it before reading.
+export default {
   parameters: {
+    // Alphabetical, so a new component turns up where its name says it should.
+    options: {
+      storySort: { method: 'alphabetical', locales: 'en-US' },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -60,6 +72,4 @@ const preview: Preview = {
   },
   decorators: [withDeprecationWarning, withTheme],
   tags: ['autodocs'],
-};
-
-export default preview;
+} satisfies Preview;
