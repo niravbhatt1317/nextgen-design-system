@@ -432,6 +432,7 @@ export {
   TableColumnMenu,
   TableColumnBoundary,
   useColumnWidths,
+  useColumnReorder,
   useTableColumns,
 } from './Table';
 export type {

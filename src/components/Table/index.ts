@@ -21,6 +21,13 @@ export { TableColumnBoundary } from './TableColumnBoundary';
 export { useColumnWidths } from './useColumnWidths';
 export type { ColumnWidths, UseColumnWidths, UseColumnWidthsOptions } from './useColumnWidths';
 
+export { useColumnReorder } from './useColumnReorder';
+export type {
+  UseColumnReorder,
+  UseColumnReorderOptions,
+  ColumnGripProps,
+} from './useColumnReorder';
+
 export { useTableColumns } from './useTableColumns';
 export type {
   TableColumnDef,
