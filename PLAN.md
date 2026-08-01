@@ -7,6 +7,8 @@ takes priority. **Most of this is deliberately not urgent.** The point of the fi
 
 ---
 
+The modal work has its own list: **[DIALOG-PLAN.md](DIALOG-PLAN.md)**.
+
 ## Progress
 
 |             |                               |
