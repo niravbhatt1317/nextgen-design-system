@@ -377,3 +377,10 @@ dark feedback block — same hue, roughly half the saturation, a darker lightnes
 Until those exist the six values stay where they are, commented with what they measure. The day
 the ramps gain them, the feedback block should point at ramp variables again like every other
 token in the file.
+
+**A note on the six `-action` tokens that came later.** `Banner` needed a ground for a button
+standing on a tinted surface, and the general `secondary` is a blue-grey that reads as borrowed
+the moment it lands on a cream banner. Those grounds are **derived, not chosen** — a `color-mix`
+of the tone's own glyph colour into the tone's own surface, 14% resting and 24% under the cursor,
+written once and resolving correctly in both themes. They add no seventh hand-picked colour, and
+they will follow the six above onto the ramps on their own the day those steps exist.

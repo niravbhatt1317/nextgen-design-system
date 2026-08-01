@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority';
 import {
   Children,
   Fragment,
+  cloneElement,
   isValidElement,
   useEffect,
   useId,
@@ -70,6 +71,55 @@ const ICON_TONE: Record<BannerTone, string> = {
   success: 'mdt-text-feedback-success-icon',
   ai: 'mdt-text-feedback-ai-icon',
   neutral: 'mdt-text-feedback-neutral-icon',
+};
+
+/**
+ * The ground a button stands on inside this banner, published as two local
+ * variables so the action classes below never have to know the tone.
+ *
+ * See `globals.css`, FEEDBACK ACTION: the tone's own glyph colour thinned into
+ * the tone's own surface. The library's general `secondary` is a blue-grey, and
+ * on a cream banner it reads as a chip borrowed from another screen.
+ */
+const ACTION_GROUND: Record<BannerTone, string> = {
+  info: '[--bn-action:var(--mdt-feedback-info-action)] [--bn-action-hover:var(--mdt-feedback-info-action-hover)]',
+  warning:
+    '[--bn-action:var(--mdt-feedback-warning-action)] [--bn-action-hover:var(--mdt-feedback-warning-action-hover)]',
+  danger:
+    '[--bn-action:var(--mdt-feedback-danger-action)] [--bn-action-hover:var(--mdt-feedback-danger-action-hover)]',
+  success:
+    '[--bn-action:var(--mdt-feedback-success-action)] [--bn-action-hover:var(--mdt-feedback-success-action-hover)]',
+  ai: '[--bn-action:var(--mdt-feedback-ai-action)] [--bn-action-hover:var(--mdt-feedback-ai-action-hover)]',
+  neutral:
+    '[--bn-action:var(--mdt-feedback-neutral-action)] [--bn-action-hover:var(--mdt-feedback-neutral-action-hover)]',
+};
+
+/**
+ * What gets added to each action, by the kind of button it is.
+ *
+ * Added to the caller's own element rather than imposed by a descendant
+ * selector, so a `link` stays a bare word and a `ghost` stays empty until the
+ * cursor is on it. Whatever the button was, it now wears the banner's colour.
+ */
+const ACTION_LOOK = {
+  filled: [
+    'mdt-bg-[var(--bn-action)] hover:mdt-bg-[var(--bn-action-hover)]',
+    'active:mdt-bg-[var(--bn-action-hover)]',
+    'mdt-text-feedback-title hover:mdt-text-feedback-title',
+    'mdt-border-transparent',
+  ].join(' '),
+  ghost: [
+    'mdt-bg-transparent hover:mdt-bg-[var(--bn-action)]',
+    'mdt-text-feedback-title hover:mdt-text-feedback-title',
+  ].join(' '),
+  bare: 'mdt-text-feedback-title hover:mdt-text-feedback-text',
+} as const;
+
+/** `link` stays a word, `ghost` stays empty until hovered, everything else fills. */
+const lookFor = (variant: unknown): string => {
+  if (variant === 'link') return ACTION_LOOK.bare;
+  if (variant === 'ghost') return ACTION_LOOK.ghost;
+  return ACTION_LOOK.filled;
 };
 
 /** The same glyph per tone that Toast uses - same meaning, same mark. */
@@ -191,6 +241,18 @@ export const Banner = ({
   const stacked =
     below || (description !== undefined && description !== null && description !== '');
 
+  // Each action keeps its own element and gains the banner's colouring. Done
+  // here rather than with a descendant selector so the treatment can differ by
+  // variant - a link must not grow a ground just because it is in a banner.
+  const dressed = flat.map((child, i) =>
+    isValidElement<{ className?: string; variant?: unknown }>(child)
+      ? cloneElement(child, {
+          key: child.key ?? i,
+          className: cn(lookFor(child.props.variant), child.props.className),
+        })
+      : child
+  );
+
   const renderGlyph = (): ReactNode => {
     if (icon === null) return null;
     return (
@@ -202,7 +264,7 @@ export const Banner = ({
 
   return (
     <section
-      className={cn(bannerVariants({ tone, placement, stacked }), className)}
+      className={cn(bannerVariants({ tone, placement, stacked }), ACTION_GROUND[tone], className)}
       data-tone={tone}
       data-slot="banner"
       // A `section` is only a landmark once it has a name, which is exactly the
@@ -236,7 +298,7 @@ export const Banner = ({
             className="mdt-mt-2.5 mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2"
             data-slot="banner-actions"
           >
-            {actions}
+            {dressed}
           </div>
         ) : null}
       </div>
@@ -245,21 +307,21 @@ export const Banner = ({
         <div
           className={cn(
             'mdt-flex mdt-shrink-0 mdt-items-center mdt-gap-2',
-            // On one line the banner grows to hold whatever is in here, so the
-            // slot takes its natural height and everything centres together.
+            // Whatever is in here sits on the banner's own centre line, however
+            // many lines of text are beside it. A control is not part of the
+            // sentence, so pinning it to the first line leaves it stranded in
+            // the top corner of a two-line banner.
             //
-            // Once the text stacks, the slot is pinned to one line tall and its
-            // contents are allowed to overflow it evenly - which centres a 32px
-            // button on a 21px first line without anyone having to know either
-            // number. Nothing is clipped; the box is an alignment reference,
-            // not a container.
-            stacked && 'mdt-h-[1.5em]'
+            // The one exception is a banner whose actions have already dropped
+            // below: the cross is then alone in the top corner, above the
+            // block it closes, which is exactly where a dismiss belongs.
+            below ? 'mdt-h-[1.5em]' : 'mdt-self-center'
           )}
           data-slot="banner-end"
         >
           {beside ? (
             <div className="mdt-flex mdt-items-center mdt-gap-2" data-slot="banner-actions">
-              {actions}
+              {dressed}
             </div>
           ) : null}
 
@@ -269,13 +331,15 @@ export const Banner = ({
               onClick={onDismiss}
               aria-label={dismissLabel}
               data-slot="banner-dismiss"
-              // Deliberately outside the tone system, exactly as Toast's is. Only
-              // the icon and the border carry the tone, and a coloured cross
-              // would compete with the glyph for the same job.
+              // The mark itself stays outside the tone system, exactly as
+              // Toast's does - a coloured cross would compete with the glyph
+              // for the same job. Its hover ground is the banner's, so it does
+              // not flash a grey patch onto a cream surface.
               className={cn(
                 'mdt-flex mdt-h-7 mdt-w-7 mdt-shrink-0 mdt-items-center mdt-justify-center',
                 'mdt-rounded-md mdt-transition-colors',
-                'mdt-text-feedback-text/70 hover:mdt-bg-feedback-text/10 hover:mdt-text-feedback-text',
+                'mdt-text-feedback-text/70 hover:mdt-text-feedback-title',
+                'hover:mdt-bg-[var(--bn-action)]',
                 'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
               )}
             >

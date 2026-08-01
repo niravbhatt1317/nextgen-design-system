@@ -69,6 +69,7 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 
 export const Default: Story = {
   args: {
+    onDismiss: () => undefined,
     actions: (
       <Button variant="secondary" size="sm">
         Choose a plan
@@ -96,7 +97,7 @@ export const Tones: Story = {
   render: () => (
     <Stack>
       {TONES.map(({ tone, title }) => (
-        <Banner key={tone} tone={tone} title={title} />
+        <Banner key={tone} tone={tone} title={title} onDismiss={() => undefined} />
       ))}
     </Stack>
   ),
@@ -112,6 +113,7 @@ export const WithDescription: Story = {
         tone="danger"
         title="Sync has been failing since 14:20"
         description="Six runs in a row returned 403 from the connector. Nothing new has come in since."
+        onDismiss={() => undefined}
       />
     </Stack>
   ),
@@ -122,6 +124,11 @@ export const WithDescription: Story = {
  * a banner is not the page — put one in a warning and it outranks the Save
  * button the person came for. `secondary`, `ghost` or `link`, and the quieter
  * one goes on the left.
+ *
+ * Whatever you pass, **the banner recolours it in its own tone** — the library's
+ * general `secondary` is a blue-grey, and on a cream banner it reads as a chip
+ * borrowed from another screen. A `ghost` still stays empty until you are on it,
+ * and a `link` still stays a bare word.
  */
 export const WithActions: Story = {
   name: 'With actions',
@@ -129,15 +136,17 @@ export const WithActions: Story = {
   render: () => (
     <Stack>
       <div>
-        <Label>One action — sits beside the words</Label>
+        <Label>One action — sits beside the words, on the banner’s centre line</Label>
         <Banner
           tone="warning"
           title="Your trial ends in 3 days"
+          description="After that, agents keep read-only access until a plan is chosen."
           actions={
             <Button variant="secondary" size="sm">
               Choose a plan
             </Button>
           }
+          onDismiss={() => undefined}
         />
       </div>
       <div>
@@ -156,6 +165,7 @@ export const WithActions: Story = {
               </Button>
             </>
           }
+          onDismiss={() => undefined}
         />
       </div>
       <div>
@@ -168,7 +178,26 @@ export const WithActions: Story = {
               Review
             </Button>
           }
+          onDismiss={() => undefined}
         />
+      </div>
+      <div>
+        <Label>Every tone recolours its own action</Label>
+        <Stack>
+          {TONES.map(({ tone, title }) => (
+            <Banner
+              key={tone}
+              tone={tone}
+              title={title}
+              actions={
+                <Button variant="secondary" size="sm">
+                  Take a look
+                </Button>
+              }
+              onDismiss={() => undefined}
+            />
+          ))}
+        </Stack>
       </div>
     </Stack>
   ),
@@ -200,6 +229,7 @@ export const ActionPlacement: Story = {
               Choose a plan
             </Button>
           }
+          onDismiss={() => undefined}
         />
       </div>
       <div>
@@ -214,6 +244,7 @@ export const ActionPlacement: Story = {
               Choose a plan
             </Button>
           }
+          onDismiss={() => undefined}
         />
       </div>
       <div>
@@ -232,6 +263,7 @@ export const ActionPlacement: Story = {
               </Button>
             </>
           }
+          onDismiss={() => undefined}
         />
       </div>
     </div>
@@ -339,11 +371,17 @@ export const CustomIcon: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Stack>
-      <Banner tone="neutral" icon={null} title="Retention is set by the platform" />
+      <Banner
+        tone="neutral"
+        icon={null}
+        title="Retention is set by the platform"
+        onDismiss={() => undefined}
+      />
       <Banner
         tone="info"
         icon={<span aria-hidden>🛠️</span>}
         title="Maintenance on Sunday, 02:00–04:00 UTC"
+        onDismiss={() => undefined}
       />
     </Stack>
   ),

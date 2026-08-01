@@ -223,21 +223,62 @@ describe('Banner', () => {
   });
 
   describe('alignment', () => {
+    const one = (
+      <Button variant="secondary" size="sm">
+        Choose a plan
+      </Button>
+    );
+
     it('centres everything on one line', () => {
       render(<Banner title={TITLE} />);
       expect(surface().className).toContain('mdt-items-center');
     });
 
-    it('moves to the first line once there is a second one', () => {
+    it('puts the glyph on the first line once there is a second one', () => {
       render(<Banner title={TITLE} description="Read-only after that." />);
       expect(surface().className).toContain('mdt-items-start');
     });
 
-    it('moves to the first line once the actions drop below', () => {
+    it('puts the glyph on the first line once the actions drop below', () => {
+      render(<Banner title={TITLE} actionPlacement="below" actions={one} />);
+      expect(surface().className).toContain('mdt-items-start');
+    });
+
+    it('keeps the action on the banner centre, even under a paragraph', () => {
+      render(<Banner title={TITLE} description="Read-only after that." actions={one} />);
+      expect(slot('end')?.className).toContain('mdt-self-center');
+    });
+
+    it('keeps the cross on the banner centre with no action beside it', () => {
+      render(
+        <Banner title={TITLE} description="Read-only after that." onDismiss={() => undefined} />
+      );
+      expect(slot('end')?.className).toContain('mdt-self-center');
+    });
+
+    it('sends the cross to the top corner once the actions have dropped below', () => {
       render(
         <Banner
           title={TITLE}
+          description="Read-only after that."
           actionPlacement="below"
+          actions={one}
+          onDismiss={() => undefined}
+        />
+      );
+      expect(slot('end')?.className).not.toContain('mdt-self-center');
+      expect(slot('end')?.className).toContain('mdt-h-[1.5em]');
+    });
+  });
+
+  describe('the actions wear the banner', () => {
+    const look = (name: string) => screen.getByRole('button', { name }).className;
+
+    it('gives a secondary button the tone ground instead of the general grey', () => {
+      render(
+        <Banner
+          tone="warning"
+          title={TITLE}
           actions={
             <Button variant="secondary" size="sm">
               Choose a plan
@@ -245,7 +286,55 @@ describe('Banner', () => {
           }
         />
       );
-      expect(surface().className).toContain('mdt-items-start');
+      expect(look('Choose a plan')).toContain('mdt-bg-[var(--bn-action)]');
+    });
+
+    it('publishes the tone ground on the banner, so nothing has to know the tone', () => {
+      render(<Banner tone="warning" title={TITLE} />);
+      expect(surface().className).toContain('[--bn-action:var(--mdt-feedback-warning-action)]');
+    });
+
+    it('leaves a ghost empty until the cursor is on it', () => {
+      render(
+        <Banner
+          title={TITLE}
+          actions={
+            <Button variant="ghost" size="sm">
+              Read the notes
+            </Button>
+          }
+        />
+      );
+      expect(look('Read the notes')).toContain('mdt-bg-transparent');
+      expect(look('Read the notes')).toContain('hover:mdt-bg-[var(--bn-action)]');
+    });
+
+    it('leaves a link a bare word', () => {
+      render(
+        <Banner
+          title={TITLE}
+          actions={
+            <Button variant="link" size="sm">
+              Review
+            </Button>
+          }
+        />
+      );
+      expect(look('Review')).not.toContain('mdt-bg-[var(--bn-action)]');
+    });
+
+    it('keeps a className the caller passed', () => {
+      render(
+        <Banner
+          title={TITLE}
+          actions={
+            <Button variant="secondary" size="sm" className="mine">
+              Choose a plan
+            </Button>
+          }
+        />
+      );
+      expect(look('Choose a plan')).toContain('mine');
     });
   });
 

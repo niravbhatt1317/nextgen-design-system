@@ -237,6 +237,90 @@
     --mdt-feedback-title: var(--mdt-neutral-150);
     --mdt-feedback-text: var(--mdt-neutral-130);
 
+    /* ============================================
+       FEEDBACK ACTION - the ground under a button standing on a tinted surface
+
+       The general `secondary` ground is a blue-grey, which is right on the page
+       and wrong the moment it lands on a cream banner - it reads as a chip
+       borrowed from somewhere else. A button sitting on a tinted surface has to
+       belong to that surface.
+
+       So the ground is the tone's OWN glyph colour, thinned into the tone's own
+       surface: 14% resting, 24% under the cursor. Same hue as the banner,
+       one clear step deeper, and nowhere near loud enough to be mistaken for a
+       primary action.
+
+       Written once, for both themes. `color-mix` resolves at the point of use,
+       so inside `.dark` these pick up the dark glyph and the dark ground on
+       their own - there is no second set of numbers to keep in step, and no new
+       hand-picked colour anywhere in it.
+       ============================================ */
+    --mdt-feedback-info-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-info-icon)) 14%,
+      hsl(var(--mdt-feedback-info-bg))
+    );
+    --mdt-feedback-info-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-info-icon)) 24%,
+      hsl(var(--mdt-feedback-info-bg))
+    );
+
+    --mdt-feedback-warning-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-warning-icon)) 14%,
+      hsl(var(--mdt-feedback-warning-bg))
+    );
+    --mdt-feedback-warning-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-warning-icon)) 24%,
+      hsl(var(--mdt-feedback-warning-bg))
+    );
+
+    --mdt-feedback-danger-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-danger-icon)) 14%,
+      hsl(var(--mdt-feedback-danger-bg))
+    );
+    --mdt-feedback-danger-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-danger-icon)) 24%,
+      hsl(var(--mdt-feedback-danger-bg))
+    );
+
+    --mdt-feedback-success-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-success-icon)) 14%,
+      hsl(var(--mdt-feedback-success-bg))
+    );
+    --mdt-feedback-success-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-success-icon)) 24%,
+      hsl(var(--mdt-feedback-success-bg))
+    );
+
+    --mdt-feedback-ai-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-ai-icon)) 14%,
+      hsl(var(--mdt-feedback-ai-bg))
+    );
+    --mdt-feedback-ai-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-ai-icon)) 24%,
+      hsl(var(--mdt-feedback-ai-bg))
+    );
+
+    --mdt-feedback-neutral-action: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-neutral-icon)) 14%,
+      hsl(var(--mdt-feedback-neutral-bg))
+    );
+    --mdt-feedback-neutral-action-hover: color-mix(
+      in srgb,
+      hsl(var(--mdt-feedback-neutral-icon)) 24%,
+      hsl(var(--mdt-feedback-neutral-bg))
+    );
+
     --mdt-radius: 0.5rem;
 
     /* ============================================
