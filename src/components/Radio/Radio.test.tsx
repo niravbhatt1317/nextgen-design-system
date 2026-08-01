@@ -265,3 +265,137 @@ describe('RadioGroup', () => {
     });
   });
 });
+
+describe('RadioGroup · segmented', () => {
+  const strip = (c: HTMLElement) => c.querySelector('[role="radiogroup"]');
+  const segments = (c: HTMLElement) => [...c.querySelectorAll('[data-slot="radio-segment"]')];
+
+  const render3 = (props: Record<string, unknown> = {}) =>
+    render(
+      <RadioGroup variant="segmented" defaultValue="medium" aria-label="Priority" {...props}>
+        <RadioGroupItem value="low">Low</RadioGroupItem>
+        <RadioGroupItem value="medium">Medium</RadioGroupItem>
+        <RadioGroupItem value="high">High</RadioGroupItem>
+      </RadioGroup>
+    );
+
+  it('is still a radio group, so it is announced as a choice', () => {
+    render3();
+    expect(screen.getByRole('radiogroup', { name: 'Priority' })).toBeInTheDocument();
+    expect(screen.getAllByRole('radio')).toHaveLength(3);
+    expect(screen.getByRole('radio', { name: 'Medium' })).toBeChecked();
+  });
+
+  it('makes one strip: one border, ends rounded, nothing behind it', () => {
+    const { container } = render3();
+    const group = strip(container);
+    expect(group).toHaveClass('mdt-border');
+    expect(group).toHaveClass('mdt-rounded-md');
+    expect(group).toHaveClass('mdt-overflow-hidden');
+    // no tray and no gaps - the joint is the shape
+    expect(group).not.toHaveClass('mdt-gap-2');
+    expect(group).not.toHaveClass('mdt-p-1');
+  });
+
+  it('shares the dividing line rather than drawing two', () => {
+    const { container } = render3();
+    expect(strip(container)).toHaveClass('[&>*:not(:first-child)]:mdt-border-l');
+  });
+
+  it('drops the circle, and marks the chosen one with a tint and a heavier word', () => {
+    const { container } = render3();
+    const chosen = segments(container)[1];
+    expect(chosen).toHaveClass('data-[state=checked]:mdt-bg-secondary');
+    expect(chosen).toHaveClass('data-[state=checked]:mdt-font-semibold');
+    // the circle belongs to the default variant, not this one
+    expect(chosen).not.toHaveClass('mdt-rounded-full');
+    expect(container.querySelector('[data-slot="radio-segment"] .mdt-bg-current')).toBeNull();
+  });
+
+  it('draws focus inside the segment, because the strip clips its own edges', () => {
+    const { container } = render3();
+    const seg = segments(container)[0];
+    expect(seg).toHaveClass('focus-visible:mdt-ring-inset');
+    expect(seg).not.toHaveClass('focus-visible:mdt-ring-offset-2');
+  });
+
+  it('takes the variant from the group, so a segment does not repeat it', () => {
+    const { container } = render3();
+    expect(segments(container)).toHaveLength(3);
+  });
+
+  it('hugs its labels by default, and does not stretch to its column', () => {
+    const { container } = render3();
+    expect(strip(container)).not.toHaveClass('mdt-w-full');
+    // a flex column would stretch it and leave a tail of empty border
+    expect(strip(container)).toHaveClass('mdt-w-fit');
+    segments(container).forEach((s) => {
+      expect(s).not.toHaveClass('mdt-flex-1');
+    });
+  });
+
+  it('shares the width equally when asked to fill the column', () => {
+    const { container } = render3({ fullWidth: true });
+    expect(strip(container)).toHaveClass('mdt-w-full');
+    segments(container).forEach((s) => {
+      expect(s).toHaveClass('mdt-flex-1');
+      // so a long label gives way instead of pushing the strip wider
+      expect(s).toHaveClass('mdt-min-w-0');
+    });
+  });
+
+  it('matches a button at the same size name', () => {
+    const { container: md } = render3();
+    expect(segments(md)[0]).toHaveClass('mdt-h-9');
+    const { container: sm } = render3({ size: 'sm' });
+    expect(segments(sm)[0]).toHaveClass('mdt-h-8');
+  });
+
+  it('lets one segment override the group size', () => {
+    const { container } = render(
+      <RadioGroup variant="segmented" defaultValue="a" aria-label="Size">
+        <RadioGroupItem value="a">A</RadioGroupItem>
+        <RadioGroupItem value="b" size="sm">
+          B
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    const [a, b] = segments(container);
+    expect(a).toHaveClass('mdt-h-9');
+    expect(b).toHaveClass('mdt-h-8');
+  });
+
+  it('changes the value when a segment is pressed', async () => {
+    const onValueChange = vi.fn();
+    render3({ onValueChange });
+    await userEvent.click(screen.getByRole('radio', { name: 'High' }));
+    expect(onValueChange).toHaveBeenCalledWith('high');
+  });
+
+  it('keeps a segment that cannot be chosen in the strip', () => {
+    const { container } = render(
+      <RadioGroup variant="segmented" defaultValue="draft" aria-label="Stage">
+        <RadioGroupItem value="draft">Draft</RadioGroupItem>
+        <RadioGroupItem value="published" disabled>
+          Published
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    // still there, still readable, just not selectable
+    expect(segments(container)).toHaveLength(2);
+    expect(screen.getByRole('radio', { name: 'Published' })).toBeDisabled();
+  });
+
+  it('leaves the other variants exactly as they were', () => {
+    const { container } = render(
+      <RadioGroup defaultValue="a" aria-label="Plain">
+        <RadioGroupItem value="a" id="pa" />
+        <RadioGroupItem value="b" id="pb" />
+      </RadioGroup>
+    );
+    expect(strip(container)).toHaveClass('mdt-grid');
+    expect(strip(container)).toHaveClass('mdt-gap-2');
+    expect(container.querySelectorAll('[data-slot="radio-segment"]')).toHaveLength(0);
+    expect(container.querySelector('#pa')).toHaveClass('mdt-rounded-full');
+  });
+});
