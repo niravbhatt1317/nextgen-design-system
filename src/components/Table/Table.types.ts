@@ -293,6 +293,16 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
    */
   sortOrder?: TableSortOrder;
 
+  /**
+   * This column's place in a multi-column sort, 1-based.
+   *
+   * Shown as a small number beside the arrow. Leave it out when only one column
+   * ever sorts - a lone "1" is noise. With two or more it is not optional: an
+   * arrow on three columns says all three are sorted and nothing about which
+   * one wins, and people reasonably assume the leftmost does.
+   */
+  sortIndex?: number;
+
   /** Called when the sort control is used. Ignored unless `sortable` is set. */
   onSort?: () => void;
 
@@ -552,5 +562,87 @@ export interface TableColumnBoundaryProps {
   insertLabel?: string;
 
   /** Extra classes for the line. */
+  className?: string;
+}
+
+/**
+ * Props for TableToolbar - the controls that act on the whole table.
+ */
+export interface TableToolbarProps extends ComponentPropsWithoutRef<'div'> {
+  /**
+   * What a screen reader calls the group.
+   *
+   * A page can hold more than one table, and "Table controls" three times over
+   * identifies none of them.
+   *
+   * @default 'Table controls'
+   */
+  label?: string;
+}
+
+/** Props for TableToolbarActions - the trailing group of a toolbar. */
+export type TableToolbarActionsProps = ComponentPropsWithoutRef<'div'>;
+
+/**
+ * Props for TableSortMenu.
+ *
+ * The rules come in and the changes go out: like everything else in Table this
+ * renders a sort, it does not own one. `useTableSort` is the other half.
+ */
+export interface TableSortMenuProps {
+  /** Every column that can be sorted, in the order to list them. */
+  columns: { key: string; label: string }[];
+
+  /** The active sort, most significant first. */
+  rules: { column: string; direction: 'ascend' | 'descend' }[];
+
+  /** Reverses one column's direction. */
+  onToggleDirection: (column: string) => void;
+
+  /** Stops sorting by one column. */
+  onRemove: (column: string) => void;
+
+  /** Moves a rule within the stack, changing which sort wins. */
+  onMove: (from: number, to: number) => void;
+
+  /** Drops every rule. */
+  onClear: () => void;
+
+  /** Starts sorting by a column that is not in the stack yet. */
+  onSortBy: (column: string) => void;
+
+  /** What a screen reader calls the trigger. @default 'Sort' */
+  label?: string;
+
+  /** Extra classes for the trigger. */
+  className?: string;
+}
+
+/**
+ * Props for TableViewMenu - grouping and which columns exist.
+ */
+export interface TableViewMenuProps {
+  /** Every column, in display order, with whether it is currently shown. */
+  columns: { key: string; label: string; visible: boolean; locked?: boolean }[];
+
+  /** The column the table is grouped by, or `null`. @default null */
+  groupBy?: string | null;
+
+  /** Called with the chosen column, or `null` for no grouping. */
+  onGroupBy: (key: string | null) => void;
+
+  /** Called with the column whose visibility was toggled. */
+  onToggleColumn: (key: string) => void;
+
+  /** Adds a Show all control. Omit it and none appears. */
+  onShowAll?: () => void;
+
+  /** Adds a Hide all control. */
+  onHideAll?: () => void;
+
+  /** What a screen reader calls the trigger. @default 'View settings' */
+  label?: string;
+
+  /** Extra classes for the trigger. */
   className?: string;
 }
