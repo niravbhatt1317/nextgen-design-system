@@ -567,7 +567,14 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
     }, [setPinned]);
 
     return (
-      <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
+      <div
+        ref={ref}
+        // Pulled up 4px, so the gap from the search is 12px here rather than the
+        // 16px a group heading sits at. A section header is a heavier thing than
+        // a group label and wants to sit closer to the field above it.
+        className={cn('-mdt-mt-1 mdt-flex mdt-flex-col mdt-gap-0.5', className)}
+        {...props}
+      >
         <div
           className={cn(
             // Pinned, so the name of the section you are in survives scrolling
@@ -580,7 +587,12 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
             //
             // 10px of it, which measures 12px clear: the heading's line box is
             // 2px taller than the text it holds.
-            'mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-items-center mdt-gap-1',
+            // `pl-1` is what puts the chevron on the same vertical as the item
+            // icons and the title on the same vertical as their labels. A row
+            // carries 8px of its own padding and this header carried none, so
+            // both sat 4px to the left of everything they head - the 24px back
+            // control holds its 16px glyph 4px in, and 4 + 4 makes up the 8.
+            'mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-items-center mdt-gap-1 mdt-pl-1',
             'mdt-pb-2.5 mdt-pt-2',
             'mdt-bg-neutral-10 dark:mdt-bg-neutral-150'
           )}
