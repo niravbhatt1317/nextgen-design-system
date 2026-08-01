@@ -870,9 +870,14 @@ const LeftNavFooter = forwardRef<HTMLDivElement, LeftNavFooterProps>(
       ref={ref}
       // No rule above it: the fade at the foot of the list already says the
       // rows end there, and a border as well draws a box round a thing that is
-      // not a box. 12px of gutter, the same as every other part - it was on
-      // `p-2`, which is 8px, and read as a different component bolted on.
-      className={cn('mdt-mt-auto mdt-shrink-0 mdt-px-3 mdt-pb-3 mdt-pt-2', className)}
+      // not a box.
+      //
+      // 16px of gutter rather than the panel's 12px, and 16px above. The rows
+      // above are a list and want their edges tight; this is a resting place at
+      // the bottom of one, and the extra 4px is what separates it from them
+      // now that no line does. The bottom stays at 12px - it already has the
+      // panel's own edge under it.
+      className={cn('mdt-mt-auto mdt-shrink-0 mdt-px-4 mdt-pb-3 mdt-pt-4', className)}
       {...props}
     />
   )
