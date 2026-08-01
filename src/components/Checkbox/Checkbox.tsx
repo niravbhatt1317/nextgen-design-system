@@ -1,9 +1,14 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
+import { createContext, forwardRef, useContext, useMemo } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '@/components/Icon';
-import type { CheckboxProps } from './Checkbox.types';
+import type {
+  CheckboxGroupContextValue,
+  CheckboxGroupProps,
+  CheckboxProps,
+  CheckboxSize,
+} from './Checkbox.types';
 
 // ============================================================================
 // Shared CSS class constants to reduce duplication (SonarJS: no-duplicate-string)
@@ -71,6 +76,38 @@ export const checkboxVariants = cva([], {
         CARD_CHECKED_CLASSES,
         DISABLED_CLASSES,
       ],
+      // ── one choice, as a chip ──
+      //
+      // Always an outline. It never fills solid, because a row of solid chips
+      // reads as a row of buttons waiting to be pressed - and these are answers,
+      // not actions. Choosing one puts the edge at full strength and lifts the
+      // ground a step; the tick on the right does the rest.
+      //
+      // 32px and an 8px corner, deliberately unlike TagPill's 24px pill with a
+      // cross. Same shape, opposite meaning: a tag says "this is already chosen,
+      // press the cross to take it away", a chip says "press me to choose".
+      // Build them alike and people press the tick expecting the option to
+      // disappear from the list rather than simply come unchosen.
+      chip: [
+        'mdt-group mdt-inline-flex mdt-items-center mdt-gap-1.5 mdt-align-middle',
+        'mdt-rounded-lg mdt-border mdt-border-input mdt-bg-transparent',
+        'mdt-font-medium mdt-leading-none mdt-text-muted-foreground',
+        'mdt-cursor-pointer mdt-whitespace-nowrap',
+        'mdt-transition-[background-color,border-color,color] mdt-duration-150',
+        'hover:mdt-border-muted-foreground hover:mdt-bg-secondary hover:mdt-text-foreground',
+        // The weight deliberately does NOT change.
+        //
+        // Bolder text is wider text - measured at 1.4px to 3.4px per chip
+        // depending on the word, which across a row is enough to tip it onto
+        // another line. Holding the tick's place and then moving the layout with
+        // the font would give away the one thing this variant is for. The edge,
+        // the ground and the tick are three cues already.
+        'data-[state=checked]:mdt-border-foreground data-[state=checked]:mdt-bg-secondary',
+        'data-[state=checked]:mdt-text-foreground',
+        FOCUS_RING_CLASSES,
+        DISABLED_CLASSES,
+        'disabled:hover:mdt-border-input disabled:hover:mdt-bg-transparent',
+      ],
       'card-with-checkbox': [
         'mdt-peer mdt-w-full mdt-cursor-pointer mdt-rounded-lg mdt-border-2 mdt-border-input',
         'mdt-p-4 mdt-transition-all',
@@ -86,6 +123,76 @@ export const checkboxVariants = cva([], {
     variant: 'default',
   },
 });
+
+/**
+ * Size and layout travel from the group to its chips, so a caller sets them
+ * once. A chip may still override its own size; nothing here stops it.
+ */
+const CheckboxGroupContext = createContext<CheckboxGroupContextValue>({
+  variant: 'default',
+  size: 'md',
+});
+
+/**
+ * 32px, comfortably above the 24px a TagPill sits at. That gap is doing work:
+ * it is one of the two things keeping "press me to choose" visibly apart from
+ * "press the cross to remove this".
+ */
+const CHIP_SIZES: Record<CheckboxSize, string> = {
+  sm: 'mdt-h-7 mdt-px-2.5 mdt-text-[13px]',
+  md: 'mdt-h-8 mdt-px-3 mdt-text-sm',
+};
+
+/**
+ * A row of choices that wraps.
+ *
+ * ## Not connected, on purpose
+ *
+ * Each chip is its own shape with its own edge, and they wrap onto the next line
+ * when the row runs out. That is the opposite of the segmented strip in `Radio`,
+ * where the segments are joined into one bar - joined says "one of these", and
+ * separate says "as many as you like".
+ *
+ * ## It is a group, and it says so
+ *
+ * `role="group"` with a name, so a screen reader announces what the chips are
+ * for before reading them. Each chip inside is a real checkbox: Tab reaches it,
+ * Space presses it, and pressing again lets it go.
+ *
+ * @example
+ * ```tsx
+ * <CheckboxGroup variant="chip" label="Which of these were affected?">
+ *   <Checkbox value="network">Network</Checkbox>
+ *   <Checkbox value="storage">Storage</Checkbox>
+ * </CheckboxGroup>
+ * ```
+ */
+const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
+  ({ className, variant = 'chip', size = 'md', label, children, ...props }, ref) => {
+    const context = useMemo<CheckboxGroupContextValue>(() => ({ variant, size }), [variant, size]);
+
+    return (
+      <CheckboxGroupContext.Provider value={context}>
+        <div
+          ref={ref}
+          role="group"
+          data-slot="checkbox-group"
+          {...(label !== undefined ? { 'aria-label': label } : {})}
+          className={cn(
+            variant === 'chip'
+              ? 'mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2'
+              : 'mdt-flex mdt-flex-col mdt-gap-2',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </CheckboxGroupContext.Provider>
+    );
+  }
+);
+CheckboxGroup.displayName = 'CheckboxGroup';
 
 /**
  * Checkbox component for toggleable selection.
@@ -109,12 +216,49 @@ export const checkboxVariants = cva([], {
  * ```
  */
 const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, CheckboxProps>(
-  ({ className, variant = 'default', children, ...props }, ref) => {
-    if (variant === 'card') {
+  ({ className, variant, size, children, ...props }, ref) => {
+    const group = useContext(CheckboxGroupContext);
+    // The group decides unless the chip says otherwise, so a row of chips is
+    // written once at the top rather than repeated on every one of them.
+    const resolved = variant ?? (group.variant === 'chip' ? 'chip' : 'default');
+
+    if (resolved === 'chip') {
       return (
         <CheckboxPrimitive.Root
           ref={ref}
-          className={cn(checkboxVariants({ variant }), className)}
+          data-slot="checkbox-chip"
+          className={cn(
+            checkboxVariants({ variant: 'chip' }),
+            CHIP_SIZES[size ?? group.size],
+            className
+          )}
+          {...props}
+        >
+          {children}
+          {/*
+            The tick's place is held whether it is shown or not.
+
+            Let the chip grow as the tick arrives and every chip after it shifts
+            along - in a wrapping row that can tip the block onto another line,
+            so the chip you were about to press moves out from under your cursor
+            mid-press. The cost is ~20px of width on every chip, chosen or not.
+          */}
+          <span
+            aria-hidden="true"
+            className="mdt-inline-flex mdt-shrink-0 mdt-opacity-0 mdt-transition-opacity mdt-duration-150 group-data-[state=checked]:mdt-opacity-100"
+            data-slot="checkbox-chip-tick"
+          >
+            <Icon name="check" size="xs" aria-hidden />
+          </span>
+        </CheckboxPrimitive.Root>
+      );
+    }
+
+    if (resolved === 'card') {
+      return (
+        <CheckboxPrimitive.Root
+          ref={ref}
+          className={cn(checkboxVariants({ variant: resolved }), className)}
           {...props}
         >
           {children}
@@ -122,11 +266,11 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
       );
     }
 
-    if (variant === 'card-with-checkbox') {
+    if (resolved === 'card-with-checkbox') {
       return (
         <CheckboxPrimitive.Root
           ref={ref}
-          className={cn(checkboxVariants({ variant }), className)}
+          className={cn(checkboxVariants({ variant: resolved }), className)}
           {...props}
         >
           <div
@@ -149,7 +293,7 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
     return (
       <CheckboxPrimitive.Root
         ref={ref}
-        className={cn(checkboxVariants({ variant }), className)}
+        className={cn(checkboxVariants({ variant: resolved }), className)}
         {...props}
       >
         <CheckboxPrimitive.Indicator className={INDICATOR_CLASSES}>
@@ -162,4 +306,4 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
 );
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox };
+export { Checkbox, CheckboxGroup };

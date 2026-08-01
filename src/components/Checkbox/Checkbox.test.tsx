@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Checkbox } from './Checkbox';
+import { Checkbox, CheckboxGroup } from './Checkbox';
 
 describe('Checkbox', () => {
   it('renders checkbox', () => {
@@ -208,5 +208,151 @@ describe('Checkbox', () => {
           .join(' ');
       expect(cls(off)).toBe(cls(on));
     });
+  });
+});
+
+describe('CheckboxGroup · chips', () => {
+  const chips = (c: HTMLElement) => [...c.querySelectorAll('[data-slot="checkbox-chip"]')];
+  const group = (c: HTMLElement) => c.querySelector('[data-slot="checkbox-group"]');
+
+  const render3 = (props: Record<string, unknown> = {}) =>
+    render(
+      <CheckboxGroup label="Affected services" {...props}>
+        <Checkbox defaultChecked>Network</Checkbox>
+        <Checkbox>Storage</Checkbox>
+        <Checkbox>Database</Checkbox>
+      </CheckboxGroup>
+    );
+
+  it('is a named group of real checkboxes, not a row of buttons', () => {
+    render3();
+    expect(screen.getByRole('group', { name: 'Affected services' })).toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+    expect(screen.getByRole('checkbox', { name: 'Network' })).toBeChecked();
+  });
+
+  it('lets go when pressed again, which is what makes it a checkbox and not a tag', async () => {
+    render3();
+    const chip = screen.getByRole('checkbox', { name: 'Storage' });
+    await userEvent.click(chip);
+    expect(chip).toBeChecked();
+    await userEvent.click(chip);
+    expect(chip).not.toBeChecked();
+  });
+
+  it('wraps rather than joining, because several answers are allowed', () => {
+    const { container } = render3();
+    expect(group(container)).toHaveClass('mdt-flex-wrap');
+    // no shared edges: a joined strip is Radio's segmented variant, not this
+    expect(group(container)).not.toHaveClass('mdt-overflow-hidden');
+    expect(group(container)).toHaveClass('mdt-gap-2');
+  });
+
+  it('stays an outline, chosen or not', () => {
+    const { container } = render3();
+    const chip = chips(container)[0];
+    expect(chip).toHaveClass('mdt-bg-transparent');
+    expect(chip).toHaveClass('mdt-border');
+    // chosen lifts the ground a step; it never fills solid
+    expect(chip).toHaveClass('data-[state=checked]:mdt-bg-secondary');
+    expect(chip).not.toHaveClass('data-[state=checked]:mdt-bg-primary');
+  });
+
+  it('firms the edge and the text when chosen, but never the weight', () => {
+    const { container } = render3();
+    const chip = chips(container)[0];
+    expect(chip).toHaveClass('data-[state=checked]:mdt-border-foreground');
+    expect(chip).toHaveClass('data-[state=checked]:mdt-text-foreground');
+    // bolder text is wider text - 1.4px to 3.4px a chip, which across a row is
+    // enough to tip it onto another line and undo the held tick space
+    expect(chip).not.toHaveClass('data-[state=checked]:mdt-font-semibold');
+  });
+
+  it('holds the room for the tick, so nothing moves when a chip is pressed', () => {
+    const { container } = render3();
+    const tick = container.querySelector('[data-slot="checkbox-chip-tick"]');
+    // present from the start, and only its opacity changes
+    expect(tick).toBeInTheDocument();
+    expect(tick).toHaveClass('mdt-opacity-0');
+    expect(tick).toHaveClass('group-data-[state=checked]:mdt-opacity-100');
+    expect(tick).not.toHaveClass('mdt-hidden');
+  });
+
+  it('puts the tick after the label, not before it', () => {
+    const { container } = render3();
+    const chip = chips(container)[0] as HTMLElement;
+    const tick = chip.querySelector('[data-slot="checkbox-chip-tick"]');
+    expect(chip.lastElementChild).toBe(tick);
+  });
+
+  it('keeps the tick out of the name a screen reader reads', () => {
+    render3();
+    // the label is the whole accessible name - no stray "check" in it
+    expect(screen.getByRole('checkbox', { name: 'Network' })).toBeInTheDocument();
+  });
+
+  it('takes the variant from the group, so a chip does not repeat it', () => {
+    const { container } = render3();
+    expect(chips(container)).toHaveLength(3);
+  });
+
+  it('is taller than a TagPill, which is what keeps the two apart', () => {
+    const { container: md } = render3();
+    expect(chips(md)[0]).toHaveClass('mdt-h-8'); // 32px, against TagPill's 24
+    const { container: sm } = render3({ size: 'sm' });
+    expect(chips(sm)[0]).toHaveClass('mdt-h-7');
+  });
+
+  it('lets one chip override the group size', () => {
+    const { container } = render(
+      <CheckboxGroup label="Sizes">
+        <Checkbox>A</Checkbox>
+        <Checkbox size="sm">B</Checkbox>
+      </CheckboxGroup>
+    );
+    const [a, b] = chips(container);
+    expect(a).toHaveClass('mdt-h-8');
+    expect(b).toHaveClass('mdt-h-7');
+  });
+
+  it('keeps a chip that cannot be pressed in the row', () => {
+    const { container } = render(
+      <CheckboxGroup label="Affected services">
+        <Checkbox defaultChecked>Network</Checkbox>
+        <Checkbox disabled>Storage</Checkbox>
+      </CheckboxGroup>
+    );
+    expect(chips(container)).toHaveLength(2);
+    expect(screen.getByRole('checkbox', { name: 'Storage' })).toBeDisabled();
+  });
+
+  it('reports each answer on its own', async () => {
+    const onCheckedChange = vi.fn();
+    render(
+      <CheckboxGroup label="Affected services">
+        <Checkbox onCheckedChange={onCheckedChange}>Network</Checkbox>
+      </CheckboxGroup>
+    );
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Network' }));
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+  });
+
+  it('leaves every other checkbox variant exactly as it was', () => {
+    const { container } = render(<Checkbox aria-label="Plain" />);
+    const box = container.querySelector('[role="checkbox"]');
+    expect(box).toHaveClass('mdt-h-4');
+    expect(box).toHaveClass('mdt-rounded-sm');
+    expect(container.querySelectorAll('[data-slot="checkbox-chip"]')).toHaveLength(0);
+  });
+
+  it('stacks rather than wrapping when the group is not chips', () => {
+    const { container } = render(
+      <CheckboxGroup variant="default" label="Plain">
+        <Checkbox aria-label="One" />
+        <Checkbox aria-label="Two" />
+      </CheckboxGroup>
+    );
+    expect(group(container)).toHaveClass('mdt-flex-col');
+    expect(chips(container)).toHaveLength(0);
   });
 });
