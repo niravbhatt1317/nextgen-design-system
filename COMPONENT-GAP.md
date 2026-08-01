@@ -336,6 +336,36 @@ cheap fix is a rule in `globals.css` that shortens every animation to near-zero 
 query, which would cover all seven at once without touching them. Worth doing deliberately rather
 than one component at a time.
 
+## `Sidebar` is deprecated, and what is still missing from `LeftNav`
+
+`LeftNav` is the navigation this library ships. `Sidebar` predates it and is deprecated as of
+1 August 2026 — not because it is broken, but because the two speak different visual languages and
+shipping both means products get two navigations that do not read as siblings:
+
+|              | `Sidebar`                  | `LeftNav`                                              |
+| ------------ | -------------------------- | ------------------------------------------------------ |
+| Selected row | `muted` fill, no indicator | `secondary` fill, `foreground` bar at the leading edge |
+| Row height   | `py-1.5`, sized to content | a fixed 32px rhythm                                    |
+| Icons        | 20px                       | 16px                                                   |
+| Search       | a `kbd` shortcut chip      | a magnifier inside the field                           |
+| Panel        | none                       | `neutral-10`, with the tile and field raised on it     |
+
+**It was deliberately not renamed to `AppSidebar`.** Renaming is a promotion: it would say "this is
+the app navigation", committing a future app nav to this component's look and API. When that nav is
+designed from references — the way the table and `LeftNav` were — it should be a second arrangement
+of `LeftNav`'s parts, not a third component. The item, group, section, search and footer are
+already generic; that is why `LeftNav` is named for its position rather than its job.
+
+### Still missing from `LeftNav`
+
+| Missing                                   | Status                                                                                                                                                                                                                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Collapse to a rail of icons**           | `SidebarCollapse` does a version of this. Not scheduled, and not needed by the settings arrangement — it is the first thing an app-navigation arrangement will want, along with a workspace switcher and a tooltip for the collapsed labels. Logged, not built. |
+| **Rendering from a configuration object** | `DataDrivenSidebar` does this. Being built as `DataLeftNav`.                                                                                                                                                                                                    |
+
+`Sidebar` goes when the app-navigation arrangement lands. Git keeps it regardless; a tag is enough
+to recover it.
+
 ## A note on method
 
 This compares component **types**, not implementations. Where four teams built the same type, they

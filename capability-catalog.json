@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 760,
+  "capabilityCount": 762,
   "counts": {
-    "story": 558,
-    "component": 181,
+    "story": 559,
+    "component": 182,
     "utility": 9,
     "hook": 12
   },
@@ -1419,6 +1419,16 @@
       "propDocs": ""
     },
     {
+      "name": "DataLeftNav",
+      "kind": "component",
+      "file": "src/components/LeftNav/DataLeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "DataLeftNav - the whole navigation from one configuration object.",
+      "doc": "DataLeftNav - the whole navigation from one configuration object. `LeftNav` is parts; this is what you reach for when the navigation is data rather than markup - which it usually is. Permissions decide what a person sees, a server decides what a plan includes, and neither belongs in JSX. **The configuration is JSON.** Icons are names, not `ReactNode`s, so a whole navigation can come from an API, sit in a database, be diffed in a pull request, or be written by a model - which is the point of this library. `DataDrivenSidebar`, the thing this replaces, took `ReactNode` icons and so could only ever be written by hand in TypeScript. **Two levels, still.** An entry with `items` at the root opens the second level; the same shape inside the second level folds open in place. A third level is not expressible - nesting deeper is ignored rather than honoured, because the alternative is a config that quietly produces a navigation nobody can get back out of. ```tsx <DataLeftNav activeKey={page} onSelect={(key) => { setPage(key); }} config={{ home: { label: 'Go to home', href: '/' }, search: {}, items: [ { key: 'profile', label: 'Profile', icon: 'user', group: 'Personal' }, { key: 'observability'",
+      "props": ["config", "activeKey", "onSelect", "onHome", "initialSection", "footer", "label"],
+      "propDocs": "The whole navigation, as data. Which entry is the page being shown. Called with the entry that was chosen. Only for entries that lead to a page. Opening a section and folding a group are the component's own business and are not reported - a product that had to handle those would be reimplementing the navigation to use it. Called when the home control is pressed. Which section to open on. Pinned to the bottom edge. Not part of the config, because it is markup. The panel's accessible name. @default 'Settings'"
+    },
+    {
       "name": "DataTable",
       "kind": "component",
       "file": "src/components/Table/DataTable.tsx",
@@ -2810,6 +2820,16 @@
       "area": "OTPInput",
       "summary": "Story: Components/OTPInput / FourDigit",
       "doc": "Components/OTPInput FourDigit",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "FromConfig",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / FromConfig",
+      "doc": "Components/LeftNav FromConfig",
       "props": [],
       "propDocs": ""
     },
@@ -5324,8 +5344,8 @@
       "kind": "component",
       "file": "src/components/Sidebar/Sidebar.tsx",
       "area": "Sidebar",
-      "summary": "Sidebar component for navigation and content organization.",
-      "doc": "Sidebar component for navigation and content organization. ```tsx <Sidebar> <SidebarHeader>IT Operations...</SidebarHeader> <SidebarSearch placeholder=\"Search...\" /> <SidebarContent> <SidebarSection> <SidebarItem icon={<Icon />}>Dashboard</SidebarItem> </SidebarSection> </SidebarContent> <SidebarFooter>Customize sidebar</SidebarFooter> </Sidebar> ```",
+      "summary": "The navigation this library ships is `LeftNav`.",
+      "doc": "The navigation this library ships is `LeftNav`. This one predates it and speaks a different visual language - a `muted` fill for the selected row with no leading indicator, 20px icons, rows that size to their content rather than to a fixed rhythm, and no sunken panel behind any of it. Neither is broken; they are from different moments, and shipping both means products get two navigations that do not read as siblings. It stays for now because `LeftNav` does not yet do two things this does: collapse to a rail of icons, and render itself from a configuration object. The second is being built; the first is logged and not scheduled. Do not build on it. When the app-navigation arrangement of `LeftNav` lands, this goes. Sidebar component for navigation and content organization. ```tsx <Sidebar> <SidebarHeader>IT Operations...</SidebarHeader> <SidebarSearch placeholder=\"Search...\" /> <SidebarContent> <SidebarSection> <SidebarItem icon={<Icon />}>Dashboard</SidebarItem> </SidebarSection> </SidebarContent> <SidebarFooter>Customize sidebar</SidebarFooter> </Sidebar> ```",
       "props": ["children"],
       "propDocs": "Content to display inside the sidebar"
     },

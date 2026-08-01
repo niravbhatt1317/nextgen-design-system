@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { IconName } from '../Icon';
 
 export interface LeftNavProps extends ComponentPropsWithoutRef<'nav'> {
   /**
@@ -123,4 +124,89 @@ export interface LeftNavItemProps extends Omit<ComponentPropsWithoutRef<'a'>, 'h
 export interface LeftNavFooterProps extends ComponentPropsWithoutRef<'div'> {
   /** Nothing of its own - a slot pinned to the bottom edge. */
   children?: ReactNode;
+}
+
+/**
+ * One entry in a `LeftNav` configuration.
+ *
+ * **Deliberately serialisable.** The icon is a name rather than a `ReactNode`,
+ * so a whole navigation is JSON: it can come from an API, sit in a database,
+ * be diffed in a pull request, or be written by a model. `DataDrivenSidebar`
+ * took `ReactNode` icons, which meant its config could only ever be written in
+ * TypeScript by hand.
+ */
+export interface LeftNavConfigItem {
+  /** Stable identity. What `activeKey` and `onSelect` speak in. */
+  key: string;
+
+  /** What it says. */
+  label: string;
+
+  /** An icon by name, from the library's own set. */
+  icon?: IconName;
+
+  /** Where it goes. With one it is a link; without, a button. */
+  href?: string;
+
+  /** A short status or count on the trailing edge - "Beta", "3". */
+  badge?: string;
+
+  /** Dims it and stops it responding. */
+  disabled?: boolean;
+
+  /**
+   * The heading this entry sits under. Entries sharing one are grouped, in the
+   * order the headings first appear. Leave it off for an unheaded block.
+   */
+  group?: string;
+
+  /**
+   * Its own pages.
+   *
+   * At the root, an entry with these opens the second level. Inside the second
+   * level, it folds open in place instead. Anything nested below that is
+   * ignored - there is no third level, and a config that asks for one is
+   * asking for something the component will not do.
+   */
+  items?: LeftNavConfigItem[];
+}
+
+export interface LeftNavConfig {
+  /** The way out. Omit it and no home control is rendered. */
+  home?: { label?: string; href?: string };
+
+  /** The search field. Omit it and none is rendered. */
+  search?: { label?: string };
+
+  /** The root list. */
+  items: LeftNavConfigItem[];
+}
+
+export interface DataLeftNavProps extends Omit<ComponentPropsWithoutRef<'nav'>, 'onSelect'> {
+  /** The whole navigation, as data. */
+  config: LeftNavConfig;
+
+  /** Which entry is the page being shown. */
+  activeKey?: string;
+
+  /**
+   * Called with the entry that was chosen.
+   *
+   * Only for entries that lead to a page. Opening a section and folding a group
+   * are the component's own business and are not reported - a product that had
+   * to handle those would be reimplementing the navigation to use it.
+   */
+  onSelect?: (key: string, item: LeftNavConfigItem) => void;
+
+  /** Called when the home control is pressed. */
+  onHome?: () => void;
+
+  /** Which section to open on. */
+  initialSection?: string | null;
+
+  /** Pinned to the bottom edge. Not part of the config, because it is markup. */
+  footer?: ReactNode;
+
+  /** The panel's accessible name. @default 'Settings' */
+  label?: string;
 }

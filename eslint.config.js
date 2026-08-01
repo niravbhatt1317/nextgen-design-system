@@ -167,6 +167,28 @@ export default tseslint.config(
     },
   },
   {
+    /**
+     * A library has to keep exporting the thing it deprecates.
+     *
+     * `@deprecated` is a message to whoever consumes this package - their
+     * editor strikes the name through and their linter warns. It is not a
+     * message to us: the component's own file, its barrel, its stories and the
+     * root export all still have to name it, and every one of those was a build
+     * failure the moment the tag went on `Sidebar`.
+     *
+     * Scoped to the places that must reference it. Anywhere else - a new
+     * component reaching for a deprecated one - still fails, which is the
+     * behaviour worth keeping.
+     */
+    files: [
+      '**/Sidebar/**',
+      'src/components/index.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-deprecated': 'off',
+    },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'jest.setup.ts'],
     languageOptions: {
       parserOptions: {

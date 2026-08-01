@@ -50,6 +50,22 @@ export const sidebarVariants = cva(
 );
 
 /**
+ * @deprecated Use `LeftNav` instead. See COMPONENT-GAP.md.
+ *
+ * The navigation this library ships is `LeftNav`. This one predates it and
+ * speaks a different visual language - a `muted` fill for the selected row with
+ * no leading indicator, 20px icons, rows that size to their content rather than
+ * to a fixed rhythm, and no sunken panel behind any of it. Neither is broken;
+ * they are from different moments, and shipping both means products get two
+ * navigations that do not read as siblings.
+ *
+ * It stays for now because `LeftNav` does not yet do two things this does:
+ * collapse to a rail of icons, and render itself from a configuration object.
+ * The second is being built; the first is logged and not scheduled.
+ *
+ * Do not build on it. When the app-navigation arrangement of `LeftNav` lands,
+ * this goes.
+ *
  * Sidebar component for navigation and content organization.
  *
  * @example

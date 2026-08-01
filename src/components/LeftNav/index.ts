@@ -21,7 +21,12 @@ export type {
   LeftNavExpandableProps,
   LeftNavItemProps,
   LeftNavFooterProps,
+  DataLeftNavProps,
+  LeftNavConfig,
+  LeftNavConfigItem,
 } from './LeftNav.types';
+
+export { DataLeftNav } from './DataLeftNav';
 
 export { useLeftNavLevels } from './useLeftNavLevels';
 export type { UseLeftNavLevels, UseLeftNavLevelsOptions } from './useLeftNavLevels';
