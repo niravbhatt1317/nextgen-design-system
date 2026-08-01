@@ -562,3 +562,17 @@ export type {
   TooltipContentRef,
   TooltipProviderProps,
 } from './Tooltip';
+
+// Upload
+export { Upload, UploadFileRow, uploadVariants, formatFileSize } from './Upload';
+export type {
+  UploadProps,
+  UploadOwnProps,
+  UploadFileRowProps,
+  UploadFileRowOwnProps,
+  UploadItem,
+  UploadKind,
+  UploadStatus,
+  UploadFailure,
+  UploadVariantsType,
+} from './Upload';
