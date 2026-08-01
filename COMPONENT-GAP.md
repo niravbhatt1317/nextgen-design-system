@@ -272,6 +272,39 @@ them, not four teams' component libraries.
 
 ---
 
+## Searched for, not found
+
+A running log, in the shape of `MISSING-TOKENS.md`: a list of decisions rather than an
+inventory. Anything looked for under the reuse rule in `CLAUDE.md` and not found goes here,
+**with the words that were searched** — the next person searches with words too, and yours
+are evidence about which ones fail.
+
+Add a row when a search comes back empty. Delete it when the thing gets built, and say in
+the commit that it did.
+
+| Searched for                | Words used                     | Found                                         | Decision                                                                                                                                                                                                                                                                             | When     |
+| --------------------------- | ------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| A sparkline in a table cell | `sparkline`, `spark`, `trend`  | nothing                                       | Drawn inline in the cell recipe as a placeholder. A real one is a charting component, which is a project rather than a component — see the data-viz gap above.                                                                                                                       | Jul 2026 |
+| A thumbnail / media cell    | `thumbnail`, `media`, `image`  | `Avatar` only, which is a person              | Placeholder in the recipe. `Avatar` deliberately not stretched to cover it: one thing, one component.                                                                                                                                                                                | Jul 2026 |
+| A small icon-only button    | `icon button`, `iconOnly`      | `Button` has `iconOnly`, and it does not work | `iconOnly` hides children and takes the glyph as `leftIcon`, which leaves no children — and children are what tell `ButtonProps` from `LinkButtonProps`, so the type then demands an `href`. Worked around with `mdt-w-8 mdt-px-0` in **four** places now. Needs fixing in `Button`. | Jul 2026 |
+| A remove-label on a tag     | `TagPill`, `remove`, `dismiss` | `TagPill`                                     | It hardcodes `aria-label="Remove"`, so a screen reader hears "Remove" for every tag on the page rather than which one. Needs a prop.                                                                                                                                                 | Jul 2026 |
+
+## Table — searched for, not found
+
+Found by running `npm run find` against every part a table needs, on 1 August 2026. Verified
+in source afterwards, because the tool produced two false gaps as well: `sticky footer` is
+covered by `stickyHeader` plus sticky summary rows, and `column alignment` by `TableAlign` on
+both `TableCell` and `TableHead`. Neither is missing. The rest are.
+
+| Missing                             | Words searched                        | Notes                                                                                                                                                                               |
+| ----------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cell truncation / text overflow     | `cell truncate`, `text overflow`      | Nothing in Table. `Sidebar`, `CodeWell` and `TagPill` each truncate their own way — three private implementations and no shared one. The duplication problem again, one level down. |
+| Row reordering — dragging rows      | `row drag`, `reorder rows`            | Only columns move. `useColumnReorder` is columns, and the search returning it for "row drag" is a tool defect, not a capability.                                                    |
+| Column groups / multi-level headers | `column groups`, `multi level header` | Nothing. A header spanning several columns has no expression.                                                                                                                       |
+| Inline cell editing                 | `inline edit`, `editable cell`        | Nothing. `EditableStatusTag` is a display recipe, not editing.                                                                                                                      |
+| Aggregate / computed totals         | `aggregate total`                     | Summary rows render; nothing computes them. The product supplies the number.                                                                                                        |
+| Copy a cell, print a table          | `copy cell`, `print table`            | Nothing — and arguably neither belongs to Table.                                                                                                                                    |
+
 ## A note on method
 
 This compares component **types**, not implementations. Where four teams built the same type, they

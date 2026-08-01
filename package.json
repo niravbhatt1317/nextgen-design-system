@@ -60,6 +60,8 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:update-snapshots": "playwright test --update-snapshots",
+    "catalog": "node scripts/extract-capabilities.mjs --write",
+    "find": "node scripts/extract-capabilities.mjs --find",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:tokens:strict": "node scripts/check-tokens.mjs --strict",
     "check:tokens:report": "node scripts/check-tokens.mjs --markdown",
