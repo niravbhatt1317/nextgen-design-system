@@ -27,6 +27,7 @@ import {
 } from './Table';
 import type { TableSortOrder } from './Table.types';
 import { useColumnWidths } from './useColumnWidths';
+import { useTableSelection } from './useTableSelection';
 
 const meta: Meta<typeof Table> = {
   title: 'Components/Table',
@@ -472,31 +473,24 @@ export const SortableHeaders: Story = {
  * Table with selectable rows using checkboxes.
  */
 export const SelectableRows: Story = {
-  render: function SelectableTable() {
-    const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-    const toggleRow = (id: number) => {
-      setSelectedRows((prev) =>
-        prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-      );
-    };
-
-    const toggleAll = () => {
-      setSelectedRows((prev) => (prev.length === users.length ? [] : users.map((u) => u.id)));
-    };
+  render: function Selectable() {
+    // `useTableSelection` rather than a hand-rolled array: it brings shift-click
+    // ranges and the indeterminate header state, both of which this story used
+    // to be missing.
+    const selection = useTableSelection({ rowIds: users.map((user) => user.id) });
 
     return (
       <div>
         <div className="mdt-mb-4 mdt-text-sm mdt-text-muted-foreground">
-          {selectedRows.length} of {users.length} row(s) selected.
+          {selection.count} of {users.length} row(s) selected.
         </div>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="mdt-w-[50px]">
                 <Checkbox
-                  checked={selectedRows.length === users.length}
-                  onCheckedChange={toggleAll}
+                  checked={selection.headerState}
+                  onCheckedChange={selection.toggleAll}
                   aria-label="Select all rows"
                 />
               </TableHead>
@@ -508,12 +502,17 @@ export const SelectableRows: Story = {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} selected={selectedRows.includes(user.id)}>
+              <TableRow key={user.id} selected={selection.isSelected(user.id)}>
                 <TableCell>
+                  {/*
+                    The shift key arrives on the click, not the change:
+                    `onCheckedChange` reports the new value and nothing about
+                    the modifiers.
+                  */}
                   <Checkbox
-                    checked={selectedRows.includes(user.id)}
-                    onCheckedChange={() => {
-                      toggleRow(user.id);
+                    checked={selection.isSelected(user.id)}
+                    onClick={(event) => {
+                      selection.toggle(user.id, { extend: event.shiftKey });
                     }}
                     aria-label={`Select ${user.name}`}
                   />
@@ -531,11 +530,6 @@ export const SelectableRows: Story = {
   },
 };
 
-/**
- * The same table at `density="short"`. This used to be hand-written padding
- * on every single cell — the story demonstrated a capability the component did
- * not actually have, so every product rebuilt it slightly differently.
- */
 export const CompactDense: Story = {
   render: () => (
     <Table density="short">
@@ -685,41 +679,70 @@ export const WithPagination: Story = {
 /**
  * Table showing empty state.
  */
+/**
+ * Three states, three different messages - and getting two of them the wrong
+ * way round is the common mistake.
+ *
+ * - **Empty** is the honest "there is nothing here yet", and offers the way to
+ *   make something.
+ * - **Filtered empty** has data; you just cannot see it. The way out is to undo
+ *   the filter, not to create a record you do not need. Saying "no invoices
+ *   yet" here sends someone off to duplicate something they already have.
+ * - **Loading** says nothing, because it does not know yet. See the
+ *   `WithLoadingState` story - skeleton rows keep the table's shape so the page
+ *   does not jump when the data lands.
+ */
 export const EmptyState: Story = {
   render: () => (
-    <Table>
-      <TableCaption>No invoices found.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="mdt-w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="mdt-text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell colSpan={4} className="mdt-h-24 mdt-text-center">
-            <div className="mdt-flex mdt-flex-col mdt-items-center mdt-justify-center mdt-gap-2">
-              <Icon name="inbox" size="xl" color="muted" className="mdt-opacity-50" />
-              <div className="mdt-text-sm mdt-text-muted-foreground">No data available.</div>
-            </div>
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+    <div className="mdt-flex mdt-flex-col mdt-gap-8">
+      {[
+        {
+          state: 'Empty',
+          icon: 'inbox' as const,
+          title: 'No invoices yet.',
+          body: 'Raise one and it will appear here.',
+          action: 'New invoice',
+        },
+        {
+          state: 'Filtered empty',
+          icon: 'search-x' as const,
+          title: 'No invoices match your filters.',
+          body: 'There are 248 invoices, none of them in this view.',
+          action: 'Clear filters',
+        },
+      ].map((empty) => (
+        <div key={empty.state} className="mdt-flex mdt-flex-col mdt-gap-2">
+          <p className="mdt-text-xs mdt-font-medium mdt-text-muted-foreground">{empty.state}</p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="mdt-w-[100px]">Invoice</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead className="mdt-text-right">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow interactive={false}>
+                <TableCell colSpan={4} className="mdt-p-0">
+                  <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-2 mdt-py-10">
+                    <Icon name={empty.icon} size="xl" color="muted" className="mdt-opacity-50" />
+                    <p className="mdt-text-sm mdt-font-medium">{empty.title}</p>
+                    <p className="mdt-text-sm mdt-text-muted-foreground">{empty.body}</p>
+                    <Button variant={empty.state === 'Empty' ? 'primary' : 'outline'} size="sm">
+                      {empty.action}
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      ))}
+    </div>
   ),
 };
 
-/**
- * Everything at once — density, sorting, selection, a sticky header and
- * pagination — built entirely from the component's own props.
- *
- * This story used to hand-assemble its sorting: a bespoke `SortIcon`, stacked
- * chevrons, and every header wrapped in a `Button`. About fifty lines of
- * scaffolding, none of it reusable, and no `aria-sort` for screen readers.
- * It is six lines now, and it is the story people copy from.
- */
 export const FullFeatured: Story = {
   render: function FullFeaturedTable() {
     type SortKey = 'name' | 'email' | 'role' | 'status';

@@ -646,3 +646,31 @@ export interface TableViewMenuProps {
   /** Extra classes for the trigger. */
   className?: string;
 }
+
+/**
+ * Props for TableBulkBar - what you can do with the rows you have selected.
+ */
+export interface TableBulkBarProps extends ComponentPropsWithoutRef<'div'> {
+  /** How many rows are selected. At zero the bar renders nothing. */
+  count: number;
+
+  /** Called to drop the selection. Omit it and no Clear control appears. */
+  onClear?: () => void;
+
+  /**
+   * What the bar says instead of "3 selected".
+   *
+   * For when rows are not rows - "3 tickets", "3 files". The default counts
+   * without naming, which is right when the noun is obvious from the table.
+   */
+  label?: string;
+
+  /** The actions, usually `TableBulkAction`. */
+  children?: ReactNode;
+}
+
+/** Props for TableBulkAction - one action on the bulk bar. */
+export interface TableBulkActionProps extends ComponentPropsWithoutRef<'button'> {
+  /** The glyph, before the label. */
+  icon?: ReactNode;
+}
