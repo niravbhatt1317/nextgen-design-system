@@ -4,6 +4,8 @@ import { Badge } from '../Badge';
 import { Checkbox } from '../Checkbox';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
+import { Skeleton } from '../Skeleton';
+import { Spinner } from '../Spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 import { TableBulkBar } from './TableBulkBar';
 import { TableColumnMenu } from './TableColumnMenu';
@@ -15,12 +17,26 @@ import { TableViewMenu } from './TableViewMenu';
 import { TableViewSwitcher } from './TableViewSwitcher';
 import { useColumnReorder } from './useColumnReorder';
 import { useSavedViews } from './useSavedViews';
+import { useInfiniteScroll } from './useInfiniteScroll';
 import { useTableColumns } from './useTableColumns';
 import { useTableFilters } from './useTableFilters';
 import { useTablePagination } from './useTablePagination';
 import { useTableSelection } from './useTableSelection';
 import { useTableSort } from './useTableSort';
 import type { DataTableProps, DataTableViewState } from './Table.types';
+
+/**
+ * How many skeleton rows a first load draws.
+ *
+ * Enough to read as a table rather than as one stray row, and few enough that
+ * the real rows do not shorten the page when they land. Capped against the page
+ * size so a five-row table does not flash twelve placeholders.
+ */
+const SKELETON_ROWS = 6;
+
+/** The focus ring every bare control in here shares. */
+const FOCUS_RING =
+  'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring';
 
 /** One cell's raw value. */
 const cellValue = (row: unknown, key: string): unknown => (row as Record<string, unknown>)[key];
@@ -112,6 +128,11 @@ export function DataTable<Row>({
   selectable = false,
   bulkActions,
   columnControls = true,
+  loading = false,
+  infinite = false,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
   savedViews = false,
   initialViews,
   initialViewId,
@@ -209,7 +230,27 @@ export function DataTable<Row>({
     setQuery(state.query);
   };
 
-  const visible = manualPagination ? sorted : pagination.slice(sorted);
+  // Infinite scroll and the pager are alternatives, never both: two ways to
+  // reach row 300 that disagree about which rows are loaded is a bug waiting to
+  // be filed. Turning it on takes the pager's slicing off too - a list that
+  // grows as you scroll has already been paged by whoever is fetching it.
+  const paged = manualPagination || infinite;
+  const visible = paged ? sorted : pagination.slice(sorted);
+
+  const { sentinelRef } = useInfiniteScroll({
+    hasMore,
+    loading: loading || loadingMore,
+    disabled: !infinite || onLoadMore === undefined,
+    onLoadMore: onLoadMore ?? (() => undefined),
+  });
+
+  // Skeletons only when there is nothing to look at yet.
+  //
+  // Replacing a table someone is reading with placeholders on every keystroke
+  // of a search is a flicker, and it throws away the rows that were probably
+  // still right. With rows on screen, a refresh dims them and says so instead.
+  const firstLoad = loading && visible.length === 0;
+  const skeletonRows = Math.min(SKELETON_ROWS, pageSize);
 
   // "Nothing here" and "nothing matches" are different sentences, and telling
   // them apart is the difference between someone creating a record and someone
@@ -392,7 +433,7 @@ export function DataTable<Row>({
                     }}
                     className={cn(
                       'mdt-flex mdt-items-center mdt-rounded-sm',
-                      'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
+                      FOCUS_RING,
                       // Unsorted offers the control on hover; a sorted column
                       // always shows its badge, because that badge is not an
                       // offer - it is the answer to "how is this ordered".
@@ -435,7 +476,7 @@ export function DataTable<Row>({
                         'mdt-text-muted-foreground hover:mdt-text-foreground',
                         'mdt-opacity-0 mdt-transition-opacity',
                         'focus-visible:mdt-opacity-100 group-hover/col:mdt-opacity-100',
-                        'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
+                        FOCUS_RING
                       )}
                     >
                       <Icon name="grip-vertical" size="sm" aria-hidden />
@@ -446,7 +487,41 @@ export function DataTable<Row>({
             ))}
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody
+          // Dimmed while a refresh is in flight, so the rows read as "these are
+          // about to change" rather than as the answer. `aria-busy` says the
+          // same thing to a screen reader, which cannot see the dimming.
+          aria-busy={loading || undefined}
+          className={cn(loading && !firstLoad && 'mdt-opacity-60 mdt-transition-opacity')}
+        >
+          {firstLoad &&
+            Array.from({ length: skeletonRows }, (_, index) => (
+              <TableRow key={`skeleton-${String(index)}`} interactive={false}>
+                {selectable && (
+                  <TableCell>
+                    <Skeleton className="mdt-h-4 mdt-w-4 mdt-rounded-sm" />
+                  </TableCell>
+                )}
+                {cols.visible.map((column) => (
+                  <TableCell key={column.key}>
+                    {/*
+                      Uneven widths, because a column of identical bars reads as
+                      a loading graphic rather than as the table that is coming.
+                    */}
+                    {/*
+                      A line of text tall, so a row of placeholders is the
+                      height of the row it stands in for. A cell holding a badge
+                      or an avatar is a few pixels taller than a line of text,
+                      which no placeholder can know in advance - this is as
+                      close as a component that has not seen your cells can get.
+                    */}
+                    <Skeleton
+                      className={cn('mdt-h-5', index % 2 === 0 ? 'mdt-w-2/3' : 'mdt-w-1/2')}
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
           {visible.map((row) => {
             const rowId = String(getRowId(row));
             return (
@@ -483,7 +558,7 @@ export function DataTable<Row>({
               </TableRow>
             );
           })}
-          {visible.length === 0 && (
+          {visible.length === 0 && !loading && (
             <TableRow interactive={false}>
               <TableCell colSpan={cols.visible.length + (selectable ? 1 : 0)} className="mdt-p-0">
                 <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-2 mdt-py-10">
@@ -491,6 +566,31 @@ export function DataTable<Row>({
                     {narrowed ? filteredEmptyMessage : emptyMessage}
                   </p>
                 </div>
+              </TableCell>
+            </TableRow>
+          )}
+          {infinite && hasMore && onLoadMore !== undefined && (
+            <TableRow interactive={false}>
+              <TableCell colSpan={cols.visible.length + (selectable ? 1 : 0)} className="mdt-p-0">
+                {/*
+                  A button, not an empty div. Scrolling is not the only way
+                  through a list - a keyboard user tabs here and a screen reader
+                  user lands on it - and the same element serves the observer.
+                */}
+                <button
+                  type="button"
+                  ref={sentinelRef}
+                  disabled={loadingMore}
+                  onClick={onLoadMore}
+                  className={cn(
+                    'mdt-flex mdt-w-full mdt-items-center mdt-justify-center mdt-gap-2 mdt-py-4',
+                    'mdt-text-sm mdt-text-muted-foreground hover:mdt-text-foreground',
+                    FOCUS_RING
+                  )}
+                >
+                  {loadingMore ? <Spinner size="sm" /> : null}
+                  {loadingMore ? 'Loading more' : 'Load more'}
+                </button>
               </TableCell>
             </TableRow>
           )}
@@ -503,7 +603,7 @@ export function DataTable<Row>({
         </TableBulkBar>
       )}
 
-      {!manualPagination && pagination.pageCount > 1 && (
+      {!paged && pagination.pageCount > 1 && (
         <div className="mdt-flex mdt-items-center mdt-justify-between mdt-text-sm">
           <span className="mdt-text-muted-foreground">
             {pagination.from + 1}–{pagination.to} of {total ?? sorted.length}

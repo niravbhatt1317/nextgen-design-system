@@ -604,4 +604,113 @@ describe('DataTable', () => {
       expect(bodyText()).toHaveLength(3);
     });
   });
+
+  describe('loading', () => {
+    it('draws skeleton rows while the first rows are on their way', () => {
+      render(<DataTable columns={columns} rows={[]} getRowId={(row: Row) => row.id} loading />);
+      const body = screen.getByRole('table').querySelector('tbody');
+      expect(body).toHaveAttribute('aria-busy', 'true');
+      // The table's shape is held rather than collapsing to a spinner and
+      // shoving the page around when the rows land.
+      expect(bodyText().length).toBeGreaterThan(1);
+      expect(screen.queryByText('Nothing to show.')).not.toBeInTheDocument();
+    });
+
+    it('keeps the rows it has and marks them busy instead', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} loading />);
+      // Replacing a table someone is reading with placeholders on every
+      // keystroke is a flicker, and throws away rows that were probably right.
+      expect(firstColumn()).toEqual(['a', 'b', 'c']);
+      expect(screen.getByRole('table').querySelector('tbody')).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('does not claim the table is empty while it is still loading', () => {
+      const { rerender } = render(
+        <DataTable columns={columns} rows={[]} getRowId={(row: Row) => row.id} loading />
+      );
+      expect(screen.queryByText('Nothing to show.')).not.toBeInTheDocument();
+      rerender(<DataTable columns={columns} rows={[]} getRowId={(row: Row) => row.id} />);
+      expect(screen.getByText('Nothing to show.')).toBeInTheDocument();
+    });
+
+    it('is not busy when nothing is loading', () => {
+      render(<DataTable columns={columns} rows={rows} getRowId={(row) => row.id} />);
+      expect(screen.getByRole('table').querySelector('tbody')).not.toHaveAttribute('aria-busy');
+    });
+  });
+
+  describe('infinite scroll', () => {
+    it('offers Load more and no pager', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          pageSize={2}
+          infinite
+          hasMore
+          onLoadMore={vi.fn()}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Load more' })).toBeInTheDocument();
+      // One way through a list, not two that disagree about which rows exist.
+      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+      // And no slicing: all three rows show despite a page size of two. The
+      // sentinel is a row of its own, so it is taken back out of the count.
+      const data = bodyText().filter((row) => !row.includes('Load more'));
+      expect(data).toHaveLength(3);
+    });
+
+    it('loads more when the button is pressed', async () => {
+      const user = userEvent.setup();
+      const onLoadMore = vi.fn();
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          infinite
+          hasMore
+          onLoadMore={onLoadMore}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Load more' }));
+      expect(onLoadMore).toHaveBeenCalledTimes(1);
+    });
+
+    it('says so while the next batch is coming, and will not ask twice', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          infinite
+          hasMore
+          loadingMore
+          onLoadMore={vi.fn()}
+        />
+      );
+      expect(screen.getByRole('button', { name: /Loading more/ })).toBeDisabled();
+    });
+
+    it('drops the control once there is nothing left', () => {
+      render(
+        <DataTable
+          columns={columns}
+          rows={rows}
+          getRowId={(row) => row.id}
+          infinite
+          onLoadMore={vi.fn()}
+        />
+      );
+      expect(screen.queryByRole('button', { name: /Load more/ })).not.toBeInTheDocument();
+    });
+
+    it('shows nothing to load without somewhere to ask', () => {
+      render(
+        <DataTable columns={columns} rows={rows} getRowId={(row) => row.id} infinite hasMore />
+      );
+      expect(screen.queryByRole('button', { name: /Load more/ })).not.toBeInTheDocument();
+    });
+  });
 });

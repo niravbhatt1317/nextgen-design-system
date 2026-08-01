@@ -267,3 +267,133 @@ export const SavedViews: Story = {
     );
   },
 };
+
+/**
+ * Rows on their way, in the two states that are not the same thing.
+ *
+ * **Nothing yet** draws skeleton rows. They hold the table's shape, so the page
+ * below barely moves when the rows land - and they say "a table is coming"
+ * rather than "something is happening", which a spinner in the middle of an
+ * empty box does not. Barely, not exactly: each placeholder is a line of text
+ * tall, and this table's status cells hold a badge, which is two pixels more.
+ * Six rows of that is 12px against a spinner's 237.
+ *
+ * **Refreshing** keeps the rows and dims them. Someone searching a table types
+ * six characters and fires six requests; blanking the table each time is a
+ * flicker, and the rows already on screen were probably still right. The body
+ * carries `aria-busy`, which says the same thing to a screen reader.
+ *
+ * The toggle below switches between them. Watch what happens to the page height
+ * on the first one, and to what you can read on the second.
+ */
+export const Loading: Story = {
+  render: function LoadingDemo() {
+    const [stage, setStage] = useState<'first' | 'refresh'>('first');
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-3">
+        <div className="mdt-flex mdt-gap-2">
+          <Button
+            variant={stage === 'first' ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setStage('first');
+            }}
+          >
+            Nothing yet
+          </Button>
+          <Button
+            variant={stage === 'refresh' ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setStage('refresh');
+            }}
+          >
+            Refreshing
+          </Button>
+        </div>
+        <DataTable
+          columns={columns}
+          rows={stage === 'first' ? [] : tickets.slice(0, 6)}
+          getRowId={(row) => row.id}
+          pageSize={6}
+          loading
+          renderCell={(row, key) =>
+            key === 'status' ? (
+              <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
+                {row.status}
+              </Badge>
+            ) : (
+              row[key as keyof Ticket]
+            )
+          }
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Rows that keep coming as you reach the end.
+ *
+ * **It replaces the pager rather than joining it.** Two ways to reach row 300
+ * that disagree about which rows are loaded is a bug waiting to be filed, so
+ * `infinite` hides the pager and stops slicing - the rows you pass are the rows
+ * shown, because a list that grows as you scroll has already been paged by
+ * whoever is fetching it.
+ *
+ * **The sentinel is a button.** Scrolling is not the only way through a list: a
+ * keyboard user tabs to the end and a screen reader user lands on it, and both
+ * need something to press. The observer watches that same button, so the person
+ * who never sees it pays nothing for it.
+ *
+ * Scroll to the bottom, or press Load more. The count says what is loaded out of
+ * what exists - the one thing infinite scroll takes away and has to give back,
+ * because without it there is no way to tell a long list from an endless one.
+ */
+export const InfiniteScroll: Story = {
+  render: function InfiniteScrollDemo() {
+    const BATCH = 8;
+    const [loaded, setLoaded] = useState(BATCH);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const hasMore = loaded < tickets.length;
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-2">
+        <div className="mdt-max-h-96 mdt-overflow-y-auto">
+          <DataTable
+            columns={columns}
+            rows={tickets.slice(0, loaded)}
+            getRowId={(row) => row.id}
+            infinite
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            onLoadMore={() => {
+              if (loadingMore || !hasMore) return;
+              setLoadingMore(true);
+              // A real product awaits a request here. The delay is the point of
+              // the demo: without one, the loading row never appears and the
+              // guard that stops page 2 being asked for four times is invisible.
+              setTimeout(() => {
+                setLoaded((count) => Math.min(count + BATCH, tickets.length));
+                setLoadingMore(false);
+              }, 600);
+            }}
+            renderCell={(row, key) =>
+              key === 'status' ? (
+                <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
+                  {row.status}
+                </Badge>
+              ) : (
+                row[key as keyof Ticket]
+              )
+            }
+          />
+        </div>
+        <p className="mdt-text-xs mdt-text-muted-foreground">
+          {loaded} of {tickets.length} loaded
+        </p>
+      </div>
+    );
+  },
+};

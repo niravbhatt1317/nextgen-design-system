@@ -451,6 +451,7 @@ export {
   useTableSelection,
   useTableSort,
   useSavedViews,
+  useInfiniteScroll,
 } from './Table';
 export type {
   ColumnWidths,
@@ -491,6 +492,8 @@ export type {
   TableView,
   UseSavedViews,
   UseSavedViewsOptions,
+  UseInfiniteScroll,
+  UseInfiniteScrollOptions,
 } from './Table';
 
 // Tabs

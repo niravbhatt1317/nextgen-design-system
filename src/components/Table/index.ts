@@ -55,6 +55,9 @@ export type {
 export { useTableSort } from './useTableSort';
 export type { SortDirection, SortRule, UseTableSort, UseTableSortOptions } from './useTableSort';
 
+export { useInfiniteScroll } from './useInfiniteScroll';
+export type { UseInfiniteScroll, UseInfiniteScrollOptions } from './useInfiniteScroll';
+
 export { useSavedViews } from './useSavedViews';
 export type { TableView, UseSavedViews, UseSavedViewsOptions } from './useSavedViews';
 

@@ -829,6 +829,41 @@ export interface DataTableProps<Row> extends Omit<ComponentPropsWithoutRef<'div'
   filteredEmptyMessage?: string;
 
   /**
+   * Whether rows are on their way.
+   *
+   * With nothing on screen yet it draws skeleton rows, which hold the table's
+   * shape rather than collapsing the page to a spinner and pushing everything
+   * below it around when the rows land. With rows already there it dims them
+   * and marks the body busy instead: replacing a table someone is reading with
+   * placeholders on every keystroke of a search is a flicker, and throws away
+   * rows that were probably still right.
+   *
+   * @default false
+   */
+  loading?: boolean;
+
+  /**
+   * Loads more rows as you reach the end, instead of paging.
+   *
+   * One or the other, never both - two ways to reach row 300 that disagree
+   * about which rows are loaded is a bug waiting to be filed. Turning this on
+   * hides the pager and stops slicing: a list that grows as you scroll has
+   * already been paged by whoever is fetching it, so pass the rows you have.
+   *
+   * @default false
+   */
+  infinite?: boolean;
+
+  /** Whether there is anything left to fetch. The stop condition. @default false */
+  hasMore?: boolean;
+
+  /** Whether the next batch is in flight. Pauses the observer, so page 2 is asked for once. @default false */
+  loadingMore?: boolean;
+
+  /** Called when the end of the list comes into view, or when Load more is pressed. */
+  onLoadMore?: () => void;
+
+  /**
    * Shows the saved views control in the toolbar.
    *
    * Off by default: a table with one way of looking at it does not need a
