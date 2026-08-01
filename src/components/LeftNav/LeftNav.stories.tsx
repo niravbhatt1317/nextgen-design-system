@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
+import { cn } from '@/utils';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
@@ -98,6 +99,14 @@ const SETTINGS: Entry[] = [
   },
   { key: 'billing', label: 'Billing', icon: 'credit-card', group: 'Workspace' },
 ];
+
+/** The raised disc the home button uses, for the footer's controls. */
+const DISC = [
+  'mdt-flex mdt-h-8 mdt-w-8 mdt-shrink-0 mdt-items-center mdt-justify-center',
+  'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background mdt-shadow-sm',
+  'mdt-text-muted-foreground mdt-transition-shadow hover:mdt-shadow-md hover:mdt-text-foreground',
+  'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
+].join(' ');
 
 /** The root list's blocks, in the order they are shown. */
 const ROOT_GROUPS = ['Personal', 'Workspace', 'Platform'];
@@ -277,8 +286,22 @@ export const Settings: Story = {
           <LeftNavFooter>
             <div className="mdt-flex mdt-items-center mdt-gap-2">
               <Avatar size="sm" name="Nirav Bhatt" />
-              <span className="mdt-flex-1 mdt-truncate mdt-text-sm">Nirav Bhatt</span>
-              <Icon name="more-horizontal" size="sm" className="mdt-text-muted-foreground" />
+              <span className="mdt-flex-1 mdt-truncate mdt-text-sm mdt-font-medium">Nirav</span>
+              {/*
+                The same raised disc as the home button. Three objects on the
+                panel - home, search, these - and every row flat between them,
+                so the chrome and the content never argue.
+              */}
+              <button type="button" aria-label="More" className={DISC}>
+                <Icon name="more-horizontal" size="sm" aria-hidden />
+              </button>
+              <button type="button" aria-label="Notifications" className={cn(DISC, 'mdt-relative')}>
+                <Icon name="bell" size="sm" aria-hidden />
+                <span
+                  aria-hidden
+                  className="mdt-absolute mdt-right-0 mdt-top-0 mdt-h-2.5 mdt-w-2.5 mdt-rounded-full mdt-border-2 mdt-border-background mdt-bg-accent-foreground"
+                />
+              </button>
             </div>
           </LeftNavFooter>
         </LeftNav>

@@ -294,16 +294,25 @@ describe('LeftNav', () => {
       expect(screen.queryByText('Voice agent')).not.toBeInTheDocument();
     });
 
-    it('turns a chevron down, where an item that opens a level points sideways', () => {
+    it('points down when shut and up when open, never sideways', async () => {
+      const user = userEvent.setup();
       const { container } = render(
         <LeftNavExpandable label="Voice">
           <LeftNavItem>Voice agent</LeftNavItem>
         </LeftNavExpandable>
       );
-      // Two different promises need two different glyphs: this one opens
-      // underneath, the other moves the whole panel.
-      expect(container.querySelector('[name="chevron-down"]')).toBeInTheDocument();
+      // Two promises, two glyphs: this one opens underneath, `hasChildren`
+      // moves the whole panel. A shut state that rotated to -90 made them
+      // identical at rest, which is the state they are in most of the time.
+      const chevron = container.querySelector('[name="chevron-down"]');
+      expect(chevron).toBeInTheDocument();
+      expect(chevron?.getAttribute('class')).not.toContain('rotate-90');
       expect(container.querySelector('[name="chevron-right"]')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Voice/ }));
+      expect(container.querySelector('[name="chevron-down"]')?.getAttribute('class')).toContain(
+        'rotate-180'
+      );
     });
   });
 
@@ -327,14 +336,15 @@ describe('LeftNav', () => {
           <LeftNavItem>Root</LeftNavItem>
         </LeftNavBody>
       );
-      expect(container.firstElementChild).toHaveAttribute('data-level', '1');
+      // The scroller sits inside a positioned wrapper that holds the fades.
+      expect(container.querySelector('[data-level]')).toHaveAttribute('data-level', '1');
 
       rerender(
         <LeftNavBody level={2}>
           <LeftNavItem>Section</LeftNavItem>
         </LeftNavBody>
       );
-      expect(container.firstElementChild).toHaveAttribute('data-level', '2');
+      expect(container.querySelector('[data-level]')).toHaveAttribute('data-level', '2');
       expect(screen.getByText('Section')).toBeInTheDocument();
       expect(screen.queryByText('Root')).not.toBeInTheDocument();
     });

@@ -117,10 +117,16 @@ const LeftNav = forwardRef<HTMLElement, LeftNavProps>(
         // all; one that is a shade back from it simply is a different surface,
         // which is what every reference here does.
         //
-        // `secondary` rather than `muted` - the lightest grey surface the
-        // system has. `muted` is one step darker and turns the panel into a
-        // slab; the references sit barely off white.
-        'mdt-border-r mdt-border-border mdt-bg-secondary',
+        // `neutral-10` - the lightest step in the palette, one shade off white.
+        // A primitive rather than a semantic pair, deliberately: every semantic
+        // surface is either white or a grey dark enough to read as a slab, and
+        // there is no semantic token for "barely tinted". Logged in
+        // MISSING-TOKENS.md as a surface the system does not name yet.
+        //
+        // `neutral-150` in dark, one step off the `neutral-160` background, for
+        // the same reason: a panel has to be a different surface, not a
+        // different colour.
+        'mdt-border-r mdt-border-border mdt-bg-neutral-10 dark:mdt-bg-neutral-150',
         className
       )}
       {...props}
@@ -215,7 +221,10 @@ const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
         // search rather than as the first form field on the page. `Input`
         // already takes it; a bare box was the lazier half of reusing `Input`.
         startAdornment={<Icon name="search" size="sm" aria-hidden />}
-        className={cn('mdt-w-full', className)}
+        // The same raised treatment as the home disc. Two objects sitting on
+        // the panel, and everything else flat on it - which is what lets the
+        // rows scroll underneath them without a border to stop the eye.
+        className={cn('mdt-w-full mdt-bg-background mdt-shadow-sm', className)}
         wrapperClassName="mdt-w-full"
         {...props}
       />
@@ -239,13 +248,35 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
   ({ className, level = 1, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      data-level={level}
-      className={cn('mdt-flex-1 mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
-      {...props}
-    >
-      <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-pb-2">{children}</div>
+    // Relative, so the two fades can sit over the scrolling rows.
+    <div className="mdt-relative mdt-flex-1 mdt-overflow-hidden">
+      <div
+        ref={ref}
+        data-level={level}
+        className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
+        {...props}
+      >
+        <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
+      </div>
+
+      {/*
+        Rows fade out rather than being sliced off.
+        
+        A hard edge under the search reads as a mistake - half a row of text
+        cut through the middle looks like something failed to render. A fade
+        says the list continues, which is the true thing and the calmer one.
+        
+        Both strips are the panel's own colour going transparent, and both are
+        `pointer-events-none` so they cannot swallow a click on the row beneath.
+      */}
+      <div
+        aria-hidden
+        className="mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-0 mdt-h-4 mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150"
+      />
+      <div
+        aria-hidden
+        className="mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-bottom-0 mdt-h-6 mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150"
+      />
     </div>
   )
 );
@@ -262,7 +293,7 @@ LeftNavBody.displayName = 'LeftNavBody';
 const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
   ({ className, title, onBack, backLabel = 'Back to all settings', children, ...props }, ref) => (
     <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
-      <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-gap-1">
+      <div className="mdt-mb-0.5 mdt-flex mdt-items-center mdt-gap-1">
         <button
           type="button"
           aria-label={backLabel}
@@ -270,7 +301,9 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           className={cn(
             'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
             'mdt-rounded-md mdt-text-muted-foreground mdt-transition-colors',
-            'hover:mdt-bg-secondary hover:mdt-text-foreground',
+            // `muted`, not `secondary` - the panel itself is lighter than
+            // `secondary` now, so the old hover was invisible against it.
+            'hover:mdt-bg-muted hover:mdt-text-foreground',
             FOCUS
           )}
         >
@@ -281,9 +314,21 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           is the only thing on the panel that says which section forty rows
           below belong to.
         */}
-        <h2 className="mdt-truncate mdt-text-sm mdt-font-medium mdt-text-foreground">{title}</h2>
+        {/*
+          Quiet. It is a label for where you are, not the thing you came to
+          read - the rows below it are. At medium weight in full black it
+          out-shouted every one of them.
+        */}
+        <h2 className="mdt-truncate mdt-text-sm mdt-font-normal mdt-text-muted-foreground">
+          {title}
+        </h2>
       </div>
-      {children}
+      {/*
+        Wrapped, so `first:pt-0` on the first group actually fires. Without it
+        the header is the first child, the first group is the second, and it
+        keeps its 16px - which put 22px between a heading and the rows it names.
+      */}
+      <div className="mdt-flex mdt-flex-col mdt-gap-0.5">{children}</div>
     </div>
   )
 );
@@ -368,8 +413,13 @@ const LeftNavExpandable = forwardRef<HTMLDivElement, LeftNavExpandableProps>(
             size="sm"
             aria-hidden
             className={cn(
+              // Down when shut, up when open - never sideways. Rotating it to
+              // -90 when shut was the first attempt and it made the collapsed
+              // state identical to `hasChildren`'s chevron-right, so the two
+              // promises this component is careful to separate looked the same
+              // at rest. Caught in a screenshot; the tests were green.
               'mdt-text-muted-foreground mdt-transition-transform',
-              !isOpen && '-mdt-rotate-90'
+              isOpen && '-mdt-rotate-180'
             )}
           />
         </button>
