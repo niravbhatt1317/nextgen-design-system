@@ -18,6 +18,7 @@ export {
 export { TableToolbar, TableToolbarActions } from './TableToolbar';
 export { TableSortMenu } from './TableSortMenu';
 export { TableViewMenu } from './TableViewMenu';
+export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 export { TableColumnMenu } from './TableColumnMenu';
 export { TableColumnBoundary } from './TableColumnBoundary';
 
@@ -30,6 +31,13 @@ export type {
   UseColumnReorderOptions,
   ColumnGripProps,
 } from './useColumnReorder';
+
+export { useTableSelection } from './useTableSelection';
+export type {
+  SelectionState,
+  UseTableSelection,
+  UseTableSelectionOptions,
+} from './useTableSelection';
 
 export { useTableSort } from './useTableSort';
 export type { SortDirection, SortRule, UseTableSort, UseTableSortOptions } from './useTableSort';
@@ -62,6 +70,8 @@ export type {
   TableToolbarActionsProps,
   TableSortMenuProps,
   TableViewMenuProps,
+  TableBulkBarProps,
+  TableBulkActionProps,
   TableColumnMenuProps,
   TableColumnBoundaryProps,
 } from './Table.types';
