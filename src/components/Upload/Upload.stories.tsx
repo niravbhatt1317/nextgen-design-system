@@ -75,6 +75,183 @@ type Story = StoryObj<typeof Upload>;
 
 const DOC_SUPPORTING = 'PDF, DOC or XLSX · up to 10 MB';
 
+/**
+ * **Start here.** A working field - pick real files off your desktop and watch
+ * them go.
+ *
+ * It takes anything, keeps its own list, previews pictures, shows live progress
+ * and fails one file in three on purpose so the failure and its Retry can be
+ * seen. There is no state behind this story: it is the component doing all of
+ * it.
+ */
+export const TryIt: Story = {
+  name: 'Try it',
+  args: {
+    multiple: true,
+    maxFiles: 5,
+    maxSize: 20 * 1024 * 1024,
+    label: 'Choose files or drop them here',
+    supporting: 'Anything · up to 5 files, 20 MB each',
+    hint: 'Anything · up to 5 files, 20 MB each',
+  },
+  render: (args) => {
+    let call = 0;
+    const sender: UploadSender = (_file, { onProgress, signal }) =>
+      new Promise((resolve, reject) => {
+        call += 1;
+        const failThisOne = call % 3 === 0;
+        let percent = 0;
+        const tick = setInterval(() => {
+          if (signal.aborted) {
+            clearInterval(tick);
+            return;
+          }
+          percent += 6;
+          if (percent >= 100) {
+            clearInterval(tick);
+            if (failThisOne) reject(new Error('server-error'));
+            else resolve();
+            return;
+          }
+          onProgress(percent);
+        }, 160);
+        signal.addEventListener('abort', () => {
+          clearInterval(tick);
+        });
+      });
+
+    return (
+      <div className="mdt-max-w-[460px]">
+        <Upload {...args} sender={sender} />
+        <p className="mdt-mt-4 mdt-text-xs mdt-leading-relaxed mdt-text-muted-foreground">
+          <b className="mdt-text-foreground">Things to try.</b> Drop a few files at once. Cancel one
+          while its bar is still moving. Every third upload fails on purpose, so keep going to see
+          the reason and the Retry. Add a sixth and it tells you the limit. For a picture with a
+          preview, see <b className="mdt-text-foreground">Picks its own image</b> below - a list of
+          several files shows marks rather than thumbnails.
+        </p>
+      </div>
+    );
+  },
+};
+
+/**
+ * An image, chosen and previewed straight from the disk.
+ *
+ * No `previewUrl` is passed in - the component makes one for any file the
+ * browser calls an image, and releases it again when the file is removed.
+ */
+export const PicksItsOwnImage: Story = {
+  args: {
+    kind: 'image',
+    accept: 'image/*',
+    maxSize: 2 * 1024 * 1024,
+    label: 'Choose an image or drop it here',
+    supporting: 'PNG, JPG or SVG · up to 2 MB',
+    hint: 'PNG, JPG or SVG · up to 2 MB',
+  },
+  render: (args) => (
+    <div className="mdt-max-w-[460px]">
+      <Upload {...args} />
+      <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
+        Pick a real picture. Hover it once it lands.
+      </p>
+    </div>
+  ),
+};
+
+/**
+ * Working, with no state of your own.
+ *
+ * No `items`, so the component keeps the list: adding, removing and the count
+ * all work as they are. This is five lines of markup and nothing else.
+ */
+export const KeepsItsOwnList: Story = {
+  args: {
+    multiple: true,
+    maxFiles: 5,
+    label: 'Choose files or drop them here',
+    supporting: 'Anything · up to 5 files',
+    hint: 'Anything · up to 5 files',
+  },
+  render: (args) => (
+    <div className="mdt-max-w-[460px]">
+      <Upload {...args} />
+    </div>
+  ),
+};
+
+/**
+ * It refuses a file before the file becomes a row.
+ *
+ * Pick something that is not a PDF, or anything over 2 MB. The border turns,
+ * the message names the number, and nothing joins the list. **Every one of
+ * these messages is written by the component** - no team has to word them.
+ */
+export const RefusesWhatItShould: Story = {
+  args: {
+    multiple: true,
+    maxFiles: 3,
+    maxSize: 2 * 1024 * 1024,
+    accept: '.pdf,.docx',
+    label: 'Choose files or drop them here',
+    supporting: 'PDF or DOCX · up to 3 files, 2 MB each',
+    hint: 'PDF or DOCX · up to 3 files, 2 MB each',
+  },
+  render: (args) => (
+    <div className="mdt-max-w-[460px]">
+      <Upload {...args} />
+      <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
+        Try a .png, a file over 2 MB, or four files at once.
+      </p>
+    </div>
+  ),
+};
+
+/**
+ * The other way round: you own the list.
+ *
+ * Pass `items` and the component draws exactly what you give it and reports
+ * what someone did. Nothing is added, removed or retried without you.
+ */
+export const YouOwnTheList: Story = {
+  render: (args) => {
+    const Demo = () => {
+      const [items, setItems] = useState<UploadItem[]>([]);
+      return (
+        <div className="mdt-max-w-[460px]">
+          <Upload
+            {...args}
+            multiple
+            maxFiles={5}
+            hint="Anything · up to 5 files"
+            items={items}
+            onSelect={(files) => {
+              setItems((prev) => [
+                ...prev,
+                ...files.map((f, i) => ({
+                  id: `${String(Date.now())}-${String(i)}`,
+                  name: f.name,
+                  size: f.size,
+                  status: 'done' as const,
+                })),
+              ]);
+            }}
+            onRemove={(id) => {
+              setItems((prev) => prev.filter((f) => f.id !== id));
+            }}
+          />
+          <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
+            Same field, but every change goes through your own state.
+          </p>
+        </div>
+      );
+    };
+    return <Demo />;
+  },
+};
+
+/** Nothing chosen yet. Hover it: the sentence gives way to the action. */
 /** Nothing chosen yet. Hover it: the sentence gives way to the action. */
 export const Resting: Story = {
   args: {
@@ -136,6 +313,9 @@ export const OneFileUploading: Story = {
  * The file's border turns, not the field's - the field did nothing wrong. The
  * second line is the reason, not the word "Failed": the red border already says
  * it failed.
+ *
+ * **A fixed picture, not a working field** - it is given a list, so it ignores
+ * what you pick. Use *Try it* at the top for that.
  */
 export const OneFileFailed: Story = {
   args: {
@@ -250,6 +430,9 @@ export const AtTheLimit: Story = {
  *
  * Storage full, blocked by scan and damaged get the cross alone: offering a
  * button that cannot succeed is worse than not offering one.
+ *
+ * **A fixed picture, not a working field** - it is given a list, so it ignores
+ * what you pick. Use *Try it* at the top for that.
  */
 export const EveryFailure: Story = {
   render: (args) => {
@@ -275,177 +458,5 @@ export const EveryFailure: Story = {
         ))}
       </div>
     );
-  },
-};
-
-/**
- * It refuses a file before the file becomes a row.
- *
- * Pick something that is not a PDF, or anything over 2 MB. The border turns,
- * the message names the number, and nothing joins the list. **Every one of
- * these messages is written by the component** - no team has to word them.
- */
-export const RefusesWhatItShould: Story = {
-  args: {
-    multiple: true,
-    maxFiles: 3,
-    maxSize: 2 * 1024 * 1024,
-    accept: '.pdf,.docx',
-    label: 'Choose files or drop them here',
-    supporting: 'PDF or DOCX · up to 3 files, 2 MB each',
-    hint: 'PDF or DOCX · up to 3 files, 2 MB each',
-  },
-  render: (args) => (
-    <div className="mdt-max-w-[460px]">
-      <Upload {...args} />
-      <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
-        Try a .png, a file over 2 MB, or four files at once.
-      </p>
-    </div>
-  ),
-};
-
-/**
- * Working, with no state of your own.
- *
- * No `items`, so the component keeps the list: adding, removing and the count
- * all work as they are. This is five lines of markup and nothing else.
- */
-export const KeepsItsOwnList: Story = {
-  args: {
-    multiple: true,
-    maxFiles: 5,
-    label: 'Choose files or drop them here',
-    supporting: 'Anything · up to 5 files',
-    hint: 'Anything · up to 5 files',
-  },
-  render: (args) => (
-    <div className="mdt-max-w-[460px]">
-      <Upload {...args} />
-    </div>
-  ),
-};
-
-/**
- * Working end to end, against a pretend server.
- *
- * The `sender` here waits, reports progress, and fails one file in three on
- * purpose so the failure and its Retry can be seen. Everything else - the bar,
- * the cancel, the retry, the limit - is the component.
- *
- * A real one would be the same shape with `fetch` inside it.
- */
-export const WithASender: Story = {
-  args: {
-    multiple: true,
-    maxFiles: 5,
-    maxSize: 20 * 1024 * 1024,
-    label: 'Choose files or drop them here',
-    supporting: 'Anything · up to 5 files, 20 MB each',
-    hint: 'Anything · up to 5 files, 20 MB each',
-  },
-  render: (args) => {
-    let call = 0;
-    const sender: UploadSender = (_file, { onProgress, signal }) =>
-      new Promise((resolve, reject) => {
-        call += 1;
-        const failThisOne = call % 3 === 0;
-        let percent = 0;
-        const tick = setInterval(() => {
-          if (signal.aborted) {
-            clearInterval(tick);
-            return;
-          }
-          percent += 7;
-          if (percent >= 100) {
-            clearInterval(tick);
-            if (failThisOne) reject(new Error('server-error'));
-            else resolve();
-            return;
-          }
-          onProgress(percent);
-        }, 140);
-        signal.addEventListener('abort', () => {
-          clearInterval(tick);
-        });
-      });
-
-    return (
-      <div className="mdt-max-w-[460px]">
-        <Upload {...args} sender={sender} />
-        <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
-          Pick a few files. Every third one fails so you can see the reason and the Retry. The cross
-          cancels an upload that is still going.
-        </p>
-      </div>
-    );
-  },
-};
-
-/**
- * An image, chosen and previewed straight from the disk.
- *
- * No `previewUrl` is passed in - the component makes one for any file the
- * browser calls an image, and releases it again when the file is removed.
- */
-export const PicksItsOwnImage: Story = {
-  args: {
-    kind: 'image',
-    accept: 'image/*',
-    maxSize: 2 * 1024 * 1024,
-    label: 'Choose an image or drop it here',
-    supporting: 'PNG, JPG or SVG · up to 2 MB',
-    hint: 'PNG, JPG or SVG · up to 2 MB',
-  },
-  render: (args) => (
-    <div className="mdt-max-w-[460px]">
-      <Upload {...args} />
-      <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
-        Pick a real picture. Hover it once it lands.
-      </p>
-    </div>
-  ),
-};
-
-/**
- * The other way round: you own the list.
- *
- * Pass `items` and the component draws exactly what you give it and reports
- * what someone did. Nothing is added, removed or retried without you.
- */
-export const YouOwnTheList: Story = {
-  render: (args) => {
-    const Demo = () => {
-      const [items, setItems] = useState<UploadItem[]>([]);
-      return (
-        <div className="mdt-max-w-[460px]">
-          <Upload
-            {...args}
-            multiple
-            maxFiles={5}
-            hint="Anything · up to 5 files"
-            items={items}
-            onSelect={(files) => {
-              setItems((prev) => [
-                ...prev,
-                ...files.map((f, i) => ({
-                  id: `${String(Date.now())}-${String(i)}`,
-                  name: f.name,
-                  size: f.size,
-                  status: 'done' as const,
-                })),
-              ]);
-            }}
-            onRemove={(id) => {
-              setItems((prev) => prev.filter((f) => f.id !== id));
-            }}
-          />
-          <p className="mdt-mt-3 mdt-text-xs mdt-text-muted-foreground">
-            Same field, but every change goes through your own state.
-          </p>
-        </div>
-      );
-    };
-    return <Demo />;
   },
 };
