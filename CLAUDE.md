@@ -487,6 +487,70 @@ export const Variants: Story = {
 
 ---
 
+## 🔁 MANDATORY Reuse — Run Before You Write ANY Code
+
+Every other check in this file runs **after** the code exists. That is why the
+same mistake kept shipping: `DataTable` was built with a hand-rolled pager while
+`Pagination` sat in the library with seven stories, and shipped without the
+column controls and bulk actions that had been built for it weeks earlier. Both
+were caught by the design owner in review. Nothing automatic even looked.
+
+Reuse is not a preference here. **A second way to do something is a defect** —
+it doubles what has to be maintained, and it guarantees the two drift.
+
+### Step 1: List what the thing needs, as nouns
+
+Before writing anything, write down the parts. Not "build a data table" —
+"page numbers, prev/next, a row count, rows-per-page, a drag handle, a way to
+hide a column".
+
+### Step 2: Search for each one. Search, not remember
+
+```bash
+npm run find -- pagination        # searches names, docs, props
+npm run find -- freeze column     # every term must appear; synonyms count
+npm run catalog                   # regenerate after adding anything
+```
+
+`CAPABILITIES.md` is the same list to read by eye, and
+`capability-catalog.json` is it in machine-readable form. Both are generated —
+never edit them.
+
+Also worth a look for anything visual: `component-catalog.json` holds every CVA
+variant and its allowed values, and `TOKENS.md` every token.
+
+### Step 3: Write down what you found
+
+**In the commit message or the pull request body.** Not in your head:
+
+```
+Reused: Pagination, useTableSelection, TableBulkBar
+Built new: pageList - searched "page numbers", "ellipsis", "page window", nothing there
+```
+
+This is the load-bearing step. A rule that can be skipped in silence fails the
+same way the last four did; a written list is either there or visibly missing.
+
+### Step 4: Build only what the search did not find
+
+If you build something new, it goes in **its own file** with a JSDoc first
+sentence saying what it does — that sentence is what the next search will match
+on. An undocumented export is unsearchable, and an unsearchable capability gets
+built again by someone else.
+
+### Step 5: Log what was missing
+
+Anything you looked for and did not find goes in `COMPONENT-GAP.md` under
+**Searched for, not found** — the same way a missing token goes in
+`MISSING-TOKENS.md`. Say what you searched for, not just what was absent: the
+next person searches with words, and yours are evidence.
+
+**None of this is enforced by CI**, deliberately — the same choice
+`check:tokens` makes. A gate that fails someone's pull request because a
+generated file is a commit behind is a gate people learn to route around.
+
+---
+
 ## 🔄 MANDATORY Validation — Run Before EVERY Task Completion
 
 After writing or modifying ANY code, run these checks in order. **Do NOT mark a task complete until all pass.**
@@ -789,34 +853,39 @@ Your role: implement solutions, run tests/builds/lint, create code changes.
 
 ## Important Files
 
-| File                                     | Purpose                                                         |
-| ---------------------------------------- | --------------------------------------------------------------- |
-| `src/components/index.ts`                | Component exports                                               |
-| `src/utils/cn.ts`                        | Class merger - **see the class order note below**               |
-| `src/components/Icon/icons/`             | 1209 generated icon files - **never edit by hand**              |
-| `src/components/Icon/icons/index.ts`     | Generated registry: every name, and the `IconName` type         |
-| `src/components/Toast/ToastBody.tsx`     | The toast surface: six tones, one calm text colour              |
-| `src/components/Toast/ToastPromo.tsx`    | The promotional toast: picture, paragraph, one action           |
-| `src/components/Toast/promoStore.ts`     | Holds the one promotional toast, outside the library            |
-| `src/components/Tabs/useEditableTabs.ts` | The rules for adding and closing tabs                           |
-| `tailwind.config.ts`                     | Tailwind config - **see the dark mode note below**              |
-| `src/styles/globals.css`                 | All design tokens live here                                     |
-| `vitest.config.ts`                       | Test config                                                     |
-| `eslint.config.js`                       | ESLint + sonarjs                                                |
-| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check                      |
-| `.github/workflows/storybook.yml`        | Deploys Storybook to GitHub Pages                               |
-| `TOKENS.md`                              | Every token that exists, grouped by category                    |
-| `MISSING-TOKENS.md`                      | Every token category that does **not** exist yet                |
-| `TOKEN-REPORT.md`                        | Generated: hardcoded values, with file and line                 |
-| `COMPONENT-GAP.md`                       | This library vs the four product design systems                 |
-| `component-catalog.json`                 | Generated: every component and variant, machine-readable        |
-| `scripts/check-tokens.mjs`               | Finds values that should be tokens                              |
-| `scripts/extract-variants.mjs`           | Builds `component-catalog.json` from the CVA definitions        |
-| `scripts/generate-icons.mjs`             | Rebuilds the icon set from Lucide - **see the icon rule below** |
+| File                                     | Purpose                                                              |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| `src/components/index.ts`                | Component exports                                                    |
+| `src/utils/cn.ts`                        | Class merger - **see the class order note below**                    |
+| `src/components/Icon/icons/`             | 1209 generated icon files - **never edit by hand**                   |
+| `src/components/Icon/icons/index.ts`     | Generated registry: every name, and the `IconName` type              |
+| `src/components/Toast/ToastBody.tsx`     | The toast surface: six tones, one calm text colour                   |
+| `src/components/Toast/ToastPromo.tsx`    | The promotional toast: picture, paragraph, one action                |
+| `src/components/Toast/promoStore.ts`     | Holds the one promotional toast, outside the library                 |
+| `src/components/Tabs/useEditableTabs.ts` | The rules for adding and closing tabs                                |
+| `tailwind.config.ts`                     | Tailwind config - **see the dark mode note below**                   |
+| `src/styles/globals.css`                 | All design tokens live here                                          |
+| `vitest.config.ts`                       | Test config                                                          |
+| `eslint.config.js`                       | ESLint + sonarjs                                                     |
+| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check                           |
+| `.github/workflows/storybook.yml`        | Deploys Storybook to GitHub Pages                                    |
+| `TOKENS.md`                              | Every token that exists, grouped by category                         |
+| `MISSING-TOKENS.md`                      | Every token category that does **not** exist yet                     |
+| `TOKEN-REPORT.md`                        | Generated: hardcoded values, with file and line                      |
+| `COMPONENT-GAP.md`                       | This library vs the four product design systems                      |
+| `component-catalog.json`                 | Generated: every component and variant, machine-readable             |
+| `CAPABILITIES.md`                        | Generated: every component, hook and utility - **search this first** |
+| `capability-catalog.json`                | The same list, machine-readable                                      |
+| `scripts/check-tokens.mjs`               | Finds values that should be tokens                                   |
+| `scripts/extract-variants.mjs`           | Builds `component-catalog.json` from the CVA definitions             |
+| `scripts/extract-capabilities.mjs`       | Builds the capability catalogue, and answers `npm run find`          |
+| `scripts/generate-icons.mjs`             | Rebuilds the icon set from Lucide - **see the icon rule below**      |
 
 ### Extra commands
 
 ```bash
+npm run find -- <words>       # what do we already have for this? SEARCH BEFORE BUILDING
+npm run catalog               # rebuild CAPABILITIES.md and capability-catalog.json
 npm run check:tokens          # report hardcoded values (does not fail)
 npm run check:tokens:strict   # same, but exits non-zero on violations
 npm run check:tokens:report   # also writes TOKEN-REPORT.md
