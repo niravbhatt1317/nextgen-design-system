@@ -305,6 +305,37 @@ both `TableCell` and `TableHead`. Neither is missing. The rest are.
 | Aggregate / computed totals         | `aggregate total`                     | Summary rows render; nothing computes them. The product supplies the number.                                                                                                        |
 | Copy a cell, print a table          | `copy cell`, `print table`            | Nothing — and arguably neither belongs to Table.                                                                                                                                    |
 
+## LeftNav — searched for, not found
+
+Searched before building the settings navigation, 1 August 2026.
+
+| Missing                                | Words searched                     | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A nav item that can say "you are here" | `nav item`, `active state`, `item` | **`Item` found and rejected.** It is the right shape - icon, label, active, disabled, and even a `SidebarNav` story - and it renders a `div` unless clickable, has no `href`, and cannot express `aria-current`. A nav row that cannot tell a screen reader which page you are on is not a nav row. `LeftNavItem` follows `PaginationLink`'s rule instead: an anchor with an `href`, a button without. Worth revisiting whether `Item` should gain both and `LeftNavItem` become a thin wrapper. |
+| A section heading in a nav             | `section heading`                  | Nothing shared. `SidebarLabel` exists but belongs to `Sidebar`. Built as `LeftNavGroup`.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| A group that folds away                | `collapse panel`, `collapsible`    | `CollapsibleCard` is a card and `TableExpandTrigger` is a table row. Neither is a nav group. Built into `LeftNavGroup`.                                                                                                                                                                                                                                                                                                                                                                          |
+| A label for a collapsed rail           | `tooltip collapsed`                | Nothing. Not built either — the settings variant does not collapse. It is what an app-navigation variant will need first.                                                                                                                                                                                                                                                                                                                                                                        |
+
+**Reused without change:** `Icon`, `Input` (the search), `Badge` (the Beta tag), `Avatar` (the footer).
+
+**Icons:** `notebook` and `blocks` are not in the frozen registry — `book-open` and `puzzle` used instead. `eye` was the obvious glyph for Observability and is already "show password" in `InputGroup`, so `activity` was used: one icon, one meaning.
+
+## Nothing in the library answers `prefers-reduced-motion`
+
+Searched on 1 August 2026 across every component, every stylesheet and the Tailwind config:
+`prefers-reduced-motion`, `motion-safe`, `motion-reduce` — **zero matches**. Meanwhile the config
+ships twelve animations and `Dialog`, `Sheet`, `Toast`, `Accordion`, `Tooltip`, `Popover` and
+`DropdownMenu` all use them, several with a full-surface `translateX(100%)`.
+
+`LeftNav` is the first component to honour it: the level-change animation keeps its fade and drops
+its travel under `motion-reduce`. The rest still move regardless of what the person asked their
+operating system for.
+
+This is not a component gap and not a token gap — it is a practice the library never adopted. The
+cheap fix is a rule in `globals.css` that shortens every animation to near-zero under the media
+query, which would cover all seven at once without touching them. Worth doing deliberately rather
+than one component at a time.
+
 ## A note on method
 
 This compares component **types**, not implementations. Where four teams built the same type, they

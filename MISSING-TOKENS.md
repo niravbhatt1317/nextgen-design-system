@@ -339,3 +339,15 @@ impact, not effort.
 [`src/styles/globals.css`](./src/styles/globals.css) and
 [`tailwind.config.ts`](./tailwind.config.ts) together, then documented in
 [`TOKENS.md`](./TOKENS.md), then removed from this file.
+
+## A surface that is barely tinted
+
+`LeftNav` needed a panel one shade off white — light enough to sit beside a white page without
+reading as a slab, dark enough to be a different surface. Every semantic surface token is either
+white (`background`, `card`, `popover`) or a grey dark enough to be a block (`secondary` at
+neutral-20, `muted` at neutral-30). It uses the `neutral-10` / `neutral-150` primitives directly,
+which is the only place in the library that does so for a surface.
+
+The missing pair is something like `--mdt-surface-sunken` — the panel a navigation or a rail sits
+on, as distinct from the page. Worth naming before a second component needs it and picks a
+different shade.

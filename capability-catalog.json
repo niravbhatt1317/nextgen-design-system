@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 747,
+  "capabilityCount": 760,
   "counts": {
-    "story": 555,
-    "component": 172,
+    "story": 558,
+    "component": 181,
     "utility": 9,
-    "hook": 11
+    "hook": 12
   },
   "capabilities": [
     {
@@ -2974,6 +2974,16 @@
       "propDocs": ""
     },
     {
+      "name": "GroupsAndExpanding",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / GroupsAndExpanding",
+      "doc": "Components/LeftNav GroupsAndExpanding",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Header",
       "kind": "story",
       "file": "src/components/Flex/Flex.stories.tsx",
@@ -3712,6 +3722,16 @@
       "propDocs": ""
     },
     {
+      "name": "LeavingVersusGoingUp",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / LeavingVersusGoingUp",
+      "doc": "Components/LeftNav LeavingVersusGoingUp",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LeftAligned",
       "kind": "story",
       "file": "src/components/Toolbar/Toolbar.stories.tsx",
@@ -3720,6 +3740,96 @@
       "doc": "Components/Toolbar LeftAligned",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "LeftNav",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "LeftNav - the navigation down the left of a settings area.",
+      "doc": "LeftNav - the navigation down the left of a settings area. **Two levels, and never three.** The root lists everything; an item with its own pages opens a second level in place. Anything that would have been a third level is flattened into the second with groups, because depth is where people get lost - three down, \"back\" has to be pressed an unknown number of times and nobody knows where they are. **Leaving and going up are different acts, and look it.** A settings area that has replaced the app's navigation needs a way out, and a second level needs a way up. Two back arrows stacked in one panel is the mistake this component exists to avoid, so they are separated on every axis available: | | `LeftNavExit` | `LeftNavSection` | | --- | --- | --- | | Where | above the search, pinned | below it, in the scrolling body | | Glyph | `arrow-left`, a long arrow | `chevron-left`, one step | | Says | the destination - \"Back to app\" | where you are - \"Observability\" | | Weight | small and muted, chrome | foreground and medium, a heading | | When | always | only at level 2 | The one that leaves is chrome and never moves. The one that goes up is a heading and belongs to the content under it. ```t",
+      "props": ["label"],
+      "propDocs": "The accessible name. Two navigations on one page must be told apart."
+    },
+    {
+      "name": "LeftNavBody",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "The part that scrolls, and the only part that changes with the level.",
+      "doc": "The part that scrolls, and the only part that changes with the level. **It does not animate the move, and `level` is not doing it secretly.** The first version keyed the inner element on the level, on the assumption that a changed key remounts the subtree and restarts a CSS animation. It does not: measured, React reuses the same DOM node and swaps the contents, so the key bought nothing and the comment explaining it was false. `level` is published as `data-level` instead. A product that wants the panel to slide can drive it from there, where the mechanism is visible rather than implied by a prop that appears to do it.",
+      "props": ["level", "direction", "viewKey"],
+      "propDocs": "Which level is showing. Published as `data-level`, and nothing else. The component does not animate the move. A product that wants it to can hang a transition off `data-level`, where the mechanism is visible. Which way the last move went, from `useLeftNavLevels`. Drives an 8px slip in the direction of travel. Omit it and the list simply appears, which is what a panel that never changes level should do. A name for the view being shown, so React remounts on a change. `level` is not enough on its own: moving between two second-level sections leaves it at 2, and without a remount the animation never replays. `useLeftNavLevels` reports one as `viewKey`."
+    },
+    {
+      "name": "LeftNavExit",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "The way out of settings, back to the app.",
+      "doc": "The way out of settings, back to the app. **A white disc on a grey panel.** Nothing else in the navigation looks like this: the rows are flat, and this one is a raised object sitting on the surface. That is what separates it from the section back further down - not a different label, a different physics. **A house, not an arrow.** An arrow means \"one step back\" and the section header uses one; a house means the place you started, which is where this actually goes. And it names the destination - \"Go to home\" - because a bare \"Back\" would be the same sentence as the control below it.",
+      "props": ["href", "children"],
+      "propDocs": "Where it goes. An anchor with one, a button without. The same rule `PaginationLink` follows: leaving settings is usually a real address worth opening in a new tab, and sometimes it is a router call. What it says. Names the destination, never just \"Back\". @default 'Back to app'"
+    },
+    {
+      "name": "LeftNavExpandable",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "One setting that has pages of its own, folding open in place.",
+      "doc": "One setting that has pages of its own, folding open in place. **This is the collapsing thing, not the group heading.** The distinction is the whole point: a group heading labels a run of unrelated settings, while this is one setting whose pages belong to it. Folding the first hides the map; folding the second hides detail you asked for. **A chevron that turns, not one that points sideways.** `LeftNavItem`'s trailing `chevron-right` means \"this opens a second level and the panel will move\". This one points down and rotates, which everywhere else in software means \"this opens underneath\". Two different promises need two different glyphs, or the panel becomes a guessing game.",
+      "props": ["icon", "label", "defaultOpen", "open", "onOpenChange"],
+      "propDocs": "The glyph on the trigger row. The setting's name. Whether it starts open. @default false Controlled open state. Pass `onOpenChange` with it."
+    },
+    {
+      "name": "LeftNavFooter",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "Pinned to the bottom edge.",
+      "doc": "Pinned to the bottom edge. An account row, a plan, an upgrade.",
+      "props": ["children"],
+      "propDocs": "Nothing of its own - a slot pinned to the bottom edge."
+    },
+    {
+      "name": "LeftNavGroup",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "A labelled block of items.",
+      "doc": "A labelled block of items. A heading, and nothing more. **It does not fold.** The first version let the heading collapse its group, which is the wrong thing to hide behind a control: a heading like \"Compute\" is a label for where you are in a list, and collapsing it takes away the map rather than the detail. What people actually want to fold is one *setting* that has pages of its own - see `LeftNavExpandable`. Two collapsing mechanisms in one panel is one too many, so this one lost.",
+      "props": ["label"],
+      "propDocs": "The heading above the group. Omit it for an unlabelled block."
+    },
+    {
+      "name": "LeftNavItem",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "One row: a page to open, or a section to descend into.",
+      "doc": "One row: a page to open, or a section to descend into. **An anchor with an `href`, a button without** - the same rule `PaginationLink` follows, and for the same reason. A settings page is a real address; a section that opens a second level in place is not. `Item` was the obvious thing to reuse and does not fit: it renders a `div` unless clickable, has no `href`, and cannot express `aria-current`. A nav row that cannot say \"you are here\" to a screen reader is not a nav row. Logged in COMPONENT-GAP.md rather than worked around.",
+      "props": ["href", "icon", "active", "hasChildren", "meta", "disabled"],
+      "propDocs": "Where it goes. An anchor with one, a button without. The glyph. Always an `<Icon>`; never an inline `<svg>`. Whether this is the page being shown. Renders `aria-current=\"page\"`, which is the part a screen reader hears. The grey pill is the part everyone else sees, and one without the other leaves somebody out. Marks the item as opening a second level. Adds the trailing chevron, and says so to a screen reader: this one does not go to a page, it opens a list. Without that they are indistinguishable until you press one. A count or a status, on the trailing edge. A `Badge`, usually. Dims it and stops it responding."
+    },
+    {
+      "name": "LeftNavSearch",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "The search field, pinned under the exit.",
+      "doc": "The search field, pinned under the exit. Sticky because a settings menu is long and the thing people do in a long menu is search it. Scrolling back to the top to find the search field is the failure mode; forty rows is exactly where it starts to bite.",
+      "props": ["label"],
+      "propDocs": "The accessible name and the placeholder. @default 'Search'"
+    },
+    {
+      "name": "LeftNavSection",
+      "kind": "component",
+      "file": "src/components/LeftNav/LeftNav.tsx",
+      "area": "LeftNav",
+      "summary": "The header of a second level: where you are, and the way back up.",
+      "doc": "The header of a second level: where you are, and the way back up. A heading with a chevron, not a button with a label. The title carries the weight because the question it answers is \"what am I looking at\" - the way back is the small part, and it sits inside the heading rather than above it so it cannot be mistaken for the exit two rows up.",
+      "props": ["title", "onBack", "backLabel"],
+      "propDocs": "The section you are inside. Answers \"where am I\", not \"how do I leave\". Back to the root list. The back control's accessible name. @default 'Back to all settings'"
     },
     {
       "name": "LeftSide",
@@ -5026,6 +5136,16 @@
       "area": "Combobox",
       "summary": "Story: Components/Combobox / ServerSideFiltering",
       "doc": "Components/Combobox ServerSideFiltering",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Settings",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / Settings",
+      "doc": "Components/LeftNav Settings",
       "props": [],
       "propDocs": ""
     },
@@ -6687,6 +6807,16 @@
       "area": "Table",
       "summary": "Asks for more rows when the end of the list comes into view.",
       "doc": "Asks for more rows when the end of the list comes into view. **Infinite scroll replaces pagination rather than joining it.** Two ways of reaching row 300 that disagree about which rows are loaded is a bug waiting to be filed, so `DataTable` shows one or the other. **The sentinel should be a button, not an empty div.** Scrolling is not the only way people move through a list: a keyboard user tabs, and a screen reader user jumps by heading or by row. A button that both loads more when pressed and loads more when scrolled into view serves all of them, and costs nothing to the person who never sees it. ```tsx const { sentinelRef } = useInfiniteScroll({ hasMore, loading, onLoadMore }); <button ref={sentinelRef} onClick={onLoadMore}>Load more</button> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useLeftNavLevels",
+      "kind": "hook",
+      "file": "src/components/LeftNav/useLeftNavLevels.ts",
+      "area": "LeftNav",
+      "summary": "Which level of a settings navigation is showing.",
+      "doc": "Which level of a settings navigation is showing. **Two levels, and the type says so.** `level` is `1 | 2`, and `open` from level 2 replaces the section rather than stacking another one - so a third level cannot be reached by calling the API wrong. Depth in a settings menu is where people get lost: three levels down, the back button has to be pressed an unknown number of times to get anywhere, and nobody knows where they are. Anything that would have been a third level is flattened into the second with groups - a static heading for a handful of pages, a collapsible group for more. Grouping shows the structure without hiding it behind another push. As with the Table hooks, it holds state and touches nothing else. Routing is the product's business: `onChange` reports the move, and what that means for the URL is not this hook's decision. ```tsx const levels = useLeftNavLevels(); levels.open('observability'); // level 2 levels.back(); // level 1 ```",
       "props": [],
       "propDocs": ""
     },
