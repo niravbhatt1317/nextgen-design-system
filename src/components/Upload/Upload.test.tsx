@@ -355,14 +355,35 @@ describe('Upload · what it refuses', () => {
 });
 
 describe('Upload · reachable by keyboard and screen reader', () => {
-  it('draws a ring on the box when the field takes focus', () => {
+  // `:focus-visible` is what tells the two apart, and jsdom cannot arrive by
+  // Tab, so the answer is stood in for. The selector itself is the browser's
+  // job; what is checked here is that the component asks and then obeys.
+  //
+  // The stand-in is put back straight away: Testing Library uses `matches`
+  // itself, and a mock left in place breaks every query after it.
+  const focusFrom = (input: HTMLElement, keyboard: boolean) => {
+    const real = input.matches.bind(input);
+    input.matches = (s: string) => (s === ':focus-visible' ? keyboard : real(s));
+    fireEvent.focus(input);
+    input.matches = real;
+  };
+
+  it('draws a ring for someone arriving by keyboard', () => {
     const { container } = render(<Upload label="Pick" />);
+    const input = container.querySelector('input[type=file]') as HTMLInputElement;
     expect(container.querySelector(BOX)).not.toHaveClass('mdt-ring-2');
 
-    fireEvent.focus(screen.getByLabelText('Pick'));
+    focusFrom(input, true);
     expect(container.querySelector(BOX)).toHaveClass('mdt-ring-2');
 
-    fireEvent.blur(screen.getByLabelText('Pick'));
+    fireEvent.blur(input);
+    expect(container.querySelector(BOX)).not.toHaveClass('mdt-ring-2');
+  });
+
+  it('draws no ring on a mouse click, because you already know where you clicked', () => {
+    const { container } = render(<Upload label="Pick" />);
+    const input = container.querySelector('input[type=file]') as HTMLInputElement;
+    focusFrom(input, false);
     expect(container.querySelector(BOX)).not.toHaveClass('mdt-ring-2');
   });
 

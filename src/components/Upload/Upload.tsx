@@ -530,6 +530,23 @@ function UploadImagePreview({ item, minHeight, onChange, onRemove }: UploadImage
   );
 }
 
+/**
+ * Did this focus arrive from a keyboard?
+ *
+ * The browser already answers this with `:focus-visible`, and it answers it
+ * better than any rule we could write - it knows about Tab, about arrow keys,
+ * about assistive tech, and about the settings a person may have changed. The
+ * try/catch is for test environments that do not implement the selector, where
+ * showing the ring is the safer of the two wrong answers.
+ */
+function isKeyboardFocus(el: Element): boolean {
+  try {
+    return el.matches(':focus-visible');
+  } catch {
+    return true;
+  }
+}
+
 /** One place decides how the box looks, in the order the states override each other. */
 function boxState({
   locked,
@@ -784,8 +801,12 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
           {...(hint !== undefined || shown !== undefined ? { 'aria-describedby': hintId } : {})}
           {...(shown !== undefined ? { 'aria-invalid': true } : {})}
           {...(accept !== undefined ? { accept } : {})}
-          onFocus={() => {
-            setFocused(true);
+          onFocus={(e) => {
+            // Keyboard only. A ring that flashes on every mouse click is noise -
+            // you already know where you clicked. It exists for the person who
+            // arrived by Tab and has nothing else telling them where they are,
+            // which is exactly what `:focus-visible` decides.
+            setFocused(isKeyboardFocus(e.currentTarget));
           }}
           onBlur={() => {
             setFocused(false);
