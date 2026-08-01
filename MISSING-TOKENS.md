@@ -20,6 +20,7 @@ decision we made on purpose.
 | ------------------------------------ | ------------- | ---------------------------------- |
 | **Colour — the quiet-variant pair**  | ❌ Missing    | Badge, Button (7 variants)         |
 | **Colour — status tones beyond six** | ⚠️ Decision   | Table cell recipes (status column) |
+| **Colour — dark surface steps**      | ❌ Missing    | Feedback surfaces (Toast, Banner)  |
 | Border radius                        | ⚠️ Partial    | One base value only, no scale      |
 | Typography — family                  | ✅ Complete   | —                                  |
 | Elevation / shadow                   | ✅ Complete   | —                                  |
@@ -351,3 +352,28 @@ which is the only place in the library that does so for a surface.
 The missing pair is something like `--mdt-surface-sunken` — the panel a navigation or a rail sits
 on, as distinct from the page. Worth naming before a second component needs it and picks a
 different shade.
+
+---
+
+## Colour — a desaturated dark step for the feedback hues
+
+**Status:** ❌ Missing · **Leaks into:** the dark feedback surfaces used by `Toast` and `Banner`
+
+Every hue ramp ends at a fully saturated dark — `orange-90` is `26 100% 20%`, `red-90` is
+`0 74% 17%`. At badge size that works: a 20px chip wants to be seen. A toast or a banner is a
+surface several hundred pixels wide, and the same value stops reading as a tinted panel and starts
+reading as a block of colour laid on the page. Measured, the old orange ground sat **1.9 against
+the page**; a surface wants nearer **1.2**.
+
+There is no step on any ramp that gives that. So `globals.css` now carries six raw values in the
+dark feedback block — same hue, roughly half the saturation, a darker lightness — and they are
+**the only colours in the system defined outside a ramp**.
+
+| Needed                                  | Example                          |
+| --------------------------------------- | -------------------------------- |
+| A desaturated dark surface step per hue | `orange-95`, around `26 50% 14%` |
+| Its matching edge, one step up          | around `26 55% 27%`              |
+
+Until those exist the six values stay where they are, commented with what they measure. The day
+the ramps gain them, the feedback block should point at ramp variables again like every other
+token in the file.
