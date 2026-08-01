@@ -32,6 +32,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const COMPONENTS_DIR = join(ROOT, 'src', 'components');
 const UTILS_DIR = join(ROOT, 'src', 'utils');
+// Empty today except for a comment saying hooks will be exported from it. The
+// day one is, it has to be searchable - a capability nobody can find is one
+// that gets written again. `src/types` and `src/styles` are deliberately out:
+// types are not capabilities, and tokens have TOKENS.md.
+const HOOKS_DIR = join(ROOT, 'src', 'hooks');
 
 const EXCLUDED_FILE = /\.(test|spec|types|classes)\.[jt]sx?$/;
 const STORY_FILE = /\.stories\.[jt]sx?$/;
@@ -246,7 +251,7 @@ const readStories = (file) => {
 };
 
 const collect = () => {
-  const files = [...walk(COMPONENTS_DIR), ...walk(UTILS_DIR)];
+  const files = [...walk(COMPONENTS_DIR), ...walk(UTILS_DIR), ...walk(HOOKS_DIR)];
   const all = [
     ...files.filter((file) => !STORY_FILE.test(file)).flatMap(readFile),
     ...files.filter((file) => STORY_FILE.test(file)).flatMap(readStories),
