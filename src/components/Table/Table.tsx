@@ -22,6 +22,7 @@ import {
   STUCK_TOP,
 } from './Table.classes';
 
+import { Badge } from '../Badge';
 import { Icon } from '../Icon';
 import type {
   TableProps,
@@ -602,6 +603,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       align = 'left',
       sortable = false,
       sortOrder = null,
+      sortIndex,
       onSort,
       frozen = false,
       columnKey,
@@ -672,12 +674,32 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
             )}
           >
             {children}
-            <Icon
-              name={SORT_ICON[key]}
-              size="sm"
-              className={cn(key === 'none' && 'mdt-opacity-50')}
-              aria-hidden
-            />
+            {/*
+              With more than one column sorting, the arrow and its rank travel
+              together as one chip.
+              An arrow on three columns says all three are sorted and nothing
+              about their precedence, and people reasonably assume the leftmost
+              column decides - it does not, the stack does. Loose next to each
+              other the two read as separate facts; in a chip they read as one.
+            */}
+            {sortIndex === undefined ? (
+              <Icon
+                name={SORT_ICON[key]}
+                size="sm"
+                className={cn(key === 'none' && 'mdt-opacity-50')}
+                aria-hidden
+              />
+            ) : (
+              <Badge
+                tone="info"
+                shape="pill"
+                size="sm"
+                icon={<Icon name={SORT_ICON[key]} aria-hidden />}
+                className="mdt-tabular-nums"
+              >
+                {sortIndex}
+              </Badge>
+            )}
           </button>
         ) : (
           children
