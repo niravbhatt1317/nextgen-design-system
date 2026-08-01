@@ -1,6 +1,15 @@
 import { cva } from 'class-variance-authority';
-import { forwardRef, useState } from 'react';
-import type { ButtonHTMLAttributes, Ref } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import type { ButtonHTMLAttributes, Ref, UIEvent } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
@@ -19,33 +28,73 @@ import type {
 /** One row height for everything clickable, so the rhythm never breaks. */
 const ROW = 'mdt-h-8 mdt-rounded-md mdt-px-2';
 
+/** How far you scroll before the header has finished folding. */
+const COLLAPSE_DISTANCE = 56;
+
+/** The height the home row gives up as it folds. */
+const EXIT_HEIGHT = 44;
+
+/** The width the search gives back so the disc has somewhere to land. */
+const DISC_LANDING = 40;
+
+interface LeftNavScrollState {
+  /** 0 at the top, 1 once the header has fully folded. */
+  progress: number;
+  atTop: boolean;
+  atBottom: boolean;
+  report: (state: { progress: number; atTop: boolean; atBottom: boolean }) => void;
+}
+
+/**
+ * What the header needs to know about the list below it.
+ *
+ * The parts are composed by the caller - exit, search and body are siblings, in
+ * whatever order suits - so the scroll position cannot be passed down as a
+ * prop. A context lets the body report and the header react without either one
+ * knowing the other exists.
+ *
+ * The default is a nav that never scrolls, which is exactly what a short one
+ * is: nothing folds, nothing fades.
+ */
+const LeftNavScroll = createContext<LeftNavScrollState>({
+  progress: 0,
+  atTop: true,
+  atBottom: true,
+  report: () => undefined,
+});
+
 const FOCUS =
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-1 focus-visible:mdt-ring-offset-background';
 
 /**
- * How the row you are on is marked.
+ * How the row you are on is marked, and why none of it is blue.
  *
- * **A tinted pill and a bar down its left edge.** The bar is the part that
+ * **A grey pill and a bar down its left edge.** The bar is the part that
  * survives a glance: a fill alone has to be strong enough to spot from the
  * corner of your eye, and at that strength forty rows of menu turn into a
- * chessboard. A 2px rule at the leading edge is unmistakable at any tint,
- * which is why it lets the fill stay quiet.
+ * chessboard. A 2px rule at the leading edge is unmistakable at any tint, which
+ * is what lets the fill stay quiet.
  *
- * It is drawn as a real element rather than a `before:` pseudo-class, so it can
- * be seen in the DOM and tested. Both use `accent`, the pair the system already
- * has for a selected surface.
+ * The system is neutral, so the mark is neutral - the bar is `foreground`, the
+ * same ink as the words. Blue was the first attempt and it made "you are here"
+ * the loudest thing in a panel whose whole job is to be quiet.
+ *
+ * **The text steps back until you are on it.** Rows sit at `foreground/70` and
+ * the selected one comes to full strength, so the list reads as one thing with
+ * a current place in it rather than forty equal claims on your attention.
  */
 export const leftNavItemVariants = cva(
   [
     'mdt-group/nav-item mdt-relative mdt-flex mdt-w-full mdt-items-center mdt-gap-2',
     ROW,
-    'mdt-text-sm mdt-text-foreground mdt-transition-colors',
+    'mdt-text-sm mdt-text-foreground/70 mdt-transition-colors',
+    'hover:mdt-text-foreground',
     FOCUS,
   ],
   {
     variants: {
       active: {
-        true: 'mdt-bg-accent mdt-font-medium mdt-text-accent-foreground',
+        true: 'mdt-bg-secondary mdt-font-medium mdt-text-foreground',
         // One step darker than the panel, not a weaker accent. A faint tint of
         // the selected colour reads as "this is nearly selected", and every row
         // you sweep past claims to be the one you are on. `muted` sits one step
@@ -104,34 +153,53 @@ export const leftNavItemVariants = cva(
  * ```
  */
 const LeftNav = forwardRef<HTMLElement, LeftNavProps>(
-  ({ className, label = 'Settings', ...props }, ref) => (
-    <nav
-      ref={ref}
-      aria-label={label}
-      className={cn(
-        // A column that owns its height, so the search pins at the top and the
-        // footer at the bottom while only the middle scrolls.
-        'mdt-flex mdt-h-full mdt-w-64 mdt-shrink-0 mdt-flex-col',
-        // Grey, and the page beside it white. A navigation that matches the
-        // content it sits next to has to be drawn with a border to exist at
-        // all; one that is a shade back from it simply is a different surface,
-        // which is what every reference here does.
-        //
-        // `neutral-10` - the lightest step in the palette, one shade off white.
-        // A primitive rather than a semantic pair, deliberately: every semantic
-        // surface is either white or a grey dark enough to read as a slab, and
-        // there is no semantic token for "barely tinted". Logged in
-        // MISSING-TOKENS.md as a surface the system does not name yet.
-        //
-        // `neutral-150` in dark, one step off the `neutral-160` background, for
-        // the same reason: a panel has to be a different surface, not a
-        // different colour.
-        'mdt-border-r mdt-border-border mdt-bg-neutral-10 dark:mdt-bg-neutral-150',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, label = 'Settings', ...props }, ref) => {
+    const [scroll, setScroll] = useState({ progress: 0, atTop: true, atBottom: true });
+    const report = useCallback((next: { progress: number; atTop: boolean; atBottom: boolean }) => {
+      // Only on a real change: a scroll event fires per frame, and setting
+      // identical state on every one of them re-renders the whole panel
+      // sixty times a second for nothing.
+      setScroll((current) =>
+        current.progress === next.progress &&
+        current.atTop === next.atTop &&
+        current.atBottom === next.atBottom
+          ? current
+          : next
+      );
+    }, []);
+    const value = useMemo(() => ({ ...scroll, report }), [scroll, report]);
+
+    return (
+      <LeftNavScroll.Provider value={value}>
+        <nav
+          ref={ref}
+          aria-label={label}
+          className={cn(
+            // A column that owns its height, so the search pins at the top and the
+            // footer at the bottom while only the middle scrolls.
+            'mdt-flex mdt-h-full mdt-w-64 mdt-shrink-0 mdt-flex-col',
+            // Grey, and the page beside it white. A navigation that matches the
+            // content it sits next to has to be drawn with a border to exist at
+            // all; one that is a shade back from it simply is a different surface,
+            // which is what every reference here does.
+            //
+            // `neutral-10` - the lightest step in the palette, one shade off white.
+            // A primitive rather than a semantic pair, deliberately: every semantic
+            // surface is either white or a grey dark enough to read as a slab, and
+            // there is no semantic token for "barely tinted". Logged in
+            // MISSING-TOKENS.md as a surface the system does not name yet.
+            //
+            // `neutral-150` in dark, one step off the `neutral-160` background, for
+            // the same reason: a panel has to be a different surface, not a
+            // different colour.
+            'mdt-border-r mdt-border-border mdt-bg-neutral-10 dark:mdt-bg-neutral-150',
+            className
+          )}
+          {...props}
+        />
+      </LeftNavScroll.Provider>
+    );
+  }
 );
 LeftNav.displayName = 'LeftNav';
 
@@ -150,52 +218,94 @@ LeftNav.displayName = 'LeftNav';
  */
 const LeftNavExit = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavExitProps>(
   ({ className, href, children = 'Go to home', ...props }, ref) => {
+    const { progress } = useContext(LeftNavScroll);
+
     const shared = {
       className: cn(
-        // Its own padding rather than a wrapper: the exit is a fixed part of the
-        // anatomy, and a caller who has to remember to pad it will forget.
-        'mdt-group/exit mdt-flex mdt-items-center mdt-gap-2 mdt-px-3 mdt-pb-3 mdt-pt-3',
-        'mdt-text-sm mdt-font-medium mdt-text-foreground',
-        'focus-visible:mdt-outline-none',
+        'mdt-group/exit mdt-absolute mdt-flex mdt-items-center mdt-gap-2',
+        'mdt-text-sm mdt-font-normal mdt-text-muted-foreground',
+        'hover:mdt-text-foreground focus-visible:mdt-outline-none',
         className
       ),
+      style: {
+        // `left`, not `translateX`. A percentage in a transform resolves
+        // against the element's own width - the button is as wide as its
+        // content, so the disc walked 83px and stopped a third of the way
+        // across. A percentage in `left` resolves against the containing
+        // block, which is the panel's content width, which is the distance it
+        // actually has to travel.
+        //
+        // Vertically it barely moves. The search rises to meet it as the row
+        // above collapses - the first attempt dropped the disc by the same
+        // 44px the search was climbing, and the two passed each other. The 6px
+        // is the difference between a 32px disc and the 36px field it lands
+        // beside.
+        // From the gutter to the far gutter: 12px in, and 12px + the disc's
+        // own 32px off the right. `left` on an absolutely positioned element
+        // resolves against the containing block's *padding* box, so the panel's
+        // own padding has to be added back by hand.
+        left: `calc(0.75rem + ${String(progress)} * (100% - 3.5rem))`,
+        top: `calc(0.75rem + ${String(progress)} * 0.375rem)`,
+      },
     };
+
     const content = (
       <>
         <span
           className={cn(
             'mdt-flex mdt-h-8 mdt-w-8 mdt-shrink-0 mdt-items-center mdt-justify-center',
-            // The one raised object on the panel. `background` rather than a
-            // literal white, so it is still the raised surface in dark mode
-            // instead of a hole punched in the page.
-            'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background mdt-shadow-sm',
-            'mdt-transition-shadow group-hover/exit:mdt-shadow-md',
+            // No border. The shadow is what lifts it off the panel; a ring as
+            // well made it a component sitting in a box rather than an object
+            // resting on a surface.
+            'mdt-rounded-full mdt-bg-background mdt-text-muted-foreground mdt-shadow-sm',
+            'mdt-transition-shadow group-hover/exit:mdt-text-foreground group-hover/exit:mdt-shadow-md',
             'group-focus-visible/exit:mdt-ring-2 group-focus-visible/exit:mdt-ring-ring'
           )}
         >
           <Icon name="home" size="sm" aria-hidden />
         </span>
-        <span className="mdt-truncate">{children}</span>
+        {/*
+          Fades and stops taking space as the header folds, so the disc has a
+          clear run to the right. Kept in the accessibility tree the whole time:
+          the control still says where it goes, whether or not the words show.
+        */}
+        <span
+          className="mdt-overflow-hidden mdt-whitespace-nowrap"
+          style={{
+            // Collapses as well as fades. Fading alone leaves the words taking
+            // up room, so the button stays wide, so it hangs off the right edge
+            // of the panel when it arrives.
+            maxWidth: `${String((1 - progress) * 100)}%`,
+            opacity: 1 - Math.min(1, progress * 2),
+          }}
+        >
+          {children}
+        </span>
       </>
     );
 
-    if (href === undefined) {
-      return (
-        <button
-          ref={ref as Ref<HTMLButtonElement>}
-          type="button"
-          {...shared}
-          {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
-        >
-          {content}
-        </button>
-      );
-    }
-
+    // The wrapper is what collapses. The disc inside it stays put and is free
+    // to travel, which is why the height is here and not on the control.
     return (
-      <a ref={ref as Ref<HTMLAnchorElement>} href={href} {...shared} {...props}>
-        {content}
-      </a>
+      <div
+        className="mdt-relative mdt-shrink-0 mdt-px-3"
+        style={{ height: `${String(12 + (1 - progress) * EXIT_HEIGHT)}px` }}
+      >
+        {href === undefined ? (
+          <button
+            ref={ref as Ref<HTMLButtonElement>}
+            type="button"
+            {...shared}
+            {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+          >
+            {content}
+          </button>
+        ) : (
+          <a ref={ref as Ref<HTMLAnchorElement>} href={href} {...shared} {...props}>
+            {content}
+          </a>
+        )}
+      </div>
     );
   }
 );
@@ -209,27 +319,37 @@ LeftNavExit.displayName = 'LeftNavExit';
  * failure mode; forty rows is exactly where it starts to bite.
  */
 const LeftNavSearch = forwardRef<HTMLInputElement, LeftNavSearchProps>(
-  ({ className, label = 'Search', ...props }, ref) => (
-    <div className="mdt-px-3 mdt-pb-4">
-      <Input
-        ref={ref}
-        type="search"
-        size="sm"
-        aria-label={label}
-        placeholder={label}
-        // The magnifier inside the field, which is what makes it read as a
-        // search rather than as the first form field on the page. `Input`
-        // already takes it; a bare box was the lazier half of reusing `Input`.
-        startAdornment={<Icon name="search" size="sm" aria-hidden />}
-        // The same raised treatment as the home disc. Two objects sitting on
-        // the panel, and everything else flat on it - which is what lets the
-        // rows scroll underneath them without a border to stop the eye.
-        className={cn('mdt-w-full mdt-bg-background mdt-shadow-sm', className)}
-        wrapperClassName="mdt-w-full"
-        {...props}
-      />
-    </div>
-  )
+  ({ className, label = 'Search', ...props }, ref) => {
+    const { progress } = useContext(LeftNavScroll);
+
+    return (
+      <div
+        className="mdt-shrink-0 mdt-px-3 mdt-pb-3 mdt-pt-1"
+        // Room on the right for the disc to land in. It rises on its own as the
+        // row above collapses - that is layout, not a transform - and only the
+        // width has to be animated.
+        style={{ paddingRight: `${String(12 + progress * DISC_LANDING)}px` }}
+      >
+        <Input
+          ref={ref}
+          type="search"
+          size="sm"
+          aria-label={label}
+          placeholder={label}
+          // The magnifier inside the field, which is what makes it read as a
+          // search rather than as the first form field on the page. `Input`
+          // already takes it; a bare box was the lazier half of reusing `Input`.
+          startAdornment={<Icon name="search" size="sm" aria-hidden />}
+          // The same raised treatment as the home disc. Two objects sitting on
+          // the panel, and everything else flat on it - which is what lets the
+          // rows scroll underneath them without a border to stop the eye.
+          className={cn('mdt-w-full mdt-bg-background mdt-shadow-sm', className)}
+          wrapperClassName="mdt-w-full"
+          {...props}
+        />
+      </div>
+    );
+  }
 );
 LeftNavSearch.displayName = 'LeftNavSearch';
 
@@ -247,38 +367,86 @@ LeftNavSearch.displayName = 'LeftNavSearch';
  * implied by a prop that appears to do it.
  */
 const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
-  ({ className, level = 1, children, ...props }, ref) => (
-    // Relative, so the two fades can sit over the scrolling rows.
-    <div className="mdt-relative mdt-flex-1 mdt-overflow-hidden">
-      <div
-        ref={ref}
-        data-level={level}
-        className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
-        {...props}
-      >
-        <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
-      </div>
+  ({ className, level = 1, children, onScroll, ...props }, ref) => {
+    const { atTop, atBottom, report } = useContext(LeftNavScroll);
+    const scroller = useRef<HTMLDivElement | null>(null);
 
-      {/*
-        Rows fade out rather than being sliced off.
-        
-        A hard edge under the search reads as a mistake - half a row of text
-        cut through the middle looks like something failed to render. A fade
-        says the list continues, which is the true thing and the calmer one.
-        
-        Both strips are the panel's own colour going transparent, and both are
-        `pointer-events-none` so they cannot swallow a click on the row beneath.
-      */}
-      <div
-        aria-hidden
-        className="mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-0 mdt-h-4 mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150"
-      />
-      <div
-        aria-hidden
-        className="mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-bottom-0 mdt-h-6 mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150"
-      />
-    </div>
-  )
+    const measure = useCallback(
+      (element: HTMLDivElement) => {
+        const { scrollTop, scrollHeight, clientHeight } = element;
+        report({
+          progress: Math.min(1, Math.max(0, scrollTop / COLLAPSE_DISTANCE)),
+          atTop: scrollTop <= 0,
+          // A pixel of slack: sub-pixel layout means the sum rarely lands
+          // exactly on the height, and without it the bottom fade never quite
+          // goes away.
+          atBottom: scrollTop + clientHeight >= scrollHeight - 1,
+        });
+      },
+      [report]
+    );
+
+    // On mount and whenever the rows change. A list shorter than the panel has
+    // nothing to fade, and switching from a short section to a long one has to
+    // bring the bottom fade back before anybody touches the wheel.
+    useEffect(() => {
+      if (scroller.current) measure(scroller.current);
+    }, [children, measure]);
+
+    const attach = useCallback(
+      (node: HTMLDivElement | null) => {
+        scroller.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref]
+    );
+
+    return (
+      // Relative, so the two fades can sit over the scrolling rows.
+      <div className="mdt-relative mdt-flex-1 mdt-overflow-hidden">
+        <div
+          ref={attach}
+          data-level={level}
+          onScroll={(event: UIEvent<HTMLDivElement>) => {
+            measure(event.currentTarget);
+            onScroll?.(event);
+          }}
+          className={cn('mdt-h-full mdt-overflow-y-auto mdt-overflow-x-hidden mdt-px-3', className)}
+          {...props}
+        >
+          <div className="mdt-flex mdt-flex-col mdt-gap-0.5 mdt-py-1">{children}</div>
+        </div>
+
+        {/*
+          Rows fade out rather than being sliced off - but only when there is
+          something under the fade.
+
+          A hard edge under the search reads as a mistake: half a row of text
+          cut through the middle looks like something failed to render. A fade
+          says the list continues. A fade with nothing behind it says the same
+          thing and is wrong, which is why each one waits for its own end of the
+          list to actually be off screen.
+        */}
+        <div
+          aria-hidden
+          className={cn(
+            'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-top-0 mdt-h-4 mdt-transition-opacity',
+            'mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150',
+            atTop && 'mdt-opacity-0'
+          )}
+        />
+        <div
+          aria-hidden
+          className={cn(
+            'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-bottom-0 mdt-h-6 mdt-transition-opacity',
+            'mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150',
+            atBottom && 'mdt-opacity-0'
+          )}
+        />
+      </div>
+    );
+  }
 );
 LeftNavBody.displayName = 'LeftNavBody';
 
@@ -293,7 +461,7 @@ LeftNavBody.displayName = 'LeftNavBody';
 const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
   ({ className, title, onBack, backLabel = 'Back to all settings', children, ...props }, ref) => (
     <div ref={ref} className={cn('mdt-flex mdt-flex-col mdt-gap-0.5', className)} {...props}>
-      <div className="mdt-mb-0.5 mdt-flex mdt-items-center mdt-gap-1">
+      <div className="mdt-mb-2 mdt-flex mdt-items-center mdt-gap-1">
         <button
           type="button"
           aria-label={backLabel}
@@ -356,7 +524,7 @@ const LeftNavGroup = forwardRef<HTMLDivElement, LeftNavGroupProps>(
       {...props}
     >
       {label !== undefined && (
-        <div className="mdt-flex mdt-h-6 mdt-items-center mdt-px-2 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
+        <div className="mdt-flex mdt-h-6 mdt-items-center mdt-px-2 mdt-text-xs mdt-font-medium mdt-text-muted-foreground/70">
           {label}
         </div>
       )}
@@ -476,7 +644,7 @@ const LeftNavItem = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavIte
         {active && (
           <span
             aria-hidden
-            className="mdt-absolute mdt-bottom-1.5 mdt-left-0 mdt-top-1.5 mdt-w-0.5 mdt-rounded-full mdt-bg-accent-foreground"
+            className="mdt-absolute mdt-bottom-1.5 mdt-left-0 mdt-top-1.5 mdt-w-0.5 mdt-rounded-full mdt-bg-foreground"
           />
         )}
         {icon !== undefined && (
@@ -485,7 +653,7 @@ const LeftNavItem = forwardRef<HTMLAnchorElement | HTMLButtonElement, LeftNavIte
               'mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
               // The glyph sits back from the label until the row matters, which
               // is what stops forty icons reading as forty things to look at.
-              active ? 'mdt-text-accent-foreground' : 'mdt-text-muted-foreground'
+              active ? 'mdt-text-foreground' : 'mdt-text-muted-foreground'
             )}
           >
             {icon}

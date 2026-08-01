@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -313,6 +313,134 @@ describe('LeftNav', () => {
       expect(container.querySelector('[name="chevron-down"]')?.getAttribute('class')).toContain(
         'rotate-180'
       );
+    });
+  });
+
+  describe('the header folds as you scroll', () => {
+    /**
+     * jsdom lays nothing out, so the scroller reports 0 for every metric. These
+     * are the numbers a real panel would have: a list twice the height of the
+     * space it sits in.
+     */
+    const scrollTo = (scroller: HTMLElement, scrollTop: number) => {
+      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
+      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', { value: scrollTop, configurable: true });
+      fireEvent.scroll(scroller);
+    };
+
+    const panel = (
+      <LeftNav>
+        <LeftNavExit onClick={() => undefined} />
+        <LeftNavSearch />
+        <LeftNavBody>
+          <LeftNavItem>Overview</LeftNavItem>
+        </LeftNavBody>
+      </LeftNav>
+    );
+
+    it('leaves the header alone at the top', () => {
+      const { container } = render(panel);
+      const home = screen.getByRole('button', { name: 'Go to home' });
+      // 0.75rem is the panel's own gutter: at rest the disc sits where every
+      // other row starts.
+      expect(home.style.left).toContain('0 * (100% - 3.5rem)');
+    });
+
+    it('walks the disc across and lifts the search as you go', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const home = screen.getByRole('button', { name: 'Go to home' });
+      const wrapper = home.parentElement as HTMLElement;
+
+      scrollTo(scroller, 56);
+      // Fully folded: the row above has given up its height, so the search
+      // rises by layout, and the disc has travelled the width of the panel.
+      expect(home.style.left).toContain('1 * (100% - 3.5rem)');
+      expect(wrapper.style.height).toBe('12px');
+    });
+
+    it('takes it halfway at half the distance, and puts it back', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const home = screen.getByRole('button', { name: 'Go to home' });
+
+      scrollTo(scroller, 28);
+      expect(home.style.left).toContain('0.5 * (100% - 3.5rem)');
+      // And reverses on the way back up, which is the half people notice.
+      scrollTo(scroller, 0);
+      expect(home.style.left).toContain('0 * (100% - 3.5rem)');
+    });
+
+    it('never folds further than it can unfold', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      const home = screen.getByRole('button', { name: 'Go to home' });
+      scrollTo(scroller, 4000);
+      expect(home.style.left).toContain('1 * (100% - 3.5rem)');
+    });
+
+    it('makes room on the right for the disc to land in', () => {
+      const { container } = render(panel);
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      // The padded wrapper, found by the thing under test rather than by
+      // counting parents - `Input` wraps itself and the count would be a
+      // hostage to its internals.
+      const field = container.querySelector('[style*="padding-right"]') as HTMLElement;
+      expect(field.style.paddingRight).toBe('12px');
+      scrollTo(scroller, 56);
+      expect(field.style.paddingRight).toBe('52px');
+    });
+  });
+
+  describe('the fades', () => {
+    const fades = (container: HTMLElement) =>
+      [...container.querySelectorAll('[aria-hidden].mdt-pointer-events-none')].map(
+        (node) => !node.className.includes('mdt-opacity-0')
+      );
+
+    it('shows neither when the whole list fits', () => {
+      const { container } = render(
+        <LeftNav>
+          <LeftNavBody>
+            <LeftNavItem>Only row</LeftNavItem>
+          </LeftNavBody>
+        </LeftNav>
+      );
+      // A fade with nothing behind it is a lie about there being more.
+      expect(fades(container)).toEqual([false, false]);
+    });
+
+    it('shows the top one once rows have gone under the search', () => {
+      const { container } = render(
+        <LeftNav>
+          <LeftNavBody>
+            <LeftNavItem>Overview</LeftNavItem>
+          </LeftNavBody>
+        </LeftNav>
+      );
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
+      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', { value: 100, configurable: true });
+      fireEvent.scroll(scroller);
+      expect(fades(container)).toEqual([true, true]);
+    });
+
+    it('drops the bottom one at the end of the list', () => {
+      const { container } = render(
+        <LeftNav>
+          <LeftNavBody>
+            <LeftNavItem>Overview</LeftNavItem>
+          </LeftNavBody>
+        </LeftNav>
+      );
+      const scroller = container.querySelector('[data-level]') as HTMLElement;
+      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
+      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
+      Object.defineProperty(scroller, 'scrollTop', { value: 400, configurable: true });
+      fireEvent.scroll(scroller);
+      expect(fades(container)).toEqual([true, false]);
     });
   });
 
