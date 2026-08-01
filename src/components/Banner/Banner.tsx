@@ -2,7 +2,6 @@ import { cva } from 'class-variance-authority';
 import {
   Children,
   Fragment,
-  cloneElement,
   isValidElement,
   useEffect,
   useId,
@@ -74,53 +73,18 @@ const ICON_TONE: Record<BannerTone, string> = {
 };
 
 /**
- * The ground a button stands on inside this banner, published as two local
- * variables so the action classes below never have to know the tone.
+ * The only button a banner carries.
  *
- * See `globals.css`, FEEDBACK ACTION: the tone's own glyph colour thinned into
- * the tone's own surface. The library's general `secondary` is a blue-grey, and
- * on a cream banner it reads as a chip borrowed from another screen.
- */
-const ACTION_GROUND: Record<BannerTone, string> = {
-  info: '[--bn-action:var(--mdt-feedback-info-action)] [--bn-action-hover:var(--mdt-feedback-info-action-hover)]',
-  warning:
-    '[--bn-action:var(--mdt-feedback-warning-action)] [--bn-action-hover:var(--mdt-feedback-warning-action-hover)]',
-  danger:
-    '[--bn-action:var(--mdt-feedback-danger-action)] [--bn-action-hover:var(--mdt-feedback-danger-action-hover)]',
-  success:
-    '[--bn-action:var(--mdt-feedback-success-action)] [--bn-action-hover:var(--mdt-feedback-success-action-hover)]',
-  ai: '[--bn-action:var(--mdt-feedback-ai-action)] [--bn-action-hover:var(--mdt-feedback-ai-action-hover)]',
-  neutral:
-    '[--bn-action:var(--mdt-feedback-neutral-action)] [--bn-action-hover:var(--mdt-feedback-neutral-action-hover)]',
-};
-
-/**
- * What gets added to each action, by the kind of button it is.
+ * A filled button on a tinted surface is a problem with no clean answer. The
+ * library's own `secondary` is a blue-grey, so on a cream banner it reads as a
+ * chip borrowed from another screen - and the alternative, giving the banner
+ * its own tinted grounds, means inventing a look that exists nowhere else in
+ * the set. A ghost has no ground to clash, so there is nothing to invent.
  *
- * Added to the caller's own element rather than imposed by a descendant
- * selector, so a `link` stays a bare word and a `ghost` stays empty until the
- * cursor is on it. Whatever the button was, it now wears the banner's colour.
+ * `link` is allowed alongside it for somewhere genuinely tight. Anything with a
+ * fill is warned about.
  */
-const ACTION_LOOK = {
-  filled: [
-    'mdt-bg-[var(--bn-action)] hover:mdt-bg-[var(--bn-action-hover)]',
-    'active:mdt-bg-[var(--bn-action-hover)]',
-    'mdt-text-feedback-title hover:mdt-text-feedback-title',
-    'mdt-border-transparent',
-  ].join(' '),
-  ghost: [
-    'mdt-bg-transparent hover:mdt-bg-[var(--bn-action)]',
-    'mdt-text-feedback-title hover:mdt-text-feedback-title',
-  ].join(' '),
-  bare: 'mdt-text-feedback-title hover:mdt-text-feedback-text',
-} as const;
-
-/** `link` stays a word, `ghost` stays empty until hovered, everything else fills. */
-const lookFor = (variant: unknown): string => {
-  if (variant === 'link') return ACTION_LOOK.bare;
-  if (variant === 'ghost') return ACTION_LOOK.ghost;
-  return ACTION_LOOK.filled;
-};
+const ALLOWED_ACTIONS = ['ghost', 'link'];
 
 /** The same glyph per tone that Toast uses - same meaning, same mark. */
 const TONE_ICON: Record<BannerTone, IconName> = {
@@ -159,25 +123,38 @@ const flattenActions = (node: ReactNode): ReactNode[] =>
   );
 
 /**
- * Warns, in development only, about a primary button in a banner.
+ * Warns, in development only, about a filled button in a banner.
  *
- * A solid button is the loudest thing on a page and a banner is not the page -
- * put one in a warning and it outranks the Save button the person came for. The
- * rule is easy to forget and impossible to see in a diff, so it is checked.
+ * Two reasons, and they stack. A solid button is the loudest thing on a page
+ * and a banner is not the page - put one in a warning and it outranks the Save
+ * button the person came for. And any fill has to be a colour: the library's
+ * general grounds are blue-greys tuned for the page, and on a cream or a green
+ * surface they read as chips borrowed from another screen.
+ *
+ * The rule is easy to forget and impossible to see in a diff, so it is checked.
  */
-const useNoPrimaryActions = (flat: readonly ReactNode[]): void => {
+const useGhostActions = (flat: readonly ReactNode[]): void => {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
 
-    const offender = flat.some(
-      (child) => isValidElement<{ variant?: unknown }>(child) && child.props.variant === 'primary'
-    );
+    // No variant at all is not "no opinion" - `Button` defaults to primary, so
+    // an action written the short way is the loudest one there is.
+    const variantOf = (child: ReactNode): string | undefined => {
+      if (!isValidElement<{ variant?: unknown }>(child)) return undefined;
+      const given = child.props.variant;
+      return typeof given === 'string' ? given : 'primary';
+    };
 
-    if (offender) {
+    const offender = flat
+      .map(variantOf)
+      .find((variant) => variant !== undefined && !ALLOWED_ACTIONS.includes(variant));
+
+    if (offender !== undefined) {
       console.warn(
-        '[Banner] An action is using variant="primary". A banner is not the page - ' +
-          'a solid button in one outranks the real primary action of the screen. ' +
-          'Use "secondary", "ghost" or "link".'
+        `[Banner] An action is using variant="${offender}". A banner only carries ` +
+          'buttons with no ground of their own: a fill has to be a colour, and every ' +
+          'colour the library has is tuned for the page rather than for a tinted ' +
+          'surface. Use "ghost", or "link" where it is genuinely tight.'
       );
     }
   }, [flat]);
@@ -227,7 +204,7 @@ export const Banner = ({
 }: BannerProps) => {
   const titleId = useId();
   const flat = useMemo(() => flattenActions(actions), [actions]);
-  useNoPrimaryActions(flat);
+  useGhostActions(flat);
 
   const hasActions = flat.length > 0;
 
@@ -241,18 +218,6 @@ export const Banner = ({
   const stacked =
     below || (description !== undefined && description !== null && description !== '');
 
-  // Each action keeps its own element and gains the banner's colouring. Done
-  // here rather than with a descendant selector so the treatment can differ by
-  // variant - a link must not grow a ground just because it is in a banner.
-  const dressed = flat.map((child, i) =>
-    isValidElement<{ className?: string; variant?: unknown }>(child)
-      ? cloneElement(child, {
-          key: child.key ?? i,
-          className: cn(lookFor(child.props.variant), child.props.className),
-        })
-      : child
-  );
-
   const renderGlyph = (): ReactNode => {
     if (icon === null) return null;
     return (
@@ -264,7 +229,7 @@ export const Banner = ({
 
   return (
     <section
-      className={cn(bannerVariants({ tone, placement, stacked }), ACTION_GROUND[tone], className)}
+      className={cn(bannerVariants({ tone, placement, stacked }), className)}
       data-tone={tone}
       data-slot="banner"
       // A `section` is only a landmark once it has a name, which is exactly the
@@ -298,7 +263,7 @@ export const Banner = ({
             className="mdt-mt-2.5 mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2"
             data-slot="banner-actions"
           >
-            {dressed}
+            {actions}
           </div>
         ) : null}
       </div>
@@ -321,7 +286,7 @@ export const Banner = ({
         >
           {beside ? (
             <div className="mdt-flex mdt-items-center mdt-gap-2" data-slot="banner-actions">
-              {dressed}
+              {actions}
             </div>
           ) : null}
 
@@ -331,15 +296,15 @@ export const Banner = ({
               onClick={onDismiss}
               aria-label={dismissLabel}
               data-slot="banner-dismiss"
-              // The mark itself stays outside the tone system, exactly as
-              // Toast's does - a coloured cross would compete with the glyph
-              // for the same job. Its hover ground is the banner's, so it does
-              // not flash a grey patch onto a cream surface.
+              // Deliberately outside the tone system, exactly as Toast's is.
+              // Only the icon and the border carry the tone, and a coloured
+              // cross would compete with the glyph for the same job. Its hover
+              // is the banner's own words at a tenth - so it darkens whatever
+              // surface it is on rather than laying a grey patch over it.
               className={cn(
                 'mdt-flex mdt-h-7 mdt-w-7 mdt-shrink-0 mdt-items-center mdt-justify-center',
                 'mdt-rounded-md mdt-transition-colors',
-                'mdt-text-feedback-text/70 hover:mdt-text-feedback-title',
-                'hover:mdt-bg-[var(--bn-action)]',
+                'mdt-text-feedback-text/70 hover:mdt-bg-feedback-text/10 hover:mdt-text-feedback-text',
                 'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
               )}
             >

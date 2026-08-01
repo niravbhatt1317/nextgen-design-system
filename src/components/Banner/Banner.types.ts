@@ -58,9 +58,12 @@ export interface BannerOwnProps {
   /**
    * The actions, quietest first and the one you mean last.
    *
-   * Pass `Button`s. **Never a primary button** - a solid button is the loudest
-   * thing on a page and a banner is not the page. `secondary`, `ghost` or
-   * `link`. In development this is checked and warned about.
+   * Pass `Button`s, and only `variant="ghost"` - or `variant="link"` where it is
+   * genuinely tight. **Nothing with a ground of its own.** A solid button is the
+   * loudest thing on a page and a banner is not the page; and a fill has to be
+   * some colour, while every ground the library has is tuned for the white page
+   * rather than for a tinted surface. In development this is checked and warned
+   * about.
    */
   actions?: ReactNode | undefined;
 

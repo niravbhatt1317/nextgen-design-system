@@ -84,7 +84,7 @@ describe('Banner', () => {
 
   describe('where the actions go', () => {
     const one = (
-      <Button variant="secondary" size="sm">
+      <Button variant="ghost" size="sm">
         Choose a plan
       </Button>
     );
@@ -93,7 +93,7 @@ describe('Banner', () => {
         <Button variant="ghost" size="sm">
           Notes
         </Button>
-        <Button variant="secondary" size="sm">
+        <Button variant="ghost" size="sm">
           Update
         </Button>
       </>
@@ -134,7 +134,7 @@ describe('Banner', () => {
         <Banner
           title={TITLE}
           actions={
-            <Button variant="secondary" size="sm" onClick={run}>
+            <Button variant="ghost" size="sm" onClick={run}>
               Choose a plan
             </Button>
           }
@@ -145,16 +145,26 @@ describe('Banner', () => {
       expect(run).toHaveBeenCalledOnce();
     });
 
-    it('warns about a primary button, which a banner must never carry', () => {
+    it.each(['primary', 'secondary', 'outline', 'destructive'] as const)(
+      'warns about a %s button, because it has a ground of its own',
+      (variant) => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+        render(<Banner title={TITLE} actions={<Button variant={variant}>Do it</Button>} />);
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining(`variant="${variant}"`));
+        warn.mockRestore();
+      }
+    );
+
+    it('warns when no variant is given at all, since Button defaults to primary', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-      render(<Banner title={TITLE} actions={<Button variant="primary">Do it</Button>} />);
+      render(<Banner title={TITLE} actions={<Button>Do it</Button>} />);
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="primary"'));
       warn.mockRestore();
     });
 
-    it('says nothing about a secondary button', () => {
+    it.each(['ghost', 'link'] as const)('says nothing about a %s button', (variant) => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-      render(<Banner title={TITLE} actions={<Button variant="secondary">Do it</Button>} />);
+      render(<Banner title={TITLE} actions={<Button variant={variant}>Do it</Button>} />);
       expect(warn).not.toHaveBeenCalled();
       warn.mockRestore();
     });
@@ -186,7 +196,7 @@ describe('Banner', () => {
           title={TITLE}
           onDismiss={() => undefined}
           actions={
-            <Button variant="secondary" size="sm">
+            <Button variant="ghost" size="sm">
               Choose a plan
             </Button>
           }
@@ -224,7 +234,7 @@ describe('Banner', () => {
 
   describe('alignment', () => {
     const one = (
-      <Button variant="secondary" size="sm">
+      <Button variant="ghost" size="sm">
         Choose a plan
       </Button>
     );
@@ -271,32 +281,21 @@ describe('Banner', () => {
     });
   });
 
-  describe('the actions wear the banner', () => {
+  describe('the actions are the library’s own buttons, untouched', () => {
     const look = (name: string) => screen.getByRole('button', { name }).className;
 
-    it('gives a secondary button the tone ground instead of the general grey', () => {
+    it('leaves a ghost exactly as the library renders it', () => {
+      const { unmount } = render(
+        <Button variant="ghost" size="sm">
+          Read the notes
+        </Button>
+      );
+      const alone = look('Read the notes');
+      unmount();
+
       render(
         <Banner
           tone="warning"
-          title={TITLE}
-          actions={
-            <Button variant="secondary" size="sm">
-              Choose a plan
-            </Button>
-          }
-        />
-      );
-      expect(look('Choose a plan')).toContain('mdt-bg-[var(--bn-action)]');
-    });
-
-    it('publishes the tone ground on the banner, so nothing has to know the tone', () => {
-      render(<Banner tone="warning" title={TITLE} />);
-      expect(surface().className).toContain('[--bn-action:var(--mdt-feedback-warning-action)]');
-    });
-
-    it('leaves a ghost empty until the cursor is on it', () => {
-      render(
-        <Banner
           title={TITLE}
           actions={
             <Button variant="ghost" size="sm">
@@ -305,13 +304,21 @@ describe('Banner', () => {
           }
         />
       );
-      expect(look('Read the notes')).toContain('mdt-bg-transparent');
-      expect(look('Read the notes')).toContain('hover:mdt-bg-[var(--bn-action)]');
+      expect(look('Read the notes')).toBe(alone);
     });
 
-    it('leaves a link a bare word', () => {
+    it('leaves a link exactly as the library renders it', () => {
+      const { unmount } = render(
+        <Button variant="link" size="sm">
+          Review
+        </Button>
+      );
+      const alone = look('Review');
+      unmount();
+
       render(
         <Banner
+          tone="danger"
           title={TITLE}
           actions={
             <Button variant="link" size="sm">
@@ -320,7 +327,12 @@ describe('Banner', () => {
           }
         />
       );
-      expect(look('Review')).not.toContain('mdt-bg-[var(--bn-action)]');
+      expect(look('Review')).toBe(alone);
+    });
+
+    it('adds no colour variable of its own to the banner', () => {
+      render(<Banner tone="warning" title={TITLE} />);
+      expect(surface().className).not.toContain('--bn-action');
     });
 
     it('keeps a className the caller passed', () => {
@@ -328,7 +340,7 @@ describe('Banner', () => {
         <Banner
           title={TITLE}
           actions={
-            <Button variant="secondary" size="sm" className="mine">
+            <Button variant="ghost" size="sm" className="mine">
               Choose a plan
             </Button>
           }

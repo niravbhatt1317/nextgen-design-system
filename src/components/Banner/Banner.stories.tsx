@@ -71,7 +71,7 @@ export const Default: Story = {
   args: {
     onDismiss: () => undefined,
     actions: (
-      <Button variant="secondary" size="sm">
+      <Button variant="ghost" size="sm">
         Choose a plan
       </Button>
     ),
@@ -120,15 +120,18 @@ export const WithDescription: Story = {
 };
 
 /**
- * **Never a primary button.** A solid button is the loudest thing on a page and
- * a banner is not the page — put one in a warning and it outranks the Save
- * button the person came for. `secondary`, `ghost` or `link`, and the quieter
- * one goes on the left.
+ * **`ghost` only, with `link` where it is genuinely tight.** Nothing with a
+ * ground of its own.
  *
- * Whatever you pass, **the banner recolours it in its own tone** — the library's
- * general `secondary` is a blue-grey, and on a cream banner it reads as a chip
- * borrowed from another screen. A `ghost` still stays empty until you are on it,
- * and a `link` still stays a bare word.
+ * Two reasons, and they stack. A solid button is the loudest thing on a page and
+ * a banner is not the page — put one in a warning and it outranks the Save button
+ * the person came for. And a fill has to be *some* colour: every ground the
+ * library has is tuned for the white page, so on a cream or a green surface it
+ * reads as a chip borrowed from another screen. A ghost has no ground, so there
+ * is nothing to clash and nothing to invent.
+ *
+ * With two actions, the **link is the quieter one** and goes first. Anything
+ * filled is warned about while you build.
  */
 export const WithActions: Story = {
   name: 'With actions',
@@ -142,7 +145,7 @@ export const WithActions: Story = {
           title="Your trial ends in 3 days"
           description="After that, agents keep read-only access until a plan is chosen."
           actions={
-            <Button variant="secondary" size="sm">
+            <Button variant="ghost" size="sm">
               Choose a plan
             </Button>
           }
@@ -150,17 +153,17 @@ export const WithActions: Story = {
         />
       </div>
       <div>
-        <Label>Two actions — drop to their own line, quieter one first</Label>
+        <Label>Two actions — drop to their own line. A link is the quieter of the two.</Label>
         <Banner
           tone="info"
           title="A newer agent build is available"
           description="Version 4.18 fixes the discovery timeout on large subnets."
           actions={
             <>
-              <Button variant="ghost" size="sm">
+              <Button variant="link" size="sm">
                 Read the notes
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button variant="ghost" size="sm">
                 Update all agents
               </Button>
             </>
@@ -169,7 +172,7 @@ export const WithActions: Story = {
         />
       </div>
       <div>
-        <Label>A link, for somewhere very tight</Label>
+        <Label>A link on its own, for somewhere very tight</Label>
         <Banner
           tone="ai"
           title="Three tickets look like duplicates of INC-4471"
@@ -182,7 +185,7 @@ export const WithActions: Story = {
         />
       </div>
       <div>
-        <Label>Every tone recolours its own action</Label>
+        <Label>The same ghost on every tone — no ground to clash with any of them</Label>
         <Stack>
           {TONES.map(({ tone, title }) => (
             <Banner
@@ -190,7 +193,7 @@ export const WithActions: Story = {
               tone={tone}
               title={title}
               actions={
-                <Button variant="secondary" size="sm">
+                <Button variant="ghost" size="sm">
                   Take a look
                 </Button>
               }
@@ -225,7 +228,7 @@ export const ActionPlacement: Story = {
           tone="warning"
           title="Your trial ends in 3 days"
           actions={
-            <Button variant="secondary" size="sm">
+            <Button variant="ghost" size="sm">
               Choose a plan
             </Button>
           }
@@ -240,7 +243,7 @@ export const ActionPlacement: Story = {
           description="After that, agents keep read-only access until a plan is chosen."
           actionPlacement="below"
           actions={
-            <Button variant="secondary" size="sm">
+            <Button variant="ghost" size="sm">
               Choose a plan
             </Button>
           }
@@ -255,10 +258,10 @@ export const ActionPlacement: Story = {
           actionPlacement="inline"
           actions={
             <>
-              <Button variant="ghost" size="sm">
+              <Button variant="link" size="sm">
                 Notes
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button variant="ghost" size="sm">
                 Update
               </Button>
             </>
@@ -290,7 +293,7 @@ export const Dismissible: Story = {
             title="All 1,204 assets imported"
             description="Nothing was skipped. The report is in Exports."
             actions={
-              <Button variant="secondary" size="sm">
+              <Button variant="ghost" size="sm">
                 Open the report
               </Button>
             }
@@ -330,7 +333,7 @@ export const Placement: Story = {
             tone="danger"
             title="Sync has been failing since 14:20"
             actions={
-              <Button variant="secondary" size="sm">
+              <Button variant="ghost" size="sm">
                 Check the connector
               </Button>
             }
@@ -350,7 +353,7 @@ export const Placement: Story = {
             tone="danger"
             title="Sync has been failing since 14:20"
             actions={
-              <Button variant="secondary" size="sm">
+              <Button variant="ghost" size="sm">
                 Check the connector
               </Button>
             }
@@ -403,7 +406,7 @@ export const LongMessage: Story = {
         title="Two agents have not signed in for 90 days"
         description="Agents that stay dormant past 120 days are archived automatically, and archived agents keep their history but stop counting towards the seat total on the next billing run."
         actions={
-          <Button variant="secondary" size="sm">
+          <Button variant="ghost" size="sm">
             Review agents
           </Button>
         }
