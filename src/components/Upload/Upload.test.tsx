@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Upload, UploadFileRow, formatFileSize } from './Upload';
 import type { UploadItem } from './Upload.types';
@@ -46,7 +46,7 @@ describe('Upload', () => {
   });
 
   describe('choosing files', () => {
-    it('hands the files over rather than adding them itself', () => {
+    it('hands the files over, and adds them when it is keeping the list', () => {
       const onSelect = vi.fn();
       const { container } = render(<Upload label="Pick" onSelect={onSelect} />);
       const file = new File(['x'], 'a.pdf', { type: 'application/pdf' });
@@ -55,8 +55,8 @@ describe('Upload', () => {
 
       expect(onSelect).toHaveBeenCalledTimes(1);
       expect(onSelect.mock.calls[0][0][0].name).toBe('a.pdf');
-      // it did not put the file in the list on its own
-      expect(container.querySelector(ROW)).not.toBeInTheDocument();
+      // no `items` prop, so the component owns the list and the row is there
+      expect(container.querySelector(ROW)).toBeInTheDocument();
     });
 
     it('reports a drop the same way it reports a pick', () => {
@@ -271,5 +271,233 @@ describe('Upload', () => {
     ])('turns %i bytes into %s', (bytes, text) => {
       expect(formatFileSize(bytes)).toBe(text);
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// What the box refuses, and what it does on its own
+// ─────────────────────────────────────────────────────────────────────────────
+
+const file = (name: string, size = 1000, type = ''): File => {
+  const f = new File(['x'], name, { type });
+  Object.defineProperty(f, 'size', { value: size });
+  return f;
+};
+
+const pick = (files: File[], label = 'Choose a file or drop it here') => {
+  fireEvent.change(screen.getByLabelText(label), { target: { files } });
+};
+
+describe('Upload · what it refuses', () => {
+  it('turns a file away for being too big, naming both numbers', () => {
+    const onSelect = vi.fn();
+    render(<Upload maxSize={10 * 1024 * 1024} onSelect={onSelect} />);
+
+    pick([file('huge.pdf', 24 * 1024 * 1024)]);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('huge.pdf is 24 MB. The limit is 10 MB.');
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('turns a file away for its format, naming what is accepted', () => {
+    render(<Upload accept=".pdf,.docx" />);
+    pick([file('photo.bmp')]);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      '.bmp files are not accepted. Use PDF or DOCX.'
+    );
+  });
+
+  it('takes the good files and refuses only the bad, rather than all or nothing', () => {
+    const onSelect = vi.fn();
+    render(<Upload multiple maxSize={1000} onSelect={onSelect} />);
+
+    pick([file('a.pdf', 500), file('b.pdf', 500), file('huge.pdf', 9999)]);
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect.mock.calls[0][0]).toHaveLength(2);
+    expect(screen.getByRole('alert')).toHaveTextContent('huge.pdf');
+  });
+
+  it('says how many were left out when there is not enough room', () => {
+    render(<Upload multiple maxFiles={2} />);
+    pick([file('a.pdf'), file('b.pdf'), file('c.pdf'), file('d.pdf')]);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'You picked 4 files. 2 is the limit, so 2 were left out.'
+    );
+  });
+
+  it('turns the box border when it refuses something', () => {
+    const { container } = render(<Upload accept=".pdf" />);
+    pick([file('photo.bmp')]);
+    expect(container.querySelector(BOX)).toHaveAttribute('data-state', 'error');
+  });
+
+  it('lets a caller error win, so the two can never contradict each other', () => {
+    render(<Upload accept=".pdf" error="Pick a plan first." />);
+    pick([file('photo.bmp')]);
+    expect(screen.getByRole('alert')).toHaveTextContent('Pick a plan first.');
+  });
+
+  it('takes only one file when multiple is off, whatever the OS sent', () => {
+    const onSelect = vi.fn();
+    render(<Upload onSelect={onSelect} />);
+    pick([file('a.pdf'), file('b.pdf')]);
+    expect(onSelect.mock.calls[0][0]).toHaveLength(1);
+  });
+
+  it('clears the message once a good file arrives', () => {
+    render(<Upload accept=".pdf" />);
+    pick([file('photo.bmp')]);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    pick([file('plan.pdf')]);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
+describe('Upload · reachable by keyboard and screen reader', () => {
+  it('draws a ring on the box when the field takes focus', () => {
+    const { container } = render(<Upload label="Pick" />);
+    expect(container.querySelector(BOX)).not.toHaveClass('mdt-ring-2');
+
+    fireEvent.focus(screen.getByLabelText('Pick'));
+    expect(container.querySelector(BOX)).toHaveClass('mdt-ring-2');
+
+    fireEvent.blur(screen.getByLabelText('Pick'));
+    expect(container.querySelector(BOX)).not.toHaveClass('mdt-ring-2');
+  });
+
+  it('reads the rules out along with the field', () => {
+    render(<Upload label="Pick" hint="PDF or DOCX up to 10 MB" />);
+    const describedBy = screen.getByLabelText('Pick').getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy as string)).toHaveTextContent(
+      'PDF or DOCX up to 10 MB'
+    );
+  });
+
+  it('marks the field invalid once it has refused something', () => {
+    render(<Upload label="Pick" accept=".pdf" />);
+    pick([file('photo.bmp')], 'Pick');
+    expect(screen.getByLabelText('Pick')).toHaveAttribute('aria-invalid', 'true');
+  });
+});
+
+describe('Upload · keeping its own list', () => {
+  it('adds a chosen file with no state of your own', () => {
+    const { container } = render(<Upload multiple />);
+    pick([file('plan.pdf', 2048)]);
+    expect(container.querySelectorAll(ROW)).toHaveLength(1);
+    expect(screen.getByText('plan.pdf')).toBeInTheDocument();
+  });
+
+  it('removes on its own, and says so', () => {
+    const onChange = vi.fn();
+    const { container } = render(<Upload multiple onChange={onChange} />);
+    pick([file('plan.pdf')]);
+    fireEvent.click(screen.getByLabelText('Remove plan.pdf'));
+    expect(container.querySelectorAll(ROW)).toHaveLength(0);
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it('counts what it holds against the limit', () => {
+    render(<Upload multiple maxFiles={2} />);
+    pick([file('a.pdf')]);
+    expect(screen.getByText('Limit 1 of 2')).toBeInTheDocument();
+    pick([file('b.pdf')]);
+    expect(screen.getByText('Limit 2 of 2')).toBeInTheDocument();
+  });
+
+  it('starts from defaultItems', () => {
+    const { container } = render(<Upload multiple defaultItems={[done({ id: 'x' })]} />);
+    expect(container.querySelectorAll(ROW)).toHaveLength(1);
+  });
+
+  it('does nothing itself while the caller owns the list', () => {
+    const onSelect = vi.fn();
+    const { container } = render(<Upload multiple items={[]} onSelect={onSelect} />);
+    pick([file('plan.pdf')]);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(container.querySelectorAll(ROW)).toHaveLength(0);
+  });
+});
+
+describe('Upload · driving a sender', () => {
+  it('shows the bar, follows progress, then lands', async () => {
+    let report: ((p: number) => void) | undefined;
+    let finish: (() => void) | undefined;
+    const sender = vi.fn(
+      (_f: File, ctx: { onProgress: (p: number) => void }) =>
+        new Promise<void>((resolve) => {
+          report = ctx.onProgress;
+          finish = resolve;
+        })
+    );
+
+    render(<Upload multiple sender={sender} />);
+    pick([file('plan.pdf', 2048)]);
+
+    expect(await screen.findByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+
+    await act(async () => {
+      report?.(42);
+      await Promise.resolve();
+    });
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '42');
+
+    await act(async () => {
+      finish?.();
+      await Promise.resolve();
+    });
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.getByText('2 KB')).toBeInTheDocument();
+  });
+
+  it('turns a thrown reason into the row that says it', async () => {
+    const sender = vi.fn(() => Promise.reject(new Error('storage-full')));
+    render(<Upload multiple sender={sender} />);
+
+    await act(async () => {
+      pick([file('plan.pdf')]);
+      await Promise.resolve();
+    });
+
+    expect(await screen.findByText('Storage full')).toBeInTheDocument();
+    // and it is one of the three that cannot be retried
+    expect(screen.queryByLabelText('Try plan.pdf again')).not.toBeInTheDocument();
+  });
+
+  it('offers Retry for a reason that could work, and runs the sender again', async () => {
+    const sender = vi.fn(() => Promise.reject(new Error('server-error')));
+    render(<Upload multiple sender={sender} />);
+
+    await act(async () => {
+      pick([file('plan.pdf')]);
+      await Promise.resolve();
+    });
+    expect(await screen.findByText('Server error')).toBeInTheDocument();
+    expect(sender).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Try plan.pdf again'));
+      await Promise.resolve();
+    });
+    expect(sender).toHaveBeenCalledTimes(2);
+  });
+
+  it('aborts the sender when an upload in flight is cancelled', async () => {
+    let signal: AbortSignal | undefined;
+    const sender = vi.fn(
+      (_f: File, ctx: { signal: AbortSignal }) =>
+        new Promise<void>(() => {
+          signal = ctx.signal;
+        })
+    );
+
+    render(<Upload multiple sender={sender} />);
+    pick([file('plan.pdf')]);
+    await screen.findByRole('progressbar');
+
+    fireEvent.click(screen.getByLabelText('Cancel plan.pdf'));
+    expect(signal?.aborted).toBe(true);
   });
 });

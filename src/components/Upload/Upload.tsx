@@ -5,6 +5,8 @@ import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import { IconTile } from '../IconTile';
 import type { UploadFailure, UploadFileRowProps, UploadItem, UploadProps } from './Upload.types';
+import { useUploadFiles } from './Upload.state';
+import { formatFileSize, validateSelection } from './Upload.validate';
 
 /**
  * Upload styles.
@@ -118,21 +120,6 @@ const FAILURE_TEXT: Record<UploadFailure, string> = {
 };
 
 const isKnownFailure = (f: string): f is UploadFailure => f in FAILURE_TEXT;
-
-/** 1 KB is 1024 bytes here, matching what an operating system reports. */
-export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${String(bytes)} B`;
-  const units = ['KB', 'MB', 'GB', 'TB'] as const;
-  let value = bytes / 1024;
-  let unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit += 1;
-  }
-  const shown =
-    value >= 10 || Number.isInteger(value) ? String(Math.round(value)) : value.toFixed(1);
-  return `${shown} ${units[unit] ?? 'TB'}`;
-}
 
 /** The three letters a mark carries, capped so a long extension cannot overflow. */
 function extensionOf(name: string): string {
@@ -304,6 +291,12 @@ interface UploadBoxProps {
   readonly state: 'rest' | 'over' | 'error' | 'disabled';
   readonly locked: boolean;
   readonly dragging: boolean;
+  /**
+   * The input that makes this box a control is visually hidden, so its own
+   * focus ring is too. The ring has to be drawn here instead, or a keyboard
+   * arrives at the field with nothing on screen saying so.
+   */
+  readonly focused: boolean;
   readonly inputId: string;
   readonly label: ReactNode;
   readonly supporting: ReactNode;
@@ -326,6 +319,7 @@ function UploadBox({
   state,
   locked,
   dragging,
+  focused,
   inputId,
   label,
   supporting,
@@ -357,7 +351,11 @@ function UploadBox({
     <div
       data-slot="upload-box"
       data-state={state}
-      className={cn(uploadVariants({ state }), 'mdt-group')}
+      className={cn(
+        uploadVariants({ state }),
+        'mdt-group',
+        focused && 'mdt-ring-2 mdt-ring-ring mdt-ring-offset-2 mdt-ring-offset-background'
+      )}
       style={{ minHeight }}
       onDragOver={onDragOver}
       onDragEnter={onDragOver}
@@ -592,10 +590,14 @@ function UploadHint({
 const Upload = forwardRef<HTMLDivElement, UploadProps>(
   (
     {
-      items = [],
+      items: controlledItems,
+      defaultItems,
+      sender,
+      onChange,
       kind = 'file',
       multiple = false,
       maxFiles,
+      maxSize,
       accept,
       label = 'Choose a file or drop it here',
       supporting,
@@ -606,6 +608,7 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
       disabled = false,
       minHeight = 180,
       onSelect,
+      onReject,
       onRemove,
       onRetry,
       className,
@@ -617,6 +620,20 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
     const hintId = useId();
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
+    const [focused, setFocused] = useState(false);
+    // What the box itself refused. A caller's `error` takes over, so the two
+    // can never contradict each other under the same field.
+    const [refusal, setRefusal] = useState<string | undefined>(undefined);
+
+    const list = useUploadFiles({
+      ...(controlledItems !== undefined ? { items: controlledItems } : {}),
+      ...(defaultItems !== undefined ? { defaultItems } : {}),
+      ...(sender !== undefined ? { sender } : {}),
+      ...(onChange !== undefined ? { onChange } : {}),
+      ...(onRemove !== undefined ? { onRemove } : {}),
+      ...(onRetry !== undefined ? { onRetry } : {}),
+    });
+    const items = list.items;
 
     const full = multiple && maxFiles !== undefined && items.length >= maxFiles;
     const locked = disabled || full;
@@ -628,12 +645,32 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
 
     const openPicker = useCallback(() => inputRef.current?.click(), []);
 
+    /**
+     * Everything a file has to get past before it becomes a row.
+     *
+     * A selection is never all-or-nothing: three good files and one that is too
+     * big means three go in and one message comes back. Refusing the lot
+     * because of one mistake makes you start again for no reason.
+     */
     const handleFiles = useCallback(
-      (list: FileList | null) => {
-        if (!list || list.length === 0) return;
-        onSelect?.(Array.from(list));
+      (incoming: FileList | null) => {
+        if (!incoming || incoming.length === 0) return;
+        const picked = Array.from(incoming);
+        const { accepted, rejected, message } = validateSelection(picked, {
+          ...(accept !== undefined ? { accept } : {}),
+          ...(maxSize !== undefined ? { maxSize } : {}),
+          ...(multiple && maxFiles !== undefined ? { maxFiles } : {}),
+          ...(multiple ? { current: items.length } : {}),
+        });
+        setRefusal(message);
+        if (rejected.length > 0) onReject?.(rejected);
+        if (accepted.length === 0) return;
+        // One file when `multiple` is off, whatever the operating system sent.
+        const take = multiple ? accepted : accepted.slice(0, 1);
+        list.add(take);
+        onSelect?.(take);
       },
-      [onSelect]
+      [accept, maxSize, maxFiles, multiple, items.length, onReject, onSelect, list]
     );
 
     const stop = (e: DragEvent) => {
@@ -655,14 +692,12 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
       if (!locked) handleFiles(e.dataTransfer.files);
     };
 
-    const state = boxState({ locked, dragging, hasError: error !== undefined });
+    const shown = error ?? refusal;
+    const state = boxState({ locked, dragging, hasError: shown !== undefined });
 
-    // Worked out once. Under exactOptionalPropertyTypes an absent handler has to
-    // be absent, not undefined, so this spread is the only way to pass them on.
-    const rowHandlers = {
-      ...(onRemove !== undefined ? { onRemove } : {}),
-      ...(onRetry !== undefined ? { onRetry } : {}),
-    };
+    // Every row acts through the list, so a self-managing field removes and
+    // retries on its own while a controlled one still calls back to its owner.
+    const rowHandlers = { onRemove: list.remove, onRetry: list.retry };
 
     const boxLabel = full ? `All ${String(maxFiles)} files added` : label;
     const boxSupporting = full ? 'Remove one to add another' : supporting;
@@ -680,7 +715,17 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
           className="mdt-sr-only"
           multiple={multiple}
           disabled={locked}
+          // So a screen reader reads the rules, and the refusal, along with the
+          // field - rather than announcing a file input with no conditions.
+          {...(hint !== undefined || shown !== undefined ? { 'aria-describedby': hintId } : {})}
+          {...(shown !== undefined ? { 'aria-invalid': true } : {})}
           {...(accept !== undefined ? { accept } : {})}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onBlur={() => {
+            setFocused(false);
+          }}
           onChange={(e) => {
             handleFiles(e.target.files);
             // so choosing the same file twice in a row still fires
@@ -693,6 +738,7 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
             state={state}
             locked={locked}
             dragging={dragging}
+            focused={focused}
             inputId={inputId}
             label={boxLabel}
             supporting={boxSupporting}
@@ -710,7 +756,7 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
             item={single}
             minHeight={minHeight}
             onChange={openPicker}
-            {...(onRemove !== undefined ? { onRemove } : {})}
+            onRemove={list.remove}
           />
         ) : null}
 
@@ -736,12 +782,12 @@ const Upload = forwardRef<HTMLDivElement, UploadProps>(
           />
         ) : null}
 
-        <UploadHint id={hintId} hint={hint} error={error} />
+        <UploadHint id={hintId} hint={hint} error={shown} />
       </div>
     );
   }
 );
 Upload.displayName = 'Upload';
 
-export { Upload, UploadFileRow };
+export { Upload, UploadFileRow, formatFileSize };
 export type { ReactNode as UploadNode, UploadItem };

@@ -564,7 +564,16 @@ export type {
 } from './Tooltip';
 
 // Upload
-export { Upload, UploadFileRow, uploadVariants, formatFileSize } from './Upload';
+export {
+  Upload,
+  UploadFileRow,
+  uploadVariants,
+  formatFileSize,
+  useUploadFiles,
+  validateSelection,
+  matchesAccept,
+  describeAccept,
+} from './Upload';
 export type {
   UploadProps,
   UploadOwnProps,
@@ -574,5 +583,9 @@ export type {
   UploadKind,
   UploadStatus,
   UploadFailure,
+  UploadRejection,
+  UploadRejectionReason,
+  UploadSender,
+  UploadSenderContext,
   UploadVariantsType,
 } from './Upload';

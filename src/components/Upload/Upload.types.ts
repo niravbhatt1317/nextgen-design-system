@@ -75,12 +75,68 @@ export interface UploadItem {
   previewUrl?: string | undefined;
 }
 
+/** Why the box turned a file away before it ever became a row. */
+export type UploadRejectionReason = 'too-big' | 'wrong-format' | 'too-many';
+
+export interface UploadRejection {
+  file: File;
+  reason: UploadRejectionReason;
+  /** Wording for one file on its own. Several are summarised into one line. */
+  message: string;
+}
+
+/** What the sender is told while it works, and how it is stopped. */
+export interface UploadSenderContext {
+  /** 0-100. Call it as often as you like; the bar follows. */
+  onProgress: (percent: number) => void;
+  /** Aborted when the file is cancelled or the field unmounts. Honour it. */
+  signal: AbortSignal;
+}
+
+/**
+ * Send one file.
+ *
+ * Resolve and the row lands. Reject and the row fails - throw an `Error` whose
+ * message is one of the eight reasons (`throw new Error('storage-full')`) to
+ * choose the wording, or throw anything at all and the component works it out
+ * from whether the browser is online.
+ */
+export type UploadSender = (file: File, context: UploadSenderContext) => Promise<void>;
+
 export interface UploadOwnProps {
   /**
-   * The files, as they stand. Leave it empty and the box is in its resting
-   * state.
+   * The files, as they stand.
+   *
+   * **Passing this puts you in charge.** The component draws what you give it
+   * and reports what someone did, and nothing else. Leave it out and the
+   * component keeps the list itself - see `sender` and `defaultItems`.
    */
   items?: UploadItem[] | undefined;
+
+  /** What the list starts with when the component is keeping it. */
+  defaultItems?: UploadItem[] | undefined;
+
+  /**
+   * Hand over one function that sends a single file, and the component does the
+   * rest: the bar, the failure, the retry, the cancel.
+   *
+   * Only read when `items` is absent. Without it the component still keeps the
+   * list, but a chosen file simply arrives as done - there is nothing to wait
+   * for.
+   */
+  sender?: UploadSender | undefined;
+
+  /** The list changed. Only fired while the component is keeping it. */
+  onChange?: ((items: UploadItem[]) => void) | undefined;
+
+  /**
+   * The biggest a single file may be, in bytes. Anything over it is refused at
+   * the box with a message naming both numbers, and never becomes a row.
+   */
+  maxSize?: number | undefined;
+
+  /** Files were turned away. The message is already shown; this is for logging. */
+  onReject?: ((rejections: UploadRejection[]) => void) | undefined;
 
   /** @default 'file' */
   kind?: UploadKind | undefined;
@@ -119,6 +175,9 @@ export interface UploadOwnProps {
    * The field is wrong: the border turns and the message replaces the hint,
    * with an icon. Nothing else changes - a red-filled box shouts about a wrong
    * file type.
+   *
+   * The box writes its own message when it refuses a file. Setting this takes
+   * that over, so the two can never fight.
    */
   error?: ReactNode | undefined;
 
@@ -135,9 +194,12 @@ export interface UploadOwnProps {
   minHeight?: number | undefined;
 
   /**
-   * Someone chose files, by picking or by dropping. **The component does not
-   * add them** - put them in `items` yourself, so validation and upload stay
-   * yours.
+   * Someone chose files, by picking or by dropping - **already checked**, so
+   * anything too big or of the wrong format has been filtered out before you
+   * see it.
+   *
+   * While `items` is set this is the only way files reach you, and adding them
+   * to the list is your job.
    */
   onSelect?: ((files: File[]) => void) | undefined;
 
