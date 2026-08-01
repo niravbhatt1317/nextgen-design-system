@@ -122,16 +122,31 @@ const kindOf = (name) => KIND_PATTERNS.find((entry) => entry.test(name)).kind;
  * answer "do we already freeze a column" - which is exactly the kind of
  * question that ends in something being built twice.
  */
+const propsByDir = new Map();
+
 const readProps = (file) => {
-  const types = file.replace(/\.tsx?$/, '.types.ts');
+  // Every `.types.ts` in the folder, not the sibling alone. `DataTableProps`
+  // lives in `Table.types.ts` with everything else, so a sibling lookup found
+  // nothing for the one component that has the most props - and "checkbox
+  // column" came back empty while `selectable` sat there documented.
+  const dir = dirname(file);
+  const cached = propsByDir.get(dir);
+  if (cached !== undefined) return cached;
+
   const byInterface = new Map();
-  let source;
-  try {
-    source = readFileSync(types, 'utf8');
-  } catch {
-    return byInterface;
-  }
-  for (const match of source.matchAll(/interface\s+([A-Za-z_$][\w$]*)\s*(?:extends[^{]+)?\{/g)) {
+  const source = readdirSync(dir)
+    .filter((entry) => entry.endsWith('.types.ts'))
+    .map((entry) => readFileSync(join(dir, entry), 'utf8'))
+    .join('\n');
+  propsByDir.set(dir, byInterface);
+
+  // `<[^>]*>` for the generic parameter list. Without it `DataTableProps<Row>`
+  // did not match at all, so the component with the most props had none
+  // indexed - and "checkbox column" came back empty while `selectable` sat
+  // there saying "Adds a checkbox column and the bulk bar".
+  for (const match of source.matchAll(
+    /interface\s+([A-Za-z_$][\w$]*)\s*(?:<[^>]*>)?\s*(?:extends[^{]+)?\{/g
+  )) {
     const start = match.index + match[0].length;
     // To the matching close brace, counting depth so a nested object type does
     // not end the interface early.
@@ -146,7 +161,16 @@ const readProps = (file) => {
     const names = [...body.matchAll(/^\s*(?:\/\*\*[\s\S]*?\*\/\s*)?'?([a-zA-Z_$][\w$-]*)'?\??\s*:/gm)].map(
       (prop) => prop[1]
     );
-    byInterface.set(match[1], [...new Set(names)]);
+    // The prose as well as the names. Half this library's behaviour is
+    // described in a prop's documentation and nowhere else: `indent` is where
+    // "rows nested under a parent" lives, and `selectable` is where the
+    // checkbox column is. Indexing the names alone answered "is there a prop
+    // called nested" - which nobody asks - and missed "do we do nested rows",
+    // which is the question.
+    const prose = [...body.matchAll(/\/\*\*((?:(?!\*\/)[\s\S])*?)\*\//g)]
+      .map((doc) => flatten(doc[1]))
+      .join(' ');
+    byInterface.set(match[1], { names: [...new Set(names)], prose });
   }
   return byInterface;
 };
@@ -193,7 +217,8 @@ const readFile = (file) => {
       area: relative(COMPONENTS_DIR, dirname(file)).split(sep)[0] || basename(dirname(file)),
       summary: summarise(found.get(name) ?? ''),
       doc: (found.get(name) ?? '').slice(0, DOC_LIMIT),
-      props: props.get(`${name}Props`) ?? [],
+      props: props.get(`${name}Props`)?.names ?? [],
+      propDocs: (props.get(`${name}Props`)?.prose ?? '').slice(0, DOC_LIMIT),
     }));
 };
 
@@ -216,6 +241,7 @@ const readStories = (file) => {
     summary: title === '' ? '' : `Story: ${title} / ${match[1]}`,
     doc: `${title} ${match[1]}`,
     props: [],
+    propDocs: '',
   }));
 };
 
@@ -253,12 +279,12 @@ const collect = () => {
 /**
  * Words that mean the same thing here, because English does not.
  *
- * Substring matching bridges "sort" and "sorting" for free; nothing bridges
- * "freeze" and "frozen". Searching for the thing you want to do and being told
- * it does not exist - when it does, under its past participle - is the failure
- * this whole catalogue is meant to prevent, so the handful of irregular pairs
- * are listed rather than left to chance. Only add a pair after a real search
- * has missed.
+ * Prefix matching bridges "sort" and "sorting" for free; nothing bridges
+ * "freeze" and "frozen", or the word a designer uses with the word the code
+ * uses. Searching for the thing you want and being told it does not exist -
+ * when it does, under another name - is the failure this catalogue exists to
+ * prevent, so the pairs are listed. Only add one after a real search has
+ * missed.
  */
 const SYNONYMS = {
   freeze: ['frozen', 'pin'],
@@ -271,50 +297,126 @@ const SYNONYMS = {
   paging: ['pagination', 'page'],
   pager: ['pagination', 'page'],
   choose: ['select', 'picker'],
+  // Designers say zebra, the code says striped. Neither is wrong and the
+  // search has to know both.
+  zebra: ['striped', 'stripe'],
+  stripe: ['striped', 'zebra'],
 };
 
 /**
- * Splits camelCase so word-boundary matching can see inside a name.
+ * How far apart two search terms may be and still count as one idea.
  *
- * `\buseColumnReorder` has no boundary before "Column" - "eC" is two word
- * characters - so searching "column reorder" found nothing while the hook sat
- * there named after the search. Every identifier in this codebase is camelCase
- * or PascalCase, so this is not an edge case, it is all of them.
+ * Every term appearing *somewhere* in a long doc comment is not a match.
+ * `useTableColumns` says "never touches your rows" in one paragraph and
+ * describes moving columns in another, so "row drag" matched it - and reported
+ * row dragging as something the library already does, which it does not. A
+ * confident wrong answer is worse than no answer: a miss makes you look
+ * harder, this makes you stop looking.
  */
-const words = (text) => text.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+const PROXIMITY = 14;
 
-/** Finds capabilities by name, area, documentation or props. What the rule tells you to run. */
+const tokenise = (text) =>
+  text
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word !== '');
+
+/**
+ * Whether a word in the text answers a search term.
+ *
+ * Either may be the prefix of the other. "align" should be found by searching
+ * "alignment" just as "alignment" is found by searching "align" - the person
+ * searching does not know which form the code chose. The floor of four
+ * characters stops "row" from matching "rows per page" through "r".
+ */
+// Three, not four. At four, "rows" fails to find "row" - the commonest pair of
+// words in this component - because the floor was being applied to the word in
+// the text rather than to the risk. Three still stops "row" matching through
+// "r" and lets "col" find "column", which is what people type.
+const MIN_STEM = 3;
+const answers = (word, needle) =>
+  word.startsWith(needle) || (needle.length >= MIN_STEM && needle.startsWith(word) && word.length >= MIN_STEM);
+
+/** Every word position in the text that answers this term or one of its synonyms. */
+const positions = (words, term) => {
+  const forms = [term, ...(SYNONYMS[term] ?? [])];
+  const found = [];
+  words.forEach((word, index) => {
+    if (forms.some((form) => answers(word, form))) found.push(index);
+  });
+  return found;
+};
+
+/**
+ * The stretch of text the terms were found in.
+ *
+ * Printed with every result, because proximity cannot tell a real match from a
+ * coincidence and should not pretend to. `columnKey` documents that
+ * "Reordering measures the header row to work out where a dragged column would
+ * land" - so "row drag" matches it, adjacent and genuine and completely the
+ * wrong answer, because row dragging does not exist. Shown the sentence, a
+ * person sees that in a second. Shown a bare component name, they believe it.
+ */
+const window = (words, places) => {
+  const from = Math.max(0, Math.min(...places) - 3);
+  const to = Math.min(words.length, Math.max(...places) + 4);
+  return words.slice(from, to).join(' ');
+};
+
+/**
+ * Finds capabilities by name, area, documentation, prop names or prop docs.
+ *
+ * What the reuse rule in CLAUDE.md tells you to run.
+ */
 const find = (terms, capabilities) => {
-  // Matched at the start of a word, not anywhere in one. Plain substring
-  // matching made "pin" hit "spinner" and "sort" hit "assorted"; a prefix at a
-  // word boundary still bridges sort/sorting/sorted, which is the whole reason
-  // not to demand exact words.
-  const needles = terms.map((term) => {
-    const word = term.toLowerCase();
-    return [word, ...(SYNONYMS[word] ?? [])].map(
-      (needle) => new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
-    );
-  });
-  const matches = capabilities.filter((entry) => {
-    const haystack = words(
-      `${entry.name} ${entry.area} ${entry.doc} ${entry.props.join(' ')}`
-    ).toLowerCase();
-    // Every term must appear, but any of its synonyms will do.
-    return needles.every((group) => group.some((needle) => needle.test(haystack)));
-  });
+  const needles = terms.map((term) => term.toLowerCase());
 
-  // A match on the name beats one on a prop, which beats one buried in the
-  // third paragraph. Without this, searching "pager" puts Card above DataTable
-  // because "page" appears in both and the list is alphabetical.
-  const rank = (entry) => {
-    const name = words(entry.name).toLowerCase();
-    const props = words(entry.props.join(' ')).toLowerCase();
-    if (needles.every((group) => group.some((needle) => needle.test(name)))) return 0;
-    if (needles.every((group) => group.some((needle) => needle.test(props)))) return 1;
-    return 2;
-  };
+  const scored = capabilities
+    .map((entry) => {
+      const nameWords = tokenise(`${entry.name} ${entry.area}`);
+      const allWords = [
+        ...nameWords,
+        ...tokenise(`${entry.doc} ${entry.props.join(' ')} ${entry.propDocs}`),
+      ];
 
-  return matches.sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+      const hits = needles.map((needle) => positions(allWords, needle));
+      if (hits.some((places) => places.length === 0)) return null;
+
+      // The tightest window that holds one occurrence of every term. Anchored
+      // on the first term rather than searched exhaustively - the difference
+      // never showed up in testing and the exhaustive version is quadratic.
+      let spread = Infinity;
+      let tightest = [];
+      for (const anchor of hits[0]) {
+        const picked = hits.map((places) =>
+          places.reduce((best, place) =>
+            Math.abs(place - anchor) < Math.abs(best - anchor) ? place : best
+          )
+        );
+        const width = Math.max(...picked) - Math.min(...picked);
+        if (width < spread) {
+          spread = width;
+          tightest = picked;
+        }
+      }
+      if (spread > PROXIMITY) return null;
+
+      // A match on the name beats one buried in the third paragraph, and the
+      // thing itself beats a demo of it. Searching "pagination" and being shown
+      // a story called `Controlled` is technically a hit and no use: what you
+      // want to know first is that `Pagination` exists.
+      const inName = needles.every((needle) => positions(nameWords, needle).length > 0);
+      const rank = (inName ? 0 : 2) + (entry.kind === 'story' ? 1 : 0);
+      return { entry, rank, spread, where: window(allWords, tightest) };
+    })
+    .filter(Boolean);
+
+  return scored
+    .sort(
+      (a, b) => a.rank - b.rank || a.spread - b.spread || a.entry.name.localeCompare(b.entry.name)
+    )
+    .map((scored_) => ({ ...scored_.entry, where: scored_.where }));
 };
 
 const KIND_ORDER = ['component', 'hook', 'utility', 'story'];
@@ -387,6 +489,8 @@ if (args[0] === '--find') {
     for (const entry of matches) {
       console.log(`${entry.name.padEnd(28)} ${entry.kind.padEnd(10)} ${entry.file}`);
       if (entry.summary !== '') console.log(`${' '.repeat(28)} ${entry.summary}`);
+      // Read this before believing the line above it.
+      if (entry.where !== '') console.log(`${' '.repeat(28)} matched: ...${entry.where}...`);
     }
   }
 } else if (args.includes('--write')) {

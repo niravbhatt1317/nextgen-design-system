@@ -289,6 +289,22 @@ the commit that it did.
 | A small icon-only button    | `icon button`, `iconOnly`      | `Button` has `iconOnly`, and it does not work | `iconOnly` hides children and takes the glyph as `leftIcon`, which leaves no children — and children are what tell `ButtonProps` from `LinkButtonProps`, so the type then demands an `href`. Worked around with `mdt-w-8 mdt-px-0` in **four** places now. Needs fixing in `Button`. | Jul 2026 |
 | A remove-label on a tag     | `TagPill`, `remove`, `dismiss` | `TagPill`                                     | It hardcodes `aria-label="Remove"`, so a screen reader hears "Remove" for every tag on the page rather than which one. Needs a prop.                                                                                                                                                 | Jul 2026 |
 
+## Table — searched for, not found
+
+Found by running `npm run find` against every part a table needs, on 1 August 2026. Verified
+in source afterwards, because the tool produced two false gaps as well: `sticky footer` is
+covered by `stickyHeader` plus sticky summary rows, and `column alignment` by `TableAlign` on
+both `TableCell` and `TableHead`. Neither is missing. The rest are.
+
+| Missing                             | Words searched                        | Notes                                                                                                                                                                               |
+| ----------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cell truncation / text overflow     | `cell truncate`, `text overflow`      | Nothing in Table. `Sidebar`, `CodeWell` and `TagPill` each truncate their own way — three private implementations and no shared one. The duplication problem again, one level down. |
+| Row reordering — dragging rows      | `row drag`, `reorder rows`            | Only columns move. `useColumnReorder` is columns, and the search returning it for "row drag" is a tool defect, not a capability.                                                    |
+| Column groups / multi-level headers | `column groups`, `multi level header` | Nothing. A header spanning several columns has no expression.                                                                                                                       |
+| Inline cell editing                 | `inline edit`, `editable cell`        | Nothing. `EditableStatusTag` is a display recipe, not editing.                                                                                                                      |
+| Aggregate / computed totals         | `aggregate total`                     | Summary rows render; nothing computes them. The product supplies the number.                                                                                                        |
+| Copy a cell, print a table          | `copy cell`, `print table`            | Nothing — and arguably neither belongs to Table.                                                                                                                                    |
+
 ## A note on method
 
 This compares component **types**, not implementations. Where four teams built the same type, they

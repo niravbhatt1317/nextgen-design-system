@@ -512,6 +512,14 @@ npm run find -- freeze column     # every term must appear; synonyms count
 npm run catalog                   # regenerate after adding anything
 ```
 
+**Read the `matched:` line under every result before believing it.** The search
+finds terms near each other; it cannot tell a real answer from a coincidence,
+and it does not pretend to. Searching `row drag` returns `TableCell`, because
+its documentation says "measures the header **row** to work out where a
+**dragged** column would land" — adjacent, genuine, and completely the wrong
+answer, since row dragging does not exist. The phrase makes that obvious in a
+second; the component name alone would have been believed.
+
 `CAPABILITIES.md` is the same list to read by eye, and
 `capability-catalog.json` is it in machine-readable form. Both are generated —
 never edit them.
