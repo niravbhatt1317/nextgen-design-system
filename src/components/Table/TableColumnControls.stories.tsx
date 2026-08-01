@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 import { TableColumnMenu } from './TableColumnMenu';
+import { useColumnReorder } from './useColumnReorder';
 import { useColumnWidths } from './useColumnWidths';
 import { useTableColumns } from './useTableColumns';
 import type { TableColumnDef } from './useTableColumns';
@@ -492,6 +495,168 @@ export const HeaderMenu: Story = {
             ))}
           </TableBody>
         </Table>
+      </div>
+    );
+  },
+};
+
+/**
+ * **Drag a column sideways to move it.** Hover a header and a grip appears on
+ * its trailing side; drag it and the other columns step aside.
+ *
+ * **The columns move as you drag, rather than a line showing where it will
+ * land.** A drop indicator tells you an index; watching the table rearrange
+ * tells you what you are going to get, which is the actual question. It works
+ * because `table-cell` is a transformable element - only table *column* boxes
+ * are excluded - so each cell slides on a transform without touching layout.
+ *
+ * **Nothing is committed until you let go.** The transforms are visual; the
+ * order changes once, on drop. A drag you abandon costs nothing, and undo has
+ * one thing to undo rather than thirty.
+ *
+ * **Pin ID and it stops moving.** Pinning is what makes a column immovable
+ * here, and unpinning gives it its grip back - so the block is a state you can
+ * see and undo, not a property of that column. (`locked` is a different thing,
+ * for columns that are not really data - a checkbox, a row number - and the
+ * other stories on this page use it.)
+ *
+ * **Keyboard:** Tab to a grip and use the arrow keys. One position per press,
+ * committed immediately - there is no "let go" to commit on.
+ */
+export const DragToReorder: Story = {
+  render: function DragToReorderDemo() {
+    // ID is an ordinary column here, unlike in the other stories on this page.
+    // Reordering should be blocked by *pinning*, which you can undo, rather
+    // than by `locked`, which is permanent - otherwise "why will this not
+    // move" has no answer on screen.
+    const cols = useTableColumns(
+      definitions.map((column) => ({ key: column.key, label: column.label }))
+    );
+    // The drop line runs the height of the table, so it needs the table's box.
+    const tableRef = useRef<HTMLTableElement>(null);
+    const lineBox = tableRef.current?.getBoundingClientRect();
+
+    const reorder = useColumnReorder({
+      columns: cols.visible,
+      frozenCount: cols.frozenCount,
+      onMove: (key, to) => {
+        cols.move(key, to);
+      },
+    });
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-3">
+        <div className="mdt-flex mdt-items-center mdt-gap-3">
+          <Button variant="outline" size="sm" onClick={cols.reset} disabled={!cols.isChanged}>
+            Reset order
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (cols.frozenCount > 0) cols.unfreeze('id');
+              else cols.freeze('id');
+            }}
+          >
+            {cols.frozenCount > 0 ? 'Unpin ID' : 'Pin ID'}
+          </Button>
+          <p className="mdt-text-xs mdt-text-muted-foreground">
+            {cols.visible.map((column) => column.label).join(' · ')}
+          </p>
+        </div>
+
+        <Table ref={tableRef} containerClassName="mdt-rounded-md mdt-border">
+          <TableHeader>
+            <TableRow>
+              {cols.visible.map((column) => (
+                <TableHead
+                  key={column.key}
+                  columnKey={column.key}
+                  style={reorder.styleFor(column.key)}
+                  className="mdt-group/col mdt-whitespace-nowrap"
+                >
+                  <span className="mdt-flex mdt-items-center mdt-gap-2">
+                    {column.label}
+                    {!column.frozen && (
+                      <button
+                        type="button"
+                        {...reorder.gripProps(column.key)}
+                        className={[
+                          'mdt-ml-auto mdt-cursor-grab mdt-touch-none mdt-rounded-sm',
+                          'mdt-text-muted-foreground hover:mdt-text-foreground',
+                          'mdt-opacity-0 mdt-transition-opacity',
+                          'focus-visible:mdt-opacity-100 group-hover/col:mdt-opacity-100',
+                          'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
+                        ].join(' ')}
+                      >
+                        <Icon name="grip-vertical" size="sm" aria-hidden />
+                      </button>
+                    )}
+                  </span>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tickets.map((ticket) => (
+              <TableRow key={ticket.id}>
+                {cols.visible.map((column) => (
+                  <TableCell
+                    key={column.key}
+                    columnKey={column.key}
+                    style={reorder.styleFor(column.key)}
+                    className="mdt-whitespace-nowrap"
+                  >
+                    {cellFor(ticket, column.key)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/*
+          The ghost and the line are the only things that move. Both are
+          `fixed`, so they sit above the table's own scroll container - which
+          clips anything inside it - and neither touches layout, which is what
+          keeps the drag smooth.
+        */}
+        {reorder.dropLine !== null &&
+          createPortal(
+            <span
+              aria-hidden
+              className="mdt-pointer-events-none mdt-fixed mdt-z-popover mdt-w-0.5 mdt-bg-primary"
+              style={{
+                left: reorder.dropLine,
+                top: lineBox?.top ?? 0,
+                height: lineBox?.height ?? 0,
+              }}
+            />,
+            document.body
+          )}
+
+        {reorder.ghost !== null &&
+          createPortal(
+            <span
+              aria-hidden
+              className={[
+                'mdt-pointer-events-none mdt-fixed mdt-z-popover',
+                'mdt-flex mdt-items-center mdt-rounded-md mdt-border mdt-border-border',
+                'mdt-bg-background mdt-px-3 mdt-py-2 mdt-text-sm mdt-font-medium mdt-shadow-lg',
+                // Nowhere to drop it: a locked or pinned column is in the way.
+                reorder.ghost.canDrop ? '' : 'mdt-border-dashed mdt-opacity-50',
+              ].join(' ')}
+              style={{
+                left: reorder.ghost.left,
+                top: reorder.ghost.top,
+                width: reorder.ghost.width,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              {reorder.ghost.label}
+            </span>,
+            document.body
+          )}
       </div>
     );
   },

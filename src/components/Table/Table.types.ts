@@ -365,6 +365,15 @@ export interface TableHeadProps extends ComponentPropsWithoutRef<'th'> {
   insertLabel?: string;
 
   /**
+   * Which column this cell belongs to.
+   *
+   * Emitted as `data-column-key`. Reordering measures the header row to work
+   * out where a dragged column would land, and it needs to know which cell is
+   * which - position alone is not enough once things start moving.
+   */
+  columnKey?: string;
+
+  /**
    * Pins this column to the left edge while the table scrolls sideways.
    *
    * `true` pins it as the first frozen column. Pass an index to pin more than
@@ -402,6 +411,15 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
    * @default 0
    */
   indent?: TableIndent;
+
+  /**
+   * Which column this cell belongs to.
+   *
+   * Emitted as `data-column-key`. Reordering measures the header row to work
+   * out where a dragged column would land, and it needs to know which cell is
+   * which - position alone is not enough once things start moving.
+   */
+  columnKey?: string;
 
   /**
    * Pins this column to the left edge while the table scrolls sideways.

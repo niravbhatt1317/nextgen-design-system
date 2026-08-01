@@ -336,6 +336,8 @@ const Table = forwardRef<HTMLTableElement, TableProps>(
               'mdt-group mdt-relative mdt-w-full mdt-overflow-auto',
               containerClassName
             )}
+            // Lets a drag inside the table find what to scroll.
+            data-table-scroller=""
             data-scrolled-top={scrolled.top ? 'true' : 'false'}
             data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
             data-scrolled-x={scrolled.x ? 'true' : 'false'}
@@ -602,6 +604,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       sortOrder = null,
       onSort,
       frozen = false,
+      columnKey,
       resizable = false,
       width,
       onResize,
@@ -628,6 +631,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
         aria-sort={sortable ? ARIA_SORT[key] : undefined}
         // The measurement finds pinned columns by this attribute.
         data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
+        data-column-key={columnKey}
         style={{
           ...style,
           ...(width === undefined ? null : { width }),
@@ -715,7 +719,7 @@ TableHead.displayName = 'TableHead';
  * ```
  */
 const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, align = 'left', indent = 0, frozen = false, style, ...props }, ref) => {
+  ({ className, align = 'left', indent = 0, frozen = false, columnKey, style, ...props }, ref) => {
     const { density } = useContext(TableContext);
     const sticky = useContext(TableStickyRowContext);
     const pinned = useFrozenPlacement(frozen);
@@ -723,6 +727,7 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
       <td
         ref={ref}
         data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
+        data-column-key={columnKey}
         style={pinned.left === undefined ? style : { ...style, left: pinned.left }}
         className={cn(
           tableCellVariants({ density, align, indent }),
