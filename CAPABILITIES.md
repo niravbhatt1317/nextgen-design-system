@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-747 capabilities: 172 components, 11 hooks, 9 utilities, 555 stories
+759 capabilities: 180 components, 12 hooks, 9 utilities, 558 stories
 
 ## Components
 
@@ -101,6 +101,14 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `InputGroupTextarea`       | InputGroup   | InputGroupTextarea - Textarea with support for addons                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `Item`                     | Item         | Item component - a flexible list item for menus, dropdowns, and lists.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `Label`                    | Label        | No forwarded ref on purpose.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `LeftNav`                  | LeftNav      | LeftNav - the navigation down the left of a settings area.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `LeftNavBody`              | LeftNav      | The part that scrolls, and the only part that changes with the level.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `LeftNavExit`              | LeftNav      | The way out of settings, back to the app.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `LeftNavFooter`            | LeftNav      | Pinned to the bottom edge.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `LeftNavGroup`             | LeftNav      | A labelled block of items, optionally one that folds away.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `LeftNavItem`              | LeftNav      | One row: a page to open, or a section to descend into.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `LeftNavSearch`            | LeftNav      | The search field, pinned under the exit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `LeftNavSection`           | LeftNav      | The header of a second level: where you are, and the way back up.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `MotadataSwitch`           | Switch       | MotadataSwitch component - A toggle switch control.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `OldButton`                | ..           | _undocumented_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `OTPInput`                 | OTPInput     | OTPInput - One-Time Password input component A fully accessible OTP input component with the following features: - Auto-focus on first empty input - Auto-advance on input - Backspace navigation - Paste support (pastes complete OTP) - Arrow key navigation - Keyboard accessible - Supports numeric and alphanumeric modes `tsx <OTPInput length={6} value={otp} onChange={setOtp} /> `                                                                                                                                |
@@ -199,19 +207,20 @@ story that already exists. They are in `capability-catalog.json` in full.
 
 ## Hooks - the behaviour
 
-| Name                 | Where | What it does                                                           |
-| -------------------- | ----- | ---------------------------------------------------------------------- |
-| `useColumnReorder`   | Table | Drag a column sideways to move it.                                     |
-| `useColumnWidths`    | Table | Holds column widths for a resizable table.                             |
-| `useEditableTabs`    | Tabs  | The rules for a tab bar the person builds themselves.                  |
-| `useInfiniteScroll`  | Table | Asks for more rows when the end of the list comes into view.           |
-| `usePromotionalOpen` | Toast | Whether a promotional toast is on screen.                              |
-| `useSavedViews`      | Table | Holds a table's saved views.                                           |
-| `useTableColumns`    | Table | Holds which columns are shown, in what order, and how many are pinned. |
-| `useTableFilters`    | Table | Holds which filters are applied.                                       |
-| `useTablePagination` | Table | Which page of a table is showing.                                      |
-| `useTableSelection`  | Table | Holds which rows are selected.                                         |
-| `useTableSort`       | Table | Holds which columns sort the table, and in what order.                 |
+| Name                 | Where   | What it does                                                           |
+| -------------------- | ------- | ---------------------------------------------------------------------- |
+| `useColumnReorder`   | Table   | Drag a column sideways to move it.                                     |
+| `useColumnWidths`    | Table   | Holds column widths for a resizable table.                             |
+| `useEditableTabs`    | Tabs    | The rules for a tab bar the person builds themselves.                  |
+| `useInfiniteScroll`  | Table   | Asks for more rows when the end of the list comes into view.           |
+| `useLeftNavLevels`   | LeftNav | Which level of a settings navigation is showing.                       |
+| `usePromotionalOpen` | Toast   | Whether a promotional toast is on screen.                              |
+| `useSavedViews`      | Table   | Holds a table's saved views.                                           |
+| `useTableColumns`    | Table   | Holds which columns are shown, in what order, and how many are pinned. |
+| `useTableFilters`    | Table   | Holds which filters are applied.                                       |
+| `useTablePagination` | Table   | Which page of a table is showing.                                      |
+| `useTableSelection`  | Table   | Holds which rows are selected.                                         |
+| `useTableSort`       | Table   | Holds which columns sort the table, and in what order.                 |
 
 ## Utilities
 

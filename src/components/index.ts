@@ -371,6 +371,32 @@ export type {
   SheetVariants,
 } from './Sheet';
 
+// LeftNav — the settings navigation. Two levels and never three.
+export {
+  LeftNav,
+  LeftNavExit,
+  LeftNavSearch,
+  LeftNavBody,
+  LeftNavSection,
+  LeftNavGroup,
+  LeftNavItem,
+  LeftNavFooter,
+  leftNavItemVariants,
+  useLeftNavLevels,
+} from './LeftNav';
+export type {
+  LeftNavProps,
+  LeftNavExitProps,
+  LeftNavSearchProps,
+  LeftNavBodyProps,
+  LeftNavSectionProps,
+  LeftNavGroupProps,
+  LeftNavItemProps,
+  LeftNavFooterProps,
+  UseLeftNavLevels,
+  UseLeftNavLevelsOptions,
+} from './LeftNav';
+
 // Sidebar
 export {
   Sidebar,
