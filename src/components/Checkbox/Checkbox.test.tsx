@@ -268,14 +268,13 @@ describe('CheckboxGroup · chips', () => {
     expect(chip).not.toHaveClass('data-[state=checked]:mdt-font-semibold');
   });
 
-  it('holds the room for the tick, so nothing moves when a chip is pressed', () => {
+  it('gives the tick no room until it is there, so an unchosen row is tight', () => {
     const { container } = render3();
     const tick = container.querySelector('[data-slot="checkbox-chip-tick"]');
-    // present from the start, and only its opacity changes
-    expect(tick).toBeInTheDocument();
-    expect(tick).toHaveClass('mdt-opacity-0');
-    expect(tick).toHaveClass('group-data-[state=checked]:mdt-opacity-100');
-    expect(tick).not.toHaveClass('mdt-hidden');
+    expect(tick).toHaveClass('mdt-hidden');
+    expect(tick).toHaveClass('group-data-[state=checked]:mdt-inline-flex');
+    // not a transparent placeholder: that would keep the width and the gap
+    expect(tick).not.toHaveClass('mdt-opacity-0');
   });
 
   it('puts the tick after the label, not before it', () => {
@@ -335,6 +334,26 @@ describe('CheckboxGroup · chips', () => {
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Network' }));
     expect(onCheckedChange).toHaveBeenCalledWith(true);
+  });
+
+  it('takes an icon before the word, and keeps the word as its name', () => {
+    render(
+      <CheckboxGroup label="Affected services">
+        <Checkbox>
+          <svg data-testid="glyph" aria-hidden="true" />
+          Network
+        </Checkbox>
+      </CheckboxGroup>
+    );
+    const chip = screen.getByRole('checkbox', { name: 'Network' });
+    expect(chip).toBeInTheDocument();
+    // the icon is inside the chip and comes first
+    expect(chip.firstElementChild).toBe(screen.getByTestId('glyph'));
+  });
+
+  it('never lets the icon squash, because a chip is as wide as its contents', () => {
+    const { container } = render3();
+    expect(chips(container)[0]).toHaveClass('[&_svg]:mdt-shrink-0');
   });
 
   it('leaves every other checkbox variant exactly as it was', () => {

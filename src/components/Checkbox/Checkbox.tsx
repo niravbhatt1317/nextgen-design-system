@@ -107,6 +107,11 @@ export const checkboxVariants = cva([], {
         FOCUS_RING_CLASSES,
         DISABLED_CLASSES,
         'disabled:hover:mdt-border-input disabled:hover:mdt-bg-transparent',
+        // An icon sits before the word at the same 6px the tick uses on the
+        // other side, so a chip with one is symmetrical rather than lopsided.
+        // It never squashes: a chip is as wide as its contents, so there is
+        // nothing to be gained by letting the icon give way first.
+        '[&_svg]:mdt-size-4 [&_svg]:mdt-shrink-0',
       ],
       'card-with-checkbox': [
         'mdt-peer mdt-w-full mdt-cursor-pointer mdt-rounded-lg mdt-border-2 mdt-border-input',
@@ -236,16 +241,22 @@ const Checkbox = forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, Che
         >
           {children}
           {/*
-            The tick's place is held whether it is shown or not.
+            The tick takes no room until it is there.
 
-            Let the chip grow as the tick arrives and every chip after it shifts
-            along - in a wrapping row that can tip the block onto another line,
-            so the chip you were about to press moves out from under your cursor
-            mid-press. The cost is ~20px of width on every chip, chosen or not.
+            An unchosen chip is exactly as wide as its own word, so a row of
+            them is as tight as it can be - which is the whole reason for
+            choosing this over holding the space. The trade, chosen with it: the
+            chip grows when pressed and everything after it shifts along, so in
+            a wrapping row a chip can drop to the next line under your cursor.
+
+            `hidden` rather than a transparent placeholder, deliberately. Flex
+            gap only counts between elements that are laid out, so taking the
+            tick out of the flow takes its 6px of gap with it and the chip sits
+            at its true width.
           */}
           <span
             aria-hidden="true"
-            className="mdt-inline-flex mdt-shrink-0 mdt-opacity-0 mdt-transition-opacity mdt-duration-150 group-data-[state=checked]:mdt-opacity-100"
+            className="mdt-hidden mdt-shrink-0 group-data-[state=checked]:mdt-inline-flex"
             data-slot="checkbox-chip-tick"
           >
             <Icon name="check" size="xs" aria-hidden />

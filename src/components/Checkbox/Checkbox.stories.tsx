@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Checkbox, CheckboxGroup } from './Checkbox';
 import { TagPill } from '../TagPill';
+import { Icon } from '../Icon';
 import { FormLabel } from '../Form';
 
 const meta: Meta<typeof Checkbox> = {
@@ -198,15 +199,14 @@ export const Chips: Story = {
 };
 
 /**
- * **Nothing moves when you press a chip.**
+ * **An unchosen chip is exactly as wide as its own word.**
  *
- * The tick's place is held whether it is shown or not. Let the chip grow as the
- * tick arrives and every chip after it shifts along — in a wrapping row that can
- * tip the whole block onto another line, so the chip you were about to press
- * moves out from under your cursor mid-press.
+ * The tick takes no room until it is there, so a row of unchosen chips is as
+ * tight as it can be. The trade is that a chip grows when you press it and
+ * everything after it shifts along.
  *
- * This column is deliberately narrow, which is where it would show. Press along
- * the top row: the rows below stay exactly where they are.
+ * This column is deliberately narrow, which is where that shows. Press along the
+ * top row and watch the rows below move.
  */
 export const ChipsWrap: Story = {
   render: () => (
@@ -339,6 +339,44 @@ export const ChipsVersusTags: Story = {
           <Checkbox>Database</Checkbox>
         </CheckboxGroup>
       </div>
+    </div>
+  ),
+};
+
+/**
+ * ## With an icon
+ *
+ * The icon sits **before the word, never instead of it**. It comes in at the
+ * same 6px the tick uses on the other side, so a chip with one reads
+ * symmetrical rather than lopsided.
+ *
+ * An icon on its own would leave nothing for a screen reader to read and
+ * nothing for anyone to be sure of — two of these mean roughly the same thing
+ * until you have learnt the set. If a chip truly has to be icon-only, it needs
+ * an `aria-label` of its own.
+ */
+export const ChipsWithIcons: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-w-[420px] mdt-flex-col mdt-gap-2">
+      <FormLabel>Which of these affected the service?</FormLabel>
+      <CheckboxGroup label="Which of these affected the service?">
+        <Checkbox defaultChecked>
+          <Icon name="wifi" size="xs" aria-hidden />
+          Network
+        </Checkbox>
+        <Checkbox>
+          <Icon name="hard-drive" size="xs" aria-hidden />
+          Storage
+        </Checkbox>
+        <Checkbox defaultChecked>
+          <Icon name="database" size="xs" aria-hidden />
+          Database
+        </Checkbox>
+        <Checkbox>
+          <Icon name="mail" size="xs" aria-hidden />
+          Email
+        </Checkbox>
+      </CheckboxGroup>
     </div>
   ),
 };
