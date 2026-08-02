@@ -459,7 +459,7 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
         part that does not move - tabs that scrolled away with the body would
         leave somebody unable to switch back without scrolling up.
       */}
-      {tabs !== undefined && <div className="mdt-pt-3">{tabs}</div>}
+      {tabs !== undefined && <div className="mdt-pt-2">{tabs}</div>}
     </div>
   )
 );
