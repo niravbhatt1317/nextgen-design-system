@@ -36,6 +36,15 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--mdt-primary) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
+          'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
+          'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
+        },
+        // The AI gradient's three stops, so the mark can be drawn from classes
+        // as well as from the SVG's own `stop-color`.
+        'ai-gradient': {
+          from: 'hsl(var(--mdt-ai-gradient-from) / <alpha-value>)',
+          via: 'hsl(var(--mdt-ai-gradient-via) / <alpha-value>)',
+          to: 'hsl(var(--mdt-ai-gradient-to) / <alpha-value>)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--mdt-secondary) / <alpha-value>)',

@@ -1,0 +1,155 @@
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { Callout } from '../Callout';
+import { AiMark } from './AiMark';
+
+const svg = (container: HTMLElement) => container.querySelector('svg') as SVGSVGElement;
+
+describe('AiMark', () => {
+  describe('the marks', () => {
+    it('draws the spark as two stars', () => {
+      const { container } = render(<AiMark />);
+      expect(svg(container).querySelectorAll('path')).toHaveLength(2);
+    });
+
+    it('draws the trio as three', () => {
+      const { container } = render(<AiMark variant="trio" />);
+      expect(svg(container).querySelectorAll('path')).toHaveLength(3);
+    });
+
+    it('crops its box to its artwork, so it is not smaller than the icons beside it', () => {
+      // Both marks arrived on a 16px box with room around them - `spark`
+      // filled 67% of it and `trio` 77%, against the ~83% a Lucide glyph
+      // fills. The paths are untouched; only the window onto them moved.
+      const { container: spark } = render(<AiMark />);
+      expect(svg(spark)).toHaveAttribute('viewBox', '2.03 1.47 12.41 12.41');
+      const { container: trio } = render(<AiMark variant="trio" />);
+      expect(svg(trio)).toHaveAttribute('viewBox', '0.84 0.83 14.34 14.34');
+    });
+
+    it('crops both to the same fill, so the two read as one size', () => {
+      const side = (c: HTMLElement) => Number(svg(c).getAttribute('viewBox')?.split(' ')[2]);
+      const { container: spark } = render(<AiMark />);
+      const { container: trio } = render(<AiMark variant="trio" />);
+      // 10.67 of 12.41, and 12.33 of 14.34 - both 86%.
+      expect(10.67 / side(spark)).toBeCloseTo(12.33 / side(trio), 2);
+    });
+
+    it('takes each size from the same scale Icon uses', () => {
+      const at = (size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => {
+        const { container } = render(<AiMark size={size} />);
+        return svg(container).getAttribute('class') ?? '';
+      };
+      expect(at('xs')).toContain('mdt-h-3');
+      expect(at('sm')).toContain('mdt-h-4');
+      expect(at('xl')).toContain('mdt-h-8');
+    });
+  });
+
+  describe('solid and line', () => {
+    it('fills with the gradient by default', () => {
+      const { container } = render(<AiMark />);
+      const path = svg(container).querySelector('path');
+      expect(path?.getAttribute('fill')).toMatch(/^url\(#mdt-ai-gradient-/);
+      expect(path).not.toHaveAttribute('stroke');
+    });
+
+    it('strokes the same outline when asked', () => {
+      const { container } = render(<AiMark appearance="line" />);
+      const path = svg(container).querySelector('path');
+      expect(path).toHaveAttribute('fill', 'none');
+      expect(path?.getAttribute('stroke')).toMatch(/^url\(#mdt-ai-gradient-/);
+    });
+
+    it('draws the line at 1 on the 16px box, not Lucide’s 2', () => {
+      // Lucide draws on a 24px box, so its 2 is 1.33 here - and these stars
+      // have concave curves that close up before a Lucide icon's would. At
+      // 1.33 the small star in `spark` filled in.
+      const { container } = render(<AiMark appearance="line" />);
+      expect(svg(container).querySelector('path')).toHaveAttribute('stroke-width', '1');
+    });
+
+    it('holds a line at full strength, whatever the mark was drawn at', () => {
+      // 30% of a solid star is a watermark; 30% of a 1px outline is nothing.
+      const { container: solid } = render(<AiMark variant="trio" />);
+      expect(solid.querySelector('g')).toHaveAttribute('opacity', '0.3');
+      const { container: line } = render(<AiMark variant="trio" appearance="line" />);
+      expect(line.querySelector('g')).toHaveAttribute('opacity', '1');
+    });
+  });
+
+  describe('the gradient', () => {
+    it('is drawn from tokens, not from literals', () => {
+      const { container } = render(<AiMark />);
+      const stops = [...svg(container).querySelectorAll('stop')];
+      expect(stops).toHaveLength(3);
+      expect(stops[0]).toHaveAttribute('stop-color', 'hsl(var(--mdt-ai-gradient-from))');
+      expect(stops[1]).toHaveAttribute('stop-color', 'hsl(var(--mdt-ai-gradient-via))');
+      expect(stops[2]).toHaveAttribute('stop-color', 'hsl(var(--mdt-ai-gradient-to))');
+    });
+
+    it('runs across each star rather than across the box they sit in', () => {
+      // Swept across the whole 16px box, the small stars land past the violet
+      // stop and come out solid magenta, and the blue end never appears.
+      const { container } = render(<AiMark />);
+      expect(svg(container).querySelector('linearGradient')).toHaveAttribute(
+        'gradientUnits',
+        'objectBoundingBox'
+      );
+    });
+
+    it('mints a fresh id per instance', () => {
+      // Two of these sharing an id is a real bug and a quiet one: the second
+      // element resolves the first one's definition, so it looks right until
+      // the first unmounts.
+      const { container } = render(
+        <>
+          <AiMark />
+          <AiMark />
+        </>
+      );
+      const ids = [...container.querySelectorAll('linearGradient')].map((g) => g.id);
+      expect(ids).toHaveLength(2);
+      expect(new Set(ids).size).toBe(2);
+    });
+  });
+
+  describe('accessibility', () => {
+    it('is decoration unless it is given a name', () => {
+      // The mark says "AI" to somebody who has learnt it and nothing to
+      // somebody who has not, so the writing beside it should carry it.
+      const { container } = render(<AiMark />);
+      expect(svg(container)).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('becomes an image when it is', () => {
+      render(<AiMark title="Generated by AI" />);
+      const mark = screen.getByRole('img', { name: 'Generated by AI' });
+      expect(mark).not.toHaveAttribute('aria-hidden');
+    });
+  });
+
+  describe('as the ai tone', () => {
+    it('is what a Callout draws for `ai`, instead of a Lucide glyph', () => {
+      // The one tone that is a brand rather than a status, and the gradient is
+      // what says so.
+      const { container } = render(<Callout tone="ai">Body</Callout>);
+      expect(container.querySelector('linearGradient')).toBeInTheDocument();
+    });
+
+    it('leaves every other tone on its Lucide glyph', () => {
+      const { container } = render(<Callout tone="warning">Body</Callout>);
+      expect(container.querySelector('linearGradient')).not.toBeInTheDocument();
+    });
+
+    it('steps aside for an icon of the caller’s own', () => {
+      const { container } = render(
+        <Callout tone="ai" icon={<span data-testid="mine" />}>
+          Body
+        </Callout>
+      );
+      expect(screen.getByTestId('mine')).toBeInTheDocument();
+      expect(container.querySelector('linearGradient')).not.toBeInTheDocument();
+    });
+  });
+});

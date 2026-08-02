@@ -100,10 +100,30 @@ export const Sizes: Story = {
       <div>
         <Label>circle</Label>
         <Row>
-          <IconTile icon={<Icon name="server" size="xs" />} tone="purple" shape="circle" size="sm" />
-          <IconTile icon={<Icon name="server" size="sm" />} tone="purple" shape="circle" size="md" />
-          <IconTile icon={<Icon name="server" size="md" />} tone="purple" shape="circle" size="lg" />
-          <IconTile icon={<Icon name="server" size="lg" />} tone="purple" shape="circle" size="xl" />
+          <IconTile
+            icon={<Icon name="server" size="xs" />}
+            tone="purple"
+            shape="circle"
+            size="sm"
+          />
+          <IconTile
+            icon={<Icon name="server" size="sm" />}
+            tone="purple"
+            shape="circle"
+            size="md"
+          />
+          <IconTile
+            icon={<Icon name="server" size="md" />}
+            tone="purple"
+            shape="circle"
+            size="lg"
+          />
+          <IconTile
+            icon={<Icon name="server" size="lg" />}
+            tone="purple"
+            shape="circle"
+            size="xl"
+          />
         </Row>
       </div>
     </Group>

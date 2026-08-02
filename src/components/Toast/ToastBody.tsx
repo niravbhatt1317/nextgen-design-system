@@ -1,9 +1,15 @@
 import { cva } from 'class-variance-authority';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
+import {
+  FEEDBACK_ICON,
+  FEEDBACK_ICON_COLOUR,
+  FEEDBACK_MARK_TONES,
+  FEEDBACK_SURFACE,
+} from '@/utils/feedback-tones';
+import { AiMark } from '../AiMark';
 import { Icon } from '../Icon';
-import type { IconName } from '../Icon';
-import type { ToastBodyProps, ToastSize, ToastTone } from './Toast.types';
+import type { ToastBodyProps, ToastSize } from './Toast.types';
 
 /**
  * The toast surface, taken from Org Mgmt's banner.
@@ -30,14 +36,7 @@ export const toastVariants = cva(
   ],
   {
     variants: {
-      tone: {
-        info: 'mdt-border-feedback-info-border mdt-bg-feedback-info-bg',
-        warning: 'mdt-border-feedback-warning-border mdt-bg-feedback-warning-bg',
-        danger: 'mdt-border-feedback-danger-border mdt-bg-feedback-danger-bg',
-        success: 'mdt-border-feedback-success-border mdt-bg-feedback-success-bg',
-        ai: 'mdt-border-feedback-ai-border mdt-bg-feedback-ai-bg',
-        neutral: 'mdt-border-feedback-neutral-border mdt-bg-feedback-neutral-bg',
-      },
+      tone: FEEDBACK_SURFACE,
       /**
        * `sm` is Om's banner measured exactly - 12px text, 10px/12px padding.
        * `md` runs a step larger for a notification read in passing rather than
@@ -52,16 +51,6 @@ export const toastVariants = cva(
   }
 );
 
-/** Only the icon carries the tone. */
-const ICON_TONE: Record<ToastTone, string> = {
-  info: 'mdt-text-feedback-info-icon',
-  warning: 'mdt-text-feedback-warning-icon',
-  danger: 'mdt-text-feedback-danger-icon',
-  success: 'mdt-text-feedback-success-icon',
-  ai: 'mdt-text-feedback-ai-icon',
-  neutral: 'mdt-text-feedback-neutral-icon',
-};
-
 const ICON_SIZE: Record<ToastSize, string> = {
   sm: 'mdt-h-3.5 mdt-w-3.5',
   md: 'mdt-h-4 mdt-w-4',
@@ -70,24 +59,6 @@ const ICON_SIZE: Record<ToastSize, string> = {
 const TITLE_SIZE: Record<ToastSize, string> = {
   sm: 'mdt-text-xs',
   md: 'mdt-text-sm',
-};
-
-/**
- * One registry icon per tone.
- *
- * These were hand-drawn copies of Om's banner glyphs until the icon set moved to
- * Lucide. The shapes are near enough - Om's circles sit a hair tighter and his
- * triangle has square corners - but a hand-cut glyph cannot be restyled, resized
- * or audited with the rest of the system, and it drifts the moment anyone edits
- * it. `ai` shares the Button's sparkle deliberately: same feature, same mark.
- */
-const TONE_ICON: Record<ToastTone, IconName> = {
-  info: 'info',
-  neutral: 'info',
-  warning: 'alert-triangle',
-  danger: 'alert-circle',
-  success: 'check',
-  ai: 'sparkles',
 };
 
 /**
@@ -108,12 +79,16 @@ export const ToastBody = ({
   onClose,
   className,
 }: ToastBodyProps) => {
-  const glyphClass = cn(ICON_SIZE[size], 'mdt-mt-0.5 mdt-shrink-0', ICON_TONE[tone]);
+  const glyphClass = cn(ICON_SIZE[size], 'mdt-mt-0.5 mdt-shrink-0', FEEDBACK_ICON_COLOUR[tone]);
 
   const renderIcon = (): ReactNode => {
     if (icon !== undefined) return <span className={glyphClass}>{icon}</span>;
     if (loading) return <Icon name="loader-2" className={cn(glyphClass, 'mdt-animate-spin')} />;
-    return <Icon name={TONE_ICON[tone]} className={glyphClass} />;
+    // The `ai` tone is a brand rather than a status, and the gradient is what
+    // says so - see FEEDBACK_MARK_TONES. Line, because every other tone glyph
+    // in this row is a Lucide outline.
+    if (FEEDBACK_MARK_TONES.has(tone)) return <AiMark appearance="line" className={glyphClass} />;
+    return <Icon name={FEEDBACK_ICON[tone]} className={glyphClass} />;
   };
 
   return (
@@ -152,7 +127,7 @@ export const ToastBody = ({
               'mdt-mt-2 mdt-rounded-sm mdt-font-semibold mdt-underline-offset-2',
               'hover:mdt-underline',
               'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
-              ICON_TONE[tone]
+              FEEDBACK_ICON_COLOUR[tone]
             )}
             data-testid="toast-action"
           >

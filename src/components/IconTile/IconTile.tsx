@@ -16,7 +16,7 @@ import { cn } from '@/utils';
  * other agree on what green means.
  */
 export const iconTileVariants = cva(
-  'mdt-inline-flex mdt-items-center mdt-justify-center mdt-shrink-0 [&_svg]:mdt-shrink-0',
+  'mdt-inline-flex mdt-shrink-0 mdt-items-center mdt-justify-center [&_svg]:mdt-shrink-0',
   {
     variants: {
       tone: {
@@ -49,8 +49,10 @@ export type IconTileTone = 'slate' | 'blue' | 'green' | 'amber' | 'rose' | 'purp
 export type IconTileSize = 'sm' | 'md' | 'lg' | 'xl';
 export type IconTileShape = 'square' | 'circle';
 
-export interface IconTileProps
-  extends Omit<ComponentPropsWithoutRef<'span'>, 'className' | 'children' | 'color'> {
+export interface IconTileProps extends Omit<
+  ComponentPropsWithoutRef<'span'>,
+  'className' | 'children' | 'color'
+> {
   /** The icon to hold. */
   icon: ReactNode;
   /** @default 'slate' */
