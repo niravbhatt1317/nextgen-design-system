@@ -413,45 +413,49 @@
        a dark toast and a dark badge belong to each other even though the light
        ones came from different places.
        ============================================ */
-    /* The tones keep their own hue in dark mode, but the fill is washed back
-       rather than laid on solid - see `FEEDBACK_SURFACE`, which composites
-       these at 30% in dark and at full strength in light.
+    /* Ten mixed values, and the only place in this file that does not point at
+       a ramp step. See MISSING-TOKENS.md - "Dark surface tints" - for why, and
+       for what would make them unnecessary.
 
-       The wash is what the alpha syntax added in #19 is for. It is needed
-       because the ramps have no low-saturation dark step: these `90`s are
-       17-20% lightness at up to 100% saturation against a 10% page, and laid
-       on solid six of them read as six blocks of colour rather than six tints.
-       The steps below them are no help either - `blue-100`, `orange-100` and
-       `yellow-100` are 10% lightness, exactly the page, and `green-100` is 9%,
-       darker than it. A fill darker than the page reads as a hole, which this
-       codebase already shipped once in the dark CodeWell.
+       The short version: the ramps have no low-saturation dark step. The `90`s
+       are 17-20% lightness at up to 100% saturation against a 10% page, and a
+       panel's worth of that is a slab rather than a tint. The steps below are
+       9-10%, level with the page or darker, and a fill darker than the page it
+       sits on reads as a hole - this codebase shipped that once already, in the
+       dark CodeWell.
 
-       Composited at 30% they land a few points above the page with the hue
-       intact, which is the tint that was wanted. */
-    --mdt-feedback-info-bg: var(--mdt-blue-90);
-    --mdt-feedback-info-border: var(--mdt-blue-70);
+       These sit at 13-18% lightness and 38-55% saturation: a lift off the page
+       with the hue intact. The borders are mixed to match at 25-32%, because a
+       bright `70` ramp step around a quiet fill is a rim, not an edge.
+
+       Values by Pranjal Gupta, who hit this drawing Banner beside a real page
+       on the same day. They replaced an alpha wash of the ramp steps that did
+       the same job with no new values but composited against whatever sat
+       behind it - so a callout on the page and the same callout in a dialog
+       were two different colours. A token you cannot predict is worse than a
+       token you had to mix. */
+    --mdt-feedback-info-bg: 218 55% 16%;
+    --mdt-feedback-info-border: 218 55% 30%;
     --mdt-feedback-info-icon: var(--mdt-blue-30);
 
-    --mdt-feedback-warning-bg: var(--mdt-orange-90);
-    --mdt-feedback-warning-border: var(--mdt-orange-70);
+    --mdt-feedback-warning-bg: 26 50% 14%;
+    --mdt-feedback-warning-border: 26 55% 27%;
     --mdt-feedback-warning-icon: var(--mdt-orange-30);
 
-    --mdt-feedback-danger-bg: var(--mdt-red-90);
-    --mdt-feedback-danger-border: var(--mdt-red-70);
+    --mdt-feedback-danger-bg: 0 45% 15%;
+    --mdt-feedback-danger-border: 0 50% 29%;
     --mdt-feedback-danger-icon: var(--mdt-red-30);
 
-    --mdt-feedback-success-bg: var(--mdt-green-90);
-    --mdt-feedback-success-border: var(--mdt-green-70);
+    --mdt-feedback-success-bg: 151 42% 13%;
+    --mdt-feedback-success-border: 151 45% 25%;
     --mdt-feedback-success-icon: var(--mdt-green-30);
 
-    /* `100`, not `90` like its neighbours: the purple ramp is not spaced like
-       the others, and `purple-90` is 40% lightness where `blue-90` and friends
-       are 17-20. Washed at the same 30% it still came out the heaviest of the
-       six. */
-    --mdt-feedback-ai-bg: var(--mdt-purple-100);
-    --mdt-feedback-ai-border: var(--mdt-purple-80);
+    --mdt-feedback-ai-bg: 270 38% 18%;
+    --mdt-feedback-ai-border: 270 42% 32%;
     --mdt-feedback-ai-icon: var(--mdt-purple-30);
 
+    /* Not mixed: `neutral-140` already is this value, to the digit. Written as
+       the ramp step it is, so the one tone that has a home keeps it. */
     --mdt-feedback-neutral-bg: var(--mdt-neutral-140);
     --mdt-feedback-neutral-border: var(--mdt-neutral-120);
     --mdt-feedback-neutral-icon: var(--mdt-neutral-30);

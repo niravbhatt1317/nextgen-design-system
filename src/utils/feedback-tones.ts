@@ -26,27 +26,19 @@ export const FEEDBACK_TONES: FeedbackTone[] = [
  * **Only the icon and the border carry the tone** - the body text stays one
  * calm colour in all six.
  *
- * The fill is laid on solid in light mode and **washed back to 30% in dark**.
- * The ramps have no low-saturation dark step, so the coloured fills available
- * there are 17-20% lightness at up to 100% saturation against a 10% page -
- * six blocks of colour rather than six tints. The steps below them are 9-10%,
- * level with the page or darker, and a fill darker than its page reads as a
- * hole. Compositing keeps the hue and takes the weight off.
+ * The dark values are mixed rather than picked off a ramp - the one place in
+ * `globals.css` that does not point at a ramp step. See MISSING-TOKENS.md,
+ * "Dark surface tints", for why and for what would retire them.
  *
- * `neutral` is not washed: it is already a neutral lift off the page, and
- * fading it would leave nothing. That rule came from Org Mgmt's banner and it is the
  * whole design: six tones that differ by a tint, an edge and a glyph read as
  * one family, while six tones of coloured text read as six problems.
  */
 export const FEEDBACK_SURFACE: Record<FeedbackTone, string> = {
-  info: 'mdt-border-feedback-info-border mdt-bg-feedback-info-bg dark:mdt-bg-feedback-info-bg/30',
-  warning:
-    'mdt-border-feedback-warning-border mdt-bg-feedback-warning-bg dark:mdt-bg-feedback-warning-bg/30',
-  danger:
-    'mdt-border-feedback-danger-border mdt-bg-feedback-danger-bg dark:mdt-bg-feedback-danger-bg/30',
-  success:
-    'mdt-border-feedback-success-border mdt-bg-feedback-success-bg dark:mdt-bg-feedback-success-bg/30',
-  ai: 'mdt-border-feedback-ai-border mdt-bg-feedback-ai-bg dark:mdt-bg-feedback-ai-bg/30',
+  info: 'mdt-border-feedback-info-border mdt-bg-feedback-info-bg',
+  warning: 'mdt-border-feedback-warning-border mdt-bg-feedback-warning-bg',
+  danger: 'mdt-border-feedback-danger-border mdt-bg-feedback-danger-bg',
+  success: 'mdt-border-feedback-success-border mdt-bg-feedback-success-bg',
+  ai: 'mdt-border-feedback-ai-border mdt-bg-feedback-ai-bg',
   neutral: 'mdt-border-feedback-neutral-border mdt-bg-feedback-neutral-bg',
 };
 
