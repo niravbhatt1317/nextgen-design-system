@@ -1,7 +1,13 @@
 import { cva } from 'class-variance-authority';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
-import { FEEDBACK_ICON, FEEDBACK_ICON_COLOUR, FEEDBACK_SURFACE } from '@/utils/feedback-tones';
+import {
+  FEEDBACK_ICON,
+  FEEDBACK_ICON_COLOUR,
+  FEEDBACK_MARK_TONES,
+  FEEDBACK_SURFACE,
+} from '@/utils/feedback-tones';
+import { AiMark } from '../AiMark';
 import { Icon } from '../Icon';
 import type { ToastBodyProps, ToastSize } from './Toast.types';
 
@@ -78,6 +84,10 @@ export const ToastBody = ({
   const renderIcon = (): ReactNode => {
     if (icon !== undefined) return <span className={glyphClass}>{icon}</span>;
     if (loading) return <Icon name="loader-2" className={cn(glyphClass, 'mdt-animate-spin')} />;
+    // The `ai` tone is a brand rather than a status, and the gradient is what
+    // says so - see FEEDBACK_MARK_TONES. Line, because every other tone glyph
+    // in this row is a Lucide outline.
+    if (FEEDBACK_MARK_TONES.has(tone)) return <AiMark appearance="line" className={glyphClass} />;
     return <Icon name={FEEDBACK_ICON[tone]} className={glyphClass} />;
   };
 

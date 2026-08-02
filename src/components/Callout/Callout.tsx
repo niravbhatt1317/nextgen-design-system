@@ -1,7 +1,13 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
-import { FEEDBACK_ICON, FEEDBACK_ICON_COLOUR, FEEDBACK_SURFACE } from '@/utils/feedback-tones';
+import {
+  FEEDBACK_ICON,
+  FEEDBACK_ICON_COLOUR,
+  FEEDBACK_MARK_TONES,
+  FEEDBACK_SURFACE,
+} from '@/utils/feedback-tones';
+import { AiMark } from '../AiMark';
 import { Icon } from '../Icon';
 import type { CalloutProps, CalloutSize, CalloutTone } from './Callout.types';
 
@@ -145,7 +151,15 @@ const Callout = forwardRef<HTMLDivElement, CalloutProps>(
       >
         {icon === false ? null : (
           <span className={glyphClass}>
-            {icon ?? <Icon name={FEEDBACK_ICON[tone]} className={ICON_SIZE[size]} aria-hidden />}
+            {icon ??
+              (FEEDBACK_MARK_TONES.has(tone) ? (
+                // Line, not solid: every other tone glyph here is a Lucide
+                // outline, and a filled mark in that row reads as a different
+                // weight of thing.
+                <AiMark appearance="line" className={ICON_SIZE[size]} />
+              ) : (
+                <Icon name={FEEDBACK_ICON[tone]} className={ICON_SIZE[size]} aria-hidden />
+              ))}
           </span>
         )}
 

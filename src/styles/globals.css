@@ -250,6 +250,37 @@
     --mdt-feedback-neutral-border: var(--mdt-neutral-30);
     --mdt-feedback-neutral-icon: var(--mdt-neutral-130);
 
+    /* ============================================
+       The AI gradient
+       ============================================
+       Three stops and an offset, taken from the marks the design owner
+       supplied. Both of their SVGs carried the same ramp, which is what made
+       it a pattern worth saving rather than two one-off fills.
+
+       **These are three colours the palette did not have**, and that is
+       deliberate rather than an oversight. The rule against adding colours
+       exists so nobody has to ask "which green" - a gradient answers to a
+       different question, because it is a mark rather than a surface. Nothing
+       may reach for these to paint a background, a border or a piece of text;
+       they exist so the AI mark is the same mark everywhere it appears.
+
+       Held as HSL triplets like every other colour here, so they compose with
+       the alpha syntax. They round-trip to within one step of the originals:
+       #4DB2FE / #721DFC / #F910E2 against #4CB1FE / #731EFB / #F911E3.
+
+       The same in both themes. A brand mark that changed colour with the
+       theme would be two marks. */
+    --mdt-ai-gradient-from: 206 99% 65%;
+    --mdt-ai-gradient-via: 263 97% 55%;
+    --mdt-ai-gradient-to: 306 95% 52%;
+
+    /* Where the middle stop sits. Not halfway - the design owner's own
+       gradient puts the violet at a quarter, which keeps most of the sweep in
+       the violet-to-magenta half and stops the blue end dominating a 16px
+       glyph. The supplied SVGs said 0.245192; 25% is what the gradient panel
+       says, and that is the source. */
+    --mdt-ai-gradient-via-position: 25%;
+
     --mdt-feedback-title: var(--mdt-neutral-150);
     --mdt-feedback-text: var(--mdt-neutral-130);
 
@@ -382,44 +413,42 @@
        a dark toast and a dark badge belong to each other even though the light
        ones came from different places.
        ============================================ */
-    /* Dark mode carries the tone in the border and the icon, and not in the
-       fill at all.
+    /* The tones keep their own hue in dark mode, but the fill is washed back
+       rather than laid on solid - see `FEEDBACK_SURFACE`, which composites
+       these at 30% in dark and at full strength in light.
 
-       That is Org Mgmt's own rule taken to its conclusion rather than a new
-       idea: "only icon and border carry the tone". In light mode a 97% tint is
-       quiet enough to hold a hue as well. In dark mode it is not - the ramps
-       have no low-saturation dark step, so the only coloured fills available
-       were `blue-90` and friends at 17-20% lightness and up to 100%
-       saturation, against a 10% page. Six of those read as six blocks of
-       colour rather than as six tints.
+       The wash is what the alpha syntax added in #19 is for. It is needed
+       because the ramps have no low-saturation dark step: these `90`s are
+       17-20% lightness at up to 100% saturation against a 10% page, and laid
+       on solid six of them read as six blocks of colour rather than six tints.
+       The steps below them are no help either - `blue-100`, `orange-100` and
+       `yellow-100` are 10% lightness, exactly the page, and `green-100` is 9%,
+       darker than it. A fill darker than the page reads as a hole, which this
+       codebase already shipped once in the dark CodeWell.
 
-       The steps below them do not work either, and it is worth writing down
-       why: `blue-100`, `orange-100` and `yellow-100` are all 10% lightness -
-       exactly the page - and `green-100` is 9%, darker than it. A fill darker
-       than the page it sits on reads as a hole, which this codebase has
-       already shipped once in the dark CodeWell.
-
-       So every fill is `neutral-140`, the same lift off the page the neutral
-       tone always had, and the border and the icon do the work. Both are
-       clearly coloured - a `70` step and a `30` step - so the tones stay
-       apart. */
-    --mdt-feedback-info-bg: var(--mdt-neutral-140);
+       Composited at 30% they land a few points above the page with the hue
+       intact, which is the tint that was wanted. */
+    --mdt-feedback-info-bg: var(--mdt-blue-90);
     --mdt-feedback-info-border: var(--mdt-blue-70);
     --mdt-feedback-info-icon: var(--mdt-blue-30);
 
-    --mdt-feedback-warning-bg: var(--mdt-neutral-140);
+    --mdt-feedback-warning-bg: var(--mdt-orange-90);
     --mdt-feedback-warning-border: var(--mdt-orange-70);
     --mdt-feedback-warning-icon: var(--mdt-orange-30);
 
-    --mdt-feedback-danger-bg: var(--mdt-neutral-140);
+    --mdt-feedback-danger-bg: var(--mdt-red-90);
     --mdt-feedback-danger-border: var(--mdt-red-70);
     --mdt-feedback-danger-icon: var(--mdt-red-30);
 
-    --mdt-feedback-success-bg: var(--mdt-neutral-140);
+    --mdt-feedback-success-bg: var(--mdt-green-90);
     --mdt-feedback-success-border: var(--mdt-green-70);
     --mdt-feedback-success-icon: var(--mdt-green-30);
 
-    --mdt-feedback-ai-bg: var(--mdt-neutral-140);
+    /* `100`, not `90` like its neighbours: the purple ramp is not spaced like
+       the others, and `purple-90` is 40% lightness where `blue-90` and friends
+       are 17-20. Washed at the same 30% it still came out the heaviest of the
+       six. */
+    --mdt-feedback-ai-bg: var(--mdt-purple-100);
     --mdt-feedback-ai-border: var(--mdt-purple-80);
     --mdt-feedback-ai-icon: var(--mdt-purple-30);
 

@@ -136,6 +136,34 @@ were a tint.
 They are backgrounds behind body text. A fill has one job here, which is to say _"this is a
 group"_; the icon and the border are what say which group.
 
+**In dark mode the same fills are composited at 30%.** The ramps have no low-saturation dark step:
+the `90`s are 17–20% lightness at up to 100% saturation against a 10% page, and laid on solid six
+of them read as six blocks of colour. The steps below are 9–10% — level with the page or darker,
+and a fill darker than its page reads as a hole. Compositing keeps the hue and takes the weight
+off. `ai` uses `purple-100` rather than `purple-90` because the purple ramp is not spaced like the
+others: `purple-90` is 40% lightness where its neighbours are 17–20.
+
+**`ai` draws a gradient mark, not a Lucide glyph.** It is the one tone that is a brand rather than
+a status — see `AiMark` and the `--mdt-ai-gradient-*` tokens.
+
+### The AI gradient
+
+| Token                            | Value         |                       |
+| -------------------------------- | ------------- | --------------------- |
+| `--mdt-ai-gradient-from`         | `206 99% 65%` | `#4DB2FE`             |
+| `--mdt-ai-gradient-via`          | `263 97% 55%` | `#721DFC`             |
+| `--mdt-ai-gradient-to`           | `306 95% 52%` | `#F910E2`             |
+| `--mdt-ai-gradient-via-position` | `25%`         | where the violet sits |
+
+**These are three colours the palette did not have, and that is deliberate.** The rule against
+adding colours exists so nobody has to ask _"which green"_ — a gradient answers a different
+question, because it is a mark rather than a surface. Nothing may reach for these to paint a
+background, a border or a piece of text; they exist so the AI mark is the same mark everywhere it
+appears. Both marks the design owner supplied carried this same ramp, which is what made it a
+pattern worth saving rather than two one-off fills.
+
+The same in both themes. A brand mark that changed colour with the theme would be two marks.
+
 Plus two shared: `--mdt-feedback-title` (`neutral-150`) and `--mdt-feedback-text` (`neutral-130`).
 
 Tailwind classes follow the same shape: `mdt-bg-feedback-success-bg`,

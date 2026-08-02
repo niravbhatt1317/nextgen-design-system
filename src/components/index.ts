@@ -9,6 +9,10 @@
 // every single pull request. Alphabetical insertion puts two new components
 // hundreds of lines apart, and git merges them without a word.
 
+// AiMark
+export { AiMark } from './AiMark';
+export type { AiMarkProps, AiMarkVariant, AiMarkAppearance, AiMarkSize } from './AiMark';
+
 // Avatar — circle or rounded square, photo or initials. The colour is derived
 // from the name, so one person is always one colour.
 export { Avatar, AvatarStack, avatarVariants, toneForName, initialsForName } from './Avatar';

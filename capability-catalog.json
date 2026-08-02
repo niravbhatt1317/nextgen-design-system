@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 794,
+  "capabilityCount": 798,
   "counts": {
-    "story": 578,
-    "component": 187,
+    "story": 581,
+    "component": 188,
     "utility": 12,
     "hook": 17
   },
@@ -48,6 +48,16 @@
       "doc": "Components/Button AiFamily",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "AiMark",
+      "kind": "component",
+      "file": "src/components/AiMark/AiMark.tsx",
+      "area": "AiMark",
+      "summary": "AiMark - the gradient mark that means \"this is AI\".",
+      "doc": "AiMark - the gradient mark that means \"this is AI\". **A mark, not an icon, which is why it is not in the icon set.** Every `<Icon>` is one stroke in `currentColor`, and that is what lets the system size, tint and audit all 1209 of them the same way. This is three colours sweeping across itself and answers to none of it - tinting it would destroy the thing that makes it recognisable. The library's rule is that Lucide is the only *icon* source; a brand mark is the same exception the seventeen kept logos are. **Two of them, each filled or drawn as a line.** `spark` is the general mark; `trio` is three stars at a third of the strength, for a surface that wants a texture rather than a glyph. `appearance=\"line\"` strokes the same outline instead of filling it, for a row where every other glyph is line art - beside a Lucide icon a solid mark reads as a different weight of thing. **The gradient is a token**, not a literal: `--mdt-ai-gradient-from`, `-via`, `-to` and `-via-position`. Both supplied marks carried the same ramp, which is what made it a pattern worth saving rather than two one-off fills. Every instance mints its own gradient `id`. Two of these on a page sharing one id is a real ",
+      "props": ["variant", "appearance", "size", "title"],
+      "propDocs": "Which mark. See {@link AiMarkVariant}. Filled, or drawn as a line. See {@link AiMarkAppearance}. Named `appearance` rather than `fill` because an `<svg>` already has a `fill` and shadowing it would make the escape hatch unreachable. How big. Defaults to `sm`, which is 16px - the size it was drawn at. A name, if the mark is carrying meaning on its own. Left off it is `aria-hidden`, which is right almost everywhere: the mark says \"AI\" to somebody who has learnt it and nothing to somebody who has not, so the writing beside it should carry the meaning. Set this only where there is no such writing."
     },
     {
       "name": "AlignItems",
@@ -1531,6 +1541,16 @@
       "area": "Icon",
       "summary": "Story: Components/Icon / DecorativeIcons",
       "doc": "Components/Icon DecorativeIcons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Default",
+      "doc": "Components/AiMark Default",
       "props": [],
       "propDocs": ""
     },
@@ -3753,6 +3773,16 @@
       "propDocs": ""
     },
     {
+      "name": "InUse",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / InUse",
+      "doc": "Components/AiMark InUse",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "isModifier",
       "kind": "utility",
       "file": "src/components/Kbd/keys.ts",
@@ -4160,6 +4190,16 @@
       "area": "TagPill",
       "summary": "Story: Components/TagPill / LongLabels",
       "doc": "Components/TagPill LongLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Marks",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Marks",
+      "doc": "Components/AiMark Marks",
       "props": [],
       "propDocs": ""
     },
