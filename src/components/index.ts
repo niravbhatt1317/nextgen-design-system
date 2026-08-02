@@ -44,6 +44,10 @@ export type { ButtonProps, ButtonVariantsType } from './Button';
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
 export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
 
+// Callout
+export { Callout, calloutVariants } from './Callout';
+export type { CalloutProps, CalloutTone, CalloutSize, CalloutVariant } from './Callout';
+
 // Card — a surface that holds related content in the page. It does not open,
 // close, float or freeze the page behind it; those are Modal and Popover, which
 // borrow this surface and add their own behaviour. Clickable and collapsible

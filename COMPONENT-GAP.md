@@ -18,6 +18,28 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## Callout — built
+
+Built because `npm run find -- callout banner alert` returned **nothing**, and five of the twelve
+dialog reference screens had one: the grouped "Access limits" block, the credential summary, the
+rule builder, the auth-method card pair, and the consequence list before a destructive confirm.
+
+`Toast`'s six tones were already the right six colours, so they were lifted into
+`src/utils/feedback-tones.ts` and both components now read from there — a seventh tone is one edit
+rather than two that drift. `Toast` was refactored onto it with no behaviour change; its 72 tests
+pass untouched.
+
+**Banner is still missing.** `COMPONENT-GAP.md` lists it as 4-of-4 and `Callout` does not cover it:
+a banner is full width at the top of a page and often dismissible, a callout is inline in the flow
+and usually is not. Same tones, different placement and different lifetime. It should be built on
+the same `feedback-tones` table when it is.
+
+**Worth a decision, not changed here:** the dark-mode feedback fills are far more saturated than
+the light ones — `blue-90`, `red-90`, `orange-90` against `blue-05`, `red-10`, `yellow-10`. On a
+toast that is a small floating card and it reads fine; on a callout the size of a paragraph it is
+a much larger area of colour. Inherited from `Toast` rather than introduced, so changing it would
+change both.
+
 ## Kbd — built, and three callers still to migrate
 
 `Kbd` landed on `nirav/dialog-and-kbd`. It exists because `npm run find -- keyboard shortcut`
