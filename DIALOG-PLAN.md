@@ -85,9 +85,11 @@ The thing that varies is not size or content — it is **how much structure the 
 
 One decision. ~440px, never scrolls, no tabs. Symmetric footer, affirmative on the right.
 
-- [ ] The base: title, prose, two buttons
-- [ ] **Consequence callout** — a list of what is about to be destroyed
-- [ ] **Typed confirmation** — "type DELETE to confirm", primary stays disabled until it matches
+- [x] **The base** ✅ `Destructive` is it — `sm`, no scroll, symmetric footer, no ⏎ chip.
+- [ ] **Consequence callout** — a list of what is about to be destroyed. **Unblocked:** `Callout`
+      now exists and its `danger` tone with a list is exactly this. Wants a Prompt story showing it.
+- [ ] **Typed confirmation** — "type DELETE to confirm", primary stays disabled until it matches.
+      The only genuinely new behaviour left in this pattern.
 
 _Reference: Wise, Delete connection._
 
@@ -96,11 +98,22 @@ _Reference: Wise, Delete connection._
 A task. Header, a body that scrolls between a sticky header and a sticky footer, footer. The
 workhorse — most of the effort goes here.
 
-- [ ] The base: sticky header, scrolling body, sticky footer
-- [ ] **Media above the header** — an image or product shot
-- [ ] **Tabs under the header**
-- [ ] **A back control in the header**
-- [ ] **A step counter** — "2 of 5"
+- [x] **The base** ✅ `scroll="body"` caps the dialog at the viewport and gives the leftover height
+      to the body. `min-h-0` is the load-bearing half — without it the body refuses to shrink and
+      nothing scrolls while every class looks right. Both edges fade, reusing `LeftNav`'s strip via
+      `src/utils/scroll-fade.ts`, and the fades are driven by a `ResizeObserver` rather than a
+      scroll event, because at rest nothing has scrolled and the bottom fade is exactly what is
+      wanted then.
+- [x] **Media above the header** ✅ `DialogMedia` — the one region with no gutter, which is why it
+      is a component rather than a div.
+- [x] **Tabs under the header** ✅ A `tabs` slot on `DialogHeader`, rendered _inside_ it: the header
+      is the part that does not move, and tabs that scrolled away would leave you unable to switch
+      back without scrolling up.
+- [x] **A back control in the header** ✅ `onBack` — an arrow on the left against close's cross on
+      the right, because two exits doing different things have to be told apart before they are
+      pressed.
+- [x] **A step counter** ✅ `counter`, on the same one-line row as back so the close button lands on
+      it exactly.
 
 _References: Add Field, Create Series, Set up Conductor, Welcome!, Build skills, Manus upgrade,
 Graphite plans._
@@ -137,7 +150,9 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
   - [x] symmetric — Cancel / Confirm, right-aligned ✅
   - [x] **asymmetric** ✅ `align="between"` — a quiet link or a step back on the left, the way
         forward on the right
-  - [x] none — `divider={false}` ✅
+  - [x] none — `divider={false}` ✅ and **not the same spacing minus a line**: without a rule the
+        separation is done by space alone, so the buttons sit 24 from the reading rather than the
+        16 the gap would give.
 
 - [x] **Every region owns its own padding.** ✅ `DialogContent` has none horizontally. `DialogHeader`,
       `DialogSteps`, the new `DialogBody` and `DialogFooter` each pad their own contents by a single
@@ -201,15 +216,17 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 Named in review as things we may want. Each is a _composition_ of the above rather than a new
 component — worth checking that stays true once the product designs arrive.
 
-- [x] **Wizard / stepper** ✅ `DialogSteps` — **to be folded into `Stepper` as a variant**, see
+- [x] **Wizard / stepper** ✅ **Folded into `Stepper`** as its `underline` layout; `DialogSteps` is
+      now a preset of it. See
       `COMPONENT-GAP.md`. Two answers to one question, built hours apart on branches that never saw
-      each other. `Dialog` is the only caller today, which makes now the cheap moment.
+      each other — one now.
 
       `DialogSteps` — the bar under each step is the progress, not a
       connector between dots. A finished step shows a tick rather than its number, and only
       finished steps are clickable.
 
-- [ ] **Tabbed** — Panel + tabs
+- [x] **Tabbed** ✅ Panel + the `tabs` slot. It is a slot rather than a pattern, which is the answer
+      this line was asking for.
 - [ ] **Split: information one side, image the other** — is this a Panel with a media slot, or does
       it need a genuine two-column body?
 - [ ] **Left nav, right content** — Workspace + aside. The same shape as Notion Preferences.
@@ -232,7 +249,9 @@ Settled with the design owner on 2 August 2026.
 
 ### Still missing, and now concrete
 
-- [ ] **A `Callout` / inset panel.** Five of the twelve screens have one — the grouped "Access
+- [x] **A `Callout` / inset panel.** ✅ Built, with `Toast`'s six tones shared through
+      `src/utils/feedback-tones.ts`. `tone="neutral"` with `icon={false}` is the plain inset panel
+      four of those five screens actually were. Five of the twelve screens had one — the grouped "Access
       limits" block, the credential summary, the rule builder, the pair of auth-method cards. There
       is no `Callout`, `Alert` or `Banner` in the library at all. `COMPONENT-GAP.md` already lists
       Banner as 4-of-4; this makes it concrete.
