@@ -36,6 +36,8 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--mdt-primary) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
+          'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
+          'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--mdt-secondary) / <alpha-value>)',

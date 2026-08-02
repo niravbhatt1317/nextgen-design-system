@@ -129,10 +129,13 @@ export {
   DialogTrigger,
   DialogClose,
   DialogContent,
+  DialogBody,
   DialogHeader,
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  useSubmitShortcut,
+  DialogSteps,
 } from './Dialog';
 export type {
   DialogProps,
@@ -140,6 +143,7 @@ export type {
   DialogPortalProps,
   DialogOverlayProps,
   DialogContentProps,
+  DialogBodyProps,
   DialogHeaderProps,
   DialogFooterProps,
   DialogTitleProps,
@@ -261,6 +265,19 @@ export type {
 // Item
 export { Item, itemVariants } from './Item';
 export type { ItemProps, ItemVariants } from './Item';
+
+// Kbd
+export { Kbd, KbdVariants, usePlatform } from './Kbd';
+export type {
+  KbdProps,
+  KbdKey,
+  KbdNamedKey,
+  KbdLayout,
+  KbdVariant,
+  KbdSize,
+  KbdTone,
+  KbdPlatform,
+} from './Kbd';
 
 // Label — the uppercase micro-heading, settling three competing letter-spacings
 export { Label, labelVariants } from './Label';

@@ -18,6 +18,52 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## Kbd — built, and three callers still to migrate
+
+`Kbd` landed on `nirav/dialog-and-kbd`. It exists because `npm run find -- keyboard shortcut`
+turned up **five** drawings of the same idea, none of which knew about the others:
+
+| where                  | what it drew                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| `CommandShortcut`      | bare text, `tracking-widest`, `text-muted-foreground`                           |
+| `DropdownMenuShortcut` | the same again, dimmed with `opacity-60` instead of a token                     |
+| `Sidebar` search       | a hand-written `<kbd>`, filled and bordered, at `mdt-text-[10px]` — a raw value |
+| `DialogSubmitHint`     | the outlined chip inside a dialog's primary button                              |
+| a five-way trial       | five more arrangements                                                          |
+
+Two of those are now gone: `DialogSubmitHint` was replaced by `Button`'s `shortcut` prop, and the
+trial was deleted once the arrangement was chosen.
+
+**Still to migrate, deliberately not in that branch:** `CommandShortcut`, `DropdownMenuShortcut`
+and `Sidebar`'s inline `<kbd>`. All three are _visible_ changes to shipped components — bare
+letter-spaced text becomes key caps — so they want their own branch and their own review rather
+than arriving as a side effect of a dialog. Migrating `Sidebar` also clears one entry from
+`TOKEN-REPORT.md`.
+
+### Button — `shortcut` is a prop, but not yet a documented variant
+
+`Button` already takes `shortcut={['mod', 'enter']}` and draws a `Kbd` from it. What is missing is
+that it is **not presented the way the icon slots are**. `Button.stories.tsx` has `WithLeftIcon`
+and `WithRightIcon` as first-class stories; there is no `WithShortcut` beside them, and `shortcut`
+does not appear in the `argTypes` block, so it has no control in the Storybook panel and no row in
+the generated props table.
+
+The effect is that the feature exists and is invisible: a designer browsing `Button` cannot find
+it, and cannot try it without editing code. For a library whose whole point is that its catalogue
+is the interface, an undocumented prop is close to an absent one.
+
+What it wants, when it is picked up:
+
+- **A story** — `WithShortcut`, sitting directly after `WithRightIcon`, so the three trailing-slot
+  options read as one family.
+- **An `argTypes` entry** — `control: 'object'` over a `KbdKey[]`, with the named keys listed in
+  the description so `'mod'` is discoverable without reading `Kbd`'s source.
+- **A note in the variants gallery** that it is a _slot_, not a `variant` value: it composes with
+  every variant rather than being one of them, in the same way `leftIcon` does.
+
+Deliberately not done in `nirav/dialog-and-kbd`: that branch's job was to make one `Kbd` exist and
+to give `Button` a way to seat it. Documenting `Button`'s own surface is `Button`'s branch.
+
 ## The short version
 
 |                                      | Count  |

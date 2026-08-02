@@ -55,19 +55,25 @@ against the viewport edge on small screens, and a place for a tall dialog to scr
 
 ---
 
-## 1 · Behaviour — the things nobody designs
+## 1 · Behaviour — the things nobody designs ✅
 
-- [ ] **Unsaved-changes guard.** Closing a half-filled form loses it. Escape, the X, and the
-      overlay all need to ask first. Every Panel needs this.
-- [ ] **Pending primary action.** Submit takes two seconds: the button shows busy, and the dialog
-      refuses to close while it is in flight.
-- [ ] **Blocking.** No X, no Escape, no overlay dismiss. Session expired, forced upgrade.
-- [ ] **Stacked.** A confirm over a form. There is already a `NestedDialogs` story, so it has been
-      tried — decide whether it is supported or a trap, and make the answer true in the code.
-- [ ] **Small screens.** Panel and Workspace become full-screen below a breakpoint, or they are
-      unusable. Half of this landed with §0 — the dialog is now inset by 16px and scrolls when it
-      is taller than the viewport, instead of growing past it.
-- [ ] **⌘↵ to submit**, with the hint rendered in the button, as Conductor does.
+- [x] **Unsaved-changes guard.** ✅ `onRequestClose(reason)` — return `false` and it stays open.
+      All three exits go through one gate, because answering the question in three places is how
+      they drift and the overlay is the one that gets forgotten.
+- [x] **Pending primary action.** ✅ `busy` refuses every exit and disables the close button
+      rather than hiding it — the way out still exists, it is just not available yet. `Button`
+      already had `loading`, so nothing new was drawn.
+- [x] **Blocking.** ✅ `blocking` removes the close button entirely rather than disabling it — an
+      X that refuses to work reads as broken rather than as deliberate.
+- [x] **Stacked — supported.** ✅ A guard that refuses to close has to be able to ask, and the
+      asking is a dialog. Both stay in the DOM; only the top one is reachable by role, so nobody
+      is offered a form they cannot get to past the question in front of it.
+- [x] **Small screens.** ✅ Full-bleed below `sm` — measured at 375px: width 375, flush left,
+      square corners. A card with 16px of inset above it. Corners and a border on something that
+      reaches every edge are decoration on a seam that does not exist.
+- [x] **⌘↵ to submit.** ✅ `useSubmitShortcut`, accepting Command or Control so one shortcut
+      works everywhere. Not plain Enter: Enter belongs to the field you are in, and requiring the
+      modifier is what lets a form with a textarea have a keyboard submit at all.
 
 ---
 
@@ -116,26 +122,77 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 
 ## 3 · Anatomy decisions
 
-- [ ] **Size scale — five steps.** `sm` 400 · `md` 520 · `lg` 720 · `xl` 960 · `full`. The
+- [x] **Size scale — five steps.** ✅ Measured: `sm` 448 · `md` 512 · `lg` 672 · `xl` 896 ·
+      `full` fills. `full` uses `self-stretch` to beat the centring on the flex parent rather
+      than computing a viewport height. The
       references cluster at roughly 440 / 600 / 720 / 900 / near-full, and five is the fewest that
       covers them without anyone reaching for `className`. Today there is exactly one width,
       `max-w-lg`, and the stories escape it with `sm:max-w-[425px]` and `sm:max-w-[800px]` —
       arbitrary values, which is the tell that the scale is missing.
 
-- [ ] **Footer, three rhythms.** `DialogFooter` can only right-align today, which cannot express
-      the one the modern references use most:
-  - [ ] symmetric — Cancel / Confirm, right-aligned
-  - [ ] **asymmetric** — a quiet link left, the primary right. "Having a problem?", "Get support",
-        "Back … Skip / Next"
-  - [ ] none — Workspace
+- [x] **Footer, three rhythms.** ✅ And the rule above it, which the product has on every dialog
+      and this had on none. It breaks out through the padding so it reaches both edges — inset by
+      24px it reads as an underline on the buttons rather than the seam between reading and
+      deciding. The header deliberately keeps none: that asymmetry is the house style.
+  - [x] symmetric — Cancel / Confirm, right-aligned ✅
+  - [x] **asymmetric** ✅ `align="between"` — a quiet link or a step back on the left, the way
+        forward on the right
+  - [x] none — `divider={false}` ✅
 
-- [ ] **Density, two steps.** `comfortable` (24px, the default) and `compact` (16px). Two, not
-      three: a middle step never gets chosen. Worth confirming against the product screenshots
-      before building.
+- [x] **Every region owns its own padding.** ✅ `DialogContent` has none horizontally. `DialogHeader`,
+      `DialogSteps`, the new `DialogBody` and `DialogFooter` each pad their own contents by a single
+      shared gutter, read from the density rather than written four times.
 
-- [ ] **Where the close button lives.** In the header row when there is a header to sit in;
-      floating over the content when there is not. Both appear in the references and the choice is
-      not arbitrary.
+      This is what removed the footer's `-mx-4 px-4` breakout — a number that had to be kept in step
+      with the container's padding by hand, and was wrong by 7px a side the first time anybody
+      measured it. The rule reaches both edges now because the footer *is* full width, not because
+      it tears back out through something.
+
+      The one thing still on the container is the **bottom**, because no region knows whether it is
+      the last thing in the box: a dialog with a footer wants 12 under its buttons and one without
+      wants 12 under its body, and putting it on the container is what makes those the same number.
+
+- [x] **Density, three steps — one number each.** ✅ `compact` 12 · `comfortable` 16 · `spacious` 24,
+      and everything else in the dialog derived from it rather than listed beside it.
+
+      | derived from the step | compact | comfortable | spacious |
+      | --- | --- | --- | --- |
+      | gutter, all four regions | 12 | 16 | 24 |
+      | above the header | 12 | 16 | 24 |
+      | between blocks | 12 | 16 | 24 |
+      | rule → buttons (step − 4) | 8 | 12 | 20 |
+      | buttons → floor (step − 4) | 8 | 12 | 20 |
+      | close glyph to the edge | 12 | 16 | 24 |
+
+      **`compact` was wrong before this** and the arithmetic is what caught it: it kept
+      `comfortable`'s 12 above the buttons while using 8 below them, so the footer was uneven about
+      its own contents at one density and even at the other. Nothing derived, so nothing noticed.
+
+      The scale is not evenly spaced. 12 → 16 is a control panel against a form; 16 → 24 is a form
+      against a page that happens to be in a box. A step in between would be a choice nobody could
+      make from a screenshot.
+
+      **Two things deliberately do not scale.** The gap between a title and its description (8, or
+      6 when the title carries a tag) and the 4px `DialogSteps` adds beneath itself are
+      relationships between two pieces of text, not between text and a box.
+
+      The close button follows the gutter **by construction**: it is anchored at the step and
+      pulled back by a constant 6 across and 4 up. Measured at all three, its glyph lands exactly
+      on the gutter — 12, 16, 24 — and its centre exactly on the title's.
+
+      The buttons stay at `md`, 36px, at every density. Tried at 32 and put back: the footer is the
+      one row that has to stay pressable.
+
+      A button carrying a `DialogSubmitHint` gets 14 before the chip and 10 after it, rather than
+      the 16 its padding would give. A chip is not reading and does not need the room a word would.
+
+- [x] **The close button lines up with the title.** ✅ It is a 28px hit area around a 16px glyph,
+      positioned so the glyph's own edge sits on the gutter and the box centres on the title's line.
+      Measured: it was 4px low before, and its centre is now exactly on the title's. Muted rather
+      than near-black, because the way out of a dialog is not the thing to look at first.
+
+- [ ] **Whether it ever moves into the header row.** Floating over the content is right when there
+      is no header to sit in. Both appear in the references and the choice is not arbitrary.
 
 ---
 
@@ -144,13 +201,46 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 Named in review as things we may want. Each is a _composition_ of the above rather than a new
 component — worth checking that stays true once the product designs arrive.
 
-- [ ] **Wizard / stepper** — Panel + step counter + back control + Back/Skip/Next footer
+- [x] **Wizard / stepper** ✅ `DialogSteps` — the bar under each step is the progress, not a
+      connector between dots. A finished step shows a tick rather than its number, and only
+      finished steps are clickable.
 - [ ] **Tabbed** — Panel + tabs
 - [ ] **Split: information one side, image the other** — is this a Panel with a media slot, or does
       it need a genuine two-column body?
 - [ ] **Left nav, right content** — Workspace + aside. The same shape as Notion Preferences.
 
 ---
+
+## The house style, read from twelve product screens
+
+Settled with the design owner on 2 August 2026.
+
+- **The header has no rule; the footer has one.** That asymmetry is deliberate — a line above the
+  buttons says the reading is over.
+- **Every primary carries a ⏎ chip.** `DialogSubmitHint`. A shortcut nobody knows about is worth
+  nothing, and the button is the only thing anybody is looking at when deciding to press it.
+- **Destructive never gets it.** Confirmed as deliberate: nobody should be able to delete something
+  by muscle memory, and a keyboard path to an irreversible act is exactly that. The rule is written
+  into `DialogSubmitHint`'s own documentation so it travels with the thing it governs.
+- **The ink is the system's** — `foreground` and `primary`, confirmed rather than matched by eye.
+- **Red is reserved entirely for destructive.**
+
+### Still missing, and now concrete
+
+- [ ] **A `Callout` / inset panel.** Five of the twelve screens have one — the grouped "Access
+      limits" block, the credential summary, the rule builder, the pair of auth-method cards. There
+      is no `Callout`, `Alert` or `Banner` in the library at all. `COMPONENT-GAP.md` already lists
+      Banner as 4-of-4; this makes it concrete.
+- [ ] **A duration chip row.** `ToggleGroup` exists but its variants are a muted track, where the
+      product uses white chips with a dark selected state and a tick. Probably one more variant
+      rather than a new component.
+- [ ] **The two-line label** — a small muted label above a darker instruction. Appears four times.
+      Belongs to the form components rather than to `Dialog`.
+- [ ] **Whole-dialog states.** _Generating credential…_ has no header, no footer and no close —
+      the dialog becomes the state. A recipe rather than a prop, probably.
+
+**Reused, confirmed by searching:** `Radio` already has a `card` variant for the auth-method cards,
+and `Button` already has `loading`.
 
 ## Not yet decided
 

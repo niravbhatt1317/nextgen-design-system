@@ -1,10 +1,21 @@
 'use client';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import {
+  CLOSE_POSITION,
+  CLOSE_PULL,
+  DialogDensityContext,
+  useDialogFooterTop,
+  useDialogGutter,
+  useDialogTop,
+} from './dialogSpacing';
 import { Icon } from '../Icon';
 import type {
+  DialogBodyProps,
+  DialogCloseReason,
   DialogContentProps,
   DialogDescriptionProps,
   DialogFooterProps,
@@ -12,6 +23,41 @@ import type {
   DialogOverlayProps,
   DialogTitleProps,
 } from './Dialog.types';
+
+/**
+ * How wide the dialog is, and how much room it gives its contents.
+ *
+ * Sizes are named for the job rather than the pixels, and there are five
+ * because the product clusters at five. `full` stretches instead of capping:
+ * `self-stretch` beats the centring on the flex parent, so it fills the height
+ * the scroller already has without anybody having to compute a viewport
+ * calculation.
+ */
+const dialogContentVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'sm:mdt-max-w-md',
+      md: 'sm:mdt-max-w-lg',
+      lg: 'sm:mdt-max-w-2xl',
+      xl: 'sm:mdt-max-w-4xl',
+      full: 'mdt-max-w-none sm:mdt-self-stretch',
+    },
+    density: {
+      // The rhythm between regions, and the floor beneath the last one. Left,
+      // right and top belong to the regions themselves - see `dialogSpacing`.
+      //
+      // The bottom stays here because no region knows whether it is the last
+      // thing in the box. A dialog with a footer wants the floor under its
+      // buttons and one without wants it under its body; putting it on the
+      // container is what makes those the same number rather than two that
+      // drift. It is the step minus 4 at each density.
+      compact: 'mdt-gap-3 mdt-pb-2',
+      comfortable: 'mdt-gap-4 mdt-pb-3',
+      spacious: 'mdt-gap-6 mdt-pb-5',
+    },
+  },
+  defaultVariants: { size: 'md', density: 'comfortable' },
+});
 
 /**
  * Dialog - a task that interrupts, in the middle of the screen.
@@ -147,10 +193,41 @@ function CloseIcon() {
 const DialogContent = forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, showCloseButton = true, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    {/*
+>(
+  (
+    {
+      className,
+      children,
+      showCloseButton = true,
+      blocking = false,
+      busy = false,
+      onRequestClose,
+      size = 'md',
+      density = 'comfortable',
+      ...props
+    },
+    ref
+  ) => {
+    /**
+     * One gate for every way out.
+     *
+     * Escape, a click outside and the close button are three different events and
+     * one question: may this close? Answering it in three places is how they
+     * drift - the guard catches Escape and forgets the overlay, and half a form
+     * is gone.
+     */
+    const closePosition = CLOSE_POSITION[density];
+
+    const mayClose = (reason: DialogCloseReason) => {
+      if (blocking || busy) return false;
+      return onRequestClose?.(reason) !== false;
+    };
+
+    return (
+      <DialogDensityContext.Provider value={density}>
+        <DialogPortal>
+          <DialogOverlay />
+          {/*
       Centred by layout, not by a transform.
 
       It used to sit at `left: 50%; top: 50%` and pull itself back with
@@ -166,40 +243,82 @@ const DialogContent = forwardRef<
       screen, and `overflow-y-auto` with `min-h-full` gives a tall one somewhere
       to scroll instead of growing past the viewport.
     */}
-    <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto mdt-p-4">
-      <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
-        <DialogPrimitive.Content
-          ref={ref}
-          className={cn(
-            'mdt-relative mdt-grid mdt-w-full mdt-max-w-lg',
-            'mdt-gap-4 mdt-rounded-lg mdt-border mdt-border-border mdt-bg-background mdt-p-6 mdt-shadow-lg',
-            'mdt-duration-200 mdt-ease-in-out',
-            'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
-            className
-          )}
-          {...props}
-        >
-          {children}
-          {showCloseButton && (
-            <DialogPrimitive.Close
-              className={cn(
-                'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
-                'mdt-ring-offset-background mdt-transition-opacity',
-                'hover:mdt-opacity-100',
-                'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-                'disabled:mdt-pointer-events-none',
-                'data-[state=open]:mdt-bg-accent data-[state=open]:mdt-text-muted-foreground'
-              )}
-            >
-              <CloseIcon />
-              <span className="mdt-sr-only">Close</span>
-            </DialogPrimitive.Close>
-          )}
-        </DialogPrimitive.Content>
-      </div>
-    </div>
-  </DialogPortal>
-));
+          {/*
+          No inset on a phone, 16px above that. A dialog floating in the middle
+          of a 375px screen with a strip of dimmed page around it is smaller
+          than it needs to be and harder to reach; below the breakpoint it takes
+          the screen.
+        */}
+          <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto sm:mdt-p-4">
+            <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
+              <DialogPrimitive.Content
+                ref={ref}
+                onEscapeKeyDown={(event) => {
+                  if (!mayClose('escape')) event.preventDefault();
+                }}
+                onPointerDownOutside={(event) => {
+                  if (!mayClose('outside')) event.preventDefault();
+                }}
+                onInteractOutside={(event) => {
+                  if (!mayClose('outside')) event.preventDefault();
+                }}
+                className={cn(
+                  'mdt-relative mdt-grid mdt-w-full',
+                  dialogContentVariants({ size, density }),
+                  // Full-bleed on a phone, a card above that. Corners and a
+                  // border on something that reaches every edge are decoration
+                  // on a seam that does not exist.
+                  'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
+                  'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
+                  'mdt-duration-200 mdt-ease-in-out',
+                  'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
+                  className
+                )}
+                {...props}
+              >
+                {children}
+                {/*
+            A blocking dialog shows no way out, because there is not one. An X
+            that refuses to work is worse than no X - it reads as broken rather
+            than as deliberate.
+          */}
+                {showCloseButton && !blocking && (
+                  <DialogPrimitive.Close
+                    disabled={busy}
+                    onClick={(event) => {
+                      if (!mayClose('close-button')) event.preventDefault();
+                    }}
+                    className={cn(
+                      // A 28px box, which is the height of the title's line, so
+                      // the glyph sits on the title's centre rather than on its
+                      // cap height. At 16px square pinned to the same top edge
+                      // it rode 6px high of the words beside it.
+                      'mdt-absolute mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
+                      closePosition,
+                      CLOSE_PULL,
+                      // Muted, not near-black. The way out of a dialog is not
+                      // the thing to look at first, and at full strength the X
+                      // competed with the title for that.
+                      'mdt-rounded-sm mdt-text-muted-foreground mdt-transition-colors',
+                      'hover:mdt-text-foreground',
+                      'mdt-ring-offset-background',
+                      'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
+                      'disabled:mdt-pointer-events-none',
+                      'data-[state=open]:mdt-bg-accent'
+                    )}
+                  >
+                    <CloseIcon />
+                    <span className="mdt-sr-only">Close</span>
+                  </DialogPrimitive.Close>
+                )}
+              </DialogPrimitive.Content>
+            </div>
+          </div>
+        </DialogPortal>
+      </DialogDensityContext.Provider>
+    );
+  }
+);
 DialogContent.displayName = 'DialogContent';
 
 /**
@@ -210,7 +329,13 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
     <div
       ref={ref}
       className={cn(
-        'mdt-flex mdt-flex-col mdt-space-y-1.5 mdt-text-center sm:mdt-text-left',
+        useDialogGutter(),
+        useDialogTop(),
+        // 8px under the title. At 6 the description read as a second line of the
+        // heading rather than as the sentence explaining it - unless the title
+        // carries a tag, which makes its line taller and closes that gap on its
+        // own. `DialogTitle` takes the 2px back in that case.
+        'mdt-flex mdt-flex-col mdt-space-y-2 mdt-text-center sm:mdt-text-left',
         className
       )}
       {...props}
@@ -223,29 +348,92 @@ DialogHeader.displayName = 'DialogHeader';
  * DialogFooter - container for action buttons.
  */
 const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-justify-end sm:mdt-space-x-2',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, align = 'end', divider = true, ...props }, ref) => {
+    // Read unconditionally. Inside the `divider &&` below they would be hooks
+    // that stop running the moment somebody passes `divider={false}`, which is
+    // the kind of bug that only shows up when a caller toggles it.
+    const gutter = useDialogGutter();
+    const aboveButtons = useDialogFooterTop();
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          gutter,
+          'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
+          // `end` is a decision - Cancel, then the primary. `between` is a
+          // journey: something quiet on the left, the way forward on the right.
+          // A step back, a support link, "having a problem?".
+          align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
+          divider && [
+            // The rule reaches both edges because the footer is a full-width
+            // block that pads its own contents - not, as it used to be, a
+            // padded box tearing back out through the container's padding with
+            // `-mx-4`. That number had to be kept in step with the container by
+            // hand, and was wrong by 7px a side the first time anyone measured.
+            'mdt-mt-2 mdt-border-t mdt-border-border',
+            // The step minus 4, matching the floor beneath the buttons, so the
+            // footer is even about its own contents. `compact` was keeping
+            // `comfortable`'s 12 here while using 8 below - measured, and the
+            // one place the densities were not the same shape.
+            aboveButtons,
+          ],
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 DialogFooter.displayName = 'DialogFooter';
+
+/**
+ * DialogBody - the reading between the header and the footer.
+ *
+ * Its own region, with the same left and right as the header and the footer, so
+ * a caller adjusts one and the other two follow. Before this the content padded
+ * itself and every region sat inside that, which meant the footer's rule had to
+ * tear back out through it with a negative margin to reach the edges.
+ *
+ * Nothing else about the body is this component's business - a form, a list, a
+ * paragraph, a scrolling pane are all just children.
+ *
+ * @example
+ * ```tsx
+ * <DialogBody>
+ *   <Input label="Invite by email" />
+ * </DialogBody>
+ * ```
+ */
+const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn(useDialogGutter(), className)} {...props} />
+));
+DialogBody.displayName = 'DialogBody';
 
 /**
  * DialogTitle - the title of the dialog.
  */
 const DialogTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, DialogTitleProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, tag, children, ...props }, ref) => (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn('mdt-text-lg mdt-font-semibold mdt-leading-none mdt-tracking-tight', className)}
+      className={cn(
+        'mdt-text-lg mdt-font-semibold mdt-leading-none mdt-tracking-tight',
+        tag !== undefined && [
+          'mdt-flex mdt-items-center mdt-gap-2',
+          // 6 under a title that carries a tag, against 8 under one that does
+          // not. A tag is taller than the text beside it, so it closes some of
+          // the gap on its own; keeping the full 8 there made the description
+          // drift away from the heading it belongs to.
+          '-mdt-mb-0.5',
+        ],
+        className
+      )}
       {...props}
-    />
+    >
+      {children}
+      {tag}
+    </DialogPrimitive.Title>
   )
 );
 DialogTitle.displayName = 'DialogTitle';
@@ -267,6 +455,7 @@ DialogDescription.displayName = 'DialogDescription';
 
 export {
   Dialog,
+  DialogBody,
   DialogPortal,
   DialogOverlay,
   DialogTrigger,
