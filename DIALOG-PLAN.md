@@ -147,12 +147,19 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 
       The rest of the rhythm, also measured: **8** title → description (at 6 the description read
       as a second line of the heading), **16** between blocks, **20** from the steps to whatever
-      follows, because that is where the reading actually starts, and **12** from the footer's
-      rule down to the buttons. The extra 4 under the steps lives on `DialogSteps` itself rather
+      follows, because that is where the reading actually starts, and **14** from the footer's
+      rule down to the buttons, matching the 14 beneath them. 14 is Tailwind's `3.5` step and the
+      only place this library uses it - deliberate, because 12 read as tight on both sides of the
+      buttons at once. The extra 4 under the steps lives on `DialogSteps` itself rather
       than as a rule on the content — the steps are the only block that wants it.
 
       The buttons stay at `md`, 36px. Tried at 32 and put back: the footer is the one row that
       has to stay pressable, and a dialog is not so dense that its actions should shrink.
+
+      A button carrying a `DialogSubmitHint` gets **12** after the chip rather than the usual 16.
+      A chip is not reading and does not need the room a word after it would. The negative margin
+      lives on the chip rather than as a Button variant, so it only ever applies where there is
+      actually a chip.
 
       `compact` is for a dialog that is mostly chrome around one control.
 

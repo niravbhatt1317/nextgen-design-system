@@ -46,11 +46,13 @@ const dialogContentVariants = cva('', {
       full: 'mdt-max-w-none sm:mdt-self-stretch',
     },
     density: {
-      // 16 on three sides and 12 underneath. The buttons sit closer to the
+      // 16 on three sides and 14 underneath. The buttons sit closer to the
       // bottom edge than the reading does to the top, which is right: the
       // footer is already separated by its rule, and a full 16 under it left
-      // the actions floating away from the box they belong to.
-      comfortable: 'mdt-gap-4 mdt-p-4 mdt-pb-3',
+      // the actions floating away from the box they belong to. 14 is the `3.5`
+      // step - unusual in this library, and deliberate: 12 read as tight once
+      // the rule above the buttons came down to match it.
+      comfortable: 'mdt-gap-4 mdt-p-4 mdt-pb-3.5',
       compact: 'mdt-gap-3 mdt-p-3 mdt-pb-2',
     },
   },
@@ -348,7 +350,7 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // Out through the padding and back again, so the rule reaches both
             // edges. Inset by 24px it reads as an underline on the buttons rather
             // than as the seam between the reading and the deciding.
-            'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-3',
+            'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-3.5',
             density === 'compact' ? '-mdt-mx-3 mdt-px-3' : '-mdt-mx-4 mdt-px-4',
           ],
           className

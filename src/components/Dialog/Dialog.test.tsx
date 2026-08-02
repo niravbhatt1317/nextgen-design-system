@@ -665,6 +665,13 @@ describe('DialogSubmitHint', () => {
     expect(container.firstElementChild?.className).toContain('mdt-border-current/25');
   });
 
+  it("pulls the button's trailing padding in, since a chip is not reading", () => {
+    // 16 becomes 12. Owned by the chip rather than by a Button variant, so it
+    // only ever applies where there is actually a chip.
+    const { container } = render(<DialogSubmitHint />);
+    expect(container.firstElementChild?.className).toContain('-mdt-mr-1');
+  });
+
   it('is outlined rather than filled', () => {
     // A filled chip reads as a second, smaller button inside the first - two
     // things to press where there is one.
@@ -701,13 +708,13 @@ describe('size and density', () => {
     expect(classes).toContain('sm:mdt-self-stretch');
   });
 
-  it('pads by 16, and by 12 underneath', () => {
+  it('pads by 16, and by 14 underneath', () => {
     // The buttons sit closer to the bottom edge than the reading does to the
     // top. The footer already has its rule; a full 16 under it as well left the
     // actions floating away from the box they belong to.
     const classes = at({});
     expect(classes).toContain('mdt-p-4');
-    expect(classes).toContain('mdt-pb-3');
+    expect(classes).toContain('mdt-pb-3.5');
   });
 
   it('tightens up when asked', () => {

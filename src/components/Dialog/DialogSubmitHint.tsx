@@ -43,7 +43,13 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
         // what makes it read as a key rather than as a glyph that drifted. In a
         // 36px button that leaves 8 above and below.
         'mdt-ml-1 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center',
-        'mdt-rounded-md',
+        'mdt-rounded',
+        // Pulls the button's own 16px right padding in to 12. A chip is not
+        // reading, so it does not need the room a word after it would; at 16 it
+        // sat marooned from the edge. The chip owns this rather than Button
+        // having a "has a chip" variant, so it only ever applies where there is
+        // actually a chip.
+        '-mdt-mr-1',
         // Outlined, not filled. A filled chip reads as a second, smaller button
         // sitting inside the first - two things to press where there is one. A
         // hairline square around the glyph says "this is a key" instead, which
