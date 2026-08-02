@@ -205,7 +205,8 @@ independently, which is the most useful signal in the whole audit.
 - [ ] **#3 Card** — 3 of 4 teams · _two documents argue this should come first, because stat tiles,
       empty states and key-value rows all sit inside one_
 - [ ] **#4 Empty state** — 3 of 4 teams
-- [ ] **#5 Wizard stepper** — 3 of 4 teams
+- [x] **#5 Wizard stepper** — 3 of 4 teams · built as `Stepper`, horizontal only. Vertical is a
+      separate component and is deliberately not in it.
 - [ ] **#6 Tag input / removable chip** — 2 of 4 teams
 
 **Cleanup.**

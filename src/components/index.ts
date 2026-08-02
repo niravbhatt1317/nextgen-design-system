@@ -479,6 +479,19 @@ export type { SpinnerProps, SpinnerVariants } from './Spinner';
 export { Stack, stackVariants } from './Stack';
 export type { StackProps, StackVariants } from './Stack';
 
+// Stepper — a named, ordered journey with a place you are now. Not Tabs: if you
+// can do them in any order, it is Tabs. Not Progress either, which is one number
+// with no names. Horizontal only; vertical is a separate component.
+export { Stepper, stepperVariants } from './Stepper';
+export type {
+  StepperProps,
+  StepperOwnProps,
+  StepperVariantsType,
+  StepperStep,
+  StepperLayout,
+  StepState,
+} from './Stepper';
+
 // Switch
 export { MotadataSwitch, motadataSwitchRootVariants, motadataSwitchThumbVariants } from './Switch';
 export type { MotadataSwitchProps, MotadataSwitchVariants } from './Switch';

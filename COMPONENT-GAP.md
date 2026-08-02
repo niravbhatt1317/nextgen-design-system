@@ -142,6 +142,7 @@ thing.** If all four built it without talking to each other, it is not optional.
 | Toast                            | 2        | `Toast`                                            |
 | Banner / inline alert            | 4        | `Banner`                                           |
 | Tabs                             | 3        | `Tabs`                                             |
+| Wizard stepper                   | 3        | `Stepper`                                          |
 | Sidebar navigation               | 4        | `Sidebar`                                          |
 | Menu / popover                   | 3        | `DropdownMenu`, `Popover`, `HoverCard`             |
 | Modal                            | 4        | `Dialog`                                           |
@@ -189,7 +190,6 @@ Ordered by how many teams built it.
 | **Avatar & avatar stack**      | No avatar of any kind in Storybook |
 | **Micro-label & count badges** | `TagPill` is not a count badge     |
 | **Empty state**                | Nothing exists                     |
-| **Wizard stepper**             | Nothing exists                     |
 
 ### Built by two
 
@@ -321,7 +321,7 @@ library. It is reasonable for it to hold primitives none of them named.
 | 4     | **Avatar** + stack              | Three teams; nothing close exists                                   |
 | 5     | **Badge** (count / micro-label) | Three teams; `TagPill` does not cover it                            |
 | 6     | **Empty state**                 | Three teams; cheap to build                                         |
-| 7     | **Wizard stepper**              | Three teams; more involved                                          |
+| 7     | ~~**Wizard stepper**~~ — built  | Three teams; more involved                                          |
 | 8     | Progress                        | Two teams                                                           |
 
 **Cards first.** Almost every other missing component — stat tile, empty state, key-value rows,

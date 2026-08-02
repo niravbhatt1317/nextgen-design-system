@@ -12,6 +12,10 @@ dist
 build
 out
 storybook-static
+# Built for a browser check on a branch, and never meant to be committed.
+# The bare name above does not catch these - a build folder named after the
+# thing being checked has to be ignored too.
+storybook-static-*
 
 # Cache directories
 .cache
