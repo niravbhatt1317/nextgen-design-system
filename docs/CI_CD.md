@@ -174,7 +174,7 @@ Set these in Azure DevOps:
 
 - Log in to your SonarQube server
 - Go to Projects > Create Project
-- Enter project key: `motadata-react-library`
+- Enter project key: `nextgen-design-system`
 - Generate a project token
 
 #### 2. Install Azure DevOps Extension
@@ -198,7 +198,7 @@ Update `sonar-project.properties`:
 
 ```properties
 sonar.host.url=https://your-sonarqube-server.com
-sonar.projectKey=motadata-react-library
+sonar.projectKey=nextgen-design-system
 ```
 
 #### 5. Enable Pipeline Job
@@ -210,7 +210,7 @@ Uncomment the SonarQube job in `azure-pipelines.yml` when your server is ready.
 See `sonar-project.properties`:
 
 ```properties
-sonar.projectKey=motadata-react-library
+sonar.projectKey=nextgen-design-system
 sonar.sources=src
 sonar.tests=src
 sonar.javascript.lcov.reportPaths=coverage/lcov.info

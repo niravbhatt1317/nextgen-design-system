@@ -229,6 +229,7 @@ A change is live a few minutes after it merges.
 
 This library began life on Azure DevOps
 (`dev.azure.com/Motadata/NextGen/_git/motadata-react-library`), developer-owned. It now lives here,
+and ships as `@mtdt/nextgen-design-system`,
 owned by design, with CI rebuilt to match. Nothing here has been merged back.
 
 ## License

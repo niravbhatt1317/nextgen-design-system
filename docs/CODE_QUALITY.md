@@ -221,7 +221,7 @@ Configure VS Code to format on save:
 See `sonar-project.properties` for full configuration:
 
 ```properties
-sonar.projectKey=motadata-react-library
+sonar.projectKey=nextgen-design-system
 sonar.sources=src
 sonar.tests=src
 sonar.test.inclusions=**/*.test.ts,**/*.test.tsx

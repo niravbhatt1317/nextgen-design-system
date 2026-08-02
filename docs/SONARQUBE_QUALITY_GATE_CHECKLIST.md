@@ -115,7 +115,7 @@ All SonarQube reports are present and valid:
 Validated `sonar-project.properties`:
 
 ```properties
-✅ sonar.projectKey=motadata-react-library
+✅ sonar.projectKey=nextgen-design-system
 ✅ sonar.sources=src
 ✅ sonar.tests=src
 ✅ sonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
