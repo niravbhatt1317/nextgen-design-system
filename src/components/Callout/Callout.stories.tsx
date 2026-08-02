@@ -85,9 +85,29 @@ export const WhatItIsFor: Story = {
       </Callout>
 
       <Callout tone="neutral" icon={false} title="Access limits">
-        <div className="mdt-mt-2 mdt-grid mdt-gap-3 sm:mdt-grid-cols-2">
-          <Input label="Maximum seats" defaultValue="50" />
-          <Input label="Session length" defaultValue="8 hours" />
+        {/*
+          A row per setting: the name on the left, the control on the right,
+          and no label on the control because the name already is one. A
+          stacked label above every field turns four short settings into a
+          form, which is not what a grouped block is for.
+        */}
+        <div className="mdt-mt-2 mdt-flex mdt-flex-col mdt-divide-y mdt-divide-border">
+          {[
+            { name: 'Maximum seats', value: '50' },
+            { name: 'Session length', value: '8 hours' },
+          ].map((setting) => (
+            <div
+              key={setting.name}
+              className="mdt-flex mdt-items-center mdt-justify-between mdt-gap-4 mdt-py-2 first:mdt-pt-0 last:mdt-pb-0"
+            >
+              <span>{setting.name}</span>
+              <Input
+                aria-label={setting.name}
+                defaultValue={setting.value}
+                className="mdt-w-32 mdt-text-right"
+              />
+            </div>
+          ))}
         </div>
       </Callout>
     </div>
@@ -99,10 +119,16 @@ export const WhatItIsFor: Story = {
  *
  * A callout's action is what you do after reading it, and putting it on the
  * right invites pressing it first.
+ *
+ * **On the width:** a callout is `w-full` on purpose. It is a block that
+ * annotates the thing above or below it, so it takes that thing's width — a
+ * callout that shrank to fit its sentence would give a stack of them ragged
+ * right edges, and would stop lining up with the form it belongs to. Put it in
+ * a narrower column and it is narrower; this story is in one.
  */
 export const WithActions: Story = {
   render: () => (
-    <div className="mdt-flex mdt-max-w-2xl mdt-flex-col mdt-gap-3">
+    <div className="mdt-flex mdt-max-w-md mdt-flex-col mdt-gap-3">
       <Callout
         tone="warning"
         title="Two members have not accepted their invite"

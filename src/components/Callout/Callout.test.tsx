@@ -67,6 +67,23 @@ describe('Callout', () => {
   });
 
   describe('the glyph', () => {
+    it('is a step under the text it sits beside', () => {
+      // At 16 against 14px copy the icon was the largest thing in the callout
+      // and pulled the eye before the writing did.
+      const { container } = render(<Callout tone="danger">Body</Callout>);
+      expect(container.querySelector('svg')?.getAttribute('class')).toContain('mdt-h-3.5');
+    });
+
+    it('is centred in a line-tall box, so it sits on the title', () => {
+      // Measured at 0.0px from the title's centre. `mt-0.5` was a fudge that
+      // looked close at one size and was off at the other, and went wrong again
+      // whenever a title made the first line taller than the body.
+      const { container } = render(<Callout title="T">Body</Callout>);
+      const box = container.querySelector('svg')?.parentElement;
+      expect(box?.className).toContain('mdt-h-5');
+      expect(box?.className).toContain('mdt-items-center');
+    });
+
     it('brings its own per tone', () => {
       const { container } = render(<Callout tone="danger">Body</Callout>);
       expect(container.querySelector('svg')).toBeInTheDocument();
@@ -153,6 +170,18 @@ describe('Callout', () => {
       render(<Callout onDismiss={onDismiss}>Body</Callout>);
       await user.click(screen.getByRole('button', { name: 'Dismiss' }));
       expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('sits on the title line, like the tone glyph', () => {
+      const { container } = render(
+        <Callout title="T" onDismiss={vi.fn()}>
+          Body
+        </Callout>
+      );
+      const close = screen.getByRole('button', { name: 'Dismiss' });
+      expect(close.className).toContain('mdt-h-5');
+      expect(close.className).toContain('mdt-items-center');
+      expect(container.querySelectorAll('svg')[1]?.getAttribute('class')).toContain('mdt-h-3.5');
     });
 
     it('lets the control be renamed', () => {

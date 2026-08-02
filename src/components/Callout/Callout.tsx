@@ -37,9 +37,31 @@ export const calloutVariants = cva(
   }
 );
 
+/**
+ * The glyph, a step under the text it sits beside.
+ *
+ * 14 against 14px body copy, 12 against 12. At 16 the icon was visibly the
+ * largest thing in the callout and pulled the eye before the writing did -
+ * which is backwards for something whose whole job is to be read.
+ */
 const ICON_SIZE: Record<CalloutSize, string> = {
-  sm: 'mdt-h-3.5 mdt-w-3.5',
-  md: 'mdt-h-4 mdt-w-4',
+  sm: 'mdt-h-3 mdt-w-3',
+  md: 'mdt-h-3.5 mdt-w-3.5',
+};
+
+/**
+ * The box the glyph is centred in: one line of the text beside it.
+ *
+ * Centring in the line rather than nudging down from the top is what makes the
+ * icon sit on the title instead of near it. `mt-0.5` was a fudge that happened
+ * to look close on one size and was measurably off on the other, and it went
+ * wrong again the moment a title made the first line taller than the body.
+ *
+ * The close control uses the same box, so the two land on the same line.
+ */
+const LINE_BOX: Record<CalloutSize, string> = {
+  sm: 'mdt-h-4',
+  md: 'mdt-h-5',
 };
 
 const TITLE_SIZE: Record<CalloutSize, string> = {
@@ -105,12 +127,12 @@ const Callout = forwardRef<HTMLDivElement, CalloutProps>(
     },
     ref
   ) => {
+    // A line-tall box with the glyph centred in it. Because the row is
+    // `items-start`, that box sits on the first line and stays there when the
+    // text wraps - beside the title, never drifting down the paragraph.
     const glyphClass = cn(
-      ICON_SIZE[size],
-      // Half the gap between the line box and the glyph. On one line that lands
-      // the icon on the centre; the moment the text wraps, the same rule leaves
-      // it beside the first line. One rule, both behaviours.
-      'mdt-mt-0.5 mdt-shrink-0',
+      'mdt-flex mdt-shrink-0 mdt-items-center mdt-justify-center',
+      LINE_BOX[size],
       FEEDBACK_ICON_COLOUR[tone]
     );
 
@@ -123,7 +145,7 @@ const Callout = forwardRef<HTMLDivElement, CalloutProps>(
       >
         {icon === false ? null : (
           <span className={glyphClass}>
-            {icon ?? <Icon name={FEEDBACK_ICON[tone]} aria-hidden />}
+            {icon ?? <Icon name={FEEDBACK_ICON[tone]} className={ICON_SIZE[size]} aria-hidden />}
           </span>
         )}
 
@@ -165,7 +187,11 @@ const Callout = forwardRef<HTMLDivElement, CalloutProps>(
             // border carry the tone, and a coloured close would compete with
             // the glyph for the same job.
             className={cn(
-              'mdt-mt-0.5 mdt-shrink-0 mdt-rounded-sm mdt-p-0.5',
+              // The same line-tall box as the tone glyph, so the two sit on the
+              // title together rather than one on it and one near it.
+              'mdt-flex mdt-shrink-0 mdt-items-center mdt-justify-center',
+              LINE_BOX[size],
+              'mdt-w-5 mdt-rounded-sm',
               'mdt-text-feedback-text/70 hover:mdt-text-feedback-text',
               'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
             )}
