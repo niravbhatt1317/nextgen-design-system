@@ -117,3 +117,24 @@ const FOOTER_PULL = {
 
 /** The pull that puts the footer's rule on the body's clipping edge. */
 export const useDialogFooterPull = () => FOOTER_PULL[useContext(DialogDensityContext)];
+
+/**
+ * Room under the last thing in a scrolling body.
+ *
+ * The same number as the gap between blocks - the rule below is the next block,
+ * and it gets the same distance as anything else would.
+ *
+ * **Inside the scroller, not below it.** That distinction is the whole point:
+ * padding here scrolls with the content, so the clipping edge stays on the rule
+ * and the fade still runs into it. A margin outside would push the scroller off
+ * the rule and open the gap that was just closed - fixing the resting state by
+ * breaking the scrolling one.
+ */
+const SCROLL_TAIL = {
+  compact: 'mdt-pb-3',
+  comfortable: 'mdt-pb-4',
+  spacious: 'mdt-pb-6',
+} as const;
+
+/** The room under the last thing in a scrolling body. */
+export const useDialogScrollTail = () => SCROLL_TAIL[useContext(DialogDensityContext)];

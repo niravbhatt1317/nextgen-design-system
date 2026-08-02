@@ -21,6 +21,7 @@ import {
   useDialogFooterTop,
   useDialogGutter,
   useDialogScrollsBody,
+  useDialogScrollTail,
   useDialogTop,
 } from './dialogSpacing';
 import { Icon } from '../Icon';
@@ -468,6 +469,7 @@ const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
   ({ className, onScroll, ...props }, ref) => {
     const gutter = useDialogGutter();
     const scrolls = useDialogScrollsBody();
+    const scrollTail = useDialogScrollTail();
     // Both true before anything has scrolled, which is right: a body short
     // enough not to scroll never reaches either end, so neither fade shows.
     const [ends, setEnds] = useState({ atTop: true, atBottom: true });
@@ -528,7 +530,7 @@ const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
           // its content, so without it the body refuses to shrink, pushes the
           // dialog past `max-h-full`, and nothing scrolls - the classic version
           // of this bug, where every other class looks right.
-          scrolls && 'mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto',
+          scrolls && ['mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto', scrollTail],
           className
         )}
         onScroll={(event) => {

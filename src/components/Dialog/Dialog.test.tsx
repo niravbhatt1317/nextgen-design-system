@@ -775,6 +775,15 @@ describe('scroll', () => {
     expect(scroller?.querySelector('span.mdt-bg-gradient')).toBeNull();
   });
 
+  it('leaves room under the last thing, inside the scroller', () => {
+    // Inside, not below: padding here scrolls with the content, so the clipping
+    // edge stays on the rule and the fade still runs into it. A margin outside
+    // would fix the resting state by breaking the scrolling one.
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.className).toContain('mdt-pb-4');
+  });
+
   it('closes the gap above the footer rule, so the cut lands on the line', () => {
     // A gap between where the content stops and where the rule is reads as
     // content cut short rather than content continuing under it.
