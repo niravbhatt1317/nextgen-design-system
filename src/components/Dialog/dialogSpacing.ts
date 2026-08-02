@@ -110,13 +110,21 @@ export const useDialogScrollsBody = () => useContext(DialogScrollContext) === 'b
  * short rather than content continuing underneath.
  */
 const FOOTER_PULL = {
-  compact: '-mdt-mt-3',
-  comfortable: '-mdt-mt-4',
-  spacious: '-mdt-mt-6',
+  compact: '[&>[data-dialog-scroller]+*]:-mdt-mt-3',
+  comfortable: '[&>[data-dialog-scroller]+*]:-mdt-mt-4',
+  spacious: '[&>[data-dialog-scroller]+*]:-mdt-mt-6',
 } as const;
 
-/** The pull that puts the footer's rule on the body's clipping edge. */
-export const useDialogFooterPull = () => FOOTER_PULL[useContext(DialogDensityContext)];
+/**
+ * The pull that puts the footer's rule on the body's clipping edge.
+ *
+ * Applied by the **content**, to whatever directly follows the scroller, rather
+ * than by the footer to itself. The footer cannot know what is above it, and a
+ * pull it applies unconditionally collapses the gap on a dialog that has no
+ * scrolling body at all - measured at 0px between a description and the rule,
+ * with the two touching.
+ */
+export const useDialogScrollerPull = () => FOOTER_PULL[useContext(DialogDensityContext)];
 
 /**
  * Room under the last thing in a scrolling body.

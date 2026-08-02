@@ -797,6 +797,15 @@ describe('scroll', () => {
     expect(footer('body')).not.toContain('mdt-mt-2');
   });
 
+  it('takes that gap back from whatever follows the scroller, not from the footer', () => {
+    // The footer cannot know what is above it. Pulling itself up collapsed it
+    // against the header on a dialog with no scrolling body at all - measured
+    // at 0px between a description and the rule, the two touching.
+    const { dialog } = at('body');
+    expect(dialog.className).toContain('[&>[data-dialog-scroller]+*]:-mdt-mt-4');
+    expect(dialog.querySelector('[data-dialog-scroller]')).toBeInTheDocument();
+  });
+
   it('holds the header and the footer still', () => {
     // The whole point of the pattern: the title and the actions stay where they
     // are while the reading moves.
@@ -870,6 +879,15 @@ describe('the Panel slots', () => {
     panel({ onBack: vi.fn() });
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  });
+
+  it('keeps the row above the title exactly one line tall', () => {
+    // The close button centres on a line. A row taller than one line leaves it
+    // sitting above the row - measured at 2px out before this.
+    panel({ onBack: vi.fn(), counter: '2 of 5' });
+    const row = screen.getByRole('heading', { name: 'Configure' }).parentElement?.firstElementChild;
+    expect(row?.className).toContain('mdt-h-5');
+    expect(screen.getByRole('button', { name: 'Back' }).className).toContain('mdt-h-5');
   });
 
   it('shows a counter where one is given', () => {

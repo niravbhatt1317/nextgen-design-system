@@ -778,7 +778,10 @@ export const Panel: Story = {
  *
  * - **Media** — `DialogMedia`, the one region with no gutter. A product shot
  *   inset by 16px reads as a picture somebody placed in a dialog; the same shot
- *   reaching both edges reads as the dialog's own.
+ *   reaching both edges reads as the dialog's own. Its footer carries
+ *   `divider={false}`: a dialog led by a picture is an announcement rather than
+ *   a form, and a rule above its one button divides something that was never in
+ *   two parts.
  * - **Tabs** — inside the header, not above the body. The header is the part
  *   that does not move, and tabs that scrolled away would leave you unable to
  *   switch back without scrolling up.
@@ -836,10 +839,17 @@ export const PanelSlots: Story = {
             <DialogHeader>
               <DialogTitle>Saved views are here</DialogTitle>
               <DialogDescription>
-                Save a filter and a column layout together, and share them with your team.
+                Save a filter and a column layout together and give the pair a name. Anyone on your
+                team can open it, and changing the view changes it for all of them — so a queue
+                everybody works from stays one queue rather than five that drift apart.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            {/*
+              No rule. A dialog led by a picture is an announcement rather than
+              a form, and a line above its one button divides a thing that was
+              never in two parts. `divider={false}` is what that is for.
+            */}
+            <DialogFooter divider={false}>
               <Button shortcut={['enter']} onClick={close}>
                 Got it
               </Button>

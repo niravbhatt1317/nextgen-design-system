@@ -17,9 +17,9 @@ import {
   CLOSE_PULL,
   DialogDensityContext,
   DialogScrollContext,
-  useDialogFooterPull,
   useDialogFooterTop,
   useDialogGutter,
+  useDialogScrollerPull,
   useDialogScrollsBody,
   useDialogScrollTail,
   useDialogTop,
@@ -235,6 +235,7 @@ const DialogContent = forwardRef<
     // Named `scrolls` inside, because `scroll` is also a DOM event handler and
     // reading `scroll === 'body'` beside `onScroll` invites a misread.
     const scrolls: DialogScroll = scroll;
+    const scrollerPull = useDialogScrollerPull();
 
     const mayClose = (reason: DialogCloseReason) => {
       if (blocking || busy) return false;
@@ -304,7 +305,7 @@ const DialogContent = forwardRef<
                     // leftover height and no more.
                     'mdt-relative mdt-flex mdt-w-full mdt-flex-col',
                     dialogContentVariants({ size, density }),
-                    scrolls === 'body' && 'mdt-max-h-full mdt-overflow-hidden',
+                    scrolls === 'body' && ['mdt-max-h-full mdt-overflow-hidden', scrollerPull],
                     // Full-bleed on a phone, a card above that. Corners and a
                     // border on something that reaches every edge are decoration
                     // on a seam that does not exist.
@@ -423,7 +424,7 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
         row rendered unconditionally does on the many dialogs that need neither.
       */}
       {(onBack !== undefined || counter !== undefined) && (
-        <div className="mdt-flex mdt-items-center mdt-justify-between mdt-gap-2">
+        <div className="mdt-mb-1 mdt-flex mdt-h-5 mdt-items-center mdt-justify-between mdt-gap-2">
           {onBack === undefined ? (
             <span />
           ) : (
@@ -431,7 +432,10 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
               type="button"
               onClick={onBack}
               className={cn(
-                'mdt--ml-1 mdt-flex mdt-items-center mdt-gap-1 mdt-rounded-sm mdt-px-1 mdt-py-0.5',
+                // No vertical padding: the row has to be exactly one line tall
+                // or the close button, which centres on a line, sits above it.
+                // Measured at 2px out before this.
+                'mdt--ml-1 mdt-flex mdt-h-5 mdt-items-center mdt-gap-1 mdt-rounded-sm mdt-px-1',
                 'mdt-text-sm mdt-text-muted-foreground mdt-transition-colors hover:mdt-text-foreground',
                 'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
               )}
@@ -455,7 +459,7 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
         part that does not move - tabs that scrolled away with the body would
         leave somebody unable to switch back without scrolling up.
       */}
-      {tabs !== undefined && <div className="mdt-pt-1">{tabs}</div>}
+      {tabs !== undefined && <div className="mdt-pt-3">{tabs}</div>}
     </div>
   )
 );
@@ -472,7 +476,6 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
     const gutter = useDialogGutter();
     const aboveButtons = useDialogFooterTop();
     const scrollsBody = useDialogScrollsBody();
-    const footerPull = useDialogFooterPull();
 
     return (
       <div
@@ -492,12 +495,12 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // `-mx-4`. That number had to be kept in step with the container by
             // hand, and was wrong by 7px a side the first time anyone measured.
             'mdt-border-t mdt-border-border',
-            // 8px above the rule normally. When the body scrolls, the rule IS
-            // the clipping edge: the 8 goes, and the content's own gap above
-            // the footer is pulled back out too, so the line sits exactly where
-            // the content stops. Measured at 16px of dead space before this -
-            // enough that a row of text vanished before it reached the rule.
-            scrollsBody ? footerPull : 'mdt-mt-2',
+            // 8px above the rule normally, and none when the body scrolls -
+            // there the rule IS the clipping edge. The content's own gap is
+            // taken back by the content, not here: a footer that pulls itself
+            // up has no way to know whether a scrolling body is above it, and
+            // collapses against a header when there is not.
+            !scrollsBody && 'mdt-mt-2',
             // The step minus 4, matching the floor beneath the buttons, so the
             // footer is even about its own contents. `compact` was keeping
             // `comfortable`'s 12 here while using 8 below - measured, and the
@@ -620,7 +623,12 @@ const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
     return (
       // The fades are siblings of the scroller, not children of it - a child
       // would scroll away with the content it is meant to be covering.
-      <div className="mdt-relative mdt-flex mdt-min-h-0 mdt-flex-1 mdt-flex-col">
+      <div
+        // What the content's pull looks for. Whatever follows this is sitting
+        // on the clipping edge and wants the gap above it taken back.
+        data-dialog-scroller=""
+        className="mdt-relative mdt-flex mdt-min-h-0 mdt-flex-1 mdt-flex-col"
+      >
         {body}
         <span
           aria-hidden
