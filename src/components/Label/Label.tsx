@@ -32,8 +32,10 @@ export const labelVariants = cva(
 export type LabelVariantsType = VariantProps<typeof labelVariants>;
 export type LabelSize = 'sm' | 'md';
 
-export interface LabelProps
-  extends Omit<ComponentPropsWithoutRef<'span'>, 'className' | 'children' | 'color'> {
+export interface LabelProps extends Omit<
+  ComponentPropsWithoutRef<'span'>,
+  'className' | 'children' | 'color'
+> {
   children: ReactNode;
   /** @default 'sm' */
   size?: LabelSize;
