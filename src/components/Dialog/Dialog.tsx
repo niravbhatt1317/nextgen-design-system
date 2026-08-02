@@ -32,6 +32,7 @@ import type {
   DialogDescriptionProps,
   DialogFooterProps,
   DialogHeaderProps,
+  DialogMediaProps,
   DialogOverlayProps,
   DialogScroll,
   DialogTitleProps,
@@ -364,8 +365,41 @@ DialogContent.displayName = 'DialogContent';
 /**
  * DialogHeader - container for title and description.
  */
+/**
+ * DialogMedia - a picture across the top of a dialog.
+ *
+ * **The one region with no gutter.** A product shot inset by 16px reads as a
+ * picture someone placed in a dialog; the same shot reaching both edges reads
+ * as the dialog's own. Every other region pads its contents - this one exists
+ * precisely not to.
+ *
+ * Sits above the header, and rounds its own top corners to match the card it is
+ * filling. Below `sm` the dialog is square, so this is too.
+ *
+ * @example
+ * ```tsx
+ * <DialogMedia>
+ *   <img src={shot} alt="" className="mdt-h-40 mdt-w-full mdt-object-cover" />
+ * </DialogMedia>
+ * ```
+ */
+const DialogMedia = forwardRef<HTMLDivElement, DialogMediaProps>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'mdt-shrink-0 mdt-overflow-hidden',
+      // Matches `DialogContent`'s own corners, and stays square on a phone
+      // where the dialog is full-bleed.
+      'mdt-rounded-none sm:mdt-rounded-t-lg',
+      className
+    )}
+    {...props}
+  />
+));
+DialogMedia.displayName = 'DialogMedia';
+
 const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, onBack, backLabel = 'Back', counter, tabs, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -382,7 +416,47 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
         className
       )}
       {...props}
-    />
+    >
+      {/*
+        The row above the title, and only when something is in it. An empty
+        strip of 20px would push the title down for no reason - which is what a
+        row rendered unconditionally does on the many dialogs that need neither.
+      */}
+      {(onBack !== undefined || counter !== undefined) && (
+        <div className="mdt-flex mdt-items-center mdt-justify-between mdt-gap-2">
+          {onBack === undefined ? (
+            <span />
+          ) : (
+            <button
+              type="button"
+              onClick={onBack}
+              className={cn(
+                'mdt--ml-1 mdt-flex mdt-items-center mdt-gap-1 mdt-rounded-sm mdt-px-1 mdt-py-0.5',
+                'mdt-text-sm mdt-text-muted-foreground mdt-transition-colors hover:mdt-text-foreground',
+                'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
+              )}
+            >
+              <Icon name="arrow-left" size="xs" aria-hidden />
+              {backLabel}
+            </button>
+          )}
+          {counter !== undefined && (
+            // Trailing, and pulled in past the close button's own inset so the
+            // two do not collide on a narrow dialog.
+            <span className="mdt-mr-7 mdt-text-xs mdt-text-muted-foreground">{counter}</span>
+          )}
+        </div>
+      )}
+
+      {children}
+
+      {/*
+        Under the reading, inside the header. Inside, because the header is the
+        part that does not move - tabs that scrolled away with the body would
+        leave somebody unable to switch back without scrolling up.
+      */}
+      {tabs !== undefined && <div className="mdt-pt-1">{tabs}</div>}
+    </div>
   )
 );
 DialogHeader.displayName = 'DialogHeader';
@@ -620,6 +694,7 @@ DialogDescription.displayName = 'DialogDescription';
 export {
   Dialog,
   DialogBody,
+  DialogMedia,
   DialogPortal,
   DialogOverlay,
   DialogTrigger,

@@ -135,6 +135,45 @@ export interface DialogContentProps extends ComponentPropsWithoutRef<
  */
 export interface DialogHeaderProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;
+
+  /**
+   * A way back, shown as an arrow before the title.
+   *
+   * For a dialog that is one step of something - the second page of a wizard,
+   * a detail view opened from a list inside the same dialog. **Not a way out**:
+   * the close button is that, and a dialog with two exits that do different
+   * things has to make the difference visible, which is why this one is an
+   * arrow on the left and close is a cross on the right.
+   */
+  onBack?: () => void;
+
+  /** What the back control is called. Say where it goes, not that it goes. */
+  backLabel?: string;
+
+  /**
+   * Where you are, as words - `2 of 5`.
+   *
+   * For a wizard too long to draw a step strip for, or one whose steps have no
+   * names worth showing. With `DialogSteps` above, this is repeating what the
+   * strip already says; use one or the other.
+   */
+  counter?: ReactNode;
+
+  /**
+   * A row of tabs belonging to this header.
+   *
+   * Rendered under the title and description, inside the header block, so it
+   * stays put when the body scrolls. Tabs that scrolled away with the content
+   * would leave somebody unable to switch back without scrolling up.
+   */
+  tabs?: ReactNode;
+}
+
+/**
+ * Props for the DialogMedia component
+ */
+export interface DialogMediaProps extends ComponentPropsWithoutRef<'div'> {
+  children: ReactNode;
 }
 
 /**

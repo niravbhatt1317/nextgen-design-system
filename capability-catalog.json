@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 865,
+  "capabilityCount": 867,
   "counts": {
-    "story": 633,
-    "component": 195,
+    "story": 634,
+    "component": 196,
     "utility": 16,
     "hook": 21
   },
@@ -2417,8 +2417,18 @@
       "kind": "component",
       "file": "src/components/Dialog/Dialog.tsx",
       "area": "Dialog",
-      "summary": "DialogHeader - container for title and description.",
-      "doc": "DialogHeader - container for title and description.",
+      "summary": "",
+      "doc": "",
+      "props": ["children", "onBack", "backLabel", "counter", "tabs"],
+      "propDocs": "A way back, shown as an arrow before the title. For a dialog that is one step of something - the second page of a wizard, a detail view opened from a list inside the same dialog. **Not a way out**: the close button is that, and a dialog with two exits that do different things has to make the difference visible, which is why this one is an arrow on the left and close is a cross on the right. What the back control is called. Say where it goes, not that it goes. Where you are, as words - `2 of 5`. For a wizard too long to draw a step strip for, or one whose steps have no names worth showing. With `DialogSteps` above, this is repeating what the strip already says; use one or the other. A row of tabs belonging to this header. Rendered under the title and description, inside the header block, so it stays put when the body scrolls. Tabs that scrolled away with the content would leave somebody unable to switch back without scrolling up."
+    },
+    {
+      "name": "DialogMedia",
+      "kind": "component",
+      "file": "src/components/Dialog/Dialog.tsx",
+      "area": "Dialog",
+      "summary": "DialogMedia - a picture across the top of a dialog.",
+      "doc": "DialogMedia - a picture across the top of a dialog. **The one region with no gutter.** A product shot inset by 16px reads as a picture someone placed in a dialog; the same shot reaching both edges reads as the dialog's own. Every other region pads its contents - this one exists precisely not to. Sits above the header, and rounds its own top corners to match the card it is filling. Below `sm` the dialog is square, so this is too. ```tsx <DialogMedia> <img src={shot} alt=\"\" className=\"mdt-h-40 mdt-w-full mdt-object-cover\" /> </DialogMedia> ```",
       "props": ["children"],
       "propDocs": ""
     },
@@ -5126,6 +5136,16 @@
       "area": "Dialog",
       "summary": "Story: Components/Dialog / Panel",
       "doc": "Components/Dialog Panel",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "PanelSlots",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / PanelSlots",
+      "doc": "Components/Dialog PanelSlots",
       "props": [],
       "propDocs": ""
     },

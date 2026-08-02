@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
 import { Callout } from '../Callout';
+import { Tabs, TabsList, TabsTrigger } from '../Tabs';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
@@ -15,6 +16,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
   DialogTrigger,
 } from './Dialog';
@@ -758,6 +760,106 @@ export const Panel: Story = {
                 }}
               >
                 Add field
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * The Panel's four slots, together.
+ *
+ * `media` above the header, `tabs` under it, a back control and a counter in
+ * it. Shown composed rather than one story each, because a real panel uses two
+ * or three at once and four stories teaching four props in isolation is less
+ * useful than one that shows how they sit together.
+ *
+ * **`DialogMedia` is the one region with no gutter.** A product shot inset by
+ * 16px reads as a picture somebody placed in a dialog; the same shot reaching
+ * both edges reads as the dialog's own.
+ *
+ * **The tabs live inside the header, not above the body.** The header is the
+ * part that does not move — tabs that scrolled away with the content would
+ * leave you unable to switch back without scrolling up.
+ *
+ * **Back is not close.** It goes one step back inside the dialog; close leaves.
+ * Two exits that do different things have to look different, which is why one
+ * is an arrow on the left and the other a cross on the right.
+ */
+export const PanelSlots: Story = {
+  render: function PanelSlotsDemo() {
+    const [open, setOpen] = useState(false);
+    const [tab, setTab] = useState('details');
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Configure integration
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent size="lg" scroll="body">
+            <DialogMedia>
+              {/* A stand-in for a product shot — the point is that it reaches both edges. */}
+              <div className="mdt-flex mdt-h-32 mdt-items-center mdt-justify-center mdt-bg-muted">
+                <span className="mdt-text-xs mdt-text-muted-foreground">
+                  Media reaches both edges — no gutter
+                </span>
+              </div>
+            </DialogMedia>
+
+            <DialogHeader
+              onBack={() => {
+                setOpen(false);
+              }}
+              backLabel="All integrations"
+              counter="2 of 5"
+              tabs={
+                <Tabs value={tab} onValueChange={setTab}>
+                  <TabsList>
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="access">Access</TabsTrigger>
+                    <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              }
+            >
+              <DialogTitle>Configure integration</DialogTitle>
+              <DialogDescription>Everything here applies to this workspace only.</DialogDescription>
+            </DialogHeader>
+
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
+              {Array.from({ length: 7 }, (_, index) => (
+                <Input
+                  key={index}
+                  label={`${tab === 'details' ? 'Detail' : tab === 'access' ? 'Permission' : 'Option'} ${String(index + 1)}`}
+                  placeholder="Enough rows that the body has to scroll…"
+                />
+              ))}
+            </DialogBody>
+
+            <DialogFooter align="between">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                shortcut={['mod', 'enter']}
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Save
               </Button>
             </DialogFooter>
           </DialogContent>

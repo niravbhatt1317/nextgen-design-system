@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
   DialogTrigger,
 } from './Dialog';
@@ -808,6 +809,77 @@ describe('scroll', () => {
     // Identical for a stack of blocks with a gap - the difference only shows up
     // when one of them has to scroll.
     expect(at('body').dialog.className).toContain('mdt-flex-col');
+  });
+});
+
+describe('the Panel slots', () => {
+  const panel = (props: Record<string, unknown> = {}) =>
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogMedia>
+            <img src="/shot.png" alt="" />
+          </DialogMedia>
+          <DialogHeader {...props}>
+            <DialogTitle>Configure</DialogTitle>
+          </DialogHeader>
+          <DialogBody>body</DialogBody>
+        </DialogContent>
+      </Dialog>
+    );
+
+  it('gives the media no gutter, unlike every other region', () => {
+    // A product shot inset by 16px reads as a picture somebody placed in a
+    // dialog; the same shot reaching both edges reads as the dialog's own.
+    // The dialog is portalled, so `container` does not hold it.
+    panel();
+    const media = screen.getByRole('dialog').firstElementChild;
+    expect(media?.className).not.toContain('mdt-px-');
+    expect(media?.className).toContain('mdt-shrink-0');
+  });
+
+  it('rounds the media to match the card it fills, and stays square on a phone', () => {
+    panel();
+    const media = screen.getByRole('dialog').firstElementChild;
+    expect(media?.className).toContain('mdt-rounded-none');
+    expect(media?.className).toContain('sm:mdt-rounded-t-lg');
+  });
+
+  it('draws no row above the title when there is nothing to put in it', () => {
+    // An empty 20px strip pushes the title down for no reason, which is what a
+    // row rendered unconditionally does on the many dialogs needing neither.
+    panel();
+    expect(screen.queryByRole('button', { name: /Back/ })).not.toBeInTheDocument();
+    const header = screen.getByRole('heading', { name: 'Configure' }).parentElement;
+    expect(header?.firstElementChild?.tagName).toBe('H2');
+  });
+
+  it('reports the back press, and names where it goes', () => {
+    const onBack = vi.fn();
+    panel({ onBack, backLabel: 'All integrations' });
+    screen.getByRole('button', { name: 'All integrations' }).click();
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps back and close as visibly different exits', () => {
+    // One steps back inside the dialog, the other leaves. Two exits doing
+    // different things have to look different.
+    panel({ onBack: vi.fn() });
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  });
+
+  it('shows a counter where one is given', () => {
+    panel({ counter: '2 of 5' });
+    expect(screen.getByText('2 of 5')).toBeInTheDocument();
+  });
+
+  it('puts the tabs inside the header, so they do not scroll away', () => {
+    // The header is the part that does not move. Tabs that scrolled with the
+    // body would leave somebody unable to switch back without scrolling up.
+    panel({ tabs: <div data-testid="tabs" /> });
+    const header = screen.getByRole('heading', { name: 'Configure' }).parentElement;
+    expect(header?.contains(screen.getByTestId('tabs'))).toBe(true);
   });
 });
 
