@@ -160,12 +160,6 @@
     --mdt-primary-foreground-muted: var(--mdt-neutral-30);
     --mdt-primary-foreground-subtle: var(--mdt-neutral-100);
 
-    /* A surface inset INTO a primary one - the chip's own fill, as opposed to
-       the two ink steps above it. Lifted off the button rather than tinted
-       toward it, so the chip reads as a key sitting on the button rather than
-       as a hole cut out of it. */
-    --mdt-primary-inset: var(--mdt-neutral-80);
-
     --mdt-secondary: var(--mdt-neutral-20);
     --mdt-secondary-foreground: var(--mdt-black);
 
@@ -348,10 +342,6 @@
        surface is white here, so "softer than the label" means darker. */
     --mdt-primary-foreground-muted: var(--mdt-neutral-130);
     --mdt-primary-foreground-subtle: var(--mdt-neutral-50);
-
-    /* The mirror: the primary surface is white here, so an inset one is a step
-       down the ramp rather than up it. */
-    --mdt-primary-inset: var(--mdt-neutral-30);
 
     --mdt-secondary: var(--mdt-neutral-130);
     --mdt-secondary-foreground: var(--mdt-neutral-10);

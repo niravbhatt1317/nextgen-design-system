@@ -768,12 +768,13 @@ describe('DialogSubmitHint', () => {
     expect(container.firstElementChild?.className).toContain('-mdt-mr-1');
   });
 
-  it('names its fill as well as its rule, so either can be dropped', () => {
-    // Under review: the fill was added to see it, and the two are separate
-    // named tokens so one can be switched off in the inspector without
-    // touching the other.
+  it('is outlined rather than filled', () => {
+    // A fill was tried and dropped by the design owner. Filled, the chip reads
+    // as a second smaller button sitting inside the first - two things to press
+    // where there is one - and the rule ended up darker than the block it
+    // surrounded, which is an outline rather than a hairline.
     const { container } = render(<DialogSubmitHint />);
-    expect(container.firstElementChild?.className).toContain('mdt-bg-primary-inset');
+    expect(container.firstElementChild?.className).not.toContain('mdt-bg-');
   });
 });
 

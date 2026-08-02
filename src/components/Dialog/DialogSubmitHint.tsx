@@ -70,10 +70,6 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
         // Named for the primary surface because that is where the chip belongs:
         // the house style puts a ⏎ on the primary action and nothing else.
         'mdt-border mdt-border-primary-foreground-subtle mdt-text-primary-foreground-muted',
-        // A fill as well as a rule. Both are named and separate, so either can
-        // be switched off in the inspector without touching the other - which
-        // is how this one is being decided.
-        'mdt-bg-primary-inset',
         className
       )}
       {...props}
