@@ -17,9 +17,22 @@ describe('AiMark', () => {
       expect(svg(container).querySelectorAll('path')).toHaveLength(3);
     });
 
-    it('keeps the 16px box it was drawn on', () => {
-      const { container } = render(<AiMark />);
-      expect(svg(container)).toHaveAttribute('viewBox', '0 0 16 16');
+    it('crops its box to its artwork, so it is not smaller than the icons beside it', () => {
+      // Both marks arrived on a 16px box with room around them - `spark`
+      // filled 67% of it and `trio` 77%, against the ~83% a Lucide glyph
+      // fills. The paths are untouched; only the window onto them moved.
+      const { container: spark } = render(<AiMark />);
+      expect(svg(spark)).toHaveAttribute('viewBox', '2.03 1.47 12.41 12.41');
+      const { container: trio } = render(<AiMark variant="trio" />);
+      expect(svg(trio)).toHaveAttribute('viewBox', '0.84 0.83 14.34 14.34');
+    });
+
+    it('crops both to the same fill, so the two read as one size', () => {
+      const side = (c: HTMLElement) => Number(svg(c).getAttribute('viewBox')?.split(' ')[2]);
+      const { container: spark } = render(<AiMark />);
+      const { container: trio } = render(<AiMark variant="trio" />);
+      // 10.67 of 12.41, and 12.33 of 14.34 - both 86%.
+      expect(10.67 / side(spark)).toBeCloseTo(12.33 / side(trio), 2);
     });
 
     it('takes each size from the same scale Icon uses', () => {

@@ -6,11 +6,17 @@ import type { AiMarkAppearance, AiMarkProps, AiMarkSize, AiMarkVariant } from '.
  * The two marks, as the design owner drew them.
  *
  * Path data copied in rather than imported, for the same reason the icon set
- * is: a mark that can change shape without a commit is not a mark. Both were
- * supplied on a 16px viewBox, so the curves land on the pixel grid at the size
- * they were drawn for.
+ * is: a mark that can change shape without a commit is not a mark.
+ *
+ * **Each carries its own viewBox, cropped to its artwork.** Both arrived on a
+ * 16px box with room around them - measured, `spark` filled 67% of it and
+ * `trio` 77%, against the ~83% a Lucide glyph fills. So at the same rendered
+ * size the mark read smaller than the icons beside it, and the two variants
+ * read as different sizes from each other. Cropping to the artwork and padding
+ * back to a common 86% fixes both: the paths are untouched, only the window
+ * onto them moved.
  */
-const MARKS: Record<AiMarkVariant, { paths: string[]; opacity: number }> = {
+const MARKS: Record<AiMarkVariant, { paths: string[]; opacity: number; viewBox: string }> = {
   // One large four-pointed star with a small one at its shoulder. The general
   // AI mark - what a tone, a button or a label reaches for.
   spark: {
@@ -21,6 +27,7 @@ const MARKS: Record<AiMarkVariant, { paths: string[]; opacity: number }> = {
     // Drawn at 90%, and kept there rather than rounded up: it is what takes the
     // magenta end off full strength against a white page.
     opacity: 0.9,
+    viewBox: '2.03 1.47 12.41 12.41',
   },
   // Three stars of falling size across the box, at a third of the strength.
   // For a surface that wants the mark as a texture rather than as a glyph.
@@ -31,6 +38,7 @@ const MARKS: Record<AiMarkVariant, { paths: string[]; opacity: number }> = {
       'M11.2163 2.01511C11.1264 1.7684 10.7775 1.7684 10.6875 2.01511L10.2653 3.17321C10.1797 3.40761 9.99504 3.59224 9.76064 3.67787L8.60255 4.09958C8.35583 4.19002 8.35583 4.53895 8.60255 4.62886L9.76064 5.0511C9.99504 5.13673 10.1797 5.32137 10.2653 5.55576L10.6875 6.71386C10.7775 6.96057 11.1264 6.96057 11.2163 6.71386L11.6385 5.55576C11.7242 5.32137 11.9088 5.13673 12.1432 5.0511L13.3013 4.62886C13.548 4.53895 13.548 4.19003 13.3013 4.09958L12.1432 3.67787C11.9088 3.59224 11.7242 3.40761 11.6385 3.17321L11.2163 2.01511Z',
     ],
     opacity: 0.3,
+    viewBox: '0.84 0.83 14.34 14.34',
   },
 };
 
@@ -104,7 +112,7 @@ const AiMark = forwardRef<SVGSVGElement, AiMarkProps>(
     return (
       <svg
         ref={ref}
-        viewBox="0 0 16 16"
+        viewBox={mark.viewBox}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className={cn('mdt-inline-flex mdt-shrink-0', SIZES[size], className)}
