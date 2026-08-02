@@ -58,6 +58,21 @@ if (facing.length === 0) {
   process.exit(0);
 }
 
+// A release pull request is the opposite of a change needing a changeset: it is
+// the changesets being spent. `changeset version` deletes them, bumps the
+// version and writes the changelog - so asking it for a changeset would be
+// asking it to describe a release that describes itself.
+const consumed = git('diff', '--name-only', '--diff-filter=D', mergeBase, 'HEAD')
+  .split('\n')
+  .filter((f) => f.startsWith('.changeset/') && f.endsWith('.md'));
+
+if (consumed.length > 0 && changed.includes('package.json') && changed.includes('CHANGELOG.md')) {
+  process.stdout.write(
+    `A release: ${String(consumed.length)} changeset(s) consumed, version and changelog updated.\n`
+  );
+  process.exit(0);
+}
+
 const added = git('diff', '--name-only', '--diff-filter=A', mergeBase, 'HEAD')
   .split('\n')
   .filter((f) => f.startsWith('.changeset/') && f.endsWith('.md'));
