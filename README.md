@@ -68,6 +68,23 @@ that is what the prefix is for.
 
 React 18 or 19, as a peer dependency. Both ESM and CommonJS, with types for each.
 
+### If an agent is doing the work
+
+The package ships **`AGENTS.md`** — the rules an AI coding agent has to follow inside a project
+that consumes this system. Point your agent at it once and the constraints travel with the version:
+
+```
+Follow the rules in node_modules/@mtdt/nextgen-design-system/AGENTS.md
+```
+
+Put that line in the consuming project's `CLAUDE.md` (or `.cursorrules`, or whatever your agent
+reads). Bump the package and the rules update — nobody's copy goes stale, and five projects cannot
+end up with five interpretations of the guidance.
+
+The catalogue ships too, so the agent can _check_ what exists rather than guess:
+`CAPABILITIES.md` to read, `capability-catalog.json` to filter. Without those, "use the design
+system's component" is an instruction with nothing to check against.
+
 ### Versioning — a changeset per user-facing pull request
 
 If your change reaches the published package, add one:

@@ -37,9 +37,18 @@ const shipped = (file) => {
   if (file.startsWith('src/docs/')) return false;
   if (file.endsWith('.mdx')) return false;
   if (file.startsWith('src/')) return true;
-  // These two decide what the bundle and the stylesheet contain, so a change to
-  // either can alter the artifact without a component being touched.
-  return file === 'tailwind.config.ts' || file === 'vite.config.ts';
+  // Everything else that can change the tarball without a component being
+  // touched: the two configs that decide what the bundle and the stylesheet
+  // contain, `package.json` because `files` and `exports` decide what is IN the
+  // tarball at all, and the two files an agent reads to find out what exists.
+  return [
+    'tailwind.config.ts',
+    'vite.config.ts',
+    'package.json',
+    'AGENTS.md',
+    'CAPABILITIES.md',
+    'capability-catalog.json',
+  ].includes(file);
 };
 
 const facing = changed.filter(shipped);
