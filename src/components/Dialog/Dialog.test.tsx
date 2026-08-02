@@ -594,6 +594,36 @@ describe('DialogFooter', () => {
     expect(footer?.className).toContain('-mdt-mx-6');
   });
 
+  /** The footer of whichever dialog is currently rendered. */
+  const footerClasses = () =>
+    [...document.querySelectorAll('div')]
+      .find((n) => (n.getAttribute('class') ?? '').includes('mdt-border-t'))
+      ?.getAttribute('class') ?? '';
+
+  const withDensity = (density: 'comfortable' | 'compact') =>
+    render(
+      <Dialog defaultOpen>
+        <DialogContent density={density}>
+          <DialogTitle>Sized</DialogTitle>
+          <DialogFooter>ok</DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+
+  it('breaks out by 24 when the dialog padded itself by 24', () => {
+    withDensity('comfortable');
+    expect(footerClasses()).toContain('-mdt-mx-6');
+  });
+
+  it('breaks out by 16 when the dialog padded itself by 16', () => {
+    withDensity('compact');
+    // Hard-coded at 24px this overhung a compact dialog by 7px on each side -
+    // measured in a browser, after the arithmetic predicted the same number.
+    // The footer cannot know the padding on its own, so the content tells it.
+    expect(footerClasses()).toContain('-mdt-mx-4');
+    expect(footerClasses()).not.toContain('-mdt-mx-6');
+  });
+
   it('can go without', () => {
     const { container } = render(<DialogFooter divider={false}>ok</DialogFooter>);
     expect(container.firstElementChild?.className).not.toContain('mdt-border-t');

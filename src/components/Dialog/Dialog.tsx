@@ -2,7 +2,7 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
+import { createContext, forwardRef, useContext } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type {
@@ -14,6 +14,18 @@ import type {
   DialogOverlayProps,
   DialogTitleProps,
 } from './Dialog.types';
+
+/**
+ * The density the content chose, so the footer can break out by the right amount.
+ *
+ * The footer's rule reaches both edges by pulling out through the dialog's
+ * padding and pushing back in, which only works if it pulls out by exactly what
+ * the padding is. Hard-coded at 24px it overhung a compact dialog by 7px on
+ * each side - measured, after the arithmetic predicted the same number. The
+ * footer is not a child of anything that knows the density, so the content
+ * tells it.
+ */
+const DialogDensityContext = createContext<'comfortable' | 'compact'>('comfortable');
 
 /**
  * How wide the dialog is, and how much room it gives its contents.
@@ -204,9 +216,10 @@ const DialogContent = forwardRef<
     };
 
     return (
-      <DialogPortal>
-        <DialogOverlay />
-        {/*
+      <DialogDensityContext.Provider value={density}>
+        <DialogPortal>
+          <DialogOverlay />
+          {/*
       Centred by layout, not by a transform.
 
       It used to sit at `left: 50%; top: 50%` and pull itself back with
@@ -222,68 +235,69 @@ const DialogContent = forwardRef<
       screen, and `overflow-y-auto` with `min-h-full` gives a tall one somewhere
       to scroll instead of growing past the viewport.
     */}
-        {/*
+          {/*
           No inset on a phone, 16px above that. A dialog floating in the middle
           of a 375px screen with a strip of dimmed page around it is smaller
           than it needs to be and harder to reach; below the breakpoint it takes
           the screen.
         */}
-        <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto sm:mdt-p-4">
-          <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
-            <DialogPrimitive.Content
-              ref={ref}
-              onEscapeKeyDown={(event) => {
-                if (!mayClose('escape')) event.preventDefault();
-              }}
-              onPointerDownOutside={(event) => {
-                if (!mayClose('outside')) event.preventDefault();
-              }}
-              onInteractOutside={(event) => {
-                if (!mayClose('outside')) event.preventDefault();
-              }}
-              className={cn(
-                'mdt-relative mdt-grid mdt-w-full',
-                dialogContentVariants({ size, density }),
-                // Full-bleed on a phone, a card above that. Corners and a
-                // border on something that reaches every edge are decoration
-                // on a seam that does not exist.
-                'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
-                'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
-                'mdt-duration-200 mdt-ease-in-out',
-                'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
-                className
-              )}
-              {...props}
-            >
-              {children}
-              {/*
+          <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto sm:mdt-p-4">
+            <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
+              <DialogPrimitive.Content
+                ref={ref}
+                onEscapeKeyDown={(event) => {
+                  if (!mayClose('escape')) event.preventDefault();
+                }}
+                onPointerDownOutside={(event) => {
+                  if (!mayClose('outside')) event.preventDefault();
+                }}
+                onInteractOutside={(event) => {
+                  if (!mayClose('outside')) event.preventDefault();
+                }}
+                className={cn(
+                  'mdt-relative mdt-grid mdt-w-full',
+                  dialogContentVariants({ size, density }),
+                  // Full-bleed on a phone, a card above that. Corners and a
+                  // border on something that reaches every edge are decoration
+                  // on a seam that does not exist.
+                  'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
+                  'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
+                  'mdt-duration-200 mdt-ease-in-out',
+                  'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
+                  className
+                )}
+                {...props}
+              >
+                {children}
+                {/*
             A blocking dialog shows no way out, because there is not one. An X
             that refuses to work is worse than no X - it reads as broken rather
             than as deliberate.
           */}
-              {showCloseButton && !blocking && (
-                <DialogPrimitive.Close
-                  disabled={busy}
-                  onClick={(event) => {
-                    if (!mayClose('close-button')) event.preventDefault();
-                  }}
-                  className={cn(
-                    'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
-                    'mdt-ring-offset-background mdt-transition-opacity',
-                    'hover:mdt-opacity-100',
-                    'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-                    'disabled:mdt-pointer-events-none',
-                    'data-[state=open]:mdt-bg-accent data-[state=open]:mdt-text-muted-foreground'
-                  )}
-                >
-                  <CloseIcon />
-                  <span className="mdt-sr-only">Close</span>
-                </DialogPrimitive.Close>
-              )}
-            </DialogPrimitive.Content>
+                {showCloseButton && !blocking && (
+                  <DialogPrimitive.Close
+                    disabled={busy}
+                    onClick={(event) => {
+                      if (!mayClose('close-button')) event.preventDefault();
+                    }}
+                    className={cn(
+                      'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
+                      'mdt-ring-offset-background mdt-transition-opacity',
+                      'hover:mdt-opacity-100',
+                      'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
+                      'disabled:mdt-pointer-events-none',
+                      'data-[state=open]:mdt-bg-accent data-[state=open]:mdt-text-muted-foreground'
+                    )}
+                  >
+                    <CloseIcon />
+                    <span className="mdt-sr-only">Close</span>
+                  </DialogPrimitive.Close>
+                )}
+              </DialogPrimitive.Content>
+            </div>
           </div>
-        </div>
-      </DialogPortal>
+        </DialogPortal>
+      </DialogDensityContext.Provider>
     );
   }
 );
@@ -310,26 +324,33 @@ DialogHeader.displayName = 'DialogHeader';
  * DialogFooter - container for action buttons.
  */
 const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
-  ({ className, align = 'end', divider = true, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
-        // `end` is a decision - Cancel, then the primary. `between` is a
-        // journey: something quiet on the left, the way forward on the right.
-        // A step back, a support link, "having a problem?".
-        align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
-        divider && [
-          // Out through the padding and back again, so the rule reaches both
-          // edges. Inset by 24px it reads as an underline on the buttons rather
-          // than as the seam between the reading and the deciding.
-          '-mdt-mx-6 mdt-mt-2 mdt-border-t mdt-border-border mdt-px-6 mdt-pt-4',
-        ],
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, align = 'end', divider = true, ...props }, ref) => {
+    // Whatever the content padded itself by, so the rule reaches both edges and
+    // no further.
+    const density = useContext(DialogDensityContext);
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
+          // `end` is a decision - Cancel, then the primary. `between` is a
+          // journey: something quiet on the left, the way forward on the right.
+          // A step back, a support link, "having a problem?".
+          align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
+          divider && [
+            // Out through the padding and back again, so the rule reaches both
+            // edges. Inset by 24px it reads as an underline on the buttons rather
+            // than as the seam between the reading and the deciding.
+            'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-4',
+            density === 'compact' ? '-mdt-mx-4 mdt-px-4' : '-mdt-mx-6 mdt-px-6',
+          ],
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 DialogFooter.displayName = 'DialogFooter';
 

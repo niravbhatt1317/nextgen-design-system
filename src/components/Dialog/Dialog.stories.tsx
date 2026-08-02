@@ -1003,3 +1003,104 @@ export const Sizes: Story = {
     );
   },
 };
+
+/**
+ * A spacing trial — open both and compare.
+ *
+ * **Current** is what the component ships: 24px of padding, a 16px gap between
+ * every block, 6px between title and description.
+ *
+ * **Trial** is the set being tried: 16px of padding, 8px between title and
+ * description, 16px from the header to the steps, and 20px from the steps to
+ * the body — a wider gap where the reading actually starts.
+ *
+ * Nothing here changes the component. Everything is a `className` on this story,
+ * so both can be looked at side by side before anything is decided.
+ */
+export const SpacingTrial: Story = {
+  render: function SpacingTrialDemo() {
+    const [mode, setMode] = useState<'current' | 'trial' | 'compact' | null>(null);
+    const trial = mode === 'trial';
+
+    return (
+      <div className="mdt-flex mdt-gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setMode('current');
+          }}
+        >
+          Current — 24 / 6 / 16
+        </Button>
+        <Button
+          onClick={() => {
+            setMode('trial');
+          }}
+        >
+          Trial — 16 / 8 / 16 / 20
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setMode('compact');
+          }}
+        >
+          density=compact
+        </Button>
+
+        <Dialog
+          open={mode !== null}
+          onOpenChange={() => {
+            setMode(null);
+          }}
+        >
+          <DialogContent
+            size="lg"
+            density={mode === 'compact' ? 'compact' : 'comfortable'}
+            className={trial ? 'mdt-gap-4 mdt-p-4' : undefined}
+          >
+            <DialogHeader className={trial ? 'mdt-space-y-2' : undefined}>
+              <DialogTitle className="mdt-flex mdt-items-center mdt-gap-2">
+                Invite guest users
+                <Badge tone="warning" size="sm" shape="pill">
+                  Guest
+                </Badge>
+              </DialogTitle>
+              <DialogDescription>
+                Guest users get temporary access to your organisation after accepting.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogSteps
+              steps={[
+                { key: 'details', label: 'Invite details' },
+                { key: 'access', label: 'Access duration' },
+              ]}
+              current={0}
+            />
+
+            {/* 20px from the steps in the trial: 16 of grid gap plus 4 here. */}
+            <div
+              className={
+                trial
+                  ? 'mdt-mt-1 mdt-flex mdt-flex-col mdt-gap-4'
+                  : 'mdt-flex mdt-flex-col mdt-gap-4'
+              }
+            >
+              <Input label="Invite by email" placeholder="You can add more than one email…" />
+              <Input label="Select a parent organisation" placeholder="MSP owner organisation" />
+            </div>
+
+            {/* The breakout has to match the padding, or the rule overhangs. */}
+            <DialogFooter className={trial ? '-mdt-mx-4 mdt-px-4' : undefined}>
+              <Button>
+                Next
+                <DialogSubmitHint />
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  },
+};
