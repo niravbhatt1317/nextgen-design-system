@@ -1,7 +1,7 @@
 {
-  "name": "motadata-react-library",
+  "name": "@mtdt/nextgen-design-system",
   "version": "0.1.0",
-  "description": "Custom UI kit for SaaS platform development and custom app development",
+  "description": "The NextGen design system: accessible React components for building SaaS platforms, designed to be readable by machines as well as people.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -23,14 +23,15 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.css"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/build-package.mjs",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest run",
@@ -66,29 +67,29 @@
     "check:tokens:strict": "node scripts/check-tokens.mjs --strict",
     "check:tokens:report": "node scripts/check-tokens.mjs --markdown",
     "pre-pipeline-check": "bash scripts/pre-pipeline-check.sh",
-    "validate": "npm run pre-pipeline-check"
+    "validate": "npm run pre-pipeline-check",
+    "verify:package": "node scripts/verify-package.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pranjalgupta-motadata/ai-ready-design-system.git"
+    "url": "git+https://github.com/niravbhatt1317/nextgen-design-system.git"
   },
   "keywords": [
+    "design-system",
     "react",
     "components",
     "ui",
-    "library",
-    "typescript",
     "tailwind",
-    "radix",
     "accessible",
-    "motadata"
+    "radix",
+    "typescript"
   ],
   "author": "Motadata",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pranjalgupta-motadata/ai-ready-design-system/issues"
+    "url": "https://github.com/niravbhatt1317/nextgen-design-system/issues"
   },
-  "homepage": "https://pranjalgupta-motadata.github.io/ai-ready-design-system",
+  "homepage": "https://niravbhatt1317.github.io/nextgen-design-system",
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
@@ -211,5 +212,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "packageManager": "npm@10.0.0"
+  "packageManager": "npm@10.0.0",
+  "publishConfig": {
+    "access": "public"
+  }
 }

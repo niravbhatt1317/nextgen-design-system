@@ -19,4 +19,4 @@ export type {
 } from './types';
 
 // Styles - consumers need to import this separately
-// import 'motadata-react-library/styles.css';
+// import '@mtdt/nextgen-design-system/styles.css';

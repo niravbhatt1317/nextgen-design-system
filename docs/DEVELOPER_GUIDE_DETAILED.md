@@ -252,7 +252,7 @@ Before starting development, verify:
 ### 5.1 Directory Structure
 
 ```
-motadata-react-library/
+nextgen-design-system/
 │
 ├── src/                          # Source code
 │   ├── components/               # UI components (main code)

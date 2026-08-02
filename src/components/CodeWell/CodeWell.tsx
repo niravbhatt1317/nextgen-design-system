@@ -126,7 +126,7 @@ const CONTROL_SURFACE: Record<CodeWellSurface, string> = {
  *
  * @example
  * ```tsx
- * <CodeWell>npm install motadata-react-library</CodeWell>
+ * <CodeWell>npm install @mtdt/nextgen-design-system</CodeWell>
  * <CodeWell surface="dark" label="Install command" copyable>curl -sSL ...</CodeWell>
  * <CodeWell maskable copyable value="sk-live-abc123">sk-live-abc123</CodeWell>
  * ```

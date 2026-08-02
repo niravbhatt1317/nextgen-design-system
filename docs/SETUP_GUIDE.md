@@ -81,7 +81,7 @@ sudo pacman -S nodejs npm
 
 ```bash
 git clone <repository-url>
-cd motadata-react-library
+cd nextgen-design-system
 npm install
 ```
 

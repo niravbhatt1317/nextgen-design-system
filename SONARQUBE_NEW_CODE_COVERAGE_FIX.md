@@ -298,7 +298,7 @@ For the files you likely changed:
 After pipeline runs, check the SonarQube/SonarCloud dashboard:
 
 1. **Go to:** https://sonarcloud.io/organizations/motadata/projects
-2. **Find:** motadata-react-library
+2. **Find:** nextgen-design-system
 3. **Check "New Code" tab:**
    - See which files SonarQube considers "new"
    - See exact line numbers missing coverage

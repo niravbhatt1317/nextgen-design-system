@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { CodeWell } from './CodeWell';
 
-const CMD = 'npm install motadata-react-library';
+const CMD = 'npm install @mtdt/nextgen-design-system';
 const BODY = 'codewell-body';
 
 const writeText = vi.fn(() => Promise.resolve());

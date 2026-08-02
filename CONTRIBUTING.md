@@ -19,8 +19,8 @@ By participating in this project, you agree to maintain a respectful and inclusi
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/motadata-react-library.git
-   cd motadata-react-library
+   git clone https://github.com/YOUR_USERNAME/nextgen-design-system.git
+   cd nextgen-design-system
    ```
 3. Install dependencies:
    ```bash

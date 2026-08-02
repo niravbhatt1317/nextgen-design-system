@@ -966,7 +966,7 @@
       "file": "src/components/CodeWell/CodeWell.tsx",
       "area": "CodeWell",
       "summary": "CodeWell - a read-only monospace surface.",
-      "doc": "CodeWell - a read-only monospace surface. ```tsx <CodeWell>npm install motadata-react-library</CodeWell> <CodeWell surface=\"dark\" label=\"Install command\" copyable>curl -sSL ...</CodeWell> <CodeWell maskable copyable value=\"sk-live-abc123\">sk-live-abc123</CodeWell> ```",
+      "doc": "CodeWell - a read-only monospace surface. ```tsx <CodeWell>npm install @mtdt/nextgen-design-system</CodeWell> <CodeWell surface=\"dark\" label=\"Install command\" copyable>curl -sSL ...</CodeWell> <CodeWell maskable copyable value=\"sk-live-abc123\">sk-live-abc123</CodeWell> ```",
       "props": [],
       "propDocs": ""
     },
