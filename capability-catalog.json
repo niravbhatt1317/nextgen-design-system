@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 786,
+  "capabilityCount": 798,
   "counts": {
-    "story": 571,
-    "component": 186,
+    "story": 581,
+    "component": 188,
     "utility": 12,
     "hook": 17
   },
@@ -48,6 +48,16 @@
       "doc": "Components/Button AiFamily",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "AiMark",
+      "kind": "component",
+      "file": "src/components/AiMark/AiMark.tsx",
+      "area": "AiMark",
+      "summary": "AiMark - the gradient mark that means \"this is AI\".",
+      "doc": "AiMark - the gradient mark that means \"this is AI\". **A mark, not an icon, which is why it is not in the icon set.** Every `<Icon>` is one stroke in `currentColor`, and that is what lets the system size, tint and audit all 1209 of them the same way. This is three colours sweeping across itself and answers to none of it - tinting it would destroy the thing that makes it recognisable. The library's rule is that Lucide is the only *icon* source; a brand mark is the same exception the seventeen kept logos are. **Two of them, each filled or drawn as a line.** `spark` is the general mark; `trio` is three stars at a third of the strength, for a surface that wants a texture rather than a glyph. `appearance=\"line\"` strokes the same outline instead of filling it, for a row where every other glyph is line art - beside a Lucide icon a solid mark reads as a different weight of thing. **The gradient is a token**, not a literal: `--mdt-ai-gradient-from`, `-via`, `-to` and `-via-position`. Both supplied marks carried the same ramp, which is what made it a pattern worth saving rather than two one-off fills. Every instance mints its own gradient `id`. Two of these on a page sharing one id is a real ",
+      "props": ["variant", "appearance", "size", "title"],
+      "propDocs": "Which mark. See {@link AiMarkVariant}. Filled, or drawn as a line. See {@link AiMarkAppearance}. Named `appearance` rather than `fill` because an `<svg>` already has a `fill` and shadowing it would make the escape hatch unreachable. How big. Defaults to `sm`, which is 16px - the size it was drawn at. A name, if the mark is carrying meaning on its own. Left off it is `aria-hidden`, which is right almost everywhere: the mark says \"AI\" to somebody who has learnt it and nothing to somebody who has not, so the writing beside it should carry the meaning. Set this only where there is no such writing."
     },
     {
       "name": "AlignItems",
@@ -246,6 +256,16 @@
       "area": "Card",
       "summary": "Story: Components/Card / AnInsetPanel",
       "doc": "Components/Card AnInsetPanel",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Announcing",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Announcing",
+      "doc": "Components/Callout Announcing",
       "props": [],
       "propDocs": ""
     },
@@ -478,6 +498,27 @@
       "doc": "Components/ButtonGroup ButtonWithDropdown",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "Callout",
+      "kind": "component",
+      "file": "src/components/Callout/Callout.tsx",
+      "area": "Callout",
+      "summary": "Callout - a tinted block that says something about the content around it.",
+      "doc": "Callout - a tinted block that says something about the content around it. **It is already there when you arrive.** That is the whole difference from `Toast`, and it decides everything else: a callout does not animate in, does not time out, is not announced as it appears, and is not dismissible unless you ask. A toast interrupts you; a callout is part of the page. Reach for it for the consequences of a destructive action, a summary of what is about to happen, a limit somebody should know about before they fill in a form, or a group of settings that belong together - `tone=\"neutral\"` with `icon={false}` is a plain inset panel, and that is a callout too. **Only the icon and the border carry the tone.** The body text stays one calm colour in all six. Six tones that differ by a tint, an edge and a glyph read as one family; six tones of coloured text read as six problems. The rule and the tokens are `Toast`'s, shared from `@/utils/feedback-tones` so a seventh tone is one edit rather than two that drift. **It takes children, not two strings.** A toast takes a title and a description because it is read in passing. A callout holds whatever the page holds - a list of what is about to be dele",
+      "props": [
+        "tone",
+        "size",
+        "variant",
+        "title",
+        "children",
+        "icon",
+        "actions",
+        "onDismiss",
+        "dismissLabel",
+        "toneLabel"
+      ],
+      "propDocs": "Which of the six tones. Defaults to `neutral`, which is the quiet one. How much room it takes. See {@link CalloutSize}. How much surface it draws. See {@link CalloutVariant}. A short line above the body, in the same calm ink as the body. Optional: a one-sentence callout does not need a heading repeating it. The reading. Anything - a sentence, a list of what is about to be deleted, a definition list, a pair of controls. This is the difference between a callout and a toast. A toast takes two strings because it is read in passing; a callout is part of the page and holds whatever the page holds. A glyph of your own, or `false` for none. Left alone, each tone brings its own. `false` is for a callout that is a grouped block rather than a warning - an icon there labels a group that does not need labelling. Controls along the bottom, usually one or two buttons. Below the reading rather than beside it: a callout's action is what you do *after* reading, and putting it on the right invites pressing it first. Makes it dismissible, and is called when the close is pressed. Absent by default, which is the opposite of `Toast`. A toast always has a way out because it arrived uninvited; a callout is"
     },
     {
       "name": "Card",
@@ -1506,6 +1547,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Default",
+      "doc": "Components/AiMark Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Avatar/Avatar.stories.tsx",
       "area": "Avatar",
       "summary": "Story: Components/Avatar / Default",
@@ -1540,6 +1591,16 @@
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / Default",
       "doc": "Components/ButtonGroup Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Default",
+      "doc": "Components/Callout Default",
       "props": [],
       "propDocs": ""
     },
@@ -2380,6 +2441,16 @@
       "area": "Tabs",
       "summary": "Story: Components/Tabs / DisabledTab",
       "doc": "Components/Tabs DisabledTab",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Dismissible",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Dismissible",
+      "doc": "Components/Callout Dismissible",
       "props": [],
       "propDocs": ""
     },
@@ -3702,6 +3773,16 @@
       "propDocs": ""
     },
     {
+      "name": "InUse",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / InUse",
+      "doc": "Components/AiMark InUse",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "isModifier",
       "kind": "utility",
       "file": "src/components/Kbd/keys.ts",
@@ -4113,6 +4194,16 @@
       "propDocs": ""
     },
     {
+      "name": "Marks",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Marks",
+      "doc": "Components/AiMark Marks",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Maskable",
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
@@ -4447,6 +4538,16 @@
       "area": "..",
       "summary": "",
       "doc": "",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OnATintedSurface",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / OnATintedSurface",
+      "doc": "Components/Callout OnATintedSurface",
       "props": [],
       "propDocs": ""
     },
@@ -6806,6 +6907,16 @@
     {
       "name": "Tones",
       "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Tones",
+      "doc": "Components/Callout Tones",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Tones",
+      "kind": "story",
       "file": "src/components/IconTile/IconTile.stories.tsx",
       "area": "IconTile",
       "summary": "Story: Components/IconTile / Tones",
@@ -7322,6 +7433,16 @@
       "propDocs": ""
     },
     {
+      "name": "WhatItIsFor",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / WhatItIsFor",
+      "doc": "Components/Callout WhatItIsFor",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Wide",
       "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
@@ -7338,6 +7459,16 @@
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / WithActionButtons",
       "doc": "Deprecated/Sidebar WithActionButtons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithActions",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / WithActions",
+      "doc": "Components/Callout WithActions",
       "props": [],
       "propDocs": ""
     },

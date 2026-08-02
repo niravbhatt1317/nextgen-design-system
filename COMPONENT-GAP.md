@@ -18,6 +18,37 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## Callout — built
+
+Built because `npm run find -- callout banner alert` returned **nothing**, and five of the twelve
+dialog reference screens had one: the grouped "Access limits" block, the credential summary, the
+rule builder, the auth-method card pair, and the consequence list before a destructive confirm.
+
+`Toast`'s six tones were already the right six colours, so they were lifted into
+`src/utils/feedback-tones.ts` and both components now read from there — a seventh tone is one edit
+rather than two that drift. `Toast` was refactored onto it with no behaviour change; its 72 tests
+pass untouched.
+
+**Banner is still missing.** `COMPONENT-GAP.md` lists it as 4-of-4 and `Callout` does not cover it:
+a banner is full width at the top of a page and often dismissible, a callout is inline in the flow
+and usually is not. Same tones, different placement and different lifetime. It should be built on
+the same `feedback-tones` table when it is.
+
+**The tints came down, in both themes, at the design owner's direction.** Light: every fill is now
+its ramp's `05` step, where four of six had been sitting at `10` while `info` sat at `05` — which
+is why `info` looked right and the rest looked heavy. Dark: the tone left the fill entirely. Every
+dark fill is `neutral-140` and the border and the icon carry the tone, which is the set's own rule
+(_"only icon and border carry the tone"_) taken to its conclusion.
+
+That was not a free choice — the ramps have no low-saturation dark step. The `90` steps were
+17–20% lightness at up to 100% saturation against a 10% page, and the `100` steps below them are
+9–10%, level with the page or darker than it. A fill darker than the page reads as a hole, which
+this codebase already shipped once in the dark CodeWell. **A per-hue dark surface tint is a genuine
+gap in the palette** — worth adding if a future component needs the fill itself to carry a hue in
+dark mode.
+
+Both changes move `Toast` too, since the two share the table. Rendered and checked in both.
+
 ## Kbd — built, and three callers still to migrate
 
 `Kbd` landed on `nirav/dialog-and-kbd`. It exists because `npm run find -- keyboard shortcut`

@@ -110,7 +110,9 @@ softer than the label" is therefore a different direction on each side, which is
 exists so a component can ask for _"the danger tint"_ rather than _"red 10"_ — but it is the same
 red 10 a Badge uses.
 
-**Toast and Banner only.** A button or a badge still reaches for `--mdt-success` and friends.
+**`Toast` and `Callout`.** A button or a badge still reaches for `--mdt-success` and friends. The
+two share the table through `src/utils/feedback-tones.ts`, so a seventh tone is one edit rather
+than two that drift.
 
 **The rule that makes the set work,** borrowed from Org Mgmt's banner: the text stays one colour in
 every tone, and only the icon and the border carry it. That rule is what makes six tones read as a
@@ -119,11 +121,48 @@ family — not the particular colours.
 | Tone    | Background   | Border       | Icon          |
 | ------- | ------------ | ------------ | ------------- |
 | info    | `blue-05`    | `blue-20`    | `blue-60`     |
-| warning | `yellow-10`  | `orange-20`  | `orange-80`   |
-| danger  | `red-10`     | `red-20`     | `red-70`      |
-| success | `green-10`   | `green-20`   | `green-70`    |
-| ai      | `purple-10`  | `purple-20`  | `purple-80`   |
+| warning | `yellow-05`  | `orange-20`  | `orange-80`   |
+| danger  | `red-05`     | `red-20`     | `red-70`      |
+| success | `green-05`   | `green-20`   | `green-70`    |
+| ai      | `purple-05`  | `purple-20`  | `purple-80`   |
 | neutral | `neutral-10` | `neutral-30` | `neutral-130` |
+
+**Every fill is the `05` step**, except neutral where `neutral-10` is the lightest there is. It was
+not always so: four of them sat at `10` while `info` sat at `05`, which is why `info` looked right
+and the other four looked heavy. `success` was the worst of it — `green-10` is 89% lightness where
+the rest of the row is 95–98%, so one tone in six was visibly a block of colour while the others
+were a tint.
+
+They are backgrounds behind body text. A fill has one job here, which is to say _"this is a
+group"_; the icon and the border are what say which group.
+
+**In dark mode the same fills are composited at 30%.** The ramps have no low-saturation dark step:
+the `90`s are 17–20% lightness at up to 100% saturation against a 10% page, and laid on solid six
+of them read as six blocks of colour. The steps below are 9–10% — level with the page or darker,
+and a fill darker than its page reads as a hole. Compositing keeps the hue and takes the weight
+off. `ai` uses `purple-100` rather than `purple-90` because the purple ramp is not spaced like the
+others: `purple-90` is 40% lightness where its neighbours are 17–20.
+
+**`ai` draws a gradient mark, not a Lucide glyph.** It is the one tone that is a brand rather than
+a status — see `AiMark` and the `--mdt-ai-gradient-*` tokens.
+
+### The AI gradient
+
+| Token                            | Value         |                       |
+| -------------------------------- | ------------- | --------------------- |
+| `--mdt-ai-gradient-from`         | `206 99% 65%` | `#4DB2FE`             |
+| `--mdt-ai-gradient-via`          | `263 97% 55%` | `#721DFC`             |
+| `--mdt-ai-gradient-to`           | `306 95% 52%` | `#F910E2`             |
+| `--mdt-ai-gradient-via-position` | `25%`         | where the violet sits |
+
+**These are three colours the palette did not have, and that is deliberate.** The rule against
+adding colours exists so nobody has to ask _"which green"_ — a gradient answers a different
+question, because it is a mark rather than a surface. Nothing may reach for these to paint a
+background, a border or a piece of text; they exist so the AI mark is the same mark everywhere it
+appears. Both marks the design owner supplied carried this same ramp, which is what made it a
+pattern worth saving rather than two one-off fills.
+
+The same in both themes. A brand mark that changed colour with the theme would be two marks.
 
 Plus two shared: `--mdt-feedback-title` (`neutral-150`) and `--mdt-feedback-text` (`neutral-130`).
 
