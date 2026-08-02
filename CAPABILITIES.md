@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-867 capabilities: 196 components, 21 hooks, 16 utilities, 634 stories
+870 capabilities: 196 components, 22 hooks, 16 utilities, 636 stories
 
 ## Components
 
@@ -223,29 +223,30 @@ story that already exists. They are in `capability-catalog.json` in full.
 
 ## Hooks - the behaviour
 
-| Name                   | Where   | What it does                                                           |
-| ---------------------- | ------- | ---------------------------------------------------------------------- |
-| `useColumnReorder`     | Table   | Drag a column sideways to move it.                                     |
-| `useColumnWidths`      | Table   | Holds column widths for a resizable table.                             |
-| `useDialogFooterPull`  | Dialog  | The pull that puts the footer's rule on the body's clipping edge.      |
-| `useDialogFooterTop`   | Dialog  | The room between the footer's rule and its buttons.                    |
-| `useDialogGutter`      | Dialog  | The left and right padding every region in this dialog shares.         |
-| `useDialogScrollsBody` | Dialog  | Whether this dialog scrolls its body rather than the page behind it.   |
-| `useDialogScrollTail`  | Dialog  | The room under the last thing in a scrolling body.                     |
-| `useDialogTop`         | Dialog  | The padding above the first region.                                    |
-| `useEditableTabs`      | Tabs    | The rules for a tab bar the person builds themselves.                  |
-| `useInfiniteScroll`    | Table   | Asks for more rows when the end of the list comes into view.           |
-| `useLeftNavLevels`     | LeftNav | Which level of a settings navigation is showing.                       |
-| `usePlatform`          | Kbd     | Which machine this is, for resolving `mod` and `alt`.                  |
-| `usePromotionalOpen`   | Toast   | Whether a promotional toast is on screen.                              |
-| `useSavedViews`        | Table   | Holds a table's saved views.                                           |
-| `useSubmitShortcut`    | Dialog  | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.         |
-| `useTableColumns`      | Table   | Holds which columns are shown, in what order, and how many are pinned. |
-| `useTableFilters`      | Table   | Holds which filters are applied.                                       |
-| `useTablePagination`   | Table   | Which page of a table is showing.                                      |
-| `useTableSelection`    | Table   | Holds which rows are selected.                                         |
-| `useTableSort`         | Table   | Holds which columns sort the table, and in what order.                 |
-| `useUploadFiles`       | Upload  | The list, and what happens to it.                                      |
+| Name                    | Where   | What it does                                                           |
+| ----------------------- | ------- | ---------------------------------------------------------------------- |
+| `useColumnReorder`      | Table   | Drag a column sideways to move it.                                     |
+| `useColumnWidths`       | Table   | Holds column widths for a resizable table.                             |
+| `useDialogFooterTop`    | Dialog  | The room between the footer's rule and its buttons.                    |
+| `useDialogGutter`       | Dialog  | The left and right padding every region in this dialog shares.         |
+| `useDialogScrollerPull` | Dialog  | The pull that puts the footer's rule on the body's clipping edge.      |
+| `useDialogScrollsBody`  | Dialog  | Whether this dialog scrolls its body rather than the page behind it.   |
+| `useDialogScrollTail`   | Dialog  | The room under the last thing in a scrolling body.                     |
+| `useDialogTop`          | Dialog  | The padding above the first region.                                    |
+| `useEditableTabs`       | Tabs    | The rules for a tab bar the person builds themselves.                  |
+| `useInfiniteScroll`     | Table   | Asks for more rows when the end of the list comes into view.           |
+| `useLeftNavLevels`      | LeftNav | Which level of a settings navigation is showing.                       |
+| `usePlatform`           | Kbd     | Which machine this is, for resolving `mod` and `alt`.                  |
+| `usePromotionalOpen`    | Toast   | Whether a promotional toast is on screen.                              |
+| `useSavedViews`         | Table   | Holds a table's saved views.                                           |
+| `useSubmitShortcut`     | Dialog  | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.         |
+| `useTableColumns`       | Table   | Holds which columns are shown, in what order, and how many are pinned. |
+| `useTableFilters`       | Table   | Holds which filters are applied.                                       |
+| `useTablePagination`    | Table   | Which page of a table is showing.                                      |
+| `useTableSelection`     | Table   | Holds which rows are selected.                                         |
+| `useTableSort`          | Table   | Holds which columns sort the table, and in what order.                 |
+| `useTypedConfirmation`  | Dialog  | Makes somebody type the name of the thing before they can destroy it.  |
+| `useUploadFiles`        | Upload  | The list, and what happens to it.                                      |
 
 ## Utilities
 

@@ -1,7 +1,8 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DialogSteps } from './DialogSteps';
 import { useSubmitShortcut } from './useSubmitShortcut';
+import { useTypedConfirmation } from './useTypedConfirmation';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -1018,5 +1019,75 @@ describe('size and density', () => {
     ['spacious', 'mdt-gap-6'],
   ] as const)('sets the rhythm between regions at %s', (density, gap) => {
     expect(at({ density })).toContain(gap);
+  });
+});
+
+describe('useTypedConfirmation', () => {
+  const typed = (phrase: string, opts?: { caseSensitive?: boolean }) =>
+    renderHook(() => useTypedConfirmation({ phrase, ...opts }));
+
+  it('refuses until the phrase matches', () => {
+    const { result } = typed('Acme Production');
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme Production' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('forgives a trailing space, because a copied name arrives with one', () => {
+    // Refusing it teaches people the control is broken rather than that they
+    // are wrong.
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: '  Acme Production ' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('ignores case by default', () => {
+    // The job is to make somebody stop and read, not to test their shift key.
+    // Somebody who typed the right name in the wrong case has demonstrably read
+    // it.
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: 'acme production' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('minds it when told to', () => {
+    const { result } = typed('Acme Production', { caseSensitive: true });
+    act(() => {
+      result.current.onChange({ target: { value: 'acme production' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+  });
+
+  it('never confirms on an empty phrase', () => {
+    // A gate that is open before anybody touches it is worse than no gate,
+    // because it looks like one.
+    const { result } = typed('');
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: '   ' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+  });
+
+  it('empties itself, for reopening on the same page', () => {
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme Production' } });
+    });
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.value).toBe('');
+    expect(result.current.confirmed).toBe(false);
   });
 });

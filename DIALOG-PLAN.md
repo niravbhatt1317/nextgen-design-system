@@ -86,10 +86,20 @@ The thing that varies is not size or content — it is **how much structure the 
 One decision. ~440px, never scrolls, no tabs. Symmetric footer, affirmative on the right.
 
 - [x] **The base** ✅ `Destructive` is it — `sm`, no scroll, symmetric footer, no ⏎ chip.
-- [ ] **Consequence callout** — a list of what is about to be destroyed. **Unblocked:** `Callout`
-      now exists and its `danger` tone with a list is exactly this. Wants a Prompt story showing it.
-- [ ] **Typed confirmation** — "type DELETE to confirm", primary stays disabled until it matches.
-      The only genuinely new behaviour left in this pattern.
+- [x] **Consequence callout** ✅ A `danger` `Callout` holding a list. A list, not prose — _"3
+      members, 12 files, every API key"_ is countable where _"this will delete your data"_ is not.
+- [x] **Typed confirmation** ✅ `useTypedConfirmation`. **The thing's own name, not the word
+      `DELETE`** — a name has to be read off the screen and copied deliberately, where `DELETE` is
+      the same five letters on every dialog anybody has seen and gets typed from memory without
+      looking at what it is about to destroy.
+
+      Trims, and ignores case unless told otherwise: a name copied off the screen arrives with a
+      trailing space often enough that refusing it teaches people the control is broken rather than
+      that they are wrong. Never confirms on an empty phrase — a gate that is open before anybody
+      touches it is worse than no gate, because it looks like one.
+
+      A speed bump, not a security control, and the ⏎ chip stays off for the same reason a
+      keyboard path is muscle memory.
 
 _Reference: Wise, Delete connection._
 
@@ -265,6 +275,46 @@ Settled with the design owner on 2 August 2026.
 
 **Reused, confirmed by searching:** `Radio` already has a `card` variant for the auth-method cards,
 and `Button` already has `loading`.
+
+## What is left — Dialog is otherwise closed
+
+Everything above is built. Three things remain, and they are not the same kind of thing.
+
+### One pattern, unbuilt
+
+- [ ] **Workspace · 4 of 12 references.** The dialog becomes a surface: near-full-screen, owns its
+      own navigation, and usually **no footer** — choosing _is_ the action. It needs a base (full
+      size, no footer, close floating over content), an **aside**, and a **filter bar** above a
+      grid. It is the last real _shape_, and it is the one that will tell us whether `LeftNav` and
+      `Dialog` actually compose — a finding about the parts, not just about Dialog.
+
+      _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config._
+
+### Two compositions, both waiting on Workspace
+
+- [ ] **Split — information one side, image the other.** The open question is whether it is a Panel
+      with a media slot or a genuine two-column body. `DialogMedia` shipping makes that answerable
+      by trying it rather than arguing it.
+- [ ] **Left nav, right content.** Workspace + aside, the Notion Preferences shape. Cannot be
+      attempted before Workspace exists.
+
+### Three that are not Dialog's, but Dialog is what found them
+
+- [ ] **A duration chip row.** `ToggleGroup` exists but draws a muted track where the product uses
+      white chips with a dark selected state and a tick. Probably one more variant, not a component.
+- [ ] **The two-line label** — a small muted label above a darker instruction, four times in the
+      references. Belongs to the form components.
+- [ ] **Whole-dialog states.** _Generating credential…_ has no header, no footer and no close: the
+      dialog becomes the state. A recipe rather than a prop, probably.
+
+### Two decisions, no code
+
+- [ ] **Whether the close button ever moves into the header row** rather than floating over the
+      content. Both appear in the references and the choice is not arbitrary.
+- [ ] **`CommandDialog` is not a dialog** — no portal, no focus trap, no escape, no overlay
+      dismiss. Logged in `PLAN.md` and deliberately out of scope here.
+
+---
 
 ## Not yet decided
 

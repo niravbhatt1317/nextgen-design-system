@@ -8,6 +8,7 @@ import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
 import { useSubmitShortcut } from './useSubmitShortcut';
+import { useTypedConfirmation } from './useTypedConfirmation';
 import {
   Dialog,
   DialogBody,
@@ -760,6 +761,86 @@ export const Panel: Story = {
                 }}
               >
                 Add field
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * **Prompt — one decision, and the two things that make a destructive one safe.**
+ *
+ * A `Callout` lists what is about to go. Not prose: a list is countable, and
+ * *"3 members, 12 files, every API key"* is a different sentence from *"this
+ * will delete your data"*.
+ *
+ * Then `useTypedConfirmation` makes you type the workspace's own name. **Its
+ * name, not the word DELETE** — a name has to be read off the screen and copied
+ * deliberately, where `DELETE` is the same five letters on every dialog anybody
+ * has ever seen and gets typed from memory without looking at what it is about
+ * to destroy.
+ *
+ * It is a speed bump, not a security control. Anybody determined will be past
+ * it in two seconds, and that is fine: the job is to turn an automatic click
+ * into a deliberate one.
+ *
+ * **No ⏎ chip and no `useSubmitShortcut`**, deliberately and for the same
+ * reason — a keyboard path *is* muscle memory, and this dialog exists to
+ * interrupt it.
+ */
+export const Prompt: Story = {
+  render: function PromptDemo() {
+    const [open, setOpen] = useState(false);
+    const workspace = 'Acme Production';
+    const confirm = useTypedConfirmation({ phrase: workspace });
+
+    const close = () => {
+      setOpen(false);
+      confirm.reset();
+    };
+
+    return (
+      <>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Delete workspace
+        </Button>
+        <Dialog open={open} onOpenChange={close}>
+          <DialogContent size="sm">
+            <DialogHeader>
+              <DialogTitle>Delete {workspace}?</DialogTitle>
+              <DialogDescription>This cannot be undone.</DialogDescription>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
+              <Callout tone="danger" size="sm">
+                Deleting it removes:
+                <ul className="mdt-mt-1.5 mdt-list-disc mdt-space-y-0.5 mdt-pl-4">
+                  <li>3 members, immediately</li>
+                  <li>12 files, permanently</li>
+                  <li>Every API key issued to this workspace</li>
+                </ul>
+              </Callout>
+              <Input
+                label={`Type ${workspace} to confirm`}
+                value={confirm.value}
+                onChange={confirm.onChange}
+                placeholder={workspace}
+                autoComplete="off"
+              />
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="outline" onClick={close}>
+                Cancel
+              </Button>
+              <Button variant="destructive" disabled={!confirm.confirmed} onClick={close}>
+                Delete workspace
               </Button>
             </DialogFooter>
           </DialogContent>

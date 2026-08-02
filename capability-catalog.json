@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 867,
+  "capabilityCount": 870,
   "counts": {
-    "story": 634,
+    "story": 636,
     "component": 196,
     "utility": 16,
-    "hook": 21
+    "hook": 22
   },
   "capabilities": [
     {
@@ -3043,6 +3043,16 @@
       "propDocs": ""
     },
     {
+      "name": "FooterRule",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / FooterRule",
+      "doc": "Components/Dialog FooterRule",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Form",
       "kind": "component",
       "file": "src/components/Form/Form.tsx",
@@ -5390,6 +5400,16 @@
       "propDocs": ""
     },
     {
+      "name": "Prompt",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Prompt",
+      "doc": "Components/Dialog Prompt",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "RadioGroup",
       "kind": "component",
       "file": "src/components/Radio/Radio.tsx",
@@ -7701,16 +7721,6 @@
       "propDocs": ""
     },
     {
-      "name": "useDialogFooterPull",
-      "kind": "hook",
-      "file": "src/components/Dialog/dialogSpacing.ts",
-      "area": "Dialog",
-      "summary": "The pull that puts the footer's rule on the body's clipping edge.",
-      "doc": "The pull that puts the footer's rule on the body's clipping edge.",
-      "props": [],
-      "propDocs": ""
-    },
-    {
       "name": "useDialogFooterTop",
       "kind": "hook",
       "file": "src/components/Dialog/dialogSpacing.ts",
@@ -7727,6 +7737,16 @@
       "area": "Dialog",
       "summary": "The left and right padding every region in this dialog shares.",
       "doc": "The left and right padding every region in this dialog shares.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogScrollerPull",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The pull that puts the footer's rule on the body's clipping edge.",
+      "doc": "The pull that puts the footer's rule on the body's clipping edge. Applied by the **content**, to whatever directly follows the scroller, rather than by the footer to itself. The footer cannot know what is above it, and a pull it applies unconditionally collapses the gap on a dialog that has no scrolling body at all - measured at 0px between a description and the rule, with the two touching.",
       "props": [],
       "propDocs": ""
     },
@@ -7877,6 +7897,16 @@
       "area": "Table",
       "summary": "Holds which columns sort the table, and in what order.",
       "doc": "Holds which columns sort the table, and in what order. Like the rest of Table it **holds state and never touches your rows**. It reports that the user wants status ascending then date descending; whether that happens in memory or in a database query is the product's business, and a table backed by a paged API could not use it any other way. ```tsx const sort = useTableSort<ColumnKey>(); <TableHead sortable sortOrder={sort.directionOf('status')} onSort={() => { sort.toggle('status'); }} > Status </TableHead> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTypedConfirmation",
+      "kind": "hook",
+      "file": "src/components/Dialog/useTypedConfirmation.ts",
+      "area": "Dialog",
+      "summary": "Makes somebody type the name of the thing before they can destroy it.",
+      "doc": "Makes somebody type the name of the thing before they can destroy it. **A speed bump, not a security control.** Anybody who wants to get past it will, in two seconds. That is fine and is the point: it is there to convert an automatic click into a deliberate one, by making the hand stop and the eyes go back and read what is about to happen. **Trims, and ignores case by default.** A name copied off the screen arrives with a trailing space often enough that refusing it teaches people the control is broken rather than that they are wrong. Pair it with a `Callout` listing what is about to go, and leave the ⏎ chip and `useSubmitShortcut` off the button - the whole point is that this cannot be done by muscle memory, and a keyboard path is muscle memory. ```tsx const confirm = useTypedConfirmation({ phrase: workspace.name }); <Input label={`Type ${workspace.name} to confirm`} value={confirm.value} onChange={confirm.onChange} /> <Button variant=\"destructive\" disabled={!confirm.confirmed} onClick={destroy}> Delete workspace </Button> ```",
       "props": [],
       "propDocs": ""
     },

@@ -157,6 +157,7 @@ export {
   DialogTitle,
   DialogDescription,
   useSubmitShortcut,
+  useTypedConfirmation,
   DialogSteps,
 } from './Dialog';
 export type {
