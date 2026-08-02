@@ -34,11 +34,20 @@ a banner is full width at the top of a page and often dismissible, a callout is 
 and usually is not. Same tones, different placement and different lifetime. It should be built on
 the same `feedback-tones` table when it is.
 
-**Worth a decision, not changed here:** the dark-mode feedback fills are far more saturated than
-the light ones — `blue-90`, `red-90`, `orange-90` against `blue-05`, `red-10`, `yellow-10`. On a
-toast that is a small floating card and it reads fine; on a callout the size of a paragraph it is
-a much larger area of colour. Inherited from `Toast` rather than introduced, so changing it would
-change both.
+**The tints came down, in both themes, at the design owner's direction.** Light: every fill is now
+its ramp's `05` step, where four of six had been sitting at `10` while `info` sat at `05` — which
+is why `info` looked right and the rest looked heavy. Dark: the tone left the fill entirely. Every
+dark fill is `neutral-140` and the border and the icon carry the tone, which is the set's own rule
+(_"only icon and border carry the tone"_) taken to its conclusion.
+
+That was not a free choice — the ramps have no low-saturation dark step. The `90` steps were
+17–20% lightness at up to 100% saturation against a 10% page, and the `100` steps below them are
+9–10%, level with the page or darker than it. A fill darker than the page reads as a hole, which
+this codebase already shipped once in the dark CodeWell. **A per-hue dark surface tint is a genuine
+gap in the palette** — worth adding if a future component needs the fill itself to carry a hue in
+dark mode.
+
+Both changes move `Toast` too, since the two share the table. Rendered and checked in both.
 
 ## Kbd — built, and three callers still to migrate
 

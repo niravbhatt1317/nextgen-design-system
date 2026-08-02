@@ -110,7 +110,9 @@ softer than the label" is therefore a different direction on each side, which is
 exists so a component can ask for _"the danger tint"_ rather than _"red 10"_ — but it is the same
 red 10 a Badge uses.
 
-**Toast and Banner only.** A button or a badge still reaches for `--mdt-success` and friends.
+**`Toast` and `Callout`.** A button or a badge still reaches for `--mdt-success` and friends. The
+two share the table through `src/utils/feedback-tones.ts`, so a seventh tone is one edit rather
+than two that drift.
 
 **The rule that makes the set work,** borrowed from Org Mgmt's banner: the text stays one colour in
 every tone, and only the icon and the border carry it. That rule is what makes six tones read as a
@@ -119,11 +121,20 @@ family — not the particular colours.
 | Tone    | Background   | Border       | Icon          |
 | ------- | ------------ | ------------ | ------------- |
 | info    | `blue-05`    | `blue-20`    | `blue-60`     |
-| warning | `yellow-10`  | `orange-20`  | `orange-80`   |
-| danger  | `red-10`     | `red-20`     | `red-70`      |
-| success | `green-10`   | `green-20`   | `green-70`    |
-| ai      | `purple-10`  | `purple-20`  | `purple-80`   |
+| warning | `yellow-05`  | `orange-20`  | `orange-80`   |
+| danger  | `red-05`     | `red-20`     | `red-70`      |
+| success | `green-05`   | `green-20`   | `green-70`    |
+| ai      | `purple-05`  | `purple-20`  | `purple-80`   |
 | neutral | `neutral-10` | `neutral-30` | `neutral-130` |
+
+**Every fill is the `05` step**, except neutral where `neutral-10` is the lightest there is. It was
+not always so: four of them sat at `10` while `info` sat at `05`, which is why `info` looked right
+and the other four looked heavy. `success` was the worst of it — `green-10` is 89% lightness where
+the rest of the row is 95–98%, so one tone in six was visibly a block of colour while the others
+were a tint.
+
+They are backgrounds behind body text. A fill has one job here, which is to say _"this is a
+group"_; the icon and the border are what say which group.
 
 Plus two shared: `--mdt-feedback-title` (`neutral-150`) and `--mdt-feedback-text` (`neutral-130`).
 

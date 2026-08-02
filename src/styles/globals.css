@@ -230,19 +230,19 @@
     --mdt-feedback-info-border: var(--mdt-blue-20);
     --mdt-feedback-info-icon: var(--mdt-blue-60);
 
-    --mdt-feedback-warning-bg: var(--mdt-yellow-10);
+    --mdt-feedback-warning-bg: var(--mdt-yellow-05);
     --mdt-feedback-warning-border: var(--mdt-orange-20);
     --mdt-feedback-warning-icon: var(--mdt-orange-80);
 
-    --mdt-feedback-danger-bg: var(--mdt-red-10);
+    --mdt-feedback-danger-bg: var(--mdt-red-05);
     --mdt-feedback-danger-border: var(--mdt-red-20);
     --mdt-feedback-danger-icon: var(--mdt-red-70);
 
-    --mdt-feedback-success-bg: var(--mdt-green-10);
+    --mdt-feedback-success-bg: var(--mdt-green-05);
     --mdt-feedback-success-border: var(--mdt-green-20);
     --mdt-feedback-success-icon: var(--mdt-green-70);
 
-    --mdt-feedback-ai-bg: var(--mdt-purple-10);
+    --mdt-feedback-ai-bg: var(--mdt-purple-05);
     --mdt-feedback-ai-border: var(--mdt-purple-20);
     --mdt-feedback-ai-icon: var(--mdt-purple-80);
 
@@ -382,23 +382,44 @@
        a dark toast and a dark badge belong to each other even though the light
        ones came from different places.
        ============================================ */
-    --mdt-feedback-info-bg: var(--mdt-blue-90);
+    /* Dark mode carries the tone in the border and the icon, and not in the
+       fill at all.
+
+       That is Org Mgmt's own rule taken to its conclusion rather than a new
+       idea: "only icon and border carry the tone". In light mode a 97% tint is
+       quiet enough to hold a hue as well. In dark mode it is not - the ramps
+       have no low-saturation dark step, so the only coloured fills available
+       were `blue-90` and friends at 17-20% lightness and up to 100%
+       saturation, against a 10% page. Six of those read as six blocks of
+       colour rather than as six tints.
+
+       The steps below them do not work either, and it is worth writing down
+       why: `blue-100`, `orange-100` and `yellow-100` are all 10% lightness -
+       exactly the page - and `green-100` is 9%, darker than it. A fill darker
+       than the page it sits on reads as a hole, which this codebase has
+       already shipped once in the dark CodeWell.
+
+       So every fill is `neutral-140`, the same lift off the page the neutral
+       tone always had, and the border and the icon do the work. Both are
+       clearly coloured - a `70` step and a `30` step - so the tones stay
+       apart. */
+    --mdt-feedback-info-bg: var(--mdt-neutral-140);
     --mdt-feedback-info-border: var(--mdt-blue-70);
     --mdt-feedback-info-icon: var(--mdt-blue-30);
 
-    --mdt-feedback-warning-bg: var(--mdt-orange-90);
+    --mdt-feedback-warning-bg: var(--mdt-neutral-140);
     --mdt-feedback-warning-border: var(--mdt-orange-70);
     --mdt-feedback-warning-icon: var(--mdt-orange-30);
 
-    --mdt-feedback-danger-bg: var(--mdt-red-90);
+    --mdt-feedback-danger-bg: var(--mdt-neutral-140);
     --mdt-feedback-danger-border: var(--mdt-red-70);
     --mdt-feedback-danger-icon: var(--mdt-red-30);
 
-    --mdt-feedback-success-bg: var(--mdt-green-90);
+    --mdt-feedback-success-bg: var(--mdt-neutral-140);
     --mdt-feedback-success-border: var(--mdt-green-70);
     --mdt-feedback-success-icon: var(--mdt-green-30);
 
-    --mdt-feedback-ai-bg: var(--mdt-purple-100);
+    --mdt-feedback-ai-bg: var(--mdt-neutral-140);
     --mdt-feedback-ai-border: var(--mdt-purple-80);
     --mdt-feedback-ai-icon: var(--mdt-purple-30);
 

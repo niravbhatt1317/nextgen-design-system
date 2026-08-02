@@ -91,14 +91,14 @@ export const WhatItIsFor: Story = {
           stacked label above every field turns four short settings into a
           form, which is not what a grouped block is for.
         */}
-        <div className="mdt-mt-2 mdt-flex mdt-flex-col mdt-divide-y mdt-divide-border">
+        <div className="mdt-mt-2 mdt-flex mdt-flex-col mdt-gap-2">
           {[
             { name: 'Maximum seats', value: '50' },
             { name: 'Session length', value: '8 hours' },
           ].map((setting) => (
             <div
               key={setting.name}
-              className="mdt-flex mdt-items-center mdt-justify-between mdt-gap-4 mdt-py-2 first:mdt-pt-0 last:mdt-pb-0"
+              className="mdt-flex mdt-items-center mdt-justify-between mdt-gap-4"
             >
               <span>{setting.name}</span>
               <Input
