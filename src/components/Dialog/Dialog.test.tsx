@@ -865,6 +865,16 @@ describe('the Panel slots', () => {
     expect(media?.className).toContain('mdt-shrink-0');
   });
 
+  it('takes the top inset off whatever follows it', () => {
+    // A header directly under a picture is not the top of the dialog, so it
+    // does not want the padding that says it is. Measured at 32 from the image
+    // to the title before this - the content's gap plus a top inset for a top
+    // the header was no longer at.
+    panel();
+    expect(screen.getByRole('dialog').className).toContain('[&>[data-dialog-media]+*]:mdt-pt-0');
+    expect(screen.getByRole('dialog').firstElementChild).toHaveAttribute('data-dialog-media');
+  });
+
   it('rounds the media to match the card it fills, and stays square on a phone', () => {
     panel();
     const media = screen.getByRole('dialog').firstElementChild;

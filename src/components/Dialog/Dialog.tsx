@@ -304,6 +304,11 @@ const DialogContent = forwardRef<
                     // them has to scroll: a flex child can be told to take the
                     // leftover height and no more.
                     'mdt-relative mdt-flex mdt-w-full mdt-flex-col',
+                    // A header directly under a picture is not the top of the
+                    // dialog, so it does not want the padding that says it is.
+                    // Left on, the title sat 32 from the image - the content's
+                    // own gap plus a top inset for a top it was no longer at.
+                    '[&>[data-dialog-media]+*]:mdt-pt-0',
                     dialogContentVariants({ size, density }),
                     scrolls === 'body' && ['mdt-max-h-full mdt-overflow-hidden', scrollerPull],
                     // Full-bleed on a phone, a card above that. Corners and a
@@ -387,6 +392,9 @@ DialogContent.displayName = 'DialogContent';
 const DialogMedia = forwardRef<HTMLDivElement, DialogMediaProps>(({ className, ...props }, ref) => (
   <div
     ref={ref}
+    // What the content's rule looks for, so whatever follows a picture drops
+    // the padding meant for the top of the dialog.
+    data-dialog-media=""
     className={cn(
       'mdt-shrink-0 mdt-overflow-hidden',
       // Matches `DialogContent`'s own corners, and stays square on a phone
