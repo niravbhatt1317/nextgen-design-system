@@ -143,270 +143,58 @@ export const Default: Story = {
 };
 
 /**
- * Dialog with a form inside.
+ * `modal` decides whether the page behind is still there.
+ *
+ * **`modal` (the default): the page is out of reach.** Focus is trapped, Tab
+ * cannot leave, and the overlay dims and blocks everything under it. That is
+ * what a dialog is for — one thing at a time.
+ *
+ * **`modal={false}`: the page keeps working.** No overlay, no focus trap, Tab
+ * walks straight out into the content behind. For a panel somebody consults
+ * while carrying on — picking a value out of a list they can still scroll.
+ *
+ * Toggle it and try tabbing out of the dialog into the two buttons behind it.
+ * There were two stories for this prop; one that lets you feel the difference
+ * beats two that describe it.
  */
-export const WithForm: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Edit Profile</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:mdt-max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <div className="mdt-grid mdt-gap-4 mdt-py-4">
-            <Input label="Name" defaultValue="John Doe" />
-            <Input label="Username" defaultValue="@johndoe" />
-            <Input label="Email" type="email" defaultValue="john@example.com" />
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button type="submit">Save Changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-};
-
-/**
- * Confirmation dialog for destructive actions.
- */
-export const Confirmation: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="destructive">Delete Account</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your account and remove your
-            data from our servers.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="mdt-gap-2">
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button variant="destructive">Yes, delete my account</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-};
-
-/**
- * Dialog without close button.
- */
-export const NoCloseButton: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
-      </DialogTrigger>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle>Terms and Conditions</DialogTitle>
-          <DialogDescription>Please read and accept our terms to continue.</DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <div className="mdt-max-h-[200px] mdt-overflow-y-auto mdt-py-4">
-            <p className="mdt-text-sm mdt-text-muted-foreground">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Decline</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button>Accept</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-};
-
-/**
- * Controlled dialog with external state management.
- */
-export const Controlled: Story = {
-  render: function ControlledDialog() {
-    const [open, setOpen] = useState(false);
+export const Modal: Story = {
+  args: { modal: true },
+  render: function ModalDemo(args) {
+    const isModal = args.modal ?? true;
 
     return (
       <div className="mdt-flex mdt-flex-col mdt-gap-4">
-        <div className="mdt-text-sm mdt-text-muted-foreground">
-          Dialog is: {open ? 'Open' : 'Closed'}
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>Open Controlled Dialog</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Controlled Dialog</DialogTitle>
-              <DialogDescription>This dialog state is controlled externally.</DialogDescription>
-            </DialogHeader>
-            <DialogBody>
-              <div className="mdt-py-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                >
-                  Close via state
-                </Button>
-              </div>
-            </DialogBody>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  },
-};
-
-/**
- * Interactive story to test modal prop.
- * Toggle the `modal` control to see the difference between modal and non-modal behavior.
- *
- * - **modal=true**: Focus trapped, dark overlay, background blocked
- * - **modal=false**: Can Tab out, no overlay, background interactive
- */
-export const InteractiveModal: Story = {
-  args: {
-    modal: true,
-  },
-  render: function InteractiveModalDialog(args) {
-    return (
-      <div className="mdt-space-y-4">
-        <div className="mdt-rounded mdt-border mdt-p-4">
-          <h3 className="mdt-font-semibold">Test Area</h3>
-          <p className="mdt-text-sm mdt-text-muted-foreground">
-            This is background content. When modal=false, you can interact with these elements while
-            the dialog is open.
+        <div className="mdt-flex mdt-flex-col mdt-gap-2 mdt-rounded-md mdt-border mdt-border-border mdt-p-3">
+          <p className="mdt-text-xs mdt-text-muted-foreground">
+            The page behind. Reachable by Tab only when `modal` is false.
           </p>
-          <div className="mdt-mt-2 mdt-space-x-2">
+          <div className="mdt-flex mdt-gap-2">
             <Button size="sm" variant="outline">
-              Background Button 1
+              Behind one
             </Button>
             <Button size="sm" variant="outline">
-              Background Button 2
+              Behind two
             </Button>
           </div>
         </div>
 
-        <Dialog modal={args.modal ?? true}>
+        <Dialog modal={isModal}>
           <DialogTrigger asChild>
-            <Button>Open Dialog (modal={String(args.modal)})</Button>
+            <Button>Open, modal={String(isModal)}</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Dialog with modal={String(args.modal)}</DialogTitle>
+              <DialogTitle>
+                {isModal ? 'The page is out of reach' : 'The page still works'}
+              </DialogTitle>
               <DialogDescription>
-                {args.modal
-                  ? 'Modal is TRUE: Focus is trapped. Try pressing Tab - you cannot reach the background buttons. Click outside to close.'
-                  : 'Modal is FALSE: Focus is not trapped. Try pressing Tab - you can reach the background buttons! Background is fully interactive.'}
+                {isModal
+                  ? 'Focus is trapped and the overlay blocks what is behind. Tab cannot leave.'
+                  : 'No overlay and no trap. Tab from the field below and you land on the buttons behind.'}
               </DialogDescription>
             </DialogHeader>
             <DialogBody>
-              <div className="mdt-space-y-4 mdt-py-4">
-                <p className="mdt-text-sm">
-                  {args.modal
-                    ? '✓ Focus trapped inside dialog\n✓ Dark overlay blocks background\n✓ Esc key closes dialog\n✓ Click overlay to close'
-                    : '✓ Can Tab to background elements\n✓ No dark overlay\n✓ Background remains interactive\n✓ Dialog floats above content'}
-                </p>
-                <Input label="Test Input" placeholder="Try tabbing from here..." />
-              </div>
-            </DialogBody>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button>Close</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <p className="mdt-text-xs mdt-text-muted-foreground">
-          💡 Tip: Toggle the &quot;modal&quot; control in the Controls panel to see the difference!
-        </p>
-      </div>
-    );
-  },
-};
-
-/**
- * Modal vs Non-Modal Dialog comparison.
- *
- * - **Modal (default)**: Traps focus, blocks background interaction, shows overlay
- * - **Non-Modal**: Allows background interaction, no focus trap, no dark overlay
- */
-export const ModalComparison: Story = {
-  render: function ModalComparisonDialog() {
-    return (
-      <div className="mdt-flex mdt-gap-4">
-        {/* Modal Dialog */}
-        <Dialog modal={true}>
-          <DialogTrigger asChild>
-            <Button>Open Modal Dialog</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modal Dialog (modal=true)</DialogTitle>
-              <DialogDescription>
-                This dialog traps focus. You cannot interact with the background or Tab out of this
-                dialog. Notice the dark overlay blocking the page behind.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogBody>
-              <div className="mdt-py-4">
-                <p className="mdt-text-sm">
-                  Try pressing Tab - focus stays within the dialog. Background is not clickable.
-                </p>
-              </div>
-            </DialogBody>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button>Close</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Non-Modal Dialog */}
-        <Dialog modal={false}>
-          <DialogTrigger asChild>
-            <Button variant="secondary">Open Non-Modal Dialog</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Non-Modal Dialog (modal=false)</DialogTitle>
-              <DialogDescription>
-                This dialog does NOT trap focus. You can Tab out and interact with the background
-                page. Notice there's no dark overlay - background remains visible and interactive.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogBody>
-              <div className="mdt-py-4">
-                <p className="mdt-text-sm">
-                  Try pressing Tab - focus can move to the background. You can click outside this
-                  dialog.
-                </p>
-              </div>
+              <Input label="Try tabbing from here" placeholder="Then press Tab twice…" />
             </DialogBody>
             <DialogFooter>
               <DialogClose asChild>
@@ -418,126 +206,6 @@ export const ModalComparison: Story = {
       </div>
     );
   },
-};
-
-/**
- * Dialog with scrollable content.
- */
-export const ScrollableContent: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>View Long Content</Button>
-      </DialogTrigger>
-      <DialogContent className="mdt-max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>Privacy Policy</DialogTitle>
-          <DialogDescription>Last updated: January 2024</DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <div className="mdt-max-h-[400px] mdt-overflow-y-auto mdt-pr-4">
-            {Array.from({ length: 10 }, (_, i) => (
-              <div key={i} className="mdt-mb-4">
-                <h4 className="mdt-font-semibold">Section {i + 1}</h4>
-                <p className="mdt-text-sm mdt-text-muted-foreground">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                  exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-              </div>
-            ))}
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button>I understand</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-};
-
-/**
- * Nested dialogs example.
- */
-export const NestedDialogs: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Open First Dialog</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>First Dialog</DialogTitle>
-          <DialogDescription>This dialog contains another dialog.</DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <div className="mdt-py-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="secondary">Open Nested Dialog</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Nested Dialog</DialogTitle>
-                  <DialogDescription>This is a nested dialog.</DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button>Close</Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Close</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-};
-
-/**
- * Custom width dialog.
- */
-export const CustomWidth: Story = {
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Open Wide Dialog</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:mdt-max-w-[800px]">
-        <DialogHeader>
-          <DialogTitle>Wide Dialog</DialogTitle>
-          <DialogDescription>This dialog has a custom maximum width of 800px.</DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <div className="mdt-grid mdt-grid-cols-2 mdt-gap-4 mdt-py-4">
-            <div className="mdt-rounded mdt-border mdt-p-4">
-              <h4 className="mdt-font-semibold">Column 1</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">Content for the first column.</p>
-            </div>
-            <div className="mdt-rounded mdt-border mdt-p-4">
-              <h4 className="mdt-font-semibold">Column 2</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">
-                Content for the second column.
-              </p>
-            </div>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button>Close</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
 };
 
 /**
