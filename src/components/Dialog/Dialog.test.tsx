@@ -768,11 +768,12 @@ describe('DialogSubmitHint', () => {
     expect(container.firstElementChild?.className).toContain('-mdt-mr-1');
   });
 
-  it('is outlined rather than filled', () => {
-    // A filled chip reads as a second, smaller button inside the first - two
-    // things to press where there is one.
+  it('names its fill as well as its rule, so either can be dropped', () => {
+    // Under review: the fill was added to see it, and the two are separate
+    // named tokens so one can be switched off in the inspector without
+    // touching the other.
     const { container } = render(<DialogSubmitHint />);
-    expect(container.firstElementChild?.className).not.toContain('mdt-bg-current');
+    expect(container.firstElementChild?.className).toContain('mdt-bg-primary-inset');
   });
 });
 

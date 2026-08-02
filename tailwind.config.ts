@@ -38,6 +38,7 @@ const config: Config = {
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
           'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
           'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
+          inset: 'hsl(var(--mdt-primary-inset) / <alpha-value>)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--mdt-secondary) / <alpha-value>)',

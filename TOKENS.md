@@ -82,6 +82,7 @@ softer than the label" is therefore a different direction on each side, which is
 | `--mdt-primary-foreground`        | `mdt-text-primary-foreground`          | `white`       | `black`       |
 | `--mdt-primary-foreground-muted`  | `mdt-text-primary-foreground-muted`    | `neutral-30`  | `neutral-130` |
 | `--mdt-primary-foreground-subtle` | `mdt-border-primary-foreground-subtle` | `neutral-100` | `neutral-50`  |
+| `--mdt-primary-inset`             | `mdt-bg-primary-inset`                 | `neutral-80`  | `neutral-30`  |
 | `--mdt-secondary`                 | `mdt-bg-secondary`                     | `neutral-20`  | `neutral-130` |
 | `--mdt-secondary-foreground`      | `mdt-text-secondary-foreground`        | `black`       | `neutral-10`  |
 | `--mdt-accent`                    | `mdt-bg-accent`                        | `blue-10`     | `blue-90`     |
