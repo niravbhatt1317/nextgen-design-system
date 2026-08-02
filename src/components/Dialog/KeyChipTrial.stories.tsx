@@ -82,7 +82,10 @@ const Divided = ({ keys }: { keys: Key[] }) => (
       {keys.map((key, i) => (
         <span key={key.id} className="mdt-inline-flex mdt-items-center">
           {i > 0 && (
-            <span className="mdt-my-1 mdt-w-px mdt-self-stretch mdt-bg-primary-foreground-subtle" />
+            // 12 tall in a 20 chip: 4px of inset top and bottom, stated rather
+            // than stretched. `self-stretch` measured 1x0 - it stretches to the
+            // row's own height, and the row is only as tall as a 12px icon.
+            <span className="mdt-h-3 mdt-w-px mdt-bg-primary-foreground-subtle" />
           )}
           <span className="mdt-inline-flex mdt-w-5 mdt-justify-center">{key.glyph}</span>
         </span>
