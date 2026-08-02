@@ -25,3 +25,15 @@ export type {
 
 export { useSubmitShortcut } from './useSubmitShortcut';
 export type { UseSubmitShortcutOptions } from './useSubmitShortcut';
+
+export { DialogSteps } from './DialogSteps';
+export { DialogSubmitHint } from './DialogSubmitHint';
+export type {
+  DialogSize,
+  DialogDensity,
+  DialogFooterAlign,
+  DialogCloseReason,
+  DialogStep,
+  DialogStepsProps,
+  DialogSubmitHintProps,
+} from './Dialog.types';

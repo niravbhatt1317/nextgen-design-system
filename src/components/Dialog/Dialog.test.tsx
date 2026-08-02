@@ -1,5 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { DialogSteps } from './DialogSteps';
+import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 
 import { render, screen, waitFor } from '@testing-library/react';
@@ -527,5 +529,133 @@ describe('useSubmitShortcut', () => {
     unmount();
     press({ key: 'Enter', metaKey: true });
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
+
+describe('DialogSteps', () => {
+  const steps = [
+    { key: 'details', label: 'Invite details' },
+    { key: 'access', label: 'Access duration' },
+    { key: 'roles', label: 'Assign roles' },
+  ];
+
+  it('ticks what is done, numbers what is not', () => {
+    const { container } = render(<DialogSteps steps={steps} current={1} />);
+    // A finished step shows a tick rather than its number: the number is only
+    // useful before you arrive, and afterwards the useful thing is that it is
+    // done.
+    expect(container.querySelector('[name="check"]')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.queryByText('1')).not.toBeInTheDocument();
+  });
+
+  it('says which one you are on', () => {
+    render(<DialogSteps steps={steps} current={1} />);
+    const here = screen.getByText('Access duration').closest('li');
+    expect(here).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByText('Invite details').closest('li')).not.toHaveAttribute('aria-current');
+  });
+
+  it('lets you go back but not forward', async () => {
+    const user = userEvent.setup();
+    const onStepSelect = vi.fn();
+    render(<DialogSteps steps={steps} current={1} onStepSelect={onStepSelect} />);
+
+    await user.click(screen.getByText('Invite details'));
+    expect(onStepSelect).toHaveBeenCalledWith('details', 0);
+
+    // Jumping ahead to a step whose inputs depend on one you have not filled in
+    // is how a form ends up half-complete in an order nobody designed for.
+    await user.click(screen.getByText('Assign roles'));
+    expect(onStepSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it('is inert without a handler', () => {
+    render(<DialogSteps steps={steps} current={2} />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('names itself for a screen reader', () => {
+    render(<DialogSteps steps={steps} current={0} label="Invite progress" />);
+    expect(screen.getByRole('list', { name: 'Invite progress' })).toBeInTheDocument();
+  });
+});
+
+describe('DialogFooter', () => {
+  it('draws the rule above it, because the product always has one', () => {
+    const { container } = render(<DialogFooter>ok</DialogFooter>);
+    const footer = container.firstElementChild;
+    // The footer is the only part separated by a line - the header flows into
+    // the body without one. A line above the buttons says "the reading is over".
+    expect(footer?.className).toContain('mdt-border-t');
+    // And it breaks out of the dialog's padding, so the rule reaches both edges
+    // rather than reading as an underline on the buttons.
+    expect(footer?.className).toContain('-mdt-mx-6');
+  });
+
+  it('can go without', () => {
+    const { container } = render(<DialogFooter divider={false}>ok</DialogFooter>);
+    expect(container.firstElementChild?.className).not.toContain('mdt-border-t');
+  });
+
+  it('pushes the two apart when there is a way back', () => {
+    const { container } = render(<DialogFooter align="between">ok</DialogFooter>);
+    expect(container.firstElementChild?.className).toContain('sm:mdt-justify-between');
+  });
+
+  it('gathers them on the right by default', () => {
+    const { container } = render(<DialogFooter>ok</DialogFooter>);
+    expect(container.firstElementChild?.className).toContain('sm:mdt-justify-end');
+  });
+});
+
+describe('DialogSubmitHint', () => {
+  it('shows the key and stays out of the reading', () => {
+    const { container } = render(<DialogSubmitHint />);
+    const chip = container.firstElementChild;
+    expect(chip).toHaveTextContent('⏎');
+    // Read out, it becomes "Send invite return symbol", which helps nobody.
+    expect(chip).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('takes the colour of whatever it sits in', () => {
+    const { container } = render(<DialogSubmitHint />);
+    // One chip works on the dark primary and on the pale disabled state without
+    // being told which it is on.
+    expect(container.firstElementChild?.className).toContain('mdt-bg-current/15');
+  });
+});
+
+describe('size and density', () => {
+  const at = (props: Record<string, unknown>) => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent {...props}>
+          <DialogTitle>Sized</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+    return screen.getByRole('dialog').getAttribute('class') ?? '';
+  };
+
+  it('defaults to the middle step', () => {
+    expect(at({})).toContain('sm:mdt-max-w-lg');
+  });
+
+  it('takes each of the five', () => {
+    expect(at({ size: 'sm' })).toContain('sm:mdt-max-w-md');
+  });
+
+  it('stretches at full rather than capping', () => {
+    // `self-stretch` beats the centring on the flex parent, so it fills the
+    // height the scroller already has - no viewport calculation needed.
+    const classes = at({ size: 'full' });
+    expect(classes).toContain('mdt-max-w-none');
+    expect(classes).toContain('sm:mdt-self-stretch');
+  });
+
+  it('tightens up when asked', () => {
+    expect(at({ density: 'compact' })).toContain('mdt-p-4');
   });
 });

@@ -122,22 +122,25 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 
 ## 3 · Anatomy decisions
 
-- [ ] **Size scale — five steps.** `sm` 400 · `md` 520 · `lg` 720 · `xl` 960 · `full`. The
+- [x] **Size scale — five steps.** ✅ Measured: `sm` 448 · `md` 512 · `lg` 672 · `xl` 896 ·
+      `full` fills. `full` uses `self-stretch` to beat the centring on the flex parent rather
+      than computing a viewport height. The
       references cluster at roughly 440 / 600 / 720 / 900 / near-full, and five is the fewest that
       covers them without anyone reaching for `className`. Today there is exactly one width,
       `max-w-lg`, and the stories escape it with `sm:max-w-[425px]` and `sm:max-w-[800px]` —
       arbitrary values, which is the tell that the scale is missing.
 
-- [ ] **Footer, three rhythms.** `DialogFooter` can only right-align today, which cannot express
-      the one the modern references use most:
-  - [ ] symmetric — Cancel / Confirm, right-aligned
-  - [ ] **asymmetric** — a quiet link left, the primary right. "Having a problem?", "Get support",
-        "Back … Skip / Next"
-  - [ ] none — Workspace
+- [x] **Footer, three rhythms.** ✅ And the rule above it, which the product has on every dialog
+      and this had on none. It breaks out through the padding so it reaches both edges — inset by
+      24px it reads as an underline on the buttons rather than the seam between reading and
+      deciding. The header deliberately keeps none: that asymmetry is the house style.
+  - [x] symmetric — Cancel / Confirm, right-aligned ✅
+  - [x] **asymmetric** ✅ `align="between"` — a quiet link or a step back on the left, the way
+        forward on the right
+  - [x] none — `divider={false}` ✅
 
-- [ ] **Density, two steps.** `comfortable` (24px, the default) and `compact` (16px). Two, not
-      three: a middle step never gets chosen. Worth confirming against the product screenshots
-      before building.
+- [x] **Density, two steps.** ✅ `comfortable` 24px, `compact` 16px. The product is uniformly
+      generous, so `compact` is there for a dialog that is mostly chrome around one control.
 
 - [ ] **Where the close button lives.** In the header row when there is a header to sit in;
       floating over the content when there is not. Both appear in the references and the choice is
@@ -150,13 +153,46 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 Named in review as things we may want. Each is a _composition_ of the above rather than a new
 component — worth checking that stays true once the product designs arrive.
 
-- [ ] **Wizard / stepper** — Panel + step counter + back control + Back/Skip/Next footer
+- [x] **Wizard / stepper** ✅ `DialogSteps` — the bar under each step is the progress, not a
+      connector between dots. A finished step shows a tick rather than its number, and only
+      finished steps are clickable.
 - [ ] **Tabbed** — Panel + tabs
 - [ ] **Split: information one side, image the other** — is this a Panel with a media slot, or does
       it need a genuine two-column body?
 - [ ] **Left nav, right content** — Workspace + aside. The same shape as Notion Preferences.
 
 ---
+
+## The house style, read from twelve product screens
+
+Settled with the design owner on 2 August 2026.
+
+- **The header has no rule; the footer has one.** That asymmetry is deliberate — a line above the
+  buttons says the reading is over.
+- **Every primary carries a ⏎ chip.** `DialogSubmitHint`. A shortcut nobody knows about is worth
+  nothing, and the button is the only thing anybody is looking at when deciding to press it.
+- **Destructive never gets it.** Confirmed as deliberate: nobody should be able to delete something
+  by muscle memory, and a keyboard path to an irreversible act is exactly that. The rule is written
+  into `DialogSubmitHint`'s own documentation so it travels with the thing it governs.
+- **The ink is the system's** — `foreground` and `primary`, confirmed rather than matched by eye.
+- **Red is reserved entirely for destructive.**
+
+### Still missing, and now concrete
+
+- [ ] **A `Callout` / inset panel.** Five of the twelve screens have one — the grouped "Access
+      limits" block, the credential summary, the rule builder, the pair of auth-method cards. There
+      is no `Callout`, `Alert` or `Banner` in the library at all. `COMPONENT-GAP.md` already lists
+      Banner as 4-of-4; this makes it concrete.
+- [ ] **A duration chip row.** `ToggleGroup` exists but its variants are a muted track, where the
+      product uses white chips with a dark selected state and a tick. Probably one more variant
+      rather than a new component.
+- [ ] **The two-line label** — a small muted label above a darker instruction. Appears four times.
+      Belongs to the form components rather than to `Dialog`.
+- [ ] **Whole-dialog states.** _Generating credential…_ has no header, no footer and no close —
+      the dialog becomes the state. A recipe rather than a prop, probably.
+
+**Reused, confirmed by searching:** `Radio` already has a `card` variant for the auth-method cards,
+and `Button` already has `loading`.
 
 ## Not yet decided
 

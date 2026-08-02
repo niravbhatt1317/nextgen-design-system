@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 767,
+  "capabilityCount": 772,
   "counts": {
-    "story": 563,
-    "component": 182,
+    "story": 566,
+    "component": 184,
     "utility": 9,
     "hook": 13
   },
@@ -2016,6 +2016,16 @@
     {
       "name": "Destructive",
       "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Destructive",
+      "doc": "Components/Dialog Destructive",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Destructive",
+      "kind": "story",
       "file": "src/components/Spinner/Spinner.stories.tsx",
       "area": "Spinner",
       "summary": "Story: Components/Spinner / Destructive",
@@ -2070,8 +2080,8 @@
       "area": "Dialog",
       "summary": "DialogContent - the main content container for the dialog.",
       "doc": "DialogContent - the main content container for the dialog. ```tsx <Dialog> <DialogTrigger asChild> <Button>Open Dialog</Button> </DialogTrigger> <DialogContent> <DialogHeader> <DialogTitle>Dialog Title</DialogTitle> <DialogDescription>Dialog description</DialogDescription> </DialogHeader> <p>Dialog content goes here</p> <DialogFooter> <Button>Action</Button> </DialogFooter> </DialogContent> </Dialog> ```",
-      "props": ["showCloseButton", "blocking", "busy", "onRequestClose"],
-      "propDocs": "Whether to show the close button Nothing dismisses it: no close button, no Escape, no click outside. For the few things that genuinely must be answered - a session that has expired, a plan that has lapsed. Reach for it rarely. A dialog with no way out is the most hostile thing an interface can do, and every use of this is a promise that the content contains the way forward. Work is in flight, so dismissal is refused until it clears. Submitting takes two seconds, and in those two seconds Escape, the close button and a stray click outside would all abandon a request that is already on its way to the server. The button shows `loading`; this stops the dialog going anywhere while it does. Asked before every dismissal. Return `false` to keep the dialog open. Anything other than `false` lets it close, so a handler that only wants to observe can return nothing. Where an unsaved-changes guard lives: return `false` and open a confirmation of your own. The reason says which way it was asked, because \"I pressed Escape\" and \"I clicked outside\" sometimes deserve different answers - the second is often an accident."
+      "props": ["showCloseButton", "blocking", "busy", "onRequestClose", "size", "density"],
+      "propDocs": "Whether to show the close button Nothing dismisses it: no close button, no Escape, no click outside. For the few things that genuinely must be answered - a session that has expired, a plan that has lapsed. Reach for it rarely. A dialog with no way out is the most hostile thing an interface can do, and every use of this is a promise that the content contains the way forward. Work is in flight, so dismissal is refused until it clears. Submitting takes two seconds, and in those two seconds Escape, the close button and a stray click outside would all abandon a request that is already on its way to the server. The button shows `loading`; this stops the dialog going anywhere while it does. Asked before every dismissal. Return `false` to keep the dialog open. Anything other than `false` lets it close, so a handler that only wants to observe can return nothing. Where an unsaved-changes guard lives: return `false` and open a confirmation of your own. The reason says which way it was asked, because \"I pressed Escape\" and \"I clicked outside\" sometimes deserve different answers - the second is often an accident. How wide it is. `sm` a single decision · `md` the default · `lg` a form · `xl` som"
     },
     {
       "name": "DialogDescription",
@@ -2090,8 +2100,8 @@
       "area": "Dialog",
       "summary": "DialogFooter - container for action buttons.",
       "doc": "DialogFooter - container for action buttons.",
-      "props": ["children"],
-      "propDocs": ""
+      "props": ["children", "align", "divider"],
+      "propDocs": "How the footer arranges what is in it. `end` puts everything on the right - Cancel then the primary, the rhythm of a decision. `between` pushes the first child to the left and the rest to the right, which is what a step back, a support link or a \"having a problem?\" wants: quiet on one side, the way forward on the other. Draws the rule above it. On by default, because the product always has one. The footer is the only part of a dialog that is separated by a line - the header flows into the body without one. That asymmetry is deliberate: a line above the buttons says \"the reading is over, now decide\"."
     },
     {
       "name": "DialogHeader",
@@ -2122,6 +2132,26 @@
       "doc": "DialogPortal - renders dialog content in a portal.",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "DialogSteps",
+      "kind": "component",
+      "file": "src/components/Dialog/DialogSteps.tsx",
+      "area": "Dialog",
+      "summary": "DialogSteps - where you are in a dialog that has more than one part.",
+      "doc": "DialogSteps - where you are in a dialog that has more than one part. **The bar under each step is the progress, not a connector between dots.** Every step owns a full-width rule beneath its own label, dark once reached and pale before. A row of circles joined by a line says \"these are stations on a route\"; a row of underlined labels says \"these are the parts, and you have done this many\" - which is the question somebody halfway through a form is actually asking. **A step you have finished shows a tick, not its number.** The number is only useful before you arrive; afterwards the useful thing is that it is done. Sits directly under the header, above the body, and never in the footer - `Back` and `Next` belong there, and putting the position there too would crowd the one row that has to stay readable. ```tsx <DialogSteps current={1} steps={[{ key: 'details', label: 'Invite details' }, { key: 'access', label: 'Access duration' }]} onStepSelect={(key) => { goTo(key); }} /> ```",
+      "props": ["steps", "current", "onStepSelect", "label"],
+      "propDocs": "The parts, in order. Which one you are on, zero-based. Everything before it counts as done. Lets a finished step be gone back to. Omit it and none are clickable. Only steps already passed. Jumping ahead to one whose inputs depend on a step you have not filled in is how a form ends up half-complete in an order nobody designed for. The list's accessible name. @default 'Progress'"
+    },
+    {
+      "name": "DialogSubmitHint",
+      "kind": "component",
+      "file": "src/components/Dialog/DialogSubmitHint.tsx",
+      "area": "Dialog",
+      "summary": "DialogSubmitHint - the ⏎ chip that sits inside a primary button.",
+      "doc": "DialogSubmitHint - the ⏎ chip that sits inside a primary button. The product puts one on every primary action: *Generate link*, *Next*, *Send invite*, *Update grant*, *Create group*, *Done, I've copied it*. A shortcut nobody knows about is worth nothing, and the button is the only place anybody is looking when they are deciding to press it. **Never on a destructive action.** *Permanently delete* and *Continue* carry no hint, deliberately: nobody should be able to delete something by muscle memory, and a keyboard path to an irreversible act is exactly that. Pair this with `useSubmitShortcut` and leave both off anything that destroys. Inherits its colour from the button it sits in, so it works on the dark primary and on the pale disabled state without knowing which it is on. ```tsx <Button onClick={save}>Send invite <DialogSubmitHint /></Button> ```",
+      "props": ["children"],
+      "propDocs": "What the chip shows. @default '⏎'"
     },
     {
       "name": "DialogTitle",
@@ -5572,6 +5602,16 @@
     {
       "name": "Sizes",
       "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Sizes",
+      "doc": "Components/Dialog Sizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sizes",
+      "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
       "summary": "Story: Components/Icon / Sizes",
@@ -5836,6 +5876,16 @@
       "area": "Cell Recipes",
       "summary": "Story: Components/Table/Cell Recipes / StatusRecipe",
       "doc": "Components/Table/Cell Recipes StatusRecipe",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Stepped",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Stepped",
+      "doc": "Components/Dialog Stepped",
       "props": [],
       "propDocs": ""
     },

@@ -1,6 +1,7 @@
 'use client';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
@@ -13,6 +14,32 @@ import type {
   DialogOverlayProps,
   DialogTitleProps,
 } from './Dialog.types';
+
+/**
+ * How wide the dialog is, and how much room it gives its contents.
+ *
+ * Sizes are named for the job rather than the pixels, and there are five
+ * because the product clusters at five. `full` stretches instead of capping:
+ * `self-stretch` beats the centring on the flex parent, so it fills the height
+ * the scroller already has without anybody having to compute a viewport
+ * calculation.
+ */
+const dialogContentVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'sm:mdt-max-w-md',
+      md: 'sm:mdt-max-w-lg',
+      lg: 'sm:mdt-max-w-2xl',
+      xl: 'sm:mdt-max-w-4xl',
+      full: 'mdt-max-w-none sm:mdt-self-stretch',
+    },
+    density: {
+      comfortable: 'mdt-gap-4 mdt-p-6',
+      compact: 'mdt-gap-3 mdt-p-4',
+    },
+  },
+  defaultVariants: { size: 'md', density: 'comfortable' },
+});
 
 /**
  * Dialog - a task that interrupts, in the middle of the screen.
@@ -157,6 +184,8 @@ const DialogContent = forwardRef<
       blocking = false,
       busy = false,
       onRequestClose,
+      size = 'md',
+      density = 'comfortable',
       ...props
     },
     ref
@@ -213,12 +242,13 @@ const DialogContent = forwardRef<
                 if (!mayClose('outside')) event.preventDefault();
               }}
               className={cn(
-                'mdt-relative mdt-grid mdt-w-full mdt-max-w-lg',
+                'mdt-relative mdt-grid mdt-w-full',
+                dialogContentVariants({ size, density }),
                 // Full-bleed on a phone, a card above that. Corners and a
                 // border on something that reaches every edge are decoration
                 // on a seam that does not exist.
                 'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
-                'mdt-gap-4 mdt-border mdt-border-border mdt-bg-background mdt-p-6 mdt-shadow-lg',
+                'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
                 'mdt-duration-200 mdt-ease-in-out',
                 'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
                 className
@@ -280,11 +310,21 @@ DialogHeader.displayName = 'DialogHeader';
  * DialogFooter - container for action buttons.
  */
 const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, align = 'end', divider = true, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-justify-end sm:mdt-space-x-2',
+        'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
+        // `end` is a decision - Cancel, then the primary. `between` is a
+        // journey: something quiet on the left, the way forward on the right.
+        // A step back, a support link, "having a problem?".
+        align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
+        divider && [
+          // Out through the padding and back again, so the rule reaches both
+          // edges. Inset by 24px it reads as an underline on the buttons rather
+          // than as the seam between the reading and the deciding.
+          '-mdt-mx-6 mdt-mt-2 mdt-border-t mdt-border-border mdt-px-6 mdt-pt-4',
+        ],
         className
       )}
       {...props}

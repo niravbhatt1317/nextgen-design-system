@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button';
+import { Badge } from '../Badge';
 import { CommandShortcut } from '../Command';
 import { Input } from '../Input';
+import { DialogSteps } from './DialogSteps';
+import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 import {
   Dialog,
@@ -786,6 +789,212 @@ export const SubmitShortcut: Story = {
               >
                 Finish setup
                 <CommandShortcut>⌘↵</CommandShortcut>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  },
+};
+
+/**
+ * The house style, assembled.
+ *
+ * Two steps, the underline stepper, an asymmetric footer, and the ⏎ chip on the
+ * primary. Everything here is the product's own language rather than a generic
+ * modal: the header flows into the body with no rule, the footer is the only
+ * part separated by one, and the bar under each step is the progress rather
+ * than a connector between dots.
+ *
+ * **The bar is the distinctive choice.** A row of circles joined by a line says
+ * "these are stations on a route". A row of underlined labels says "these are
+ * the parts, and you have done this many" — which is what somebody halfway
+ * through a form is actually asking.
+ */
+export const Stepped: Story = {
+  render: function SteppedDemo() {
+    const [open, setOpen] = useState(false);
+    const [step, setStep] = useState(0);
+
+    const steps = [
+      { key: 'details', label: 'Invite details' },
+      { key: 'access', label: 'Access duration' },
+    ];
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+            setStep(0);
+          }}
+        >
+          Invite guest users
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent size="lg">
+            <DialogHeader>
+              <DialogTitle className="mdt-flex mdt-items-center mdt-gap-2">
+                Invite guest users
+                <Badge tone="warning" size="sm" shape="pill">
+                  Guest
+                </Badge>
+              </DialogTitle>
+              <DialogDescription>
+                Guest users get temporary access to your organisation after accepting.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogSteps
+              steps={steps}
+              current={step}
+              onStepSelect={(_key, index) => {
+                setStep(index);
+              }}
+            />
+
+            {step === 0 ? (
+              <Input label="Invite by email" placeholder="You can add more than one email…" />
+            ) : (
+              <Input label="Expiry date and time" placeholder="16 Oct 2025, 12:30 PM" />
+            )}
+
+            <DialogFooter align={step === 0 ? 'end' : 'between'}>
+              {step === 1 && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setStep(0);
+                  }}
+                >
+                  Back
+                </Button>
+              )}
+              <Button
+                onClick={() => {
+                  if (step === 0) setStep(1);
+                  else setOpen(false);
+                }}
+              >
+                {step === 0 ? 'Next' : 'Send invite'}
+                <DialogSubmitHint />
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * Destructive, and deliberately without the shortcut.
+ *
+ * Red fill rather than the dark primary, Cancel on the left of it, and **no ⏎
+ * chip** — the one place in the system where the keyboard path is withheld on
+ * purpose. Nobody should be able to delete something by muscle memory, and a
+ * keyboard route to an irreversible act is exactly that.
+ *
+ * The same rule applies to `useSubmitShortcut`: leave both off anything that
+ * destroys.
+ */
+export const Destructive: Story = {
+  render: function DestructiveDemo() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Delete user
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent size="sm">
+            <DialogHeader>
+              <DialogTitle>Delete this user?</DialogTitle>
+              <DialogDescription>
+                This permanently removes their access, data and assigned permissions from the
+                workspace.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Permanently delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * Five widths, because the product clusters at five.
+ *
+ * `sm` a single decision · `md` the default · `lg` a form · `xl` something with
+ * two columns or a builder in it · `full` a surface with its own navigation.
+ *
+ * Before this there was one width, and the stories escaped it with
+ * `sm:max-w-[425px]` and `sm:max-w-[800px]` — arbitrary values, which is always
+ * the tell that a scale is missing.
+ */
+export const Sizes: Story = {
+  render: function SizesDemo() {
+    const [size, setSize] = useState<'sm' | 'md' | 'lg' | 'xl' | 'full' | null>(null);
+
+    return (
+      <div className="mdt-flex mdt-flex-wrap mdt-gap-2">
+        {(['sm', 'md', 'lg', 'xl', 'full'] as const).map((option) => (
+          <Button
+            key={option}
+            variant="outline"
+            onClick={() => {
+              setSize(option);
+            }}
+          >
+            {option}
+          </Button>
+        ))}
+        <Dialog
+          open={size !== null}
+          onOpenChange={() => {
+            setSize(null);
+          }}
+        >
+          <DialogContent size={size ?? 'md'}>
+            <DialogHeader>
+              <DialogTitle>Size {size}</DialogTitle>
+              <DialogDescription>
+                Each step is named for the job rather than the pixels.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  setSize(null);
+                }}
+              >
+                Close
+                <DialogSubmitHint />
               </Button>
             </DialogFooter>
           </DialogContent>

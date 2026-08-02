@@ -134,6 +134,8 @@ export {
   DialogTitle,
   DialogDescription,
   useSubmitShortcut,
+  DialogSteps,
+  DialogSubmitHint,
 } from './Dialog';
 export type {
   DialogProps,
