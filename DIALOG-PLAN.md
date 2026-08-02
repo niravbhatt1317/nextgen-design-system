@@ -139,33 +139,53 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
         forward on the right
   - [x] none — `divider={false}` ✅
 
-- [x] **Density, two steps.** ✅ `comfortable` 16px on three sides and **12 underneath**;
-      `compact` 12 and 8. Measured against a trial rather than argued: 24 all round read as a
-      poster rather than a dialog once the steps and the rule were both in. The bottom is the one
-      side that is not square — the footer already has its rule, and a full 16 under the buttons
-      as well left them floating away from the box they belong to.
+- [x] **Every region owns its own padding.** ✅ `DialogContent` has none horizontally. `DialogHeader`,
+      `DialogSteps`, the new `DialogBody` and `DialogFooter` each pad their own contents by a single
+      shared gutter, read from the density rather than written four times.
 
-      The rest of the rhythm, also measured: **8** title → description (at 6 the description read
-      as a second line of the heading), **16** between blocks, **20** from the steps to whatever
-      follows, because that is where the reading actually starts, and **14** from the footer's
-      rule down to the buttons, matching the 14 beneath them. 14 is Tailwind's `3.5` step and the
-      only place this library uses it - deliberate, because 12 read as tight on both sides of the
-      buttons at once. The extra 4 under the steps lives on `DialogSteps` itself rather
-      than as a rule on the content — the steps are the only block that wants it.
+      This is what removed the footer's `-mx-4 px-4` breakout — a number that had to be kept in step
+      with the container's padding by hand, and was wrong by 7px a side the first time anybody
+      measured it. The rule reaches both edges now because the footer *is* full width, not because
+      it tears back out through something.
 
-      The buttons stay at `md`, 36px. Tried at 32 and put back: the footer is the one row that
-      has to stay pressable, and a dialog is not so dense that its actions should shrink.
+      The one thing still on the container is the **bottom**, because no region knows whether it is
+      the last thing in the box: a dialog with a footer wants 12 under its buttons and one without
+      wants 12 under its body, and putting it on the container is what makes those the same number.
 
-      A button carrying a `DialogSubmitHint` gets **12** after the chip rather than the usual 16.
-      A chip is not reading and does not need the room a word after it would. The negative margin
-      lives on the chip rather than as a Button variant, so it only ever applies where there is
-      actually a chip.
+- [x] **Density, two steps.** ✅ Measured against a trial rather than argued. `comfortable`:
 
-      `compact` is for a dialog that is mostly chrome around one control.
+      | | |
+      | --- | --- |
+      | gutter, all four regions | 16 |
+      | above the header | 16 |
+      | title → description | 6 with a tag, 8 without |
+      | header → steps | 16 |
+      | steps → body | 20 |
+      | body → rule | 24 |
+      | rule → buttons | 12 |
+      | buttons → bottom | 12 |
 
-- [ ] **Where the close button lives.** In the header row when there is a header to sit in;
-      floating over the content when there is not. Both appear in the references and the choice is
-      not arbitrary.
+      `compact` is the same shape at 12 and 8, for a dialog that is mostly chrome around one control.
+
+      **The title's tag changes the gap under it.** A `<Badge>` makes the title's line taller and
+      closes some of that gap on its own, so `DialogTitle` takes 2px back when it has one. Which is
+      why the tag is a prop rather than something written into `children` — written inline it looks
+      identical and leaves the spacing wrong.
+
+      The buttons stay at `md`, 36px. Tried at 32 and put back: the footer is the one row that has
+      to stay pressable, and a dialog is not so dense that its actions should shrink.
+
+      A button carrying a `DialogSubmitHint` gets 14 before the chip and 10 after it, rather than
+      the 16 its padding would give. A chip is not reading and does not need the room a word would.
+      Both live on the chip, so they only apply where there is actually a chip.
+
+- [x] **The close button lines up with the title.** ✅ It is a 28px hit area around a 16px glyph,
+      positioned so the glyph's own edge sits on the gutter and the box centres on the title's line.
+      Measured: it was 4px low before, and its centre is now exactly on the title's. Muted rather
+      than near-black, because the way out of a dialog is not the thing to look at first.
+
+- [ ] **Whether it ever moves into the header row.** Floating over the content is right when there
+      is no header to sit in. Both appear in the references and the choice is not arbitrary.
 
 ---
 

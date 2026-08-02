@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import { useDialogGutter } from './dialogSpacing';
 import { Icon } from '../Icon';
 import type { DialogStepsProps } from './Dialog.types';
 
@@ -41,7 +42,7 @@ const DialogSteps = forwardRef<HTMLOListElement, DialogStepsProps>(
       // content's grid gap plus this. The reading starts below the steps, and
       // the extra 4 is what says so. It lives here rather than as a rule on the
       // content because the steps are the only block that wants it.
-      className={cn('mdt-mb-1 mdt-flex mdt-gap-3', className)}
+      className={cn(useDialogGutter(), 'mdt-mb-1 mdt-flex mdt-gap-3', className)}
       {...props}
     >
       {steps.map((step, index) => {

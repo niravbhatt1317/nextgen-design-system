@@ -42,23 +42,30 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
         // 20 square around a 12 icon: 4px of room on all four sides, which is
         // what makes it read as a key rather than as a glyph that drifted. In a
         // 36px button that leaves 8 above and below.
-        'mdt-ml-1 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center',
+        'mdt-inline-flex mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center',
         'mdt-rounded',
-        // Pulls the button's own 16px right padding in to 12. A chip is not
-        // reading, so it does not need the room a word after it would; at 16 it
-        // sat marooned from the edge. The chip owns this rather than Button
-        // having a "has a chip" variant, so it only ever applies where there is
-        // actually a chip.
-        '-mdt-mr-1',
+        // 14 from the label, and 10 to the button's edge. The 14 is the
+        // button's own 8px gap plus this 6; the 10 is its 16px padding pulled
+        // in by 6. A chip is not reading, so it does not need the room a
+        // word after it would; at 16 it sat marooned from the edge. Both live
+        // on the chip rather than as a "has a chip" variant on Button, so they
+        // only ever apply where there is actually a chip.
+        '-mdt-mr-1.5 mdt-ml-1.5',
         // Outlined, not filled. A filled chip reads as a second, smaller button
         // sitting inside the first - two things to press where there is one. A
         // hairline square around the glyph says "this is a key" instead, which
         // is what it is.
         //
-        // Both the rule and the glyph are the button's own ink at reduced
-        // strength, so one chip works on the dark primary and on the pale
-        // disabled state without being told which it is on.
-        'mdt-border-current/25 mdt-border',
+        // The whole chip fades rather than the border carrying an alpha of its
+        // own. `border-current/25` looks like it would do that and does not:
+        // Tailwind cannot mix an alpha into `currentColor` here, so it fell
+        // through to the theme's own border token - a fixed slate with no
+        // relation to the button it sat on, measured at rgb(203,211,225) on a
+        // near-black button and rgb(81,98,129) on a white one. Fading the whole
+        // element keeps both the rule and the glyph as the button's own ink,
+        // which is also how the product draws it: the chip is quieter than the
+        // label beside it.
+        'mdt-border mdt-border-current mdt-opacity-50',
         className
       )}
       {...props}

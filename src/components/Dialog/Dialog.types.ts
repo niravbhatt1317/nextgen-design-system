@@ -147,9 +147,24 @@ export interface DialogFooterProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 /**
+ * Props for the DialogBody component
+ */
+export type DialogBodyProps = ComponentPropsWithoutRef<'div'>;
+
+/**
  * Props for the DialogTitle component
  */
-export type DialogTitleProps = ComponentPropsWithoutRef<typeof DialogPrimitive.Title>;
+export interface DialogTitleProps extends ComponentPropsWithoutRef<typeof DialogPrimitive.Title> {
+  /**
+   * A short status beside the title - `Guest`, `Beta`, `Draft`.
+   *
+   * Passed rather than written inline so the title knows it is there: a tag
+   * makes the line taller, and the gap to the description is tightened by 2px
+   * to match. A `<Badge>` written straight into `children` looks identical and
+   * leaves the spacing wrong.
+   */
+  tag?: ReactNode;
+}
 
 /**
  * Props for the DialogDescription component

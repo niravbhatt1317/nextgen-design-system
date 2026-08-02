@@ -9,6 +9,7 @@ import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -125,9 +126,11 @@ export const Default: Story = {
             This is a description of the dialog. It provides additional context about the content.
           </DialogDescription>
         </DialogHeader>
-        <div className="mdt-py-4">
-          <p>Dialog content goes here. You can put any content inside.</p>
-        </div>
+        <DialogBody>
+          <div className="mdt-py-4">
+            <p>Dialog content goes here. You can put any content inside.</p>
+          </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -155,11 +158,13 @@ export const WithForm: Story = {
             Make changes to your profile here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className="mdt-grid mdt-gap-4 mdt-py-4">
-          <Input label="Name" defaultValue="John Doe" />
-          <Input label="Username" defaultValue="@johndoe" />
-          <Input label="Email" type="email" defaultValue="john@example.com" />
-        </div>
+        <DialogBody>
+          <div className="mdt-grid mdt-gap-4 mdt-py-4">
+            <Input label="Name" defaultValue="John Doe" />
+            <Input label="Username" defaultValue="@johndoe" />
+            <Input label="Email" type="email" defaultValue="john@example.com" />
+          </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -213,13 +218,15 @@ export const NoCloseButton: Story = {
           <DialogTitle>Terms and Conditions</DialogTitle>
           <DialogDescription>Please read and accept our terms to continue.</DialogDescription>
         </DialogHeader>
-        <div className="mdt-max-h-[200px] mdt-overflow-y-auto mdt-py-4">
-          <p className="mdt-text-sm mdt-text-muted-foreground">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          </p>
-        </div>
+        <DialogBody>
+          <div className="mdt-max-h-[200px] mdt-overflow-y-auto mdt-py-4">
+            <p className="mdt-text-sm mdt-text-muted-foreground">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+          </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Decline</Button>
@@ -254,16 +261,18 @@ export const Controlled: Story = {
               <DialogTitle>Controlled Dialog</DialogTitle>
               <DialogDescription>This dialog state is controlled externally.</DialogDescription>
             </DialogHeader>
-            <div className="mdt-py-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Close via state
-              </Button>
-            </div>
+            <DialogBody>
+              <div className="mdt-py-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  Close via state
+                </Button>
+              </div>
+            </DialogBody>
           </DialogContent>
         </Dialog>
       </div>
@@ -314,14 +323,16 @@ export const InteractiveModal: Story = {
                   : 'Modal is FALSE: Focus is not trapped. Try pressing Tab - you can reach the background buttons! Background is fully interactive.'}
               </DialogDescription>
             </DialogHeader>
-            <div className="mdt-space-y-4 mdt-py-4">
-              <p className="mdt-text-sm">
-                {args.modal
-                  ? '✓ Focus trapped inside dialog\n✓ Dark overlay blocks background\n✓ Esc key closes dialog\n✓ Click overlay to close'
-                  : '✓ Can Tab to background elements\n✓ No dark overlay\n✓ Background remains interactive\n✓ Dialog floats above content'}
-              </p>
-              <Input label="Test Input" placeholder="Try tabbing from here..." />
-            </div>
+            <DialogBody>
+              <div className="mdt-space-y-4 mdt-py-4">
+                <p className="mdt-text-sm">
+                  {args.modal
+                    ? '✓ Focus trapped inside dialog\n✓ Dark overlay blocks background\n✓ Esc key closes dialog\n✓ Click overlay to close'
+                    : '✓ Can Tab to background elements\n✓ No dark overlay\n✓ Background remains interactive\n✓ Dialog floats above content'}
+                </p>
+                <Input label="Test Input" placeholder="Try tabbing from here..." />
+              </div>
+            </DialogBody>
             <DialogFooter>
               <DialogClose asChild>
                 <Button>Close</Button>
@@ -361,11 +372,13 @@ export const ModalComparison: Story = {
                 dialog. Notice the dark overlay blocking the page behind.
               </DialogDescription>
             </DialogHeader>
-            <div className="mdt-py-4">
-              <p className="mdt-text-sm">
-                Try pressing Tab - focus stays within the dialog. Background is not clickable.
-              </p>
-            </div>
+            <DialogBody>
+              <div className="mdt-py-4">
+                <p className="mdt-text-sm">
+                  Try pressing Tab - focus stays within the dialog. Background is not clickable.
+                </p>
+              </div>
+            </DialogBody>
             <DialogFooter>
               <DialogClose asChild>
                 <Button>Close</Button>
@@ -387,12 +400,14 @@ export const ModalComparison: Story = {
                 page. Notice there's no dark overlay - background remains visible and interactive.
               </DialogDescription>
             </DialogHeader>
-            <div className="mdt-py-4">
-              <p className="mdt-text-sm">
-                Try pressing Tab - focus can move to the background. You can click outside this
-                dialog.
-              </p>
-            </div>
+            <DialogBody>
+              <div className="mdt-py-4">
+                <p className="mdt-text-sm">
+                  Try pressing Tab - focus can move to the background. You can click outside this
+                  dialog.
+                </p>
+              </div>
+            </DialogBody>
             <DialogFooter>
               <DialogClose asChild>
                 <Button>Close</Button>
@@ -419,18 +434,20 @@ export const ScrollableContent: Story = {
           <DialogTitle>Privacy Policy</DialogTitle>
           <DialogDescription>Last updated: January 2024</DialogDescription>
         </DialogHeader>
-        <div className="mdt-max-h-[400px] mdt-overflow-y-auto mdt-pr-4">
-          {Array.from({ length: 10 }, (_, i) => (
-            <div key={i} className="mdt-mb-4">
-              <h4 className="mdt-font-semibold">Section {i + 1}</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              </p>
-            </div>
-          ))}
-        </div>
+        <DialogBody>
+          <div className="mdt-max-h-[400px] mdt-overflow-y-auto mdt-pr-4">
+            {Array.from({ length: 10 }, (_, i) => (
+              <div key={i} className="mdt-mb-4">
+                <h4 className="mdt-font-semibold">Section {i + 1}</h4>
+                <p className="mdt-text-sm mdt-text-muted-foreground">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                  exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+              </div>
+            ))}
+          </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button>I understand</Button>
@@ -455,24 +472,26 @@ export const NestedDialogs: Story = {
           <DialogTitle>First Dialog</DialogTitle>
           <DialogDescription>This dialog contains another dialog.</DialogDescription>
         </DialogHeader>
-        <div className="mdt-py-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="secondary">Open Nested Dialog</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nested Dialog</DialogTitle>
-                <DialogDescription>This is a nested dialog.</DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button>Close</Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <DialogBody>
+          <div className="mdt-py-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="secondary">Open Nested Dialog</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nested Dialog</DialogTitle>
+                  <DialogDescription>This is a nested dialog.</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button>Close</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Close</Button>
@@ -497,16 +516,20 @@ export const CustomWidth: Story = {
           <DialogTitle>Wide Dialog</DialogTitle>
           <DialogDescription>This dialog has a custom maximum width of 800px.</DialogDescription>
         </DialogHeader>
-        <div className="mdt-grid mdt-grid-cols-2 mdt-gap-4 mdt-py-4">
-          <div className="mdt-rounded mdt-border mdt-p-4">
-            <h4 className="mdt-font-semibold">Column 1</h4>
-            <p className="mdt-text-sm mdt-text-muted-foreground">Content for the first column.</p>
+        <DialogBody>
+          <div className="mdt-grid mdt-grid-cols-2 mdt-gap-4 mdt-py-4">
+            <div className="mdt-rounded mdt-border mdt-p-4">
+              <h4 className="mdt-font-semibold">Column 1</h4>
+              <p className="mdt-text-sm mdt-text-muted-foreground">Content for the first column.</p>
+            </div>
+            <div className="mdt-rounded mdt-border mdt-p-4">
+              <h4 className="mdt-font-semibold">Column 2</h4>
+              <p className="mdt-text-sm mdt-text-muted-foreground">
+                Content for the second column.
+              </p>
+            </div>
           </div>
-          <div className="mdt-rounded mdt-border mdt-p-4">
-            <h4 className="mdt-font-semibold">Column 2</h4>
-            <p className="mdt-text-sm mdt-text-muted-foreground">Content for the second column.</p>
-          </div>
-        </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button>Close</Button>
@@ -558,13 +581,15 @@ export const UnsavedChanges: Story = {
               <DialogTitle>Edit name</DialogTitle>
               <DialogDescription>Type something, then try to close it.</DialogDescription>
             </DialogHeader>
-            <Input
-              label="Name"
-              value={value}
-              onChange={(event) => {
-                setValue(event.target.value);
-              }}
-            />
+            <DialogBody>
+              <Input
+                label="Name"
+                value={value}
+                onChange={(event) => {
+                  setValue(event.target.value);
+                }}
+              />
+            </DialogBody>
             <DialogFooter>
               <Button
                 variant="outline"
@@ -582,35 +607,36 @@ export const UnsavedChanges: Story = {
                 Save
               </Button>
             </DialogFooter>
-
-            <Dialog open={asking} onOpenChange={setAsking}>
-              <DialogContent className="sm:mdt-max-w-[420px]">
-                <DialogHeader>
-                  <DialogTitle>Discard your changes?</DialogTitle>
-                  <DialogDescription>What you have typed will not be kept.</DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setAsking(false);
-                    }}
-                  >
-                    Keep editing
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      setAsking(false);
-                      setValue('');
-                      setOpen(false);
-                    }}
-                  >
-                    Discard
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <DialogBody>
+              <Dialog open={asking} onOpenChange={setAsking}>
+                <DialogContent className="sm:mdt-max-w-[420px]">
+                  <DialogHeader>
+                    <DialogTitle>Discard your changes?</DialogTitle>
+                    <DialogDescription>What you have typed will not be kept.</DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setAsking(false);
+                      }}
+                    >
+                      Keep editing
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        setAsking(false);
+                        setValue('');
+                        setOpen(false);
+                      }}
+                    >
+                      Discard
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </DialogBody>
           </DialogContent>
         </Dialog>
       </>
@@ -835,11 +861,14 @@ export const Stepped: Story = {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent size="lg">
             <DialogHeader>
-              <DialogTitle className="mdt-flex mdt-items-center mdt-gap-2">
+              <DialogTitle
+                tag={
+                  <Badge tone="warning" size="sm" shape="pill">
+                    Guest
+                  </Badge>
+                }
+              >
                 Invite guest users
-                <Badge tone="warning" size="sm" shape="pill">
-                  Guest
-                </Badge>
               </DialogTitle>
               <DialogDescription>
                 Guest users get temporary access to your organisation after accepting.
@@ -853,13 +882,13 @@ export const Stepped: Story = {
                 setStep(index);
               }}
             />
-
-            {step === 0 ? (
-              <Input label="Invite by email" placeholder="You can add more than one email…" />
-            ) : (
-              <Input label="Expiry date and time" placeholder="16 Oct 2025, 12:30 PM" />
-            )}
-
+            <DialogBody>
+              {step === 0 ? (
+                <Input label="Invite by email" placeholder="You can add more than one email…" />
+              ) : (
+                <Input label="Expiry date and time" placeholder="16 Oct 2025, 12:30 PM" />
+              )}
+            </DialogBody>
             <DialogFooter align={step === 0 ? 'end' : 'between'}>
               {step === 1 && (
                 <Button
@@ -1049,11 +1078,14 @@ export const Density: Story = {
         >
           <DialogContent size="lg" density={mode ?? 'comfortable'}>
             <DialogHeader>
-              <DialogTitle className="mdt-flex mdt-items-center mdt-gap-2">
+              <DialogTitle
+                tag={
+                  <Badge tone="warning" size="sm" shape="pill">
+                    Guest
+                  </Badge>
+                }
+              >
                 Invite guest users
-                <Badge tone="warning" size="sm" shape="pill">
-                  Guest
-                </Badge>
               </DialogTitle>
               <DialogDescription>
                 Guest users get temporary access to your organisation after accepting.
@@ -1067,12 +1099,12 @@ export const Density: Story = {
               ]}
               current={0}
             />
-
-            <div className="mdt-flex mdt-flex-col mdt-gap-4">
-              <Input label="Invite by email" placeholder="You can add more than one email…" />
-              <Input label="Select a parent organisation" placeholder="MSP owner organisation" />
-            </div>
-
+            <DialogBody>
+              <div className="mdt-flex mdt-flex-col mdt-gap-4">
+                <Input label="Invite by email" placeholder="You can add more than one email…" />
+                <Input label="Select a parent organisation" placeholder="MSP owner organisation" />
+              </div>
+            </DialogBody>
             <DialogFooter>
               <Button>
                 Next

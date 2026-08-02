@@ -8,6 +8,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -596,9 +597,11 @@ describe('DialogFooter', () => {
     // The footer is the only part separated by a line - the header flows into
     // the body without one. A line above the buttons says "the reading is over".
     expect(footer?.className).toContain('mdt-border-t');
-    // And it breaks out of the dialog's padding, so the rule reaches both edges
-    // rather than reading as an underline on the buttons.
-    expect(footer?.className).toContain('-mdt-mx-4');
+    // The rule reaches both edges because the footer is a full-width block that
+    // pads its own contents. It used to be a padded box tearing back out
+    // through the container's padding with a negative margin, and that number
+    // was wrong by 7px a side the first time anybody measured it.
+    expect(footer?.className).not.toContain('-mdt-mx');
   });
 
   /** The footer of whichever dialog is currently rendered. */
@@ -617,18 +620,15 @@ describe('DialogFooter', () => {
       </Dialog>
     );
 
-  it('breaks out by 16 when the dialog padded itself by 16', () => {
+  it('pads its own contents by the gutter the rest of the dialog uses', () => {
     withDensity('comfortable');
-    expect(footerClasses()).toContain('-mdt-mx-4');
+    expect(footerClasses()).toContain('mdt-px-4');
   });
 
-  it('breaks out by 12 when the dialog padded itself by 12', () => {
+  it('follows the density, so the three regions cannot drift apart', () => {
     withDensity('compact');
-    // Hard-coded at one number this overhung the tighter dialog by 7px on each
-    // side - measured in a browser, after the arithmetic predicted the same.
-    // The footer cannot know the padding on its own, so the content tells it.
-    expect(footerClasses()).toContain('-mdt-mx-3');
-    expect(footerClasses()).not.toContain('-mdt-mx-4');
+    expect(footerClasses()).toContain('mdt-px-3');
+    expect(footerClasses()).not.toContain('mdt-px-4');
   });
 
   it('can go without', () => {
@@ -647,6 +647,96 @@ describe('DialogFooter', () => {
   });
 });
 
+describe('the regions', () => {
+  const at = (density: 'comfortable' | 'compact') => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent density={density}>
+          <DialogHeader>
+            <DialogTitle>Sized</DialogTitle>
+          </DialogHeader>
+          <DialogBody>body</DialogBody>
+          <DialogFooter>ok</DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+    const dialog = screen.getByRole('dialog');
+    return [...dialog.children].map((n) => n.getAttribute('class') ?? '');
+  };
+
+  it('gives header, body and footer the same left and right', () => {
+    // One value in one place. Three regions each carrying their own number is
+    // how they drift, and a footer inset differently from the body above it is
+    // visible at a glance.
+    const gutters = at('comfortable').filter((c) => c.includes('mdt-px-'));
+    expect(gutters).toHaveLength(3);
+    expect(gutters.every((c) => c.includes('mdt-px-4'))).toBe(true);
+  });
+
+  it('moves all three together when the density changes', () => {
+    const gutters = at('compact').filter((c) => c.includes('mdt-px-'));
+    expect(gutters).toHaveLength(3);
+    expect(gutters.every((c) => c.includes('mdt-px-3'))).toBe(true);
+  });
+
+  it('puts the space above the first region on the header, not the box', () => {
+    expect(at('comfortable')[0]).toContain('mdt-pt-4');
+  });
+});
+
+describe('DialogTitle', () => {
+  const title = (tag?: boolean) => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle {...(tag === true ? { tag: <span>Guest</span> } : {})}>Invite</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+    return screen.getByRole('heading', { name: /Invite/ });
+  };
+
+  it('takes a tag beside the title', () => {
+    title(true);
+    expect(screen.getByText('Guest')).toBeInTheDocument();
+  });
+
+  it('tightens the gap under itself when it carries one', () => {
+    // 6 under a title with a tag, against 8 under one without. A tag is taller
+    // than the text beside it, so it closes some of that gap on its own.
+    expect(title(true).className).toContain('-mdt-mb-0.5');
+  });
+
+  it('leaves the gap alone when it does not', () => {
+    expect(title().className).not.toContain('-mdt-mb-0.5');
+  });
+});
+
+describe('the close button', () => {
+  const close = () => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle>Sized</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    );
+    return screen.getByRole('button', { name: 'Close' });
+  };
+
+  it("is as tall as the title line, so it sits on the title's centre", () => {
+    // At 16px square pinned to the same top edge it rode 6px high of the words
+    // beside it. 28 is the line box of the title, so the two centres meet.
+    expect(close().className).toContain('mdt-h-7');
+  });
+
+  it('is muted rather than near-black', () => {
+    // The way out of a dialog is not the thing to look at first, and at full
+    // strength the X competed with the title for that.
+    expect(close().className).toContain('mdt-text-muted-foreground');
+  });
+});
+
 describe('DialogSubmitHint', () => {
   it('shows the key and stays out of the reading', () => {
     const { container } = render(<DialogSubmitHint />);
@@ -659,10 +749,15 @@ describe('DialogSubmitHint', () => {
   });
 
   it('takes the colour of whatever it sits in', () => {
+    // `border-current/25` looks like it would do this and does not - Tailwind
+    // cannot mix an alpha into `currentColor` here, so it fell through to the
+    // theme's own border token, a fixed slate with no relation to the button.
+    // Fading the whole element keeps rule and glyph as the button's own ink.
     const { container } = render(<DialogSubmitHint />);
-    // One chip works on the dark primary and on the pale disabled state without
-    // being told which it is on.
-    expect(container.firstElementChild?.className).toContain('mdt-border-current/25');
+    const classes = container.firstElementChild?.className ?? '';
+    expect(classes).toContain('mdt-border-current');
+    expect(classes).not.toContain('mdt-border-current/');
+    expect(classes).toContain('mdt-opacity-50');
   });
 
   it("pulls the button's trailing padding in, since a chip is not reading", () => {
@@ -708,18 +803,22 @@ describe('size and density', () => {
     expect(classes).toContain('sm:mdt-self-stretch');
   });
 
-  it('pads by 16, and by 14 underneath', () => {
-    // The buttons sit closer to the bottom edge than the reading does to the
-    // top. The footer already has its rule; a full 16 under it as well left the
-    // actions floating away from the box they belong to.
+  it('keeps only the rhythm between regions and the floor beneath them', () => {
+    // Left, right and top belong to the regions themselves. The bottom stays on
+    // the container because no region knows whether it is the last thing in the
+    // box - a dialog with a footer wants 12 under its buttons and one without
+    // wants 12 under its body, and this is what makes those the same number.
     const classes = at({});
-    expect(classes).toContain('mdt-p-4');
-    expect(classes).toContain('mdt-pb-3.5');
+    expect(classes).toContain('mdt-gap-4');
+    expect(classes).toContain('mdt-pb-3');
+    expect(classes).not.toContain('mdt-p-4');
+    expect(classes).not.toContain('mdt-px-4');
+    expect(classes).not.toContain('mdt-pt-4');
   });
 
   it('tightens up when asked', () => {
     const classes = at({ density: 'compact' });
-    expect(classes).toContain('mdt-p-3');
+    expect(classes).toContain('mdt-gap-3');
     expect(classes).toContain('mdt-pb-2');
   });
 });
