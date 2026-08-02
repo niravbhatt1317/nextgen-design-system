@@ -23,7 +23,7 @@ Before you begin, ensure you have:
 ### Step 1: Install the Package
 
 ```bash
-npm install motadata-react-library
+npm install @mtdt/nextgen-design-system
 ```
 
 ### Step 2: Import Global Styles
@@ -31,7 +31,7 @@ npm install motadata-react-library
 Import the library CSS file in your application entry point (e.g., `main.tsx` or `App.tsx`):
 
 ```tsx
-import 'motadata-react-library/styles.css';
+import '@mtdt/nextgen-design-system/styles.css';
 ```
 
 > **Note:** The library uses **system fonts by default** (San Francisco on Mac, Segoe UI on Windows, etc.)
@@ -43,7 +43,7 @@ import 'motadata-react-library/styles.css';
 You are ready to start using components!
 
 ```tsx
-import { Button, Input, Card } from 'motadata-react-library';
+import { Button, Input, Card } from '@mtdt/nextgen-design-system';
 
 function App() {
   return (
@@ -72,7 +72,7 @@ export default {
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/motadata-react-library/**/*.{js,ts,jsx,tsx}', // Add this line
+    './node_modules/@mtdt/nextgen-design-system/**/*.{js,ts,jsx,tsx}', // Add this line
   ],
   theme: {
     extend: {},
@@ -153,7 +153,7 @@ Motadata React Library is written in TypeScript and provides full type definitio
 ### Importing Types
 
 ```tsx
-import type { ButtonProps } from 'motadata-react-library';
+import type { ButtonProps } from '@mtdt/nextgen-design-system';
 
 const CustomButton: React.FC<ButtonProps> = (props) => {
   return <Button {...props} />;
@@ -165,7 +165,7 @@ const CustomButton: React.FC<ButtonProps> = (props) => {
 All component props are fully typed:
 
 ```tsx
-import { Button } from 'motadata-react-library';
+import { Button } from '@mtdt/nextgen-design-system';
 
 // TypeScript will autocomplete and validate props
 <Button
@@ -186,7 +186,7 @@ import { Button } from 'motadata-react-library';
 **Solution:** Ensure you have imported the CSS file:
 
 ```tsx
-import 'motadata-react-library/styles.css';
+import '@mtdt/nextgen-design-system/styles.css';
 ```
 
 ### Tailwind Classes Not Working
@@ -197,7 +197,7 @@ import 'motadata-react-library/styles.css';
 
 ```js
 content: [
-  './node_modules/motadata-react-library/**/*.{js,ts,jsx,tsx}',
+  './node_modules/@mtdt/nextgen-design-system/**/*.{js,ts,jsx,tsx}',
 ],
 ```
 
@@ -239,12 +239,12 @@ Now that you are set up, explore the library:
 
 - [Learn Design Foundations](?path=/docs/foundation-colors--docs) - Colors, typography, spacing, and more
 - [See Component Examples](?path=/docs/components-button--docs) - Interactive component demos
-- [View on GitHub](https://github.com/motadata/motadata-react-library) - Source code and examples
+- [View on GitHub](https://github.com/motadata/@mtdt/nextgen-design-system) - Source code and examples
 
 ---
 
 ## Need Help?
 
-- **GitHub Issues:** [Report bugs or request features](https://github.com/motadata/motadata-react-library/issues)
-- **GitHub Discussions:** [Ask questions and share ideas](https://github.com/motadata/motadata-react-library/discussions)
+- **GitHub Issues:** [Report bugs or request features](https://github.com/motadata/@mtdt/nextgen-design-system/issues)
+- **GitHub Discussions:** [Ask questions and share ideas](https://github.com/motadata/@mtdt/nextgen-design-system/discussions)
 - **Documentation:** Browse this Storybook for comprehensive guides

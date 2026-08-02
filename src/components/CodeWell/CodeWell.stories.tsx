@@ -21,7 +21,7 @@ const meta: Meta<typeof CodeWell> = {
       },
     },
   },
-  args: { children: 'npm install motadata-react-library' },
+  args: { children: 'npm install @mtdt/nextgen-design-system' },
 };
 
 export default meta;
@@ -53,7 +53,7 @@ export const Copyable: Story = {
   render: () => (
     <Stack>
       <CodeWell copyable label="Install command">
-        npm install motadata-react-library
+        npm install @mtdt/nextgen-design-system
       </CodeWell>
       <CodeWell copyable surface="dark" label="Agent bootstrap">
         curl -sSL https://motadata.example.com/install.sh | sh

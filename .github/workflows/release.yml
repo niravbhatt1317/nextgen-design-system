@@ -1,0 +1,73 @@
+name: Release
+
+# Publishing is a deliberate act, not something a merge does behind your back.
+#
+# This runs only when somebody asks for it from the Actions tab, and it stops
+# before the irreversible step unless they also tick `publish`. A dry run leaves
+# the tarball as an artifact you can download and install, which is the only way
+# to know a package works before it is public - npm cannot take a version back.
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Actually publish to npm. Leave unticked for a dry run.'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Build, verify, and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          # Writes the registry into .npmrc so `npm publish` knows where to go.
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      # The same gate `main` has. A package is the one artifact people cannot
+      # fix by pulling again, so nothing skips the checks on the way out.
+      - run: npm run typecheck
+      - run: npx eslint src --ext .ts,.tsx --max-warnings 0
+      - run: npm run test:coverage
+      - run: npm run build
+
+      # Everything `exports` promises has to exist. This repo shipped an
+      # `exports` map naming `dist/styles.css` and `dist/index.d.cts` for months
+      # while neither file was ever written - a package that installs cleanly
+      # and renders every component unstyled.
+      - name: Check the package contains what it promises
+        run: node scripts/verify-package.mjs
+
+      - name: Pack
+        run: npm pack --pack-destination .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-tarball
+          path: '*.tgz'
+          retention-days: 14
+
+      - name: Publish
+        if: ${{ inputs.publish }}
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Say what happened
+        run: |
+          if [ "${{ inputs.publish }}" = "true" ]; then
+            echo "Published $(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Dry run. The tarball is attached to this run as \`package-tarball\`." >> "$GITHUB_STEP_SUMMARY"
+            echo "Download it and \`npm i ./<file>.tgz\` in a scratch app before publishing for real." >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -146,7 +146,8 @@ const UNTOKENISED_RULES = [
   {
     id: 'spacing',
     category: 'Spacing',
-    pattern: /\bmdt-(?:p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|space-x|space-y)-[0-9.]+\b/g,
+    pattern:
+      /\bmdt-(?:p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|space-x|space-y)-[0-9.]+\b/g,
   },
 ];
 

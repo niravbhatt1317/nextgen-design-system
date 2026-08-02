@@ -47,6 +47,40 @@ guessing.
 
 ---
 
+## Using it in a product
+
+```bash
+npm install @mtdt/nextgen-design-system
+```
+
+```tsx
+import '@mtdt/nextgen-design-system/styles.css';
+import { Button, Callout, Dialog, DialogContent, DialogTitle } from '@mtdt/nextgen-design-system';
+```
+
+**The stylesheet is not optional and is not automatic.** Every component here is Tailwind utility
+classes with an `mdt-` prefix; without that one import you get correct, accessible, completely
+unstyled markup — and no error to tell you why. Import it once, at the root of your app.
+
+**You do not need Tailwind to use this.** The stylesheet ships compiled, so the package works in any
+React app. If you _do_ use Tailwind, the `mdt-` prefix means our classes cannot collide with yours —
+that is what the prefix is for.
+
+React 18 or 19, as a peer dependency. Both ESM and CommonJS, with types for each.
+
+### Checking a build before it goes out
+
+```bash
+npm run build          # includes the stylesheet and the CommonJS types
+npm run verify:package # everything `exports` promises actually exists
+npm pack               # the tarball, to install in a scratch app and try
+```
+
+That last step is worth doing rather than trusting. This package spent months naming
+`dist/styles.css` in its `exports` map without ever building the file: `npm pack` succeeded,
+`npm install` succeeded, and every component rendered unstyled. A green build and a working artifact
+are two different claims.
+
 ## Looking at it
 
 You don't need to install anything. The Storybook is published on every change:

@@ -163,9 +163,9 @@ const readProps = (file) => {
       end += 1;
     }
     const body = source.slice(start, end - 1);
-    const names = [...body.matchAll(/^\s*(?:\/\*\*[\s\S]*?\*\/\s*)?'?([a-zA-Z_$][\w$-]*)'?\??\s*:/gm)].map(
-      (prop) => prop[1]
-    );
+    const names = [
+      ...body.matchAll(/^\s*(?:\/\*\*[\s\S]*?\*\/\s*)?'?([a-zA-Z_$][\w$-]*)'?\??\s*:/gm),
+    ].map((prop) => prop[1]);
     // The prose as well as the names. Half this library's behaviour is
     // described in a prop's documentation and nowhere else: `indent` is where
     // "rows nested under a parent" lives, and `selectable` is where the
@@ -341,7 +341,8 @@ const tokenise = (text) =>
 // "r" and lets "col" find "column", which is what people type.
 const MIN_STEM = 3;
 const answers = (word, needle) =>
-  word.startsWith(needle) || (needle.length >= MIN_STEM && needle.startsWith(word) && word.length >= MIN_STEM);
+  word.startsWith(needle) ||
+  (needle.length >= MIN_STEM && needle.startsWith(word) && word.length >= MIN_STEM);
 
 /** Every word position in the text that answers this term or one of its synonyms. */
 const positions = (words, term) => {
@@ -515,17 +516,19 @@ if (args[0] === '--find') {
     'utf8'
   );
   writeFileSync(join(ROOT, 'CAPABILITIES.md'), `${toMarkdown({ capabilities, counts })}\n`, 'utf8');
-  console.log(`Wrote capability-catalog.json and CAPABILITIES.md - ${String(capabilities.length)} capabilities.`);
+  console.log(
+    `Wrote capability-catalog.json and CAPABILITIES.md - ${String(capabilities.length)} capabilities.`
+  );
 } else {
   console.log(`${String(capabilities.length)} capabilities`);
   for (const kind of KIND_ORDER) {
     if (counts[kind]) console.log(`  ${String(counts[kind]).padStart(3)} ${KIND_PLURAL[kind]}`);
   }
-  const undocumented = capabilities.filter(
-    (entry) => entry.doc === '' && entry.kind !== 'story'
-  );
+  const undocumented = capabilities.filter((entry) => entry.doc === '' && entry.kind !== 'story');
   if (undocumented.length > 0) {
-    console.log(`\n${String(undocumented.length)} undocumented - unsearchable, so effectively missing:`);
+    console.log(
+      `\n${String(undocumented.length)} undocumented - unsearchable, so effectively missing:`
+    );
     for (const entry of undocumented.slice(0, 20)) console.log(`  ${entry.name}  ${entry.file}`);
     if (undocumented.length > 20) console.log(`  ... and ${String(undocumented.length - 20)} more`);
   }
