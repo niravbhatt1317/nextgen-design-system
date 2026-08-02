@@ -17,6 +17,9 @@ export const stepperVariants = cva('mdt-flex mdt-w-full mdt-list-none mdt-p-0', 
       stacked: 'mdt-items-start',
       // Wraps rather than clipping. Nothing is hidden; the strip gets taller.
       inline: 'mdt-flex-wrap mdt-items-center mdt-gap-x-1 mdt-gap-y-1',
+      // Equal columns, so the bars read as one track cut into parts rather than
+      // as labels that happen to be underlined.
+      underline: 'mdt-items-stretch mdt-gap-3',
     },
   },
   defaultVariants: { layout: 'stacked' },
@@ -69,18 +72,82 @@ const MARK: Partial<Record<StepState, 'check' | 'minus'>> = {
   skipped: 'minus',
 };
 
+/**
+ * Every part that changes colour does it over the same 150ms.
+ *
+ * The disc, the connector and the bar all move together when `current` changes,
+ * and three different durations would make one strip look like three.
+ */
+const SETTLES = 'mdt-transition-colors mdt-duration-150';
+
 const DISC_BASE = [
   'mdt-flex mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full',
   'mdt-box-border mdt-font-semibold mdt-tabular-nums',
-  'mdt-transition-colors mdt-duration-150',
+  SETTLES,
 ];
 
 const DISC_SIZE: Record<StepperLayout, string> = {
   stacked: 'mdt-h-8 mdt-w-8 mdt-border-2 mdt-text-[13px]',
   inline: 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs',
+  underline: 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs',
 };
 
-const MARK_SIZE: Record<StepperLayout, 'sm' | 'xs'> = { stacked: 'sm', inline: 'xs' };
+const MARK_SIZE: Record<StepperLayout, 'sm' | 'xs'> = {
+  stacked: 'sm',
+  inline: 'xs',
+  underline: 'xs',
+};
+
+/**
+ * The bar under one step.
+ *
+ * 2px so it reads as a track rather than as a border on the label above it, and
+ * filled by the same rule the stacked connector uses - `primary` once the step
+ * is settled, `muted` while it is not. The state vocabulary is the one the rest
+ * of this component already speaks; only the drawing is new.
+ */
+const BAR_REACHED = 'mdt-bg-primary';
+const BAR_AHEAD = 'mdt-bg-muted';
+
+const BAR_STATE: Record<StepState, string> = {
+  complete: BAR_REACHED,
+  current: BAR_REACHED,
+  upcoming: BAR_AHEAD,
+  skipped: BAR_AHEAD,
+  disabled: BAR_AHEAD,
+};
+
+/** How one step's label sits beside its disc, per layout. */
+const LABEL_FLOW: Record<StepperLayout, string> = {
+  stacked: 'mdt-text-[13px]',
+  // Must not wrap - its steps sit on one row and a broken word breaks the row.
+  inline: 'mdt-whitespace-nowrap mdt-text-sm',
+  // Owns a column, so it truncates rather than pushing its neighbours around.
+  underline: 'mdt-truncate mdt-text-sm',
+};
+
+/** What a clickable step's button holds, per layout. */
+const TRIGGER_FLOW: Record<StepperLayout, string> = {
+  // No padding above, on purpose. The connector is pinned to the disc's own
+  // centre line, so anything that pushes the disc down leaves the line hanging.
+  stacked:
+    'mdt-flex mdt-w-full mdt-flex-col mdt-items-center mdt-gap-2 mdt-px-1 mdt-pb-1 mdt-pt-0 mdt-text-center',
+  inline: 'mdt-flex mdt-items-center mdt-gap-2 mdt-px-1 mdt-py-1',
+  // No horizontal padding: the label has to start where the bar under it
+  // starts, or the two read as unrelated.
+  underline: 'mdt-flex mdt-w-full mdt-items-center mdt-gap-2 mdt-py-0.5 mdt-text-left',
+};
+
+/** How one step's own box behaves in the row, per layout. */
+const STEP_FLOW: Record<StepperLayout, string> = {
+  stacked:
+    'mdt-relative mdt-min-w-[92px] mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-items-center mdt-gap-2 mdt-text-center',
+  inline: 'mdt-items-center mdt-gap-2',
+  // Equal columns, so the bars read as one track cut into parts. `min-w-0`
+  // lets a long label truncate instead of widening its column past its
+  // neighbours.
+  underline: 'mdt-min-w-0 mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-gap-2',
+};
 
 /**
  * The room one stacked step needs before its label starts breaking.
@@ -193,6 +260,8 @@ export const Stepper = ({
 }: StepperProps) => {
   // Only `stacked` has anything to fall back to, so nothing is measured on
   // `inline` - it already wraps.
+  // `underline` never collapses: its columns already shrink, and dropping it to
+  // `inline` would take away the bars that are the whole point of it.
   const watching = responsive && layout === 'stacked';
   const [ref, width] = useMeasuredWidth(watching);
 
@@ -236,11 +305,7 @@ export const Stepper = ({
               {renderDisc(state, index)}
               <span
                 data-slot="stepper-label"
-                className={cn(
-                  'mdt-leading-snug',
-                  shown === 'stacked' ? 'mdt-text-[13px]' : 'mdt-whitespace-nowrap mdt-text-sm',
-                  LABEL_STATE[state]
-                )}
+                className={cn('mdt-leading-snug', LABEL_FLOW[shown], LABEL_STATE[state])}
               >
                 {step.label}
               </span>
@@ -266,12 +331,7 @@ export const Stepper = ({
                 'mdt-rounded-md mdt-transition-colors',
                 'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-2 focus-visible:mdt-ring-offset-background',
                 'hover:mdt-bg-muted',
-                shown === 'stacked'
-                  ? // No padding above, on purpose. The connector is pinned to the
-                    // disc's own centre line, so anything that pushes the disc down
-                    // leaves the line hanging behind it.
-                    'mdt-flex mdt-w-full mdt-flex-col mdt-items-center mdt-gap-2 mdt-px-1 mdt-pb-1 mdt-pt-0 mdt-text-center'
-                  : 'mdt-flex mdt-items-center mdt-gap-2 mdt-px-1 mdt-py-1'
+                TRIGGER_FLOW[shown]
               )}
             >
               {label}
@@ -295,13 +355,7 @@ export const Stepper = ({
               // Exactly one step carries this, and it is what a screen reader
               // uses to say "current step" rather than reading five equal items.
               {...(state === 'current' ? { 'aria-current': 'step' as const } : {})}
-              className={cn(
-                'mdt-flex',
-                shown === 'stacked'
-                  ? 'mdt-relative mdt-min-w-[92px] mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-items-center mdt-gap-2 mdt-text-center'
-                  : 'mdt-items-center mdt-gap-2',
-                state === 'disabled' && 'mdt-opacity-45'
-              )}
+              className={cn('mdt-flex', STEP_FLOW[shown], state === 'disabled' && 'mdt-opacity-45')}
             >
               {shown === 'stacked' && index > 0 ? (
                 // Pinned to the centre line of the discs and stopped clear of
@@ -315,7 +369,7 @@ export const Stepper = ({
                   className={cn(
                     'mdt-absolute mdt-top-[15px] mdt-h-0.5 mdt-rounded-full',
                     'mdt-left-[calc(-50%+24px)] mdt-right-[calc(50%+24px)]',
-                    'mdt-transition-colors mdt-duration-150',
+                    SETTLES,
                     joined ? 'mdt-bg-primary' : 'mdt-bg-muted'
                   )}
                 />
@@ -331,7 +385,29 @@ export const Stepper = ({
                 />
               ) : null}
 
-              {inner}
+              {/*
+                `underline` stacks a row over a bar, so the disc and its label
+                need a row of their own inside the column. `stacked` is already
+                a column and `inline` is already a row, which is why neither
+                needs this.
+              */}
+              {shown === 'underline' ? (
+                <span className="mdt-flex mdt-min-w-0 mdt-items-center mdt-gap-2">{inner}</span>
+              ) : (
+                inner
+              )}
+
+              {shown === 'underline' ? (
+                // Under this step's own label, not between two discs. Every
+                // step owns one, which is what makes the row read as a track
+                // cut into parts rather than as a line joining stations.
+                <span
+                  aria-hidden="true"
+                  data-slot="stepper-bar"
+                  data-joined={state === 'complete' || state === 'current'}
+                  className={cn('mdt-h-0.5 mdt-w-full mdt-rounded-full', SETTLES, BAR_STATE[state])}
+                />
+              ) : null}
             </li>
           );
         })}

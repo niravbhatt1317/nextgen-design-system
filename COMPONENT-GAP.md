@@ -18,35 +18,27 @@ excluded — this is components only, from Button onwards.
 
 ---
 
-## DialogSteps folds into Stepper — decided, not yet done
+## DialogSteps folds into Stepper — done
 
-`Stepper` landed in #45 and `DialogSteps` in #40, hours apart, on two branches that never saw each
-other. They are **two answers to one question**: where am I in a multi-step flow.
+`Stepper` (#45) and `DialogSteps` (#40) landed hours apart on branches that never saw each other:
+two answers to one question, _where am I in a multi-step flow_.
 
-They are not identical. `Stepper` is the general strip — a disc over or beside its label, joined by
-a line that fills once you are past it, in `stacked` and `inline` arrangements. `DialogSteps` is an
-underline: every step owns a full-width rule beneath its own label, dark once reached and pale
-before, and a finished step shows a tick rather than its number.
+`Stepper` now has an `underline` layout — a full-width rule beneath each label rather than a line
+between discs — and `DialogSteps` is a preset of it: that layout, seated in the dialog's gutter and
+told not to shrink when the body scrolls. Every rule about how a step _looks_ is `Stepper`'s and is
+now the same everywhere: filled disc for settled, outlined for live, a tick once a step is behind
+you, a dash for skipped, the states worked out from `current`.
 
-**The decision, taken by the design owner on 2 August 2026: `DialogSteps` becomes a variant of
-`Stepper`, and `Stepper` is what everything reaches for.** Today `Dialog` is the only caller, so
-the migration is one component's worth of work and nobody's product breaks. That will not stay
-true, and this is the last cheap moment to do it.
+Two things changed by folding it in, both improvements:
 
-Not done yet, deliberately — it wants its own branch and its own review rather than being folded
-into whatever was in flight when it was noticed.
+- the markup is `Stepper`'s labelled `<nav>` rather than a bare `<ol>`. A labelled landmark can be
+  jumped to; a labelled list cannot.
+- `DialogSteps` forwards no ref, because `Stepper` takes none — it keeps one of its own to measure
+  with. Nothing used it.
 
-What it needs when it is picked up:
-
-- an `underline` variant on `Stepper`, carrying the rule-beneath-the-label drawing and the
-  tick-replaces-number rule
-- `DialogSteps` reduced to a preset of it, keeping its own name and its JSDoc — the rules about
-  where it sits in a dialog and which steps are clickable are Dialog's business, not Stepper's
-- one search afterwards (`npm run find -- stepper`) to confirm there is one answer, not two
-
-**Why this is written down rather than remembered:** two people built the same idea on the same day
-without either knowing. A note in a shared file is the only part of that story anybody can act on
-later.
+**Why it was worth doing at all:** `Dialog` was the only caller, so the migration cost one component
+and broke nobody. Left a month, the tick would have been fixed in one of them and not the other,
+and nobody would have known which they were looking at.
 
 ## Callout — built
 

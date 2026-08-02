@@ -6,6 +6,7 @@ export {
   DialogClose,
   DialogContent,
   DialogBody,
+  DialogMedia,
   DialogHeader,
   DialogFooter,
   DialogTitle,
@@ -18,6 +19,7 @@ export type {
   DialogOverlayProps,
   DialogContentProps,
   DialogBodyProps,
+  DialogMediaProps,
   DialogHeaderProps,
   DialogFooterProps,
   DialogTitleProps,
@@ -26,6 +28,8 @@ export type {
 } from './Dialog.types';
 
 export { useSubmitShortcut } from './useSubmitShortcut';
+export { useTypedConfirmation } from './useTypedConfirmation';
+export type { UseTypedConfirmation, UseTypedConfirmationOptions } from './useTypedConfirmation';
 export type { UseSubmitShortcutOptions } from './useSubmitShortcut';
 
 export { DialogSteps } from './DialogSteps';

@@ -151,11 +151,13 @@ export {
   DialogClose,
   DialogContent,
   DialogBody,
+  DialogMedia,
   DialogHeader,
   DialogFooter,
   DialogTitle,
   DialogDescription,
   useSubmitShortcut,
+  useTypedConfirmation,
   DialogSteps,
 } from './Dialog';
 export type {
@@ -165,6 +167,7 @@ export type {
   DialogOverlayProps,
   DialogContentProps,
   DialogBodyProps,
+  DialogMediaProps,
   DialogHeaderProps,
   DialogFooterProps,
   DialogTitleProps,

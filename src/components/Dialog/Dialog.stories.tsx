@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
 import { Callout } from '../Callout';
+import { Tabs, TabsList, TabsTrigger } from '../Tabs';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
 import { useSubmitShortcut } from './useSubmitShortcut';
+import { useTypedConfirmation } from './useTypedConfirmation';
 import {
   Dialog,
   DialogBody,
@@ -15,6 +17,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
   DialogTrigger,
 } from './Dialog';
@@ -763,6 +766,314 @@ export const Panel: Story = {
           </DialogContent>
         </Dialog>
       </>
+    );
+  },
+};
+
+/**
+ * **Prompt — one decision, and the two things that make a destructive one safe.**
+ *
+ * A `Callout` lists what is about to go. Not prose: a list is countable, and
+ * *"3 members, 12 files, every API key"* is a different sentence from *"this
+ * will delete your data"*.
+ *
+ * Then `useTypedConfirmation` makes you type the workspace's own name. **Its
+ * name, not the word DELETE** — a name has to be read off the screen and copied
+ * deliberately, where `DELETE` is the same five letters on every dialog anybody
+ * has ever seen and gets typed from memory without looking at what it is about
+ * to destroy.
+ *
+ * It is a speed bump, not a security control. Anybody determined will be past
+ * it in two seconds, and that is fine: the job is to turn an automatic click
+ * into a deliberate one.
+ *
+ * **No ⏎ chip and no `useSubmitShortcut`**, deliberately and for the same
+ * reason — a keyboard path *is* muscle memory, and this dialog exists to
+ * interrupt it.
+ */
+export const Prompt: Story = {
+  render: function PromptDemo() {
+    const [open, setOpen] = useState(false);
+    const workspace = 'Acme Production';
+    const confirm = useTypedConfirmation({ phrase: workspace });
+
+    const close = () => {
+      setOpen(false);
+      confirm.reset();
+    };
+
+    return (
+      <>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Delete workspace
+        </Button>
+        <Dialog open={open} onOpenChange={close}>
+          <DialogContent size="sm">
+            <DialogHeader>
+              <DialogTitle>Delete {workspace}?</DialogTitle>
+              <DialogDescription>This cannot be undone.</DialogDescription>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
+              <Callout tone="danger" size="sm">
+                Deleting it removes:
+                <ul className="mdt-mt-1.5 mdt-list-disc mdt-space-y-0.5 mdt-pl-4">
+                  <li>3 members, immediately</li>
+                  <li>12 files, permanently</li>
+                  <li>Every API key issued to this workspace</li>
+                </ul>
+              </Callout>
+              <Input
+                label={`Type ${workspace} to confirm`}
+                value={confirm.value}
+                onChange={confirm.onChange}
+                placeholder={workspace}
+                autoComplete="off"
+              />
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="outline" onClick={close}>
+                Cancel
+              </Button>
+              <Button variant="destructive" disabled={!confirm.confirmed} onClick={close}>
+                Delete workspace
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * The footer's rule is a choice, on any dialog.
+ *
+ * `divider` is a prop on `DialogFooter` and nothing else depends on it — it
+ * works at every size, every density, and with `scroll="page"` or `"body"`.
+ *
+ * **With the rule** — the default, and right for a form. A line above the
+ * buttons says the reading is over and the deciding starts. The header
+ * deliberately has no matching rule; that asymmetry is the house style.
+ *
+ * **Without it** — for a dialog that was never in two parts. An announcement
+ * with one button, a confirmation of two sentences: there is no reading to
+ * separate from the deciding, and a line drawn across it invents a seam.
+ *
+ * **They are not the same spacing minus a line.** Without a rule the
+ * separation has to be done by space alone, so the buttons sit **24px** from
+ * the reading rather than the 16 the gap alone would give. With a rule, 24 is
+ * where the line sits and the buttons are 12 below it.
+ */
+export const FooterRule: Story = {
+  render: function FooterRuleDemo() {
+    const [open, setOpen] = useState<'rule' | 'none' | null>(null);
+    const close = () => {
+      setOpen(null);
+    };
+
+    return (
+      <div className="mdt-flex mdt-gap-2">
+        <Button
+          onClick={() => {
+            setOpen('rule');
+          }}
+        >
+          With the rule
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('none');
+          }}
+        >
+          Without
+        </Button>
+
+        <Dialog open={open === 'rule'} onOpenChange={close}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Rename this view</DialogTitle>
+              <DialogDescription>Everyone who uses it will see the new name.</DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <Input label="Name" defaultValue="Unassigned, this week" />
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="outline" onClick={close}>
+                Cancel
+              </Button>
+              <Button shortcut={['mod', 'enter']} onClick={close}>
+                Rename
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open === 'none'} onOpenChange={close}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Your export is on its way</DialogTitle>
+              <DialogDescription>
+                We will email a link when it is ready. Large exports can take a few minutes.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter divider={false}>
+              <Button shortcut={['enter']} onClick={close}>
+                Got it
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  },
+};
+
+/**
+ * The Panel's slots — **one dialog each**, because that is how they are used.
+ *
+ * They were first shown all four at once and it was unreadable: a picture, a
+ * back link, a counter and a row of tabs above one form is not a panel anybody
+ * would design. Each button below opens a panel using the one slot it is about.
+ *
+ * - **Media** — `DialogMedia`, the one region with no gutter. A product shot
+ *   inset by 16px reads as a picture somebody placed in a dialog; the same shot
+ *   reaching both edges reads as the dialog's own. Its footer carries
+ *   `divider={false}`: a dialog led by a picture is an announcement rather than
+ *   a form, and a rule above its one button divides something that was never in
+ *   two parts.
+ * - **Tabs** — inside the header, not above the body. The header is the part
+ *   that does not move, and tabs that scrolled away would leave you unable to
+ *   switch back without scrolling up.
+ * - **Back and a counter** — for one step of something longer. Back is **not**
+ *   close: it goes back inside the dialog, close leaves. Two exits doing
+ *   different things are drawn differently — an arrow on the left, a cross on
+ *   the right.
+ */
+export const PanelSlots: Story = {
+  render: function PanelSlotsDemo() {
+    const [open, setOpen] = useState<'media' | 'tabs' | 'steps' | null>(null);
+    const [tab, setTab] = useState('details');
+    const close = () => {
+      setOpen(null);
+    };
+
+    const rows = (word: string, n: number) =>
+      Array.from({ length: n }, (_, index) => (
+        <Input key={index} label={`${word} ${String(index + 1)}`} placeholder="…" />
+      ));
+
+    return (
+      <div className="mdt-flex mdt-flex-wrap mdt-gap-2">
+        <Button
+          onClick={() => {
+            setOpen('media');
+          }}
+        >
+          Media
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('tabs');
+          }}
+        >
+          Tabs
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('steps');
+          }}
+        >
+          Back and counter
+        </Button>
+
+        <Dialog open={open === 'media'} onOpenChange={close}>
+          <DialogContent scroll="body">
+            <DialogMedia>
+              <div className="mdt-flex mdt-h-36 mdt-items-center mdt-justify-center mdt-bg-muted">
+                <span className="mdt-text-xs mdt-text-muted-foreground">A product shot</span>
+              </div>
+            </DialogMedia>
+            <DialogHeader>
+              <DialogTitle>Saved views are here</DialogTitle>
+              <DialogDescription>
+                Save a filter and a column layout together and give the pair a name. Anyone on your
+                team can open it, and changing the view changes it for all of them — so a queue
+                everybody works from stays one queue rather than five that drift apart.
+              </DialogDescription>
+            </DialogHeader>
+            {/*
+              No rule. A dialog led by a picture is an announcement rather than
+              a form, and a line above its one button divides a thing that was
+              never in two parts. `divider={false}` is what that is for.
+            */}
+            <DialogFooter divider={false}>
+              <Button shortcut={['enter']} onClick={close}>
+                Got it
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open === 'tabs'} onOpenChange={close}>
+          <DialogContent size="lg" scroll="body">
+            <DialogHeader
+              tabs={
+                <Tabs value={tab} onValueChange={setTab}>
+                  <TabsList variant="underline">
+                    <TabsTrigger variant="underline" value="details">
+                      Details
+                    </TabsTrigger>
+                    <TabsTrigger variant="underline" value="access">
+                      Access
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              }
+            >
+              <DialogTitle>Configure integration</DialogTitle>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
+              {rows(tab === 'details' ? 'Detail' : 'Permission', 8)}
+            </DialogBody>
+            <DialogFooter align="between">
+              <Button variant="ghost" onClick={close}>
+                Cancel
+              </Button>
+              <Button shortcut={['mod', 'enter']} onClick={close}>
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open === 'steps'} onOpenChange={close}>
+          <DialogContent scroll="body">
+            <DialogHeader onBack={close} backLabel="All integrations" counter="2 of 5">
+              <DialogTitle>Map the fields</DialogTitle>
+              <DialogDescription>
+                Match each column in the file to a field on the ticket.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">{rows('Column', 6)}</DialogBody>
+            <DialogFooter align="between">
+              <Button variant="ghost" onClick={close}>
+                Back
+              </Button>
+              <Button shortcut={['mod', 'enter']} onClick={close}>
+                Next
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     );
   },
 };

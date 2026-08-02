@@ -1,7 +1,8 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DialogSteps } from './DialogSteps';
 import { useSubmitShortcut } from './useSubmitShortcut';
+import { useTypedConfirmation } from './useTypedConfirmation';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,6 +15,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogTitle,
   DialogTrigger,
 } from './Dialog';
@@ -578,8 +580,11 @@ describe('DialogSteps', () => {
   });
 
   it('names itself for a screen reader', () => {
+    // A `nav`, not a bare list - that is `Stepper`'s own markup, and it is
+    // better: a labelled landmark can be jumped to, where a labelled list
+    // cannot.
     render(<DialogSteps steps={steps} current={0} label="Invite progress" />);
-    expect(screen.getByRole('list', { name: 'Invite progress' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Invite progress' })).toBeInTheDocument();
   });
 
   it('leaves more room beneath itself than the dialog leaves between blocks', () => {
@@ -634,6 +639,20 @@ describe('DialogFooter', () => {
   it('can go without', () => {
     const { container } = render(<DialogFooter divider={false}>ok</DialogFooter>);
     expect(container.firstElementChild?.className).not.toContain('mdt-border-t');
+  });
+
+  it('is not the same spacing minus a line when it goes without', () => {
+    // Without a rule the separation has to be done by space alone, so the
+    // buttons get MORE room above them, not the rule's room minus the rule.
+    // Measured: 24 from the reading, against 37 with a rule at 24 and the
+    // buttons 12 below it. Dropping to the bare 16 read as a footer that had
+    // lost something rather than one that never had it.
+    const { container: bare } = render(<DialogFooter divider={false}>ok</DialogFooter>);
+    expect(bare.firstElementChild?.className).toContain('mdt-mt-2');
+    expect(bare.firstElementChild?.className).not.toContain('mdt-pt-');
+
+    const { container: ruled } = render(<DialogFooter>ok</DialogFooter>);
+    expect(ruled.firstElementChild?.className).toContain('mdt-pt-3');
   });
 
   it('pushes the two apart when there is a way back', () => {
@@ -793,6 +812,15 @@ describe('scroll', () => {
     expect(footer('body')).not.toContain('mdt-mt-2');
   });
 
+  it('takes that gap back from whatever follows the scroller, not from the footer', () => {
+    // The footer cannot know what is above it. Pulling itself up collapsed it
+    // against the header on a dialog with no scrolling body at all - measured
+    // at 0px between a description and the rule, the two touching.
+    const { dialog } = at('body');
+    expect(dialog.className).toContain('[&>[data-dialog-scroller]+*]:-mdt-mt-4');
+    expect(dialog.querySelector('[data-dialog-scroller]')).toBeInTheDocument();
+  });
+
   it('holds the header and the footer still', () => {
     // The whole point of the pattern: the title and the actions stay where they
     // are while the reading moves.
@@ -808,6 +836,95 @@ describe('scroll', () => {
     // Identical for a stack of blocks with a gap - the difference only shows up
     // when one of them has to scroll.
     expect(at('body').dialog.className).toContain('mdt-flex-col');
+  });
+});
+
+describe('the Panel slots', () => {
+  const panel = (props: Record<string, unknown> = {}) =>
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogMedia>
+            <img src="/shot.png" alt="" />
+          </DialogMedia>
+          <DialogHeader {...props}>
+            <DialogTitle>Configure</DialogTitle>
+          </DialogHeader>
+          <DialogBody>body</DialogBody>
+        </DialogContent>
+      </Dialog>
+    );
+
+  it('gives the media no gutter, unlike every other region', () => {
+    // A product shot inset by 16px reads as a picture somebody placed in a
+    // dialog; the same shot reaching both edges reads as the dialog's own.
+    // The dialog is portalled, so `container` does not hold it.
+    panel();
+    const media = screen.getByRole('dialog').firstElementChild;
+    expect(media?.className).not.toContain('mdt-px-');
+    expect(media?.className).toContain('mdt-shrink-0');
+  });
+
+  it('takes the top inset off whatever follows it', () => {
+    // 20 from the image to the title. At 32 the header was still applying a
+    // top inset for a top it was no longer at; at 16 - the content's gap alone
+    // - the words sat against the edge of the image.
+    panel();
+    expect(screen.getByRole('dialog').className).toContain('[&>[data-dialog-media]+*]:mdt-pt-1');
+    expect(screen.getByRole('dialog').firstElementChild).toHaveAttribute('data-dialog-media');
+  });
+
+  it('rounds the media to match the card it fills, and stays square on a phone', () => {
+    panel();
+    const media = screen.getByRole('dialog').firstElementChild;
+    expect(media?.className).toContain('mdt-rounded-none');
+    expect(media?.className).toContain('sm:mdt-rounded-t-lg');
+  });
+
+  it('draws no row above the title when there is nothing to put in it', () => {
+    // An empty 20px strip pushes the title down for no reason, which is what a
+    // row rendered unconditionally does on the many dialogs needing neither.
+    panel();
+    expect(screen.queryByRole('button', { name: /Back/ })).not.toBeInTheDocument();
+    const header = screen.getByRole('heading', { name: 'Configure' }).parentElement;
+    expect(header?.firstElementChild?.tagName).toBe('H2');
+  });
+
+  it('reports the back press, and names where it goes', () => {
+    const onBack = vi.fn();
+    panel({ onBack, backLabel: 'All integrations' });
+    screen.getByRole('button', { name: 'All integrations' }).click();
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps back and close as visibly different exits', () => {
+    // One steps back inside the dialog, the other leaves. Two exits doing
+    // different things have to look different.
+    panel({ onBack: vi.fn() });
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  });
+
+  it('keeps the row above the title exactly one line tall', () => {
+    // The close button centres on a line. A row taller than one line leaves it
+    // sitting above the row - measured at 2px out before this.
+    panel({ onBack: vi.fn(), counter: '2 of 5' });
+    const row = screen.getByRole('heading', { name: 'Configure' }).parentElement?.firstElementChild;
+    expect(row?.className).toContain('mdt-h-5');
+    expect(screen.getByRole('button', { name: 'Back' }).className).toContain('mdt-h-5');
+  });
+
+  it('shows a counter where one is given', () => {
+    panel({ counter: '2 of 5' });
+    expect(screen.getByText('2 of 5')).toBeInTheDocument();
+  });
+
+  it('puts the tabs inside the header, so they do not scroll away', () => {
+    // The header is the part that does not move. Tabs that scrolled with the
+    // body would leave somebody unable to switch back without scrolling up.
+    panel({ tabs: <div data-testid="tabs" /> });
+    const header = screen.getByRole('heading', { name: 'Configure' }).parentElement;
+    expect(header?.contains(screen.getByTestId('tabs'))).toBe(true);
   });
 });
 
@@ -911,5 +1028,75 @@ describe('size and density', () => {
     ['spacious', 'mdt-gap-6'],
   ] as const)('sets the rhythm between regions at %s', (density, gap) => {
     expect(at({ density })).toContain(gap);
+  });
+});
+
+describe('useTypedConfirmation', () => {
+  const typed = (phrase: string, opts?: { caseSensitive?: boolean }) =>
+    renderHook(() => useTypedConfirmation({ phrase, ...opts }));
+
+  it('refuses until the phrase matches', () => {
+    const { result } = typed('Acme Production');
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme Production' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('forgives a trailing space, because a copied name arrives with one', () => {
+    // Refusing it teaches people the control is broken rather than that they
+    // are wrong.
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: '  Acme Production ' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('ignores case by default', () => {
+    // The job is to make somebody stop and read, not to test their shift key.
+    // Somebody who typed the right name in the wrong case has demonstrably read
+    // it.
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: 'acme production' } });
+    });
+    expect(result.current.confirmed).toBe(true);
+  });
+
+  it('minds it when told to', () => {
+    const { result } = typed('Acme Production', { caseSensitive: true });
+    act(() => {
+      result.current.onChange({ target: { value: 'acme production' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+  });
+
+  it('never confirms on an empty phrase', () => {
+    // A gate that is open before anybody touches it is worse than no gate,
+    // because it looks like one.
+    const { result } = typed('');
+    expect(result.current.confirmed).toBe(false);
+    act(() => {
+      result.current.onChange({ target: { value: '   ' } });
+    });
+    expect(result.current.confirmed).toBe(false);
+  });
+
+  it('empties itself, for reopening on the same page', () => {
+    const { result } = typed('Acme Production');
+    act(() => {
+      result.current.onChange({ target: { value: 'Acme Production' } });
+    });
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.value).toBe('');
+    expect(result.current.confirmed).toBe(false);
   });
 });
