@@ -30,6 +30,19 @@ export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 /** How much room the dialog gives its contents. */
 export type DialogDensity = 'compact' | 'comfortable' | 'spacious';
 
+/**
+ * Which part of a tall dialog scrolls.
+ *
+ * `page` lets the whole dialog grow and scrolls the dimmed area behind it. Right
+ * for a Prompt, and for anything short enough that scrolling is the exception.
+ *
+ * `body` caps the dialog at the viewport and scrolls only its body, leaving the
+ * header and the footer where they are. That is the Panel pattern - seven of
+ * the twelve product screens this was read from - and it is what keeps the
+ * primary action reachable without scrolling to the bottom of a long form.
+ */
+export type DialogScroll = 'page' | 'body';
+
 /** How a footer arranges what is in it. */
 export type DialogFooterAlign = 'end' | 'between';
 
@@ -107,6 +120,14 @@ export interface DialogContentProps extends ComponentPropsWithoutRef<
    * @default 'comfortable'
    */
   density?: DialogDensity;
+
+  /**
+   * Which part of a tall dialog scrolls. See {@link DialogScroll}.
+   *
+   * Defaults to `page`. `body` is what makes a Panel: the header stays, the
+   * footer stays, and the reading between them moves.
+   */
+  scroll?: DialogScroll;
 }
 
 /**

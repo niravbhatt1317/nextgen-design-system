@@ -87,3 +87,15 @@ export const useDialogTop = () => TOP[useContext(DialogDensityContext)];
 
 /** The room between the footer's rule and its buttons. */
 export const useDialogFooterTop = () => FOOTER_TOP[useContext(DialogDensityContext)];
+
+/**
+ * Which part of a tall dialog scrolls, for the regions that have to know.
+ *
+ * Only `DialogBody` reads it. The header and the footer behave the same either
+ * way - they are the parts that do not move - and it is the body that has to
+ * decide between growing and scrolling.
+ */
+export const DialogScrollContext = createContext<'page' | 'body'>('page');
+
+/** Whether this dialog scrolls its body rather than the page behind it. */
+export const useDialogScrollsBody = () => useContext(DialogScrollContext) === 'body';

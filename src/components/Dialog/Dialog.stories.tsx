@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
+import { Callout } from '../Callout';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
@@ -1026,6 +1027,74 @@ export const Sizes: Story = {
           </DialogContent>
         </Dialog>
       </div>
+    );
+  },
+};
+
+/**
+ * **Panel — the workhorse.** Seven of the twelve product screens this was read
+ * from are this shape: a header that stays, a body that scrolls, a footer that
+ * stays.
+ *
+ * `scroll="body"` is what makes it. Without it a long dialog grows past the
+ * screen and the dimmed area behind it scrolls instead — which works, but puts
+ * the primary action at the bottom of a long form, where somebody filling it in
+ * has to scroll past everything to reach it. Here the action never moves.
+ *
+ * Scroll the body and watch the title and the buttons stay put.
+ */
+export const Panel: Story = {
+  render: function PanelDemo() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Add a field
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent size="lg" scroll="body">
+            <DialogHeader>
+              <DialogTitle>Add a field</DialogTitle>
+              <DialogDescription>Fields appear on every ticket in this project.</DialogDescription>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
+              <Callout tone="info" size="sm">
+                A field cannot be deleted once tickets have used it — it can only be hidden.
+              </Callout>
+              {Array.from({ length: 9 }, (_, index) => (
+                <Input
+                  key={index}
+                  label={`Attribute ${String(index + 1)}`}
+                  placeholder="Enough rows that it has to scroll…"
+                />
+              ))}
+            </DialogBody>
+            <DialogFooter align="between">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                shortcut={['mod', 'enter']}
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Add field
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   },
 };
