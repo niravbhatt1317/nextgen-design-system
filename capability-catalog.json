@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 778,
+  "capabilityCount": 786,
   "counts": {
-    "story": 567,
+    "story": 571,
     "component": 186,
-    "utility": 9,
-    "hook": 16
+    "utility": 12,
+    "hook": 17
   },
   "capabilities": [
     {
@@ -1706,6 +1706,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Default",
+      "doc": "Components/Kbd Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
       "summary": "Story: Components/Label / Default",
@@ -2014,6 +2024,16 @@
       "propDocs": "Name of the deprecated component Deprecation information"
     },
     {
+      "name": "describeKeys",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "What the whole combination is called - \"Command + Shift + E\".",
+      "doc": "What the whole combination is called - \"Command + Shift + E\". Spelled out rather than symbolic, because the symbols are the one thing a screen reader cannot help with.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Destructive",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -2172,16 +2192,6 @@
       "doc": "DialogSteps - where you are in a dialog that has more than one part. **The bar under each step is the progress, not a connector between dots.** Every step owns a full-width rule beneath its own label, dark once reached and pale before. A row of circles joined by a line says \"these are stations on a route\"; a row of underlined labels says \"these are the parts, and you have done this many\" - which is the question somebody halfway through a form is actually asking. **A step you have finished shows a tick, not its number.** The number is only useful before you arrive; afterwards the useful thing is that it is done. Sits directly under the header, above the body, and never in the footer - `Back` and `Next` belong there, and putting the position there too would crowd the one row that has to stay readable. ```tsx <DialogSteps current={1} steps={[{ key: 'details', label: 'Invite details' }, { key: 'access', label: 'Access duration' }]} onStepSelect={(key) => { goTo(key); }} /> ```",
       "props": ["steps", "current", "onStepSelect", "label"],
       "propDocs": "The parts, in order. Which one you are on, zero-based. Everything before it counts as done. Lets a finished step be gone back to. Omit it and none are clickable. Only steps already passed. Jumping ahead to one whose inputs depend on a step you have not filled in is how a form ends up half-complete in an order nobody designed for. The list's accessible name. @default 'Progress'"
-    },
-    {
-      "name": "DialogSubmitHint",
-      "kind": "component",
-      "file": "src/components/Dialog/DialogSubmitHint.tsx",
-      "area": "Dialog",
-      "summary": "DialogSubmitHint - the ⏎ chip that sits inside a primary button.",
-      "doc": "DialogSubmitHint - the ⏎ chip that sits inside a primary button. The product puts one on every primary action: *Generate link*, *Next*, *Send invite*, *Update grant*, *Create group*, *Done, I've copied it*. A shortcut nobody knows about is worth nothing, and the button is the only place anybody is looking when they are deciding to press it. **Never on a destructive action.** *Permanently delete* and *Continue* carry no hint, deliberately: nobody should be able to delete something by muscle memory, and a keyboard path to an irreversible act is exactly that. Pair this with `useSubmitShortcut` and leave both off anything that destroys. **The glyph is Lucide's `corner-down-left`, not the ⏎ character.** The character carries its own sidebearings and sits off its own baseline, so it can never be centred in a box - it read as leaning into one corner however the padding was set. An icon has neither problem, and it is the same arrow the product draws. Inherits its colour from the button it sits in, so it works on the dark primary and on the pale disabled state without knowing which it is on. ```tsx <Button onClick={save}>Send invite <DialogSubmitHint /></Button> ```",
-      "props": ["children"],
-      "propDocs": "What the chip shows. @default '⏎'"
     },
     {
       "name": "DialogTitle",
@@ -2610,6 +2620,16 @@
       "area": "Cell Recipes",
       "summary": "Story: Components/Table/Cell Recipes / EmptyValueRecipe",
       "doc": "Components/Table/Cell Recipes EmptyValueRecipe",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Every",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Every",
+      "doc": "Components/Kbd Every",
       "props": [],
       "propDocs": ""
     },
@@ -3682,6 +3702,16 @@
       "propDocs": ""
     },
     {
+      "name": "isModifier",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "Whether a key is a modifier rather than the key being modified.",
+      "doc": "Whether a key is a modifier rather than the key being modified.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Item",
       "kind": "component",
       "file": "src/components/Item/Item.tsx",
@@ -3700,6 +3730,27 @@
       "doc": "Layout/Flex JustifyContent",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "Kbd",
+      "kind": "component",
+      "file": "src/components/Kbd/Kbd.tsx",
+      "area": "Kbd",
+      "summary": "Kbd - a keyboard shortcut, drawn as keys.",
+      "doc": "Kbd - a keyboard shortcut, drawn as keys. **Reach for this anywhere a shortcut is shown**: inside a button, at the end of a menu row, in a search field, in a legend, in a help panel. Before it existed this library drew shortcuts five different ways in five files - `CommandShortcut`, `DropdownMenuShortcut`, a hand-written `<kbd>` in `Sidebar`, and two more - none of which knew about the others. **Keys go in as data.** `keys={['mod', 'shift', 'e']}`, not a hand-assembled row of icons. That is what makes it something a model can write correctly, which is the point of this library, and it is also what lets the component know which keys are modifiers and what to say out loud. **`'mod'` is the key to reach for.** Command on a Mac, Control everywhere else - which is what almost every shortcut actually means. `useSubmitShortcut` already accepts either at the event level, so a hint naming one of them was telling half the people the wrong thing. **It is announced, not hidden.** The keys are read out spelled - \"Command + Shift + E\" - because the symbols are the one thing a screen reader cannot help with. Pass `decorative` where the shortcut really is decoration on something that already says ",
+      "props": [
+        "keys",
+        "layout",
+        "variant",
+        "size",
+        "tone",
+        "tight",
+        "dimModifiers",
+        "platform",
+        "decorative",
+        "label"
+      ],
+      "propDocs": "The keys, in the order they are pressed. Data rather than markup, deliberately: `keys={['mod', 'shift', 'e']}` is something a model gets right, and a hand-assembled row of icons is not. This library's primary consumer is a machine. A cap per key, or one cap holding all of them. `separate` is the default because it is the only arrangement where a three-key shortcut still reads as three things rather than as a word. Outlined, or a filled block. `filled` is quieter and belongs where the shortcut is information rather than an offer - a legend, a help panel, a list of what the keys do. How big the keys are. `md` matches the text beside it at `text-sm`. Which ink to draw in. See {@link KbdTone}. Pull the keys closer together. `separate` only. 2px instead of 4, so the caps read as one shape at a glance while staying countable up close. Draw the modifiers a tone quieter than the key they modify. Hierarchy without extra geometry: in `⌘⇧E` the E is the part that changes between shortcuts, and this is what makes it the part you read. Which machine to render for, if you know better than the browser does. Left alone, `mod` and `alt` follow the machine the page is on. Hide it from assistive tech"
     },
     {
       "name": "KeyboardNavigation",
@@ -4640,6 +4691,16 @@
       "propDocs": ""
     },
     {
+      "name": "Platform",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Platform",
+      "doc": "Components/Kbd Platform",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Popover",
       "kind": "component",
       "file": "src/components/Popover/Popover.tsx",
@@ -4976,6 +5037,16 @@
       "area": "Textarea",
       "summary": "Story: Components/Textarea / ResizeVariants",
       "doc": "Components/Textarea ResizeVariants",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "resolveKey",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "One key, as a glyph to draw and a name to announce.",
+      "doc": "One key, as a glyph to draw and a name to announce. Anything not in the table is drawn as itself and announced as itself, upper cased - so `'e'`, `'/'` and `'F5'` all work without needing an entry. A registry that refuses unknown keys would mean a pull request every time somebody adds a shortcut.",
       "props": [],
       "propDocs": ""
     },
@@ -6911,6 +6982,16 @@
       "propDocs": ""
     },
     {
+      "name": "Usage",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Usage",
+      "doc": "Components/Kbd Usage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useColumnReorder",
       "kind": "hook",
       "file": "src/components/Table/useColumnReorder.ts",
@@ -6987,6 +7068,16 @@
       "area": "LeftNav",
       "summary": "Which level of a settings navigation is showing.",
       "doc": "Which level of a settings navigation is showing. **Two levels, and the type says so.** `level` is `1 | 2`, and `open` from level 2 replaces the section rather than stacking another one - so a third level cannot be reached by calling the API wrong. Depth in a settings menu is where people get lost: three levels down, the back button has to be pressed an unknown number of times to get anywhere, and nobody knows where they are. Anything that would have been a third level is flattened into the second with groups - a static heading for a handful of pages, a collapsible group for more. Grouping shows the structure without hiding it behind another push. As with the Table hooks, it holds state and touches nothing else. Routing is the product's business: `onChange` reports the move, and what that means for the URL is not this hook's decision. ```tsx const levels = useLeftNavLevels(); levels.open('observability'); // level 2 levels.back(); // level 1 ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "usePlatform",
+      "kind": "hook",
+      "file": "src/components/Kbd/usePlatform.ts",
+      "area": "Kbd",
+      "summary": "Which machine this is, for resolving `mod` and `alt`.",
+      "doc": "Which machine this is, for resolving `mod` and `alt`. `useSyncExternalStore` rather than an effect, so a client-rendered page gets the right answer on its **first** paint - an effect would draw `Ctrl` and then swap it for `⌘`, which is a flicker on exactly the surface that is meant to be glanced at. A server-rendered page gets `windows` and corrects itself on hydration without a mismatch, which is what the third argument is for.",
       "props": [],
       "propDocs": ""
     },

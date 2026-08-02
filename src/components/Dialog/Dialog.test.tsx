@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DialogSteps } from './DialogSteps';
-import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 
 import { render, screen, waitFor } from '@testing-library/react';
@@ -756,47 +755,6 @@ describe('the close button', () => {
     // The way out of a dialog is not the thing to look at first, and at full
     // strength the X competed with the title for that.
     expect(close().className).toContain('mdt-text-muted-foreground');
-  });
-});
-
-describe('DialogSubmitHint', () => {
-  it('shows the key and stays out of the reading', () => {
-    const { container } = render(<DialogSubmitHint />);
-    const chip = container.firstElementChild;
-    // An icon, not the ⏎ character: the character carries its own sidebearings
-    // and sits off its own baseline, so it cannot be centred in a box.
-    expect(chip?.querySelector('svg')).toBeInTheDocument();
-    // Read out, it becomes "Send invite return symbol", which helps nobody.
-    expect(chip).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('draws three named tones, not one colour faded by a percentage', () => {
-    // The label at full strength, the glyph a step softer, the hairline softer
-    // again - each a token that flips with the theme, because `primary` itself
-    // inverts and "softer than the label" is a different direction on each side.
-    const { container } = render(<DialogSubmitHint />);
-    const classes = container.firstElementChild?.className ?? '';
-    expect(classes).toContain('mdt-text-primary-foreground-muted');
-    expect(classes).toContain('mdt-border-primary-foreground-subtle');
-    // An opacity is a number nobody can look up.
-    expect(classes).not.toContain('mdt-opacity');
-    expect(classes).not.toContain('current');
-  });
-
-  it("pulls the button's trailing padding in, since a chip is not reading", () => {
-    // 16 becomes 12. Owned by the chip rather than by a Button variant, so it
-    // only ever applies where there is actually a chip.
-    const { container } = render(<DialogSubmitHint />);
-    expect(container.firstElementChild?.className).toContain('-mdt-mr-1');
-  });
-
-  it('is outlined rather than filled', () => {
-    // A fill was tried and dropped by the design owner. Filled, the chip reads
-    // as a second smaller button sitting inside the first - two things to press
-    // where there is one - and the rule ended up darker than the block it
-    // surrounded, which is an outline rather than a hairline.
-    const { container } = render(<DialogSubmitHint />);
-    expect(container.firstElementChild?.className).not.toContain('mdt-bg-');
   });
 });
 

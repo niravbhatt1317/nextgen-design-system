@@ -3,6 +3,8 @@ import { cva } from 'class-variance-authority';
 import { forwardRef, type MouseEvent } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
+import { Kbd } from '../Kbd';
+import type { KbdSize, KbdTone } from '../Kbd';
 import type {
   ButtonProps,
   ButtonColor,
@@ -159,6 +161,43 @@ const colorClasses: Record<ButtonColor, string> = {
   warning: 'mdt-bg-warning mdt-text-warning-foreground hover:mdt-bg-warning/90',
   error: 'mdt-bg-destructive mdt-text-destructive-foreground hover:mdt-bg-destructive/90',
   info: 'mdt-bg-info mdt-text-info-foreground hover:mdt-bg-info/90',
+};
+
+/**
+ * Which button fills solidly enough that a key cap on it needs inverted ink.
+ *
+ * Everything else - outline, ghost, link, and the soft and outlined tones -
+ * sits on the page's own background, where the default ink is right.
+ */
+const SOLID_VARIANTS = new Set(['primary', 'destructive', 'success', 'ai']);
+
+/** A key cap one step down from the button, so it never outweighs the label. */
+type SizeKey = NonNullable<ButtonProps['size']>;
+
+const SHORTCUT_SIZE: Record<SizeKey, KbdSize> = {
+  xs: 'sm',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  xl: 'lg',
+  icon: 'md',
+};
+
+/**
+ * How the cap is seated at the end of the button.
+ *
+ * Pulled back out of the button's trailing padding, because a chip is not
+ * reading and does not need the room a word after it would - at the full
+ * padding it sat marooned from the edge. Scaled with the size, since pulling a
+ * fixed 6px out of an `xs` button's 8px padding would leave almost nothing.
+ */
+const SHORTCUT_SEAT: Record<SizeKey, string> = {
+  xs: 'mdt-ml-1 -mdt-mr-0.5',
+  sm: 'mdt-ml-1 -mdt-mr-1',
+  md: 'mdt-ml-1.5 -mdt-mr-1.5',
+  lg: 'mdt-ml-1.5 -mdt-mr-2',
+  xl: 'mdt-ml-1.5 -mdt-mr-2',
+  icon: '',
 };
 
 /**
@@ -392,6 +431,7 @@ function buildButtonContent(props: {
   children: React.ReactNode;
   loadingText?: ButtonProps['loadingText'];
   successText?: ButtonProps['successText'];
+  shortcut?: React.ReactNode;
 }) {
   const {
     badge,
@@ -407,6 +447,7 @@ function buildButtonContent(props: {
     children,
     loadingText,
     successText,
+    shortcut,
   } = props;
 
   // Determine content to display
@@ -431,6 +472,11 @@ function buildButtonContent(props: {
       {!loading && !success && wrappedLeftIcon}
       {!iconOnly && renderContent()}
       {!loading && !success && wrappedRightIcon}
+      {/*
+        Hidden while the button is busy or has just succeeded, like the icons:
+        the shortcut is an offer, and neither state is accepting one.
+      */}
+      {!loading && !success && !iconOnly && shortcut}
       {loading && loadingPosition === 'right' && <LoadingSpinner size={spinnerSize} />}
     </>
   );
@@ -657,6 +703,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     rotateIcon = false,
     badge,
     badgePosition = 'top-right',
+    shortcut,
     ripple = false,
     disabled,
     children,
@@ -691,6 +738,26 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     ripple,
     className,
   });
+
+  // The key cap at the end, if this button offers a shortcut. Built here rather
+  // than by the caller so the tone follows the button's own variant and the
+  // seating follows its size - the two things a caller composing `<Kbd>` by
+  // hand would have to know and would get wrong.
+  const shortcutSize = SHORTCUT_SIZE[size ?? 'md'];
+  const shortcutTone: KbdTone = SOLID_VARIANTS.has(variant ?? 'primary') ? 'inverted' : 'default';
+  const renderedShortcut =
+    shortcut === undefined ? undefined : (
+      <Kbd
+        keys={shortcut}
+        size={shortcutSize}
+        tone={shortcutTone}
+        // The button's own label already says what it does, and the cap is
+        // beside it - read out, "Send invite Command Enter" is noise. A
+        // shortcuts list is the opposite case, and `Kbd` announces by default.
+        decorative
+        className={SHORTCUT_SEAT[size ?? 'md']}
+      />
+    );
 
   // An `ai` button brings its own sparkle unless the caller supplied an icon
   const resolvedLeftIcon = resolveAiSparkle({ variant, leftIcon, rightIcon, size });
@@ -737,6 +804,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     children,
     loadingText,
     successText,
+    shortcut: renderedShortcut,
   });
 
   // Render as link using helper function

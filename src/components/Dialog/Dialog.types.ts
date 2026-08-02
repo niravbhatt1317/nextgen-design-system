@@ -204,8 +204,3 @@ export interface DialogStepsProps extends Omit<ComponentPropsWithoutRef<'ol'>, '
   /** The list's accessible name. @default 'Progress' */
   label?: string;
 }
-
-export interface DialogSubmitHintProps extends ComponentPropsWithoutRef<'span'> {
-  /** What the chip shows. @default '⏎' */
-  children?: ReactNode;
-}

@@ -18,6 +18,28 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## Kbd — built, and three callers still to migrate
+
+`Kbd` landed on `nirav/dialog-and-kbd`. It exists because `npm run find -- keyboard shortcut`
+turned up **five** drawings of the same idea, none of which knew about the others:
+
+| where                  | what it drew                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| `CommandShortcut`      | bare text, `tracking-widest`, `text-muted-foreground`                           |
+| `DropdownMenuShortcut` | the same again, dimmed with `opacity-60` instead of a token                     |
+| `Sidebar` search       | a hand-written `<kbd>`, filled and bordered, at `mdt-text-[10px]` — a raw value |
+| `DialogSubmitHint`     | the outlined chip inside a dialog's primary button                              |
+| a five-way trial       | five more arrangements                                                          |
+
+Two of those are now gone: `DialogSubmitHint` was replaced by `Button`'s `shortcut` prop, and the
+trial was deleted once the arrangement was chosen.
+
+**Still to migrate, deliberately not in that branch:** `CommandShortcut`, `DropdownMenuShortcut`
+and `Sidebar`'s inline `<kbd>`. All three are _visible_ changes to shipped components — bare
+letter-spaced text becomes key caps — so they want their own branch and their own review rather
+than arriving as a side effect of a dialog. Migrating `Sidebar` also clears one entry from
+`TOKEN-REPORT.md`.
+
 ## The short version
 
 |                                      | Count  |

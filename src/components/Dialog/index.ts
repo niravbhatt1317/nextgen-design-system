@@ -29,7 +29,6 @@ export { useSubmitShortcut } from './useSubmitShortcut';
 export type { UseSubmitShortcutOptions } from './useSubmitShortcut';
 
 export { DialogSteps } from './DialogSteps';
-export { DialogSubmitHint } from './DialogSubmitHint';
 export type {
   DialogSize,
   DialogDensity,
@@ -37,5 +36,4 @@ export type {
   DialogCloseReason,
   DialogStep,
   DialogStepsProps,
-  DialogSubmitHintProps,
 } from './Dialog.types';

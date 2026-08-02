@@ -5,7 +5,6 @@ import { Badge } from '../Badge';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
-import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 import {
   Dialog,
@@ -806,13 +805,13 @@ export const SubmitShortcut: Story = {
                 Cancel
               </Button>
               <Button
+                shortcut={['mod', 'enter']}
                 onClick={() => {
                   setSaved((n) => n + 1);
                   setOpen(false);
                 }}
               >
                 Finish setup
-                <DialogSubmitHint />
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -903,9 +902,9 @@ export const Stepped: Story = {
                   if (step === 0) setStep(1);
                   else setOpen(false);
                 }}
+                shortcut={['mod', 'enter']}
               >
                 {step === 0 ? 'Next' : 'Send invite'}
-                <DialogSubmitHint />
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1019,9 +1018,9 @@ export const Sizes: Story = {
                 onClick={() => {
                   setSize(null);
                 }}
+                shortcut={['enter']}
               >
                 Close
-                <DialogSubmitHint />
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1116,10 +1115,7 @@ export const Density: Story = {
               </div>
             </DialogBody>
             <DialogFooter>
-              <Button>
-                Next
-                <DialogSubmitHint />
-              </Button>
+              <Button shortcut={['mod', 'enter']}>Next</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
