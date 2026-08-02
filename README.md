@@ -68,6 +68,29 @@ that is what the prefix is for.
 
 React 18 or 19, as a peer dependency. Both ESM and CommonJS, with types for each.
 
+### Versioning — a changeset per user-facing pull request
+
+If your change reaches the published package, add one:
+
+```bash
+npm run changeset
+```
+
+It asks for a bump — patch, minor or major — and a sentence for somebody reading the changelog
+rather than the diff. Commit the file it writes into `.changeset/` and push. CI enforces this: a
+pull request that touches `src/` (excluding tests, stories, docs and `dev.tsx`) or
+`tailwind.config.ts` or `vite.config.ts` and carries no changeset fails.
+
+**Everything else is exempt, on purpose.** A README fix, a story, a workflow, a plan document —
+none of them change a byte of the tarball, and demanding a version bump for them teaches people the
+gate is noise. A gate people learn to route around is worse than no gate.
+
+If a change genuinely ships nothing, label the pull request **`no changeset`**. It is a label rather
+than a silent pass so the decision leaves a trace.
+
+At release time `npm run version` consumes every waiting changeset, works out the bump, writes
+`CHANGELOG.md`, and updates `package.json`. Commit that, then publish.
+
 ### Releasing
 
 **No npm token exists, deliberately.** Publishing runs from _Actions → Release_, and the workflow
