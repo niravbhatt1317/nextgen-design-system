@@ -144,6 +144,20 @@
     --mdt-primary: var(--mdt-black);
     --mdt-primary-foreground: var(--mdt-white);
 
+    /* Two quieter steps of the ink that sits ON the primary surface.
+       No new colours - both point at ramp steps that already existed.
+
+       They exist because `primary` inverts between themes: near-black with
+       white ink here, white with black ink in dark mode. So "a tone softer
+       than the label" is a different direction on each, and no single ramp
+       step can be it on both. The same reason `--mdt-primary-foreground`
+       itself is a token rather than the word `white`.
+
+       Used by the ⏎ chip on a primary action: the glyph one step off the
+       label, the hairline round it quieter again. */
+    --mdt-primary-foreground-muted: var(--mdt-neutral-30);
+    --mdt-primary-foreground-subtle: var(--mdt-neutral-40);
+
     --mdt-secondary: var(--mdt-neutral-20);
     --mdt-secondary-foreground: var(--mdt-black);
 
@@ -321,6 +335,11 @@
 
     --mdt-primary: var(--mdt-white);
     --mdt-primary-foreground: var(--mdt-black);
+
+    /* The same two steps, read from the other end of the ramp - the primary
+       surface is white here, so "softer than the label" means darker. */
+    --mdt-primary-foreground-muted: var(--mdt-neutral-130);
+    --mdt-primary-foreground-subtle: var(--mdt-neutral-50);
 
     --mdt-secondary: var(--mdt-neutral-130);
     --mdt-secondary-foreground: var(--mdt-neutral-10);

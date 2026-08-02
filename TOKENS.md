@@ -54,6 +54,15 @@ is not part of this design system.
 Each pairs a surface with the text colour that belongs on it — `primary` with
 `primary-foreground`, `card` with `card-foreground`, and so on.
 
+**Two quieter steps of the ink that sits on the primary surface** were added for the ⏎ chip:
+`primary-foreground-muted` for a glyph one step off the label, and `primary-foreground-subtle` for
+a hairline quieter again. No new colours - both point at ramp steps that already existed.
+
+They have to be tokens rather than the label faded by a percentage, because `primary` **inverts**
+between themes: near-black with white ink in light mode, white with black ink in dark. "A tone
+softer than the label" is therefore a different direction on each side, which is the same reason
+`--mdt-primary-foreground` is a token rather than the word `white`.
+
 ### Surfaces
 
 | Token                      | Tailwind                      | Light   | Dark          |
@@ -67,16 +76,18 @@ Each pairs a surface with the text colour that belongs on it — `primary` with
 
 ### Actions
 
-| Token                        | Tailwind                        | Light         | Dark          |
-| ---------------------------- | ------------------------------- | ------------- | ------------- |
-| `--mdt-primary`              | `mdt-bg-primary`                | `black`       | `white`       |
-| `--mdt-primary-foreground`   | `mdt-text-primary-foreground`   | `white`       | `black`       |
-| `--mdt-secondary`            | `mdt-bg-secondary`              | `neutral-20`  | `neutral-130` |
-| `--mdt-secondary-foreground` | `mdt-text-secondary-foreground` | `black`       | `neutral-10`  |
-| `--mdt-accent`               | `mdt-bg-accent`                 | `blue-10`     | `blue-90`     |
-| `--mdt-accent-foreground`    | `mdt-text-accent-foreground`    | `blue-50`     | `blue-20`     |
-| `--mdt-muted`                | `mdt-bg-muted`                  | `neutral-30`  | `neutral-120` |
-| `--mdt-muted-foreground`     | `mdt-text-muted-foreground`     | `neutral-100` | `neutral-40`  |
+| Token                             | Tailwind                               | Light         | Dark          |
+| --------------------------------- | -------------------------------------- | ------------- | ------------- |
+| `--mdt-primary`                   | `mdt-bg-primary`                       | `black`       | `white`       |
+| `--mdt-primary-foreground`        | `mdt-text-primary-foreground`          | `white`       | `black`       |
+| `--mdt-primary-foreground-muted`  | `mdt-text-primary-foreground-muted`    | `neutral-30`  | `neutral-130` |
+| `--mdt-primary-foreground-subtle` | `mdt-border-primary-foreground-subtle` | `neutral-40`  | `neutral-50`  |
+| `--mdt-secondary`                 | `mdt-bg-secondary`                     | `neutral-20`  | `neutral-130` |
+| `--mdt-secondary-foreground`      | `mdt-text-secondary-foreground`        | `black`       | `neutral-10`  |
+| `--mdt-accent`                    | `mdt-bg-accent`                        | `blue-10`     | `blue-90`     |
+| `--mdt-accent-foreground`         | `mdt-text-accent-foreground`           | `blue-50`     | `blue-20`     |
+| `--mdt-muted`                     | `mdt-bg-muted`                         | `neutral-30`  | `neutral-120` |
+| `--mdt-muted-foreground`          | `mdt-text-muted-foreground`            | `neutral-100` | `neutral-40`  |
 
 ### Status
 

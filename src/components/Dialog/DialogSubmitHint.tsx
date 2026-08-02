@@ -51,21 +51,25 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
         // on the chip rather than as a "has a chip" variant on Button, so they
         // only ever apply where there is actually a chip.
         '-mdt-mr-1.5 mdt-ml-1.5',
-        // Outlined, not filled. A filled chip reads as a second, smaller button
-        // sitting inside the first - two things to press where there is one. A
-        // hairline square around the glyph says "this is a key" instead, which
-        // is what it is.
+        // Outlined, not filled. A filled chip reads as a second, smaller
+        // button sitting inside the first - two things to press where there is
+        // one. A hairline square around the glyph says "this is a key".
         //
-        // The whole chip fades rather than the border carrying an alpha of its
-        // own. `border-current/25` looks like it would do that and does not:
-        // Tailwind cannot mix an alpha into `currentColor` here, so it fell
-        // through to the theme's own border token - a fixed slate with no
-        // relation to the button it sat on, measured at rgb(203,211,225) on a
-        // near-black button and rgb(81,98,129) on a white one. Fading the whole
-        // element keeps both the rule and the glyph as the button's own ink,
-        // which is also how the product draws it: the chip is quieter than the
-        // label beside it.
-        'mdt-border mdt-border-current mdt-opacity-50',
+        // Three tones, all named: the button's label at full strength, the
+        // glyph a step softer, the hairline softer again. They are tokens
+        // rather than `currentColor` faded by some percentage, because the
+        // percentage was never the point - what was wanted was a defined tone,
+        // and an opacity is a number nobody can look up.
+        //
+        // The earlier `border-current/25` was worse than untokenised: Tailwind
+        // cannot mix an alpha into `currentColor` here, so it fell through to
+        // the theme's own border token - a fixed slate with no relation to the
+        // button it sat on, measured at rgb(203,211,225) on a near-black button
+        // and rgb(81,98,129) on a white one.
+        //
+        // Named for the primary surface because that is where the chip belongs:
+        // the house style puts a ⏎ on the primary action and nothing else.
+        'mdt-border mdt-border-primary-foreground-subtle mdt-text-primary-foreground-muted',
         className
       )}
       {...props}

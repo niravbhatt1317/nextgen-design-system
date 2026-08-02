@@ -748,16 +748,17 @@ describe('DialogSubmitHint', () => {
     expect(chip).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('takes the colour of whatever it sits in', () => {
-    // `border-current/25` looks like it would do this and does not - Tailwind
-    // cannot mix an alpha into `currentColor` here, so it fell through to the
-    // theme's own border token, a fixed slate with no relation to the button.
-    // Fading the whole element keeps rule and glyph as the button's own ink.
+  it('draws three named tones, not one colour faded by a percentage', () => {
+    // The label at full strength, the glyph a step softer, the hairline softer
+    // again - each a token that flips with the theme, because `primary` itself
+    // inverts and "softer than the label" is a different direction on each side.
     const { container } = render(<DialogSubmitHint />);
     const classes = container.firstElementChild?.className ?? '';
-    expect(classes).toContain('mdt-border-current');
-    expect(classes).not.toContain('mdt-border-current/');
-    expect(classes).toContain('mdt-opacity-50');
+    expect(classes).toContain('mdt-text-primary-foreground-muted');
+    expect(classes).toContain('mdt-border-primary-foreground-subtle');
+    // An opacity is a number nobody can look up.
+    expect(classes).not.toContain('mdt-opacity');
+    expect(classes).not.toContain('current');
   });
 
   it("pulls the button's trailing padding in, since a chip is not reading", () => {
