@@ -640,6 +640,20 @@ describe('DialogFooter', () => {
     expect(container.firstElementChild?.className).not.toContain('mdt-border-t');
   });
 
+  it('is not the same spacing minus a line when it goes without', () => {
+    // Without a rule the separation has to be done by space alone, so the
+    // buttons get MORE room above them, not the rule's room minus the rule.
+    // Measured: 24 from the reading, against 37 with a rule at 24 and the
+    // buttons 12 below it. Dropping to the bare 16 read as a footer that had
+    // lost something rather than one that never had it.
+    const { container: bare } = render(<DialogFooter divider={false}>ok</DialogFooter>);
+    expect(bare.firstElementChild?.className).toContain('mdt-mt-2');
+    expect(bare.firstElementChild?.className).not.toContain('mdt-pt-');
+
+    const { container: ruled } = render(<DialogFooter>ok</DialogFooter>);
+    expect(ruled.firstElementChild?.className).toContain('mdt-pt-3');
+  });
+
   it('pushes the two apart when there is a way back', () => {
     const { container } = render(<DialogFooter align="between">ok</DialogFooter>);
     expect(container.firstElementChild?.className).toContain('sm:mdt-justify-between');

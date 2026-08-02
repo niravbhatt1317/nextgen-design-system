@@ -507,6 +507,16 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // one place the densities were not the same shape.
             aboveButtons,
           ],
+          // Without a rule the footer is simply the last block, and the
+          // separation a line was doing has to be done by space alone - so it
+          // gets MORE room above it, not the rule's room minus the rule.
+          //
+          // 8 on top of the content's own gap, which lands the buttons 24 from
+          // the reading. With a rule that 24 is where the line sits, and the
+          // buttons are 12 below it. Dropping straight to the gap - 16 - was
+          // what `divider={false}` used to give, and it read as a footer that
+          // had lost something rather than one that never had it.
+          !divider && !scrollsBody && 'mdt-mt-2',
           className
         )}
         {...props}

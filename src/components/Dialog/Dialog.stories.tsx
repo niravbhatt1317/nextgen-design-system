@@ -770,6 +770,90 @@ export const Panel: Story = {
 };
 
 /**
+ * The footer's rule is a choice, on any dialog.
+ *
+ * `divider` is a prop on `DialogFooter` and nothing else depends on it — it
+ * works at every size, every density, and with `scroll="page"` or `"body"`.
+ *
+ * **With the rule** — the default, and right for a form. A line above the
+ * buttons says the reading is over and the deciding starts. The header
+ * deliberately has no matching rule; that asymmetry is the house style.
+ *
+ * **Without it** — for a dialog that was never in two parts. An announcement
+ * with one button, a confirmation of two sentences: there is no reading to
+ * separate from the deciding, and a line drawn across it invents a seam.
+ *
+ * **They are not the same spacing minus a line.** Without a rule the
+ * separation has to be done by space alone, so the buttons sit **24px** from
+ * the reading rather than the 16 the gap alone would give. With a rule, 24 is
+ * where the line sits and the buttons are 12 below it.
+ */
+export const FooterRule: Story = {
+  render: function FooterRuleDemo() {
+    const [open, setOpen] = useState<'rule' | 'none' | null>(null);
+    const close = () => {
+      setOpen(null);
+    };
+
+    return (
+      <div className="mdt-flex mdt-gap-2">
+        <Button
+          onClick={() => {
+            setOpen('rule');
+          }}
+        >
+          With the rule
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('none');
+          }}
+        >
+          Without
+        </Button>
+
+        <Dialog open={open === 'rule'} onOpenChange={close}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Rename this view</DialogTitle>
+              <DialogDescription>Everyone who uses it will see the new name.</DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <Input label="Name" defaultValue="Unassigned, this week" />
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="outline" onClick={close}>
+                Cancel
+              </Button>
+              <Button shortcut={['mod', 'enter']} onClick={close}>
+                Rename
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open === 'none'} onOpenChange={close}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Your export is on its way</DialogTitle>
+              <DialogDescription>
+                We will email a link when it is ready. Large exports can take a few minutes.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter divider={false}>
+              <Button shortcut={['enter']} onClick={close}>
+                Got it
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  },
+};
+
+/**
  * The Panel's slots — **one dialog each**, because that is how they are used.
  *
  * They were first shown all four at once and it was unreadable: a picture, a
