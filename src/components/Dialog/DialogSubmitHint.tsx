@@ -32,11 +32,20 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
       // return symbol", which helps nobody.
       aria-hidden
       className={cn(
-        'mdt-ml-1 mdt-inline-flex mdt-h-5 mdt-min-w-5 mdt-items-center mdt-justify-center',
-        'mdt-rounded mdt-px-1 mdt-text-xs',
-        // A tint of whatever ink the button is using, so one chip works on the
-        // dark primary and on the pale disabled state without being told which.
-        'mdt-bg-current/15',
+        // Square, and half the height of the 32px button it sits in. At 20 it
+        // left 6px above and below and read as crowding the label; at 16 there
+        // is 8, which is the proportion the product's own chip has.
+        'mdt-ml-1 mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center',
+        'mdt-rounded mdt-text-xs mdt-leading-none',
+        // Outlined, not filled. A filled chip reads as a second, smaller button
+        // sitting inside the first - two things to press where there is one. A
+        // hairline square around the glyph says "this is a key" instead, which
+        // is what it is.
+        //
+        // Both the rule and the glyph are the button's own ink at reduced
+        // strength, so one chip works on the dark primary and on the pale
+        // disabled state without being told which it is on.
+        'mdt-border-current/25 mdt-border',
         className
       )}
       {...props}

@@ -6,6 +6,7 @@ import { useSubmitShortcut } from './useSubmitShortcut';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Button } from '../Button';
 import {
   Dialog,
   DialogClose,
@@ -641,6 +642,27 @@ describe('DialogFooter', () => {
     expect(container.firstElementChild?.className).toContain('sm:mdt-justify-between');
   });
 
+  it('sizes the buttons it holds at 32 rather than 36', () => {
+    render(
+      <DialogFooter>
+        <Button>Next</Button>
+      </DialogFooter>
+    );
+    // A dialog's actions sit under a rule at the bottom of a card, not in a
+    // page's own toolbar. At the default 36 they were the heaviest thing in the
+    // box - louder than the title.
+    expect(screen.getByRole('button', { name: 'Next' }).className).toContain('mdt-h-8');
+  });
+
+  it('lets a button say otherwise', () => {
+    render(
+      <DialogFooter>
+        <Button size="lg">Next</Button>
+      </DialogFooter>
+    );
+    expect(screen.getByRole('button', { name: 'Next' }).className).toContain('mdt-h-10');
+  });
+
   it('gathers them on the right by default', () => {
     const { container } = render(<DialogFooter>ok</DialogFooter>);
     expect(container.firstElementChild?.className).toContain('sm:mdt-justify-end');
@@ -660,7 +682,14 @@ describe('DialogSubmitHint', () => {
     const { container } = render(<DialogSubmitHint />);
     // One chip works on the dark primary and on the pale disabled state without
     // being told which it is on.
-    expect(container.firstElementChild?.className).toContain('mdt-bg-current/15');
+    expect(container.firstElementChild?.className).toContain('mdt-border-current/25');
+  });
+
+  it('is outlined rather than filled', () => {
+    // A filled chip reads as a second, smaller button inside the first - two
+    // things to press where there is one.
+    const { container } = render(<DialogSubmitHint />);
+    expect(container.firstElementChild?.className).not.toContain('mdt-bg-current');
   });
 });
 
