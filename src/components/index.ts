@@ -40,6 +40,19 @@ export type {
   BadgeSize,
 } from './Badge';
 
+// Banner — a message that sits in the page and stays there. Shares Toast's six
+// tones and palette on purpose; shares nothing about how it behaves. If you
+// would still need the message after a refresh, it is a Banner.
+export { Banner, bannerVariants } from './Banner';
+export type {
+  BannerProps,
+  BannerOwnProps,
+  BannerVariantsType,
+  BannerTone,
+  BannerPlacement,
+  BannerActionPlacement,
+} from './Banner';
+
 // Button
 export { Button, ButtonVariants } from './Button';
 export type { ButtonProps, ButtonVariantsType } from './Button';
