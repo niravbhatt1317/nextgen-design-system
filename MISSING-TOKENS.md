@@ -34,8 +34,9 @@ decision we made on purpose.
 | **Motion — duration & easing**       | ❌ Missing    | ~8 components + all 14 animations  |
 | **Breakpoints**                      | ❌ Missing    | Container only                     |
 | **Hardcoded sizes**                  | ❌ Violations | 10 shipped components              |
+| **Colour — dark surface tints**      | ⚠️ Mixed      | The 6 feedback tones, dark mode    |
 
-**12 categories missing, 1 partial, 1 set of live violations.**
+**12 categories missing, 1 partial, 1 mixed-by-hand, 1 set of live violations.**
 
 ---
 
@@ -320,6 +321,48 @@ problem. It needs a design decision either way.
 
 ---
 
+## 11 · Dark surface tints — MIXED, and the only values in the file that are
+
+**Status: shipped as literals, deliberately, and they should not stay that way.**
+
+Ten values in `globals.css` do not point at a ramp step: the dark-mode fills and borders of the six
+feedback tones. The measurements, the ratios and the proposed ramp steps below are Pranjal's, from
+the Banner work; the note on what was tried instead is from the Callout work. Two people found the
+same gap on the same day from opposite ends, which is the strongest evidence it is real.
+
+**Status:** ❌ Missing · **Leaks into:** the dark feedback surfaces used by `Toast` and `Banner`
+
+Every hue ramp ends at a fully saturated dark — `orange-90` is `26 100% 20%`, `red-90` is
+`0 74% 17%`. At badge size that works: a 20px chip wants to be seen. A toast or a banner is a
+surface several hundred pixels wide, and the same value stops reading as a tinted panel and starts
+reading as a block of colour laid on the page. Measured, the old orange ground sat **1.9 against
+the page**; a surface wants nearer **1.2**.
+
+There is no step on any ramp that gives that. So `globals.css` now carries six raw values in the
+dark feedback block — same hue, roughly half the saturation, a darker lightness — and they are
+**the only colours in the system defined outside a ramp**.
+
+| Needed                                  | Example                          |
+| --------------------------------------- | -------------------------------- |
+| A desaturated dark surface step per hue | `orange-95`, around `26 50% 14%` |
+| Its matching edge, one step up          | around `26 55% 27%`              |
+
+Until those exist the six values stay where they are, commented with what they measure. The day
+the ramps gain them, the feedback block should point at ramp variables again like every other
+token in the file.
+
+### What was tried instead, and why it lost
+
+The same six ramp steps composited at 30% alpha. It adds no values and looks close — but **an alpha
+wash composites against whatever is behind it**, so the same token renders one colour on the page
+(`neutral-160`) and another inside a dialog (`neutral-150`). A token you cannot predict from its
+name is worse than a token you had to mix.
+
+### Until then
+
+These ten are the exception, and this section is the reason they are allowed to be. `TOKENS.md`
+and `COMPONENT-GAP.md` point here rather than repeating it.
+
 ## What happens next
 
 Each category above is a **design decision**, not an implementation task. The order below is by
@@ -354,26 +397,3 @@ on, as distinct from the page. Worth naming before a second component needs it a
 different shade.
 
 ---
-
-## Colour — a desaturated dark step for the feedback hues
-
-**Status:** ❌ Missing · **Leaks into:** the dark feedback surfaces used by `Toast` and `Banner`
-
-Every hue ramp ends at a fully saturated dark — `orange-90` is `26 100% 20%`, `red-90` is
-`0 74% 17%`. At badge size that works: a 20px chip wants to be seen. A toast or a banner is a
-surface several hundred pixels wide, and the same value stops reading as a tinted panel and starts
-reading as a block of colour laid on the page. Measured, the old orange ground sat **1.9 against
-the page**; a surface wants nearer **1.2**.
-
-There is no step on any ramp that gives that. So `globals.css` now carries six raw values in the
-dark feedback block — same hue, roughly half the saturation, a darker lightness — and they are
-**the only colours in the system defined outside a ramp**.
-
-| Needed                                  | Example                          |
-| --------------------------------------- | -------------------------------- |
-| A desaturated dark surface step per hue | `orange-95`, around `26 50% 14%` |
-| Its matching edge, one step up          | around `26 55% 27%`              |
-
-Until those exist the six values stay where they are, commented with what they measure. The day
-the ramps gain them, the feedback block should point at ramp variables again like every other
-token in the file.

@@ -144,6 +144,22 @@
     --mdt-primary: var(--mdt-black);
     --mdt-primary-foreground: var(--mdt-white);
 
+    /* Two quieter steps of the ink that sits ON the primary surface.
+       No new colours - both point at ramp steps that already existed.
+
+       They exist because `primary` inverts between themes: near-black with
+       white ink here, white with black ink in dark mode. So "a tone softer
+       than the label" is a different direction on each, and no single ramp
+       step can be it on both. The same reason `--mdt-primary-foreground`
+       itself is a token rather than the word `white`.
+
+       Used by the ⏎ chip on a primary action: the glyph one step off the
+       label, the hairline round it quieter again. The two are far apart on
+       the ramp on purpose - the glyph has to read, the hairline only has to
+       describe a shape. */
+    --mdt-primary-foreground-muted: var(--mdt-neutral-30);
+    --mdt-primary-foreground-subtle: var(--mdt-neutral-100);
+
     --mdt-secondary: var(--mdt-neutral-20);
     --mdt-secondary-foreground: var(--mdt-black);
 
@@ -214,25 +230,56 @@
     --mdt-feedback-info-border: var(--mdt-blue-20);
     --mdt-feedback-info-icon: var(--mdt-blue-60);
 
-    --mdt-feedback-warning-bg: var(--mdt-yellow-10);
+    --mdt-feedback-warning-bg: var(--mdt-yellow-05);
     --mdt-feedback-warning-border: var(--mdt-orange-20);
     --mdt-feedback-warning-icon: var(--mdt-orange-80);
 
-    --mdt-feedback-danger-bg: var(--mdt-red-10);
+    --mdt-feedback-danger-bg: var(--mdt-red-05);
     --mdt-feedback-danger-border: var(--mdt-red-20);
     --mdt-feedback-danger-icon: var(--mdt-red-70);
 
-    --mdt-feedback-success-bg: var(--mdt-green-10);
+    --mdt-feedback-success-bg: var(--mdt-green-05);
     --mdt-feedback-success-border: var(--mdt-green-20);
     --mdt-feedback-success-icon: var(--mdt-green-70);
 
-    --mdt-feedback-ai-bg: var(--mdt-purple-10);
+    --mdt-feedback-ai-bg: var(--mdt-purple-05);
     --mdt-feedback-ai-border: var(--mdt-purple-20);
     --mdt-feedback-ai-icon: var(--mdt-purple-80);
 
     --mdt-feedback-neutral-bg: var(--mdt-neutral-10);
     --mdt-feedback-neutral-border: var(--mdt-neutral-30);
     --mdt-feedback-neutral-icon: var(--mdt-neutral-130);
+
+    /* ============================================
+       The AI gradient
+       ============================================
+       Three stops and an offset, taken from the marks the design owner
+       supplied. Both of their SVGs carried the same ramp, which is what made
+       it a pattern worth saving rather than two one-off fills.
+
+       **These are three colours the palette did not have**, and that is
+       deliberate rather than an oversight. The rule against adding colours
+       exists so nobody has to ask "which green" - a gradient answers to a
+       different question, because it is a mark rather than a surface. Nothing
+       may reach for these to paint a background, a border or a piece of text;
+       they exist so the AI mark is the same mark everywhere it appears.
+
+       Held as HSL triplets like every other colour here, so they compose with
+       the alpha syntax. They round-trip to within one step of the originals:
+       #4DB2FE / #721DFC / #F910E2 against #4CB1FE / #731EFB / #F911E3.
+
+       The same in both themes. A brand mark that changed colour with the
+       theme would be two marks. */
+    --mdt-ai-gradient-from: 206 99% 65%;
+    --mdt-ai-gradient-via: 263 97% 55%;
+    --mdt-ai-gradient-to: 306 95% 52%;
+
+    /* Where the middle stop sits. Not halfway - the design owner's own
+       gradient puts the violet at a quarter, which keeps most of the sweep in
+       the violet-to-magenta half and stops the blue end dominating a 16px
+       glyph. The supplied SVGs said 0.245192; 25% is what the gradient panel
+       says, and that is the source. */
+    --mdt-ai-gradient-via-position: 25%;
 
     --mdt-feedback-title: var(--mdt-neutral-150);
     --mdt-feedback-text: var(--mdt-neutral-130);
@@ -322,6 +369,11 @@
     --mdt-primary: var(--mdt-white);
     --mdt-primary-foreground: var(--mdt-black);
 
+    /* The same two steps, read from the other end of the ramp - the primary
+       surface is white here, so "softer than the label" means darker. */
+    --mdt-primary-foreground-muted: var(--mdt-neutral-130);
+    --mdt-primary-foreground-subtle: var(--mdt-neutral-50);
+
     --mdt-secondary: var(--mdt-neutral-130);
     --mdt-secondary-foreground: var(--mdt-neutral-10);
 
@@ -387,6 +439,27 @@
 
        Floors are 4.5 for words and 3.0 for a meaningful graphic.
        ============================================ */
+    /* Ten mixed values, and the only place in this file that does not point at
+       a ramp step. See MISSING-TOKENS.md - "Dark surface tints" - for why, and
+       for what would make them unnecessary.
+
+       The short version: the ramps have no low-saturation dark step. The `90`s
+       are 17-20% lightness at up to 100% saturation against a 10% page, and a
+       panel's worth of that is a slab rather than a tint. The steps below are
+       9-10%, level with the page or darker, and a fill darker than the page it
+       sits on reads as a hole - this codebase shipped that once already, in the
+       dark CodeWell.
+
+       These sit at 13-18% lightness and 38-55% saturation: a lift off the page
+       with the hue intact. The borders are mixed to match at 25-32%, because a
+       bright `70` ramp step around a quiet fill is a rim, not an edge.
+
+       Values by Pranjal Gupta, who hit this drawing Banner beside a real page
+       on the same day. They replaced an alpha wash of the ramp steps that did
+       the same job with no new values but composited against whatever sat
+       behind it - so a callout on the page and the same callout in a dialog
+       were two different colours. A token you cannot predict is worse than a
+       token you had to mix. */
     --mdt-feedback-info-bg: 218 55% 16%;
     --mdt-feedback-info-border: 218 55% 30%;
     --mdt-feedback-info-icon: var(--mdt-blue-30);
@@ -407,7 +480,9 @@
     --mdt-feedback-ai-border: 270 42% 32%;
     --mdt-feedback-ai-icon: var(--mdt-purple-30);
 
-    --mdt-feedback-neutral-bg: 217 40% 15%;
+    /* Not mixed: `neutral-140` already is this value, to the digit. Written as
+       the ramp step it is, so the one tone that has a home keeps it. */
+    --mdt-feedback-neutral-bg: var(--mdt-neutral-140);
     --mdt-feedback-neutral-border: var(--mdt-neutral-120);
     --mdt-feedback-neutral-icon: var(--mdt-neutral-30);
 

@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 762,
+  "capabilityCount": 802,
   "counts": {
-    "story": 559,
-    "component": 182,
-    "utility": 9,
-    "hook": 12
+    "story": 582,
+    "component": 189,
+    "utility": 12,
+    "hook": 19
   },
   "capabilities": [
     {
@@ -48,6 +48,16 @@
       "doc": "Components/Button AiFamily",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "AiMark",
+      "kind": "component",
+      "file": "src/components/AiMark/AiMark.tsx",
+      "area": "AiMark",
+      "summary": "AiMark - the gradient mark that means \"this is AI\".",
+      "doc": "AiMark - the gradient mark that means \"this is AI\". **A mark, not an icon, which is why it is not in the icon set.** Every `<Icon>` is one stroke in `currentColor`, and that is what lets the system size, tint and audit all 1209 of them the same way. This is three colours sweeping across itself and answers to none of it - tinting it would destroy the thing that makes it recognisable. The library's rule is that Lucide is the only *icon* source; a brand mark is the same exception the seventeen kept logos are. **Two of them, each filled or drawn as a line.** `spark` is the general mark; `trio` is three stars at a third of the strength, for a surface that wants a texture rather than a glyph. `appearance=\"line\"` strokes the same outline instead of filling it, for a row where every other glyph is line art - beside a Lucide icon a solid mark reads as a different weight of thing. **The gradient is a token**, not a literal: `--mdt-ai-gradient-from`, `-via`, `-to` and `-via-position`. Both supplied marks carried the same ramp, which is what made it a pattern worth saving rather than two one-off fills. Every instance mints its own gradient `id`. Two of these on a page sharing one id is a real ",
+      "props": ["variant", "appearance", "size", "title"],
+      "propDocs": "Which mark. See {@link AiMarkVariant}. Filled, or drawn as a line. See {@link AiMarkAppearance}. Named `appearance` rather than `fill` because an `<svg>` already has a `fill` and shadowing it would make the escape hatch unreachable. How big. Defaults to `sm`, which is 16px - the size it was drawn at. A name, if the mark is carrying meaning on its own. Left off it is `aria-hidden`, which is right almost everywhere: the mark says \"AI\" to somebody who has learnt it and nothing to somebody who has not, so the writing beside it should carry the meaning. Set this only where there is no such writing."
     },
     {
       "name": "AlignItems",
@@ -250,6 +260,16 @@
       "propDocs": ""
     },
     {
+      "name": "Announcing",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Announcing",
+      "doc": "Components/Callout Announcing",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "AskAI",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -370,6 +390,16 @@
       "propDocs": ""
     },
     {
+      "name": "Blocking",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Blocking",
+      "doc": "Components/Dialog Blocking",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Borderless",
       "kind": "story",
       "file": "src/components/Toolbar/Toolbar.stories.tsx",
@@ -468,6 +498,27 @@
       "doc": "Components/ButtonGroup ButtonWithDropdown",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "Callout",
+      "kind": "component",
+      "file": "src/components/Callout/Callout.tsx",
+      "area": "Callout",
+      "summary": "Callout - a tinted block that says something about the content around it.",
+      "doc": "Callout - a tinted block that says something about the content around it. **It is already there when you arrive.** That is the whole difference from `Toast`, and it decides everything else: a callout does not animate in, does not time out, is not announced as it appears, and is not dismissible unless you ask. A toast interrupts you; a callout is part of the page. Reach for it for the consequences of a destructive action, a summary of what is about to happen, a limit somebody should know about before they fill in a form, or a group of settings that belong together - `tone=\"neutral\"` with `icon={false}` is a plain inset panel, and that is a callout too. **Only the icon and the border carry the tone.** The body text stays one calm colour in all six. Six tones that differ by a tint, an edge and a glyph read as one family; six tones of coloured text read as six problems. The rule and the tokens are `Toast`'s, shared from `@/utils/feedback-tones` so a seventh tone is one edit rather than two that drift. **It takes children, not two strings.** A toast takes a title and a description because it is read in passing. A callout holds whatever the page holds - a list of what is about to be dele",
+      "props": [
+        "tone",
+        "size",
+        "variant",
+        "title",
+        "children",
+        "icon",
+        "actions",
+        "onDismiss",
+        "dismissLabel",
+        "toneLabel"
+      ],
+      "propDocs": "Which of the six tones. Defaults to `neutral`, which is the quiet one. How much room it takes. See {@link CalloutSize}. How much surface it draws. See {@link CalloutVariant}. A short line above the body, in the same calm ink as the body. Optional: a one-sentence callout does not need a heading repeating it. The reading. Anything - a sentence, a list of what is about to be deleted, a definition list, a pair of controls. This is the difference between a callout and a toast. A toast takes two strings because it is read in passing; a callout is part of the page and holds whatever the page holds. A glyph of your own, or `false` for none. Left alone, each tone brings its own. `false` is for a callout that is a grouped block rather than a warning - an icon there labels a group that does not need labelling. Controls along the bottom, usually one or two buttons. Below the reading rather than beside it: a callout's action is what you do *after* reading, and putting it on the right invites pressing it first. Makes it dismissible, and is called when the close is pressed. Absent by default, which is the opposite of `Toast`. A toast always has a way out because it arrived uninvited; a callout is"
     },
     {
       "name": "Card",
@@ -1496,6 +1547,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Default",
+      "doc": "Components/AiMark Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Avatar/Avatar.stories.tsx",
       "area": "Avatar",
       "summary": "Story: Components/Avatar / Default",
@@ -1530,6 +1591,16 @@
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / Default",
       "doc": "Components/ButtonGroup Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Default",
+      "doc": "Components/Callout Default",
       "props": [],
       "propDocs": ""
     },
@@ -1690,6 +1761,16 @@
       "area": "Item",
       "summary": "Story: Components/Item / Default",
       "doc": "Components/Item Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Default",
+      "doc": "Components/Kbd Default",
       "props": [],
       "propDocs": ""
     },
@@ -1956,6 +2037,16 @@
     {
       "name": "Density",
       "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Density",
+      "doc": "Components/Dialog Density",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Density",
+      "kind": "story",
       "file": "src/components/Table/Table.stories.tsx",
       "area": "Table",
       "summary": "Story: Components/Table / Density",
@@ -1994,12 +2085,32 @@
       "propDocs": "Name of the deprecated component Deprecation information"
     },
     {
+      "name": "describeKeys",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "What the whole combination is called - \"Command + Shift + E\".",
+      "doc": "What the whole combination is called - \"Command + Shift + E\". Spelled out rather than symbolic, because the symbols are the one thing a screen reader cannot help with.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Destructive",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
       "area": "Button",
       "summary": "Story: Components/Button / Destructive",
       "doc": "Components/Button Destructive",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Destructive",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Destructive",
+      "doc": "Components/Dialog Destructive",
       "props": [],
       "propDocs": ""
     },
@@ -2044,6 +2155,16 @@
       "propDocs": ""
     },
     {
+      "name": "DialogBody",
+      "kind": "component",
+      "file": "src/components/Dialog/Dialog.tsx",
+      "area": "Dialog",
+      "summary": "DialogBody - the reading between the header and the footer.",
+      "doc": "DialogBody - the reading between the header and the footer. Its own region, with the same left and right as the header and the footer, so a caller adjusts one and the other two follow. Before this the content padded itself and every region sat inside that, which meant the footer's rule had to tear back out through it with a negative margin to reach the edges. Nothing else about the body is this component's business - a form, a list, a paragraph, a scrolling pane are all just children. ```tsx <DialogBody> <Input label=\"Invite by email\" /> </DialogBody> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "DialogClose",
       "kind": "component",
       "file": "src/components/Dialog/Dialog.tsx",
@@ -2060,8 +2181,26 @@
       "area": "Dialog",
       "summary": "DialogContent - the main content container for the dialog.",
       "doc": "DialogContent - the main content container for the dialog. ```tsx <Dialog> <DialogTrigger asChild> <Button>Open Dialog</Button> </DialogTrigger> <DialogContent> <DialogHeader> <DialogTitle>Dialog Title</DialogTitle> <DialogDescription>Dialog description</DialogDescription> </DialogHeader> <p>Dialog content goes here</p> <DialogFooter> <Button>Action</Button> </DialogFooter> </DialogContent> </Dialog> ```",
-      "props": ["showCloseButton"],
-      "propDocs": "Whether to show the close button"
+      "props": [
+        "showCloseButton",
+        "blocking",
+        "busy",
+        "onRequestClose",
+        "size",
+        "density",
+        "scroll"
+      ],
+      "propDocs": "Whether to show the close button Nothing dismisses it: no close button, no Escape, no click outside. For the few things that genuinely must be answered - a session that has expired, a plan that has lapsed. Reach for it rarely. A dialog with no way out is the most hostile thing an interface can do, and every use of this is a promise that the content contains the way forward. Work is in flight, so dismissal is refused until it clears. Submitting takes two seconds, and in those two seconds Escape, the close button and a stray click outside would all abandon a request that is already on its way to the server. The button shows `loading`; this stops the dialog going anywhere while it does. Asked before every dismissal. Return `false` to keep the dialog open. Anything other than `false` lets it close, so a handler that only wants to observe can return nothing. Where an unsaved-changes guard lives: return `false` and open a confirmation of your own. The reason says which way it was asked, because \"I pressed Escape\" and \"I clicked outside\" sometimes deserve different answers - the second is often an accident. How wide it is. `sm` a single decision · `md` the default · `lg` a form · `xl` som"
+    },
+    {
+      "name": "DialogDensityContext",
+      "kind": "component",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The density the surrounding `DialogContent` was set to.",
+      "doc": "The density the surrounding `DialogContent` was set to. Every region reads it rather than being told, so a caller sets the density in one place and the header, steps, body and footer all move together.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "DialogDescription",
@@ -2080,8 +2219,8 @@
       "area": "Dialog",
       "summary": "DialogFooter - container for action buttons.",
       "doc": "DialogFooter - container for action buttons.",
-      "props": ["children"],
-      "propDocs": ""
+      "props": ["children", "align", "divider"],
+      "propDocs": "How the footer arranges what is in it. `end` puts everything on the right - Cancel then the primary, the rhythm of a decision. `between` pushes the first child to the left and the rest to the right, which is what a step back, a support link or a \"having a problem?\" wants: quiet on one side, the way forward on the other. Draws the rule above it. On by default, because the product always has one. The footer is the only part of a dialog that is separated by a line - the header flows into the body without one. That asymmetry is deliberate: a line above the buttons says \"the reading is over, now decide\"."
     },
     {
       "name": "DialogHeader",
@@ -2114,14 +2253,34 @@
       "propDocs": ""
     },
     {
+      "name": "DialogScrollContext",
+      "kind": "component",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "Which part of a tall dialog scrolls, for the regions that have to know.",
+      "doc": "Which part of a tall dialog scrolls, for the regions that have to know. Only `DialogBody` reads it. The header and the footer behave the same either way - they are the parts that do not move - and it is the body that has to decide between growing and scrolling.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DialogSteps",
+      "kind": "component",
+      "file": "src/components/Dialog/DialogSteps.tsx",
+      "area": "Dialog",
+      "summary": "DialogSteps - where you are in a dialog that has more than one part.",
+      "doc": "DialogSteps - where you are in a dialog that has more than one part. **The bar under each step is the progress, not a connector between dots.** Every step owns a full-width rule beneath its own label, dark once reached and pale before. A row of circles joined by a line says \"these are stations on a route\"; a row of underlined labels says \"these are the parts, and you have done this many\" - which is the question somebody halfway through a form is actually asking. **A step you have finished shows a tick, not its number.** The number is only useful before you arrive; afterwards the useful thing is that it is done. Sits directly under the header, above the body, and never in the footer - `Back` and `Next` belong there, and putting the position there too would crowd the one row that has to stay readable. ```tsx <DialogSteps current={1} steps={[{ key: 'details', label: 'Invite details' }, { key: 'access', label: 'Access duration' }]} onStepSelect={(key) => { goTo(key); }} /> ```",
+      "props": ["steps", "current", "onStepSelect", "label"],
+      "propDocs": "The parts, in order. Which one you are on, zero-based. Everything before it counts as done. Lets a finished step be gone back to. Omit it and none are clickable. Only steps already passed. Jumping ahead to one whose inputs depend on a step you have not filled in is how a form ends up half-complete in an order nobody designed for. The list's accessible name. @default 'Progress'"
+    },
+    {
       "name": "DialogTitle",
       "kind": "component",
       "file": "src/components/Dialog/Dialog.tsx",
       "area": "Dialog",
       "summary": "DialogTitle - the title of the dialog.",
       "doc": "DialogTitle - the title of the dialog.",
-      "props": [],
-      "propDocs": ""
+      "props": ["tag"],
+      "propDocs": "A short status beside the title - `Guest`, `Beta`, `Draft`. Passed rather than written inline so the title knows it is there: a tag makes the line taller, and the gap to the description is tightened by 2px to match. A `<Badge>` written straight into `children` looks identical and leaves the spacing wrong."
     },
     {
       "name": "DialogTrigger",
@@ -2300,6 +2459,16 @@
       "area": "Tabs",
       "summary": "Story: Components/Tabs / DisabledTab",
       "doc": "Components/Tabs DisabledTab",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Dismissible",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Dismissible",
+      "doc": "Components/Callout Dismissible",
       "props": [],
       "propDocs": ""
     },
@@ -2540,6 +2709,16 @@
       "area": "Cell Recipes",
       "summary": "Story: Components/Table/Cell Recipes / EmptyValueRecipe",
       "doc": "Components/Table/Cell Recipes EmptyValueRecipe",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Every",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Every",
+      "doc": "Components/Kbd Every",
       "props": [],
       "propDocs": ""
     },
@@ -3612,6 +3791,26 @@
       "propDocs": ""
     },
     {
+      "name": "InUse",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / InUse",
+      "doc": "Components/AiMark InUse",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "isModifier",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "Whether a key is a modifier rather than the key being modified.",
+      "doc": "Whether a key is a modifier rather than the key being modified.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Item",
       "kind": "component",
       "file": "src/components/Item/Item.tsx",
@@ -3630,6 +3829,27 @@
       "doc": "Layout/Flex JustifyContent",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "Kbd",
+      "kind": "component",
+      "file": "src/components/Kbd/Kbd.tsx",
+      "area": "Kbd",
+      "summary": "Kbd - a keyboard shortcut, drawn as keys.",
+      "doc": "Kbd - a keyboard shortcut, drawn as keys. **Reach for this anywhere a shortcut is shown**: inside a button, at the end of a menu row, in a search field, in a legend, in a help panel. Before it existed this library drew shortcuts five different ways in five files - `CommandShortcut`, `DropdownMenuShortcut`, a hand-written `<kbd>` in `Sidebar`, and two more - none of which knew about the others. **Keys go in as data.** `keys={['mod', 'shift', 'e']}`, not a hand-assembled row of icons. That is what makes it something a model can write correctly, which is the point of this library, and it is also what lets the component know which keys are modifiers and what to say out loud. **`'mod'` is the key to reach for.** Command on a Mac, Control everywhere else - which is what almost every shortcut actually means. `useSubmitShortcut` already accepts either at the event level, so a hint naming one of them was telling half the people the wrong thing. **It is announced, not hidden.** The keys are read out spelled - \"Command + Shift + E\" - because the symbols are the one thing a screen reader cannot help with. Pass `decorative` where the shortcut really is decoration on something that already says ",
+      "props": [
+        "keys",
+        "layout",
+        "variant",
+        "size",
+        "tone",
+        "tight",
+        "dimModifiers",
+        "platform",
+        "decorative",
+        "label"
+      ],
+      "propDocs": "The keys, in the order they are pressed. Data rather than markup, deliberately: `keys={['mod', 'shift', 'e']}` is something a model gets right, and a hand-assembled row of icons is not. This library's primary consumer is a machine. A cap per key, or one cap holding all of them. `separate` is the default because it is the only arrangement where a three-key shortcut still reads as three things rather than as a word. Outlined, or a filled block. `filled` is quieter and belongs where the shortcut is information rather than an offer - a legend, a help panel, a list of what the keys do. How big the keys are. `md` matches the text beside it at `text-sm`. Which ink to draw in. See {@link KbdTone}. Pull the keys closer together. `separate` only. 2px instead of 4, so the caps read as one shape at a glance while staying countable up close. Draw the modifiers a tone quieter than the key they modify. Hierarchy without extra geometry: in `⌘⇧E` the E is the part that changes between shortcuts, and this is what makes it the part you read. Which machine to render for, if you know better than the browser does. Left alone, `mod` and `alt` follow the machine the page is on. Hide it from assistive tech"
     },
     {
       "name": "KeyboardNavigation",
@@ -3992,6 +4212,16 @@
       "propDocs": ""
     },
     {
+      "name": "Marks",
+      "kind": "story",
+      "file": "src/components/AiMark/AiMark.stories.tsx",
+      "area": "AiMark",
+      "summary": "Story: Components/AiMark / Marks",
+      "doc": "Components/AiMark Marks",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Maskable",
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
@@ -4330,6 +4560,16 @@
       "propDocs": ""
     },
     {
+      "name": "OnATintedSurface",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / OnATintedSurface",
+      "doc": "Components/Callout OnATintedSurface",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "OTPInput",
       "kind": "component",
       "file": "src/components/OTPInput/OTPInput.tsx",
@@ -4530,6 +4770,16 @@
       "propDocs": ""
     },
     {
+      "name": "Panel",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Panel",
+      "doc": "Components/Dialog Panel",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PasswordToggle",
       "kind": "story",
       "file": "src/components/InputGroup/InputGroup.stories.tsx",
@@ -4550,12 +4800,32 @@
       "propDocs": ""
     },
     {
+      "name": "Pending",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Pending",
+      "doc": "Components/Dialog Pending",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PillHoverCards",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
       "area": "Select",
       "summary": "Story: Components/Select / PillHoverCards",
       "doc": "Components/Select PillHoverCards",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Platform",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Platform",
+      "doc": "Components/Kbd Platform",
       "props": [],
       "propDocs": ""
     },
@@ -4896,6 +5166,16 @@
       "area": "Textarea",
       "summary": "Story: Components/Textarea / ResizeVariants",
       "doc": "Components/Textarea ResizeVariants",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "resolveKey",
+      "kind": "utility",
+      "file": "src/components/Kbd/keys.ts",
+      "area": "Kbd",
+      "summary": "One key, as a glyph to draw and a name to announce.",
+      "doc": "One key, as a glyph to draw and a name to announce. Anything not in the table is drawn as itself and announced as itself, upper cased - so `'e'`, `'/'` and `'F5'` all work without needing an entry. A registry that refuses unknown keys would mean a pull request every time somebody adds a shortcut.",
       "props": [],
       "propDocs": ""
     },
@@ -5552,6 +5832,16 @@
     {
       "name": "Sizes",
       "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Sizes",
+      "doc": "Components/Dialog Sizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sizes",
+      "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
       "summary": "Story: Components/Icon / Sizes",
@@ -5820,6 +6110,16 @@
       "propDocs": ""
     },
     {
+      "name": "Stepped",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Stepped",
+      "doc": "Components/Dialog Stepped",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "StickyHeader",
       "kind": "story",
       "file": "src/components/Table/Table.stories.tsx",
@@ -5866,6 +6166,16 @@
       "area": "Icon",
       "summary": "Story: Components/Icon / StrokeWidth",
       "doc": "Components/Icon StrokeWidth",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SubmitShortcut",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / SubmitShortcut",
+      "doc": "Components/Dialog SubmitShortcut",
       "props": [],
       "propDocs": ""
     },
@@ -6625,6 +6935,16 @@
     {
       "name": "Tones",
       "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / Tones",
+      "doc": "Components/Callout Tones",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Tones",
+      "kind": "story",
       "file": "src/components/IconTile/IconTile.stories.tsx",
       "area": "IconTile",
       "summary": "Story: Components/IconTile / Tones",
@@ -6791,6 +7111,26 @@
       "propDocs": ""
     },
     {
+      "name": "UnsavedChanges",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / UnsavedChanges",
+      "doc": "Components/Dialog UnsavedChanges",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Usage",
+      "kind": "story",
+      "file": "src/components/Kbd/Kbd.stories.tsx",
+      "area": "Kbd",
+      "summary": "Story: Components/Kbd / Usage",
+      "doc": "Components/Kbd Usage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useColumnReorder",
       "kind": "hook",
       "file": "src/components/Table/useColumnReorder.ts",
@@ -6807,6 +7147,56 @@
       "area": "Table",
       "summary": "Holds column widths for a resizable table.",
       "doc": "Holds column widths for a resizable table. `TableHead` provides the handle and its keyboard behaviour but deliberately owns no state, the same way sorting is a contract rather than an implementation. This is the arithmetic, kept separate so a table driven by TanStack, a server, or a user's saved layout can ignore it entirely. The pattern follows `useEditableTabs`: props on the component, rules in a hook beside it. ```tsx const { widths, setWidth, reset, isResized } = useColumnWidths({ name: 220, email: 280, }); <Table layout=\"fixed\"> <TableHeader> <TableRow> <TableHead resizable width={widths.name} onResize={(w) => { setWidth('name', w); }} > Name </TableHead> </TableRow> </TableHeader> </Table> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogFooterPull",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The pull that puts the footer's rule on the body's clipping edge.",
+      "doc": "The pull that puts the footer's rule on the body's clipping edge.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogFooterTop",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The room between the footer's rule and its buttons.",
+      "doc": "The room between the footer's rule and its buttons.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogGutter",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The left and right padding every region in this dialog shares.",
+      "doc": "The left and right padding every region in this dialog shares.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogScrollsBody",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "Whether this dialog scrolls its body rather than the page behind it.",
+      "doc": "Whether this dialog scrolls its body rather than the page behind it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogTop",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The padding above the first region.",
+      "doc": "The padding above the first region.",
       "props": [],
       "propDocs": ""
     },
@@ -6841,6 +7231,16 @@
       "propDocs": ""
     },
     {
+      "name": "usePlatform",
+      "kind": "hook",
+      "file": "src/components/Kbd/usePlatform.ts",
+      "area": "Kbd",
+      "summary": "Which machine this is, for resolving `mod` and `alt`.",
+      "doc": "Which machine this is, for resolving `mod` and `alt`. `useSyncExternalStore` rather than an effect, so a client-rendered page gets the right answer on its **first** paint - an effect would draw `Ctrl` and then swap it for `⌘`, which is a flicker on exactly the surface that is meant to be glanced at. A server-rendered page gets `windows` and corrects itself on hydration without a mismatch, which is what the third argument is for.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "usePromotionalOpen",
       "kind": "hook",
       "file": "src/components/Toast/Toast.tsx",
@@ -6857,6 +7257,16 @@
       "area": "Table",
       "summary": "Holds a table's saved views.",
       "doc": "Holds a table's saved views. A view is a name for a table you have set up - the columns you kept, the sort you chose, the filters you applied - so you can get back to it tomorrow without doing it again. It is the payoff for everything in 5a to 5f: each of those controls already reports its state, and this is what makes that state worth something. Like the rest of Table, **it holds state and never touches your rows**, and it does not persist anything either. Pass `initial` in and write `onChange` out; where they go is the product's decision, and the interesting ones - views shared with a team, views in a URL - are impossible for a hook that assumed `localStorage`. ```tsx const current = useMemo(() => ({ columns: cols.state, sort: sort.rules }), [cols.state, sort.rules]); const views = useSavedViews({ current, initial: stored }); // Applying one: const next = views.apply(id); if (next) { cols.restore(next.columns); sort.restore(next.sort); } ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSubmitShortcut",
+      "kind": "hook",
+      "file": "src/components/Dialog/useSubmitShortcut.ts",
+      "area": "Dialog",
+      "summary": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.",
+      "doc": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action. **Not plain Enter.** A dialog is full of fields, and Enter belongs to the one you are in - it moves between them, it opens a select, it adds a line to a textarea. Requiring the modifier is what lets a form with a `<textarea>` in it have a keyboard submit at all. **Say so in the button.** The shortcut nobody knows about is worth nothing; every product that ships this renders the keys next to the label. `Button` takes the hint as part of its children. Listens on the document rather than on the dialog, because focus may be anywhere inside it - or, while a native select is open, briefly nowhere. ```tsx useSubmitShortcut({ onSubmit: save, enabled: open && !busy }); <Button loading={busy}>Finish setup <CommandShortcut>⌘↵</CommandShortcut></Button> ```",
       "props": [],
       "propDocs": ""
     },
@@ -7071,6 +7481,16 @@
       "propDocs": ""
     },
     {
+      "name": "WhatItIsFor",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / WhatItIsFor",
+      "doc": "Components/Callout WhatItIsFor",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Wide",
       "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
@@ -7087,6 +7507,16 @@
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / WithActionButtons",
       "doc": "Deprecated/Sidebar WithActionButtons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithActions",
+      "kind": "story",
+      "file": "src/components/Callout/Callout.stories.tsx",
+      "area": "Callout",
+      "summary": "Story: Components/Callout / WithActions",
+      "doc": "Components/Callout WithActions",
       "props": [],
       "propDocs": ""
     },

@@ -1,3 +1,4 @@
+import type { KbdKey } from '../Kbd';
 import type { VariantProps } from 'class-variance-authority';
 import type {
   ComponentPropsWithoutRef,
@@ -95,6 +96,24 @@ interface LinkButtonProps
  * Common props shared by both button and link variants
  */
 interface CommonButtonProps {
+  /**
+   * A keyboard shortcut, shown as key caps at the end of the button.
+   *
+   * `shortcut={['mod', 'enter']}` - Command on a Mac, Control elsewhere. The
+   * cap's ink follows this button's variant and its size follows this button's
+   * size, which is why it is a prop rather than a `<Kbd>` a caller composes:
+   * both are things the button knows and a caller would have to guess.
+   *
+   * **Never on a destructive action.** Nobody should be able to delete
+   * something by muscle memory, and a keyboard path to an irreversible act is
+   * exactly that. Leave this off anything that destroys, and leave
+   * `useSubmitShortcut` off with it.
+   *
+   * Hidden while `loading` or `success`, like the icons - the shortcut is an
+   * offer and neither state is accepting one.
+   */
+  shortcut?: KbdKey[];
+
   /**
    * Content to display inside the button
    */
