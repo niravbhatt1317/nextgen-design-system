@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-777 capabilities: 186 components, 15 hooks, 9 utilities, 567 stories
+778 capabilities: 186 components, 16 hooks, 9 utilities, 567 stories
 
 ## Components
 
@@ -217,6 +217,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | -------------------- | ------- | ---------------------------------------------------------------------- |
 | `useColumnReorder`   | Table   | Drag a column sideways to move it.                                     |
 | `useColumnWidths`    | Table   | Holds column widths for a resizable table.                             |
+| `useDialogFooterTop` | Dialog  | The room between the footer's rule and its buttons.                    |
 | `useDialogGutter`    | Dialog  | The left and right padding every region in this dialog shares.         |
 | `useDialogTop`       | Dialog  | The padding above the first region.                                    |
 | `useEditableTabs`    | Tabs    | The rules for a tab bar the person builds themselves.                  |

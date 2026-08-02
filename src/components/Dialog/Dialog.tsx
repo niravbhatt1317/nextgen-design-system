@@ -6,7 +6,9 @@ import { forwardRef } from 'react';
 import { cn } from '@/utils';
 import {
   CLOSE_POSITION,
+  CLOSE_PULL,
   DialogDensityContext,
+  useDialogFooterTop,
   useDialogGutter,
   useDialogTop,
 } from './dialogSpacing';
@@ -45,11 +47,13 @@ const dialogContentVariants = cva('', {
       // right and top belong to the regions themselves - see `dialogSpacing`.
       //
       // The bottom stays here because no region knows whether it is the last
-      // thing in the box. A dialog with a footer wants 12 under its buttons and
-      // one without wants 12 under its body; putting it on the container is
-      // what makes those the same number rather than two that drift.
-      comfortable: 'mdt-gap-4 mdt-pb-3',
+      // thing in the box. A dialog with a footer wants the floor under its
+      // buttons and one without wants it under its body; putting it on the
+      // container is what makes those the same number rather than two that
+      // drift. It is the step minus 4 at each density.
       compact: 'mdt-gap-3 mdt-pb-2',
+      comfortable: 'mdt-gap-4 mdt-pb-3',
+      spacious: 'mdt-gap-6 mdt-pb-5',
     },
   },
   defaultVariants: { size: 'md', density: 'comfortable' },
@@ -291,6 +295,7 @@ const DialogContent = forwardRef<
                       // it rode 6px high of the words beside it.
                       'mdt-absolute mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
                       closePosition,
+                      CLOSE_PULL,
                       // Muted, not near-black. The way out of a dialog is not
                       // the thing to look at first, and at full strength the X
                       // competed with the title for that.
@@ -343,29 +348,42 @@ DialogHeader.displayName = 'DialogHeader';
  * DialogFooter - container for action buttons.
  */
 const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
-  ({ className, align = 'end', divider = true, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        useDialogGutter(),
-        'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
-        // `end` is a decision - Cancel, then the primary. `between` is a
-        // journey: something quiet on the left, the way forward on the right.
-        // A step back, a support link, "having a problem?".
-        align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
-        divider && [
-          // The rule reaches both edges because the footer is a full-width
-          // block that pads its own contents - not, as it used to be, a padded
-          // box tearing back out through the container's padding with `-mx-4`.
-          // That number had to be kept in step with the container by hand, and
-          // was wrong by 7px a side the first time anybody measured it.
-          'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-3',
-        ],
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, align = 'end', divider = true, ...props }, ref) => {
+    // Read unconditionally. Inside the `divider &&` below they would be hooks
+    // that stop running the moment somebody passes `divider={false}`, which is
+    // the kind of bug that only shows up when a caller toggles it.
+    const gutter = useDialogGutter();
+    const aboveButtons = useDialogFooterTop();
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          gutter,
+          'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
+          // `end` is a decision - Cancel, then the primary. `between` is a
+          // journey: something quiet on the left, the way forward on the right.
+          // A step back, a support link, "having a problem?".
+          align === 'end' ? 'sm:mdt-justify-end' : 'sm:mdt-justify-between',
+          divider && [
+            // The rule reaches both edges because the footer is a full-width
+            // block that pads its own contents - not, as it used to be, a
+            // padded box tearing back out through the container's padding with
+            // `-mx-4`. That number had to be kept in step with the container by
+            // hand, and was wrong by 7px a side the first time anyone measured.
+            'mdt-mt-2 mdt-border-t mdt-border-border',
+            // The step minus 4, matching the floor beneath the buttons, so the
+            // footer is even about its own contents. `compact` was keeping
+            // `comfortable`'s 12 here while using 8 below - measured, and the
+            // one place the densities were not the same shape.
+            aboveButtons,
+          ],
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 DialogFooter.displayName = 'DialogFooter';
 

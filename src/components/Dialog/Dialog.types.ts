@@ -28,7 +28,7 @@ export type DialogOverlayProps = ComponentPropsWithoutRef<typeof DialogPrimitive
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 /** How much room the dialog gives its contents. */
-export type DialogDensity = 'comfortable' | 'compact';
+export type DialogDensity = 'compact' | 'comfortable' | 'spacious';
 
 /** How a footer arranges what is in it. */
 export type DialogFooterAlign = 'end' | 'between';

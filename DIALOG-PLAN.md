@@ -152,32 +152,39 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
       the last thing in the box: a dialog with a footer wants 12 under its buttons and one without
       wants 12 under its body, and putting it on the container is what makes those the same number.
 
-- [x] **Density, two steps.** ✅ Measured against a trial rather than argued. `comfortable`:
+- [x] **Density, three steps — one number each.** ✅ `compact` 12 · `comfortable` 16 · `spacious` 24,
+      and everything else in the dialog derived from it rather than listed beside it.
 
-      | | |
-      | --- | --- |
-      | gutter, all four regions | 16 |
-      | above the header | 16 |
-      | title → description | 6 with a tag, 8 without |
-      | header → steps | 16 |
-      | steps → body | 20 |
-      | body → rule | 24 |
-      | rule → buttons | 12 |
-      | buttons → bottom | 12 |
+      | derived from the step | compact | comfortable | spacious |
+      | --- | --- | --- | --- |
+      | gutter, all four regions | 12 | 16 | 24 |
+      | above the header | 12 | 16 | 24 |
+      | between blocks | 12 | 16 | 24 |
+      | rule → buttons (step − 4) | 8 | 12 | 20 |
+      | buttons → floor (step − 4) | 8 | 12 | 20 |
+      | close glyph to the edge | 12 | 16 | 24 |
 
-      `compact` is the same shape at 12 and 8, for a dialog that is mostly chrome around one control.
+      **`compact` was wrong before this** and the arithmetic is what caught it: it kept
+      `comfortable`'s 12 above the buttons while using 8 below them, so the footer was uneven about
+      its own contents at one density and even at the other. Nothing derived, so nothing noticed.
 
-      **The title's tag changes the gap under it.** A `<Badge>` makes the title's line taller and
-      closes some of that gap on its own, so `DialogTitle` takes 2px back when it has one. Which is
-      why the tag is a prop rather than something written into `children` — written inline it looks
-      identical and leaves the spacing wrong.
+      The scale is not evenly spaced. 12 → 16 is a control panel against a form; 16 → 24 is a form
+      against a page that happens to be in a box. A step in between would be a choice nobody could
+      make from a screenshot.
 
-      The buttons stay at `md`, 36px. Tried at 32 and put back: the footer is the one row that has
-      to stay pressable, and a dialog is not so dense that its actions should shrink.
+      **Two things deliberately do not scale.** The gap between a title and its description (8, or
+      6 when the title carries a tag) and the 4px `DialogSteps` adds beneath itself are
+      relationships between two pieces of text, not between text and a box.
+
+      The close button follows the gutter **by construction**: it is anchored at the step and
+      pulled back by a constant 6 across and 4 up. Measured at all three, its glyph lands exactly
+      on the gutter — 12, 16, 24 — and its centre exactly on the title's.
+
+      The buttons stay at `md`, 36px, at every density. Tried at 32 and put back: the footer is the
+      one row that has to stay pressable.
 
       A button carrying a `DialogSubmitHint` gets 14 before the chip and 10 after it, rather than
       the 16 its padding would give. A chip is not reading and does not need the room a word would.
-      Both live on the chip, so they only apply where there is actually a chip.
 
 - [x] **The close button lines up with the title.** ✅ It is a 28px hit area around a 16px glyph,
       positioned so the glyph's own edge sits on the gutter and the box centres on the title's line.

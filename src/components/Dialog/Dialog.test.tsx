@@ -6,6 +6,7 @@ import { useSubmitShortcut } from './useSubmitShortcut';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { DialogDensity } from './Dialog.types';
 import {
   Dialog,
   DialogBody,
@@ -648,7 +649,7 @@ describe('DialogFooter', () => {
 });
 
 describe('the regions', () => {
-  const at = (density: 'comfortable' | 'compact') => {
+  const at = (density: DialogDensity) => {
     render(
       <Dialog defaultOpen>
         <DialogContent density={density}>
@@ -673,14 +674,35 @@ describe('the regions', () => {
     expect(gutters.every((c) => c.includes('mdt-px-4'))).toBe(true);
   });
 
-  it('moves all three together when the density changes', () => {
-    const gutters = at('compact').filter((c) => c.includes('mdt-px-'));
+  it.each([
+    ['compact', 'mdt-px-3'],
+    ['comfortable', 'mdt-px-4'],
+    ['spacious', 'mdt-px-6'],
+  ] as const)('moves all three together at %s', (density, gutter) => {
+    const gutters = at(density).filter((c) => c.includes('mdt-px-'));
     expect(gutters).toHaveLength(3);
-    expect(gutters.every((c) => c.includes('mdt-px-3'))).toBe(true);
+    expect(gutters.every((c) => c.includes(gutter))).toBe(true);
   });
 
-  it('puts the space above the first region on the header, not the box', () => {
-    expect(at('comfortable')[0]).toContain('mdt-pt-4');
+  it.each([
+    ['compact', 'mdt-pt-3'],
+    ['comfortable', 'mdt-pt-4'],
+    ['spacious', 'mdt-pt-6'],
+  ] as const)('puts the space above the first region on the header at %s', (density, top) => {
+    expect(at(density)[0]).toContain(top);
+  });
+
+  it.each([
+    ['compact', 'mdt-pt-2', 'mdt-pb-2'],
+    ['comfortable', 'mdt-pt-3', 'mdt-pb-3'],
+    ['spacious', 'mdt-pt-5', 'mdt-pb-5'],
+  ] as const)('is even about its buttons at %s', (density, above, below) => {
+    // The step minus 4, both sides. This is what `compact` was getting wrong:
+    // it kept `comfortable`'s 12 above the buttons while using 8 below them.
+    const classes = at(density);
+    const footer = classes.find((c) => c.includes('mdt-border-t')) ?? '';
+    expect(footer).toContain(above);
+    expect(screen.getByRole('dialog').getAttribute('class')).toContain(below);
   });
 });
 
@@ -819,9 +841,11 @@ describe('size and density', () => {
     expect(classes).not.toContain('mdt-pt-4');
   });
 
-  it('tightens up when asked', () => {
-    const classes = at({ density: 'compact' });
-    expect(classes).toContain('mdt-gap-3');
-    expect(classes).toContain('mdt-pb-2');
+  it.each([
+    ['compact', 'mdt-gap-3'],
+    ['comfortable', 'mdt-gap-4'],
+    ['spacious', 'mdt-gap-6'],
+  ] as const)('sets the rhythm between regions at %s', (density, gap) => {
+    expect(at({ density })).toContain(gap);
   });
 });

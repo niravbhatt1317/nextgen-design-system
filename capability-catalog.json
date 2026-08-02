@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 777,
+  "capabilityCount": 778,
   "counts": {
     "story": 567,
     "component": 186,
     "utility": 9,
-    "hook": 15
+    "hook": 16
   },
   "capabilities": [
     {
@@ -6927,6 +6927,16 @@
       "area": "Table",
       "summary": "Holds column widths for a resizable table.",
       "doc": "Holds column widths for a resizable table. `TableHead` provides the handle and its keyboard behaviour but deliberately owns no state, the same way sorting is a contract rather than an implementation. This is the arithmetic, kept separate so a table driven by TanStack, a server, or a user's saved layout can ignore it entirely. The pattern follows `useEditableTabs`: props on the component, rules in a hook beside it. ```tsx const { widths, setWidth, reset, isResized } = useColumnWidths({ name: 220, email: 280, }); <Table layout=\"fixed\"> <TableHeader> <TableRow> <TableHead resizable width={widths.name} onResize={(w) => { setWidth('name', w); }} > Name </TableHead> </TableRow> </TableHeader> </Table> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogFooterTop",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The room between the footer's rule and its buttons.",
+      "doc": "The room between the footer's rule and its buttons.",
       "props": [],
       "propDocs": ""
     },

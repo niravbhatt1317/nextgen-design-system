@@ -5,6 +5,7 @@ import { Badge } from '../Badge';
 import { CommandShortcut } from '../Command';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
+import type { DialogDensity } from './Dialog.types';
 import { DialogSubmitHint } from './DialogSubmitHint';
 import { useSubmitShortcut } from './useSubmitShortcut';
 import {
@@ -1034,23 +1035,27 @@ export const Sizes: Story = {
 };
 
 /**
- * The two densities, side by side.
+ * The three densities, side by side.
  *
- * **Comfortable** is what everything gets unless it asks otherwise: 16px on
- * three sides and 12px underneath, 8px between the title and its description,
- * 16px between blocks — and 20px from the steps to whatever follows them,
- * because that is where the reading actually starts.
+ * One number each - **compact 12 · comfortable 16 · spacious 24** - and every
+ * other measurement in the dialog derived from it. The gutter every region
+ * shares is that number; the space above the header is that number; the floor
+ * beneath the buttons and the rule above them are that number minus 4, because
+ * the footer already carries a line and a full gutter under it as well left the
+ * actions floating away from the box.
  *
- * **Compact** is 12px and 8px, for a dialog that is mostly chrome around one
- * control.
+ * The scale is not evenly spaced. 12 → 16 is the difference between a control
+ * panel and a form; 16 → 24 is the difference between a form and a page that
+ * happens to be in a box. A step in between would be a choice nobody could make
+ * from a screenshot.
  *
- * The footer's rule breaks out through whichever padding it finds, so it
- * reaches both edges in either — hard-coded at 24px it overhung the compact one
- * by 7px a side, measured.
+ * **Two things deliberately do not scale**: the gap between a title and its
+ * description, and the 4px the steps add beneath themselves. Both are
+ * relationships between two pieces of text rather than between text and a box.
  */
 export const Density: Story = {
   render: function DensityDemo() {
-    const [mode, setMode] = useState<'comfortable' | 'compact' | null>(null);
+    const [mode, setMode] = useState<DialogDensity | null>(null);
 
     return (
       <div className="mdt-flex mdt-gap-2">
@@ -1068,6 +1073,14 @@ export const Density: Story = {
           }}
         >
           Compact
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setMode('spacious');
+          }}
+        >
+          Spacious
         </Button>
 
         <Dialog

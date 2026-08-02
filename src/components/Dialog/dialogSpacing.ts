@@ -10,40 +10,80 @@ import type { DialogDensity } from './Dialog.types';
 export const DialogDensityContext = createContext<DialogDensity>('comfortable');
 
 /**
- * Left and right, shared by every region.
+ * One number per density, and everything else derived from it.
  *
- * **The content itself has no horizontal padding.** Each region is a full-width
- * block that pads its own contents, which is what lets the footer's rule reach
- * both edges without the negative margin it used to need - `-mx-4 px-4`, a
- * number that had to be kept in step with the container's padding by hand and
- * was wrong by 7px a side the first time anyone measured it.
+ * `compact` 12 · `comfortable` 16 · `spacious` 24.
  *
- * One value, one place, so the three regions cannot drift apart.
+ * Not evenly spaced, on purpose. 12 → 16 is the difference between a control
+ * panel and a form; 16 → 24 is the difference between a form and a page that
+ * happens to be in a box. A step between 16 and 24 would be a choice nobody
+ * could make from a screenshot.
+ *
+ * Two things fall out of the number rather than being listed beside it:
+ *
+ * - **The bottom is the number minus 4.** The buttons sit closer to the bottom
+ *   edge than the reading does to the top, because the footer already carries
+ *   its rule and a full gutter under it as well left the actions floating away
+ *   from the box. Measured once at `comfortable`, and it holds at every step -
+ *   which is why it is arithmetic here rather than a third map to keep in sync.
+ * - **The rule above the buttons is the same minus 4**, so the footer is even
+ *   about its own contents. This is what `compact` was getting wrong: it kept
+ *   `comfortable`'s 12 above the buttons while using 8 below them.
+ *
+ * What deliberately does **not** scale: the gap between a title and its
+ * description, and the 4px `DialogSteps` adds beneath itself. Both are
+ * relationships between two pieces of text rather than between text and a box.
  */
-const GUTTER = { comfortable: 'mdt-px-4', compact: 'mdt-px-3' } as const;
+const GUTTER = {
+  compact: 'mdt-px-3',
+  comfortable: 'mdt-px-4',
+  spacious: 'mdt-px-6',
+} as const;
 
 /** The space above the first region. The bottom belongs to the content. */
-const TOP = { comfortable: 'mdt-pt-4', compact: 'mdt-pt-3' } as const;
+const TOP = {
+  compact: 'mdt-pt-3',
+  comfortable: 'mdt-pt-4',
+  spacious: 'mdt-pt-6',
+} as const;
+
+/** The step minus 4: the room between the footer's rule and its buttons. */
+const FOOTER_TOP = {
+  compact: 'mdt-pt-2',
+  comfortable: 'mdt-pt-3',
+  spacious: 'mdt-pt-5',
+} as const;
 
 /**
- * Where the close button sits, so its glyph lines up with the gutter.
+ * Where the close button starts, before `CLOSE_PULL` moves it.
  *
- * Inset by less than the gutter on both axes, because the button is a 28px hit
- * area around a 16px glyph. Horizontally 10 + 6 puts the glyph's own edge on
- * the 16 the title starts at. Vertically the top is pulled up so the 28px box
- * centres on the title's line rather than on the padding above it - measured,
- * the glyph sat 4px low of the title beside it before this.
+ * The same number as the gutter, so the two follow each other by construction
+ * rather than by two maps that happen to agree today.
  *
  * A plain map rather than a hook - `DialogContent` is what provides the
  * density, so it cannot read its own context.
  */
 export const CLOSE_POSITION = {
-  comfortable: 'mdt-right-2.5 mdt-top-3',
-  compact: 'mdt-right-1.5 mdt-top-2',
+  compact: 'mdt-right-3 mdt-top-3',
+  comfortable: 'mdt-right-4 mdt-top-4',
+  spacious: 'mdt-right-6 mdt-top-6',
 } as const;
+
+/**
+ * And then pulled back onto the title, by the same amount at every density.
+ *
+ * The close button is a 28px hit area around a 16px glyph, so it comes out of
+ * the gutter by 6 to put the glyph's own edge on it, and up by 4 to centre the
+ * box on the title's line rather than on the padding above it. Measured before
+ * this existed: the glyph sat 4px low of the title beside it.
+ */
+export const CLOSE_PULL = '-mdt-mr-1.5 -mdt-mt-1';
 
 /** The left and right padding every region in this dialog shares. */
 export const useDialogGutter = () => GUTTER[useContext(DialogDensityContext)];
 
 /** The padding above the first region. */
 export const useDialogTop = () => TOP[useContext(DialogDensityContext)];
+
+/** The room between the footer's rule and its buttons. */
+export const useDialogFooterTop = () => FOOTER_TOP[useContext(DialogDensityContext)];
