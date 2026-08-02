@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
-import { CommandShortcut } from '../Command';
 import { Input } from '../Input';
 import { DialogSteps } from './DialogSteps';
 import type { DialogDensity } from './Dialog.types';
@@ -608,36 +607,34 @@ export const UnsavedChanges: Story = {
                 Save
               </Button>
             </DialogFooter>
-            <DialogBody>
-              <Dialog open={asking} onOpenChange={setAsking}>
-                <DialogContent className="sm:mdt-max-w-[420px]">
-                  <DialogHeader>
-                    <DialogTitle>Discard your changes?</DialogTitle>
-                    <DialogDescription>What you have typed will not be kept.</DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setAsking(false);
-                      }}
-                    >
-                      Keep editing
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        setAsking(false);
-                        setValue('');
-                        setOpen(false);
-                      }}
-                    >
-                      Discard
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </DialogBody>
+            <Dialog open={asking} onOpenChange={setAsking}>
+              <DialogContent className="sm:mdt-max-w-[420px]">
+                <DialogHeader>
+                  <DialogTitle>Discard your changes?</DialogTitle>
+                  <DialogDescription>What you have typed will not be kept.</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setAsking(false);
+                    }}
+                  >
+                    Keep editing
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setAsking(false);
+                      setValue('');
+                      setOpen(false);
+                    }}
+                  >
+                    Discard
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </DialogContent>
         </Dialog>
       </>
@@ -815,7 +812,7 @@ export const SubmitShortcut: Story = {
                 }}
               >
                 Finish setup
-                <CommandShortcut>⌘↵</CommandShortcut>
+                <DialogSubmitHint />
               </Button>
             </DialogFooter>
           </DialogContent>
