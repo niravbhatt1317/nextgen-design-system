@@ -136,12 +136,16 @@ were a tint.
 They are backgrounds behind body text. A fill has one job here, which is to say _"this is a
 group"_; the icon and the border are what say which group.
 
-**In dark mode the same fills are composited at 30%.** The ramps have no low-saturation dark step:
-the `90`s are 17–20% lightness at up to 100% saturation against a 10% page, and laid on solid six
-of them read as six blocks of colour. The steps below are 9–10% — level with the page or darker,
-and a fill darker than its page reads as a hole. Compositing keeps the hue and takes the weight
-off. `ai` uses `purple-100` rather than `purple-90` because the purple ramp is not spaced like the
-others: `purple-90` is 40% lightness where its neighbours are 17–20.
+**In dark mode the fills and borders are mixed, not picked.** They are the only ten values in
+`globals.css` that do not point at a ramp step, and they are an exception with a reason: the ramps
+have no low-saturation dark step. The `90`s are 17–20% lightness at up to 100% saturation against a
+10% page — a slab rather than a tint — and the steps below are 9–10%, level with the page or darker,
+which reads as a hole. These sit at 13–18% lightness and 38–55% saturation, which is the band that
+does not exist.
+
+**See `MISSING-TOKENS.md` § 11** for the full record, including what was tried instead and what
+would retire them: one more step per hue's ramp, at which point these ten go back to being
+`var(--mdt-blue-dark)` and friends.
 
 **`ai` draws a gradient mark, not a Lucide glyph.** It is the one tone that is a brand rather than
 a status — see `AiMark` and the `--mdt-ai-gradient-*` tokens.

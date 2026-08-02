@@ -43,9 +43,10 @@ dark fill is `neutral-140` and the border and the icon carry the tone, which is 
 That was not a free choice — the ramps have no low-saturation dark step. The `90` steps were
 17–20% lightness at up to 100% saturation against a 10% page, and the `100` steps below them are
 9–10%, level with the page or darker than it. A fill darker than the page reads as a hole, which
-this codebase already shipped once in the dark CodeWell. **A per-hue dark surface tint is a genuine
-gap in the palette** — worth adding if a future component needs the fill itself to carry a hue in
-dark mode.
+this codebase already shipped once in the dark CodeWell. **That gap is now filled by hand rather than by the palette**, and recorded as such: ten mixed
+values, in `MISSING-TOKENS.md` § 11, with what would retire them. Values by Pranjal Gupta, who hit
+the same wall drawing Banner on the same day — adopted onto `main` rather than left to collide at
+merge.
 
 Both changes move `Toast` too, since the two share the table. Rendered and checked in both.
 
