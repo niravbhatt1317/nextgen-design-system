@@ -9,6 +9,10 @@
 // every single pull request. Alphabetical insertion puts two new components
 // hundreds of lines apart, and git merges them without a word.
 
+// AiMark
+export { AiMark } from './AiMark';
+export type { AiMarkProps, AiMarkVariant, AiMarkAppearance, AiMarkSize } from './AiMark';
+
 // Avatar — circle or rounded square, photo or initials. The colour is derived
 // from the name, so one person is always one colour.
 export { Avatar, AvatarStack, avatarVariants, toneForName, initialsForName } from './Avatar';
@@ -43,6 +47,10 @@ export type { ButtonProps, ButtonVariantsType } from './Button';
 // ButtonGroup
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
 export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
+
+// Callout
+export { Callout, calloutVariants } from './Callout';
+export type { CalloutProps, CalloutTone, CalloutSize, CalloutVariant } from './Callout';
 
 // Card — a surface that holds related content in the page. It does not open,
 // close, float or freeze the page behind it; those are Modal and Popover, which
@@ -129,10 +137,13 @@ export {
   DialogTrigger,
   DialogClose,
   DialogContent,
+  DialogBody,
   DialogHeader,
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  useSubmitShortcut,
+  DialogSteps,
 } from './Dialog';
 export type {
   DialogProps,
@@ -140,6 +151,7 @@ export type {
   DialogPortalProps,
   DialogOverlayProps,
   DialogContentProps,
+  DialogBodyProps,
   DialogHeaderProps,
   DialogFooterProps,
   DialogTitleProps,
@@ -261,6 +273,19 @@ export type {
 // Item
 export { Item, itemVariants } from './Item';
 export type { ItemProps, ItemVariants } from './Item';
+
+// Kbd
+export { Kbd, KbdVariants, usePlatform } from './Kbd';
+export type {
+  KbdProps,
+  KbdKey,
+  KbdNamedKey,
+  KbdLayout,
+  KbdVariant,
+  KbdSize,
+  KbdTone,
+  KbdPlatform,
+} from './Kbd';
 
 // Label — the uppercase micro-heading, settling three competing letter-spacings
 export { Label, labelVariants } from './Label';
