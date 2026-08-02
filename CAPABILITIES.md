@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-762 capabilities: 182 components, 12 hooks, 9 utilities, 559 stories
+767 capabilities: 182 components, 13 hooks, 9 utilities, 563 stories
 
 ## Components
 
@@ -218,6 +218,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `useLeftNavLevels`   | LeftNav | Which level of a settings navigation is showing.                       |
 | `usePromotionalOpen` | Toast   | Whether a promotional toast is on screen.                              |
 | `useSavedViews`      | Table   | Holds a table's saved views.                                           |
+| `useSubmitShortcut`  | Dialog  | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.         |
 | `useTableColumns`    | Table   | Holds which columns are shown, in what order, and how many are pinned. |
 | `useTableFilters`    | Table   | Holds which filters are applied.                                       |
 | `useTablePagination` | Table   | Which page of a table is showing.                                      |

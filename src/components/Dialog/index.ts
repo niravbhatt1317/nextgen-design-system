@@ -22,3 +22,6 @@ export type {
   DialogDescriptionProps,
   DialogCloseProps,
 } from './Dialog.types';
+
+export { useSubmitShortcut } from './useSubmitShortcut';
+export type { UseSubmitShortcutOptions } from './useSubmitShortcut';

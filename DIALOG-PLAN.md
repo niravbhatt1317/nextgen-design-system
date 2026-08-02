@@ -55,19 +55,25 @@ against the viewport edge on small screens, and a place for a tall dialog to scr
 
 ---
 
-## 1 · Behaviour — the things nobody designs
+## 1 · Behaviour — the things nobody designs ✅
 
-- [ ] **Unsaved-changes guard.** Closing a half-filled form loses it. Escape, the X, and the
-      overlay all need to ask first. Every Panel needs this.
-- [ ] **Pending primary action.** Submit takes two seconds: the button shows busy, and the dialog
-      refuses to close while it is in flight.
-- [ ] **Blocking.** No X, no Escape, no overlay dismiss. Session expired, forced upgrade.
-- [ ] **Stacked.** A confirm over a form. There is already a `NestedDialogs` story, so it has been
-      tried — decide whether it is supported or a trap, and make the answer true in the code.
-- [ ] **Small screens.** Panel and Workspace become full-screen below a breakpoint, or they are
-      unusable. Half of this landed with §0 — the dialog is now inset by 16px and scrolls when it
-      is taller than the viewport, instead of growing past it.
-- [ ] **⌘↵ to submit**, with the hint rendered in the button, as Conductor does.
+- [x] **Unsaved-changes guard.** ✅ `onRequestClose(reason)` — return `false` and it stays open.
+      All three exits go through one gate, because answering the question in three places is how
+      they drift and the overlay is the one that gets forgotten.
+- [x] **Pending primary action.** ✅ `busy` refuses every exit and disables the close button
+      rather than hiding it — the way out still exists, it is just not available yet. `Button`
+      already had `loading`, so nothing new was drawn.
+- [x] **Blocking.** ✅ `blocking` removes the close button entirely rather than disabling it — an
+      X that refuses to work reads as broken rather than as deliberate.
+- [x] **Stacked — supported.** ✅ A guard that refuses to close has to be able to ask, and the
+      asking is a dialog. Both stay in the DOM; only the top one is reachable by role, so nobody
+      is offered a form they cannot get to past the question in front of it.
+- [x] **Small screens.** ✅ Full-bleed below `sm` — measured at 375px: width 375, flush left,
+      square corners. A card with 16px of inset above it. Corners and a border on something that
+      reaches every edge are decoration on a seam that does not exist.
+- [x] **⌘↵ to submit.** ✅ `useSubmitShortcut`, accepting Command or Control so one shortcut
+      works everywhere. Not plain Enter: Enter belongs to the field you are in, and requiring the
+      modifier is what lets a form with a textarea have a keyboard submit at all.
 
 ---
 

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button';
+import { CommandShortcut } from '../Command';
 import { Input } from '../Input';
+import { useSubmitShortcut } from './useSubmitShortcut';
 import {
   Dialog,
   DialogClose,
@@ -510,4 +512,285 @@ export const CustomWidth: Story = {
       </DialogContent>
     </Dialog>
   ),
+};
+
+/**
+ * Closing a half-filled form should ask first.
+ *
+ * Type something, then try every way out — Escape, the X, a click on the
+ * overlay. All three are one question, answered in one place: `onRequestClose`
+ * returns `false` and a confirmation opens instead. Answering it in three
+ * places is how they drift, and the one that gets forgotten is the overlay.
+ *
+ * The confirmation is a second `Dialog` **on top of the first** — supported
+ * deliberately, because a guard that refuses to close has to be able to ask,
+ * and the asking is a dialog. Both stay in the DOM; only the top one is
+ * reachable by a screen reader, so nobody is offered a form they cannot get to.
+ */
+export const UnsavedChanges: Story = {
+  render: function UnsavedChangesDemo() {
+    const [open, setOpen] = useState(false);
+    const [asking, setAsking] = useState(false);
+    const [value, setValue] = useState('');
+    const dirty = value.trim() !== '';
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Edit name
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent
+            onRequestClose={() => {
+              if (!dirty) return true;
+              setAsking(true);
+              return false;
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Edit name</DialogTitle>
+              <DialogDescription>Type something, then try to close it.</DialogDescription>
+            </DialogHeader>
+            <Input
+              label="Name"
+              value={value}
+              onChange={(event) => {
+                setValue(event.target.value);
+              }}
+            />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+
+            <Dialog open={asking} onOpenChange={setAsking}>
+              <DialogContent className="sm:mdt-max-w-[420px]">
+                <DialogHeader>
+                  <DialogTitle>Discard your changes?</DialogTitle>
+                  <DialogDescription>What you have typed will not be kept.</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setAsking(false);
+                    }}
+                  >
+                    Keep editing
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setAsking(false);
+                      setValue('');
+                      setOpen(false);
+                    }}
+                  >
+                    Discard
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * While the work is in flight, nothing gets out.
+ *
+ * Press Save and for two seconds the button is busy, the close button is
+ * disabled, and Escape and the overlay both refuse. Those two seconds are
+ * exactly when an accidental Escape abandons a request that is already on its
+ * way to the server.
+ *
+ * The close button is *disabled* rather than hidden — unlike a blocking dialog,
+ * the way out still exists, it is just not available yet, and hiding it would
+ * say something untrue.
+ *
+ * `Button` already had `loading`; nothing new was drawn for it.
+ */
+export const Pending: Story = {
+  render: function PendingDemo() {
+    const [open, setOpen] = useState(false);
+    const [busy, setBusy] = useState(false);
+
+    const save = () => {
+      setBusy(true);
+      setTimeout(() => {
+        setBusy(false);
+        setOpen(false);
+      }, 2000);
+    };
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Save changes
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent busy={busy}>
+            <DialogHeader>
+              <DialogTitle>Save changes</DialogTitle>
+              <DialogDescription>This takes two seconds. Try to escape it.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button loading={busy} onClick={save}>
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * No way out, because there genuinely is not one.
+ *
+ * A session that has expired, a plan that has lapsed. No close button, no
+ * Escape, no click outside — and no X at all rather than an X that refuses to
+ * work, which reads as broken rather than as deliberate.
+ *
+ * **Reach for this rarely.** A dialog with no way out is the most hostile thing
+ * an interface can do, and every use of it is a promise that the content
+ * contains the way forward. Here it is the button.
+ */
+export const Blocking: Story = {
+  render: function BlockingDemo() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Expire my session
+        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent blocking>
+            <DialogHeader>
+              <DialogTitle>Your session has expired</DialogTitle>
+              <DialogDescription>
+                Sign in again to carry on. Escape, the overlay and the close button all do nothing —
+                the only way on is the button.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Sign in again
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  },
+};
+
+/**
+ * ⌘↵ submits, and the button says so.
+ *
+ * Not plain Enter: a dialog is full of fields, and Enter belongs to the one you
+ * are in — it moves between them, it opens a select, it adds a line to a
+ * textarea. Requiring the modifier is what lets a form with a `<textarea>` have
+ * a keyboard submit at all.
+ *
+ * The shortcut nobody knows about is worth nothing, so the keys are rendered
+ * next to the label — as Conductor does on *Finish setup*.
+ */
+export const SubmitShortcut: Story = {
+  render: function SubmitShortcutDemo() {
+    const [open, setOpen] = useState(false);
+    const [saved, setSaved] = useState(0);
+
+    useSubmitShortcut({
+      onSubmit: () => {
+        setSaved((n) => n + 1);
+        setOpen(false);
+      },
+      enabled: open,
+    });
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-3">
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Set up
+        </Button>
+        <p className="mdt-text-sm mdt-text-muted-foreground">Submitted {saved} times</p>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Set up Conductor</DialogTitle>
+              <DialogDescription>
+                Press ⌘↵ — or Ctrl↵ — instead of reaching for the mouse.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setSaved((n) => n + 1);
+                  setOpen(false);
+                }}
+              >
+                Finish setup
+                <CommandShortcut>⌘↵</CommandShortcut>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  },
 };

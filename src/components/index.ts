@@ -133,6 +133,7 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  useSubmitShortcut,
 } from './Dialog';
 export type {
   DialogProps,

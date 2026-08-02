@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 762,
+  "capabilityCount": 767,
   "counts": {
-    "story": 559,
+    "story": 563,
     "component": 182,
     "utility": 9,
-    "hook": 12
+    "hook": 13
   },
   "capabilities": [
     {
@@ -366,6 +366,16 @@
       "area": "Button",
       "summary": "Story: Components/Button / BetaExample",
       "doc": "Components/Button BetaExample",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Blocking",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Blocking",
+      "doc": "Components/Dialog Blocking",
       "props": [],
       "propDocs": ""
     },
@@ -2060,8 +2070,8 @@
       "area": "Dialog",
       "summary": "DialogContent - the main content container for the dialog.",
       "doc": "DialogContent - the main content container for the dialog. ```tsx <Dialog> <DialogTrigger asChild> <Button>Open Dialog</Button> </DialogTrigger> <DialogContent> <DialogHeader> <DialogTitle>Dialog Title</DialogTitle> <DialogDescription>Dialog description</DialogDescription> </DialogHeader> <p>Dialog content goes here</p> <DialogFooter> <Button>Action</Button> </DialogFooter> </DialogContent> </Dialog> ```",
-      "props": ["showCloseButton"],
-      "propDocs": "Whether to show the close button"
+      "props": ["showCloseButton", "blocking", "busy", "onRequestClose"],
+      "propDocs": "Whether to show the close button Nothing dismisses it: no close button, no Escape, no click outside. For the few things that genuinely must be answered - a session that has expired, a plan that has lapsed. Reach for it rarely. A dialog with no way out is the most hostile thing an interface can do, and every use of this is a promise that the content contains the way forward. Work is in flight, so dismissal is refused until it clears. Submitting takes two seconds, and in those two seconds Escape, the close button and a stray click outside would all abandon a request that is already on its way to the server. The button shows `loading`; this stops the dialog going anywhere while it does. Asked before every dismissal. Return `false` to keep the dialog open. Anything other than `false` lets it close, so a handler that only wants to observe can return nothing. Where an unsaved-changes guard lives: return `false` and open a confirmation of your own. The reason says which way it was asked, because \"I pressed Escape\" and \"I clicked outside\" sometimes deserve different answers - the second is often an accident."
     },
     {
       "name": "DialogDescription",
@@ -4550,6 +4560,16 @@
       "propDocs": ""
     },
     {
+      "name": "Pending",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / Pending",
+      "doc": "Components/Dialog Pending",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PillHoverCards",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -5870,6 +5890,16 @@
       "propDocs": ""
     },
     {
+      "name": "SubmitShortcut",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / SubmitShortcut",
+      "doc": "Components/Dialog SubmitShortcut",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Success",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -6791,6 +6821,16 @@
       "propDocs": ""
     },
     {
+      "name": "UnsavedChanges",
+      "kind": "story",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: Components/Dialog / UnsavedChanges",
+      "doc": "Components/Dialog UnsavedChanges",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useColumnReorder",
       "kind": "hook",
       "file": "src/components/Table/useColumnReorder.ts",
@@ -6857,6 +6897,16 @@
       "area": "Table",
       "summary": "Holds a table's saved views.",
       "doc": "Holds a table's saved views. A view is a name for a table you have set up - the columns you kept, the sort you chose, the filters you applied - so you can get back to it tomorrow without doing it again. It is the payoff for everything in 5a to 5f: each of those controls already reports its state, and this is what makes that state worth something. Like the rest of Table, **it holds state and never touches your rows**, and it does not persist anything either. Pass `initial` in and write `onChange` out; where they go is the product's decision, and the interesting ones - views shared with a team, views in a URL - are impossible for a hook that assumed `localStorage`. ```tsx const current = useMemo(() => ({ columns: cols.state, sort: sort.rules }), [cols.state, sort.rules]); const views = useSavedViews({ current, initial: stored }); // Applying one: const next = views.apply(id); if (next) { cols.restore(next.columns); sort.restore(next.sort); } ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSubmitShortcut",
+      "kind": "hook",
+      "file": "src/components/Dialog/useSubmitShortcut.ts",
+      "area": "Dialog",
+      "summary": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.",
+      "doc": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action. **Not plain Enter.** A dialog is full of fields, and Enter belongs to the one you are in - it moves between them, it opens a select, it adds a line to a textarea. Requiring the modifier is what lets a form with a `<textarea>` in it have a keyboard submit at all. **Say so in the button.** The shortcut nobody knows about is worth nothing; every product that ships this renders the keys next to the label. `Button` takes the hint as part of its children. Listens on the document rather than on the dialog, because focus may be anywhere inside it - or, while a native select is open, briefly nowhere. ```tsx useSubmitShortcut({ onSubmit: save, enabled: open && !busy }); <Button loading={busy}>Finish setup <CommandShortcut>⌘↵</CommandShortcut></Button> ```",
       "props": [],
       "propDocs": ""
     },
