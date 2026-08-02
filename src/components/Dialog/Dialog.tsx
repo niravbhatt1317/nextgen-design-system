@@ -2,13 +2,22 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils';
+import {
+  SCROLL_FADE_BOTTOM,
+  SCROLL_FADE_DOWN,
+  SCROLL_FADE_OFF,
+  SCROLL_FADE_STRIP,
+  SCROLL_FADE_TOP,
+  SCROLL_FADE_UP,
+} from '@/utils/scroll-fade';
 import {
   CLOSE_POSITION,
   CLOSE_PULL,
   DialogDensityContext,
   DialogScrollContext,
+  useDialogFooterPull,
   useDialogFooterTop,
   useDialogGutter,
   useDialogScrollsBody,
@@ -387,6 +396,8 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
     // the kind of bug that only shows up when a caller toggles it.
     const gutter = useDialogGutter();
     const aboveButtons = useDialogFooterTop();
+    const scrollsBody = useDialogScrollsBody();
+    const footerPull = useDialogFooterPull();
 
     return (
       <div
@@ -405,7 +416,13 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // padded box tearing back out through the container's padding with
             // `-mx-4`. That number had to be kept in step with the container by
             // hand, and was wrong by 7px a side the first time anyone measured.
-            'mdt-mt-2 mdt-border-t mdt-border-border',
+            'mdt-border-t mdt-border-border',
+            // 8px above the rule normally. When the body scrolls, the rule IS
+            // the clipping edge: the 8 goes, and the content's own gap above
+            // the footer is pulled back out too, so the line sits exactly where
+            // the content stops. Measured at 16px of dead space before this -
+            // enough that a row of text vanished before it reached the rule.
+            scrollsBody ? footerPull : 'mdt-mt-2',
             // The step minus 4, matching the floor beneath the buttons, so the
             // footer is even about its own contents. `compact` was keeping
             // `comfortable`'s 12 here while using 8 below - measured, and the
@@ -420,6 +437,14 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
   }
 );
 DialogFooter.displayName = 'DialogFooter';
+
+/**
+ * A dialog's own card, which is where its fades have to end.
+ *
+ * The strip and the directions are shared from `@/utils/scroll-fade`; only the
+ * colour is here, because a fade ends in whatever surface it sits on.
+ */
+const DIALOG_FADE_SURFACE = 'mdt-from-background';
 
 /**
  * DialogBody - the reading between the header and the footer.
@@ -439,22 +464,112 @@ DialogFooter.displayName = 'DialogFooter';
  * </DialogBody>
  * ```
  */
-const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      useDialogGutter(),
-      // The one region that changes with `scroll`. `min-h-0` is the load-
-      // bearing half: a flex child's minimum size is its content, so without
-      // it the body refuses to shrink, pushes the dialog past `max-h-full`,
-      // and nothing scrolls - the classic version of this bug, where every
-      // other class looks right.
-      useDialogScrollsBody() && 'mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto',
-      className
-    )}
-    {...props}
-  />
-));
+const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
+  ({ className, onScroll, ...props }, ref) => {
+    const gutter = useDialogGutter();
+    const scrolls = useDialogScrollsBody();
+    // Both true before anything has scrolled, which is right: a body short
+    // enough not to scroll never reaches either end, so neither fade shows.
+    const [ends, setEnds] = useState({ atTop: true, atBottom: true });
+    const scroller = useRef<HTMLDivElement | null>(null);
+
+    const measure = useCallback((node: HTMLDivElement | null) => {
+      if (!node) return;
+      const { scrollTop, scrollHeight, clientHeight } = node;
+      setEnds({
+        atTop: scrollTop <= 0,
+        // A pixel of slack. Sub-pixel heights and browser rounding mean an
+        // exact comparison can be one short at the very bottom, and a fade that
+        // never quite turns off is worse than no fade.
+        atBottom: scrollTop + clientHeight >= scrollHeight - 1,
+      });
+    }, []);
+
+    /*
+      Watched, not measured once.
+
+      A scroll event is the obvious trigger and it is not enough: at rest
+      nothing has scrolled, so a body long enough to need the bottom fade
+      showed none until somebody had already scrolled it - which is the one
+      moment the fade existed to prevent. Measured, 742px of content in a
+      527px box with the fade off.
+
+      A single measurement on mount fixes that case and not the next one: a
+      body whose height changes under it - a font arriving, a section
+      expanding, the window resizing - would keep whichever answer it had at
+      mount. The observer covers all of them, and fires once on attach, which
+      is the mount measurement for free.
+    */
+    useEffect(() => {
+      const node = scroller.current;
+      if (!scrolls || !node || typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(() => {
+        measure(node);
+      });
+      observer.observe(node);
+      return () => {
+        observer.disconnect();
+      };
+    }, [scrolls, measure]);
+
+    const body = (
+      <div
+        // Merged: the component needs the node to watch it, and the caller may
+        // want it too. Dropping either is a bug that only shows up in whichever
+        // one nobody tested.
+        ref={(node: HTMLDivElement | null) => {
+          scroller.current = node;
+          if (typeof ref === 'function') ref(node);
+          else if (ref) ref.current = node;
+        }}
+        className={cn(
+          gutter,
+          // `min-h-0` is the load-bearing half: a flex child's minimum size is
+          // its content, so without it the body refuses to shrink, pushes the
+          // dialog past `max-h-full`, and nothing scrolls - the classic version
+          // of this bug, where every other class looks right.
+          scrolls && 'mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto',
+          className
+        )}
+        onScroll={(event) => {
+          if (scrolls) measure(event.currentTarget);
+          onScroll?.(event);
+        }}
+        {...props}
+      />
+    );
+
+    if (!scrolls) return body;
+
+    return (
+      // The fades are siblings of the scroller, not children of it - a child
+      // would scroll away with the content it is meant to be covering.
+      <div className="mdt-relative mdt-flex mdt-min-h-0 mdt-flex-1 mdt-flex-col">
+        {body}
+        <span
+          aria-hidden
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_TOP,
+            SCROLL_FADE_DOWN,
+            DIALOG_FADE_SURFACE,
+            ends.atTop && SCROLL_FADE_OFF
+          )}
+        />
+        <span
+          aria-hidden
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_BOTTOM,
+            SCROLL_FADE_UP,
+            DIALOG_FADE_SURFACE,
+            ends.atBottom && SCROLL_FADE_OFF
+          )}
+        />
+      </div>
+    );
+  }
+);
 DialogBody.displayName = 'DialogBody';
 
 /**

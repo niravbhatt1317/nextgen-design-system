@@ -738,13 +738,50 @@ describe('scroll', () => {
     // content, so without it the body refuses to shrink, pushes the dialog
     // past `max-h-full`, and nothing scrolls - while every other class looks
     // right.
-    const body = at('body').regions.find((c) => c.includes('mdt-overflow-y-auto')) ?? '';
-    expect(body).toContain('mdt-min-h-0');
-    expect(body).toContain('mdt-flex-1');
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.className).toContain('mdt-min-h-0');
+    expect(scroller?.parentElement?.className).toContain('mdt-flex-1');
   });
 
   it('leaves the body alone when the page scrolls instead', () => {
-    expect(at('page').regions.some((c) => c.includes('mdt-overflow-y-auto'))).toBe(false);
+    expect(at('page').dialog.querySelector('.mdt-overflow-y-auto')).toBeNull();
+  });
+
+  it('fades both edges, and starts with both fades off', () => {
+    // A fade with nothing behind it says there is more when there is not. A
+    // body short enough not to scroll never reaches either end, so neither
+    // shows until it has been scrolled.
+    const { dialog } = at('body');
+    const fades = [...dialog.querySelectorAll('span[aria-hidden]')].filter((n) =>
+      n.className.includes('mdt-bg-gradient')
+    );
+    expect(fades).toHaveLength(2);
+    expect(fades.every((f) => f.className.includes('mdt-opacity-0'))).toBe(true);
+  });
+
+  it('ends its fades in the dialog’s own surface', () => {
+    // A fade ends in whatever it sits on. `LeftNav` draws the same edge in its
+    // panel colour; only the strip and the direction are shared.
+    const { dialog } = at('body');
+    const fade = dialog.querySelector('span.mdt-bg-gradient-to-b');
+    expect(fade?.className).toContain('mdt-from-background');
+  });
+
+  it('puts the fades beside the scroller, not inside it', () => {
+    // A child would scroll away with the content it is meant to be covering.
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.querySelector('span.mdt-bg-gradient')).toBeNull();
+  });
+
+  it('closes the gap above the footer rule, so the cut lands on the line', () => {
+    // A gap between where the content stops and where the rule is reads as
+    // content cut short rather than content continuing under it.
+    const footer = (scroll: 'page' | 'body') =>
+      at(scroll).regions.find((c) => c.includes('mdt-border-t')) ?? '';
+    expect(footer('page')).toContain('mdt-mt-2');
+    expect(footer('body')).not.toContain('mdt-mt-2');
   });
 
   it('holds the header and the footer still', () => {

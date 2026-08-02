@@ -11,6 +11,14 @@ import {
 } from 'react';
 import type { ButtonHTMLAttributes, Ref, UIEvent } from 'react';
 import { cn } from '@/utils';
+import {
+  SCROLL_FADE_BOTTOM,
+  SCROLL_FADE_DOWN,
+  SCROLL_FADE_OFF,
+  SCROLL_FADE_STRIP,
+  SCROLL_FADE_TOP,
+  SCROLL_FADE_UP,
+} from '@/utils/scroll-fade';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
 import type {
@@ -34,19 +42,18 @@ const ROW = 'mdt-h-8 mdt-rounded-md mdt-px-2';
  * Every fade in here is the surface dissolving rather than a grey laid over
  * the rows, which is why they all reach for the same pair.
  */
-/** Every fade is the same strip in a different direction. */
-const FADE_STRIP = 'mdt-pointer-events-none mdt-absolute mdt-inset-x-0 mdt-transition-opacity';
+/**
+ * The panel's own surface, which is where every fade has to end.
+ *
+ * The strip, the two directions and the "already at that end" state are shared
+ * from `@/utils/scroll-fade` - `Dialog` draws the same edge. Only the colour
+ * stays here, because a fade ends in whatever it sits on and a nav panel and a
+ * dialog card are not the same colour.
+ */
+const FADE_SURFACE = 'mdt-from-neutral-10 dark:mdt-from-neutral-150';
 
-/** The height of a fade at the top of a list, and at the head of a section. */
-const FADE_TOP = 'mdt-top-0 mdt-h-4';
-
-/** A fade with nothing behind it says there is more when there is not. */
-const FADE_OFF = 'mdt-opacity-0';
-
-const FADE_DOWN =
-  'mdt-bg-gradient-to-b mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150';
-const FADE_UP =
-  'mdt-bg-gradient-to-t mdt-from-neutral-10 mdt-to-transparent dark:mdt-from-neutral-150';
+const FADE_DOWN = cn(SCROLL_FADE_DOWN, FADE_SURFACE);
+const FADE_UP = cn(SCROLL_FADE_UP, FADE_SURFACE);
 
 /** How long the header takes to unfold when the level changes under it. */
 const UNFOLD_MS = 200;
@@ -610,11 +617,21 @@ const LeftNavBody = forwardRef<HTMLDivElement, LeftNavBodyProps>(
         */}
         <div
           aria-hidden
-          className={cn(FADE_STRIP, FADE_TOP, FADE_DOWN, (atTop || pinned) && FADE_OFF)}
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_TOP,
+            FADE_DOWN,
+            (atTop || pinned) && SCROLL_FADE_OFF
+          )}
         />
         <div
           aria-hidden
-          className={cn(FADE_STRIP, 'mdt-bottom-0 mdt-h-6', FADE_UP, atBottom && FADE_OFF)}
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_BOTTOM,
+            FADE_UP,
+            atBottom && SCROLL_FADE_OFF
+          )}
         />
       </div>
     );
@@ -715,12 +732,12 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
           <div
             aria-hidden
             className={cn(
-              FADE_STRIP,
+              SCROLL_FADE_STRIP,
               // 24px, the same as the fade at the foot of the list. At 16px it
               // was visibly a different fade from the two either side of it.
               'mdt-top-full mdt-h-6',
               FADE_DOWN,
-              atTop && FADE_OFF
+              atTop && SCROLL_FADE_OFF
             )}
           />
         </div>

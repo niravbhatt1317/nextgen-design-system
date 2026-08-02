@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-798 capabilities: 188 components, 17 hooks, 12 utilities, 581 stories
+802 capabilities: 189 components, 19 hooks, 12 utilities, 582 stories
 
 ## Components
 
@@ -65,6 +65,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `DialogHeader`             | Dialog       | DialogHeader - container for title and description.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `DialogOverlay`            | Dialog       | DialogOverlay - semi-transparent backdrop behind the dialog.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `DialogPortal`             | Dialog       | DialogPortal - renders dialog content in a portal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `DialogScrollContext`      | Dialog       | Which part of a tall dialog scrolls, for the regions that have to know.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `DialogSteps`              | Dialog       | DialogSteps - where you are in a dialog that has more than one part.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `DialogTitle`              | Dialog       | DialogTitle - the title of the dialog.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `DialogTrigger`            | Dialog       | DialogTrigger - element that opens the dialog.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -215,25 +216,27 @@ story that already exists. They are in `capability-catalog.json` in full.
 
 ## Hooks - the behaviour
 
-| Name                 | Where   | What it does                                                           |
-| -------------------- | ------- | ---------------------------------------------------------------------- |
-| `useColumnReorder`   | Table   | Drag a column sideways to move it.                                     |
-| `useColumnWidths`    | Table   | Holds column widths for a resizable table.                             |
-| `useDialogFooterTop` | Dialog  | The room between the footer's rule and its buttons.                    |
-| `useDialogGutter`    | Dialog  | The left and right padding every region in this dialog shares.         |
-| `useDialogTop`       | Dialog  | The padding above the first region.                                    |
-| `useEditableTabs`    | Tabs    | The rules for a tab bar the person builds themselves.                  |
-| `useInfiniteScroll`  | Table   | Asks for more rows when the end of the list comes into view.           |
-| `useLeftNavLevels`   | LeftNav | Which level of a settings navigation is showing.                       |
-| `usePlatform`        | Kbd     | Which machine this is, for resolving `mod` and `alt`.                  |
-| `usePromotionalOpen` | Toast   | Whether a promotional toast is on screen.                              |
-| `useSavedViews`      | Table   | Holds a table's saved views.                                           |
-| `useSubmitShortcut`  | Dialog  | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.         |
-| `useTableColumns`    | Table   | Holds which columns are shown, in what order, and how many are pinned. |
-| `useTableFilters`    | Table   | Holds which filters are applied.                                       |
-| `useTablePagination` | Table   | Which page of a table is showing.                                      |
-| `useTableSelection`  | Table   | Holds which rows are selected.                                         |
-| `useTableSort`       | Table   | Holds which columns sort the table, and in what order.                 |
+| Name                   | Where   | What it does                                                           |
+| ---------------------- | ------- | ---------------------------------------------------------------------- |
+| `useColumnReorder`     | Table   | Drag a column sideways to move it.                                     |
+| `useColumnWidths`      | Table   | Holds column widths for a resizable table.                             |
+| `useDialogFooterPull`  | Dialog  | The pull that puts the footer's rule on the body's clipping edge.      |
+| `useDialogFooterTop`   | Dialog  | The room between the footer's rule and its buttons.                    |
+| `useDialogGutter`      | Dialog  | The left and right padding every region in this dialog shares.         |
+| `useDialogScrollsBody` | Dialog  | Whether this dialog scrolls its body rather than the page behind it.   |
+| `useDialogTop`         | Dialog  | The padding above the first region.                                    |
+| `useEditableTabs`      | Tabs    | The rules for a tab bar the person builds themselves.                  |
+| `useInfiniteScroll`    | Table   | Asks for more rows when the end of the list comes into view.           |
+| `useLeftNavLevels`     | LeftNav | Which level of a settings navigation is showing.                       |
+| `usePlatform`          | Kbd     | Which machine this is, for resolving `mod` and `alt`.                  |
+| `usePromotionalOpen`   | Toast   | Whether a promotional toast is on screen.                              |
+| `useSavedViews`        | Table   | Holds a table's saved views.                                           |
+| `useSubmitShortcut`    | Dialog  | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.         |
+| `useTableColumns`      | Table   | Holds which columns are shown, in what order, and how many are pinned. |
+| `useTableFilters`      | Table   | Holds which filters are applied.                                       |
+| `useTablePagination`   | Table   | Which page of a table is showing.                                      |
+| `useTableSelection`    | Table   | Holds which rows are selected.                                         |
+| `useTableSort`         | Table   | Holds which columns sort the table, and in what order.                 |
 
 ## Utilities
 
