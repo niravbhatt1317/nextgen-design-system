@@ -30,7 +30,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # The same Node `ci.yml` uses, from the same file. Hardcoding it here
+          # meant the artifact could be built on a different runtime than the
+          # one every test ran against, and nothing would have said so.
+          node-version-file: .nvmrc
           cache: npm
           # Writes the registry into .npmrc so `npm publish` knows where to go.
           registry-url: https://registry.npmjs.org
@@ -38,7 +41,12 @@ jobs:
       # Node 20 ships npm 10, and Trusted Publishing needs 11.5.1 or newer.
       # Without this the publish falls back to looking for a token and fails
       # with an authentication error that says nothing about the version.
-      - run: npm install -g npm@latest
+      #
+      # Pinned to the 11 line, not `@latest`. npm 12 requires Node 22.22 or
+      # newer, so on this repo's Node 20 `npm install -g npm@latest` fails
+      # outright with EBADENGINE - which is how the first dry run ended, four
+      # steps before it could have told us anything about publishing.
+      - run: npm install -g npm@^11
 
       - run: npm ci
 
