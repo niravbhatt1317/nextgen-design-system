@@ -1,6 +1,6 @@
 {
   "name": "@mtdt/nextgen-design-system",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The NextGen design system: accessible React components for building SaaS platforms, designed to be readable by machines as well as people.",
   "type": "module",
   "main": "./dist/index.cjs",
