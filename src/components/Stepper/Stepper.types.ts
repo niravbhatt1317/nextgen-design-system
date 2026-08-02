@@ -20,13 +20,18 @@ export type StepperLayout = 'stacked' | 'inline';
 /**
  * What a step is, at this moment.
  *
- * Four of the six are worked out from `current` and never need setting. The two
- * you set yourself are the ones no counter can know about:
+ * Three are worked out from `current` and never need setting. The two you set
+ * yourself are the ones no counter can know about:
  *
- * - `error` - the step is where you are and something in it is wrong
  * - `skipped` - passed over on purpose, and not coming back
+ * - `disabled` - there, but not available to this person
+ *
+ * **There is no error state, on purpose.** A red disc says where a problem is
+ * and never what it is, so it always needs a message beside it - and once the
+ * message is there, the disc is repeating itself. Leave the step as `current`
+ * and put a `Banner` under the strip.
  */
-export type StepState = 'complete' | 'current' | 'upcoming' | 'error' | 'skipped' | 'disabled';
+export type StepState = 'complete' | 'current' | 'upcoming' | 'skipped' | 'disabled';
 
 export interface StepperStep {
   /**
@@ -46,8 +51,8 @@ export interface StepperStep {
   /**
    * Overrides what `current` would have worked out.
    *
-   * Only worth setting for `error`, `skipped` and `disabled` - the other three
-   * are what the counter already says.
+   * Only worth setting for `skipped` and `disabled` - the other three are what
+   * the counter already says.
    */
   state?: StepState | undefined;
 

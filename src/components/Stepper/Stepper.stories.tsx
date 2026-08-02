@@ -98,21 +98,20 @@ export const Layouts: Story = {
   ),
 };
 
-const SIX: StepperStep[] = [
+const ALL_STATES: StepperStep[] = [
   { label: 'Completed', state: 'complete' },
   { label: 'Current', state: 'current' },
   { label: 'Upcoming', state: 'upcoming' },
-  { label: 'Error', state: 'error' },
   { label: 'Skipped', state: 'skipped' },
   { label: 'Disabled', state: 'disabled' },
 ];
 
 /**
- * Six, and every one is readable **without colour** — a tick, a number, a cross,
- * a dash. The shape says it as well as the colour does.
+ * Five, and every one is readable **without colour** — a tick, a number, a dash.
+ * The shape says it as well as the tone does.
  *
- * Four are worked out from `current` and never need setting. The two you set
- * yourself are the ones no counter can know about: `error` and `skipped`.
+ * Three are worked out from `current` and never need setting. The two you set
+ * yourself are the ones no counter can know about: `skipped` and `disabled`.
  */
 export const States: Story = {
   parameters: { controls: { disable: true } },
@@ -120,34 +119,36 @@ export const States: Story = {
     <Stack>
       <div>
         <Label>stacked</Label>
-        <Stepper steps={SIX} current={1} aria-label="Every state" />
+        <Stepper steps={ALL_STATES} current={1} aria-label="Every state" />
       </div>
       <div>
         <Label>inline</Label>
-        <Stepper steps={SIX} current={1} layout="inline" aria-label="Every state" />
+        <Stepper steps={ALL_STATES} current={1} layout="inline" aria-label="Every state" />
       </div>
     </Stack>
   ),
 };
 
 /**
- * A red disc says **where** the problem is, never what it is. Every reference
- * agrees on this — so it is always paired with a Banner or an inline message.
+ * **There is no error state, on purpose.**
  *
- * Note the disc is outlined, not filled: a broken step is one you are still
- * standing on, and filled means settled.
+ * A coloured ring says *where* a problem is and never what it is, so it always
+ * needs a message beside it — and once the message is there, the ring is only
+ * repeating itself. Leave the step as the current one and put a `Banner` under
+ * the strip, which is where somebody can actually read what went wrong and what
+ * to do about it.
  */
-export const WithAnError: Story = {
-  name: 'With an error',
+export const WhenSomethingGoesWrong: Story = {
+  name: 'When something goes wrong',
   parameters: { controls: { disable: true } },
   render: () => (
-    <div className="mdt-flex mdt-flex-col mdt-gap-4">
+    <div className="mdt-flex mdt-max-w-2xl mdt-flex-col mdt-gap-4">
       <Stepper
         aria-label="Import assets"
         current={1}
         steps={[
           { label: 'Choose a source' },
-          { label: 'Connect', state: 'error' },
+          { label: 'Connect' },
           { label: 'Map fields' },
           { label: 'Review' },
         ]}

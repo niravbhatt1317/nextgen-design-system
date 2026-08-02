@@ -22,7 +22,7 @@ export const stepperVariants = cva('mdt-flex mdt-w-full mdt-list-none mdt-p-0', 
   defaultVariants: { layout: 'stacked' },
 });
 
-/** Nothing behind it. Four of the six states share this exactly. */
+/** Nothing behind it. Four of the five states share this exactly. */
 const HOLLOW = 'mdt-bg-transparent';
 
 /** The quiet ink, worn by every state that is not the one you are on. */
@@ -33,14 +33,17 @@ const QUIET = 'mdt-text-muted-foreground';
  * disc is live.**
  *
  * That is why the number stays visible on the step you are standing on and only
- * turns into a tick once it is behind you - and why a broken step is outlined
- * rather than filled. You are still standing on it.
+ * turns into a tick once it is behind you.
+ *
+ * There is no red disc here, on purpose. A coloured ring says *where* a problem
+ * is and never what it is, so it always needs a message beside it - and once the
+ * message is there, the ring is only repeating itself. A broken step stays
+ * `current`, with a `Banner` under the strip.
  */
 const DISC_STATE: Record<StepState, string> = {
   complete: `mdt-border-primary mdt-bg-primary mdt-text-primary-foreground`,
   current: `mdt-border-primary ${HOLLOW} mdt-text-foreground`,
   upcoming: `mdt-border-border ${HOLLOW} ${QUIET}`,
-  error: `mdt-border-destructive ${HOLLOW} mdt-text-destructive`,
   // Passed over, not finished, so it never earns a fill.
   skipped: `mdt-border-border ${HOLLOW} ${QUIET}`,
   disabled: `mdt-border-border ${HOLLOW} ${QUIET}`,
@@ -50,7 +53,6 @@ const LABEL_STATE: Record<StepState, string> = {
   complete: QUIET,
   current: 'mdt-text-foreground mdt-font-semibold',
   upcoming: QUIET,
-  error: 'mdt-text-destructive mdt-font-semibold',
   skipped: QUIET,
   disabled: QUIET,
 };
@@ -59,12 +61,11 @@ const LABEL_STATE: Record<StepState, string> = {
  * What goes inside the disc.
  *
  * The shape says it as well as the colour does, which is what makes this legible
- * to someone who cannot tell red from ink: tick for done, cross for broken, dash
- * for passed over, and the number everywhere else.
+ * to someone who cannot tell one hue from another: a tick for done, a dash for
+ * passed over, and the number everywhere else.
  */
-const MARK: Partial<Record<StepState, 'check' | 'x' | 'minus'>> = {
+const MARK: Partial<Record<StepState, 'check' | 'minus'>> = {
   complete: 'check',
-  error: 'x',
   skipped: 'minus',
 };
 
@@ -293,9 +294,7 @@ export const Stepper = ({
               data-state={state}
               // Exactly one step carries this, and it is what a screen reader
               // uses to say "current step" rather than reading five equal items.
-              {...(state === 'current' || state === 'error'
-                ? { 'aria-current': 'step' as const }
-                : {})}
+              {...(state === 'current' ? { 'aria-current': 'step' as const } : {})}
               className={cn(
                 'mdt-flex',
                 shown === 'stacked'

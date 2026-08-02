@@ -68,24 +68,28 @@ describe('Stepper', () => {
     it('lets a step override what the counter said', () => {
       render(
         <Stepper
-          steps={[{ label: 'A' }, { label: 'B', state: 'error' }, { label: 'C', state: 'skipped' }]}
-          current={1}
+          steps={[
+            { label: 'A' },
+            { label: 'B', state: 'skipped' },
+            { label: 'C', state: 'disabled' },
+          ]}
+          current={0}
           aria-label={LABEL}
         />
       );
-      expect(stateOf(1)).toBe('error');
-      expect(stateOf(2)).toBe('skipped');
+      expect(stateOf(1)).toBe('skipped');
+      expect(stateOf(2)).toBe('disabled');
     });
 
-    it('still marks a broken step as the current one - you are standing on it', () => {
+    it('marks nothing as current when the override took the current step away', () => {
       render(
         <Stepper
-          steps={[{ label: 'A' }, { label: 'B', state: 'error' }]}
+          steps={[{ label: 'A' }, { label: 'B', state: 'skipped' }]}
           current={1}
           aria-label={LABEL}
         />
       );
-      expect(steps()[1]).toHaveAttribute('aria-current', 'step');
+      expect(steps().filter((li) => li.getAttribute('aria-current') === 'step')).toHaveLength(0);
     });
   });
 
@@ -103,17 +107,22 @@ describe('Stepper', () => {
       expect(disc).not.toContain('mdt-bg-primary ');
     });
 
-    it('leaves a broken step outlined too, because you have not left it', () => {
+    it('never paints a disc red - there is no error state, and that is the point', () => {
       render(
         <Stepper
-          steps={[{ label: 'A' }, { label: 'B', state: 'error' }]}
+          steps={[
+            { label: 'A' },
+            { label: 'B' },
+            { label: 'C', state: 'skipped' },
+            { label: 'D', state: 'disabled' },
+          ]}
           current={1}
           aria-label={LABEL}
         />
       );
-      const disc = discOf(steps()[1] as HTMLElement).className;
-      expect(disc).toContain('mdt-border-destructive');
-      expect(disc).toContain('mdt-bg-transparent');
+      steps().forEach((li) => {
+        expect(discOf(li).className).not.toContain('destructive');
+      });
     });
 
     it('outlines an upcoming step in neutral, not in primary', () => {
