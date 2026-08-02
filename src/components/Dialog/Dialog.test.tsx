@@ -866,12 +866,11 @@ describe('the Panel slots', () => {
   });
 
   it('takes the top inset off whatever follows it', () => {
-    // A header directly under a picture is not the top of the dialog, so it
-    // does not want the padding that says it is. Measured at 32 from the image
-    // to the title before this - the content's gap plus a top inset for a top
-    // the header was no longer at.
+    // 20 from the image to the title. At 32 the header was still applying a
+    // top inset for a top it was no longer at; at 16 - the content's gap alone
+    // - the words sat against the edge of the image.
     panel();
-    expect(screen.getByRole('dialog').className).toContain('[&>[data-dialog-media]+*]:mdt-pt-0');
+    expect(screen.getByRole('dialog').className).toContain('[&>[data-dialog-media]+*]:mdt-pt-1');
     expect(screen.getByRole('dialog').firstElementChild).toHaveAttribute('data-dialog-media');
   });
 

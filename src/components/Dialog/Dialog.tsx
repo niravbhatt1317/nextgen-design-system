@@ -305,10 +305,13 @@ const DialogContent = forwardRef<
                     // leftover height and no more.
                     'mdt-relative mdt-flex mdt-w-full mdt-flex-col',
                     // A header directly under a picture is not the top of the
-                    // dialog, so it does not want the padding that says it is.
-                    // Left on, the title sat 32 from the image - the content's
-                    // own gap plus a top inset for a top it was no longer at.
-                    '[&>[data-dialog-media]+*]:mdt-pt-0',
+                    // dialog, so it does not want the full padding that says it
+                    // is - and does not want none either. At 32 it kept a top
+                    // inset for a top it was no longer at; at 16, the content's
+                    // gap alone, the words sat against the edge of the image.
+                    // 20 is the step between, and the only place the dialog
+                    // uses it.
+                    '[&>[data-dialog-media]+*]:mdt-pt-1',
                     dialogContentVariants({ size, density }),
                     scrolls === 'body' && ['mdt-max-h-full mdt-overflow-hidden', scrollerPull],
                     // Full-bleed on a phone, a card above that. Corners and a
