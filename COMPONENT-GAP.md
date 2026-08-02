@@ -18,6 +18,36 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## DialogSteps folds into Stepper — decided, not yet done
+
+`Stepper` landed in #45 and `DialogSteps` in #40, hours apart, on two branches that never saw each
+other. They are **two answers to one question**: where am I in a multi-step flow.
+
+They are not identical. `Stepper` is the general strip — a disc over or beside its label, joined by
+a line that fills once you are past it, in `stacked` and `inline` arrangements. `DialogSteps` is an
+underline: every step owns a full-width rule beneath its own label, dark once reached and pale
+before, and a finished step shows a tick rather than its number.
+
+**The decision, taken by the design owner on 2 August 2026: `DialogSteps` becomes a variant of
+`Stepper`, and `Stepper` is what everything reaches for.** Today `Dialog` is the only caller, so
+the migration is one component's worth of work and nobody's product breaks. That will not stay
+true, and this is the last cheap moment to do it.
+
+Not done yet, deliberately — it wants its own branch and its own review rather than being folded
+into whatever was in flight when it was noticed.
+
+What it needs when it is picked up:
+
+- an `underline` variant on `Stepper`, carrying the rule-beneath-the-label drawing and the
+  tick-replaces-number rule
+- `DialogSteps` reduced to a preset of it, keeping its own name and its JSDoc — the rules about
+  where it sits in a dialog and which steps are clickable are Dialog's business, not Stepper's
+- one search afterwards (`npm run find -- stepper`) to confirm there is one answer, not two
+
+**Why this is written down rather than remembered:** two people built the same idea on the same day
+without either knowing. A note in a shared file is the only part of that story anybody can act on
+later.
+
 ## Callout — built
 
 Built because `npm run find -- callout banner alert` returned **nothing**, and five of the twelve
