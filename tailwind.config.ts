@@ -36,6 +36,15 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--mdt-primary) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
+          'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
+          'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
+        },
+        // The AI gradient's three stops, so the mark can be drawn from classes
+        // as well as from the SVG's own `stop-color`.
+        'ai-gradient': {
+          from: 'hsl(var(--mdt-ai-gradient-from) / <alpha-value>)',
+          via: 'hsl(var(--mdt-ai-gradient-via) / <alpha-value>)',
+          to: 'hsl(var(--mdt-ai-gradient-to) / <alpha-value>)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--mdt-secondary) / <alpha-value>)',
@@ -282,6 +291,19 @@ const config: Config = {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        // A hint of travel, not a transition. The `slide-*` pair below moves
+        // 100% because it was built for Dialog and Sheet, where the whole
+        // surface arrives; 8px is for a list changing underneath a header that
+        // stays put, where the direction is the message and the distance is
+        // only there to carry it.
+        'nav-in-from-right': {
+          from: { opacity: '0', transform: 'translateX(8px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        'nav-in-from-left': {
+          from: { opacity: '0', transform: 'translateX(-8px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
         'fade-out': {
           from: { opacity: '1' },
           to: { opacity: '0' },
@@ -331,6 +353,11 @@ const config: Config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.2s ease-out',
+        // Faster than the 0.2s everything else uses. This one runs on a control
+        // you are already looking at, and 200ms of it reads as the panel
+        // thinking rather than answering.
+        'nav-in-from-right': 'nav-in-from-right 0.16s ease-out',
+        'nav-in-from-left': 'nav-in-from-left 0.16s ease-out',
         'fade-out': 'fade-out 0.2s ease-out',
         'slide-in-from-top': 'slide-in-from-top 0.2s ease-out',
         'slide-in-from-bottom': 'slide-in-from-bottom 0.2s ease-out',

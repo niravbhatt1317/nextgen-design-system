@@ -13,8 +13,10 @@ const BULLETS = '•'.repeat(BULLET_COUNT);
 
 export type SecretDotsSize = 'sm' | 'md';
 
-export interface SecretDotsProps
-  extends Omit<ComponentPropsWithoutRef<'span'>, 'className' | 'children' | 'color'> {
+export interface SecretDotsProps extends Omit<
+  ComponentPropsWithoutRef<'span'>,
+  'className' | 'children' | 'color'
+> {
   /**
    * What is hidden. Announced to screen readers.
    *

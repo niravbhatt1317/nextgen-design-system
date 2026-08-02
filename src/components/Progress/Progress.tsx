@@ -14,16 +14,19 @@ const DEFAULT_MAX = 100;
  * thing independently and neither found a fault in it, so this follows it
  * closely: a tinted track, a value fill, and optional markers on the track.
  */
-export const progressVariants = cva('mdt-w-full mdt-overflow-hidden mdt-rounded-full mdt-bg-muted', {
-  variants: {
-    size: {
-      sm: 'mdt-h-1',
-      md: 'mdt-h-1.5',
-      lg: 'mdt-h-2',
+export const progressVariants = cva(
+  'mdt-w-full mdt-overflow-hidden mdt-rounded-full mdt-bg-muted',
+  {
+    variants: {
+      size: {
+        sm: 'mdt-h-1',
+        md: 'mdt-h-1.5',
+        lg: 'mdt-h-2',
+      },
     },
-  },
-  defaultVariants: { size: 'md' },
-});
+    defaultVariants: { size: 'md' },
+  }
+);
 
 const FILL_TONE: Record<ProgressTone, string> = {
   default: 'mdt-bg-info',
@@ -45,7 +48,16 @@ const clamp = (n: number, min: number, max: number): number => Math.min(Math.max
  */
 const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   (
-    { value, max = DEFAULT_MAX, tone = 'default', size = 'md', baseline, floor, className, ...rest },
+    {
+      value,
+      max = DEFAULT_MAX,
+      tone = 'default',
+      size = 'md',
+      baseline,
+      floor,
+      className,
+      ...rest
+    },
     ref
   ) => {
     const safeMax = max > 0 ? max : DEFAULT_MAX;

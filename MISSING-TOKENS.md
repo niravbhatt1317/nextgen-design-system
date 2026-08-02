@@ -33,8 +33,9 @@ decision we made on purpose.
 | **Motion — duration & easing**       | ❌ Missing    | ~8 components + all 14 animations  |
 | **Breakpoints**                      | ❌ Missing    | Container only                     |
 | **Hardcoded sizes**                  | ❌ Violations | 10 shipped components              |
+| **Colour — dark surface tints**      | ⚠️ Mixed      | The 6 feedback tones, dark mode    |
 
-**12 categories missing, 1 partial, 1 set of live violations.**
+**12 categories missing, 1 partial, 1 mixed-by-hand, 1 set of live violations.**
 
 ---
 
@@ -319,6 +320,58 @@ problem. It needs a design decision either way.
 
 ---
 
+## 11 · Dark surface tints — MIXED, and the only values in the file that are
+
+**Status: shipped as literals, deliberately, and they should not stay that way.**
+
+Ten values in `globals.css` do not point at a ramp step. They are the dark-mode fills and borders
+of the six feedback tones:
+
+|         | fill              | border            |
+| ------- | ----------------- | ----------------- |
+| info    | `218 55% 16%`     | `218 55% 30%`     |
+| warning | `26 50% 14%`      | `26 55% 27%`      |
+| danger  | `0 45% 15%`       | `0 50% 29%`       |
+| success | `151 42% 13%`     | `151 45% 25%`     |
+| ai      | `270 38% 18%`     | `270 42% 32%`     |
+| neutral | _(`neutral-140`)_ | _(`neutral-120`)_ |
+
+### Why they had to be mixed
+
+**The ramps have no low-saturation dark step.** Every hue runs from a `05` tint to a `100` near-black
+at high saturation throughout, and a tinted _surface_ in dark mode needs neither end:
+
+- the `90`s are 17–20% lightness at up to 100% saturation. Against a 10% page, a panel's worth of
+  that is a slab of colour rather than a surface that happens to be tinted.
+- the `100`s below them are 10% (blue, orange, yellow), 12% (red) and **9% (green)** — level with the
+  page or darker than it. A fill darker than the page it sits on reads as a hole, which this
+  codebase shipped once already in the dark CodeWell.
+
+There is no third option on the ramps. The values above sit at 13–18% lightness and 38–55%
+saturation, which is the band that does not exist.
+
+### What was tried instead, and why it lost
+
+The same six ramp steps composited at 30% alpha. It adds no values and looks close — but **an alpha
+wash composites against whatever is behind it**, so the same token renders one colour on the page
+(`neutral-160`) and another inside a dialog (`neutral-150`). A token you cannot predict from its
+name is worse than a token you had to mix.
+
+### What would retire these
+
+**A `dark` step on each hue's ramp** — one more entry per colour, at roughly the lightness and
+saturation of the values above, named like every other step. Then these ten become
+`var(--mdt-blue-dark)` and friends, the file goes back to pointing at ramps only, and anything else
+that needs a tinted dark surface has somewhere to look. That is a palette change, so it wants doing
+deliberately rather than as a side effect of a component.
+
+Until then these ten are the exception, and this section is the reason they are allowed to be.
+
+_Values by Pranjal Gupta, who hit this drawing Banner beside a real page. Adopted onto `main` on
+2 August 2026 so his branch would not have to carry a palette decision through a merge._
+
+---
+
 ## What happens next
 
 Each category above is a **design decision**, not an implementation task. The order below is by
@@ -339,3 +392,15 @@ impact, not effort.
 [`src/styles/globals.css`](./src/styles/globals.css) and
 [`tailwind.config.ts`](./tailwind.config.ts) together, then documented in
 [`TOKENS.md`](./TOKENS.md), then removed from this file.
+
+## A surface that is barely tinted
+
+`LeftNav` needed a panel one shade off white — light enough to sit beside a white page without
+reading as a slab, dark enough to be a different surface. Every semantic surface token is either
+white (`background`, `card`, `popover`) or a grey dark enough to be a block (`secondary` at
+neutral-20, `muted` at neutral-30). It uses the `neutral-10` / `neutral-150` primitives directly,
+which is the only place in the library that does so for a surface.
+
+The missing pair is something like `--mdt-surface-sunken` — the panel a navigation or a rail sits
+on, as distinct from the page. Worth naming before a second component needs it and picks a
+different shade.

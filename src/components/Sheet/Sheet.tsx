@@ -15,7 +15,65 @@ import type {
 } from './Sheet.types';
 
 /**
- * Sheet root component - controls open/close state.
+ * Sheet - a task that attends to something on screen, from the edge.
+ *
+ * A drawer, in most people's vocabulary. The word is here so that searching for
+ * it finds this.
+ *
+ * ## Sheet or Dialog
+ *
+ * They are built from the same primitive and share an overlay, a focus trap,
+ * escape handling and an animation. The mechanics will not tell you which to
+ * reach for. One question does:
+ *
+ * > **Does the task need the thing behind it?**
+ *
+ * **Yes — a Sheet.** You came from a list, a record, a canvas, and you are
+ * going back to it; it stays legible behind you. **No — a `Dialog`.** It
+ * interrupts, and the background is dimmed because it has stopped mattering.
+ *
+ * | | |
+ * | --- | --- |
+ * | Inspect a record you clicked in a list | **Sheet** |
+ * | Filters | **Sheet** |
+ * | A long form of stacked fields | **Sheet** |
+ * | Anything you open dozens of times a session | **Sheet** - it is the gentler interruption |
+ * | Destructive confirm | `Dialog`, always |
+ * | Blocking - session expired, forced upgrade | `Dialog` |
+ * | Compare options side by side | `Dialog` |
+ * | Settings, or picking from a grid | `Dialog` at full size |
+ * | Wizard or onboarding sequence | `Dialog` |
+ *
+ * **Shape follows content**, and it decides more cases than any principle. A
+ * Sheet is tall and narrow, so it suits a vertical stack - fields, a record's
+ * properties, an activity feed. Three pricing tiers physically do not fit in
+ * one; that belongs in a `Dialog`.
+ *
+ * **Creating something new depends on where you came from.** From a list, a
+ * Sheet keeps the list visible while the new row appears in it. From a global
+ * "New" button there is no context to preserve, so a `Dialog` is right. Attio's
+ * new record is a drawer; Linear's new issue is a modal. Both are correct.
+ *
+ * ### Never
+ *
+ * - A destructive confirm in a Sheet. You must not be able to work around the
+ *   decision by carrying on beside it.
+ * - A wizard in a Sheet: step chrome and back/next read wrong on a narrow
+ *   vertical surface.
+ * - Sheet stacked on Sheet. A **`Dialog` over a Sheet** is the one legitimate
+ *   stack - a confirmation interrupting a panel.
+ *
+ * @example
+ * ```tsx
+ * <Sheet>
+ *   <SheetTrigger asChild><Button>Filters</Button></SheetTrigger>
+ *   <SheetContent side="right">
+ *     <SheetHeader>
+ *       <SheetTitle>Filters</SheetTitle>
+ *     </SheetHeader>
+ *   </SheetContent>
+ * </Sheet>
+ * ```
  */
 const Sheet = DialogPrimitive.Root;
 

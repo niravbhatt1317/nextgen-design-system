@@ -18,6 +18,84 @@ excluded — this is components only, from Button onwards.
 
 ---
 
+## Callout — built
+
+Built because `npm run find -- callout banner alert` returned **nothing**, and five of the twelve
+dialog reference screens had one: the grouped "Access limits" block, the credential summary, the
+rule builder, the auth-method card pair, and the consequence list before a destructive confirm.
+
+`Toast`'s six tones were already the right six colours, so they were lifted into
+`src/utils/feedback-tones.ts` and both components now read from there — a seventh tone is one edit
+rather than two that drift. `Toast` was refactored onto it with no behaviour change; its 72 tests
+pass untouched.
+
+**Banner is still missing.** `COMPONENT-GAP.md` lists it as 4-of-4 and `Callout` does not cover it:
+a banner is full width at the top of a page and often dismissible, a callout is inline in the flow
+and usually is not. Same tones, different placement and different lifetime. It should be built on
+the same `feedback-tones` table when it is.
+
+**The tints came down, in both themes, at the design owner's direction.** Light: every fill is now
+its ramp's `05` step, where four of six had been sitting at `10` while `info` sat at `05` — which
+is why `info` looked right and the rest looked heavy. Dark: the tone left the fill entirely. Every
+dark fill is `neutral-140` and the border and the icon carry the tone, which is the set's own rule
+(_"only icon and border carry the tone"_) taken to its conclusion.
+
+That was not a free choice — the ramps have no low-saturation dark step. The `90` steps were
+17–20% lightness at up to 100% saturation against a 10% page, and the `100` steps below them are
+9–10%, level with the page or darker than it. A fill darker than the page reads as a hole, which
+this codebase already shipped once in the dark CodeWell. **That gap is now filled by hand rather than by the palette**, and recorded as such: ten mixed
+values, in `MISSING-TOKENS.md` § 11, with what would retire them. Values by Pranjal Gupta, who hit
+the same wall drawing Banner on the same day — adopted onto `main` rather than left to collide at
+merge.
+
+Both changes move `Toast` too, since the two share the table. Rendered and checked in both.
+
+## Kbd — built, and three callers still to migrate
+
+`Kbd` landed on `nirav/dialog-and-kbd`. It exists because `npm run find -- keyboard shortcut`
+turned up **five** drawings of the same idea, none of which knew about the others:
+
+| where                  | what it drew                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| `CommandShortcut`      | bare text, `tracking-widest`, `text-muted-foreground`                           |
+| `DropdownMenuShortcut` | the same again, dimmed with `opacity-60` instead of a token                     |
+| `Sidebar` search       | a hand-written `<kbd>`, filled and bordered, at `mdt-text-[10px]` — a raw value |
+| `DialogSubmitHint`     | the outlined chip inside a dialog's primary button                              |
+| a five-way trial       | five more arrangements                                                          |
+
+Two of those are now gone: `DialogSubmitHint` was replaced by `Button`'s `shortcut` prop, and the
+trial was deleted once the arrangement was chosen.
+
+**Still to migrate, deliberately not in that branch:** `CommandShortcut`, `DropdownMenuShortcut`
+and `Sidebar`'s inline `<kbd>`. All three are _visible_ changes to shipped components — bare
+letter-spaced text becomes key caps — so they want their own branch and their own review rather
+than arriving as a side effect of a dialog. Migrating `Sidebar` also clears one entry from
+`TOKEN-REPORT.md`.
+
+### Button — `shortcut` is a prop, but not yet a documented variant
+
+`Button` already takes `shortcut={['mod', 'enter']}` and draws a `Kbd` from it. What is missing is
+that it is **not presented the way the icon slots are**. `Button.stories.tsx` has `WithLeftIcon`
+and `WithRightIcon` as first-class stories; there is no `WithShortcut` beside them, and `shortcut`
+does not appear in the `argTypes` block, so it has no control in the Storybook panel and no row in
+the generated props table.
+
+The effect is that the feature exists and is invisible: a designer browsing `Button` cannot find
+it, and cannot try it without editing code. For a library whose whole point is that its catalogue
+is the interface, an undocumented prop is close to an absent one.
+
+What it wants, when it is picked up:
+
+- **A story** — `WithShortcut`, sitting directly after `WithRightIcon`, so the three trailing-slot
+  options read as one family.
+- **An `argTypes` entry** — `control: 'object'` over a `KbdKey[]`, with the named keys listed in
+  the description so `'mod'` is discoverable without reading `Kbd`'s source.
+- **A note in the variants gallery** that it is a _slot_, not a `variant` value: it composes with
+  every variant rather than being one of them, in the same way `leftIcon` does.
+
+Deliberately not done in `nirav/dialog-and-kbd`: that branch's job was to make one `Kbd` exist and
+to give `Button` a way to seat it. Documenting `Button`'s own surface is `Button`'s branch.
+
 ## The short version
 
 |                                      | Count  |
@@ -304,6 +382,67 @@ both `TableCell` and `TableHead`. Neither is missing. The rest are.
 | Inline cell editing                 | `inline edit`, `editable cell`        | Nothing. `EditableStatusTag` is a display recipe, not editing.                                                                                                                      |
 | Aggregate / computed totals         | `aggregate total`                     | Summary rows render; nothing computes them. The product supplies the number.                                                                                                        |
 | Copy a cell, print a table          | `copy cell`, `print table`            | Nothing — and arguably neither belongs to Table.                                                                                                                                    |
+
+## LeftNav — searched for, not found
+
+Searched before building the settings navigation, 1 August 2026.
+
+| Missing                                | Words searched                     | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A nav item that can say "you are here" | `nav item`, `active state`, `item` | **`Item` found and rejected.** It is the right shape - icon, label, active, disabled, and even a `SidebarNav` story - and it renders a `div` unless clickable, has no `href`, and cannot express `aria-current`. A nav row that cannot tell a screen reader which page you are on is not a nav row. `LeftNavItem` follows `PaginationLink`'s rule instead: an anchor with an `href`, a button without. Worth revisiting whether `Item` should gain both and `LeftNavItem` become a thin wrapper. |
+| A section heading in a nav             | `section heading`                  | Nothing shared. `SidebarLabel` exists but belongs to `Sidebar`. Built as `LeftNavGroup`.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| A group that folds away                | `collapse panel`, `collapsible`    | `CollapsibleCard` is a card and `TableExpandTrigger` is a table row. Neither is a nav group. Built into `LeftNavGroup`.                                                                                                                                                                                                                                                                                                                                                                          |
+| A label for a collapsed rail           | `tooltip collapsed`                | Nothing. Not built either — the settings variant does not collapse. It is what an app-navigation variant will need first.                                                                                                                                                                                                                                                                                                                                                                        |
+
+**Reused without change:** `Icon`, `Input` (the search), `Badge` (the Beta tag), `Avatar` (the footer).
+
+**Icons:** `notebook` and `blocks` are not in the frozen registry — `book-open` and `puzzle` used instead. `eye` was the obvious glyph for Observability and is already "show password" in `InputGroup`, so `activity` was used: one icon, one meaning.
+
+## Nothing in the library answers `prefers-reduced-motion`
+
+Searched on 1 August 2026 across every component, every stylesheet and the Tailwind config:
+`prefers-reduced-motion`, `motion-safe`, `motion-reduce` — **zero matches**. Meanwhile the config
+ships twelve animations and `Dialog`, `Sheet`, `Toast`, `Accordion`, `Tooltip`, `Popover` and
+`DropdownMenu` all use them, several with a full-surface `translateX(100%)`.
+
+`LeftNav` is the first component to honour it: the level-change animation keeps its fade and drops
+its travel under `motion-reduce`. The rest still move regardless of what the person asked their
+operating system for.
+
+This is not a component gap and not a token gap — it is a practice the library never adopted. The
+cheap fix is a rule in `globals.css` that shortens every animation to near-zero under the media
+query, which would cover all seven at once without touching them. Worth doing deliberately rather
+than one component at a time.
+
+## `Sidebar` is deprecated, and what is still missing from `LeftNav`
+
+`LeftNav` is the navigation this library ships. `Sidebar` predates it and is deprecated as of
+1 August 2026 — not because it is broken, but because the two speak different visual languages and
+shipping both means products get two navigations that do not read as siblings:
+
+|              | `Sidebar`                  | `LeftNav`                                              |
+| ------------ | -------------------------- | ------------------------------------------------------ |
+| Selected row | `muted` fill, no indicator | `secondary` fill, `foreground` bar at the leading edge |
+| Row height   | `py-1.5`, sized to content | a fixed 32px rhythm                                    |
+| Icons        | 20px                       | 16px                                                   |
+| Search       | a `kbd` shortcut chip      | a magnifier inside the field                           |
+| Panel        | none                       | `neutral-10`, with the tile and field raised on it     |
+
+**It was deliberately not renamed to `AppSidebar`.** Renaming is a promotion: it would say "this is
+the app navigation", committing a future app nav to this component's look and API. When that nav is
+designed from references — the way the table and `LeftNav` were — it should be a second arrangement
+of `LeftNav`'s parts, not a third component. The item, group, section, search and footer are
+already generic; that is why `LeftNav` is named for its position rather than its job.
+
+### Still missing from `LeftNav`
+
+| Missing                                   | Status                                                                                                                                                                                                                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Collapse to a rail of icons**           | `SidebarCollapse` does a version of this. Not scheduled, and not needed by the settings arrangement — it is the first thing an app-navigation arrangement will want, along with a workspace switcher and a tooltip for the collapsed labels. Logged, not built. |
+| **Rendering from a configuration object** | `DataDrivenSidebar` does this. Being built as `DataLeftNav`.                                                                                                                                                                                                    |
+
+`Sidebar` goes when the app-navigation arrangement lands. Git keeps it regardless; a tag is enough
+to recover it.
 
 ## A note on method
 
