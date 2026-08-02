@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
-import { createContext, forwardRef, useContext, type MouseEvent } from 'react';
+import { forwardRef, type MouseEvent } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type {
@@ -12,21 +12,6 @@ import type {
   ButtonSize,
   SpinnerSize,
 } from './Button.types';
-
-/**
- * The size buttons take when nobody says otherwise.
- *
- * A surface that wants all its buttons at one size - a dialog footer, a table's
- * bulk bar - sets it once here rather than every caller remembering. An explicit
- * `size` on a button still wins, and outside a provider nothing changes: the
- * default is `undefined`, which falls through to `md` exactly as before.
- *
- * @example
- * ```tsx
- * <ButtonSizeContext.Provider value="sm">{children}</ButtonSizeContext.Provider>
- * ```
- */
-export const ButtonSizeContext = createContext<ButtonProps['size']>(undefined);
 
 /**
  * Button variants using Class Variance Authority (CVA)
@@ -642,7 +627,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     className,
     style,
     variant,
-    size: sizeProp,
+    size,
     fullWidth,
     shape = 'rounded',
     elevation = 0,
@@ -678,10 +663,6 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     onClick,
     ...restProps
   } = props;
-
-  // What the surface asked for, if it asked. An explicit prop still wins.
-  const inherited = useContext(ButtonSizeContext);
-  const size = sizeProp ?? inherited;
 
   // Determine if rendering as link
   const isLink = 'href' in props;

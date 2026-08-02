@@ -6,7 +6,6 @@ import { useSubmitShortcut } from './useSubmitShortcut';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button } from '../Button';
 import {
   Dialog,
   DialogClose,
@@ -642,27 +641,6 @@ describe('DialogFooter', () => {
     expect(container.firstElementChild?.className).toContain('sm:mdt-justify-between');
   });
 
-  it('sizes the buttons it holds at 32 rather than 36', () => {
-    render(
-      <DialogFooter>
-        <Button>Next</Button>
-      </DialogFooter>
-    );
-    // A dialog's actions sit under a rule at the bottom of a card, not in a
-    // page's own toolbar. At the default 36 they were the heaviest thing in the
-    // box - louder than the title.
-    expect(screen.getByRole('button', { name: 'Next' }).className).toContain('mdt-h-8');
-  });
-
-  it('lets a button say otherwise', () => {
-    render(
-      <DialogFooter>
-        <Button size="lg">Next</Button>
-      </DialogFooter>
-    );
-    expect(screen.getByRole('button', { name: 'Next' }).className).toContain('mdt-h-10');
-  });
-
   it('gathers them on the right by default', () => {
     const { container } = render(<DialogFooter>ok</DialogFooter>);
     expect(container.firstElementChild?.className).toContain('sm:mdt-justify-end');
@@ -673,7 +651,9 @@ describe('DialogSubmitHint', () => {
   it('shows the key and stays out of the reading', () => {
     const { container } = render(<DialogSubmitHint />);
     const chip = container.firstElementChild;
-    expect(chip).toHaveTextContent('⏎');
+    // An icon, not the ⏎ character: the character carries its own sidebearings
+    // and sits off its own baseline, so it cannot be centred in a box.
+    expect(chip?.querySelector('svg')).toBeInTheDocument();
     // Read out, it becomes "Send invite return symbol", which helps nobody.
     expect(chip).toHaveAttribute('aria-hidden', 'true');
   });

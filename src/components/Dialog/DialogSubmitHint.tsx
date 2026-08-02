@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import { Icon } from '../Icon';
 import type { DialogSubmitHintProps } from './Dialog.types';
 
 /**
@@ -15,6 +16,12 @@ import type { DialogSubmitHintProps } from './Dialog.types';
  * memory, and a keyboard path to an irreversible act is exactly that. Pair this
  * with `useSubmitShortcut` and leave both off anything that destroys.
  *
+ * **The glyph is Lucide's `corner-down-left`, not the ⏎ character.** The
+ * character carries its own sidebearings and sits off its own baseline, so it
+ * can never be centred in a box - it read as leaning into one corner however
+ * the padding was set. An icon has neither problem, and it is the same arrow
+ * the product draws.
+ *
  * Inherits its colour from the button it sits in, so it works on the dark
  * primary and on the pale disabled state without knowing which it is on.
  *
@@ -24,7 +31,7 @@ import type { DialogSubmitHintProps } from './Dialog.types';
  * ```
  */
 const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
-  ({ className, children = '⏎', ...props }, ref) => (
+  ({ className, children, ...props }, ref) => (
     <span
       ref={ref}
       // Not announced. A screen reader gets the shortcut from the button's own
@@ -32,11 +39,11 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
       // return symbol", which helps nobody.
       aria-hidden
       className={cn(
-        // Square, and half the height of the 32px button it sits in. At 20 it
-        // left 6px above and below and read as crowding the label; at 16 there
-        // is 8, which is the proportion the product's own chip has.
-        'mdt-ml-1 mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center',
-        'mdt-rounded mdt-text-xs mdt-leading-none',
+        // 20 square around a 12 icon: 4px of room on all four sides, which is
+        // what makes it read as a key rather than as a glyph that drifted. In a
+        // 36px button that leaves 8 above and below.
+        'mdt-ml-1 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center',
+        'mdt-rounded-md',
         // Outlined, not filled. A filled chip reads as a second, smaller button
         // sitting inside the first - two things to press where there is one. A
         // hairline square around the glyph says "this is a key" instead, which
@@ -50,7 +57,7 @@ const DialogSubmitHint = forwardRef<HTMLSpanElement, DialogSubmitHintProps>(
       )}
       {...props}
     >
-      {children}
+      {children ?? <Icon name="corner-down-left" size="xs" aria-hidden />}
     </span>
   )
 );

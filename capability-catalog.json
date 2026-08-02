@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 774,
+  "capabilityCount": 773,
   "counts": {
     "story": 567,
-    "component": 185,
+    "component": 184,
     "utility": 9,
     "hook": 13
   },
@@ -466,16 +466,6 @@
       "area": "Spinner",
       "summary": "Story: Components/Spinner / ButtonLoadingState",
       "doc": "Components/Spinner ButtonLoadingState",
-      "props": [],
-      "propDocs": ""
-    },
-    {
-      "name": "ButtonSizeContext",
-      "kind": "component",
-      "file": "src/components/Button/Button.tsx",
-      "area": "Button",
-      "summary": "The size buttons take when nobody says otherwise.",
-      "doc": "The size buttons take when nobody says otherwise. A surface that wants all its buttons at one size - a dialog footer, a table's bulk bar - sets it once here rather than every caller remembering. An explicit `size` on a button still wins, and outside a provider nothing changes: the default is `undefined`, which falls through to `md` exactly as before. ```tsx <ButtonSizeContext.Provider value=\"sm\">{children}</ButtonSizeContext.Provider> ```",
       "props": [],
       "propDocs": ""
     },
@@ -2169,7 +2159,7 @@
       "file": "src/components/Dialog/DialogSubmitHint.tsx",
       "area": "Dialog",
       "summary": "DialogSubmitHint - the ⏎ chip that sits inside a primary button.",
-      "doc": "DialogSubmitHint - the ⏎ chip that sits inside a primary button. The product puts one on every primary action: *Generate link*, *Next*, *Send invite*, *Update grant*, *Create group*, *Done, I've copied it*. A shortcut nobody knows about is worth nothing, and the button is the only place anybody is looking when they are deciding to press it. **Never on a destructive action.** *Permanently delete* and *Continue* carry no hint, deliberately: nobody should be able to delete something by muscle memory, and a keyboard path to an irreversible act is exactly that. Pair this with `useSubmitShortcut` and leave both off anything that destroys. Inherits its colour from the button it sits in, so it works on the dark primary and on the pale disabled state without knowing which it is on. ```tsx <Button onClick={save}>Send invite <DialogSubmitHint /></Button> ```",
+      "doc": "DialogSubmitHint - the ⏎ chip that sits inside a primary button. The product puts one on every primary action: *Generate link*, *Next*, *Send invite*, *Update grant*, *Create group*, *Done, I've copied it*. A shortcut nobody knows about is worth nothing, and the button is the only place anybody is looking when they are deciding to press it. **Never on a destructive action.** *Permanently delete* and *Continue* carry no hint, deliberately: nobody should be able to delete something by muscle memory, and a keyboard path to an irreversible act is exactly that. Pair this with `useSubmitShortcut` and leave both off anything that destroys. **The glyph is Lucide's `corner-down-left`, not the ⏎ character.** The character carries its own sidebearings and sits off its own baseline, so it can never be centred in a box - it read as leaning into one corner however the padding was set. An icon has neither problem, and it is the same arrow the product draws. Inherits its colour from the button it sits in, so it works on the dark primary and on the pale disabled state without knowing which it is on. ```tsx <Button onClick={save}>Send invite <DialogSubmitHint /></Button> ```",
       "props": ["children"],
       "propDocs": "What the chip shows. @default '⏎'"
     },

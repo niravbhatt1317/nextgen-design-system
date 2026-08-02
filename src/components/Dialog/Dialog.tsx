@@ -4,7 +4,6 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva } from 'class-variance-authority';
 import { createContext, forwardRef, useContext } from 'react';
 import { cn } from '@/utils';
-import { ButtonSizeContext } from '../Button';
 import { Icon } from '../Icon';
 import type {
   DialogCloseReason,
@@ -349,21 +348,14 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // Out through the padding and back again, so the rule reaches both
             // edges. Inset by 24px it reads as an underline on the buttons rather
             // than as the seam between the reading and the deciding.
-            'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-4',
+            'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-3',
             density === 'compact' ? '-mdt-mx-3 mdt-px-3' : '-mdt-mx-4 mdt-px-4',
           ],
           className
         )}
         {...props}
       >
-        {/*
-          32px, not the 36 a button is by default. A dialog's actions sit under
-          a rule at the bottom of a card, not in a page's own toolbar, and at 36
-          they were the heaviest thing in the box - louder than the title. The
-          footer sets it once here rather than every caller remembering; an
-          explicit `size` on a button still wins.
-        */}
-        <ButtonSizeContext.Provider value="sm">{children}</ButtonSizeContext.Provider>
+        {children}
       </div>
     );
   }

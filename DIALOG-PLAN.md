@@ -147,9 +147,12 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 
       The rest of the rhythm, also measured: **8** title → description (at 6 the description read
       as a second line of the heading), **16** between blocks, **20** from the steps to whatever
-      follows, because that is where the reading actually starts. The extra 4 lives on
-      `DialogSteps` itself rather than as a rule on the content — the steps are the only block
-      that wants it.
+      follows, because that is where the reading actually starts, and **12** from the footer's
+      rule down to the buttons. The extra 4 under the steps lives on `DialogSteps` itself rather
+      than as a rule on the content — the steps are the only block that wants it.
+
+      The buttons stay at `md`, 36px. Tried at 32 and put back: the footer is the one row that
+      has to stay pressable, and a dialog is not so dense that its actions should shrink.
 
       `compact` is for a dialog that is mostly chrome around one control.
 
