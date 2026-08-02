@@ -1,3 +1,4 @@
+import type { FeedbackTone } from '@/utils/feedback-tones';
 import type { ExternalToast, ToasterProps as SonnerToasterProps } from 'sonner';
 import type { ReactNode } from 'react';
 
@@ -29,7 +30,7 @@ export type ToastType = 'default' | 'success' | 'error' | 'warning' | 'info' | '
  * suggesting something, and a plain statement of fact that is neither good news
  * nor bad.
  */
-export type ToastTone = 'info' | 'warning' | 'danger' | 'success' | 'ai' | 'neutral';
+export type ToastTone = FeedbackTone;
 
 /**
  * `sm` is Om's banner measured exactly. `md` runs one step larger.
