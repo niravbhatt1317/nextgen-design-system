@@ -705,6 +705,112 @@ describe('the regions', () => {
   });
 });
 
+describe('scroll', () => {
+  const at = (scroll: 'page' | 'body') => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent scroll={scroll}>
+          <DialogHeader>
+            <DialogTitle>Panel</DialogTitle>
+          </DialogHeader>
+          <DialogBody>body</DialogBody>
+          <DialogFooter>ok</DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+    const dialog = screen.getByRole('dialog');
+    return { dialog, regions: [...dialog.children].map((n) => n.getAttribute('class') ?? '') };
+  };
+
+  it('lets the whole dialog grow by default', () => {
+    const { dialog } = at('page');
+    expect(dialog.className).not.toContain('mdt-max-h-full');
+  });
+
+  it('caps the dialog at the viewport when the body scrolls', () => {
+    const { dialog } = at('body');
+    expect(dialog.className).toContain('mdt-max-h-full');
+    expect(dialog.className).toContain('mdt-overflow-hidden');
+  });
+
+  it('gives the body the leftover height, and lets it shrink into it', () => {
+    // `min-h-0` is the load-bearing half. A flex child's minimum size is its
+    // content, so without it the body refuses to shrink, pushes the dialog
+    // past `max-h-full`, and nothing scrolls - while every other class looks
+    // right.
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.className).toContain('mdt-min-h-0');
+    expect(scroller?.parentElement?.className).toContain('mdt-flex-1');
+  });
+
+  it('leaves the body alone when the page scrolls instead', () => {
+    expect(at('page').dialog.querySelector('.mdt-overflow-y-auto')).toBeNull();
+  });
+
+  it('fades both edges, and starts with both fades off', () => {
+    // A fade with nothing behind it says there is more when there is not. A
+    // body short enough not to scroll never reaches either end, so neither
+    // shows until it has been scrolled.
+    const { dialog } = at('body');
+    const fades = [...dialog.querySelectorAll('span[aria-hidden]')].filter((n) =>
+      n.className.includes('mdt-bg-gradient')
+    );
+    expect(fades).toHaveLength(2);
+    expect(fades.every((f) => f.className.includes('mdt-opacity-0'))).toBe(true);
+  });
+
+  it('ends its fades in the dialog’s own surface', () => {
+    // A fade ends in whatever it sits on. `LeftNav` draws the same edge in its
+    // panel colour; only the strip and the direction are shared.
+    const { dialog } = at('body');
+    const fade = dialog.querySelector('span.mdt-bg-gradient-to-b');
+    expect(fade?.className).toContain('mdt-from-background');
+  });
+
+  it('puts the fades beside the scroller, not inside it', () => {
+    // A child would scroll away with the content it is meant to be covering.
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.querySelector('span.mdt-bg-gradient')).toBeNull();
+  });
+
+  it('leaves room under the last thing, inside the scroller', () => {
+    // Inside, not below: padding here scrolls with the content, so the clipping
+    // edge stays on the rule and the fade still runs into it. A margin outside
+    // would fix the resting state by breaking the scrolling one.
+    const { dialog } = at('body');
+    const scroller = dialog.querySelector('.mdt-overflow-y-auto');
+    expect(scroller?.className).toContain('mdt-pb-4');
+  });
+
+  it('closes the gap above the footer rule, so the cut lands on the line', () => {
+    // A gap between where the content stops and where the rule is reads as
+    // content cut short rather than content continuing under it.
+    const footer = (scroll: 'page' | 'body') =>
+      at(scroll).regions.find((c) => c.includes('mdt-border-t')) ?? '';
+    expect(footer('page')).toContain('mdt-mt-2');
+    expect(footer('body')).not.toContain('mdt-mt-2');
+  });
+
+  it('holds the header and the footer still', () => {
+    // The whole point of the pattern: the title and the actions stay where they
+    // are while the reading moves.
+    const { regions } = at('body');
+    // Not `regions.at(-1)` - the close button is the last child, after the
+    // footer. The footer is the one carrying the rule.
+    const footer = regions.find((c) => c.includes('mdt-border-t')) ?? '';
+    expect(regions[0]).toContain('mdt-shrink-0');
+    expect(footer).toContain('mdt-shrink-0');
+  });
+
+  it('stacks its regions as flex, not grid', () => {
+    // Identical for a stack of blocks with a gap - the difference only shows up
+    // when one of them has to scroll.
+    expect(at('body').dialog.className).toContain('mdt-flex-col');
+  });
+});
+
 describe('DialogTitle', () => {
   const title = (tag?: boolean) => {
     render(

@@ -87,3 +87,54 @@ export const useDialogTop = () => TOP[useContext(DialogDensityContext)];
 
 /** The room between the footer's rule and its buttons. */
 export const useDialogFooterTop = () => FOOTER_TOP[useContext(DialogDensityContext)];
+
+/**
+ * Which part of a tall dialog scrolls, for the regions that have to know.
+ *
+ * Only `DialogBody` reads it. The header and the footer behave the same either
+ * way - they are the parts that do not move - and it is the body that has to
+ * decide between growing and scrolling.
+ */
+export const DialogScrollContext = createContext<'page' | 'body'>('page');
+
+/** Whether this dialog scrolls its body rather than the page behind it. */
+export const useDialogScrollsBody = () => useContext(DialogScrollContext) === 'body';
+
+/**
+ * What the footer pulls up by when the body scrolls, to cancel the content's
+ * own gap above it.
+ *
+ * The same number as the gap, from the same place, so the two cannot drift.
+ * Without it the body's clipping edge sits a gap's width above the rule, and
+ * content disappears before it reaches the line - which reads as content cut
+ * short rather than content continuing underneath.
+ */
+const FOOTER_PULL = {
+  compact: '-mdt-mt-3',
+  comfortable: '-mdt-mt-4',
+  spacious: '-mdt-mt-6',
+} as const;
+
+/** The pull that puts the footer's rule on the body's clipping edge. */
+export const useDialogFooterPull = () => FOOTER_PULL[useContext(DialogDensityContext)];
+
+/**
+ * Room under the last thing in a scrolling body.
+ *
+ * The same number as the gap between blocks - the rule below is the next block,
+ * and it gets the same distance as anything else would.
+ *
+ * **Inside the scroller, not below it.** That distinction is the whole point:
+ * padding here scrolls with the content, so the clipping edge stays on the rule
+ * and the fade still runs into it. A margin outside would push the scroller off
+ * the rule and open the gap that was just closed - fixing the resting state by
+ * breaking the scrolling one.
+ */
+const SCROLL_TAIL = {
+  compact: 'mdt-pb-3',
+  comfortable: 'mdt-pb-4',
+  spacious: 'mdt-pb-6',
+} as const;
+
+/** The room under the last thing in a scrolling body. */
+export const useDialogScrollTail = () => SCROLL_TAIL[useContext(DialogDensityContext)];

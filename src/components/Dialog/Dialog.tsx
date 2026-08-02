@@ -2,14 +2,26 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils';
+import {
+  SCROLL_FADE_BOTTOM,
+  SCROLL_FADE_DOWN,
+  SCROLL_FADE_OFF,
+  SCROLL_FADE_STRIP,
+  SCROLL_FADE_TOP,
+  SCROLL_FADE_UP,
+} from '@/utils/scroll-fade';
 import {
   CLOSE_POSITION,
   CLOSE_PULL,
   DialogDensityContext,
+  DialogScrollContext,
+  useDialogFooterPull,
   useDialogFooterTop,
   useDialogGutter,
+  useDialogScrollsBody,
+  useDialogScrollTail,
   useDialogTop,
 } from './dialogSpacing';
 import { Icon } from '../Icon';
@@ -21,6 +33,7 @@ import type {
   DialogFooterProps,
   DialogHeaderProps,
   DialogOverlayProps,
+  DialogScroll,
   DialogTitleProps,
 } from './Dialog.types';
 
@@ -204,6 +217,7 @@ const DialogContent = forwardRef<
       onRequestClose,
       size = 'md',
       density = 'comfortable',
+      scroll = 'page',
       ...props
     },
     ref
@@ -217,6 +231,9 @@ const DialogContent = forwardRef<
      * is gone.
      */
     const closePosition = CLOSE_POSITION[density];
+    // Named `scrolls` inside, because `scroll` is also a DOM event handler and
+    // reading `scroll === 'body'` beside `onScroll` invites a misread.
+    const scrolls: DialogScroll = scroll;
 
     const mayClose = (reason: DialogCloseReason) => {
       if (blocking || busy) return false;
@@ -224,10 +241,11 @@ const DialogContent = forwardRef<
     };
 
     return (
-      <DialogDensityContext.Provider value={density}>
-        <DialogPortal>
-          <DialogOverlay />
-          {/*
+      <DialogScrollContext.Provider value={scrolls}>
+        <DialogDensityContext.Provider value={density}>
+          <DialogPortal>
+            <DialogOverlay />
+            {/*
       Centred by layout, not by a transform.
 
       It used to sit at `left: 50%; top: 50%` and pull itself back with
@@ -243,79 +261,101 @@ const DialogContent = forwardRef<
       screen, and `overflow-y-auto` with `min-h-full` gives a tall one somewhere
       to scroll instead of growing past the viewport.
     */}
-          {/*
+            {/*
           No inset on a phone, 16px above that. A dialog floating in the middle
           of a 375px screen with a strip of dimmed page around it is smaller
           than it needs to be and harder to reach; below the breakpoint it takes
           the screen.
         */}
-          <div className="mdt-fixed mdt-inset-0 mdt-z-50 mdt-overflow-y-auto sm:mdt-p-4">
-            <div className="mdt-flex mdt-min-h-full mdt-items-center mdt-justify-center">
-              <DialogPrimitive.Content
-                ref={ref}
-                onEscapeKeyDown={(event) => {
-                  if (!mayClose('escape')) event.preventDefault();
-                }}
-                onPointerDownOutside={(event) => {
-                  if (!mayClose('outside')) event.preventDefault();
-                }}
-                onInteractOutside={(event) => {
-                  if (!mayClose('outside')) event.preventDefault();
-                }}
+            <div
+              className={cn(
+                'mdt-fixed mdt-inset-0 mdt-z-50 sm:mdt-p-4',
+                // `page` scrolls the dimmed area behind the dialog; `body` never
+                // does, because the dialog is capped to fit inside it.
+                scrolls === 'page' ? 'mdt-overflow-y-auto' : 'mdt-overflow-hidden'
+              )}
+            >
+              <div
                 className={cn(
-                  'mdt-relative mdt-grid mdt-w-full',
-                  dialogContentVariants({ size, density }),
-                  // Full-bleed on a phone, a card above that. Corners and a
-                  // border on something that reaches every edge are decoration
-                  // on a seam that does not exist.
-                  'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
-                  'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
-                  'mdt-duration-200 mdt-ease-in-out',
-                  'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
-                  className
+                  'mdt-flex mdt-items-center mdt-justify-center',
+                  // `min-h-full` lets a tall dialog push the wrapper taller than
+                  // the screen and scroll it. `h-full` refuses to, which is what
+                  // gives `max-h-full` on the dialog something to measure
+                  // against - without it there is no height to be a fraction of.
+                  scrolls === 'page' ? 'mdt-min-h-full' : 'mdt-h-full'
                 )}
-                {...props}
               >
-                {children}
-                {/*
+                <DialogPrimitive.Content
+                  ref={ref}
+                  onEscapeKeyDown={(event) => {
+                    if (!mayClose('escape')) event.preventDefault();
+                  }}
+                  onPointerDownOutside={(event) => {
+                    if (!mayClose('outside')) event.preventDefault();
+                  }}
+                  onInteractOutside={(event) => {
+                    if (!mayClose('outside')) event.preventDefault();
+                  }}
+                  className={cn(
+                    // `flex-col`, not `grid`. Identical for a stack of blocks
+                    // with a gap, and the difference only shows up when one of
+                    // them has to scroll: a flex child can be told to take the
+                    // leftover height and no more.
+                    'mdt-relative mdt-flex mdt-w-full mdt-flex-col',
+                    dialogContentVariants({ size, density }),
+                    scrolls === 'body' && 'mdt-max-h-full mdt-overflow-hidden',
+                    // Full-bleed on a phone, a card above that. Corners and a
+                    // border on something that reaches every edge are decoration
+                    // on a seam that does not exist.
+                    'mdt-min-h-full mdt-rounded-none sm:mdt-min-h-0 sm:mdt-rounded-lg',
+                    'mdt-border mdt-border-border mdt-bg-background mdt-shadow-lg',
+                    'mdt-duration-200 mdt-ease-in-out',
+                    'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
+                    className
+                  )}
+                  {...props}
+                >
+                  {children}
+                  {/*
             A blocking dialog shows no way out, because there is not one. An X
             that refuses to work is worse than no X - it reads as broken rather
             than as deliberate.
           */}
-                {showCloseButton && !blocking && (
-                  <DialogPrimitive.Close
-                    disabled={busy}
-                    onClick={(event) => {
-                      if (!mayClose('close-button')) event.preventDefault();
-                    }}
-                    className={cn(
-                      // A 28px box, which is the height of the title's line, so
-                      // the glyph sits on the title's centre rather than on its
-                      // cap height. At 16px square pinned to the same top edge
-                      // it rode 6px high of the words beside it.
-                      'mdt-absolute mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
-                      closePosition,
-                      CLOSE_PULL,
-                      // Muted, not near-black. The way out of a dialog is not
-                      // the thing to look at first, and at full strength the X
-                      // competed with the title for that.
-                      'mdt-rounded-sm mdt-text-muted-foreground mdt-transition-colors',
-                      'hover:mdt-text-foreground',
-                      'mdt-ring-offset-background',
-                      'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-                      'disabled:mdt-pointer-events-none',
-                      'data-[state=open]:mdt-bg-accent'
-                    )}
-                  >
-                    <CloseIcon />
-                    <span className="mdt-sr-only">Close</span>
-                  </DialogPrimitive.Close>
-                )}
-              </DialogPrimitive.Content>
+                  {showCloseButton && !blocking && (
+                    <DialogPrimitive.Close
+                      disabled={busy}
+                      onClick={(event) => {
+                        if (!mayClose('close-button')) event.preventDefault();
+                      }}
+                      className={cn(
+                        // A 28px box, which is the height of the title's line, so
+                        // the glyph sits on the title's centre rather than on its
+                        // cap height. At 16px square pinned to the same top edge
+                        // it rode 6px high of the words beside it.
+                        'mdt-absolute mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
+                        closePosition,
+                        CLOSE_PULL,
+                        // Muted, not near-black. The way out of a dialog is not
+                        // the thing to look at first, and at full strength the X
+                        // competed with the title for that.
+                        'mdt-rounded-sm mdt-text-muted-foreground mdt-transition-colors',
+                        'hover:mdt-text-foreground',
+                        'mdt-ring-offset-background',
+                        'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
+                        'disabled:mdt-pointer-events-none',
+                        'data-[state=open]:mdt-bg-accent'
+                      )}
+                    >
+                      <CloseIcon />
+                      <span className="mdt-sr-only">Close</span>
+                    </DialogPrimitive.Close>
+                  )}
+                </DialogPrimitive.Content>
+              </div>
             </div>
-          </div>
-        </DialogPortal>
-      </DialogDensityContext.Provider>
+          </DialogPortal>
+        </DialogDensityContext.Provider>
+      </DialogScrollContext.Provider>
     );
   }
 );
@@ -331,6 +371,9 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
       className={cn(
         useDialogGutter(),
         useDialogTop(),
+        // Never squeezed to make room for the body - that is the whole point
+        // of the Panel: the title and the actions stay where they are.
+        'mdt-shrink-0',
         // 8px under the title. At 6 the description read as a second line of the
         // heading rather than as the sentence explaining it - unless the title
         // carries a tag, which makes its line taller and closes that gap on its
@@ -354,12 +397,15 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
     // the kind of bug that only shows up when a caller toggles it.
     const gutter = useDialogGutter();
     const aboveButtons = useDialogFooterTop();
+    const scrollsBody = useDialogScrollsBody();
+    const footerPull = useDialogFooterPull();
 
     return (
       <div
         ref={ref}
         className={cn(
           gutter,
+          'mdt-shrink-0',
           'mdt-flex mdt-flex-col-reverse sm:mdt-flex-row sm:mdt-items-center sm:mdt-gap-2',
           // `end` is a decision - Cancel, then the primary. `between` is a
           // journey: something quiet on the left, the way forward on the right.
@@ -371,7 +417,13 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // padded box tearing back out through the container's padding with
             // `-mx-4`. That number had to be kept in step with the container by
             // hand, and was wrong by 7px a side the first time anyone measured.
-            'mdt-mt-2 mdt-border-t mdt-border-border',
+            'mdt-border-t mdt-border-border',
+            // 8px above the rule normally. When the body scrolls, the rule IS
+            // the clipping edge: the 8 goes, and the content's own gap above
+            // the footer is pulled back out too, so the line sits exactly where
+            // the content stops. Measured at 16px of dead space before this -
+            // enough that a row of text vanished before it reached the rule.
+            scrollsBody ? footerPull : 'mdt-mt-2',
             // The step minus 4, matching the floor beneath the buttons, so the
             // footer is even about its own contents. `compact` was keeping
             // `comfortable`'s 12 here while using 8 below - measured, and the
@@ -386,6 +438,14 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
   }
 );
 DialogFooter.displayName = 'DialogFooter';
+
+/**
+ * A dialog's own card, which is where its fades have to end.
+ *
+ * The strip and the directions are shared from `@/utils/scroll-fade`; only the
+ * colour is here, because a fade ends in whatever surface it sits on.
+ */
+const DIALOG_FADE_SURFACE = 'mdt-from-background';
 
 /**
  * DialogBody - the reading between the header and the footer.
@@ -405,9 +465,113 @@ DialogFooter.displayName = 'DialogFooter';
  * </DialogBody>
  * ```
  */
-const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn(useDialogGutter(), className)} {...props} />
-));
+const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
+  ({ className, onScroll, ...props }, ref) => {
+    const gutter = useDialogGutter();
+    const scrolls = useDialogScrollsBody();
+    const scrollTail = useDialogScrollTail();
+    // Both true before anything has scrolled, which is right: a body short
+    // enough not to scroll never reaches either end, so neither fade shows.
+    const [ends, setEnds] = useState({ atTop: true, atBottom: true });
+    const scroller = useRef<HTMLDivElement | null>(null);
+
+    const measure = useCallback((node: HTMLDivElement | null) => {
+      if (!node) return;
+      const { scrollTop, scrollHeight, clientHeight } = node;
+      setEnds({
+        atTop: scrollTop <= 0,
+        // A pixel of slack. Sub-pixel heights and browser rounding mean an
+        // exact comparison can be one short at the very bottom, and a fade that
+        // never quite turns off is worse than no fade.
+        atBottom: scrollTop + clientHeight >= scrollHeight - 1,
+      });
+    }, []);
+
+    /*
+      Watched, not measured once.
+
+      A scroll event is the obvious trigger and it is not enough: at rest
+      nothing has scrolled, so a body long enough to need the bottom fade
+      showed none until somebody had already scrolled it - which is the one
+      moment the fade existed to prevent. Measured, 742px of content in a
+      527px box with the fade off.
+
+      A single measurement on mount fixes that case and not the next one: a
+      body whose height changes under it - a font arriving, a section
+      expanding, the window resizing - would keep whichever answer it had at
+      mount. The observer covers all of them, and fires once on attach, which
+      is the mount measurement for free.
+    */
+    useEffect(() => {
+      const node = scroller.current;
+      if (!scrolls || !node || typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(() => {
+        measure(node);
+      });
+      observer.observe(node);
+      return () => {
+        observer.disconnect();
+      };
+    }, [scrolls, measure]);
+
+    const body = (
+      <div
+        // Merged: the component needs the node to watch it, and the caller may
+        // want it too. Dropping either is a bug that only shows up in whichever
+        // one nobody tested.
+        ref={(node: HTMLDivElement | null) => {
+          scroller.current = node;
+          if (typeof ref === 'function') ref(node);
+          else if (ref) ref.current = node;
+        }}
+        className={cn(
+          gutter,
+          // `min-h-0` is the load-bearing half: a flex child's minimum size is
+          // its content, so without it the body refuses to shrink, pushes the
+          // dialog past `max-h-full`, and nothing scrolls - the classic version
+          // of this bug, where every other class looks right.
+          scrolls && ['mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto', scrollTail],
+          className
+        )}
+        onScroll={(event) => {
+          if (scrolls) measure(event.currentTarget);
+          onScroll?.(event);
+        }}
+        {...props}
+      />
+    );
+
+    if (!scrolls) return body;
+
+    return (
+      // The fades are siblings of the scroller, not children of it - a child
+      // would scroll away with the content it is meant to be covering.
+      <div className="mdt-relative mdt-flex mdt-min-h-0 mdt-flex-1 mdt-flex-col">
+        {body}
+        <span
+          aria-hidden
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_TOP,
+            SCROLL_FADE_DOWN,
+            DIALOG_FADE_SURFACE,
+            ends.atTop && SCROLL_FADE_OFF
+          )}
+        />
+        <span
+          aria-hidden
+          className={cn(
+            SCROLL_FADE_STRIP,
+            SCROLL_FADE_BOTTOM,
+            SCROLL_FADE_UP,
+            DIALOG_FADE_SURFACE,
+            ends.atBottom && SCROLL_FADE_OFF
+          )}
+        />
+      </div>
+    );
+  }
+);
 DialogBody.displayName = 'DialogBody';
 
 /**
