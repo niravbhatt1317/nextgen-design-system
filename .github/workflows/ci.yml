@@ -32,7 +32,23 @@ permissions:
 # own green tick, and `main` is only ever pushed to by a merge, so completing
 # every run costs almost nothing.
 concurrency:
-  group: ci-${{ github.ref }}
+  # Per COMMIT on `main`, per branch on a pull request.
+  #
+  # `cancel-in-progress: false` was already here and is not enough on its own:
+  # it stops GitHub killing a RUNNING job, but a PENDING one is still dropped
+  # the moment a third run joins the group. Three merges eight seconds apart
+  # left three cancelled runs on `main` - measured, each ended within 24s of
+  # starting, exactly as the next merge landed.
+  #
+  # Nothing went unverified that day, because each had passed its own pull
+  # request check first. But a cancelled run wears a warning icon that is
+  # indistinguishable from a real failure at a glance, and the day a merge does
+  # break `main` is the day somebody scrolls past it.
+  #
+  # A group per commit cannot queue behind anything, so nothing supersedes it.
+  # Pull requests keep the shared group deliberately: there, a newer push
+  # SHOULD cancel the run for the code it replaced.
+  group: ci-${{ github.ref }}-${{ github.event_name == 'pull_request' && 'pr' || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
