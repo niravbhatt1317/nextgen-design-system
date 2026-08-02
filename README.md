@@ -68,6 +68,21 @@ that is what the prefix is for.
 
 React 18 or 19, as a peer dependency. Both ESM and CommonJS, with types for each.
 
+### Releasing
+
+**No npm token exists, deliberately.** Publishing runs from _Actions → Release_, and the workflow
+proves its identity to npm through GitHub's OIDC — npm's Trusted Publishing. There is no secret to
+leak, rotate, or forget to renew, and nobody who can open a pull request can reach a credential,
+because there is not one.
+
+It needs the package on npmjs.com to name **this repository and this workflow file** under
+_Settings → Trusted Publisher_. Renaming `.github/workflows/release.yml` breaks publishing until
+that is updated too — the trade for having no credential.
+
+Leave `publish` unticked the first time. The run does the whole gate, builds, verifies the package,
+and attaches the tarball as an artifact you can download and install in a scratch app. Tick it when
+you want the real thing; npm cannot take a version back.
+
 ### Checking a build before it goes out
 
 ```bash

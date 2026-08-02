@@ -16,6 +16,9 @@ on:
 
 permissions:
   contents: read
+  # What lets this workflow prove to npm that it is this repo, running this
+  # file, without a token existing anywhere. See the publish step.
+  id-token: write
 
 jobs:
   release:
@@ -31,6 +34,11 @@ jobs:
           cache: npm
           # Writes the registry into .npmrc so `npm publish` knows where to go.
           registry-url: https://registry.npmjs.org
+
+      # Node 20 ships npm 10, and Trusted Publishing needs 11.5.1 or newer.
+      # Without this the publish falls back to looking for a token and fails
+      # with an authentication error that says nothing about the version.
+      - run: npm install -g npm@latest
 
       - run: npm ci
 
@@ -57,16 +65,26 @@ jobs:
           path: '*.tgz'
           retention-days: 14
 
+      # No token. npm verifies the OIDC identity GitHub mints for this workflow
+      # against the trusted publisher configured on the package, so there is no
+      # secret to leak, rotate, or forget to renew - and nothing to hand to
+      # anybody who can open a pull request.
+      #
+      # It requires the package on npmjs.com to name this repository AND this
+      # workflow file under Settings -> Trusted Publisher. Renaming this file
+      # breaks publishing until that is updated too, which is the trade for not
+      # having a credential.
+      #
+      # npm also attaches a provenance attestation automatically, so the
+      # registry can show which commit and which workflow built the tarball.
       - name: Publish
         if: ${{ inputs.publish }}
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Say what happened
         run: |
           if [ "${{ inputs.publish }}" = "true" ]; then
-            echo "Published $(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")" >> "$GITHUB_STEP_SUMMARY"
+            echo "Published $(node -p "require('./package.json').name")@$(node -p "require('./package.json').version") with provenance." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "Dry run. The tarball is attached to this run as \`package-tarball\`." >> "$GITHUB_STEP_SUMMARY"
             echo "Download it and \`npm i ./<file>.tgz\` in a scratch app before publishing for real." >> "$GITHUB_STEP_SUMMARY"
