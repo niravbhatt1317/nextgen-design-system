@@ -1,0 +1,45 @@
+name: Changeset
+
+# Every pull request that changes what a consumer gets has to say how the
+# version should move.
+#
+# Not because versioning is sacred, but because the alternative is what this
+# repo already had: a package sitting at 0.1.0 while `main` moved underneath it,
+# and nobody able to say from the outside which components a given version
+# contains. A changeset is the one moment somebody is looking at the change and
+# knows whether it is a patch or a break.
+on:
+  pull_request:
+    branches: [main]
+    # `synchronize` matters: adding the changeset in a later push should turn
+    # this green without closing and reopening the pull request. `labeled` and
+    # `unlabeled` matter for the same reason on the escape hatch.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changeset:
+    name: Does this need a changeset?
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The check compares against the merge base, so it needs history.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check
+        env:
+          # An escape hatch that has to be used deliberately and leaves a trace.
+          # A gate with no way past it gets removed the first time it is wrong;
+          # a gate you have to label your way past stays.
+          SKIP: ${{ contains(github.event.pull_request.labels.*.name, 'no changeset') }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: node scripts/check-changeset.mjs
