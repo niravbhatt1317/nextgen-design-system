@@ -40,6 +40,19 @@ export type {
   BadgeSize,
 } from './Badge';
 
+// Banner — a message that sits in the page and stays there. Shares Toast's six
+// tones and palette on purpose; shares nothing about how it behaves. If you
+// would still need the message after a refresh, it is a Banner.
+export { Banner, bannerVariants } from './Banner';
+export type {
+  BannerProps,
+  BannerOwnProps,
+  BannerVariantsType,
+  BannerTone,
+  BannerPlacement,
+  BannerActionPlacement,
+} from './Banner';
+
 // Button
 export { Button, ButtonVariants } from './Button';
 export type { ButtonProps, ButtonVariantsType } from './Button';
@@ -466,6 +479,19 @@ export type { SpinnerProps, SpinnerVariants } from './Spinner';
 export { Stack, stackVariants } from './Stack';
 export type { StackProps, StackVariants } from './Stack';
 
+// Stepper — a named, ordered journey with a place you are now. Not Tabs: if you
+// can do them in any order, it is Tabs. Not Progress either, which is one number
+// with no names. Horizontal only; vertical is a separate component.
+export { Stepper, stepperVariants } from './Stepper';
+export type {
+  StepperProps,
+  StepperOwnProps,
+  StepperVariantsType,
+  StepperStep,
+  StepperLayout,
+  StepState,
+} from './Stepper';
+
 // Switch
 export { MotadataSwitch, motadataSwitchRootVariants, motadataSwitchThumbVariants } from './Switch';
 export type { MotadataSwitchProps, MotadataSwitchVariants } from './Switch';
@@ -619,3 +645,30 @@ export type {
   TooltipContentRef,
   TooltipProviderProps,
 } from './Tooltip';
+
+// Upload
+export {
+  Upload,
+  UploadFileRow,
+  uploadVariants,
+  formatFileSize,
+  useUploadFiles,
+  validateSelection,
+  matchesAccept,
+  describeAccept,
+} from './Upload';
+export type {
+  UploadProps,
+  UploadOwnProps,
+  UploadFileRowProps,
+  UploadFileRowOwnProps,
+  UploadItem,
+  UploadKind,
+  UploadStatus,
+  UploadFailure,
+  UploadRejection,
+  UploadRejectionReason,
+  UploadSender,
+  UploadSenderContext,
+  UploadVariantsType,
+} from './Upload';

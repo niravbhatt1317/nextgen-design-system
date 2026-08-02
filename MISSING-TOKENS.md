@@ -20,6 +20,7 @@ decision we made on purpose.
 | ------------------------------------ | ------------- | ---------------------------------- |
 | **Colour — the quiet-variant pair**  | ❌ Missing    | Badge, Button (7 variants)         |
 | **Colour — status tones beyond six** | ⚠️ Decision   | Table cell recipes (status column) |
+| **Colour — dark surface steps**      | ❌ Missing    | Feedback surfaces (Toast, Banner)  |
 | Border radius                        | ⚠️ Partial    | One base value only, no scale      |
 | Typography — family                  | ✅ Complete   | —                                  |
 | Elevation / shadow                   | ✅ Complete   | —                                  |
@@ -324,31 +325,31 @@ problem. It needs a design decision either way.
 
 **Status: shipped as literals, deliberately, and they should not stay that way.**
 
-Ten values in `globals.css` do not point at a ramp step. They are the dark-mode fills and borders
-of the six feedback tones:
+Ten values in `globals.css` do not point at a ramp step: the dark-mode fills and borders of the six
+feedback tones. The measurements, the ratios and the proposed ramp steps below are Pranjal's, from
+the Banner work; the note on what was tried instead is from the Callout work. Two people found the
+same gap on the same day from opposite ends, which is the strongest evidence it is real.
 
-|         | fill              | border            |
-| ------- | ----------------- | ----------------- |
-| info    | `218 55% 16%`     | `218 55% 30%`     |
-| warning | `26 50% 14%`      | `26 55% 27%`      |
-| danger  | `0 45% 15%`       | `0 50% 29%`       |
-| success | `151 42% 13%`     | `151 45% 25%`     |
-| ai      | `270 38% 18%`     | `270 42% 32%`     |
-| neutral | _(`neutral-140`)_ | _(`neutral-120`)_ |
+**Status:** ❌ Missing · **Leaks into:** the dark feedback surfaces used by `Toast` and `Banner`
 
-### Why they had to be mixed
+Every hue ramp ends at a fully saturated dark — `orange-90` is `26 100% 20%`, `red-90` is
+`0 74% 17%`. At badge size that works: a 20px chip wants to be seen. A toast or a banner is a
+surface several hundred pixels wide, and the same value stops reading as a tinted panel and starts
+reading as a block of colour laid on the page. Measured, the old orange ground sat **1.9 against
+the page**; a surface wants nearer **1.2**.
 
-**The ramps have no low-saturation dark step.** Every hue runs from a `05` tint to a `100` near-black
-at high saturation throughout, and a tinted _surface_ in dark mode needs neither end:
+There is no step on any ramp that gives that. So `globals.css` now carries six raw values in the
+dark feedback block — same hue, roughly half the saturation, a darker lightness — and they are
+**the only colours in the system defined outside a ramp**.
 
-- the `90`s are 17–20% lightness at up to 100% saturation. Against a 10% page, a panel's worth of
-  that is a slab of colour rather than a surface that happens to be tinted.
-- the `100`s below them are 10% (blue, orange, yellow), 12% (red) and **9% (green)** — level with the
-  page or darker than it. A fill darker than the page it sits on reads as a hole, which this
-  codebase shipped once already in the dark CodeWell.
+| Needed                                  | Example                          |
+| --------------------------------------- | -------------------------------- |
+| A desaturated dark surface step per hue | `orange-95`, around `26 50% 14%` |
+| Its matching edge, one step up          | around `26 55% 27%`              |
 
-There is no third option on the ramps. The values above sit at 13–18% lightness and 38–55%
-saturation, which is the band that does not exist.
+Until those exist the six values stay where they are, commented with what they measure. The day
+the ramps gain them, the feedback block should point at ramp variables again like every other
+token in the file.
 
 ### What was tried instead, and why it lost
 
@@ -357,20 +358,10 @@ wash composites against whatever is behind it**, so the same token renders one c
 (`neutral-160`) and another inside a dialog (`neutral-150`). A token you cannot predict from its
 name is worse than a token you had to mix.
 
-### What would retire these
+### Until then
 
-**A `dark` step on each hue's ramp** — one more entry per colour, at roughly the lightness and
-saturation of the values above, named like every other step. Then these ten become
-`var(--mdt-blue-dark)` and friends, the file goes back to pointing at ramps only, and anything else
-that needs a tinted dark surface has somewhere to look. That is a palette change, so it wants doing
-deliberately rather than as a side effect of a component.
-
-Until then these ten are the exception, and this section is the reason they are allowed to be.
-
-_Values by Pranjal Gupta, who hit this drawing Banner beside a real page. Adopted onto `main` on
-2 August 2026 so his branch would not have to carry a palette decision through a merge._
-
----
+These ten are the exception, and this section is the reason they are allowed to be. `TOKENS.md`
+and `COMPONENT-GAP.md` point here rather than repeating it.
 
 ## What happens next
 
@@ -404,3 +395,5 @@ which is the only place in the library that does so for a surface.
 The missing pair is something like `--mdt-surface-sunken` — the panel a navigation or a rail sits
 on, as distinct from the page. Worth naming before a second component needs it and picks a
 different shade.
+
+---

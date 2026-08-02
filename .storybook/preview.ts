@@ -28,20 +28,20 @@ const withTheme: Decorator = (Story, context) => {
 // setting, so the interface, the Docs pages and the canvas all agree on load.
 const startingTheme = getInitialTheme();
 
-/**
- * Exported inline, on purpose.
- *
- * `options.storySort` is not read at runtime — Storybook parses this file as
- * *text* before anything runs, and its parser cannot follow a variable. Written
- * as `const preview = {...}; export default preview` the sort is silently
- * ignored: no error, no warning, and a sidebar that is alphabetical for forty
- * entries and not for the last two. Its own message says the parameter "should
- * be defined inline".
- *
- * `satisfies` keeps the type checking; the parser strips it before reading.
- */
+// Exported as the object itself rather than through a `preview` variable, and
+// that is not a style choice. Storybook reads `options.storySort` by parsing
+// this file as TEXT before anything runs, and its parser cannot follow a
+// variable - so behind one, the sort is silently ignored. No error, no warning;
+// the sidebar just falls back to the order the files happened to be walked in,
+// which puts the most recently touched component at the very bottom.
+//
+// `satisfies` keeps the type checking and the parser strips it before reading.
 export default {
   parameters: {
+    // Alphabetical, so a new component turns up where its name says it should.
+    options: {
+      storySort: { method: 'alphabetical', locales: 'en-US' },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -59,23 +59,6 @@ export default {
     // design system's own `--mdt-background` token via the theme toggle above.
     // Re-adding it would hardcode colours that live in globals.css.
     layout: 'centered',
-    // A to Z, and nothing else.
-    //
-    // Without this the sidebar follows the order the files happened to be
-    // indexed in, which is alphabetical right up until it is not — Radio and
-    // LeftNav both landed after Tooltip, and Table's own pages came out in the
-    // order they were written. A list that is sorted for forty entries and
-    // random for three is worse than one that is plainly unsorted, because you
-    // stop trusting it and start scanning the whole thing.
-    //
-    // `locales` is set so the order does not shift with whatever language the
-    // machine running Storybook happens to be in.
-    options: {
-      storySort: {
-        method: 'alphabetical',
-        locales: 'en-US',
-      },
-    },
   },
   globalTypes: {
     // Deliberately no `toolbar` here. Storybook's built-in toolbar control can

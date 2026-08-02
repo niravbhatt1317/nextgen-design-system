@@ -408,10 +408,36 @@
        FEEDBACK SURFACE - dark
 
        Om's banner is light-only, as are all four product systems, so there is
-       nothing exact to copy here. Rather than invent a second dark palette,
-       these come off our own ramps at the same steps Badge already uses - so
-       a dark toast and a dark badge belong to each other even though the light
-       ones came from different places.
+       nothing exact to copy here.
+
+       These used to come off the ramps at the same steps Badge uses - the -90
+       end of each hue, fully saturated. A badge is a 20px chip, and at that
+       size a saturated dark works. A toast or a banner is a surface several
+       hundred pixels wide, and the same value reads as a block of colour laid
+       on the page rather than a panel that happens to be tinted. Measured, the
+       old orange ground sat 1.9 above the page; a surface wants nearer 1.2.
+
+       So these are the tone's own hue at roughly HALF the saturation and a
+       darker step. Same hue, so a warning still reads warm; far less
+       saturation, so it reads as a surface.
+
+       Not on the ramps, and that is the point worth knowing: the ramps have no
+       desaturated dark step for any of these hues, because nothing needed one
+       until a full-width tinted surface did. Recorded in MISSING-TOKENS.md.
+       These are the only colours defined outside a ramp, and they should go
+       back onto one the day those steps exist.
+
+       Measured against the page and the text they carry:
+
+         tone      ground     title  body   icon   edge/bg  bg/page
+         info      218 55 16   14.97  12.87  7.82   1.56     1.15
+         warning    26 50 14   14.49  12.45 10.49   1.72     1.19
+         danger      0 45 15   15.65  13.45  9.25   1.54     1.10
+         success   151 42 13   13.75  11.82  8.37   1.84     1.26
+         ai        270 38 18   14.80  12.72  8.75   1.49     1.17
+         neutral   217 40 15   15.06  12.95 12.95   1.21     1.15
+
+       Floors are 4.5 for words and 3.0 for a meaningful graphic.
        ============================================ */
     /* Ten mixed values, and the only place in this file that does not point at
        a ramp step. See MISSING-TOKENS.md - "Dark surface tints" - for why, and

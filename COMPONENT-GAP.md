@@ -101,11 +101,11 @@ to give `Button` a way to seat it. Documenting `Button`'s own surface is `Button
 |                                      | Count  |
 | ------------------------------------ | ------ |
 | Component rows in the merged library | 42     |
-| Fully covered in Storybook           | **16** |
+| Fully covered in Storybook           | **17** |
 | Partially covered                    | **4**  |
-| Missing entirely                     | **22** |
+| Missing entirely                     | **21** |
 
-**Storybook covers about 38% of what the four teams actually built.**
+**Storybook covers about 40% of what the four teams actually built.**
 
 The gap is not evenly spread. Forms, overlays and navigation are in good shape. **Data display and
 feedback are almost empty.**
@@ -125,7 +125,7 @@ thing.** If all four built it without talking to each other, it is not optional.
 
 ---
 
-## ✅ Covered — 16
+## ✅ Covered — 17
 
 | Merged row                       | Built by | Storybook component                                |
 | -------------------------------- | -------- | -------------------------------------------------- |
@@ -140,7 +140,9 @@ thing.** If all four built it without talking to each other, it is not optional.
 | Data table                       | 4        | `Table`                                            |
 | Pagination bar                   | 1        | `Pagination`                                       |
 | Toast                            | 2        | `Toast`                                            |
+| Banner / inline alert            | 4        | `Banner`                                           |
 | Tabs                             | 3        | `Tabs`                                             |
+| Wizard stepper                   | 3        | `Stepper`                                          |
 | Sidebar navigation               | 4        | `Sidebar`                                          |
 | Menu / popover                   | 3        | `DropdownMenu`, `Popover`, `HoverCard`             |
 | Modal                            | 4        | `Dialog`                                           |
@@ -169,16 +171,17 @@ Something close exists, but it is not the same component and would need work.
 
 ---
 
-## ❌ Missing — 22
+## ❌ Missing — 21
 
 Ordered by how many teams built it.
 
 ### Built by all four — build these first
 
-| Merged row          | Notes                                                                                    |
-| ------------------- | ---------------------------------------------------------------------------------------- |
-| **KPI / stat tile** | Every team built one. Dashboards are core to all four products.                          |
-| **Banner**          | Every team built one. Only `_internal/DeprecationBanner` exists, and it is not exported. |
+| Merged row          | Notes                                                           |
+| ------------------- | --------------------------------------------------------------- |
+| **KPI / stat tile** | Every team built one. Dashboards are core to all four products. |
+
+`Banner` was the other one here and is now built — see Covered, above.
 
 ### Built by three
 
@@ -187,7 +190,6 @@ Ordered by how many teams built it.
 | **Avatar & avatar stack**      | No avatar of any kind in Storybook |
 | **Micro-label & count badges** | `TagPill` is not a count badge     |
 | **Empty state**                | Nothing exists                     |
-| **Wizard stepper**             | Nothing exists                     |
 
 ### Built by two
 
@@ -314,12 +316,12 @@ library. It is reasonable for it to hold primitives none of them named.
 | Order | Component                       | Why                                                                 |
 | ----- | ------------------------------- | ------------------------------------------------------------------- |
 | 1     | **Card** + section header       | Blocks the most other work, and the README already claims it exists |
-| 2     | **Banner / Alert**              | All four teams built one                                            |
+| 2     | ~~**Banner / Alert**~~ — built  | All four teams built one                                            |
 | 3     | **KPI / stat tile**             | All four teams built one                                            |
 | 4     | **Avatar** + stack              | Three teams; nothing close exists                                   |
 | 5     | **Badge** (count / micro-label) | Three teams; `TagPill` does not cover it                            |
 | 6     | **Empty state**                 | Three teams; cheap to build                                         |
-| 7     | **Wizard stepper**              | Three teams; more involved                                          |
+| 7     | ~~**Wizard stepper**~~ — built  | Three teams; more involved                                          |
 | 8     | Progress                        | Two teams                                                           |
 
 **Cards first.** Almost every other missing component — stat tile, empty state, key-value rows,
