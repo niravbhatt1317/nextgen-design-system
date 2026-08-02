@@ -580,6 +580,13 @@ describe('DialogSteps', () => {
     render(<DialogSteps steps={steps} current={0} label="Invite progress" />);
     expect(screen.getByRole('list', { name: 'Invite progress' })).toBeInTheDocument();
   });
+
+  it('leaves more room beneath itself than the dialog leaves between blocks', () => {
+    // 20 to whatever follows, against 16 everywhere else - the grid's gap plus
+    // this 4. The reading starts below the steps.
+    const { container } = render(<DialogSteps steps={steps} current={0} />);
+    expect(container.firstElementChild?.className).toContain('mdt-mb-1');
+  });
 });
 
 describe('DialogFooter', () => {
@@ -591,7 +598,7 @@ describe('DialogFooter', () => {
     expect(footer?.className).toContain('mdt-border-t');
     // And it breaks out of the dialog's padding, so the rule reaches both edges
     // rather than reading as an underline on the buttons.
-    expect(footer?.className).toContain('-mdt-mx-6');
+    expect(footer?.className).toContain('-mdt-mx-4');
   });
 
   /** The footer of whichever dialog is currently rendered. */
@@ -610,18 +617,18 @@ describe('DialogFooter', () => {
       </Dialog>
     );
 
-  it('breaks out by 24 when the dialog padded itself by 24', () => {
+  it('breaks out by 16 when the dialog padded itself by 16', () => {
     withDensity('comfortable');
-    expect(footerClasses()).toContain('-mdt-mx-6');
+    expect(footerClasses()).toContain('-mdt-mx-4');
   });
 
-  it('breaks out by 16 when the dialog padded itself by 16', () => {
+  it('breaks out by 12 when the dialog padded itself by 12', () => {
     withDensity('compact');
-    // Hard-coded at 24px this overhung a compact dialog by 7px on each side -
-    // measured in a browser, after the arithmetic predicted the same number.
+    // Hard-coded at one number this overhung the tighter dialog by 7px on each
+    // side - measured in a browser, after the arithmetic predicted the same.
     // The footer cannot know the padding on its own, so the content tells it.
-    expect(footerClasses()).toContain('-mdt-mx-4');
-    expect(footerClasses()).not.toContain('-mdt-mx-6');
+    expect(footerClasses()).toContain('-mdt-mx-3');
+    expect(footerClasses()).not.toContain('-mdt-mx-4');
   });
 
   it('can go without', () => {
@@ -685,7 +692,18 @@ describe('size and density', () => {
     expect(classes).toContain('sm:mdt-self-stretch');
   });
 
+  it('pads by 16, and by 12 underneath', () => {
+    // The buttons sit closer to the bottom edge than the reading does to the
+    // top. The footer already has its rule; a full 16 under it as well left the
+    // actions floating away from the box they belong to.
+    const classes = at({});
+    expect(classes).toContain('mdt-p-4');
+    expect(classes).toContain('mdt-pb-3');
+  });
+
   it('tightens up when asked', () => {
-    expect(at({ density: 'compact' })).toContain('mdt-p-4');
+    const classes = at({ density: 'compact' });
+    expect(classes).toContain('mdt-p-3');
+    expect(classes).toContain('mdt-pb-2');
   });
 });

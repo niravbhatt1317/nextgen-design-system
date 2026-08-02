@@ -46,8 +46,12 @@ const dialogContentVariants = cva('', {
       full: 'mdt-max-w-none sm:mdt-self-stretch',
     },
     density: {
-      comfortable: 'mdt-gap-4 mdt-p-6',
-      compact: 'mdt-gap-3 mdt-p-4',
+      // 16 on three sides and 12 underneath. The buttons sit closer to the
+      // bottom edge than the reading does to the top, which is right: the
+      // footer is already separated by its rule, and a full 16 under it left
+      // the actions floating away from the box they belong to.
+      comfortable: 'mdt-gap-4 mdt-p-4 mdt-pb-3',
+      compact: 'mdt-gap-3 mdt-p-3 mdt-pb-2',
     },
   },
   defaultVariants: { size: 'md', density: 'comfortable' },
@@ -311,7 +315,9 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
     <div
       ref={ref}
       className={cn(
-        'mdt-flex mdt-flex-col mdt-space-y-1.5 mdt-text-center sm:mdt-text-left',
+        // 8px under the title. At 6 the description read as a second line of the
+        // heading rather than as the sentence explaining it.
+        'mdt-flex mdt-flex-col mdt-space-y-2 mdt-text-center sm:mdt-text-left',
         className
       )}
       {...props}
@@ -343,7 +349,7 @@ const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
             // edges. Inset by 24px it reads as an underline on the buttons rather
             // than as the seam between the reading and the deciding.
             'mdt-mt-2 mdt-border-t mdt-border-border mdt-pt-4',
-            density === 'compact' ? '-mdt-mx-4 mdt-px-4' : '-mdt-mx-6 mdt-px-6',
+            density === 'compact' ? '-mdt-mx-3 mdt-px-3' : '-mdt-mx-4 mdt-px-4',
           ],
           className
         )}

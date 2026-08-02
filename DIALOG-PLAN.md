@@ -139,8 +139,19 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
         forward on the right
   - [x] none — `divider={false}` ✅
 
-- [x] **Density, two steps.** ✅ `comfortable` 24px, `compact` 16px. The product is uniformly
-      generous, so `compact` is there for a dialog that is mostly chrome around one control.
+- [x] **Density, two steps.** ✅ `comfortable` 16px on three sides and **12 underneath**;
+      `compact` 12 and 8. Measured against a trial rather than argued: 24 all round read as a
+      poster rather than a dialog once the steps and the rule were both in. The bottom is the one
+      side that is not square — the footer already has its rule, and a full 16 under the buttons
+      as well left them floating away from the box they belong to.
+
+      The rest of the rhythm, also measured: **8** title → description (at 6 the description read
+      as a second line of the heading), **16** between blocks, **20** from the steps to whatever
+      follows, because that is where the reading actually starts. The extra 4 lives on
+      `DialogSteps` itself rather than as a rule on the content — the steps are the only block
+      that wants it.
+
+      `compact` is for a dialog that is mostly chrome around one control.
 
 - [ ] **Where the close button lives.** In the header row when there is a header to sit in;
       floating over the content when there is not. Both appear in the references and the choice is

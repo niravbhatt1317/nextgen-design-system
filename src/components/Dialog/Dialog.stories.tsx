@@ -1005,39 +1005,32 @@ export const Sizes: Story = {
 };
 
 /**
- * A spacing trial — open both and compare.
+ * The two densities, side by side.
  *
- * **Current** is what the component ships: 24px of padding, a 16px gap between
- * every block, 6px between title and description.
+ * **Comfortable** is what everything gets unless it asks otherwise: 16px on
+ * three sides and 12px underneath, 8px between the title and its description,
+ * 16px between blocks — and 20px from the steps to whatever follows them,
+ * because that is where the reading actually starts.
  *
- * **Trial** is the set being tried: 16px of padding, 8px between title and
- * description, 16px from the header to the steps, and 20px from the steps to
- * the body — a wider gap where the reading actually starts.
+ * **Compact** is 12px and 8px, for a dialog that is mostly chrome around one
+ * control.
  *
- * Nothing here changes the component. Everything is a `className` on this story,
- * so both can be looked at side by side before anything is decided.
+ * The footer's rule breaks out through whichever padding it finds, so it
+ * reaches both edges in either — hard-coded at 24px it overhung the compact one
+ * by 7px a side, measured.
  */
-export const SpacingTrial: Story = {
-  render: function SpacingTrialDemo() {
-    const [mode, setMode] = useState<'current' | 'trial' | 'compact' | null>(null);
-    const trial = mode === 'trial';
+export const Density: Story = {
+  render: function DensityDemo() {
+    const [mode, setMode] = useState<'comfortable' | 'compact' | null>(null);
 
     return (
       <div className="mdt-flex mdt-gap-2">
         <Button
-          variant="outline"
           onClick={() => {
-            setMode('current');
+            setMode('comfortable');
           }}
         >
-          Current — 24 / 6 / 16
-        </Button>
-        <Button
-          onClick={() => {
-            setMode('trial');
-          }}
-        >
-          Trial — 16 / 8 / 16 / 20
+          Comfortable
         </Button>
         <Button
           variant="outline"
@@ -1045,7 +1038,7 @@ export const SpacingTrial: Story = {
             setMode('compact');
           }}
         >
-          density=compact
+          Compact
         </Button>
 
         <Dialog
@@ -1054,12 +1047,8 @@ export const SpacingTrial: Story = {
             setMode(null);
           }}
         >
-          <DialogContent
-            size="lg"
-            density={mode === 'compact' ? 'compact' : 'comfortable'}
-            className={trial ? 'mdt-gap-4 mdt-p-4' : undefined}
-          >
-            <DialogHeader className={trial ? 'mdt-space-y-2' : undefined}>
+          <DialogContent size="lg" density={mode ?? 'comfortable'}>
+            <DialogHeader>
               <DialogTitle className="mdt-flex mdt-items-center mdt-gap-2">
                 Invite guest users
                 <Badge tone="warning" size="sm" shape="pill">
@@ -1079,20 +1068,12 @@ export const SpacingTrial: Story = {
               current={0}
             />
 
-            {/* 20px from the steps in the trial: 16 of grid gap plus 4 here. */}
-            <div
-              className={
-                trial
-                  ? 'mdt-mt-1 mdt-flex mdt-flex-col mdt-gap-4'
-                  : 'mdt-flex mdt-flex-col mdt-gap-4'
-              }
-            >
+            <div className="mdt-flex mdt-flex-col mdt-gap-4">
               <Input label="Invite by email" placeholder="You can add more than one email…" />
               <Input label="Select a parent organisation" placeholder="MSP owner organisation" />
             </div>
 
-            {/* The breakout has to match the padding, or the rule overhangs. */}
-            <DialogFooter className={trial ? '-mdt-mx-4 mdt-px-4' : undefined}>
+            <DialogFooter>
               <Button>
                 Next
                 <DialogSubmitHint />

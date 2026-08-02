@@ -34,7 +34,16 @@ const MARK = 'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify
  */
 const DialogSteps = forwardRef<HTMLOListElement, DialogStepsProps>(
   ({ className, steps, current, onStepSelect, label = 'Progress', ...props }, ref) => (
-    <ol ref={ref} aria-label={label} className={cn('mdt-flex mdt-gap-3', className)} {...props}>
+    <ol
+      ref={ref}
+      aria-label={label}
+      // 20px to whatever follows, against the 16 between everything else: the
+      // content's grid gap plus this. The reading starts below the steps, and
+      // the extra 4 is what says so. It lives here rather than as a rule on the
+      // content because the steps are the only block that wants it.
+      className={cn('mdt-mb-1 mdt-flex mdt-gap-3', className)}
+      {...props}
+    >
       {steps.map((step, index) => {
         const done = index < current;
         const here = index === current;
