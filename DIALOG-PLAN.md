@@ -201,9 +201,14 @@ _References: Jasper Library, Notion Preferences, Cal.com embed, LangGraph config
 Named in review as things we may want. Each is a _composition_ of the above rather than a new
 component — worth checking that stays true once the product designs arrive.
 
-- [x] **Wizard / stepper** ✅ `DialogSteps` — the bar under each step is the progress, not a
+- [x] **Wizard / stepper** ✅ `DialogSteps` — **to be folded into `Stepper` as a variant**, see
+      `COMPONENT-GAP.md`. Two answers to one question, built hours apart on branches that never saw
+      each other. `Dialog` is the only caller today, which makes now the cheap moment.
+
+      `DialogSteps` — the bar under each step is the progress, not a
       connector between dots. A finished step shows a tick rather than its number, and only
       finished steps are clickable.
+
 - [ ] **Tabbed** — Panel + tabs
 - [ ] **Split: information one side, image the other** — is this a Panel with a media slot, or does
       it need a genuine two-column body?

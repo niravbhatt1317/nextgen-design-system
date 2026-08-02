@@ -1,14 +1,24 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 802,
+  "capabilityCount": 865,
   "counts": {
-    "story": 582,
-    "component": 189,
-    "utility": 12,
-    "hook": 19
+    "story": 633,
+    "component": 195,
+    "utility": 16,
+    "hook": 21
   },
   "capabilities": [
+    {
+      "name": "ActionPlacement",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / ActionPlacement",
+      "doc": "Components/Banner ActionPlacement",
+      "props": [],
+      "propDocs": ""
+    },
     {
       "name": "ActiveState",
       "kind": "story",
@@ -320,6 +330,16 @@
       "propDocs": ""
     },
     {
+      "name": "AtTheLimit",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / AtTheLimit",
+      "doc": "Components/Upload AtTheLimit",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "AutoFlowDense",
       "kind": "story",
       "file": "src/components/Grid/Grid.stories.tsx",
@@ -380,6 +400,16 @@
       "propDocs": ""
     },
     {
+      "name": "Banner",
+      "kind": "component",
+      "file": "src/components/Banner/Banner.tsx",
+      "area": "Banner",
+      "summary": "Banner - a message that sits in the page and stays there.",
+      "doc": "Banner - a message that sits in the page and stays there. It is about the thing it sits above, it waits for you, and it can carry as many actions as the situation actually needs. **It is not a Toast**, though they share the six tones and the same palette deliberately. A toast floats over the page, arrives on its own and leaves on a timer, so you may not be looking when it appears and it can never hold the only copy of something important. A banner is in the layout, has no timer, and leaves only when the reason for it has gone. *The one-line test: if you would still need the message after a refresh, it is a banner.* It is announced as a region and read in the order it appears, not as a live region that interrupts - which is the other half of the same difference. The region takes its name from the title, so a banner with no title is not a landmark at all. ```tsx <Banner tone=\"warning\" title=\"Your trial ends in 3 days\" description=\"After that, agents keep read-only access until a plan is chosen.\" actions={<Button variant=\"secondary\" size=\"sm\">Choose a plan</Button>} onDismiss={hide} /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "BetaExample",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -436,6 +466,36 @@
       "area": "Sheet",
       "summary": "Story: Components/Sheet / BottomSide",
       "doc": "Components/Sheet BottomSide",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Breakdown",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / Breakdown",
+      "doc": "Components/Progress Breakdown",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "BreakdownWithoutLegend",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / BreakdownWithoutLegend",
+      "doc": "Components/Progress BreakdownWithoutLegend",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "BreakdownWithoutMax",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / BreakdownWithoutMax",
+      "doc": "Components/Progress BreakdownWithoutMax",
       "props": [],
       "propDocs": ""
     },
@@ -707,8 +767,18 @@
       "area": "Checkbox",
       "summary": "Checkbox component for toggleable selection.",
       "doc": "Checkbox component for toggleable selection. ```tsx // Default checkbox <Checkbox id=\"terms\" /> // Card variant <Checkbox id=\"feature\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Enable Feature</div> <div className=\"text-sm text-muted-foreground\"> This will enable the advanced feature. </div> </div> </div> </Checkbox> ```",
-      "props": ["children"],
-      "propDocs": "Content to display inside the checkbox (for card variant)"
+      "props": ["children", "size"],
+      "propDocs": "What the checkbox holds: the label of a chip, or the content of a card. Overrides the group's size for this chip alone."
+    },
+    {
+      "name": "CheckboxGroup",
+      "kind": "component",
+      "file": "src/components/Checkbox/Checkbox.tsx",
+      "area": "Checkbox",
+      "summary": "A row of choices that wraps.",
+      "doc": "A row of choices that wraps. ## Not connected, on purpose Each chip is its own shape with its own edge, and they wrap onto the next line when the row runs out. That is the opposite of the segmented strip in `Radio`, where the segments are joined into one bar - joined says \"one of these\", and separate says \"as many as you like\". ## It is a group, and it says so `role=\"group\"` with a name, so a screen reader announces what the chips are for before reading them. Each chip inside is a real checkbox: Tab reaches it, Space presses it, and pressing again lets it go. ```tsx <CheckboxGroup variant=\"chip\" label=\"Which of these were affected?\"> <Checkbox value=\"network\">Network</Checkbox> <Checkbox value=\"storage\">Storage</Checkbox> </CheckboxGroup> ```",
+      "props": ["children", "variant", "size", "label"],
+      "propDocs": " Chip height, for a chip group. What the choices are for, read out before the chips themselves. Without it a screen reader announces six checkboxes and no reason for them."
     },
     {
       "name": "Checked",
@@ -717,6 +787,76 @@
       "area": "Switch",
       "summary": "Story: Components/Switch / Checked",
       "doc": "Components/Switch Checked",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Chips",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / Chips",
+      "doc": "Components/Checkbox Chips",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipsDisabled",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipsDisabled",
+      "doc": "Components/Checkbox ChipsDisabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipsInteractive",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipsInteractive",
+      "doc": "Components/Checkbox ChipsInteractive",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipSizes",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipSizes",
+      "doc": "Components/Checkbox ChipSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipsVersusTags",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipsVersusTags",
+      "doc": "Components/Checkbox ChipsVersusTags",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipsWithIcons",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipsWithIcons",
+      "doc": "Components/Checkbox ChipsWithIcons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipsWrap",
+      "kind": "story",
+      "file": "src/components/Checkbox/Checkbox.stories.tsx",
+      "area": "Checkbox",
+      "summary": "Story: Components/Checkbox / ChipsWrap",
+      "doc": "Components/Checkbox ChipsWrap",
       "props": [],
       "propDocs": ""
     },
@@ -767,6 +907,16 @@
       "area": "Item",
       "summary": "Story: Components/Item / Clickable",
       "doc": "Components/Item Clickable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Clickable",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / Clickable",
+      "doc": "Components/Stepper Clickable",
       "props": [],
       "propDocs": ""
     },
@@ -1062,10 +1212,10 @@
     {
       "name": "Confirmation",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / Confirmation",
-      "doc": "Components/Dialog Confirmation",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / Confirmation",
+      "doc": "Deprecated/Dialog stories Confirmation",
       "props": [],
       "propDocs": ""
     },
@@ -1112,10 +1262,10 @@
     {
       "name": "Controlled",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / Controlled",
-      "doc": "Components/Dialog Controlled",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / Controlled",
+      "doc": "Deprecated/Dialog stories Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1246,6 +1396,16 @@
       "area": "Command",
       "summary": "Story: Components/Command / CustomEmptyState",
       "doc": "Components/Command CustomEmptyState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomIcon",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / CustomIcon",
+      "doc": "Components/Banner CustomIcon",
       "props": [],
       "propDocs": ""
     },
@@ -1392,10 +1552,10 @@
     {
       "name": "CustomWidth",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / CustomWidth",
-      "doc": "Components/Dialog CustomWidth",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / CustomWidth",
+      "doc": "Deprecated/Dialog stories CustomWidth",
       "props": [],
       "propDocs": ""
     },
@@ -1571,6 +1731,16 @@
       "area": "Badge",
       "summary": "Story: Components/Badge / Default",
       "doc": "Components/Badge Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / Default",
+      "doc": "Components/Banner Default",
       "props": [],
       "propDocs": ""
     },
@@ -1937,6 +2107,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / Default",
+      "doc": "Components/Stepper Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Switch/Switch.stories.tsx",
       "area": "Switch",
       "summary": "Story: Components/Switch / Default",
@@ -2083,6 +2263,16 @@
       "doc": "DeprecationBanner component Displays a warning banner for deprecated components in Storybook. This component is for internal use in Storybook stories only.",
       "props": ["componentName", "deprecationInfo"],
       "propDocs": "Name of the deprecated component Deprecation information"
+    },
+    {
+      "name": "describeAccept",
+      "kind": "utility",
+      "file": "src/components/Upload/Upload.validate.ts",
+      "area": "Upload",
+      "summary": "`accept` in words, for a message a person has to read.",
+      "doc": "`accept` in words, for a message a person has to read. \".pdf,.docx\" becomes \"PDF or DOCX\"; \"image/*\" becomes \"images\". A message that repeats the raw attribute back at you - `.pdf,.doc,.docx` - is a message written for the machine that rejected the file.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "describeKeys",
@@ -2465,6 +2655,16 @@
     {
       "name": "Dismissible",
       "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / Dismissible",
+      "doc": "Components/Banner Dismissible",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Dismissible",
+      "kind": "story",
       "file": "src/components/Callout/Callout.stories.tsx",
       "area": "Callout",
       "summary": "Story: Components/Callout / Dismissible",
@@ -2733,6 +2933,16 @@
       "propDocs": ""
     },
     {
+      "name": "EveryFailure",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / EveryFailure",
+      "doc": "Components/Upload EveryFailure",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "ExpandableRows",
       "kind": "story",
       "file": "src/components/Table/Table.stories.tsx",
@@ -2759,6 +2969,16 @@
       "area": "Button",
       "summary": "Story: Components/Button / ExperimentalExample",
       "doc": "Components/Button ExperimentalExample",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "FieldError",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / FieldError",
+      "doc": "Components/Upload FieldError",
       "props": [],
       "propDocs": ""
     },
@@ -2839,6 +3059,16 @@
       "area": "Flex",
       "summary": "Story: Layout/Flex / FormActions",
       "doc": "Layout/Flex FormActions",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "formatFileSize",
+      "kind": "utility",
+      "file": "src/components/Upload/Upload.validate.ts",
+      "area": "Upload",
+      "summary": "1 KB is 1024 bytes here, matching what an operating system reports.",
+      "doc": "1 KB is 1024 bytes here, matching what an operating system reports.",
       "props": [],
       "propDocs": ""
     },
@@ -3314,6 +3544,16 @@
       "propDocs": "Content to render inside the trigger Change the default rendered element for the one passed as a child, merging their props and behavior."
     },
     {
+      "name": "HowManySteps",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / HowManySteps",
+      "doc": "Components/Stepper HowManySteps",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Icon",
       "kind": "component",
       "file": "src/components/Icon/Icon.tsx",
@@ -3420,6 +3660,36 @@
       "area": "ScrollArea",
       "summary": "Story: Components/ScrollArea / ImageGallery",
       "doc": "Components/ScrollArea ImageGallery",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InAForm",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / InAForm",
+      "doc": "Components/Upload InAForm",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InANarrowColumn",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / InANarrowColumn",
+      "doc": "Components/Stepper InANarrowColumn",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InAWizard",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / InAWizard",
+      "doc": "Components/Stepper InAWizard",
       "props": [],
       "propDocs": ""
     },
@@ -3781,16 +4051,6 @@
       "propDocs": ""
     },
     {
-      "name": "InteractiveModal",
-      "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / InteractiveModal",
-      "doc": "Components/Dialog InteractiveModal",
-      "props": [],
-      "propDocs": ""
-    },
-    {
       "name": "InUse",
       "kind": "story",
       "file": "src/components/AiMark/AiMark.stories.tsx",
@@ -3850,6 +4110,16 @@
         "label"
       ],
       "propDocs": "The keys, in the order they are pressed. Data rather than markup, deliberately: `keys={['mod', 'shift', 'e']}` is something a model gets right, and a hand-assembled row of icons is not. This library's primary consumer is a machine. A cap per key, or one cap holding all of them. `separate` is the default because it is the only arrangement where a three-key shortcut still reads as three things rather than as a word. Outlined, or a filled block. `filled` is quieter and belongs where the shortcut is information rather than an offer - a legend, a help panel, a list of what the keys do. How big the keys are. `md` matches the text beside it at `text-sm`. Which ink to draw in. See {@link KbdTone}. Pull the keys closer together. `separate` only. 2px instead of 4, so the caps read as one shape at a glance while staying countable up close. Draw the modifiers a tone quieter than the key they modify. Hierarchy without extra geometry: in `⌘⇧E` the E is the part that changes between shortcuts, and this is what makes it the part you read. Which machine to render for, if you know better than the browser does. Left alone, `mod` and `alt` follow the machine the page is on. Hide it from assistive tech"
+    },
+    {
+      "name": "KeepsItsOwnList",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / KeepsItsOwnList",
+      "doc": "Components/Upload KeepsItsOwnList",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "KeyboardNavigation",
@@ -3948,6 +4218,16 @@
       "area": "Combobox",
       "summary": "Story: Components/Combobox / LargeDataset",
       "doc": "Components/Combobox LargeDataset",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Layouts",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / Layouts",
+      "doc": "Components/Stepper Layouts",
       "props": [],
       "propDocs": ""
     },
@@ -4212,6 +4492,26 @@
       "propDocs": ""
     },
     {
+      "name": "LongMessage",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / LongMessage",
+      "doc": "Components/Banner LongMessage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ManyFiles",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / ManyFiles",
+      "doc": "Components/Upload ManyFiles",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Marks",
       "kind": "story",
       "file": "src/components/AiMark/AiMark.stories.tsx",
@@ -4228,6 +4528,16 @@
       "area": "CodeWell",
       "summary": "Story: Components/CodeWell / Maskable",
       "doc": "Components/CodeWell Maskable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "matchesAccept",
+      "kind": "utility",
+      "file": "src/components/Upload/Upload.validate.ts",
+      "area": "Upload",
+      "summary": "Does this file match the `accept` string? The same three forms the file input itself understands: an extension (`.pdf`), a whole family (`image/*`), or an exact type (`application/pdf`).",
+      "doc": "Does this file match the `accept` string? The same three forms the file input itself understands: an extension (`.pdf`), a whole family (`image/*`), or an exact type (`application/pdf`). An empty `accept` means everything is fine. Extension first, type second. A `.log` file usually arrives with no MIME type at all, and a `.csv` arrives as `application/vnd.ms-excel` on some machines and `text/csv` on others - the name is the more reliable of the two.",
       "props": [],
       "propDocs": ""
     },
@@ -4302,12 +4612,12 @@
       "propDocs": ""
     },
     {
-      "name": "ModalComparison",
+      "name": "Modal",
       "kind": "story",
       "file": "src/components/Dialog/Dialog.stories.tsx",
       "area": "Dialog",
-      "summary": "Story: Components/Dialog / ModalComparison",
-      "doc": "Components/Dialog ModalComparison",
+      "summary": "Story: Components/Dialog / Modal",
+      "doc": "Components/Dialog Modal",
       "props": [],
       "propDocs": ""
     },
@@ -4452,10 +4762,10 @@
     {
       "name": "NestedDialogs",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / NestedDialogs",
-      "doc": "Components/Dialog NestedDialogs",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / NestedDialogs",
+      "doc": "Deprecated/Dialog stories NestedDialogs",
       "props": [],
       "propDocs": ""
     },
@@ -4492,10 +4802,10 @@
     {
       "name": "NoCloseButton",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / NoCloseButton",
-      "doc": "Components/Dialog NoCloseButton",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / NoCloseButton",
+      "doc": "Deprecated/Dialog stories NoCloseButton",
       "props": [],
       "propDocs": ""
     },
@@ -4566,6 +4876,46 @@
       "area": "Callout",
       "summary": "Story: Components/Callout / OnATintedSurface",
       "doc": "Components/Callout OnATintedSurface",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OneFileDone",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / OneFileDone",
+      "doc": "Components/Upload OneFileDone",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OneFileFailed",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / OneFileFailed",
+      "doc": "Components/Upload OneFileFailed",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OneFileUploading",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / OneFileUploading",
+      "doc": "Components/Upload OneFileUploading",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OneImage",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / OneImage",
+      "doc": "Components/Upload OneImage",
       "props": [],
       "propDocs": ""
     },
@@ -4810,12 +5160,32 @@
       "propDocs": ""
     },
     {
+      "name": "PicksItsOwnImage",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / PicksItsOwnImage",
+      "doc": "Components/Upload PicksItsOwnImage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PillHoverCards",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
       "area": "Select",
       "summary": "Story: Components/Select / PillHoverCards",
       "doc": "Components/Select PillHoverCards",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Placement",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / Placement",
+      "doc": "Components/Banner Placement",
       "props": [],
       "propDocs": ""
     },
@@ -4965,7 +5335,17 @@
       "file": "src/components/Progress/Progress.tsx",
       "area": "Progress",
       "summary": "Progress - how far along something is.",
-      "doc": "Progress - how far along something is. ```tsx <Progress value={62} aria-label=\"Storage used\" /> <Progress value={91} tone=\"danger\" baseline={75} aria-label=\"Seats used\" /> ```",
+      "doc": "Progress - how far along something is. ## Four slots for words, and a key A line above and a line below, each with a left end and a right end, so a name and its number sit at opposite sides of the same bar. Any of the four can be left out. The key goes last and is for the **markers** - `baseline` and `floor` - because a key of one colour explains nothing. ## It is one value A bar split into named parts is not progress: nothing is advancing toward finishing, it is a whole broken up, and there is no single value for a screen reader to announce. That is `ProgressBreakdown`. ```tsx <Progress value={62} aria-label=\"Storage used\" /> <Progress value={91} tone=\"danger\" baseline={75} above={{ left: 'Seats used', right: '91 of 100' }} below={{ right: '9 left' }} legend={[ { label: 'Used', value: 91, swatch: 'danger' }, { label: 'Your plan allows', value: 75, swatch: 'baseline' }, ]} aria-label=\"Seats used\" /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ProgressBreakdown",
+      "kind": "component",
+      "file": "src/components/Progress/Progress.tsx",
+      "area": "Progress",
+      "summary": "ProgressBreakdown - one whole, divided into named parts.",
+      "doc": "ProgressBreakdown - one whole, divided into named parts. ## Why this is not Progress Same track, same tones, same sizes - and a different question. Progress says how far along one thing is; this says what a whole is made of. Nothing here is advancing toward finishing and there is no single value, so it cannot be announced as \"91 of 100\". It is one picture with one sentence describing it, which is why `aria-label` has to carry the whole story. Kept apart on purpose. Built as a variant of Progress the two would be one prop away from each other, and somebody would reach for a stacked bar when they wanted a progress bar - or put a stacked bar where a screen reader had been promised a value. ```tsx <ProgressBreakdown max={100} segments={[ { label: 'Tickets', value: 48, valueLabel: '48 GB' }, { label: 'Attachments', value: 22, valueLabel: '22 GB', tone: 'warning' }, { label: 'Backups', value: 14, valueLabel: '14 GB', tone: 'success' }, ]} remainderLabel=\"Free\" above={{ left: 'Storage', right: '100 GB' }} aria-label=\"Storage: 48 GB tickets, 22 GB attachments, 14 GB backups, 16 GB free\" /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -4995,9 +5375,9 @@
       "file": "src/components/Radio/Radio.tsx",
       "area": "Radio",
       "summary": "RadioGroup component for managing a group of radio buttons.",
-      "doc": "RadioGroup component for managing a group of radio buttons. ```tsx <RadioGroup defaultValue=\"option1\"> <RadioGroupItem value=\"option1\" id=\"r1\"> Option 1 </RadioGroupItem> <RadioGroupItem value=\"option2\" id=\"r2\"> Option 2 </RadioGroupItem> </RadioGroup> ```",
-      "props": ["children"],
-      "propDocs": "Content to display inside the radio group"
+      "doc": "RadioGroup component for managing a group of radio buttons. ```tsx <RadioGroup defaultValue=\"option1\"> <RadioGroupItem value=\"option1\" id=\"r1\"> Option 1 </RadioGroupItem> </RadioGroup> // As a segmented strip <RadioGroup variant=\"segmented\" defaultValue=\"medium\"> <RadioGroupItem value=\"low\">Low</RadioGroupItem> <RadioGroupItem value=\"medium\">Medium</RadioGroupItem> <RadioGroupItem value=\"high\">High</RadioGroupItem> </RadioGroup> ```",
+      "props": ["children", "variant", "size", "fullWidth"],
+      "propDocs": "Content to display inside the radio group  Segment height, for a segmented group. Segments share the width equally and the strip fills its column, so it lines up with the fields above and below. Only read when `segmented`."
     },
     {
       "name": "RadioGroupItem",
@@ -5005,9 +5385,9 @@
       "file": "src/components/Radio/Radio.tsx",
       "area": "Radio",
       "summary": "RadioGroupItem component for individual radio button items.",
-      "doc": "RadioGroupItem component for individual radio button items. ```tsx // Default radio <RadioGroupItem value=\"option1\" id=\"r1\" /> // Card variant <RadioGroupItem value=\"option1\" id=\"r1\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Option 1</div> <div className=\"text-sm text-muted-foreground\">Description</div> </div> </div> </RadioGroupItem> ```",
-      "props": ["children"],
-      "propDocs": "Content to display inside the radio item (for card variant)"
+      "doc": "RadioGroupItem component for individual radio button items. ```tsx // Default radio <RadioGroupItem value=\"option1\" id=\"r1\" /> // Card variant <RadioGroupItem value=\"option1\" id=\"r1\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Option 1</div> <div className=\"text-sm text-muted-foreground\">Description</div> </div> </div> </RadioGroupItem> // One segment of a segmented group <RadioGroupItem value=\"low\">Low</RadioGroupItem> ```",
+      "props": ["children", "size"],
+      "propDocs": "What the item holds: the label of a segment, or the content of a card. Overrides the group's size for this segment alone."
     },
     {
       "name": "ReadOnly",
@@ -5036,6 +5416,16 @@
       "area": "Skeleton",
       "summary": "Story: Components/Skeleton / Rectangle",
       "doc": "Components/Skeleton Rectangle",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "RefusesWhatItShould",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / RefusesWhatItShould",
+      "doc": "Components/Upload RefusesWhatItShould",
       "props": [],
       "propDocs": ""
     },
@@ -5180,6 +5570,16 @@
       "propDocs": ""
     },
     {
+      "name": "Resting",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / Resting",
+      "doc": "Components/Upload Resting",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "RichContent",
       "kind": "story",
       "file": "src/components/Tooltip/Tooltip.stories.tsx",
@@ -5232,10 +5632,10 @@
     {
       "name": "ScrollableContent",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / ScrollableContent",
-      "doc": "Components/Dialog ScrollableContent",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / ScrollableContent",
+      "doc": "Deprecated/Dialog stories ScrollableContent",
       "props": [],
       "propDocs": ""
     },
@@ -5336,6 +5736,66 @@
       "area": "Separator",
       "summary": "Story: Layout/Separator / SectionDivider",
       "doc": "Layout/Separator SectionDivider",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Segmented",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / Segmented",
+      "doc": "Components/Radio Segmented",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SegmentedDisabled",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / SegmentedDisabled",
+      "doc": "Components/Radio SegmentedDisabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SegmentedInAForm",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / SegmentedInAForm",
+      "doc": "Components/Radio SegmentedInAForm",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SegmentedSizes",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / SegmentedSizes",
+      "doc": "Components/Radio SegmentedSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SegmentedWidth",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / SegmentedWidth",
+      "doc": "Components/Radio SegmentedWidth",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SegmentedWithIcons",
+      "kind": "story",
+      "file": "src/components/Radio/Radio.stories.tsx",
+      "area": "Radio",
+      "summary": "Story: Components/Radio / SegmentedWithIcons",
+      "doc": "Components/Radio SegmentedWithIcons",
       "props": [],
       "propDocs": ""
     },
@@ -6080,6 +6540,26 @@
       "propDocs": ""
     },
     {
+      "name": "Stacked",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / Stacked",
+      "doc": "Components/Progress Stacked",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "States",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / States",
+      "doc": "Components/Stepper States",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "States",
       "kind": "story",
       "file": "src/components/TagPill/TagPill.stories.tsx",
@@ -6116,6 +6596,16 @@
       "area": "Dialog",
       "summary": "Story: Components/Dialog / Stepped",
       "doc": "Components/Dialog Stepped",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Stepper",
+      "kind": "component",
+      "file": "src/components/Stepper/Stepper.tsx",
+      "area": "Stepper",
+      "summary": "Stepper - a named, ordered journey with a place you are now.",
+      "doc": "Stepper - a named, ordered journey with a place you are now. **It is not Tabs.** Tabs are four doors into the same room: no order, nothing to finish, and everything behind them already exists. A stepper is a sequence where the steps ahead of you have not happened yet. *The one-line test: if you can do them in any order, it is Tabs.* It is not `Progress` either, which is one number with no names and nobody doing anything; nor a breadcrumb, which is depth rather than sequence. Announced as a list with one item marked as the current step. Steps are plain text and not focusable unless `onStepSelect` is given - a step is not a button unless you can actually go there, and a strip of five stops that do nothing is worse than no stops at all. ```tsx <Stepper aria-label=\"Import assets\" current={2} steps={[ { label: 'Choose a source' }, { label: 'Connect' }, { label: 'Map fields' }, { label: 'Review' }, ]} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -6935,6 +7425,16 @@
     {
       "name": "Tones",
       "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / Tones",
+      "doc": "Components/Banner Tones",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Tones",
+      "kind": "story",
       "file": "src/components/Callout/Callout.stories.tsx",
       "area": "Callout",
       "summary": "Story: Components/Callout / Tones",
@@ -7091,6 +7591,16 @@
       "propDocs": ""
     },
     {
+      "name": "TryIt",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / TryIt",
+      "doc": "Components/Upload TryIt",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TwoFrozenColumns",
       "kind": "story",
       "file": "src/components/Table/TableColumnControls.stories.tsx",
@@ -7117,6 +7627,26 @@
       "area": "Dialog",
       "summary": "Story: Components/Dialog / UnsavedChanges",
       "doc": "Components/Dialog UnsavedChanges",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Upload",
+      "kind": "component",
+      "file": "src/components/Upload/Upload.tsx",
+      "area": "Upload",
+      "summary": "Upload - one file or many, as a form field.",
+      "doc": "Upload - one file or many, as a form field. ```tsx <Upload label=\"Choose a file or drop it here\" supporting=\"PDF, DOC or XLSX · up to 10 MB\" hint=\"PDF, DOC or XLSX · up to 10 MB\" items={files} onSelect={handleSelect} onRemove={handleRemove} /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "UploadFileRow",
+      "kind": "component",
+      "file": "src/components/Upload/Upload.tsx",
+      "area": "Upload",
+      "summary": "One file, as a row.",
+      "doc": "One file, as a row. ## 74px, whatever state it is in The floor is the 48px mark plus its padding. Without it a failed row comes out 8px shorter than the others - an error tile is square and a file mark is not - and the list would jump the moment an upload gave up. ## The second line is the reason, not the word \"Failed\" The red border already says it failed. That line is the only place left to say *why*, and spending it on a word you can already see wastes it.",
       "props": [],
       "propDocs": ""
     },
@@ -7187,6 +7717,16 @@
       "area": "Dialog",
       "summary": "Whether this dialog scrolls its body rather than the page behind it.",
       "doc": "Whether this dialog scrolls its body rather than the page behind it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useDialogScrollTail",
+      "kind": "hook",
+      "file": "src/components/Dialog/dialogSpacing.ts",
+      "area": "Dialog",
+      "summary": "The room under the last thing in a scrolling body.",
+      "doc": "The room under the last thing in a scrolling body.",
       "props": [],
       "propDocs": ""
     },
@@ -7317,6 +7857,26 @@
       "area": "Table",
       "summary": "Holds which columns sort the table, and in what order.",
       "doc": "Holds which columns sort the table, and in what order. Like the rest of Table it **holds state and never touches your rows**. It reports that the user wants status ascending then date descending; whether that happens in memory or in a database query is the product's business, and a table backed by a paged API could not use it any other way. ```tsx const sort = useTableSort<ColumnKey>(); <TableHead sortable sortOrder={sort.directionOf('status')} onSort={() => { sort.toggle('status'); }} > Status </TableHead> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useUploadFiles",
+      "kind": "hook",
+      "file": "src/components/Upload/Upload.state.ts",
+      "area": "Upload",
+      "summary": "The list, and what happens to it.",
+      "doc": "The list, and what happens to it. ## Two ways to use it, one component Pass `items` and you own the list - the component draws exactly what you give it and reports what someone did. Leave `items` out and the component keeps the list itself: adding, removing, retrying and the limit all work with no state of your own. ## The line the design system will not cross Even self-managing, it never sends anything. You hand it **one function** that sends a single file and reports progress; it runs that function, drives the bar, and turns a rejection into a row that says why. Signed URLs, chunking, headers and retry policy are different in every product and belong in the product - but *none of that* is a reason for every team to rewrite the list.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "validateSelection",
+      "kind": "utility",
+      "file": "src/components/Upload/Upload.validate.ts",
+      "area": "Upload",
+      "summary": "Check a selection before any of it becomes a row.",
+      "doc": "Check a selection before any of it becomes a row. **Every message names the number.** \"That file is 24 MB, the limit is 10 MB\" tells you what to do next; \"Invalid file\" does not. Room is counted first, then each file is judged on its own. A selection is never all-or-nothing: three good files and one that is too big means three files go in and one message comes back, rather than a form that refuses everything because of one mistake.",
       "props": [],
       "propDocs": ""
     },
@@ -7491,6 +8051,16 @@
       "propDocs": ""
     },
     {
+      "name": "WhenSomethingGoesWrong",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / WhenSomethingGoesWrong",
+      "doc": "Components/Stepper WhenSomethingGoesWrong",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Wide",
       "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
@@ -7507,6 +8077,16 @@
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / WithActionButtons",
       "doc": "Deprecated/Sidebar WithActionButtons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithActions",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / WithActions",
+      "doc": "Components/Banner WithActions",
       "props": [],
       "propDocs": ""
     },
@@ -7661,6 +8241,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithDescription",
+      "kind": "story",
+      "file": "src/components/Banner/Banner.stories.tsx",
+      "area": "Banner",
+      "summary": "Story: Components/Banner / WithDescription",
+      "doc": "Components/Banner WithDescription",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithDescriptions",
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
@@ -7677,6 +8267,16 @@
       "area": "Select",
       "summary": "Story: Components/Select / WithDescriptions",
       "doc": "Components/Select WithDescriptions",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithDescriptions",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / WithDescriptions",
+      "doc": "Components/Stepper WithDescriptions",
       "props": [],
       "propDocs": ""
     },
@@ -7823,10 +8423,10 @@
     {
       "name": "WithForm",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: Components/Dialog / WithForm",
-      "doc": "Components/Dialog WithForm",
+      "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
+      "area": "Dialog stories",
+      "summary": "Story: Deprecated/Dialog stories / WithForm",
+      "doc": "Deprecated/Dialog stories WithForm",
       "props": [],
       "propDocs": ""
     },
@@ -8011,12 +8611,32 @@
       "propDocs": ""
     },
     {
+      "name": "WithLabels",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / WithLabels",
+      "doc": "Components/Progress WithLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithLeftIcon",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
       "area": "Button",
       "summary": "Story: Components/Button / WithLeftIcon",
       "doc": "Components/Button WithLeftIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithLegend",
+      "kind": "story",
+      "file": "src/components/Progress/Progress.stories.tsx",
+      "area": "Progress",
+      "summary": "Story: Components/Progress / WithLegend",
+      "doc": "Components/Progress WithLegend",
       "props": [],
       "propDocs": ""
     },
@@ -8287,6 +8907,16 @@
       "area": "Stack",
       "summary": "Story: Layout/Stack / Wrapping",
       "doc": "Layout/Stack Wrapping",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "YouOwnTheList",
+      "kind": "story",
+      "file": "src/components/Upload/Upload.stories.tsx",
+      "area": "Upload",
+      "summary": "Story: Components/Upload / YouOwnTheList",
+      "doc": "Components/Upload YouOwnTheList",
       "props": [],
       "propDocs": ""
     }
