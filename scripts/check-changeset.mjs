@@ -46,6 +46,7 @@ const shipped = (file) => {
     'vite.config.ts',
     'package.json',
     'AGENTS.md',
+    'MIGRATION-PROMPT.md',
     'CAPABILITIES.md',
     'capability-catalog.json',
   ].includes(file);

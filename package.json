@@ -20,11 +20,13 @@
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json",
     "./AGENTS.md": "./AGENTS.md",
-    "./capability-catalog.json": "./capability-catalog.json"
+    "./capability-catalog.json": "./capability-catalog.json",
+    "./MIGRATION-PROMPT.md": "./MIGRATION-PROMPT.md"
   },
   "files": [
     "dist",
     "AGENTS.md",
+    "MIGRATION-PROMPT.md",
     "CAPABILITIES.md",
     "capability-catalog.json",
     "README.md",

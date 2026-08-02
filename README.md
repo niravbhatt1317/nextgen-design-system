@@ -81,6 +81,12 @@ Put that line in the consuming project's `CLAUDE.md` (or `.cursorrules`, or what
 reads). Bump the package and the rules update — nobody's copy goes stale, and five projects cannot
 end up with five interpretations of the guidance.
 
+**`MIGRATION-PROMPT.md` ships too** — one prompt to paste into a fresh Claude Code session opened
+in a project being migrated. It installs the package, writes the rules into that project's own
+`CLAUDE.md`, surveys what is there before touching anything, and migrates one flow at a time with a
+verification pass after each. Written for somebody who has never chosen a component and will not be
+reviewing the choice.
+
 The catalogue ships too, so the agent can _check_ what exists rather than guess:
 `CAPABILITIES.md` to read, `capability-catalog.json` to filter. Without those, "use the design
 system's component" is an instruction with nothing to check against.
