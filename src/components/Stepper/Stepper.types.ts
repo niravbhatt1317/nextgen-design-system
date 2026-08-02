@@ -12,10 +12,18 @@ export type StepperVariantsType = VariantProps<typeof stepperVariants>;
  * the disc beside its label on one row, separated by a chevron: half the height,
  * and it wraps onto another row rather than breaking its words.
  *
+ * `underline` gives every step a full-width rule beneath its own label instead
+ * of a line between discs. **The bar is the progress, not a connector.** A row
+ * of circles joined by a line says "these are stations on a route"; a row of
+ * underlined labels says "these are the parts, and you have done this many" -
+ * which is what somebody halfway through a form is actually asking. It is the
+ * shape a dialog wants, where a stepper has to fit above a body without taking
+ * a third of the height.
+ *
  * Vertical is deliberately not here. It is a different component with different
- * rules, not a third value on this switch.
+ * rules, not a fourth value on this switch.
  */
-export type StepperLayout = 'stacked' | 'inline';
+export type StepperLayout = 'stacked' | 'inline' | 'underline';
 
 /**
  * What a step is, at this moment.

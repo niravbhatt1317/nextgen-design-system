@@ -579,8 +579,11 @@ describe('DialogSteps', () => {
   });
 
   it('names itself for a screen reader', () => {
+    // A `nav`, not a bare list - that is `Stepper`'s own markup, and it is
+    // better: a labelled landmark can be jumped to, where a labelled list
+    // cannot.
     render(<DialogSteps steps={steps} current={0} label="Invite progress" />);
-    expect(screen.getByRole('list', { name: 'Invite progress' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Invite progress' })).toBeInTheDocument();
   });
 
   it('leaves more room beneath itself than the dialog leaves between blocks', () => {

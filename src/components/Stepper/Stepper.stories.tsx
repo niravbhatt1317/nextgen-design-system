@@ -81,6 +81,16 @@ export const Default: Story = {};
  * `stacked` puts the disc above its label, joined by a line that fills only once
  * you are past it. `inline` sets the disc beside its label on one row with a
  * chevron between — **half the height**, and it wraps rather than breaking words.
+ *
+ * `underline` gives every step a full-width rule beneath its own label instead
+ * of a line between discs. **The bar is the progress, not a connector.** A row
+ * of circles joined by a line says *"these are stations on a route"*; a row of
+ * underlined labels says *"these are the parts, and you have done this many"* —
+ * which is what somebody halfway through a form is actually asking.
+ *
+ * It is what `DialogSteps` draws. That used to be a second implementation of
+ * this idea living in `Dialog`; two answers to one question is a defect, and
+ * the tick would eventually have been fixed in one of them and not the other.
  */
 export const Layouts: Story = {
   parameters: { controls: { disable: true } },
@@ -93,6 +103,10 @@ export const Layouts: Story = {
       <div>
         <Label>inline — half the height</Label>
         <Stepper steps={IMPORT} current={2} layout="inline" aria-label="Import assets" />
+      </div>
+      <div>
+        <Label>underline — the bar is the progress</Label>
+        <Stepper steps={IMPORT} current={2} layout="underline" aria-label="Import assets" />
       </div>
     </Stack>
   ),

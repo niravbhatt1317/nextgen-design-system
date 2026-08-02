@@ -770,101 +770,135 @@ export const Panel: Story = {
 };
 
 /**
- * The Panel's four slots, together.
+ * The Panel's slots — **one dialog each**, because that is how they are used.
  *
- * `media` above the header, `tabs` under it, a back control and a counter in
- * it. Shown composed rather than one story each, because a real panel uses two
- * or three at once and four stories teaching four props in isolation is less
- * useful than one that shows how they sit together.
+ * They were first shown all four at once and it was unreadable: a picture, a
+ * back link, a counter and a row of tabs above one form is not a panel anybody
+ * would design. Each button below opens a panel using the one slot it is about.
  *
- * **`DialogMedia` is the one region with no gutter.** A product shot inset by
- * 16px reads as a picture somebody placed in a dialog; the same shot reaching
- * both edges reads as the dialog's own.
- *
- * **The tabs live inside the header, not above the body.** The header is the
- * part that does not move — tabs that scrolled away with the content would
- * leave you unable to switch back without scrolling up.
- *
- * **Back is not close.** It goes one step back inside the dialog; close leaves.
- * Two exits that do different things have to look different, which is why one
- * is an arrow on the left and the other a cross on the right.
+ * - **Media** — `DialogMedia`, the one region with no gutter. A product shot
+ *   inset by 16px reads as a picture somebody placed in a dialog; the same shot
+ *   reaching both edges reads as the dialog's own.
+ * - **Tabs** — inside the header, not above the body. The header is the part
+ *   that does not move, and tabs that scrolled away would leave you unable to
+ *   switch back without scrolling up.
+ * - **Back and a counter** — for one step of something longer. Back is **not**
+ *   close: it goes back inside the dialog, close leaves. Two exits doing
+ *   different things are drawn differently — an arrow on the left, a cross on
+ *   the right.
  */
 export const PanelSlots: Story = {
   render: function PanelSlotsDemo() {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState<'media' | 'tabs' | 'steps' | null>(null);
     const [tab, setTab] = useState('details');
+    const close = () => {
+      setOpen(null);
+    };
+
+    const rows = (word: string, n: number) =>
+      Array.from({ length: n }, (_, index) => (
+        <Input key={index} label={`${word} ${String(index + 1)}`} placeholder="…" />
+      ));
 
     return (
-      <>
+      <div className="mdt-flex mdt-flex-wrap mdt-gap-2">
         <Button
           onClick={() => {
-            setOpen(true);
+            setOpen('media');
           }}
         >
-          Configure integration
+          Media
         </Button>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent size="lg" scroll="body">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('tabs');
+          }}
+        >
+          Tabs
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpen('steps');
+          }}
+        >
+          Back and counter
+        </Button>
+
+        <Dialog open={open === 'media'} onOpenChange={close}>
+          <DialogContent scroll="body">
             <DialogMedia>
-              {/* A stand-in for a product shot — the point is that it reaches both edges. */}
-              <div className="mdt-flex mdt-h-32 mdt-items-center mdt-justify-center mdt-bg-muted">
-                <span className="mdt-text-xs mdt-text-muted-foreground">
-                  Media reaches both edges — no gutter
-                </span>
+              <div className="mdt-flex mdt-h-36 mdt-items-center mdt-justify-center mdt-bg-muted">
+                <span className="mdt-text-xs mdt-text-muted-foreground">A product shot</span>
               </div>
             </DialogMedia>
+            <DialogHeader>
+              <DialogTitle>Saved views are here</DialogTitle>
+              <DialogDescription>
+                Save a filter and a column layout together, and share them with your team.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button shortcut={['enter']} onClick={close}>
+                Got it
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
+        <Dialog open={open === 'tabs'} onOpenChange={close}>
+          <DialogContent size="lg" scroll="body">
             <DialogHeader
-              onBack={() => {
-                setOpen(false);
-              }}
-              backLabel="All integrations"
-              counter="2 of 5"
               tabs={
                 <Tabs value={tab} onValueChange={setTab}>
-                  <TabsList>
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="access">Access</TabsTrigger>
-                    <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  <TabsList variant="underline">
+                    <TabsTrigger variant="underline" value="details">
+                      Details
+                    </TabsTrigger>
+                    <TabsTrigger variant="underline" value="access">
+                      Access
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
               }
             >
               <DialogTitle>Configure integration</DialogTitle>
-              <DialogDescription>Everything here applies to this workspace only.</DialogDescription>
             </DialogHeader>
-
             <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">
-              {Array.from({ length: 7 }, (_, index) => (
-                <Input
-                  key={index}
-                  label={`${tab === 'details' ? 'Detail' : tab === 'access' ? 'Permission' : 'Option'} ${String(index + 1)}`}
-                  placeholder="Enough rows that the body has to scroll…"
-                />
-              ))}
+              {rows(tab === 'details' ? 'Detail' : 'Permission', 8)}
             </DialogBody>
-
             <DialogFooter align="between">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
+              <Button variant="ghost" onClick={close}>
                 Cancel
               </Button>
-              <Button
-                shortcut={['mod', 'enter']}
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
+              <Button shortcut={['mod', 'enter']} onClick={close}>
                 Save
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </>
+
+        <Dialog open={open === 'steps'} onOpenChange={close}>
+          <DialogContent scroll="body">
+            <DialogHeader onBack={close} backLabel="All integrations" counter="2 of 5">
+              <DialogTitle>Map the fields</DialogTitle>
+              <DialogDescription>
+                Match each column in the file to a field on the ticket.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogBody className="mdt-flex mdt-flex-col mdt-gap-4">{rows('Column', 6)}</DialogBody>
+            <DialogFooter align="between">
+              <Button variant="ghost" onClick={close}>
+                Back
+              </Button>
+              <Button shortcut={['mod', 'enter']} onClick={close}>
+                Next
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     );
   },
 };
