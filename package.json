@@ -18,10 +18,15 @@
       }
     },
     "./styles.css": "./dist/styles.css",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./AGENTS.md": "./AGENTS.md",
+    "./capability-catalog.json": "./capability-catalog.json"
   },
   "files": [
     "dist",
+    "AGENTS.md",
+    "CAPABILITIES.md",
+    "capability-catalog.json",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
