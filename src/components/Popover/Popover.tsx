@@ -45,7 +45,12 @@ const PopoverContent = forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        'mdt-z-50 mdt-w-72 mdt-rounded-md mdt-border mdt-border-border',
+        // A width and a padding, not THE width and THE padding. Both were fixed
+        // at 288px and 16px, so a popover holding one line of text was as wide as
+        // one holding a form and neither could say otherwise without fighting the
+        // class list. Defaults now, overridable by className like everything else.
+        'mdt-z-popover mdt-w-72 mdt-max-w-[calc(100vw-2rem)] mdt-rounded-2xl',
+        'mdt-border mdt-border-border',
         'mdt-bg-popover mdt-p-4 mdt-text-popover-foreground mdt-shadow-md',
         'mdt-outline-none',
         'data-[state=open]:mdt-animate-in data-[state=closed]:mdt-animate-out',

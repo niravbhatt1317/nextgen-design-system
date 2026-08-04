@@ -54,6 +54,9 @@ const config: Config = {
           DEFAULT: 'hsl(var(--mdt-destructive) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-destructive-foreground) / <alpha-value>)',
         },
+        // Red words. A surface you put white text on and a colour you read as
+        // text cannot be the same value - see globals.css.
+        'danger-text': 'hsl(var(--mdt-danger-text) / <alpha-value>)',
         muted: {
           DEFAULT: 'hsl(var(--mdt-muted) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-muted-foreground) / <alpha-value>)',

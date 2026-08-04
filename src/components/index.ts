@@ -175,15 +175,22 @@ export type {
   DialogCloseProps,
 } from './Dialog';
 
-// DropdownMenu
+// DropdownMenu — a panel of things you DO. A menu is things you do; a select
+// is a value you submit. Sort-by and filter sit between the two and live here
+// as its choosing variants, not as three more components.
 export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuList,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
   DropdownMenuRadioItem,
   DropdownMenuLabel,
+  DropdownMenuHeader,
+  DropdownMenuSearch,
+  DropdownMenuSelectAll,
+  DropdownMenuFooter,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuGroup,
@@ -203,10 +210,16 @@ export type {
   DropdownMenuSubTriggerProps,
   DropdownMenuSubContentProps,
   DropdownMenuContentProps,
+  DropdownMenuListProps,
   DropdownMenuItemProps,
   DropdownMenuCheckboxItemProps,
   DropdownMenuRadioItemProps,
+  DropdownMenuRadioIndicator,
   DropdownMenuLabelProps,
+  DropdownMenuHeaderProps,
+  DropdownMenuSearchProps,
+  DropdownMenuSelectAllProps,
+  DropdownMenuFooterProps,
   DropdownMenuSeparatorProps,
   DropdownMenuShortcutProps,
 } from './DropdownMenu';

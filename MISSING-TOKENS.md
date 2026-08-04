@@ -397,3 +397,26 @@ on, as distinct from the page. Worth naming before a second component needs it a
 different shade.
 
 ---
+
+## Colour — a red for WORDS, as distinct from a red surface
+
+**Status:** ✅ Filled, as `--mdt-danger-text` · **Found by:** `DropdownMenu`'s destructive row
+
+`--mdt-destructive` is tuned to carry white text **on** it — that is why it points at `red-65` in
+light and `red-60` in dark, both deep enough for white to sit on top. Being read **as** text is a
+different job, and on a dark popover the same value measured **3.43**, under the 4.5 floor. A red
+menu row was failing quietly in dark mode.
+
+`--mdt-danger-text` is `red-65` in light and `red-50` in dark, which measures **5.69** and **5.07**
+against a popover. Both steps already existed on the ramp; nothing was invented.
+
+| Token               | Light    | Dark     | For                          |
+| ------------------- | -------- | -------- | ---------------------------- |
+| `--mdt-destructive` | `red-65` | `red-60` | A surface with white text on |
+| `--mdt-danger-text` | `red-65` | `red-50` | Red words on an ordinary bg  |
+
+Exactly the shape of the note above about `--mdt-success` pointing at `green-70` rather than the
+brighter `green-50`: **a fill colour and an ink colour cannot be the same value.** Worth checking
+whether `warning` and `info` have the same problem wherever they are used as text.
+
+---

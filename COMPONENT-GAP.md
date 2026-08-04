@@ -118,6 +118,23 @@ What it wants, when it is picked up:
 Deliberately not done in `nirav/dialog-and-kbd`: that branch's job was to make one `Kbd` exist and
 to give `Button` a way to seat it. Documenting `Button`'s own surface is `Button`'s branch.
 
+## Menu rework — done, and one migration cleared
+
+`DropdownMenu` and `Popover` were the last two components never redesigned. `npm run find -- "select
+all" menu` returned **nothing**, so the select-all band is genuinely new and is logged here as the
+file asks.
+
+The menu gained a panel header, a search box, a select-all band with a real in-between state, a
+height cap that scrolls, and a footer — each optional. A row now has two independent ends and
+reserves no room it is not using.
+
+**`DropdownMenuShortcut` now draws `Kbd`**, which clears one of the three migrations listed under
+_Kbd — built, and three callers still to migrate_. **`CommandShortcut` and `Sidebar`'s inline
+`<kbd>` are still outstanding** and still want their own branch.
+
+One token came out of it: `--mdt-danger-text`, because `--mdt-destructive` measured 3.43 against a
+dark popover when read as text — under the 4.5 floor. Recorded in `MISSING-TOKENS.md`.
+
 ## The short version
 
 |                                      | Count  |

@@ -172,6 +172,18 @@
     --mdt-destructive: var(--mdt-red-65);
     --mdt-destructive-foreground: var(--mdt-white);
 
+    /* Red WORDS, as distinct from a red surface.
+
+       `destructive` is tuned to carry white text ON it, which is a different
+       job from being read AS text. In dark mode that leaves it at 3.43 against
+       a popover - under the 4.5 floor - so a red menu row was failing quietly.
+       One step lighter clears it at 5.07 and light mode does not move.
+
+       Exactly the reason `--mdt-success` already points at green-70 rather
+       than the brighter green-50: a fill colour and an ink colour cannot be
+       the same value. */
+    --mdt-danger-text: var(--mdt-red-65);
+
     --mdt-warning: var(--mdt-orange-50);
     --mdt-warning-foreground: var(--mdt-black);
 
@@ -384,6 +396,7 @@
     --mdt-accent-foreground: var(--mdt-blue-20);
 
     --mdt-destructive: var(--mdt-red-60);
+    --mdt-danger-text: var(--mdt-red-50);
     --mdt-destructive-foreground: var(--mdt-white);
 
     --mdt-warning: var(--mdt-orange-60);
