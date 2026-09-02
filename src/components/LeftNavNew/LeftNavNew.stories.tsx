@@ -64,9 +64,10 @@ function labelOf(key: string, collections: LeftNavNewCollection[]): string {
 }
 
 /**
- * The frame every story shares: the trigger sits in the page header band
- * ([panel icon] | title), exactly where the product keeps it, and the canvas
- * echoes whatever the rail last selected.
+ * The frame every story shares, shaped like the console's shell: the rail owns
+ * the full height on the left, and everything else is the right section. The
+ * trigger sits in THAT section's header band ([panel icon] | title) — there is
+ * no full-width top bar. The canvas echoes whatever the rail last selected.
  */
 function WorkspaceDemo({
   startCollapsed = false,
@@ -97,40 +98,39 @@ function WorkspaceDemo({
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',
         height: '100vh',
         background: 'hsl(var(--mdt-background))',
       }}
     >
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          height: 48,
-          padding: '0 12px',
-          borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
-          flex: '0 0 auto',
+      <LeftNavNew
+        collections={collections}
+        activeKey={active}
+        onSelect={setActive}
+        onSettings={() => {
+          setActive('settings');
         }}
-      >
-        <LeftNavNewTrigger
-          collapsed={collapsed}
-          onToggle={() => {
-            setCollapsed(!collapsed);
+        {...(withAccount ? { account } : {})}
+        collapsed={collapsed}
+      />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        <header
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: 48,
+            padding: '0 12px',
+            borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
+            flex: '0 0 auto',
           }}
-        />
-        <span style={{ fontSize: 13, color: 'hsl(var(--mdt-muted-foreground))' }}>Workspace</span>
-      </header>
-      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <LeftNavNew
-          collections={collections}
-          activeKey={active}
-          onSelect={setActive}
-          onSettings={() => {
-            setActive('settings');
-          }}
-          {...(withAccount ? { account } : {})}
-          collapsed={collapsed}
-        />
+        >
+          <LeftNavNewTrigger
+            collapsed={collapsed}
+            onToggle={() => {
+              setCollapsed(!collapsed);
+            }}
+          />
+          <span style={{ fontSize: 13, color: 'hsl(var(--mdt-muted-foreground))' }}>Workspace</span>
+        </header>
         <main
           style={{
             flex: 1,
