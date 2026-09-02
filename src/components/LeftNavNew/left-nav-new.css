@@ -1,0 +1,973 @@
+/* LeftNav New — the merged console's approved workspace navigation, ported
+ * verbatim as a PARALLEL component for review. The existing LeftNav is
+ * untouched; this file is the console's `sidebarNav.css` + `orgSwitcher.css`
+ * merged, with two changes made for this port:
+ *
+ *   1. Two raw hexes that were tokens by value are now tokens by name:
+ *      #ECF1F9 → hsl(var(--mdt-neutral-20)), #1D2B3E → hsl(var(--mdt-neutral-130)).
+ *   2. Rows gained the design system's focus-visible ring (the one thing the
+ *      console version lacked against the LeftNav parity audit).
+ *
+ * The remaining raw hexes are values the token set does not name yet (dark
+ * hover/section greys, the six avatar tone pairs). They are flagged, not
+ * hidden — naming them is part of this PR's review. */
+
+/* ── the design system's focus recipe (ring-2 ring-ring offset-1) in plain CSS ── */
+.snv-row:focus-visible,
+.snv-trigger:focus-visible,
+.ogsw-card:focus-visible,
+.ogsw-row:focus-visible,
+.ogsw-gbtn:focus-visible,
+.ogsw-door:focus-visible,
+.ogsw-out:focus-visible,
+.ogsw-tseg button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px hsl(var(--mdt-background)),
+    0 0 0 3px hsl(var(--mdt-ring));
+}
+
+.snv-mid {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── the quiet search — rail-wide; ⌘K hands it the caret ── */
+.snv-line {
+  height: 38px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  transition:
+    height 0.18s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.14s linear;
+}
+.snv-srch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin: 0 12px 6px;
+  padding: 0 8px;
+  /* one step up from --mdt-border — the faintest grey was invisible at rest */
+  border: 1px solid hsl(var(--mdt-neutral-30));
+  border-radius: 8px;
+  background: transparent;
+  cursor: text;
+  transition: border-color 0.12s;
+}
+.snv-srch:focus-within {
+  border-color: hsl(var(--mdt-muted-foreground));
+}
+.snv-srch svg {
+  color: hsl(var(--mdt-muted-foreground));
+  flex: 0 0 auto;
+}
+.snv-srch input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: hsl(var(--mdt-foreground));
+}
+.snv-srch input::placeholder {
+  color: hsl(var(--mdt-muted-foreground));
+}
+.snv-kbd {
+  font-size: 12px;
+  color: hsl(var(--mdt-muted-foreground));
+  letter-spacing: 0.04em;
+  flex: 0 0 auto;
+  cursor: default;
+}
+
+/* ── the scrolling list ── */
+.snv-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 12px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--mdt-border)) transparent;
+}
+.snv-body::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.snv-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.snv-body::-webkit-scrollbar-thumb {
+  background: hsl(var(--mdt-border));
+  border-radius: 99px;
+}
+@keyframes snv-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.snv-body {
+  animation: snv-in 0.24s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .snv-body {
+    animation: none;
+  }
+  .snv-line {
+    transition: none;
+  }
+}
+
+/* ── rows: 14px text, ink at reduced strength at rest, full ink when selected;
+ *    the FILL alone carries the selected state at normal weight ── */
+.snv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  color: hsl(var(--mdt-foreground) / 0.72);
+  margin-bottom: 2px;
+}
+.dark .snv-row {
+  color: hsl(var(--mdt-foreground) / 0.84);
+}
+.snv-row svg {
+  flex: 0 0 auto;
+  color: hsl(var(--mdt-foreground) / 0.72);
+}
+.dark .snv-row svg {
+  color: hsl(var(--mdt-foreground) / 0.84);
+}
+.snv-row:hover {
+  background: hsl(var(--mdt-neutral-20));
+}
+.dark .snv-row:hover {
+  background: hsl(var(--mdt-neutral-130));
+}
+.snv-row[data-on='true'] {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+.dark .snv-row[data-on='true'] {
+  background: hsl(var(--mdt-neutral-130));
+}
+.snv-row[data-on='true'] svg {
+  color: hsl(var(--mdt-foreground));
+}
+.snv-lbl {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.snv-meta {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.snv-livedot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: hsl(var(--mdt-success));
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+/* not-yet-available: icon + text fade to 40%, the badge keeps full strength */
+.snv-off {
+  cursor: default;
+  color: hsl(var(--mdt-foreground));
+}
+.snv-off:hover {
+  background: transparent;
+}
+.snv-off > svg,
+.snv-off .snv-lbl {
+  opacity: 0.4;
+}
+/* the console's disabled look (Nothing starred yet): whole row, ink at 50% */
+.snv-dis {
+  cursor: default;
+  color: hsl(var(--mdt-foreground));
+  opacity: 0.5;
+}
+.snv-dis:hover {
+  background: transparent;
+}
+/* quiet non-action rows (More) */
+.snv-ghost {
+  cursor: default;
+}
+.snv-ghost:hover {
+  background: transparent;
+}
+
+/* ── section labels: 12px on a 24px slot; a hairline separator lives in the gap
+ *    above — none above the first. The label grey is an ACCEPTED contrast
+ *    exception in the console (#9B9EAA, 2.55:1 — intentional). ── */
+.snv-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 18px 2px 2px;
+  padding: 0 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9b9eaa;
+}
+.dark .snv-label {
+  color: #a7b0bf;
+}
+.snv-body > .snv-label:first-child {
+  margin-top: 6px;
+}
+.snv-label::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -11px;
+  height: 1px;
+  background: hsl(var(--mdt-neutral-20));
+}
+.dark .snv-label::before {
+  background: #222933;
+}
+.snv-body > .snv-label:first-child::before {
+  display: none;
+}
+
+/* ── the folder tree: the folder IS the open/closed state; boards hang off ONE
+ *    continuous spine with rounded branch curves. Each board owns its segment
+ *    of the spine, so hovering board N lights only the path to N, and the
+ *    selected board's path stays dark persistently. Overlapping strokes are
+ *    avoided on purpose — they rendered denser and read as two colours. ── */
+.snv-tfold {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.snv-kids {
+  position: relative;
+  margin-left: 20px;
+  padding: 2px 0;
+  overflow: hidden;
+}
+.snv-kids .snv-row {
+  position: relative;
+  margin-left: 12px;
+  width: calc(100% - 12px);
+  padding-left: 8px;
+}
+/* rest is drawn from the muted grey, not the hairline — visible on low-density screens too */
+.snv-kids .snv-row::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: calc(50% - 7px);
+  height: 7px;
+  width: 9px;
+  border-left: 1px solid hsl(var(--mdt-muted-foreground) / 0.3);
+  border-bottom: 1px solid hsl(var(--mdt-muted-foreground) / 0.3);
+  border-bottom-left-radius: 7px;
+  transition: border-color 0.15s;
+  pointer-events: none;
+}
+.snv-kids .snv-row::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: -999px;
+  bottom: calc(50% + 7px);
+  width: 1px;
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 20%, hsl(var(--mdt-neutral-10)));
+  transition: background 0.15s;
+  pointer-events: none;
+}
+.dark .snv-kids .snv-row::after {
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 20%, hsl(var(--mdt-neutral-150)));
+}
+/* connector tones, ordered: rest lightest → hover the middle → selected the darkest */
+.snv-kids .snv-row:hover {
+  z-index: 1;
+}
+.snv-kids .snv-row:hover::after {
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 52%, hsl(var(--mdt-neutral-10)));
+}
+.dark .snv-kids .snv-row:hover::after {
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 52%, hsl(var(--mdt-neutral-150)));
+}
+.snv-kids .snv-row:hover::before {
+  border-color: hsl(var(--mdt-muted-foreground) / 0.7);
+}
+.snv-kids .snv-row[data-on='true'] {
+  z-index: 2;
+}
+.snv-kids .snv-row[data-on='true']::after {
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 78%, hsl(var(--mdt-neutral-10)));
+}
+.dark .snv-kids .snv-row[data-on='true']::after {
+  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 78%, hsl(var(--mdt-neutral-150)));
+}
+.snv-kids .snv-row[data-on='true']::before {
+  border-color: hsl(var(--mdt-muted-foreground));
+}
+
+/* ── the pinned bottom zone (Settings) ── */
+.snv-pinned {
+  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  padding: 6px 12px;
+  flex: 0 0 auto;
+}
+.dark .snv-pinned {
+  border-top-color: #222933;
+}
+.snv-pinned .snv-row {
+  margin-bottom: 0;
+}
+
+/* ── the "soon" badge: neutral fill, no outline, full strength on the faded row ── */
+.snv-soon {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: hsl(var(--mdt-foreground));
+  opacity: 0.7;
+  background: #e4e7eb;
+  border-radius: 99px;
+  padding: 1px 7px;
+}
+.dark .snv-soon {
+  background: #2a313b;
+}
+
+/* ── the collapse trigger: [panel icon] | breadcrumbs, in the page header band ── */
+.snv-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: hsl(var(--mdt-muted-foreground));
+  flex: 0 0 auto;
+}
+.snv-trigger:hover {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+.dark .snv-trigger:hover {
+  background: hsl(var(--mdt-neutral-130));
+}
+.snv-trigdiv {
+  width: 1px;
+  height: 16px;
+  background: hsl(var(--mdt-border));
+  margin: 0 10px 0 8px;
+  flex: 0 0 auto;
+}
+
+/* ── the collapsed rail: 56px icon bar. Names survive as tooltips; a collapsed
+ *    collection shows its boards in a hover flyout. The account card collapses
+ *    to its avatar alone. ── */
+.snv-cardwrap {
+  padding: 10px 12px;
+  flex: 0 0 auto;
+}
+.snv-railwrap {
+  display: contents;
+}
+.snv-railwrap[data-collapsed='true'] .snv-cardwrap {
+  padding: 10px 6px;
+}
+.snv-railwrap[data-collapsed='true'] .ogsw-card {
+  justify-content: center;
+  padding: 8px 0;
+  gap: 0;
+}
+.snv-railwrap[data-collapsed='true'] .ogsw-card > *:not(.ogsw-av) {
+  display: none;
+}
+.snv-railwrap[data-collapsed='true'] .snv-line {
+  display: none;
+}
+.snv-railwrap[data-collapsed='true'] .snv-body {
+  padding: 8px 0;
+}
+.snv-railwrap[data-collapsed='true'] .snv-body .snv-row {
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0 auto 2px;
+  justify-content: center;
+}
+.snv-railwrap[data-collapsed='true'] .snv-row .snv-lbl,
+.snv-railwrap[data-collapsed='true'] .snv-row .snv-meta {
+  display: none;
+}
+.snv-railwrap[data-collapsed='true'] .snv-kids {
+  display: none;
+}
+.snv-railwrap[data-collapsed='true'] .snv-label {
+  height: 1px;
+  margin: 10px 16px;
+  padding: 0;
+  overflow: hidden;
+  color: transparent;
+  background: hsl(var(--mdt-neutral-20));
+}
+.dark .snv-railwrap[data-collapsed='true'] .snv-label {
+  background: #222933;
+}
+.snv-railwrap[data-collapsed='true'] .snv-label::before {
+  display: none;
+}
+.snv-railwrap[data-collapsed='true'] .snv-pinned {
+  padding: 6px 0;
+}
+.snv-railwrap[data-collapsed='true'] .snv-pinned .snv-row {
+  width: 32px;
+  margin: 0 auto;
+}
+/* the first label-bar would double the card hairline right above it — drop it */
+.snv-railwrap[data-collapsed='true'] .snv-body > .snv-label:first-child {
+  display: none;
+}
+
+/* the flyout: a collapsed collection's boards on hover */
+.snv-flyhead {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9b9eaa;
+  padding: 4px 8px 6px;
+}
+.dark .snv-flyhead {
+  color: #a7b0bf;
+}
+
+/* ══ the account card + destination panel (the console's approved org
+ *    switcher). Type scale 13/12/11, weights 600 identity / 500 actions /
+ *    400 listing, icons 14px at 1.5px stroke. ══ */
+
+/* The account card — flat at rest, a quiet wash on hover and while open. */
+.ogsw-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mdt-radius);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: hsl(var(--mdt-foreground));
+  transition: background 0.15s;
+}
+.ogsw-card:hover,
+.ogsw-card[data-open='true'] {
+  background: hsl(var(--mdt-neutral-20));
+}
+.ogsw-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: hsl(var(--mdt-info));
+  color: hsl(0 0% 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.ogsw-nm {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ogsw-sub {
+  display: block;
+  font-size: 11px;
+  color: hsl(var(--mdt-muted-foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The panel itself (PopoverContent). */
+.ogsw-panel {
+  width: 280px;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+/* Where you ARE — information, never a control. */
+.ogsw-here {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  cursor: default;
+  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+}
+.ogsw-hic {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--mdt-info));
+  color: hsl(0 0% 100%);
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ogsw-ht {
+  min-width: 0;
+  flex: 1;
+}
+.ogsw-hn {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ogsw-hs {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: hsl(var(--mdt-muted-foreground));
+  line-height: 1.3;
+}
+
+/* The count line that morphs into the search input. */
+.ogsw-lsthead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 8px 0 14px;
+  flex: 0 0 auto;
+}
+.ogsw-count {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.ogsw-gbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.ogsw-gbtn:hover {
+  background: hsl(var(--mdt-neutral-10));
+  color: hsl(var(--mdt-foreground));
+}
+.ogsw-vdiv {
+  width: 1px;
+  height: 14px;
+  background: hsl(var(--mdt-border));
+  margin: 0 2px;
+  flex: 0 0 auto;
+}
+
+/* The reusable inputbox, with the ✕ inside. */
+.ogsw-inputbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 4px 0 12px;
+  background: transparent;
+  border: 1px solid hsl(var(--mdt-border));
+  border-radius: 7px;
+  transition: border-color 0.12s;
+}
+.ogsw-inputbox:focus-within {
+  border-color: hsl(var(--mdt-muted-foreground));
+}
+.ogsw-inputbox input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  color: hsl(var(--mdt-foreground));
+  background: transparent;
+}
+/* the BOX carries the focus look, not the bare input */
+.ogsw-inputbox input:focus-visible {
+  outline: none;
+}
+.ogsw-inputbox input::placeholder {
+  color: hsl(var(--mdt-muted-foreground));
+}
+.ogsw-inputbox .ogsw-gbtn {
+  width: 24px;
+  height: 22px;
+}
+.ogsw-sic {
+  color: hsl(var(--mdt-muted-foreground));
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+/* The heading-less scrolling list — recents float up silently.
+ * Scrollbar: thumb only, no track fill. */
+.ogsw-list {
+  max-height: 224px;
+  overflow-y: auto;
+  padding: 0 6px 6px;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--mdt-border)) transparent;
+}
+.ogsw-list::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.ogsw-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ogsw-list::-webkit-scrollbar-thumb {
+  background: hsl(var(--mdt-border));
+  border-radius: 99px;
+}
+.ogsw-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: hsl(var(--mdt-foreground));
+}
+.ogsw-row:hover {
+  background: hsl(var(--mdt-neutral-10));
+}
+.ogsw-glyph {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+.ogsw-who {
+  min-width: 0;
+  flex: 1;
+}
+.ogsw-n {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* margin 11px + parent gap 9px = the approved 20px minimum from the name */
+.ogsw-go {
+  display: none;
+  align-items: center;
+  gap: 3px;
+  color: hsl(var(--mdt-info));
+  font-size: 11px;
+  font-weight: 600;
+  flex: 0 0 auto;
+  margin-left: 11px;
+}
+.ogsw-row:hover .ogsw-go {
+  display: inline-flex;
+}
+.ogsw-empty {
+  padding: 14px 12px;
+  font-size: 12px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+
+/* The way back up — only exists while inside an organization. */
+.ogsw-doorsec {
+  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  flex: 0 0 auto;
+}
+.ogsw-door {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 6px;
+  width: calc(100% - 12px);
+  padding: 8px 10px;
+  border: 1px dashed hsl(var(--mdt-info) / 0.4);
+  background: hsl(var(--mdt-blue-10));
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: hsl(var(--mdt-foreground));
+}
+.ogsw-door:hover {
+  border-style: solid;
+}
+.ogsw-fic {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--mdt-info));
+  color: hsl(0 0% 100%);
+  flex: 0 0 auto;
+}
+.ogsw-fn {
+  font-weight: 500;
+  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.ogsw-doorgo {
+  margin-left: auto;
+  color: hsl(var(--mdt-info));
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+/* Footer: email + ⋯ row and the theme tabs… */
+.ogsw-footsec {
+  border-top: 1px solid hsl(var(--mdt-border));
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+.ogsw-frow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 2px 4px 2px 8px;
+  border-radius: 6px;
+}
+.ogsw-mail {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: hsl(var(--mdt-muted-foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Track one ladder step darker than the panel hovers — at neutral-10 it
+ * vanished on low-contrast screens. */
+.ogsw-tseg {
+  display: flex;
+  gap: 2px;
+  background: hsl(var(--mdt-neutral-20));
+  border-radius: 8px;
+  padding: 3px;
+  margin: 4px 8px;
+}
+.ogsw-tseg button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: hsl(var(--mdt-muted-foreground));
+  cursor: pointer;
+}
+.ogsw-tseg button.ogsw-on {
+  background: hsl(var(--mdt-popover));
+  color: hsl(var(--mdt-foreground));
+  font-weight: 600;
+}
+
+/* …then Log out, sectioned off on its own, red with a light-red hover. */
+.ogsw-outsec {
+  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+.ogsw-out {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 2px 4px 2px 8px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  color: hsl(var(--mdt-destructive));
+}
+.ogsw-out:hover {
+  background: hsl(var(--mdt-destructive) / 0.08);
+}
+/* The dark destructive red measures 3.43:1 on the dark panel — below the 4.5
+ * text bar. The approved mock's dark red passes; use it. */
+.dark .ogsw-out {
+  color: #f97066;
+}
+
+/* "Powered by" quieter than the wordmark beside it. */
+.ogsw-powered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 12px 12px;
+  font-size: 11px;
+  color: hsl(var(--mdt-muted-foreground) / 0.65);
+  flex: 0 0 auto;
+}
+.ogsw-powered svg {
+  display: block;
+  opacity: 0.75;
+}
+
+/* Dark equivalents for values the `.dark` token block does not redefine —
+ * part of the pending-naming review list. */
+.dark .ogsw-card:hover,
+.dark .ogsw-card[data-open='true'] {
+  background: #212936;
+}
+.dark .ogsw-here,
+.dark .ogsw-doorsec,
+.dark .ogsw-outsec {
+  border-color: #222933;
+}
+.dark .ogsw-tseg {
+  background: #222933;
+}
+.dark .ogsw-door {
+  background: #15283e;
+}
+
+/* The six approved avatar tone pairs (light, then dark) — the one non-token
+ * palette: the token set has no categorical avatar palette yet. Assigned to
+ * an organization by stable index. */
+.ogsw-t0 {
+  background: #e8f0fc;
+  color: #2a6fdb;
+}
+.ogsw-t1 {
+  background: #e7f5ee;
+  color: #1d7a50;
+}
+.ogsw-t2 {
+  background: #fdf0db;
+  color: #b87a0f;
+}
+.ogsw-t3 {
+  background: #fde7eb;
+  color: #d14a66;
+}
+.ogsw-t4 {
+  background: #f5e9f9;
+  color: #9042bf;
+}
+.ogsw-t5 {
+  background: #eef0f4;
+  color: #516381;
+}
+.dark .ogsw-t0 {
+  background: #1b2a44;
+  color: #7faaf0;
+}
+.dark .ogsw-t1 {
+  background: #16302a;
+  color: #63c79e;
+}
+.dark .ogsw-t2 {
+  background: #33290f;
+  color: #e0b25b;
+}
+.dark .ogsw-t3 {
+  background: #3a1e26;
+  color: #ee93a8;
+}
+.dark .ogsw-t4 {
+  background: #2c1f38;
+  color: #c08fe8;
+}
+.dark .ogsw-t5 {
+  background: #232a34;
+  color: #9aa8bc;
+}
