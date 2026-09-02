@@ -43,14 +43,23 @@ const COLLECTIONS: LeftNavNewCollection[] = [
   },
 ];
 
-/* Demo organizations — obviously-fictional names, sized so the member-count
- * formatting shows both its forms. */
+/* The console's first ten organizations, names verbatim, so the panel reads
+ * exactly like the product. Per-org member counts are demo values in the
+ * console's own 40–1,440 range; MSP_TOTAL is the product's real 50-org
+ * population, carried explicitly so the where-you-are strip matches. */
 const ORGS = [
-  { id: 'northwind', name: 'Northwind Traders', memberCount: 1284 },
-  { id: 'fabrikam', name: 'Fabrikam', memberCount: 342 },
-  { id: 'contoso', name: 'Contoso Ltd', memberCount: 2210 },
-  { id: 'wayside', name: 'Wayside Systems', memberCount: 96 },
+  { id: 'finserve', name: 'Finserve Bank', memberCount: 1284 },
+  { id: 'acmehealth', name: 'Acme Healthcare', memberCount: 812 },
+  { id: 'northwind', name: 'Northwind Manufacturing', memberCount: 1391 },
+  { id: 'kestrel', name: 'Kestrel Retail Group', memberCount: 264 },
+  { id: 'voltaic', name: 'Voltaic Energy', memberCount: 508 },
+  { id: 'beacon', name: 'Beacon Legal LLP', memberCount: 129 },
+  { id: 'saffron', name: 'Saffron Hospitality', memberCount: 976 },
+  { id: 'polaris', name: 'Polaris Logistics', memberCount: 1108 },
+  { id: 'mosaic', name: 'Mosaic Education Trust', memberCount: 342 },
+  { id: 'cedarwood', name: 'Cedarwood Public Library', memberCount: 87 },
 ];
+const MSP_TOTAL = 38700;
 
 const FIXED_ROWS: Record<string, string> = {
   settings: 'Settings',
@@ -71,7 +80,7 @@ function labelOf(key: string, collections: LeftNavNewCollection[]): string {
  */
 function WorkspaceDemo({
   startCollapsed = false,
-  startOrg = 'northwind',
+  startOrg = 'finserve',
   startActive = 'warroom',
   collections = COLLECTIONS,
   withAccount = true,
@@ -89,6 +98,7 @@ function WorkspaceDemo({
   const account: LeftNavNewAccount = {
     email: 'demo.admin@motadata.com',
     orgs: ORGS,
+    totalMembers: MSP_TOTAL,
     currentOrgId: orgId,
     onSwitchOrg: setOrgId,
     theme,
@@ -148,13 +158,14 @@ function WorkspaceDemo({
 }
 
 /**
- * The whole rail, as the product ships it: account/place card at the top,
- * the quiet search (⌘K works), Inbox and Explore, the folder tree with its
- * connector spine, and Settings pinned at the bottom. Click a folder to fold
- * its boards; type in the search to filter them.
+ * The whole rail, as the product ships it: account/place card at the top
+ * (starting in the MSP-wide view, exactly where the product lands after
+ * login), the quiet search (⌘K works), Inbox and Explore, the folder tree
+ * with its connector spine, and Settings pinned at the bottom. Click a folder
+ * to fold its boards; type in the search to filter them.
  */
 export const Workspace: Story = {
-  render: () => <WorkspaceDemo />,
+  render: () => <WorkspaceDemo startOrg={null} />,
 };
 
 /**
@@ -170,11 +181,11 @@ export const CollapsedRail: Story = {
 /**
  * The account card opens the destination panel to its right: where you are,
  * the go-to-organization list (recently-left places float up), the MSP-wide
- * door, then email, theme tabs, and Log out. This story starts in the
- * MSP-wide view — travel into an organization and back.
+ * door, then email, theme tabs, and Log out. This story starts inside an
+ * organization so the door shows — travel out and back.
  */
 export const AccountSwitcher: Story = {
-  render: () => <WorkspaceDemo startOrg={null} />,
+  render: () => <WorkspaceDemo />,
 };
 
 /**

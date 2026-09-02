@@ -39,6 +39,11 @@ const LBL = 'snv-lbl';
 const ON = 'true';
 const GBTN = 'ogsw-gbtn';
 const FOLDER = 'folder';
+/* Every root the component renders into (the rail, both popover portals, the
+ * trigger) wears this class — it carries the console's palette layer, defined
+ * in left-nav-new.css. Portals leave the rail's DOM, so the class must ride
+ * on each of them, not just the nav. */
+const SCOPE = 'lnn-scope';
 
 /* ── small helpers, ported from the console ─────────────────────────────── */
 
@@ -225,6 +230,7 @@ function CollectionBlock({
           side="right"
           align="start"
           sideOffset={6}
+          className={SCOPE}
           style={{ padding: 6, width: 208 }}
           onOpenAutoFocus={(e) => {
             e.preventDefault();
@@ -275,7 +281,7 @@ function SwitcherPanel({
   const { orgs } = account;
   const hereId = account.currentOrgId ?? null;
   const hereOrg = hereId === null ? null : (orgs.find((o) => o.id === hereId) ?? null);
-  const totalMembers = orgs.reduce((sum, o) => sum + o.memberCount, 0);
+  const totalMembers = account.totalMembers ?? orgs.reduce((sum, o) => sum + o.memberCount, 0);
   const theme = account.theme ?? 'light';
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -532,7 +538,7 @@ function AccountCard({ account }: { account: LeftNavNewAccount }) {
         side="right"
         align="start"
         sideOffset={8}
-        className="ogsw-panel"
+        className={cn(SCOPE, 'ogsw-panel')}
         style={{ padding: 0, width: 280 }}
         onEscapeKeyDown={(e) => {
           /* first Escape closes the SEARCH, a second closes the panel */
@@ -566,14 +572,14 @@ export function LeftNavNewTrigger({
     <>
       <button
         type="button"
-        className="snv-trigger"
+        className={cn(SCOPE, 'snv-trigger')}
         title={label}
         aria-label={label}
         onClick={onToggle}
       >
         <Icon name="panel-left" size={16} />
       </button>
-      {withDivider ? <span className="snv-trigdiv" aria-hidden="true" /> : null}
+      {withDivider ? <span className={cn(SCOPE, 'snv-trigdiv')} aria-hidden="true" /> : null}
     </>
   );
 }
@@ -633,7 +639,7 @@ export function LeftNavNew({
   return (
     <LeftNav
       label={label}
-      className={className}
+      className={cn(SCOPE, className)}
       style={{
         height: '100%',
         flex: '0 0 auto',
@@ -679,23 +685,14 @@ export function LeftNavNew({
           </div>
 
           <div className="snv-body">
-            <button
-              type="button"
-              className={ROW}
-              data-on={activeKey === 'inbox' ? ON : undefined}
-              title="Inbox"
-              onClick={() => onSelect?.('inbox')}
-            >
+            {/* Inbox and Explore are inert in the console (placeholder rows).
+             * Replicated as-is — do not wire them without the console doing
+             * it first. */}
+            <button type="button" className={ROW} title="Inbox">
               <Icon name="inbox" size={16} />
               <span className={LBL}>Inbox</span>
             </button>
-            <button
-              type="button"
-              className={ROW}
-              data-on={activeKey === 'explore' ? ON : undefined}
-              title="Explore"
-              onClick={() => onSelect?.('explore')}
-            >
+            <button type="button" className={ROW} title="Explore">
               <Icon name="compass" size={16} />
               <span className={LBL}>Explore</span>
             </button>

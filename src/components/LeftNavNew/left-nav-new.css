@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* LeftNav New — the merged console's approved workspace navigation, ported
  * verbatim as a PARALLEL component for review. The existing LeftNav is
  * untouched; this file is the console's `sidebarNav.css` + `orgSwitcher.css`
@@ -11,6 +13,40 @@
  * The remaining raw hexes are values the token set does not name yet (dark
  * hover/section greys, the six avatar tone pairs). They are flagged, not
  * hidden — naming them is part of this PR's review. */
+
+/* ══ the console's palette layer, carried WITH the component ══
+ *
+ * The console re-points these tokens app-wide in LIGHT mode (its global.css
+ * does it under `:root:not(.dark)`; in dark it deliberately falls back to the
+ * design system's own values, so dark needs no overrides here). The rail was
+ * DESIGNED on these values — without them every tint drifts, measured against
+ * the live product. Scoped to `.lnn-scope` so nothing else in the design
+ * system moves. Each line is a candidate for a real token home — part of this
+ * PR's naming review. */
+.lnn-scope {
+  font-family:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Arial,
+    sans-serif,
+    system-ui,
+    sans-serif;
+}
+:root:not(.dark) .lnn-scope {
+  --mdt-border: var(--mdt-neutral-20); /* the console's one-border-grey ruling */
+  --mdt-neutral-30: 220 37% 92%; /* ink-200 default border (#E3E8F2) */
+  --mdt-muted-foreground: 240 7% 48%; /* ink-500 muted (#727283) */
+  --mdt-foreground: 218 63% 7%; /* ink-900 reading text */
+  --mdt-info: 214 98% 44%; /* the interactive blue (#0262DE) */
+  --mdt-blue-10: 214 90% 97%; /* chip/tint background */
+  --mdt-success: 136 53% 43%; /* rgb(52,168,83) */
+  --mdt-destructive: 353 84% 47%; /* rgb(219,19,42) */
+  --mdt-ring: 214 98% 44%; /* the console's ring token is the interactive blue */
+}
 
 /* ── the design system's focus recipe (ring-2 ring-ring offset-1) in plain CSS ── */
 .snv-row:focus-visible,

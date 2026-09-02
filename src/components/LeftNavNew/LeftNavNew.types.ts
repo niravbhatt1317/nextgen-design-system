@@ -48,6 +48,12 @@ export type LeftNavNewTheme = 'light' | 'dark' | 'system';
 export interface LeftNavNewAccount {
   email: string;
   orgs: LeftNavNewOrg[];
+  /**
+   * The MSP-wide user population shown on the "where you are" strip. When a
+   * demo trims the org list, this keeps the strip's number honest to the
+   * full roster. Defaults to the sum of `orgs`.
+   */
+  totalMembers?: number;
   /** Which organization the viewer is inside. `null` is the MSP-wide view. */
   currentOrgId?: string | null;
   /** Travel. `null` asks for the MSP-wide view. */
