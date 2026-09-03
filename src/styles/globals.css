@@ -138,7 +138,7 @@
      * own overrides. Contrast on white: ink-400 2.67:1 (a deliberate
      * exception for quiet headings), ink-500 4.72:1, azure-60 5.52:1,
      * emerald-60 3.06:1 (fails as text, see the changeset). */
-    --mdt-ink-400: 228 8% 64%; /* #9B9EAA quiet heading grey */
+    --mdt-ink-400: 228 8.1% 63.7%; /* #9B9EAA quiet heading grey (decimals so the value lands exactly) */
     --mdt-ink-500: 240 7% 48%; /* #727283 muted text */
     --mdt-azure-60: 214 98% 44%; /* #0262DE interactive blue */
     --mdt-emerald-60: 136 53% 43%; /* #34A853 success green */
