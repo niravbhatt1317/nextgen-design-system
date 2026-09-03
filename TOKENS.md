@@ -87,20 +87,21 @@ softer than the label" is therefore a different direction on each side, which is
 | `--mdt-accent`                    | `mdt-bg-accent`                        | `blue-10`     | `blue-90`     |
 | `--mdt-accent-foreground`         | `mdt-text-accent-foreground`           | `blue-50`     | `blue-20`     |
 | `--mdt-muted`                     | `mdt-bg-muted`                         | `neutral-30`  | `neutral-120` |
-| `--mdt-muted-foreground`          | `mdt-text-muted-foreground`            | `neutral-100` | `neutral-40`  |
+| `--mdt-muted-foreground`          | `mdt-text-muted-foreground`            | `ink-500`     | `neutral-40`  |
+| `--mdt-muted-foreground-subtle`   | `mdt-text-muted-foreground-subtle`     | `ink-400`     | `neutral-50`  |
 
 ### Status
 
-| Token                          | Tailwind                          | Light       | Dark        | Meaning                     |
-| ------------------------------ | --------------------------------- | ----------- | ----------- | --------------------------- |
-| `--mdt-destructive`            | `mdt-bg-destructive`              | `red-65`    | `red-60`    | Errors, destructive actions |
-| `--mdt-destructive-foreground` | `mdt-text-destructive-foreground` | `white`     | `white`     |                             |
-| `--mdt-warning`                | `mdt-bg-warning`                  | `orange-50` | `orange-60` | Warnings, needs attention   |
-| `--mdt-warning-foreground`     | `mdt-text-warning-foreground`     | `black`     | `black`     |                             |
-| `--mdt-success`                | `mdt-bg-success`                  | `green-70`  | `green-70`  | Success, confirmation       |
-| `--mdt-success-foreground`     | `mdt-text-success-foreground`     | `white`     | `white`     |                             |
-| `--mdt-info`                   | `mdt-bg-info`                     | `blue-50`   | `blue-50`   | Information, neutral notice |
-| `--mdt-info-foreground`        | `mdt-text-info-foreground`        | `white`     | `black`     |                             |
+| Token                          | Tailwind                          | Light        | Dark        | Meaning                     |
+| ------------------------------ | --------------------------------- | ------------ | ----------- | --------------------------- |
+| `--mdt-destructive`            | `mdt-bg-destructive`              | `red-65`     | `red-60`    | Errors, destructive actions |
+| `--mdt-destructive-foreground` | `mdt-text-destructive-foreground` | `white`      | `white`     |                             |
+| `--mdt-warning`                | `mdt-bg-warning`                  | `orange-50`  | `orange-60` | Warnings, needs attention   |
+| `--mdt-warning-foreground`     | `mdt-text-warning-foreground`     | `black`      | `black`     |                             |
+| `--mdt-success`                | `mdt-bg-success`                  | `emerald-60` | `green-70`  | Success, confirmation       |
+| `--mdt-success-foreground`     | `mdt-text-success-foreground`     | `white`      | `white`     |                             |
+| `--mdt-info`                   | `mdt-bg-info`                     | `azure-60`   | `blue-50`   | Information, neutral notice |
+| `--mdt-info-foreground`        | `mdt-text-info-foreground`        | `white`      | `black`     |                             |
 
 ---
 
@@ -194,7 +195,7 @@ toast and a dark badge belong to each other.
 | -------------- | ------------------- | ------------ | ------------ | ------------------------ |
 | `--mdt-border` | `mdt-border-border` | `neutral-40` | `neutral-90` | All borders and dividers |
 | `--mdt-input`  | `mdt-border-input`  | `neutral-40` | `neutral-90` | Form field borders       |
-| `--mdt-ring`   | `mdt-ring-ring`     | `black`      | `neutral-50` | Focus rings              |
+| `--mdt-ring`   | `mdt-ring-ring`     | `azure-60`   | `neutral-50` | Focus rings              |
 
 ---
 
@@ -333,6 +334,21 @@ The backbone of the system. Surfaces, borders, and text.
 | `--mdt-purple-90`  | `mdt-bg-purple-90`  | `#442299` |
 | `--mdt-purple-100` | `mdt-bg-purple-100` | `#221166` |
 
+### Console foundation colours (added 2026-09-03, names provisional)
+
+The merged console's text and accent colours, added as new steps with their values untouched so the
+console and the library share one palette. They sit outside the ramps above on purpose: the greys
+are near-neutral where `neutral` leans blue, and the blue and green are different hues from `blue`
+and `green`. The console files the same values under `neutral-70` / `blue-60` / `green-60` in its
+own overrides; which naming wins is Nirav's call.
+
+| Token              | Class                 | Hex       | Used for                                                     |
+| ------------------ | --------------------- | --------- | ------------------------------------------------------------ |
+| `--mdt-ink-400`    | `mdt-text-ink-400`    | `#9B9EAA` | Quiet headings. 2.67:1 on white, a deliberate exception      |
+| `--mdt-ink-500`    | `mdt-text-ink-500`    | `#727283` | Muted text, the new `muted-foreground`. 4.72:1 on white      |
+| `--mdt-azure-60`   | `mdt-text-azure-60`   | `#0262DE` | Interactive blue, the new `info` and `ring`. 5.52:1 on white |
+| `--mdt-emerald-60` | `mdt-text-emerald-60` | `#34A853` | Success green, the new `success`. 3.06:1 as text on white    |
+
 ---
 
 ## 3 · Radius
@@ -449,6 +465,9 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 | Green               | 11     |
 | Blue                | 13     |
 | Purple              | 11     |
+| Ink (console)       | 2      |
+| Azure (console)     | 1      |
+| Emerald (console)   | 1      |
 | **Primitive total** | **88** |
 | Semantic            | 25     |
 | Radius              | 1      |

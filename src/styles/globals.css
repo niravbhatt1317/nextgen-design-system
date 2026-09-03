@@ -127,6 +127,22 @@
     --mdt-purple-90: 270 63% 40%; /* #442299 */
     --mdt-purple-100: 270 50% 25%; /* #221166 */
 
+    /* ── Console foundation colours (added 2026-09-03, Pranjal's call) ──
+     * The merged console's muted text grey, quiet heading grey, interactive
+     * blue and success green, added as NEW steps with their values untouched
+     * so the console and the library share one palette. They sit outside the
+     * ramps above on purpose: the greys are near-neutral where the neutral
+     * ramp leans blue, and the blue and green are different hues from the
+     * blue and green ramps. NAMES ARE PROVISIONAL, to settle with Nirav. The
+     * console itself files them under neutral-70 / blue-60 / green-60 in its
+     * own overrides. Contrast on white: ink-400 2.67:1 (a deliberate
+     * exception for quiet headings), ink-500 4.72:1, azure-60 5.52:1,
+     * emerald-60 3.06:1 (fails as text, see the changeset). */
+    --mdt-ink-400: 228 8% 64%; /* #9B9EAA quiet heading grey */
+    --mdt-ink-500: 240 7% 48%; /* #727283 muted text */
+    --mdt-azure-60: 214 98% 44%; /* #0262DE interactive blue */
+    --mdt-emerald-60: 136 53% 43%; /* #34A853 success green */
+
     /* ============================================
        SEMANTIC COLORS - LIGHT MODE
        All semantic colors extend from the color palette
@@ -164,7 +180,12 @@
     --mdt-secondary-foreground: var(--mdt-black);
 
     --mdt-muted: var(--mdt-neutral-30);
-    --mdt-muted-foreground: var(--mdt-neutral-100);
+    --mdt-muted-foreground: var(
+      --mdt-ink-500
+    ); /* 2026-09-03: the console's muted text; was neutral-100 */
+    --mdt-muted-foreground-subtle: var(
+      --mdt-ink-400
+    ); /* quiet headings (the nav's "Collections" / "Favorite"); 2.67:1 by design */
 
     --mdt-accent: var(--mdt-blue-10);
     --mdt-accent-foreground: var(--mdt-blue-50);
@@ -179,15 +200,19 @@
        button carries white text, matching destructive, and white on green 50
        measures 2.5:1 - unreadable. Green 70 measures 4.9:1 and also fixes green
        *text* against a white page, which failed at 2.5:1 everywhere it was used. */
-    --mdt-success: var(--mdt-green-70);
+    --mdt-success: var(
+      --mdt-emerald-60
+    ); /* 2026-09-03: the console's success green; was green-70. 3.06:1 as text on white, flagged */
     --mdt-success-foreground: var(--mdt-white);
 
-    --mdt-info: var(--mdt-blue-50);
+    --mdt-info: var(--mdt-azure-60); /* 2026-09-03: the console's interactive blue; was blue-50 */
     --mdt-info-foreground: var(--mdt-white);
 
     --mdt-border: var(--mdt-neutral-40);
     --mdt-input: var(--mdt-neutral-40);
-    --mdt-ring: var(--mdt-black);
+    --mdt-ring: var(
+      --mdt-azure-60
+    ); /* 2026-09-03: focus rings in the interactive blue; were near-black */
 
     /* ============================================
        RAISED SURFACE - a surface sitting above the page
@@ -379,6 +404,9 @@
 
     --mdt-muted: var(--mdt-neutral-120);
     --mdt-muted-foreground: var(--mdt-neutral-40);
+    --mdt-muted-foreground-subtle: var(
+      --mdt-neutral-50
+    ); /* dark set aside for now (2026-09-03); a readable placeholder */
 
     --mdt-accent: var(--mdt-blue-90);
     --mdt-accent-foreground: var(--mdt-blue-20);
