@@ -468,7 +468,7 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 | Ink (console)       | 2      |
 | Azure (console)     | 1      |
 | Emerald (console)   | 1      |
-| **Primitive total** | **88** |
+| **Primitive total** | **92** |
 | Semantic            | 25     |
 | Radius              | 1      |
 | Typography          | 2      |
