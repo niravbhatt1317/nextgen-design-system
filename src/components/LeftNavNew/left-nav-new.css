@@ -1010,3 +1010,165 @@
   background: #232a34;
   color: #9aa8bc;
 }
+
+/* ══ the settings floors: Settings, and Agent Fleet beneath it (ported verbatim
+ * from the console's sidebarNav.css, 2026-09-03) ══
+ * The breadcrumb strip is both the heading and the way back; scrolling the list
+ * tucks the search into the trail's right end. The one change: the separator
+ * chevron's grey is the ink-400 token instead of its raw hex. Dark values stay
+ * raw, by Pranjal's call (dark mode set aside). */
+.snv-body > .snv-label:first-child,
+.snv-group:first-child .snv-label {
+  margin-top: 6px;
+}
+
+.snv-body > .snv-label:first-child::before,
+.snv-group:first-child .snv-label::before {
+  display: none;
+}
+
+/* ── the breadcrumb strip (settings + fleet): every step keeps the pill's side padding at
+ *    rest (space reserved — hover paints the fill and nothing moves; the jiggle was rejected
+ *    2026-08-24). Colour alone marks the current step. Strip inset 4 + chip 8 = the 12px line. ── */
+.snv-crumb {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 36px;
+  padding: 0 12px 0 10px;
+  margin-bottom: 2px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.snv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: hsl(var(--mdt-muted-foreground));
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.snv-chip svg {
+  flex: 0 0 auto;
+}
+
+button.snv-chip {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+button.snv-chip:hover {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark button.snv-chip:hover {
+  background: #222933;
+}
+
+.snv-chip[data-now='true'] {
+  color: hsl(var(--mdt-foreground));
+}
+
+.snv-btxt {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snv-csep {
+  color: hsl(var(--mdt-muted-foreground-subtle));
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.dark .snv-csep {
+  color: #a7b0bf;
+}
+
+/* scrolling the list tucks the search into the trail's right end; back at the top it returns */
+.snv-sic {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  color: hsl(var(--mdt-muted-foreground));
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+  pointer-events: none;
+}
+
+.snv-sic:hover {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark .snv-sic:hover {
+  background: #222933;
+}
+
+.snv-mid[data-scrolled='true'] .snv-sic {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.snv-mid[data-scrolled='true'] .snv-line {
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.snv-mid[data-scrolled='true'] .snv-crumb {
+  box-shadow: 0 1px 0 hsl(var(--mdt-neutral-20));
+}
+
+.dark .snv-mid[data-scrolled='true'] .snv-crumb {
+  box-shadow: 0 1px 0 #222933;
+}
+
+.snv-railwrap[data-collapsed='true'] .snv-line,
+.snv-railwrap[data-collapsed='true'] .snv-crumb {
+  display: none;
+}
+
+/* collapsed trail: home + one-level-up stacked, a hairline before the options (2026-08-24) */
+.snv-ccol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  flex: 0 0 auto;
+  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+}
+
+.dark .snv-ccol {
+  border-bottom-color: #222933;
+}
+
+.snv-ccol .snv-row {
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0 auto 2px;
+  justify-content: center;
+}

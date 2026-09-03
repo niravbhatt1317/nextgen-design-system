@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import { LeftNav } from '../LeftNav';
@@ -9,7 +9,9 @@ import type {
   LeftNavNewCollection,
   LeftNavNewOrg,
   LeftNavNewProps,
+  LeftNavNewSettingsSection,
   LeftNavNewTriggerProps,
+  LeftNavNewView,
 } from './LeftNavNew.types';
 import './left-nav-new.css';
 
@@ -584,6 +586,299 @@ export function LeftNavNewTrigger({
   );
 }
 
+/* ── the settings floors: Settings, and Agent Fleet beneath it ──────────────
+ *
+ * Ported from the console's ShellNav. The crumb strip (home › Settings ›
+ * Agent Fleet, every earlier step clickable) is both the heading and the way
+ * back; the search never folds and takes the caret on floor changes; scrolling
+ * the list tucks the search into the trail's right end, where a magnifier
+ * brings it back. Level state is kept by LeftNavNew itself rather than
+ * `useLeftNavLevels`: that hook models two floors by design, and this rail has
+ * three (workspace above the settings pair). */
+
+const SCROLL_TUCK_AT = 8;
+const FOCUS_AFTER_KEY = 120;
+const FOCUS_AFTER_SCROLL = 220;
+
+function filterSections(sections: LeftNavNewSettingsSection[], q: string) {
+  return sections
+    .map((s) => ({ ...s, items: s.items.filter((it) => !q || it.label.toLowerCase().includes(q)) }))
+    .filter((s) => s.items.length > 0);
+}
+
+interface CrumbStripProps {
+  inFleet: boolean;
+  fleetLabel: string;
+  onHome: () => void;
+  onBackToSettings: () => void;
+  onSearchIcon: () => void;
+}
+
+function CrumbStrip({
+  inFleet,
+  fleetLabel,
+  onHome,
+  onBackToSettings,
+  onSearchIcon,
+}: CrumbStripProps) {
+  const sep = (
+    <span className="snv-csep">
+      <Icon name="chevron-right" size={12} />
+    </span>
+  );
+  return (
+    <div className="snv-crumb">
+      <button
+        type="button"
+        className="snv-chip"
+        onClick={onHome}
+        title="Back to workspace"
+        aria-label="Back to workspace"
+      >
+        {/* 14px, one step up the icon ladder — 12 read too small here */}
+        <Icon name="home" size={14} />
+      </button>
+      {sep}
+      {inFleet ? (
+        <>
+          <button
+            type="button"
+            className="snv-chip"
+            onClick={onBackToSettings}
+            title="Back to all settings"
+          >
+            <span className="snv-btxt">Settings</span>
+          </button>
+          {sep}
+          <span className="snv-chip" data-now={ON}>
+            <span className="snv-btxt">{fleetLabel}</span>
+          </span>
+        </>
+      ) : (
+        <span className="snv-chip" data-now={ON}>
+          <span className="snv-btxt">Settings</span>
+        </span>
+      )}
+      <button
+        type="button"
+        className="snv-sic"
+        aria-label="Search"
+        title="Search"
+        onClick={onSearchIcon}
+      >
+        <Icon name="search" size={14} />
+      </button>
+    </div>
+  );
+}
+
+interface SettingsRowsProps {
+  sections: LeftNavNewSettingsSection[];
+  activeKey?: string | undefined;
+  onPick: (key: string) => void;
+  onEnterFleet: (itemKey: string) => void;
+}
+
+function SettingsRows({ sections, activeKey, onPick, onEnterFleet }: SettingsRowsProps) {
+  return (
+    <>
+      {sections.map((s) => (
+        <Fragment key={s.key}>
+          <div className="snv-label">{s.label}</div>
+          {s.items.map((it) => {
+            const off = !!it.soon;
+            const enters = !!it.section;
+            let onClick: (() => void) | undefined;
+            if (!off) {
+              onClick = enters
+                ? () => {
+                    onEnterFleet(it.key);
+                  }
+                : () => {
+                    onPick(it.key);
+                  };
+            }
+            return (
+              <button
+                key={it.key}
+                type="button"
+                className={off ? cn(ROW, 'snv-off') : ROW}
+                data-on={!off && it.key === activeKey ? ON : undefined}
+                aria-disabled={off || undefined}
+                title={it.label}
+                onClick={onClick}
+              >
+                <Icon name={it.icon} size={16} />
+                <span className={LBL}>{it.label}</span>
+                {off || enters ? (
+                  <span className="snv-meta">
+                    {off ? (
+                      <span className="snv-soon">soon</span>
+                    ) : (
+                      <Icon name="chevron-right" size={14} />
+                    )}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+interface SettingsRailProps {
+  view: 'settings' | 'fleet';
+  sections: LeftNavNewSettingsSection[];
+  fleet: LeftNavNewSettingsSection[];
+  fleetLabel: string;
+  activeKey?: string | undefined;
+  collapsed: boolean;
+  account?: LeftNavNewAccount | undefined;
+  onHome: () => void;
+  onBackToSettings: () => void;
+  onEnterFleet: (itemKey: string) => void;
+  onPick: (key: string) => void;
+}
+
+function SettingsRail(props: SettingsRailProps) {
+  const { view, sections, fleet, fleetLabel, activeKey, collapsed, account } = props;
+  const { onHome, onBackToSettings, onEnterFleet, onPick } = props;
+  const inFleet = view === 'fleet';
+  const [query, setQuery] = useState('');
+  const [scrolled, setScrolled] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+
+  /* Scrolls the search back into view and hands it the caret. */
+  const focusSearch = useCallback((delay: number) => {
+    bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    window.setTimeout(() => searchRef.current?.focus({ preventScroll: true }), delay);
+  }, []);
+
+  /* Ctrl/Cmd K owns the search. */
+  useEffect(() => {
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        focusSearch(FOCUS_AFTER_KEY);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [focusSearch]);
+
+  /* Floor changes reset the scroll-tuck and hand the search the caret — but
+   * not on first mount, which would steal focus from the screen. */
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    if (bodyRef.current) bodyRef.current.scrollTop = 0;
+    setScrolled(false);
+    searchRef.current?.focus({ preventScroll: true });
+  }, [inFleet]);
+
+  const q = query.trim().toLowerCase();
+  const rows = useMemo(
+    () => filterSections(inFleet ? fleet : sections, q),
+    [inFleet, fleet, sections, q]
+  );
+  const placeholder = inFleet ? 'Search fleet' : 'Search settings';
+
+  return (
+    <div className="snv-railwrap" data-collapsed={collapsed ? ON : undefined}>
+      {account ? (
+        <div className="snv-cardwrap">
+          <AccountCard account={account} />
+        </div>
+      ) : null}
+      <div className="snv-mid" data-scrolled={scrolled ? ON : undefined}>
+        {/* Collapsed, the trail folds into STACKED icon buttons — home, and one
+         * level up on the fleet floor — with a hairline before the list. */}
+        {collapsed ? (
+          <div className="snv-ccol">
+            <button
+              type="button"
+              className={ROW}
+              title="Back to workspace"
+              aria-label="Back to workspace"
+              onClick={onHome}
+            >
+              <Icon name="home" size={16} />
+            </button>
+            {inFleet ? (
+              <button
+                type="button"
+                className={ROW}
+                title="Back to all settings"
+                aria-label="Back to all settings"
+                onClick={onBackToSettings}
+              >
+                <Icon name="arrow-left" size={16} />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        <CrumbStrip
+          inFleet={inFleet}
+          fleetLabel={fleetLabel}
+          onHome={onHome}
+          onBackToSettings={onBackToSettings}
+          onSearchIcon={() => {
+            focusSearch(FOCUS_AFTER_SCROLL);
+          }}
+        />
+        <div className="snv-line">
+          <label className="snv-srch">
+            <Icon name="search" size={14} />
+            <input
+              ref={searchRef}
+              type="text"
+              value={query}
+              placeholder={placeholder}
+              aria-label={placeholder}
+              onChange={(e) => {
+                setQuery(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setQuery('');
+                  e.currentTarget.blur();
+                }
+              }}
+            />
+            <span className="snv-kbd">⌘K</span>
+          </label>
+        </div>
+        <div
+          className="snv-body"
+          key={inFleet ? 'fleet' : 'root'}
+          ref={bodyRef}
+          onScroll={(e) => {
+            setScrolled(e.currentTarget.scrollTop > SCROLL_TUCK_AT);
+          }}
+        >
+          <SettingsRows
+            sections={rows}
+            activeKey={activeKey}
+            onPick={onPick}
+            onEnterFleet={onEnterFleet}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const firstPageKey = (sections?: LeftNavNewSettingsSection[]) =>
+  sections?.find((s) => s.items.length > 0)?.items[0]?.key;
+
 /* ── the rail itself ────────────────────────────────────────────────────── */
 
 export function LeftNavNew({
@@ -596,7 +891,41 @@ export function LeftNavNew({
   label = 'Workspace',
   className,
   style,
+  settings,
+  fleet,
+  view: viewProp,
+  defaultView = 'workspace',
+  onViewChange,
 }: LeftNavNewProps) {
+  const [viewState, setViewState] = useState<LeftNavNewView>(defaultView);
+  const view: LeftNavNewView = viewProp ?? viewState;
+  const setView = (next: LeftNavNewView) => {
+    setViewState(next);
+    onViewChange?.(next);
+  };
+  const floors = settings && settings.length > 0 ? settings : null;
+  const fleetItem = settings?.flatMap((s) => s.items).find((it) => it.section === 'fleet');
+  /* Descending picks the floor's first page, exactly as the product routes:
+   * Settings lands on Users, Agent Fleet on its command center. */
+  const enterSettings = () => {
+    onSettings?.();
+    if (!floors) return;
+    setView('settings');
+    const k = firstPageKey(settings);
+    if (k) onSelect?.(k);
+  };
+  const enterFleet = (itemKey: string) => {
+    setView('fleet');
+    onSelect?.(firstPageKey(fleet) ?? itemKey);
+  };
+  const backToSettings = () => {
+    setView('settings');
+    const k = firstPageKey(settings);
+    if (k) onSelect?.(k);
+  };
+  const goHome = () => {
+    setView('workspace');
+  };
   const [query, setQuery] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
@@ -636,19 +965,40 @@ export function LeftNavNew({
 
   const q = query.trim().toLowerCase();
 
+  const shell = {
+    className: cn(SCOPE, className),
+    style: {
+      height: '100%',
+      flex: '0 0 auto',
+      width: collapsed ? 56 : 256,
+      overflow: 'hidden',
+      transition: 'width .2s cubic-bezier(.2,.7,.2,1)',
+      ...style,
+    },
+  };
+
+  if (view !== 'workspace' && floors) {
+    return (
+      <LeftNav label="Settings" {...shell}>
+        <SettingsRail
+          view={view}
+          sections={floors}
+          fleet={fleet ?? []}
+          fleetLabel={fleetItem?.label ?? 'Agent Fleet'}
+          activeKey={activeKey}
+          collapsed={collapsed}
+          account={account}
+          onHome={goHome}
+          onBackToSettings={backToSettings}
+          onEnterFleet={enterFleet}
+          onPick={(k) => onSelect?.(k)}
+        />
+      </LeftNav>
+    );
+  }
+
   return (
-    <LeftNav
-      label={label}
-      className={cn(SCOPE, className)}
-      style={{
-        height: '100%',
-        flex: '0 0 auto',
-        width: collapsed ? 56 : 256,
-        overflow: 'hidden',
-        transition: 'width .2s cubic-bezier(.2,.7,.2,1)',
-        ...style,
-      }}
-    >
+    <LeftNav label={label} {...shell}>
       <div className="snv-railwrap" data-collapsed={collapsed ? ON : undefined}>
         {/* Account/place control at the rail top. Collapsed it shows its
          * avatar alone — the card itself is unchanged. */}
@@ -746,7 +1096,7 @@ export function LeftNavNew({
           {/* The way into settings, pinned to the rail's bottom in its own
            * zone — system control, visibly apart from the content list. */}
           <div className="snv-pinned">
-            <button type="button" className={ROW} title="Settings" onClick={() => onSettings?.()}>
+            <button type="button" className={ROW} title="Settings" onClick={enterSettings}>
               <Icon name="settings" size={14} />
               <span className={LBL}>Settings</span>
               <span className="snv-meta">

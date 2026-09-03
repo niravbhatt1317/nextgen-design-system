@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { LeftNavNew, LeftNavNewTrigger } from './LeftNavNew';
-import type { LeftNavNewAccount, LeftNavNewCollection, LeftNavNewTheme } from './LeftNavNew.types';
+import type {
+  LeftNavNewAccount,
+  LeftNavNewCollection,
+  LeftNavNewSettingsSection,
+  LeftNavNewTheme,
+  LeftNavNewView,
+} from './LeftNavNew.types';
 
 const meta: Meta<typeof LeftNavNew> = {
   title: 'Components/LeftNav New',
@@ -43,6 +49,105 @@ const COLLECTIONS: LeftNavNewCollection[] = [
   },
 ];
 
+/* The console's settings floor, verbatim (MSP perspective, every entry). */
+const SETTINGS: LeftNavNewSettingsSection[] = [
+  {
+    key: 'people',
+    label: 'People & Access',
+    items: [
+      { key: 'users', label: 'Users', icon: 'users' },
+      { key: 'service', label: 'Service accounts', icon: 'bot' },
+      { key: 'teams', label: 'Teams', icon: 'users-2' },
+      { key: 'roles', label: 'Roles', icon: 'shield' },
+      { key: 'permissions', label: 'Permissions', icon: 'list-checks', soon: true },
+    ],
+  },
+  {
+    key: 'admin',
+    label: 'Administration',
+    items: [{ key: 'organizations', label: 'Organization', icon: 'building-2' }],
+  },
+  {
+    key: 'custom',
+    label: 'Customization',
+    items: [
+      { key: 'fields', label: 'User attributes', icon: 'user-cog' },
+      { key: 'org_attributes', label: 'Organization attributes', icon: 'sliders-horizontal' },
+    ],
+  },
+  {
+    key: 'operations',
+    label: 'Operations',
+    items: [{ key: 'fleet', label: 'Agent Fleet', icon: 'cpu', section: 'fleet' }],
+  },
+  {
+    key: 'discovery',
+    label: 'Discovery',
+    items: [
+      { key: 'credentials', label: 'Credential profiles', icon: 'key-round' },
+      { key: 'secret_stores', label: 'Secret stores', icon: 'lock' },
+    ],
+  },
+];
+
+/* The console's fleet floor, verbatim: Agent Fleet Management's seven groups. */
+const FLEET: LeftNavNewSettingsSection[] = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    items: [
+      { key: 'home', label: 'Command center', icon: 'layout-dashboard' },
+      { key: 'insights', label: 'Insights & alerts', icon: 'bell' },
+    ],
+  },
+  {
+    key: 'fleet',
+    label: 'Fleet',
+    items: [
+      { key: 'inventory', label: 'Inventory', icon: 'package' },
+      { key: 'enroll', label: 'Enroll agents', icon: 'package-plus' },
+      { key: 'retire', label: 'Retire agents', icon: 'package-minus' },
+    ],
+  },
+  {
+    key: 'deployments',
+    label: 'Deployments',
+    items: [
+      { key: 'config', label: 'Configuration', icon: 'settings-2' },
+      { key: 'modules', label: 'Modules', icon: 'puzzle' },
+      { key: 'upgrades', label: 'Upgrades', icon: 'arrow-up-circle' },
+    ],
+  },
+  {
+    key: 'fleet_ops',
+    label: 'Operations',
+    items: [
+      { key: 'health_fp', label: 'Health & footprint', icon: 'heart-pulse' },
+      { key: 'diagnose', label: 'Diagnose', icon: 'stethoscope' },
+      { key: 'copilot', label: 'AI copilot', icon: 'sparkles' },
+      { key: 'killswitch', label: 'Kill-switch', icon: 'power' },
+    ],
+  },
+  {
+    key: 'governance',
+    label: 'Governance',
+    items: [
+      { key: 'security', label: 'Security & audit', icon: 'shield-check' },
+      { key: 'aiagents', label: 'AI agents', icon: 'bot' },
+    ],
+  },
+  {
+    key: 'msp',
+    label: 'Tenants',
+    items: [{ key: 'tenants', label: 'MSP operations', icon: 'building-2' }],
+  },
+  {
+    key: 'integrations',
+    label: 'Integrations',
+    items: [{ key: 'integrations', label: 'APIs & automation', icon: 'webhook' }],
+  },
+];
+
 /* The console's first ten organizations, names verbatim, so the panel reads
  * exactly like the product. Per-org member counts are demo values in the
  * console's own 40–1,440 range; MSP_TOTAL is the product's real 50-org
@@ -61,37 +166,52 @@ const ORGS = [
 ];
 const MSP_TOTAL = 38700;
 
+/* The frame is deliberately SHORT so the rail has to scroll: that is where the
+ * search tucks into the crumb strip and the list takes over. */
+const FRAME_HEIGHT = 560;
+const FRAME_MAX_WIDTH = 960;
+
 const FIXED_ROWS: Record<string, string> = {
   settings: 'Settings',
   inbox: 'Inbox',
   explore: 'Explore',
 };
 
+const FLOOR_TITLE: Record<LeftNavNewView, string> = {
+  workspace: 'Workspace',
+  settings: 'Settings',
+  fleet: 'Agent Fleet',
+};
+
 function labelOf(key: string, collections: LeftNavNewCollection[]): string {
   const board = collections.flatMap((c) => c.children).find((ch) => ch.key === key);
-  return board?.label ?? FIXED_ROWS[key] ?? key;
+  if (board) return board.label;
+  const page = [...SETTINGS, ...FLEET].flatMap((s) => s.items).find((it) => it.key === key);
+  return page?.label ?? FIXED_ROWS[key] ?? key;
 }
 
 /**
  * The frame every story shares, shaped like the console's shell: the rail owns
  * the full height on the left, and everything else is the right section. The
  * trigger sits in THAT section's header band ([panel icon] | title) — there is
- * no full-width top bar. The canvas echoes whatever the rail last selected.
+ * no full-width top bar. The frame is short on purpose, so the rail scrolls.
+ * The canvas echoes whatever the rail last selected.
  */
 function WorkspaceDemo({
   startCollapsed = false,
   startOrg = 'finserve',
   startActive = 'warroom',
+  startView = 'workspace',
   collections = COLLECTIONS,
-  withAccount = true,
 }: {
   startCollapsed?: boolean;
   startOrg?: string | null;
   startActive?: string;
+  startView?: LeftNavNewView;
   collections?: LeftNavNewCollection[];
-  withAccount?: boolean;
 }) {
   const [active, setActive] = useState(startActive);
+  const [view, setView] = useState<LeftNavNewView>(startView);
   const [collapsed, setCollapsed] = useState(startCollapsed);
   const [orgId, setOrgId] = useState<string | null>(startOrg);
   const [theme, setTheme] = useState<LeftNavNewTheme>('light');
@@ -105,53 +225,62 @@ function WorkspaceDemo({
     onThemeChange: setTheme,
   };
   return (
-    <div
-      style={{
-        display: 'flex',
-        height: '100vh',
-        background: 'hsl(var(--mdt-background))',
-      }}
-    >
-      <LeftNavNew
-        collections={collections}
-        activeKey={active}
-        onSelect={setActive}
-        onSettings={() => {
-          setActive('settings');
+    <div style={{ padding: 24, background: 'hsl(var(--mdt-background))' }}>
+      <div
+        style={{
+          display: 'flex',
+          height: FRAME_HEIGHT,
+          maxWidth: FRAME_MAX_WIDTH,
+          border: '1px solid hsl(var(--mdt-neutral-20))',
+          background: 'hsl(var(--mdt-background))',
+          overflow: 'hidden',
         }}
-        {...(withAccount ? { account } : {})}
-        collapsed={collapsed}
-      />
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            height: 48,
-            padding: '0 12px',
-            borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
-            flex: '0 0 auto',
-          }}
-        >
-          <LeftNavNewTrigger
-            collapsed={collapsed}
-            onToggle={() => {
-              setCollapsed(!collapsed);
+      >
+        <LeftNavNew
+          collections={collections}
+          settings={SETTINGS}
+          fleet={FLEET}
+          view={view}
+          onViewChange={setView}
+          activeKey={active}
+          onSelect={setActive}
+          account={account}
+          collapsed={collapsed}
+        />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <header
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: 48,
+              padding: '0 12px',
+              borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
+              flex: '0 0 auto',
             }}
-          />
-          <span style={{ fontSize: 13, color: 'hsl(var(--mdt-muted-foreground))' }}>Workspace</span>
-        </header>
-        <main
-          style={{
-            flex: 1,
-            display: 'grid',
-            placeItems: 'center',
-            color: 'hsl(var(--mdt-muted-foreground))',
-            fontSize: 13,
-          }}
-        >
-          Selected: {labelOf(active, collections)}
-        </main>
+          >
+            <LeftNavNewTrigger
+              collapsed={collapsed}
+              onToggle={() => {
+                setCollapsed(!collapsed);
+              }}
+            />
+            <span style={{ fontSize: 13, color: 'hsl(var(--mdt-muted-foreground))' }}>
+              {FLOOR_TITLE[view]}
+            </span>
+          </header>
+          <main
+            style={{
+              flex: 1,
+              display: 'grid',
+              placeItems: 'center',
+              color: 'hsl(var(--mdt-muted-foreground))',
+              fontSize: 13,
+            }}
+          >
+            {view === 'workspace' ? 'Selected: ' : 'Page: '}
+            {labelOf(active, collections)}
+          </main>
+        </div>
       </div>
     </div>
   );
@@ -162,17 +291,39 @@ function WorkspaceDemo({
  * (starting in the MSP-wide view, exactly where the product lands after
  * login), the quiet search (⌘K works), Inbox and Explore, the folder tree
  * with its connector spine, and Settings pinned at the bottom. Click a folder
- * to fold its boards; type in the search to filter them.
+ * to fold its boards; type in the search to filter them. Click Settings to
+ * descend a floor.
  */
 export const Workspace: Story = {
   render: () => <WorkspaceDemo startOrg={null} />,
 };
 
 /**
+ * One floor down. The crumb strip (home › Settings) replaces the heading and
+ * is the way back; the list is long enough to scroll, and scrolling tucks the
+ * search into the strip's right end, where a magnifier brings it back (so does
+ * ⌘K). Permissions reads disabled with its "soon" badge; Agent Fleet carries a
+ * chevron because it descends again.
+ */
+export const Settings: Story = {
+  render: () => <WorkspaceDemo startOrg={null} startView="settings" startActive="users" />,
+};
+
+/**
+ * Two floors down: the Agent Fleet floor, with a three-step crumb (home ›
+ * Settings › Agent Fleet). Every earlier step is clickable. The search
+ * re-scopes to the fleet and takes the caret on arrival.
+ */
+export const AgentFleet: Story = {
+  render: () => <WorkspaceDemo startOrg={null} startView="fleet" startActive="home" />,
+};
+
+/**
  * The 56px icon rail. Names survive as tooltips, the account card shows its
  * avatar alone, and hovering (or clicking) a folder opens its boards in a
  * flyout with a short grace timer for the pointer's travel. The header-band
- * trigger expands it again.
+ * trigger expands it again. On the settings floors the crumb strip folds into
+ * stacked icon buttons: home, and one level up when on the fleet floor.
  */
 export const CollapsedRail: Story = {
   render: () => <WorkspaceDemo startCollapsed />,

@@ -2,7 +2,11 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { LeftNavNew, LeftNavNewTrigger } from './LeftNavNew';
-import type { LeftNavNewAccount, LeftNavNewCollection } from './LeftNavNew.types';
+import type {
+  LeftNavNewAccount,
+  LeftNavNewCollection,
+  LeftNavNewSettingsSection,
+} from './LeftNavNew.types';
 
 const COLLECTIONS: LeftNavNewCollection[] = [
   {
@@ -160,5 +164,115 @@ describe('LeftNavNewTrigger', () => {
     expect(onToggle).toHaveBeenCalled();
     rerender(<LeftNavNewTrigger collapsed onToggle={onToggle} />);
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
+  });
+});
+
+/* ── the settings floors ──────────────────────────────────────────────────── */
+
+const SETTINGS: LeftNavNewSettingsSection[] = [
+  {
+    key: 'people',
+    label: 'People & Access',
+    items: [
+      { key: 'users', label: 'Users', icon: 'users' },
+      { key: 'perm', label: 'Permissions', icon: 'list-checks', soon: true },
+    ],
+  },
+  {
+    key: 'ops',
+    label: 'Operations',
+    items: [{ key: 'fleet', label: 'Agent Fleet', icon: 'cpu', section: 'fleet' }],
+  },
+];
+
+const FLEET: LeftNavNewSettingsSection[] = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    items: [
+      { key: 'home', label: 'Command center', icon: 'layout-dashboard' },
+      { key: 'insights', label: 'Insights & alerts', icon: 'bell' },
+    ],
+  },
+];
+
+describe('LeftNavNew settings floors', () => {
+  it('Settings descends to the settings floor and selects its first page', async () => {
+    const onSelect = vi.fn();
+    const onViewChange = vi.fn();
+    render(
+      <LeftNavNew
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        onSelect={onSelect}
+        onViewChange={onViewChange}
+      />
+    );
+    await userEvent.click(screen.getByTitle('Settings'));
+    expect(onViewChange).toHaveBeenCalledWith('settings');
+    expect(onSelect).toHaveBeenCalledWith('users');
+    expect(screen.getByRole('navigation', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByText('People & Access')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search settings')).toBeInTheDocument();
+  });
+
+  it('Agent Fleet descends a floor; the crumb strip is the way back up, twice', async () => {
+    const onSelect = vi.fn();
+    render(
+      <LeftNavNew
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        defaultView="settings"
+        onSelect={onSelect}
+      />
+    );
+    await userEvent.click(screen.getByTitle('Agent Fleet'));
+    expect(onSelect).toHaveBeenCalledWith('home');
+    expect(screen.getByText('Command center')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search fleet')).toBeInTheDocument();
+    await userEvent.click(screen.getByTitle('Back to all settings'));
+    expect(screen.getByText('People & Access')).toBeInTheDocument();
+    await userEvent.click(screen.getByTitle('Back to workspace'));
+    expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
+  });
+
+  it('a "soon" page refuses the click; the search filters the floor and survives a floor change', async () => {
+    const onSelect = vi.fn();
+    render(
+      <LeftNavNew
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        defaultView="settings"
+        onSelect={onSelect}
+      />
+    );
+    await userEvent.click(screen.getByTitle('Permissions'));
+    expect(onSelect).not.toHaveBeenCalledWith('perm');
+    await userEvent.click(screen.getByTitle('Agent Fleet'));
+    await userEvent.type(screen.getByPlaceholderText('Search fleet'), 'insi');
+    expect(screen.queryByText('Command center')).not.toBeInTheDocument();
+    expect(screen.getByText('Insights & alerts')).toBeInTheDocument();
+    // the query is one box across both floors, as in the product
+    await userEvent.click(screen.getByTitle('Back to all settings'));
+    expect(screen.getByPlaceholderText('Search settings')).toHaveValue('insi');
+    expect(screen.queryByText('People & Access')).not.toBeInTheDocument();
+  });
+
+  it('scrolling the list tucks the search away; the floor without settings stays on Settings-only behaviour', () => {
+    const onSettings = vi.fn();
+    const { container, unmount } = render(
+      <LeftNavNew collections={COLLECTIONS} settings={SETTINGS} defaultView="settings" />
+    );
+    const body = container.querySelector('.snv-body') as HTMLElement;
+    fireEvent.scroll(body, { target: { scrollTop: 40 } });
+    expect(container.querySelector('.snv-mid')).toHaveAttribute('data-scrolled', 'true');
+    unmount();
+    render(<LeftNavNew collections={COLLECTIONS} onSettings={onSettings} />);
+    fireEvent.click(screen.getByTitle('Settings'));
+    expect(onSettings).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
   });
 });

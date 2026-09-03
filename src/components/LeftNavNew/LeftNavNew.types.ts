@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import type { IconName } from '../Icon';
 
 /**
  * One board (a leaf destination) inside a collection.
@@ -65,12 +66,60 @@ export interface LeftNavNewAccount {
   onThemeChange?: (theme: LeftNavNewTheme) => void;
 }
 
+/**
+ * Which floor the rail is showing. `workspace` is the product's home rail;
+ * `settings` and `fleet` are the two floors beneath it, reached through the
+ * pinned Settings row and then the Agent Fleet entry. Three floors, never
+ * more: the crumb strip is the way back up.
+ */
+export type LeftNavNewView = 'workspace' | 'settings' | 'fleet';
+
+/** One page on the settings or fleet floor. */
+export interface LeftNavNewSettingsItem {
+  key: string;
+  label: string;
+  /** One glyph per row; the category labels carry none. */
+  icon: IconName;
+  /** Not built yet: reads disabled with the neutral "soon" badge. */
+  soon?: boolean;
+  /**
+   * An item that descends to the fleet floor instead of opening a page. Its
+   * label becomes the current crumb down there.
+   */
+  section?: 'fleet';
+}
+
+/** A category on the settings or fleet floor: a label, then its pages. */
+export interface LeftNavNewSettingsSection {
+  key: string;
+  label: string;
+  items: LeftNavNewSettingsItem[];
+}
+
 export interface LeftNavNewProps {
   collections: LeftNavNewCollection[];
-  /** The selected board. The collection holding it is highlighted too. */
+  /**
+   * The settings floor, as categories of pages. Supplying it makes the pinned
+   * Settings row descend into it (and selects its first page, as the product
+   * does). Omit it and Settings only fires `onSettings`.
+   */
+  settings?: LeftNavNewSettingsSection[];
+  /** The fleet floor, reached from the settings item marked `section: 'fleet'`. */
+  fleet?: LeftNavNewSettingsSection[];
+  /** Controlled floor. Leave it out and the rail keeps the floor itself. */
+  view?: LeftNavNewView;
+  /** The floor to start on when uncontrolled. @default 'workspace' */
+  defaultView?: LeftNavNewView;
+  /** Every floor change, including the ones the crumb strip makes. */
+  onViewChange?: (view: LeftNavNewView) => void;
+  /**
+   * The selected board, or the selected settings/fleet page. One key space
+   * across all three floors; the collection holding a board is highlighted too.
+   */
   activeKey?: string;
+  /** A board or a page was picked. Descending a floor picks its first page. */
   onSelect?: (key: string) => void;
-  /** The pinned Settings row at the rail's bottom. */
+  /** The pinned Settings row at the rail's bottom, whether or not `settings` is given. */
   onSettings?: () => void;
   /** Omit it and the rail renders without the account card. */
   account?: LeftNavNewAccount;
