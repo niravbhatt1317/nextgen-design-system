@@ -493,6 +493,11 @@
 .snv-railwrap[data-collapsed='true'] .snv-pinned .snv-row {
   width: 32px;
   margin: 0 auto;
+  /* 2026-09-03 (Pranjal): the collapsed gear read off-centre — the console rule
+   * keeps the row's 12px side padding, so the glyph sits 3px left. Centre it
+   * like every other collapsed row. */
+  padding: 0;
+  justify-content: center;
 }
 /* the first label-bar would double the card hairline right above it — drop it */
 .snv-railwrap[data-collapsed='true'] .snv-body > .snv-label:first-child {

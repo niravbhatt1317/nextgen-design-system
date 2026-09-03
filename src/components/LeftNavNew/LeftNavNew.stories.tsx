@@ -166,10 +166,10 @@ const ORGS = [
 ];
 const MSP_TOTAL = 38700;
 
-/* The frame is deliberately SHORT so the rail has to scroll: that is where the
- * search tucks into the crumb strip and the list takes over. */
-const FRAME_HEIGHT = 560;
-const FRAME_MAX_WIDTH = 960;
+/* The frame is sized so the rail still has to scroll on the fleet floor (its
+ * longest list): that is where the search tucks into the crumb strip. */
+const FRAME_HEIGHT = 720;
+const FRAME_MAX_WIDTH = 1280;
 
 const FIXED_ROWS: Record<string, string> = {
   settings: 'Settings',

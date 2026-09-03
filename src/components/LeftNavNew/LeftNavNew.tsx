@@ -1097,7 +1097,9 @@ export function LeftNavNew({
            * zone — system control, visibly apart from the content list. */}
           <div className="snv-pinned">
             <button type="button" className={ROW} title="Settings" onClick={enterSettings}>
-              <Icon name="settings" size={14} />
+              {/* 14 expanded (the console's pick); 16 collapsed so it matches the
+               * other icon-rail glyphs — one size per context. */}
+              <Icon name="settings" size={collapsed ? 16 : 14} />
               <span className={LBL}>Settings</span>
               <span className="snv-meta">
                 <span role="img" aria-label="Live">
