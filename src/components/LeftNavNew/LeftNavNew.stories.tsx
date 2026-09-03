@@ -191,13 +191,12 @@ export const AccountSwitcher: Story = {
 /**
  * Row states side by side: a selected board, live boards, a not-live board
  * that keeps its normal look but refuses the click, and a "Soon" board that
- * fades to 40% while the badge keeps full strength. The rail also renders
- * without an account card, as here.
+ * fades to 40% while the badge keeps full strength. The account card stays,
+ * as it does everywhere in the product.
  */
 export const RowStates: Story = {
   render: () => (
     <WorkspaceDemo
-      withAccount={false}
       startActive="selected"
       collections={[
         {
