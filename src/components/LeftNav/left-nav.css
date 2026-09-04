@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* LeftNav New — the merged console's approved workspace navigation, ported
+/* LeftNav — the merged console's approved workspace navigation, ported
  * verbatim as a PARALLEL component for review. The existing LeftNav is
  * untouched; this file is the console's `sidebarNav.css` + `orgSwitcher.css`
  * merged, with two changes made for this port:

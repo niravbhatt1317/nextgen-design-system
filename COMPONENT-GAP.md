@@ -440,6 +440,11 @@ than one component at a time.
 
 ## `Sidebar` is deprecated, and what is still missing from `LeftNav`
 
+> **2026-09-03 (Pranjal):** the settings-only `LeftNav` described below is now `LeftNavOld`, deprecated
+> under `Deprecated/LeftNav Old` in Storybook. `LeftNav` is the product navigation ported from the merged
+> console (workspace rail plus the Settings and Agent Fleet floors), which covers the two gaps in the table
+> at the end of this section: it collapses to an icon rail and renders from a configuration object.
+
 `LeftNav` is the navigation this library ships. `Sidebar` predates it and is deprecated as of
 1 August 2026 — not because it is broken, but because the two speak different visual languages and
 shipping both means products get two navigations that do not read as siblings:

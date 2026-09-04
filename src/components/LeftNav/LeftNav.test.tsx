@@ -1,693 +1,274 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act, renderHook } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import {
-  LeftNav,
-  LeftNavBody,
-  LeftNavExit,
-  LeftNavFooter,
-  LeftNavExpandable,
-  LeftNavGroup,
-  LeftNavItem,
-  LeftNavSearch,
-  LeftNavSection,
-} from './LeftNav';
-import { useLeftNavLevels } from './useLeftNavLevels';
+import { describe, expect, it, vi } from 'vitest';
+import { LeftNav, LeftNavTrigger } from './LeftNav';
+import type { LeftNavAccount, LeftNavCollection, LeftNavSettingsSection } from './LeftNav.types';
 
-describe('useLeftNavLevels', () => {
-  it('starts at the root', () => {
-    const { result } = renderHook(() => useLeftNavLevels());
-    expect(result.current.level).toBe(1);
-    expect(result.current.section).toBeNull();
+const COLLECTIONS: LeftNavCollection[] = [
+  {
+    key: 'incident',
+    label: 'Incident Response',
+    defaultOpen: true,
+    children: [
+      { key: 'warroom', label: 'Incident War Room', live: true },
+      { key: 'rca', label: 'Root Cause Analysis Board' },
+      { key: 'perm', label: 'Permissions', soon: true },
+    ],
+  },
+  {
+    key: 'monitoring',
+    label: 'Monitoring & Metrics',
+    children: [{ key: 'health', label: 'Service Health', live: true }],
+  },
+];
+
+const ACCOUNT: LeftNavAccount = {
+  email: 'demo.admin@motadata.com',
+  orgs: [
+    { id: 'northwind', name: 'Northwind Traders', memberCount: 1284 },
+    { id: 'fabrikam', name: 'Fabrikam', memberCount: 342 },
+  ],
+  currentOrgId: 'northwind',
+};
+
+describe('LeftNav', () => {
+  it('renders the rail with its accessible name and the seeded tree', () => {
+    render(<LeftNav collections={COLLECTIONS} activeKey="warroom" />);
+    expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
+    expect(screen.getByText('Incident Response')).toBeInTheDocument();
+    // defaultOpen shows its boards; the closed group hides its own
+    expect(screen.getByText('Incident War Room')).toBeInTheDocument();
+    expect(screen.queryByText('Service Health')).not.toBeInTheDocument();
   });
 
-  it('starts inside a section when told to', () => {
-    const { result } = renderHook(() => useLeftNavLevels({ initial: 'observability' }));
-    expect(result.current.level).toBe(2);
-    expect(result.current.isOpen('observability')).toBe(true);
+  it('selecting a live board reports it and marks the row', () => {
+    const onSelect = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} activeKey="warroom" onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Incident War Room' }));
+    expect(onSelect).toHaveBeenCalledWith('warroom');
+    expect(screen.getByRole('button', { name: 'Incident War Room' })).toHaveAttribute(
+      'data-on',
+      'true'
+    );
   });
 
-  it('opens a section and comes back', () => {
-    const onChange = vi.fn();
-    const { result } = renderHook(() => useLeftNavLevels({ onChange }));
-    act(() => {
-      result.current.open('billing');
-    });
-    expect(result.current.level).toBe(2);
-    expect(onChange).toHaveBeenLastCalledWith('billing');
-    act(() => {
-      result.current.back();
-    });
-    expect(result.current.level).toBe(1);
-    expect(onChange).toHaveBeenLastCalledWith(null);
+  it('the collection holding the active board carries the highlight too', () => {
+    render(<LeftNav collections={COLLECTIONS} activeKey="warroom" />);
+    expect(screen.getByRole('button', { name: 'Incident Response' })).toHaveAttribute(
+      'data-on',
+      'true'
+    );
   });
 
-  it('never goes past level two', () => {
-    const { result } = renderHook(() => useLeftNavLevels());
-    act(() => {
-      result.current.open('one');
-    });
-    act(() => {
-      result.current.open('two');
-    });
-    // Opening from level 2 replaces the section rather than stacking another.
-    // Depth is where people get lost, so a third level is not reachable by
-    // calling the API wrong - one `back` always returns to the root.
-    expect(result.current.level).toBe(2);
-    expect(result.current.section).toBe('two');
-    act(() => {
-      result.current.back();
-    });
-    expect(result.current.level).toBe(1);
+  it('a board that is not live refuses the click', () => {
+    const onSelect = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} onSelect={onSelect} />);
+    const row = screen.getByRole('button', { name: 'Root Cause Analysis Board' });
+    expect(row).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(row);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('reports which way it went', () => {
-    const { result } = renderHook(() => useLeftNavLevels());
-    expect(result.current.direction).toBeNull();
-    act(() => {
-      result.current.open('billing');
-    });
-    expect(result.current.direction).toBe('forward');
-    act(() => {
-      result.current.back();
-    });
-    expect(result.current.direction).toBe('back');
+  it('a "soon" board wears the badge and refuses the click', () => {
+    const onSelect = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} onSelect={onSelect} />);
+    expect(screen.getByText('Soon')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Permissions/ }));
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('calls a sideways move forward, because that is the story', () => {
-    const { result } = renderHook(() => useLeftNavLevels());
-    act(() => {
-      result.current.open('one');
-    });
-    act(() => {
-      result.current.open('two');
-    });
-    expect(result.current.direction).toBe('forward');
+  it('clicking the folder folds the boards away and back', () => {
+    render(<LeftNav collections={COLLECTIONS} />);
+    const folder = screen.getByRole('button', { name: 'Incident Response' });
+    fireEvent.click(folder);
+    expect(screen.queryByText('Incident War Room')).not.toBeInTheDocument();
+    fireEvent.click(folder);
+    expect(screen.getByText('Incident War Room')).toBeInTheDocument();
   });
 
-  it('names the view, so a section change remounts even at the same level', () => {
-    const { result } = renderHook(() => useLeftNavLevels());
-    expect(result.current.viewKey).toBe('root');
-    act(() => {
-      result.current.open('billing');
-    });
-    expect(result.current.viewKey).toBe('billing');
-    act(() => {
-      result.current.open('security');
-    });
-    // Both are level 2. Keying on the level alone would not remount, and an
-    // animation on a subtree that only re-rendered has already played.
-    expect(result.current.viewKey).toBe('security');
+  it('search filters boards and forces closed groups open', async () => {
+    const user = userEvent.setup();
+    render(<LeftNav collections={COLLECTIONS} />);
+    await user.type(screen.getByLabelText('Search workspace'), 'health');
+    // the closed monitoring group opens to show its match
+    expect(screen.getByText('Service Health')).toBeInTheDocument();
+    // the incident group has no match left and disappears entirely
+    expect(screen.queryByText('Incident War Room')).not.toBeInTheDocument();
+    expect(screen.queryByText('Incident Response')).not.toBeInTheDocument();
   });
 
-  it('ignores a later change to the starting section', () => {
-    const { result, rerender } = renderHook(({ initial }) => useLeftNavLevels({ initial }), {
-      initialProps: { initial: 'billing' as string | null },
-    });
-    rerender({ initial: 'security' });
-    expect(result.current.section).toBe('billing');
+  it('Escape clears the search', async () => {
+    const user = userEvent.setup();
+    render(<LeftNav collections={COLLECTIONS} />);
+    const input = screen.getByLabelText('Search workspace');
+    await user.type(input, 'health');
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(input).toHaveValue('');
+    expect(screen.getByText('Incident War Room')).toBeInTheDocument();
+  });
+
+  it('Ctrl+K hands the search the caret', () => {
+    render(<LeftNav collections={COLLECTIONS} />);
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true });
+    expect(screen.getByLabelText('Search workspace')).toHaveFocus();
+  });
+
+  it('the pinned Settings row reports through its own callback', () => {
+    const onSettings = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} onSettings={onSettings} />);
+    fireEvent.click(screen.getByRole('button', { name: /Settings/ }));
+    expect(onSettings).toHaveBeenCalled();
+  });
+
+  it('collapsed, clicking a folder opens its boards in a flyout', async () => {
+    const onSelect = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} collapsed onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Incident Response' }));
+    const fly = await screen.findByRole('dialog');
+    fireEvent.click(within(fly).getByRole('button', { name: 'Incident War Room' }));
+    expect(onSelect).toHaveBeenCalledWith('warroom');
+  });
+
+  it('the account card opens the destination panel and travels', async () => {
+    const onSwitchOrg = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} account={{ ...ACCOUNT, onSwitchOrg }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Organization switcher and account' }));
+    const panel = await screen.findByRole('dialog');
+    expect(within(panel).getByText('demo.admin@motadata.com')).toBeInTheDocument();
+    expect(within(panel).getByText('2 organizations')).toBeInTheDocument();
+    // the current organization is the "here" strip, not a row in the list
+    expect(within(panel).queryByRole('button', { name: /Northwind Traders/ })).toBeNull();
+    fireEvent.click(within(panel).getByRole('button', { name: /Fabrikam/ }));
+    expect(onSwitchOrg).toHaveBeenCalledWith('fabrikam');
+  });
+
+  it('inside an organization the panel offers the MSP-wide door', async () => {
+    const onSwitchOrg = vi.fn();
+    render(<LeftNav collections={COLLECTIONS} account={{ ...ACCOUNT, onSwitchOrg }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Organization switcher and account' }));
+    const panel = await screen.findByRole('dialog');
+    fireEvent.click(within(panel).getByRole('button', { name: /Switch to MSP-wide view/ }));
+    expect(onSwitchOrg).toHaveBeenCalledWith(null);
   });
 });
 
-describe('LeftNav', () => {
-  describe('the panel', () => {
-    it('names itself, so two navigations can be told apart', () => {
-      render(<LeftNav />);
-      expect(screen.getByRole('navigation', { name: 'Settings' })).toBeInTheDocument();
-    });
-
-    it('takes a different name', () => {
-      render(<LeftNav label="Workspace settings" />);
-      expect(screen.getByRole('navigation', { name: 'Workspace settings' })).toBeInTheDocument();
-    });
+describe('LeftNavTrigger', () => {
+  it('names its state and toggles', () => {
+    const onToggle = vi.fn();
+    const { rerender } = render(<LeftNavTrigger collapsed={false} onToggle={onToggle} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    expect(onToggle).toHaveBeenCalled();
+    rerender(<LeftNavTrigger collapsed onToggle={onToggle} />);
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
   });
+});
 
-  describe('leaving versus going up', () => {
-    // The whole reason this component exists. The two controls must never be
-    // the same kind of thing.
-    const both = (
-      <LeftNav>
-        <LeftNavExit href="/app">Go to home</LeftNavExit>
-        <LeftNavBody level={2}>
-          <LeftNavSection title="Observability" onBack={() => undefined}>
-            <LeftNavItem>Overview</LeftNavItem>
-          </LeftNavSection>
-        </LeftNavBody>
-      </LeftNav>
+/* ── the settings floors ──────────────────────────────────────────────────── */
+
+const SETTINGS: LeftNavSettingsSection[] = [
+  {
+    key: 'people',
+    label: 'People & Access',
+    items: [
+      { key: 'users', label: 'Users', icon: 'users' },
+      { key: 'perm', label: 'Permissions', icon: 'list-checks', soon: true },
+    ],
+  },
+  {
+    key: 'ops',
+    label: 'Operations',
+    items: [{ key: 'fleet', label: 'Agent Fleet', icon: 'cpu', section: 'fleet' }],
+  },
+];
+
+const FLEET: LeftNavSettingsSection[] = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    items: [
+      { key: 'home', label: 'Command center', icon: 'layout-dashboard' },
+      { key: 'insights', label: 'Insights & alerts', icon: 'bell' },
+    ],
+  },
+];
+
+describe('LeftNav settings floors', () => {
+  it('Settings descends to the settings floor and selects its first page', async () => {
+    const onSelect = vi.fn();
+    const onViewChange = vi.fn();
+    render(
+      <LeftNav
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        onSelect={onSelect}
+        onViewChange={onViewChange}
+      />
     );
-
-    it('the exit names its destination and is a link when it has one', () => {
-      render(both);
-      const exit = screen.getByRole('link', { name: 'Go to home' });
-      expect(exit).toHaveAttribute('href', '/app');
-    });
-
-    it('the section back names where you are, not where it goes', () => {
-      render(both);
-      // "Back to all settings" is the accessible name of a small chevron; the
-      // visible text is the section, because the question a heading answers is
-      // "what am I looking at".
-      expect(screen.getByRole('button', { name: 'Back to all settings' })).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: 'Observability' })).toBeInTheDocument();
-    });
-
-    it('the section title is a heading, which the exit is not', () => {
-      render(both);
-      const headings = screen.getAllByRole('heading');
-      expect(headings).toHaveLength(1);
-      expect(headings[0]).toHaveTextContent('Observability');
-    });
-
-    it('the exit is a button when it has nowhere to go', async () => {
-      const user = userEvent.setup();
-      const onClick = vi.fn();
-      render(<LeftNavExit onClick={onClick} />);
-      // Defaults to naming the destination rather than a bare "Back".
-      await user.click(screen.getByRole('button', { name: 'Go to home' }));
-      expect(onClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('goes back from the section', async () => {
-      const user = userEvent.setup();
-      const onBack = vi.fn();
-      render(
-        <LeftNavSection title="Billing" onBack={onBack}>
-          <LeftNavItem>Invoices</LeftNavItem>
-        </LeftNavSection>
-      );
-      await user.click(screen.getByRole('button', { name: 'Back to all settings' }));
-      expect(onBack).toHaveBeenCalledTimes(1);
-    });
+    await userEvent.click(screen.getByTitle('Settings'));
+    expect(onViewChange).toHaveBeenCalledWith('settings');
+    expect(onSelect).toHaveBeenCalledWith('users');
+    expect(screen.getByRole('navigation', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByText('People & Access')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search settings')).toBeInTheDocument();
   });
 
-  describe('items', () => {
-    it('is a link with an href and a button without', () => {
-      render(
-        <>
-          <LeftNavItem href="/settings/profile">Profile</LeftNavItem>
-          <LeftNavItem>Opens a section</LeftNavItem>
-        </>
-      );
-      expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute(
-        'href',
-        '/settings/profile'
-      );
-      expect(screen.getByRole('button', { name: 'Opens a section' })).toHaveAttribute(
-        'type',
-        'button'
-      );
-    });
-
-    it('says which page you are on, to a screen reader as well as by eye', () => {
-      render(<LeftNavItem active>Profile</LeftNavItem>);
-      // The grey pill is for everyone else; without this, one group is left out.
-      expect(screen.getByRole('button', { name: 'Profile' })).toHaveAttribute(
-        'aria-current',
-        'page'
-      );
-    });
-
-    it('leaves aria-current off everything else', () => {
-      render(<LeftNavItem>Profile</LeftNavItem>);
-      expect(screen.getByRole('button')).not.toHaveAttribute('aria-current');
-    });
-
-    it('marks an item that opens a second level', () => {
-      const { container } = render(<LeftNavItem hasChildren>Observability</LeftNavItem>);
-      // The trailing chevron is what separates "goes to a page" from "opens a
-      // list" before you press it.
-      expect(container.querySelector('[name="chevron-right"]')).toBeInTheDocument();
-    });
-
-    it('has no chevron when it goes straight to a page', () => {
-      const { container } = render(<LeftNavItem>General</LeftNavItem>);
-      expect(container.querySelector('[name="chevron-right"]')).not.toBeInTheDocument();
-    });
-
-    it('carries a count or a status on the trailing edge', () => {
-      render(<LeftNavItem meta={<span>Beta</span>}>Integrations</LeftNavItem>);
-      expect(screen.getByText('Beta')).toBeInTheDocument();
-    });
-
-    it('disables a button for real', async () => {
-      const user = userEvent.setup();
-      const onClick = vi.fn();
-      render(
-        <LeftNavItem disabled onClick={onClick}>
-          Not yours
-        </LeftNavItem>
-      );
-      const item = screen.getByRole('button', { name: 'Not yours' });
-      expect(item).toBeDisabled();
-      await user.click(item);
-      expect(onClick).not.toHaveBeenCalled();
-    });
-
-    it('says a disabled link is disabled, since HTML has no way to', () => {
-      render(
-        <LeftNavItem href="/nope" disabled>
-          Not yours
-        </LeftNavItem>
-      );
-      const item = screen.getByRole('link', { name: 'Not yours' });
-      expect(item).toHaveAttribute('aria-disabled', 'true');
-      expect(item).toHaveAttribute('tabindex', '-1');
-    });
-  });
-
-  describe('groups', () => {
-    it('labels a block without hiding it', () => {
-      render(
-        <LeftNavGroup label="Personal">
-          <LeftNavItem>Profile</LeftNavItem>
-        </LeftNavGroup>
-      );
-      // A plain heading by default: a control that hides four rows costs a
-      // click and saves nothing.
-      expect(screen.getByText('Personal')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /Personal/ })).not.toBeInTheDocument();
-      expect(screen.getByText('Profile')).toBeInTheDocument();
-    });
-
-    it('does not fold, because a heading is the map', async () => {
-      const user = userEvent.setup();
-      render(
-        <LeftNavGroup label="Workspace">
-          <LeftNavItem>Members</LeftNavItem>
-        </LeftNavGroup>
-      );
-      // Collapsing a heading hides where you are in the list rather than the
-      // detail. What folds is one setting with pages of its own.
-      expect(screen.queryByRole('button', { name: /Workspace/ })).not.toBeInTheDocument();
-      await user.click(screen.getByText('Workspace'));
-      expect(screen.getByText('Members')).toBeVisible();
-    });
-
-    it('takes an unlabelled block', () => {
-      render(
-        <LeftNavGroup>
-          <LeftNavItem>Loose item</LeftNavItem>
-        </LeftNavGroup>
-      );
-      expect(screen.getByText('Loose item')).toBeInTheDocument();
-    });
-  });
-
-  describe('a setting that folds open', () => {
-    it('starts shut, and opens in place', async () => {
-      const user = userEvent.setup();
-      render(
-        <LeftNavExpandable label="Voice">
-          <LeftNavItem>Voice agent</LeftNavItem>
-        </LeftNavExpandable>
-      );
-      expect(screen.queryByText('Voice agent')).not.toBeInTheDocument();
-      const trigger = screen.getByRole('button', { name: /Voice/ });
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-      await user.click(trigger);
-      expect(trigger).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getByText('Voice agent')).toBeVisible();
-    });
-
-    it('starts open when told to', () => {
-      render(
-        <LeftNavExpandable label="Voice" defaultOpen>
-          <LeftNavItem>Voice agent</LeftNavItem>
-        </LeftNavExpandable>
-      );
-      expect(screen.getByText('Voice agent')).toBeVisible();
-    });
-
-    it('can be driven from outside', async () => {
-      const user = userEvent.setup();
-      const onOpenChange = vi.fn();
-      render(
-        <LeftNavExpandable label="Voice" open={false} onOpenChange={onOpenChange}>
-          <LeftNavItem>Voice agent</LeftNavItem>
-        </LeftNavExpandable>
-      );
-      await user.click(screen.getByRole('button', { name: /Voice/ }));
-      expect(onOpenChange).toHaveBeenCalledWith(true);
-      // Controlled, so it did not move on its own.
-      expect(screen.queryByText('Voice agent')).not.toBeInTheDocument();
-    });
-
-    it('points down when shut and up when open, never sideways', async () => {
-      const user = userEvent.setup();
-      const { container } = render(
-        <LeftNavExpandable label="Voice">
-          <LeftNavItem>Voice agent</LeftNavItem>
-        </LeftNavExpandable>
-      );
-      // Two promises, two glyphs: this one opens underneath, `hasChildren`
-      // moves the whole panel. A shut state that rotated to -90 made them
-      // identical at rest, which is the state they are in most of the time.
-      const chevron = container.querySelector('[name="chevron-down"]');
-      expect(chevron).toBeInTheDocument();
-      expect(chevron?.getAttribute('class')).not.toContain('rotate-90');
-      expect(container.querySelector('[name="chevron-right"]')).not.toBeInTheDocument();
-
-      await user.click(screen.getByRole('button', { name: /Voice/ }));
-      expect(container.querySelector('[name="chevron-down"]')?.getAttribute('class')).toContain(
-        'rotate-180'
-      );
-    });
-  });
-
-  describe('the header folds as you scroll', () => {
-    /**
-     * jsdom lays nothing out, so the scroller reports 0 for every metric. These
-     * are the numbers a real panel would have: a list twice the height of the
-     * space it sits in.
-     */
-    const scrollTo = (scroller: HTMLElement, scrollTop: number) => {
-      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
-      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', {
-        value: scrollTop,
-        configurable: true,
-        writable: true,
-      });
-      fireEvent.scroll(scroller);
-    };
-
-    const panel = (
-      <LeftNav>
-        <LeftNavExit onClick={() => undefined} />
-        <LeftNavSearch />
-        <LeftNavBody>
-          <LeftNavItem>Overview</LeftNavItem>
-        </LeftNavBody>
-      </LeftNav>
+  it('Agent Fleet descends a floor; the crumb strip is the way back up, twice', async () => {
+    const onSelect = vi.fn();
+    render(
+      <LeftNav
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        defaultView="settings"
+        onSelect={onSelect}
+      />
     );
-
-    it('stays put - the tile never travels', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const home = screen.getByRole('button', { name: 'Go to home' });
-
-      expect(home.style.left).toBe('0.75rem');
-      scrollTo(scroller, 56);
-      // An earlier version walked it to the right as the header folded, and it
-      // read as a thing escaping rather than a panel tidying itself: the one
-      // fixed point on the screen was the one that moved.
-      expect(home.style.left).toBe('0.75rem');
-    });
-
-    it('gives up the row above so the search rises into it', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const home = screen.getByRole('button', { name: 'Go to home' });
-      const wrapper = home.parentElement as HTMLElement;
-
-      expect(wrapper.style.height).toBe('56px');
-      scrollTo(scroller, 56);
-      // Only the 12px of gutter left: the search is on the home row now.
-      expect(wrapper.style.height).toBe('12px');
-    });
-
-    /** A wheel notch, which is what actually drives the fold. */
-    const wheel = (scroller: HTMLElement, deltaY: number, scrollTop = 0) => {
-      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
-      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', {
-        value: scrollTop,
-        configurable: true,
-        writable: true,
-      });
-      fireEvent.wheel(scroller, { deltaY });
-    };
-
-    it('spends the first wheel on the fold, and never on the list', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-
-      // Half a fold's worth of wheel: the header is halfway and the list has
-      // not been asked to move. A row sliding under the search before the
-      // search has finished arriving is the thing that reads as broken.
-      wheel(scroller, 28);
-      expect(wrapper.style.height).toBe('34px');
-      wheel(scroller, 28);
-      expect(wrapper.style.height).toBe('12px');
-    });
-
-    it('unfolds on the way back up before the list moves', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-
-      wheel(scroller, 56);
-      expect(wrapper.style.height).toBe('12px');
-      // At the top of the list, an upward wheel is spent on the header.
-      wheel(scroller, -56, 0);
-      expect(wrapper.style.height).toBe('56px');
-    });
-
-    it('lets the wheel through once the header is folded', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const onWheel = vi.fn();
-      scroller.addEventListener('wheel', onWheel);
-
-      wheel(scroller, 56);
-      const [folding] = onWheel.mock.calls.at(-1) as [WheelEvent];
-      expect(folding.defaultPrevented).toBe(true);
-
-      wheel(scroller, 56, 100);
-      const [through] = onWheel.mock.calls.at(-1) as [WheelEvent];
-      // Nothing intercepted: the list scrolls the way lists scroll.
-      expect(through.defaultPrevented).toBe(false);
-    });
-
-    it('folds at once for a keyboard or a dragged scrollbar', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-
-      // No wheel involved. Half a header with no way to finish it is worse
-      // than a folded one.
-      scrollTo(scroller, 120);
-      expect(wrapper.style.height).toBe('12px');
-    });
-
-    it('never folds further than it can unfold', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-      scrollTo(scroller, 4000);
-      expect(wrapper.style.height).toBe('12px');
-    });
-
-    it('eases open when the level changes, and never while the wheel is on it', async () => {
-      const { container, rerender } = render(
-        <LeftNav>
-          <LeftNavExit onClick={() => undefined} />
-          <LeftNavSearch />
-          <LeftNavBody level={2}>
-            <LeftNavItem>Overview</LeftNavItem>
-          </LeftNavBody>
-        </LeftNav>
-      );
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-
-      wheel(scroller, 56);
-      // Under the wheel the fold must track exactly. A transition here lags
-      // behind your fingers.
-      expect(wrapper.className).not.toContain('mdt-transition-all');
-
-      rerender(
-        <LeftNav>
-          <LeftNavExit onClick={() => undefined} />
-          <LeftNavSearch />
-          <LeftNavBody level={1}>
-            <LeftNavItem>General</LeftNavItem>
-          </LeftNavBody>
-        </LeftNav>
-      );
-      // Going back from a scrolled second level unfolds the header, and doing
-      // it in one frame is a jolt at the top of the panel.
-      const after = screen.getByRole('button', { name: 'Go to home' }).parentElement as HTMLElement;
-      expect(after.className).toContain('mdt-transition-all');
-      expect(after.className).toContain('motion-reduce:mdt-transition-none');
-
-      await waitFor(() => {
-        expect(
-          (screen.getByRole('button', { name: 'Go to home' }).parentElement as HTMLElement)
-            .className
-        ).not.toContain('mdt-transition-all');
-      });
-    });
-
-    it('does not fold at all when there is barely anything to scroll', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      const wrapper = screen.getByRole('button', { name: 'Go to home' })
-        .parentElement as HTMLElement;
-
-      // A list 20px taller than the panel can scroll 20px and no further, which
-      // used to leave the header stopped a third of the way through folding -
-      // parked in the middle of nowhere and staying there.
-      Object.defineProperty(scroller, 'scrollHeight', { value: 420, configurable: true });
-      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', {
-        value: 20,
-        configurable: true,
-        writable: true,
-      });
-      fireEvent.scroll(scroller);
-      expect(wrapper.style.height).toBe('56px');
-    });
-
-    it('makes room on the left, where the tile already is', () => {
-      const { container } = render(panel);
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      // The padded wrapper, found by the thing under test rather than by
-      // counting parents - `Input` wraps itself and the count would be a
-      // hostage to its internals.
-      const field = container.querySelector('[style*="padding-left"]') as HTMLElement;
-      expect(field.style.paddingLeft).toBe('12px');
-      scrollTo(scroller, 56);
-      expect(field.style.paddingLeft).toBe('52px');
-    });
+    await userEvent.click(screen.getByTitle('Agent Fleet'));
+    expect(onSelect).toHaveBeenCalledWith('home');
+    expect(screen.getByText('Command center')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search fleet')).toBeInTheDocument();
+    await userEvent.click(screen.getByTitle('Back to all settings'));
+    expect(screen.getByText('People & Access')).toBeInTheDocument();
+    await userEvent.click(screen.getByTitle('Back to workspace'));
+    expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
   });
 
-  describe('the fades', () => {
-    const fades = (container: HTMLElement) =>
-      [...container.querySelectorAll('[aria-hidden].mdt-pointer-events-none')].map(
-        (node) => !node.className.includes('mdt-opacity-0')
-      );
-
-    it('shows neither when the whole list fits', () => {
-      const { container } = render(
-        <LeftNav>
-          <LeftNavBody>
-            <LeftNavItem>Only row</LeftNavItem>
-          </LeftNavBody>
-        </LeftNav>
-      );
-      // A fade with nothing behind it is a lie about there being more.
-      expect(fades(container)).toEqual([false, false]);
-    });
-
-    it('shows the top one once rows have gone under the search', () => {
-      const { container } = render(
-        <LeftNav>
-          <LeftNavBody>
-            <LeftNavItem>Overview</LeftNavItem>
-          </LeftNavBody>
-        </LeftNav>
-      );
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
-      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', {
-        value: 100,
-        configurable: true,
-        writable: true,
-      });
-      fireEvent.scroll(scroller);
-      expect(fades(container)).toEqual([true, true]);
-    });
-
-    it('drops the bottom one at the end of the list', () => {
-      const { container } = render(
-        <LeftNav>
-          <LeftNavBody>
-            <LeftNavItem>Overview</LeftNavItem>
-          </LeftNavBody>
-        </LeftNav>
-      );
-      const scroller = container.querySelector('[data-level]') as HTMLElement;
-      Object.defineProperty(scroller, 'scrollHeight', { value: 800, configurable: true });
-      Object.defineProperty(scroller, 'clientHeight', { value: 400, configurable: true });
-      Object.defineProperty(scroller, 'scrollTop', {
-        value: 400,
-        configurable: true,
-        writable: true,
-      });
-      fireEvent.scroll(scroller);
-      expect(fades(container)).toEqual([true, false]);
-    });
+  it('a "soon" page refuses the click; the search filters the floor and survives a floor change', async () => {
+    const onSelect = vi.fn();
+    render(
+      <LeftNav
+        collections={COLLECTIONS}
+        settings={SETTINGS}
+        fleet={FLEET}
+        defaultView="settings"
+        onSelect={onSelect}
+      />
+    );
+    await userEvent.click(screen.getByTitle('Permissions'));
+    expect(onSelect).not.toHaveBeenCalledWith('perm');
+    await userEvent.click(screen.getByTitle('Agent Fleet'));
+    await userEvent.type(screen.getByPlaceholderText('Search fleet'), 'insi');
+    expect(screen.queryByText('Command center')).not.toBeInTheDocument();
+    expect(screen.getByText('Insights & alerts')).toBeInTheDocument();
+    // the query is one box across both floors, as in the product
+    await userEvent.click(screen.getByTitle('Back to all settings'));
+    expect(screen.getByPlaceholderText('Search settings')).toHaveValue('insi');
+    expect(screen.queryByText('People & Access')).not.toBeInTheDocument();
   });
 
-  describe('the rest of the anatomy', () => {
-    it('names the search field and takes typing', async () => {
-      const user = userEvent.setup();
-      const onChange = vi.fn();
-      render(<LeftNavSearch onChange={onChange} />);
-      await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'bill');
-      expect(onChange).toHaveBeenCalled();
-    });
-
-    it('takes a different search label', () => {
-      render(<LeftNavSearch label="Find a setting" />);
-      expect(screen.getByRole('searchbox', { name: 'Find a setting' })).toBeInTheDocument();
-    });
-
-    it('slips in the direction of travel, and keeps the fade for anyone who asked for less', () => {
-      const { container, rerender } = render(
-        <LeftNavBody level={2} direction="forward" viewKey="billing">
-          <LeftNavItem>Invoices</LeftNavItem>
-        </LeftNavBody>
-      );
-      const inner = () => container.querySelector('[data-level] > div');
-      expect(inner()?.className).toContain('mdt-animate-nav-in-from-right');
-      expect(inner()?.className).toContain('motion-reduce:mdt-animate-fade-in');
-
-      rerender(
-        <LeftNavBody level={1} direction="back" viewKey="root">
-          <LeftNavItem>General</LeftNavItem>
-        </LeftNavBody>
-      );
-      expect(inner()?.className).toContain('mdt-animate-nav-in-from-left');
-    });
-
-    it('does not animate a panel that has never changed level', () => {
-      const { container } = render(
-        <LeftNavBody>
-          <LeftNavItem>General</LeftNavItem>
-        </LeftNavBody>
-      );
-      expect(container.querySelector('[data-level] > div')?.className).not.toContain('mdt-animate');
-    });
-
-    it('publishes the level, and does not pretend to animate it', () => {
-      const { rerender, container } = render(
-        <LeftNavBody level={1}>
-          <LeftNavItem>Root</LeftNavItem>
-        </LeftNavBody>
-      );
-      // The scroller sits inside a positioned wrapper that holds the fades.
-      expect(container.querySelector('[data-level]')).toHaveAttribute('data-level', '1');
-
-      rerender(
-        <LeftNavBody level={2}>
-          <LeftNavItem>Section</LeftNavItem>
-        </LeftNavBody>
-      );
-      expect(container.querySelector('[data-level]')).toHaveAttribute('data-level', '2');
-      expect(screen.getByText('Section')).toBeInTheDocument();
-      expect(screen.queryByText('Root')).not.toBeInTheDocument();
-    });
-
-    it('holds a footer at the bottom', () => {
-      render(
-        <LeftNav>
-          <LeftNavFooter>
-            <span>Nirav</span>
-          </LeftNavFooter>
-        </LeftNav>
-      );
-      const nav = screen.getByRole('navigation');
-      expect(within(nav).getByText('Nirav')).toBeInTheDocument();
-    });
+  it('scrolling the list tucks the search away; the floor without settings stays on Settings-only behaviour', () => {
+    const onSettings = vi.fn();
+    const { container, unmount } = render(
+      <LeftNav collections={COLLECTIONS} settings={SETTINGS} defaultView="settings" />
+    );
+    const body = container.querySelector('.snv-body') as HTMLElement;
+    fireEvent.scroll(body, { target: { scrollTop: 40 } });
+    expect(container.querySelector('.snv-mid')).toHaveAttribute('data-scrolled', 'true');
+    unmount();
+    render(<LeftNav collections={COLLECTIONS} onSettings={onSettings} />);
+    fireEvent.click(screen.getByTitle('Settings'));
+    expect(onSettings).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
   });
 });

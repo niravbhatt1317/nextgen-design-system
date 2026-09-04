@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
 import {
-  LeftNav,
+  LeftNavOld,
   LeftNavBody,
   LeftNavExit,
   LeftNavExpandable,
@@ -11,9 +11,9 @@ import {
   LeftNavItem,
   LeftNavSearch,
   LeftNavSection,
-} from './LeftNav';
+} from './LeftNavOld';
 import { useLeftNavLevels } from './useLeftNavLevels';
-import type { DataLeftNavProps, LeftNavConfigItem } from './LeftNav.types';
+import type { DataLeftNavProps, LeftNavConfigItem } from './LeftNavOld.types';
 
 /**
  * Entries in the order their headings first appear.
@@ -52,7 +52,7 @@ const flatten = (
 /**
  * DataLeftNav - the whole navigation from one configuration object.
  *
- * `LeftNav` is parts; this is what you reach for when the navigation is data
+ * `LeftNavOld` is parts; this is what you reach for when the navigation is data
  * rather than markup - which it usually is. Permissions decide what a person
  * sees, a server decides what a plan includes, and neither belongs in JSX.
  *
@@ -141,7 +141,7 @@ export function DataLeftNav({
   );
 
   return (
-    <LeftNav label={label} {...props}>
+    <LeftNavOld label={label} {...props}>
       {config.home !== undefined && (
         <LeftNavExit
           {...(config.home.href === undefined ? {} : { href: config.home.href })}
@@ -261,7 +261,7 @@ export function DataLeftNav({
       </LeftNavBody>
 
       {footer !== undefined && <LeftNavFooter>{footer}</LeftNavFooter>}
-    </LeftNav>
+    </LeftNavOld>
   );
 }
 

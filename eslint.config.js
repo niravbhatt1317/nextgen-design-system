@@ -182,6 +182,7 @@ export default tseslint.config(
      */
     files: [
       '**/Sidebar/**',
+      '**/LeftNavOld/**',
       'src/components/index.ts',
     ],
     rules: {

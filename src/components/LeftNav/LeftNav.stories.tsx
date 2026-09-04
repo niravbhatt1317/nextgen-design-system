@@ -1,24 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useMemo, useState } from 'react';
-import { cn } from '@/utils';
-import { Avatar } from '../Avatar';
-import { Badge } from '../Badge';
-import { Icon } from '../Icon';
-import type { IconName } from '../Icon';
-import {
-  LeftNav,
-  LeftNavBody,
-  LeftNavExit,
-  LeftNavFooter,
-  LeftNavExpandable,
-  LeftNavGroup,
-  LeftNavItem,
-  LeftNavSearch,
-  LeftNavSection,
-} from './LeftNav';
-import { DataLeftNav } from './DataLeftNav';
-import { useLeftNavLevels } from './useLeftNavLevels';
-import type { LeftNavConfig } from './LeftNav.types';
+import { useState } from 'react';
+import { LeftNav, LeftNavTrigger } from './LeftNav';
+import type {
+  LeftNavAccount,
+  LeftNavCollection,
+  LeftNavSettingsSection,
+  LeftNavTheme,
+  LeftNavView,
+} from './LeftNav.types';
 
 const meta: Meta<typeof LeftNav> = {
   title: 'Components/LeftNav',
@@ -30,489 +19,350 @@ const meta: Meta<typeof LeftNav> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-interface Page {
-  key: string;
-  label: string;
-  icon: IconName;
-  group?: string;
-  disabled?: boolean;
-  /** Pages of its own. Folds open in place - it never becomes a third level. */
-  pages?: { key: string; label: string }[];
-}
-
-interface Entry {
-  key: string;
-  label: string;
-  icon: IconName;
-  /** Which block of the root list it belongs to. */
-  group: string;
-  meta?: string;
-  pages?: Page[];
-}
-
-/** The root list. Anything with `pages` opens a second level instead of a page. */
-const SETTINGS: Entry[] = [
-  { key: 'general', label: 'General', icon: 'settings', group: 'Workspace' },
-  { key: 'members', label: 'Members', icon: 'users', group: 'Workspace' },
-  { key: 'notifications', label: 'Notifications', icon: 'bell', group: 'Personal' },
+/* The console's own workspace seed: three collections of boards. */
+const COLLECTIONS: LeftNavCollection[] = [
   {
-    key: 'observability',
-    label: 'Observability',
-    icon: 'activity',
-    group: 'Platform',
-    pages: [
-      { key: 'overview', label: 'Overview', icon: 'layout-grid' },
-      { key: 'query', label: 'Query', icon: 'line-chart' },
-      { key: 'notebooks', label: 'Notebooks', icon: 'book-open' },
-      {
-        key: 'alerts',
-        label: 'Alerts',
-        icon: 'alert-triangle',
-        pages: [
-          { key: 'alert-rules', label: 'Rules' },
-          { key: 'alert-channels', label: 'Channels' },
-          { key: 'alert-history', label: 'History' },
-        ],
-      },
-      { key: 'functions', label: 'Functions', icon: 'function-square', group: 'Compute' },
-      { key: 'agent-runs', label: 'Agent runs', icon: 'workflow', group: 'Compute' },
-      { key: 'sandboxes', label: 'Sandboxes', icon: 'terminal', group: 'Compute' },
-      { key: 'edge', label: 'Edge requests', icon: 'globe', group: 'CDN' },
-      { key: 'isr', label: 'ISR', icon: 'file-stack', group: 'CDN' },
-      { key: 'images', label: 'Image optimisation', icon: 'image', group: 'CDN' },
-      { key: 'origins', label: 'External origins', icon: 'shuffle', group: 'CDN', disabled: true },
+    key: 'incident',
+    label: 'Incident Response',
+    defaultOpen: true,
+    children: [
+      { key: 'alerts', label: 'Active Alerts Board', live: true },
+      { key: 'warroom', label: 'Incident War Room', live: true },
+      { key: 'rca', label: 'Root Cause Analysis Board', live: true },
     ],
   },
-  { key: 'security', label: 'Security', icon: 'shield', group: 'Personal' },
-  { key: 'domains', label: 'Domains', icon: 'globe', group: 'Platform' },
+  {
+    key: 'monitoring',
+    label: 'Monitoring & Metrics',
+    children: [
+      { key: 'health', label: 'Service Health', live: true },
+      { key: 'capacity', label: 'Capacity Planning', live: true },
+    ],
+  },
+  {
+    key: 'kb',
+    label: 'Knowledge Base & Solutions',
+    children: [
+      { key: 'articles', label: 'Articles', live: true },
+      { key: 'runbooks', label: 'Runbooks', live: true },
+    ],
+  },
+];
+
+/* The console's settings floor, verbatim (MSP perspective, every entry). */
+const SETTINGS: LeftNavSettingsSection[] = [
+  {
+    key: 'people',
+    label: 'People & Access',
+    items: [
+      { key: 'users', label: 'Users', icon: 'users' },
+      { key: 'service', label: 'Service accounts', icon: 'bot' },
+      { key: 'teams', label: 'Teams', icon: 'users-2' },
+      { key: 'roles', label: 'Roles', icon: 'shield' },
+      { key: 'permissions', label: 'Permissions', icon: 'list-checks', soon: true },
+    ],
+  },
+  {
+    key: 'admin',
+    label: 'Administration',
+    items: [{ key: 'organizations', label: 'Organization', icon: 'building-2' }],
+  },
+  {
+    key: 'custom',
+    label: 'Customization',
+    items: [
+      { key: 'fields', label: 'User attributes', icon: 'user-cog' },
+      { key: 'org_attributes', label: 'Organization attributes', icon: 'sliders-horizontal' },
+    ],
+  },
+  {
+    key: 'operations',
+    label: 'Operations',
+    items: [{ key: 'fleet', label: 'Agent Fleet', icon: 'cpu', section: 'fleet' }],
+  },
+  {
+    key: 'discovery',
+    label: 'Discovery',
+    items: [
+      { key: 'credentials', label: 'Credential profiles', icon: 'key-round' },
+      { key: 'secret_stores', label: 'Secret stores', icon: 'lock' },
+    ],
+  },
+];
+
+/* The console's fleet floor, verbatim: Agent Fleet Management's seven groups. */
+const FLEET: LeftNavSettingsSection[] = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    items: [
+      { key: 'home', label: 'Command center', icon: 'layout-dashboard' },
+      { key: 'insights', label: 'Insights & alerts', icon: 'bell' },
+    ],
+  },
+  {
+    key: 'fleet',
+    label: 'Fleet',
+    items: [
+      { key: 'inventory', label: 'Inventory', icon: 'package' },
+      { key: 'enroll', label: 'Enroll agents', icon: 'package-plus' },
+      { key: 'retire', label: 'Retire agents', icon: 'package-minus' },
+    ],
+  },
+  {
+    key: 'deployments',
+    label: 'Deployments',
+    items: [
+      { key: 'config', label: 'Configuration', icon: 'settings-2' },
+      { key: 'modules', label: 'Modules', icon: 'puzzle' },
+      { key: 'upgrades', label: 'Upgrades', icon: 'arrow-up-circle' },
+    ],
+  },
+  {
+    key: 'fleet_ops',
+    label: 'Operations',
+    items: [
+      { key: 'health_fp', label: 'Health & footprint', icon: 'heart-pulse' },
+      { key: 'diagnose', label: 'Diagnose', icon: 'stethoscope' },
+      { key: 'copilot', label: 'AI copilot', icon: 'sparkles' },
+      { key: 'killswitch', label: 'Kill-switch', icon: 'power' },
+    ],
+  },
+  {
+    key: 'governance',
+    label: 'Governance',
+    items: [
+      { key: 'security', label: 'Security & audit', icon: 'shield-check' },
+      { key: 'aiagents', label: 'AI agents', icon: 'bot' },
+    ],
+  },
+  {
+    key: 'msp',
+    label: 'Tenants',
+    items: [{ key: 'tenants', label: 'MSP operations', icon: 'building-2' }],
+  },
   {
     key: 'integrations',
     label: 'Integrations',
-    icon: 'puzzle',
-    group: 'Platform',
-    meta: 'Beta',
-    pages: [
-      { key: 'installed', label: 'Installed', icon: 'package' },
-      { key: 'marketplace', label: 'Marketplace', icon: 'store' },
-      { key: 'webhooks', label: 'Webhooks', icon: 'webhook', group: 'Developer' },
-      { key: 'api-keys', label: 'API keys', icon: 'key', group: 'Developer' },
-      { key: 'oauth', label: 'OAuth apps', icon: 'lock', group: 'Developer' },
-    ],
+    items: [{ key: 'integrations', label: 'APIs & automation', icon: 'webhook' }],
   },
-  { key: 'billing', label: 'Billing', icon: 'credit-card', group: 'Workspace' },
 ];
 
-/** The raised disc the home button uses, for the footer's controls. */
+/* The console's first ten organizations, names verbatim, so the panel reads
+ * exactly like the product. Per-org member counts are demo values in the
+ * console's own 40–1,440 range; MSP_TOTAL is the product's real 50-org
+ * population, carried explicitly so the where-you-are strip matches. */
+const ORGS = [
+  { id: 'finserve', name: 'Finserve Bank', memberCount: 1284 },
+  { id: 'acmehealth', name: 'Acme Healthcare', memberCount: 812 },
+  { id: 'northwind', name: 'Northwind Manufacturing', memberCount: 1391 },
+  { id: 'kestrel', name: 'Kestrel Retail Group', memberCount: 264 },
+  { id: 'voltaic', name: 'Voltaic Energy', memberCount: 508 },
+  { id: 'beacon', name: 'Beacon Legal LLP', memberCount: 129 },
+  { id: 'saffron', name: 'Saffron Hospitality', memberCount: 976 },
+  { id: 'polaris', name: 'Polaris Logistics', memberCount: 1108 },
+  { id: 'mosaic', name: 'Mosaic Education Trust', memberCount: 342 },
+  { id: 'cedarwood', name: 'Cedarwood Public Library', memberCount: 87 },
+];
+const MSP_TOTAL = 38700;
+
+/* The frame is sized so the rail still has to scroll on the fleet floor (its
+ * longest list): that is where the search tucks into the crumb strip. */
+const FRAME_HEIGHT = 720;
+const FRAME_MAX_WIDTH = 1280;
+
+const FIXED_ROWS: Record<string, string> = {
+  settings: 'Settings',
+  inbox: 'Inbox',
+  explore: 'Explore',
+};
+
+const FLOOR_TITLE: Record<LeftNavView, string> = {
+  workspace: 'Workspace',
+  settings: 'Settings',
+  fleet: 'Agent Fleet',
+};
+
+function labelOf(key: string, collections: LeftNavCollection[]): string {
+  const board = collections.flatMap((c) => c.children).find((ch) => ch.key === key);
+  if (board) return board.label;
+  const page = [...SETTINGS, ...FLEET].flatMap((s) => s.items).find((it) => it.key === key);
+  return page?.label ?? FIXED_ROWS[key] ?? key;
+}
+
 /**
- * The footer's controls: the avatar's size, and flat.
- *
- * 24px to match the avatar beside them, so the row reads as three things of one
- * size rather than a face between two larger buttons. No shadow either - the
- * search is the raised thing on this panel, and a footer that also lifts turns
- * a quiet strip into a second header.
+ * The frame every story shares, shaped like the console's shell: the rail owns
+ * the full height on the left, and everything else is the right section. The
+ * trigger sits in THAT section's header band ([panel icon] | title) — there is
+ * no full-width top bar. The frame is short on purpose, so the rail scrolls.
+ * The canvas echoes whatever the rail last selected.
  */
-const DISC = [
-  'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
-  'mdt-rounded-full mdt-border mdt-border-border mdt-bg-background',
-  'mdt-text-muted-foreground mdt-transition-colors hover:mdt-text-foreground',
-  'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
-].join(' ');
+function WorkspaceDemo({
+  startCollapsed = false,
+  startOrg = 'finserve',
+  startActive = 'warroom',
+  startView = 'workspace',
+  collections = COLLECTIONS,
+}: {
+  startCollapsed?: boolean;
+  startOrg?: string | null;
+  startActive?: string;
+  startView?: LeftNavView;
+  collections?: LeftNavCollection[];
+}) {
+  const [active, setActive] = useState(startActive);
+  const [view, setView] = useState<LeftNavView>(startView);
+  const [collapsed, setCollapsed] = useState(startCollapsed);
+  const [orgId, setOrgId] = useState<string | null>(startOrg);
+  const [theme, setTheme] = useState<LeftNavTheme>('light');
+  const account: LeftNavAccount = {
+    email: 'demo.admin@motadata.com',
+    orgs: ORGS,
+    totalMembers: MSP_TOTAL,
+    currentOrgId: orgId,
+    onSwitchOrg: setOrgId,
+    theme,
+    onThemeChange: setTheme,
+  };
+  return (
+    <div style={{ padding: 24, background: 'hsl(var(--mdt-background))' }}>
+      <div
+        style={{
+          display: 'flex',
+          height: FRAME_HEIGHT,
+          maxWidth: FRAME_MAX_WIDTH,
+          border: '1px solid hsl(var(--mdt-neutral-20))',
+          background: 'hsl(var(--mdt-background))',
+          overflow: 'hidden',
+        }}
+      >
+        <LeftNav
+          collections={collections}
+          settings={SETTINGS}
+          fleet={FLEET}
+          view={view}
+          onViewChange={setView}
+          activeKey={active}
+          onSelect={setActive}
+          account={account}
+          collapsed={collapsed}
+        />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <header
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: 48,
+              padding: '0 12px',
+              borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
+              flex: '0 0 auto',
+            }}
+          >
+            <LeftNavTrigger
+              collapsed={collapsed}
+              onToggle={() => {
+                setCollapsed(!collapsed);
+              }}
+            />
+            <span style={{ fontSize: 13, color: 'hsl(var(--mdt-muted-foreground))' }}>
+              {FLOOR_TITLE[view]}
+            </span>
+          </header>
+          <main
+            style={{
+              flex: 1,
+              display: 'grid',
+              placeItems: 'center',
+              color: 'hsl(var(--mdt-muted-foreground))',
+              fontSize: 13,
+            }}
+          >
+            {view === 'workspace' ? 'Selected: ' : 'Page: '}
+            {labelOf(active, collections)}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-/** The root list's blocks, in the order they are shown. */
-const ROOT_GROUPS = ['Personal', 'Workspace', 'Platform'];
-
-/** The groups a section's pages fall into, in the order they first appear. */
-const groupsOf = (pages: Page[]) => {
-  const order: (string | undefined)[] = [];
-  for (const page of pages) if (!order.includes(page.group)) order.push(page.group);
-  return order.map((group) => ({ group, pages: pages.filter((page) => page.group === group) }));
+/**
+ * The whole rail, as the product ships it: account/place card at the top
+ * (starting in the MSP-wide view, exactly where the product lands after
+ * login), the quiet search (⌘K works), Inbox and Explore, the folder tree
+ * with its connector spine, and Settings pinned at the bottom. Click a folder
+ * to fold its boards; type in the search to filter them. Click Settings to
+ * descend a floor.
+ */
+export const Workspace: Story = {
+  render: () => <WorkspaceDemo startOrg={null} />,
 };
 
 /**
- * The settings navigation, as a premium product builds it.
- *
- * **Two levels and never three.** The root lists everything. Press
- * *Observability* or *Integrations* - the ones with a trailing chevron - and
- * the panel moves to that section. Anything that would have been a third level
- * is flattened here into groups, because depth is where people get lost: three
- * down, "back" has to be pressed an unknown number of times and nobody knows
- * where they are.
- *
- * **Leaving and going up never compete.** This is the problem the component was
- * built around. A settings area that has replaced the app's navigation needs a
- * way out, and the second level needs a way up, and two back arrows in one
- * panel is a coin toss. They are separated on every axis at once:
- *
- * | | Go to home | Observability |
- * | --- | --- | --- |
- * | Where | above the search, never moves | below it, with the content it belongs to |
- * | Glyph | a house on a raised white disc | a flat chevron |
- * | Says | the destination | where you are |
- * | Weight | small, muted, chrome | a heading |
- *
- * Read them together: the top one is a way out of the building, the second is
- * the name of the room you are standing in.
- *
- * **The search stays put.** Forty rows is exactly where scrolling back to the
- * top to find the search field starts to hurt, so it never leaves.
+ * One floor down. The crumb strip (home › Settings) replaces the heading and
+ * is the way back; the list is long enough to scroll, and scrolling tucks the
+ * search into the strip's right end, where a magnifier brings it back (so does
+ * ⌘K). Permissions reads disabled with its "soon" badge; Agent Fleet carries a
+ * chevron because it descends again.
  */
 export const Settings: Story = {
-  render: function SettingsNav() {
-    const levels = useLeftNavLevels();
-    const [current, setCurrent] = useState('general');
-    const [query, setQuery] = useState('');
-
-    const section = SETTINGS.find((entry) => entry.key === levels.section);
-    const needle = query.trim().toLowerCase();
-
-    // Search reaches into the second level too. A settings menu people search
-    // is one where the thing they want is three sections away - matching only
-    // what is on screen would answer "not found" while it sits one press away.
-    const matches = useMemo(() => {
-      if (needle === '') return null;
-      return SETTINGS.flatMap((entry) => {
-        const own = entry.label.toLowerCase().includes(needle) ? [{ entry, page: undefined }] : [];
-        const pages = (entry.pages ?? [])
-          .filter((page) => page.label.toLowerCase().includes(needle))
-          .map((page) => ({ entry, page }));
-        return [...own, ...pages];
-      });
-    }, [needle]);
-
-    return (
-      <div className="mdt-flex mdt-h-screen mdt-bg-muted/30">
-        <LeftNav>
-          <LeftNavExit onClick={() => undefined} />
-          <LeftNavSearch
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-            }}
-          />
-
-          <LeftNavBody level={levels.level} direction={levels.direction} viewKey={levels.viewKey}>
-            {matches !== null ? (
-              <LeftNavGroup
-                label={`${String(matches.length)} ${matches.length === 1 ? 'result' : 'results'}`}
-              >
-                {matches.map(({ entry, page }) => (
-                  <LeftNavItem
-                    key={`${entry.key}-${page?.key ?? 'self'}`}
-                    icon={<Icon name={page?.icon ?? entry.icon} size="sm" aria-hidden />}
-                    active={current === (page?.key ?? entry.key)}
-                    meta={
-                      page ? (
-                        <span className="mdt-truncate mdt-text-xs mdt-text-muted-foreground">
-                          {entry.label}
-                        </span>
-                      ) : undefined
-                    }
-                    onClick={() => {
-                      if (page) levels.open(entry.key);
-                      setCurrent(page?.key ?? entry.key);
-                      setQuery('');
-                    }}
-                  >
-                    {page?.label ?? entry.label}
-                  </LeftNavItem>
-                ))}
-              </LeftNavGroup>
-            ) : section === undefined ? (
-              ROOT_GROUPS.map((group) => (
-                <LeftNavGroup key={group} label={group}>
-                  {SETTINGS.filter((entry) => entry.group === group).map((entry) => (
-                    <LeftNavItem
-                      key={entry.key}
-                      icon={<Icon name={entry.icon} size="sm" aria-hidden />}
-                      active={current === entry.key}
-                      hasChildren={entry.pages !== undefined}
-                      meta={
-                        entry.meta === undefined ? undefined : (
-                          <Badge tone="neutral" size="sm" shape="pill">
-                            {entry.meta}
-                          </Badge>
-                        )
-                      }
-                      onClick={() => {
-                        if (entry.pages) {
-                          levels.open(entry.key);
-                          // Land on the first page rather than on a list with
-                          // nothing chosen. A second level that opens with no
-                          // selection asks you to pick again having just picked.
-                          const first = entry.pages[0];
-                          if (first) setCurrent(first.pages?.[0]?.key ?? first.key);
-                        } else {
-                          setCurrent(entry.key);
-                        }
-                      }}
-                    >
-                      {entry.label}
-                    </LeftNavItem>
-                  ))}
-                </LeftNavGroup>
-              ))
-            ) : (
-              <LeftNavSection title={section.label} onBack={levels.back}>
-                {groupsOf(section.pages ?? []).map(({ group, pages }) => (
-                  <LeftNavGroup
-                    key={group ?? 'ungrouped'}
-                    {...(group === undefined ? {} : { label: group })}
-                  >
-                    {pages.map((page) =>
-                      page.pages ? (
-                        // One setting with pages of its own, folding open in
-                        // place. The group heading above it does not fold -
-                        // that would hide the map rather than the detail.
-                        <LeftNavExpandable
-                          key={page.key}
-                          icon={<Icon name={page.icon} size="sm" aria-hidden />}
-                          label={page.label}
-                          defaultOpen={page.pages.some((child) => child.key === current)}
-                        >
-                          {page.pages.map((child) => (
-                            <LeftNavItem
-                              key={child.key}
-                              active={current === child.key}
-                              onClick={() => {
-                                setCurrent(child.key);
-                              }}
-                            >
-                              {child.label}
-                            </LeftNavItem>
-                          ))}
-                        </LeftNavExpandable>
-                      ) : (
-                        <LeftNavItem
-                          key={page.key}
-                          icon={<Icon name={page.icon} size="sm" aria-hidden />}
-                          active={current === page.key}
-                          disabled={page.disabled ?? false}
-                          onClick={() => {
-                            setCurrent(page.key);
-                          }}
-                        >
-                          {page.label}
-                        </LeftNavItem>
-                      )
-                    )}
-                  </LeftNavGroup>
-                ))}
-              </LeftNavSection>
-            )}
-          </LeftNavBody>
-
-          <LeftNavFooter>
-            <div className="mdt-flex mdt-items-center mdt-gap-2">
-              <Avatar size="sm" name="Nirav Bhatt" />
-              <span className="mdt-flex-1 mdt-truncate mdt-text-sm mdt-font-medium">Nirav</span>
-              {/*
-                The same raised disc as the home button. Three objects on the
-                panel - home, search, these - and every row flat between them,
-                so the chrome and the content never argue.
-              */}
-              <button type="button" aria-label="More" className={DISC}>
-                <Icon name="more-horizontal" size="xs" aria-hidden />
-              </button>
-              <button type="button" aria-label="Notifications" className={cn(DISC, 'mdt-relative')}>
-                <Icon name="bell" size="xs" aria-hidden />
-                <span
-                  aria-hidden
-                  className="mdt-absolute -mdt-right-0.5 -mdt-top-0.5 mdt-h-2 mdt-w-2 mdt-rounded-full mdt-border-2 mdt-border-background mdt-bg-foreground"
-                />
-              </button>
-            </div>
-          </LeftNavFooter>
-        </LeftNav>
-
-        <div className="mdt-flex-1 mdt-p-8">
-          <p className="mdt-text-sm mdt-text-muted-foreground">
-            Showing <span className="mdt-font-medium mdt-text-foreground">{current}</span> — level{' '}
-            {levels.level}
-          </p>
-        </div>
-      </div>
-    );
-  },
+  render: () => <WorkspaceDemo startOrg={null} startView="settings" startActive="users" />,
 };
 
 /**
- * The two controls, side by side, with nothing else on the panel.
- *
- * The whole design problem in one screen. They are never confusable because
- * they are not the same kind of thing: one is chrome that never moves and names
- * where it goes, the other is a heading that names where you are and belongs to
- * the rows beneath it.
+ * Two floors down: the Agent Fleet floor, with a three-step crumb (home ›
+ * Settings › Agent Fleet). Every earlier step is clickable. The search
+ * re-scopes to the fleet and takes the caret on arrival.
  */
-export const LeavingVersusGoingUp: Story = {
-  render: function BothControls() {
-    return (
-      <div className="mdt-flex mdt-h-screen">
-        <LeftNav>
-          <LeftNavExit onClick={() => undefined} />
-          <LeftNavSearch />
-          <LeftNavBody level={2}>
-            <LeftNavSection title="Observability" onBack={() => undefined}>
-              <LeftNavItem icon={<Icon name="layout-grid" size="sm" aria-hidden />} active>
-                Overview
-              </LeftNavItem>
-              <LeftNavItem icon={<Icon name="line-chart" size="sm" aria-hidden />}>
-                Query
-              </LeftNavItem>
-              <LeftNavItem icon={<Icon name="book-open" size="sm" aria-hidden />}>
-                Notebooks
-              </LeftNavItem>
-            </LeftNavSection>
-          </LeftNavBody>
-        </LeftNav>
-        <div className="mdt-flex-1 mdt-p-8 mdt-text-sm mdt-text-muted-foreground">
-          Above the search: a long arrow, muted, naming its destination — a way out.
-          <br />
-          Below it: a chevron and a heading, naming where you are — a way up.
-        </div>
-      </div>
-    );
-  },
+export const AgentFleet: Story = {
+  render: () => <WorkspaceDemo startOrg={null} startView="fleet" startActive="home" />,
 };
 
 /**
- * Group headings, and the one thing that folds.
- *
- * **A heading never folds.** "Workspace" labels a run of settings; hiding it
- * takes away the map rather than the detail, and a control that hides four rows
- * costs a click and saves nothing.
- *
- * **A setting with pages of its own does.** *Voice* is one setting; its three
- * pages belong to it, and folding them hides detail you asked for rather than
- * the structure you navigate by. It carries a chevron that turns downward,
- * where an item opening a second level carries one pointing sideways — two
- * different promises, two different glyphs.
+ * The 56px icon rail. Names survive as tooltips, the account card shows its
+ * avatar alone, and hovering (or clicking) a folder opens its boards in a
+ * flyout with a short grace timer for the pointer's travel. The header-band
+ * trigger expands it again. On the settings floors the crumb strip folds into
+ * stacked icon buttons: home, and one level up when on the fleet floor.
  */
-export const GroupsAndExpanding: Story = {
+export const CollapsedRail: Story = {
+  render: () => <WorkspaceDemo startCollapsed />,
+};
+
+/**
+ * The account card opens the destination panel to its right: where you are,
+ * the go-to-organization list (recently-left places float up), the MSP-wide
+ * door, then email, theme tabs, and Log out. This story starts inside an
+ * organization so the door shows — travel out and back.
+ */
+export const AccountSwitcher: Story = {
+  render: () => <WorkspaceDemo />,
+};
+
+/**
+ * Row states side by side: a selected board, live boards, a not-live board
+ * that keeps its normal look but refuses the click, and a "Soon" board that
+ * fades to 40% while the badge keeps full strength. The account card stays,
+ * as it does everywhere in the product.
+ */
+export const RowStates: Story = {
   render: () => (
-    <div className="mdt-flex mdt-h-screen">
-      <LeftNav>
-        <LeftNavBody>
-          <LeftNavGroup label="Personal">
-            <LeftNavItem icon={<Icon name="user" size="sm" aria-hidden />} active>
-              Profile
-            </LeftNavItem>
-            <LeftNavItem icon={<Icon name="bell" size="sm" aria-hidden />}>
-              Notifications
-            </LeftNavItem>
-          </LeftNavGroup>
-
-          <LeftNavGroup label="Workspace">
-            <LeftNavItem icon={<Icon name="users" size="sm" aria-hidden />}>Members</LeftNavItem>
-            <LeftNavExpandable
-              icon={<Icon name="mic" size="sm" aria-hidden />}
-              label="Voice"
-              defaultOpen
-            >
-              <LeftNavItem>Voice agent</LeftNavItem>
-              <LeftNavItem>Text to speech</LeftNavItem>
-              <LeftNavItem>Speech to text</LeftNavItem>
-            </LeftNavExpandable>
-            <LeftNavItem icon={<Icon name="credit-card" size="sm" aria-hidden />}>
-              Billing
-            </LeftNavItem>
-          </LeftNavGroup>
-        </LeftNavBody>
-      </LeftNav>
-      <div className="mdt-flex-1" />
-    </div>
+    <WorkspaceDemo
+      startActive="selected"
+      collections={[
+        {
+          key: 'states',
+          label: 'Board States',
+          defaultOpen: true,
+          children: [
+            { key: 'selected', label: 'A selected board', live: true },
+            { key: 'live', label: 'A live board', live: true },
+            { key: 'notlive', label: 'Not wired up yet' },
+            { key: 'soon', label: 'Permissions', soon: true },
+          ],
+        },
+        ...COLLECTIONS,
+      ]}
+    />
   ),
-};
-
-/**
- * The same navigation, from one object.
- *
- * `LeftNav` is parts; `DataLeftNav` is what you reach for when the navigation is
- * data rather than markup — which it usually is. Permissions decide what a
- * person sees, a plan decides what a workspace includes, and neither belongs in
- * JSX.
- *
- * **The configuration below is JSON.** Icons are names, not React nodes, so a
- * whole navigation can come from an API, sit in a database, be diffed in a pull
- * request, or be written by a model. That last one is the point of this
- * library, and it is the thing `DataDrivenSidebar` could never do: it took
- * `ReactNode` icons, so its config could only ever be written by hand in
- * TypeScript.
- *
- * Everything the composed version does, this does — two levels, groups, a page
- * that folds open in place, search across the whole tree, the 8px slip. The
- * readout underneath shows what it reported.
- */
-export const FromConfig: Story = {
-  render: function FromConfigDemo() {
-    const [page, setPage] = useState('profile');
-
-    const config: LeftNavConfig = {
-      home: { label: 'Go to home' },
-      search: {},
-      items: [
-        { key: 'profile', label: 'Profile', icon: 'user', group: 'Personal' },
-        { key: 'notifications', label: 'Notifications', icon: 'bell', group: 'Personal' },
-        { key: 'members', label: 'Members', icon: 'users', group: 'Workspace' },
-        { key: 'billing', label: 'Billing', icon: 'credit-card', group: 'Workspace' },
-        {
-          key: 'observability',
-          label: 'Observability',
-          icon: 'activity',
-          group: 'Platform',
-          items: [
-            { key: 'overview', label: 'Overview', icon: 'layout-grid' },
-            { key: 'query', label: 'Query', icon: 'line-chart' },
-            {
-              key: 'alerts',
-              label: 'Alerts',
-              icon: 'alert-triangle',
-              items: [
-                { key: 'alert-rules', label: 'Rules' },
-                { key: 'alert-channels', label: 'Channels' },
-              ],
-            },
-            { key: 'functions', label: 'Functions', icon: 'function-square', group: 'Compute' },
-            { key: 'sandboxes', label: 'Sandboxes', icon: 'terminal', group: 'Compute' },
-            { key: 'edge', label: 'Edge requests', icon: 'globe', group: 'CDN' },
-            { key: 'isr', label: 'ISR', icon: 'file-stack', group: 'CDN' },
-          ],
-        },
-        {
-          key: 'integrations',
-          label: 'Integrations',
-          icon: 'puzzle',
-          group: 'Platform',
-          badge: 'Beta',
-          items: [
-            { key: 'installed', label: 'Installed', icon: 'package' },
-            { key: 'api-keys', label: 'API keys', icon: 'key', group: 'Developer' },
-          ],
-        },
-        { key: 'domains', label: 'Domains', icon: 'globe', group: 'Platform' },
-      ],
-    };
-
-    return (
-      <div className="mdt-flex mdt-h-screen">
-        <DataLeftNav
-          config={config}
-          activeKey={page}
-          onSelect={(key) => {
-            setPage(key);
-          }}
-          footer={
-            <div className="mdt-flex mdt-items-center mdt-gap-2">
-              <Avatar size="sm" name="Nirav Bhatt" />
-              <span className="mdt-flex-1 mdt-truncate mdt-text-sm mdt-font-medium">Nirav</span>
-            </div>
-          }
-        />
-        <div className="mdt-flex-1 mdt-p-8">
-          <p className="mdt-text-sm mdt-text-muted-foreground">
-            Reported: <span className="mdt-font-medium mdt-text-foreground">{page}</span>
-          </p>
-        </div>
-      </div>
-    );
-  },
 };
