@@ -752,7 +752,23 @@ function SettingsRail(props: SettingsRailProps) {
   const [scrolled, setScrolled] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
+
+  /* Tucking the search row hands its height to the list. On a floor that
+   * overflows by less than that, the tuck would end the overflow, the list
+   * would snap back to the top, un-tuck, shrink, overflow again, and shiver
+   * on the spot (seen on the Settings floor: 11px of overflow against a 38px
+   * row). So: tuck only past the threshold AND only when the list still
+   * scrolls after the gift; once tucked, stay tucked until the very top. */
+  const onBodyScroll = (el: HTMLDivElement) => {
+    setScrolled((tucked) => {
+      if (tucked) return el.scrollTop > 0;
+      if (el.scrollTop <= SCROLL_TUCK_AT) return false;
+      const gain = lineRef.current?.getBoundingClientRect().height ?? 0;
+      return el.scrollHeight - el.clientHeight - gain > SCROLL_TUCK_AT;
+    });
+  };
 
   /* Scrolls the search back into view and hands it the caret. */
   const focusSearch = useCallback((delay: number) => {
@@ -836,7 +852,7 @@ function SettingsRail(props: SettingsRailProps) {
             focusSearch(FOCUS_AFTER_SCROLL);
           }}
         />
-        <div className="snv-line">
+        <div className="snv-line" ref={lineRef}>
           <label className="snv-srch">
             <Icon name="search" size={14} />
             <input
@@ -863,7 +879,7 @@ function SettingsRail(props: SettingsRailProps) {
           key={inFleet ? 'fleet' : 'root'}
           ref={bodyRef}
           onScroll={(e) => {
-            setScrolled(e.currentTarget.scrollTop > SCROLL_TUCK_AT);
+            onBodyScroll(e.currentTarget);
           }}
         >
           <SettingsRows

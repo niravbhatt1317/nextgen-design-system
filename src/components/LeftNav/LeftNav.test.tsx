@@ -263,6 +263,9 @@ describe('LeftNav settings floors', () => {
       <LeftNav collections={COLLECTIONS} settings={SETTINGS} defaultView="settings" />
     );
     const body = container.querySelector('.snv-body') as HTMLElement;
+    // a list long enough that it still scrolls once the search row is tucked away
+    Object.defineProperty(body, 'scrollHeight', { value: 900, configurable: true });
+    Object.defineProperty(body, 'clientHeight', { value: 500, configurable: true });
     fireEvent.scroll(body, { target: { scrollTop: 40 } });
     expect(container.querySelector('.snv-mid')).toHaveAttribute('data-scrolled', 'true');
     unmount();
@@ -270,5 +273,42 @@ describe('LeftNav settings floors', () => {
     fireEvent.click(screen.getByTitle('Settings'));
     expect(onSettings).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('navigation', { name: 'Workspace' })).toBeInTheDocument();
+  });
+});
+
+describe('LeftNav settings floor: the search tuck never fights the list height', () => {
+  const layout = (container: HTMLElement, scrollHeight: number, clientHeight: number) => {
+    const body = container.querySelector('.snv-body') as HTMLElement;
+    Object.defineProperty(body, 'scrollHeight', { value: scrollHeight, configurable: true });
+    Object.defineProperty(body, 'clientHeight', { value: clientHeight, configurable: true });
+    const line = container.querySelector('.snv-line') as HTMLElement;
+    line.getBoundingClientRect = () => ({ height: 38 }) as DOMRect;
+    return body;
+  };
+  const scrollTo = (body: HTMLElement, top: number) => {
+    Object.defineProperty(body, 'scrollTop', { value: top, configurable: true, writable: true });
+    fireEvent.scroll(body);
+  };
+
+  it('tucks when the list will still scroll after gaining the search row', () => {
+    const { container } = render(
+      <LeftNav collections={COLLECTIONS} settings={SETTINGS} defaultView="settings" />
+    );
+    const body = layout(container, 900, 500);
+    scrollTo(body, 40);
+    expect(container.querySelector('.snv-mid')).toHaveAttribute('data-scrolled', 'true');
+    scrollTo(body, 3);
+    expect(container.querySelector('.snv-mid')).toHaveAttribute('data-scrolled', 'true');
+    scrollTo(body, 0);
+    expect(container.querySelector('.snv-mid')).not.toHaveAttribute('data-scrolled');
+  });
+
+  it('leaves the search in place when the list overflows by less than the row', () => {
+    const { container } = render(
+      <LeftNav collections={COLLECTIONS} settings={SETTINGS} defaultView="settings" />
+    );
+    const body = layout(container, 584, 573);
+    scrollTo(body, 11);
+    expect(container.querySelector('.snv-mid')).not.toHaveAttribute('data-scrolled');
   });
 });
