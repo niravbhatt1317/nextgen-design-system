@@ -23,6 +23,7 @@ const meta: Meta<typeof BadgeNew> = {
           '| **Three sizes** | 20, 24 and 28px tall, the existing steps. |',
           '| **Small is text or dot** | An icon handed to a small badge is dropped. Medium and large take a 14 or 16px icon. |',
           '| **Our colours** | Seven tones with a meaning. Category colours (LDAP, SCIM…) come in through `palette`. |',
+          '| **Capital first letter** | Every label starts with a capital. A lowercase-only word sits in the lower half of the line box and reads as low, whatever the line-height. |',
           '',
           'The dot is the strong tone colour, 6px, 8px at large. The × on a removable chip exists at',
           "medium and large only. Six of the console's colours have no palette name yet and are flagged",
@@ -54,6 +55,8 @@ const TONE_LABEL: Record<BadgeNewTone, string> = {
   slate: 'Inactive',
   inverse: 'Offboarded',
 };
+/* Labels start with a capital: a lowercase-only word sits in the lower half of the line box and reads as low. */
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 /* Category colours, as a product would pass them. Not tones: they mean nothing. */
 const LDAP: BadgeNewPalette = { fill: '#F2F3FD', ink: '#4F5BC4' };
 const SCIM: BadgeNewPalette = { fill: '#EDF8F7', ink: '#1F7A71', dot: '#22857B' };
@@ -200,14 +203,14 @@ export const Emphasis: Story = {
       <Row label="fill · default">
         {TONES.slice(0, 6).map((tone) => (
           <BadgeNew key={tone} tone={tone} dot>
-            {tone}
+            {cap(tone)}
           </BadgeNew>
         ))}
       </Row>
       <Row label="outline">
         {TONES.slice(0, 6).map((tone) => (
           <BadgeNew key={tone} tone={tone} emphasis="outline">
-            {tone}
+            {cap(tone)}
           </BadgeNew>
         ))}
       </Row>
