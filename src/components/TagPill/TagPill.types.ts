@@ -13,6 +13,13 @@ export type TagPillVariants = VariantProps<typeof TagPillVariantsCVA>;
 export type TagPillShape = 'pill' | 'square';
 
 /**
+ * How the tag is drawn. `fill` is the default: the same neutral tint as a
+ * neutral Badge, no stroke. `outline` clears the fill and draws a light inset
+ * stroke; the geometry does not change.
+ */
+export type TagPillEmphasis = 'fill' | 'outline';
+
+/**
  * Props for the TagPill component.
  *
  * ## What a tag is, and is not
@@ -23,10 +30,9 @@ export type TagPillShape = 'pill' | 'square';
  *
  * ## What is deliberately absent
  *
- * - **Colour.** Neutral only for now. The palette holds seven usable hues, and
- *   deciding whether a tag's colour carries meaning or is a free choice is a
- *   design decision that has not been made. Three of the ten colours this
- *   component used to offer - pink, teal and cyan - are not in the palette at
+ * - **Colour.** Neutral only, by ruling (4 September 2026). Colour on a chip
+ *   means the system set it, which makes it a Badge; a tag is the person's, so
+ *   it keeps the neutral Badge tint and the eye reads the two as one family.
  *   all, so they were never really on offer.
  * - **Clicking the tag itself**, renaming in place, and a field that creates
  *   tags. Those are three separate pieces of work, and two of them are the same
@@ -40,6 +46,9 @@ export type TagPillShape = 'pill' | 'square';
 export interface TagPillOwnProps {
   /** The tag's outline. @default 'pill' */
   shape?: TagPillShape | undefined;
+
+  /** Fill by default; outline on request, never by default. @default 'fill' */
+  emphasis?: TagPillEmphasis | undefined;
 
   /**
    * A small mark before the label, drawn at 12px.

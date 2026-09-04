@@ -26,7 +26,7 @@ const meta: Meta<typeof BadgeOld> = {
           '',
           '`Badge` is now the badge ported from the merged console: the same three sizes, the',
           'console colours, no stroke by default, `slate` and `inverse` tones, `palette` for category',
-          'colours and a × for filter chips. This is the earlier version, kept so the two can be',
+          'colours. This is the earlier version, kept so the two can be',
           'reviewed side by side. `emphasis="subtle"` there is `emphasis="fill"` here.',
           '',
           '**Do not start anything new on it.**',

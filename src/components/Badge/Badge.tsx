@@ -8,8 +8,8 @@ import './badge.css';
 /**
  * Badge styles.
  *
- * One component for the status pill with its dot, the squarer tag, counts,
- * category chips, filter chips with a ×, and the unread marker. Ported from
+ * One component for the status pill with its dot, the squarer category chip, counts,
+ * category chips and the unread marker. Ported from
  * the merged console on 4 September 2026: the previous Badge's spacing, the
  * console's colours, and no stroke by default.
  *
@@ -97,9 +97,6 @@ const DOT_ONLY_SIZE: Record<BadgeSize, string> = {
   lg: 'mdt-size-2.5',
 };
 
-/** The × on a removable chip. Small has none. */
-const REMOVE_PX: Record<BadgeSize, number> = { sm: 0, md: 10, lg: 12 };
-
 /** How wide a truncated label may get before it is cut off. */
 const TRUNCATE_WIDTH = 'mdt-max-w-32';
 
@@ -118,25 +115,6 @@ function capCount(children: BadgeProps['children'], max: number | undefined) {
   return `${String(max)}+`;
 }
 
-/* The × is drawn inline so it holds its exact size; the Icon wrapper snaps to its own steps. */
-function Cross({ px }: { px: number }) {
-  return (
-    <svg
-      width={px}
-      height={px}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  );
-}
-
 /**
  * Badge - a small label that says what something is.
  *
@@ -146,7 +124,6 @@ function Cross({ px }: { px: number }) {
  * <Badge tone="info" shape="square">3 users</Badge>
  * <Badge tone="danger" emphasis="solid" size="sm" max={99}>1284</Badge>
  * <Badge shape="square" palette={{ fill: '#F2F3FD', ink: '#4F5BC4' }}>LDAP</Badge>
- * <Badge shape="square" onRemove={clear}>Status: Active</Badge>
  * <Badge tone="success" dot aria-label="Online" />
  * ```
  */
@@ -161,8 +138,6 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     palette,
     max,
     truncate = false,
-    onRemove,
-    removeLabel = 'Remove',
     className,
     style,
     children,
@@ -199,7 +174,6 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   }
 
   const iconOnly = showIcon && !hasLabel;
-  const canRemove = size !== 'sm' && typeof onRemove === 'function';
 
   return (
     <span
@@ -232,19 +206,6 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
         >
           {label}
         </span>
-      ) : null}
-      {canRemove ? (
-        <button
-          type="button"
-          className="bdg-remove"
-          aria-label={removeLabel}
-          onClick={(event) => {
-            event.stopPropagation();
-            onRemove();
-          }}
-        >
-          <Cross px={REMOVE_PX[size]} />
-        </button>
       ) : null}
     </span>
   );

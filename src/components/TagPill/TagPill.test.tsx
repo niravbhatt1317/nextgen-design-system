@@ -62,7 +62,7 @@ describe('TagPill', () => {
 
     it('tints neutral in both themes', () => {
       render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-bg-neutral-20');
+      expect(getTag()).toHaveClass('mdt-bg-neutral-10');
       expect(getTag()).toHaveClass('dark:mdt-bg-neutral-120');
     });
   });
@@ -81,6 +81,24 @@ describe('TagPill', () => {
     it('is a pill by default', () => {
       render(<TagPill>{TEXT}</TagPill>);
       expect(getTag()).toHaveClass('mdt-rounded-full');
+    });
+  });
+
+  describe('emphasis', () => {
+    it('is filled by default, the neutral Badge tint, with no stroke of any kind', () => {
+      render(<TagPill>Production</TagPill>);
+      expect(getTag()).toHaveClass('mdt-bg-neutral-10');
+      expect(getTag().className).not.toContain('mdt-shadow-[inset');
+      expect(getTag().className).not.toContain('mdt-border');
+    });
+
+    it('clears the fill and draws a light inset stroke when outlined, without moving', () => {
+      render(<TagPill emphasis="outline">Production</TagPill>);
+      expect(getTag()).toHaveClass('mdt-bg-transparent');
+      expect(getTag().className).toContain('mdt-shadow-[inset_0_0_0_1px');
+      expect(getTag()).not.toHaveClass('mdt-bg-neutral-10');
+      expect(getTag()).toHaveClass('mdt-h-6');
+      expect(getTag().className).not.toContain('mdt-border');
     });
   });
 
@@ -121,9 +139,9 @@ describe('TagPill', () => {
     // The chip only lifts on hover when there is something to act on.
     it('gains a hover state only when it is removable', () => {
       const { rerender } = render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-20');
       rerender(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('hover:mdt-bg-neutral-30');
+      expect(getTag()).toHaveClass('hover:mdt-bg-neutral-20');
     });
 
     it('tightens the right inset when the cross is there', () => {
@@ -157,7 +175,7 @@ describe('TagPill', () => {
 
     it('does not lift on hover', () => {
       render(<TagPill readOnly>{TEXT}</TagPill>);
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-20');
     });
 
     it('keeps the roomier right inset, having no cross to make space for', () => {
@@ -215,7 +233,7 @@ describe('TagPill', () => {
           {TEXT}
         </TagPill>
       );
-      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-30');
+      expect(getTag()).not.toHaveClass('hover:mdt-bg-neutral-20');
     });
   });
 

@@ -26,8 +26,8 @@ export type {
   AvatarShape,
 } from './Avatar';
 
-// Badge — the badge ported from the merged console: status pills, tags, counts,
-// category chips, filter chips and the unread marker. No stroke by default;
+// Badge — the badge ported from the merged console: status pills, sources, counts,
+// category chips and the unread marker; never removable (that is TagPill). No stroke;
 // small is text or dot only. Replaced the previous Badge (now BadgeOld) 2026-09-04.
 export { Badge, badgeVariants } from './Badge';
 export type {
@@ -626,7 +626,13 @@ export type {
 // TagPill — a label a person put there and can take away. Badge is the other
 // half of the pair: a label the system applies, which nobody removes.
 export { TagPill, tagPillVariants } from './TagPill';
-export type { TagPillProps, TagPillOwnProps, TagPillVariants, TagPillShape } from './TagPill';
+export type {
+  TagPillProps,
+  TagPillOwnProps,
+  TagPillVariants,
+  TagPillShape,
+  TagPillEmphasis,
+} from './TagPill';
 
 // Textarea
 export { Textarea, textareaVariants } from './Textarea';

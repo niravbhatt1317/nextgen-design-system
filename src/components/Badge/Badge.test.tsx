@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
-import userEvent from '@testing-library/user-event';
 import { Badge, badgeVariants } from './Badge';
 
 const Glyph = () => (
@@ -231,39 +230,6 @@ describe('Badge', () => {
       render(<Badge truncate>Waiting for the identity provider</Badge>);
       expect(screen.getByTestId('badge')).toHaveClass('mdt-max-w-32');
       expect(screen.getByTestId('badge-label')).toHaveClass('mdt-truncate', 'mdt-min-w-0');
-    });
-  });
-
-  describe('removable chips', () => {
-    it('shows a × at medium that calls back and does not bubble to the chip', async () => {
-      const onRemove = vi.fn();
-      const onClick = vi.fn();
-      render(
-        <Badge shape="square" onRemove={onRemove} onClick={onClick}>
-          Status: Active
-        </Badge>
-      );
-      await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
-      expect(onRemove).toHaveBeenCalledTimes(1);
-      expect(onClick).not.toHaveBeenCalled();
-    });
-
-    it('takes a custom accessible name for the ×', () => {
-      render(
-        <Badge onRemove={() => undefined} removeLabel="Clear the status filter">
-          Status: Active
-        </Badge>
-      );
-      expect(screen.getByRole('button', { name: 'Clear the status filter' })).toBeInTheDocument();
-    });
-
-    it('has no × at small, even when asked', () => {
-      render(
-        <Badge size="sm" onRemove={() => undefined}>
-          Filter
-        </Badge>
-      );
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
   });
 

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Icon } from '../Icon';
+import { TagPill } from '../TagPill';
 import { Badge } from './Badge';
 import type { BadgePalette, BadgeShape, BadgeSize, BadgeTone } from './Badge.types';
 
@@ -13,8 +14,8 @@ const meta: Meta<typeof Badge> = {
     docs: {
       description: {
         component: [
-          'A small label that says what something is: the status pill with its dot, the squarer',
-          'tag, counts, category chips, filter chips with a ×, and the unread marker.',
+          'A small label the system applies and nobody removes: the status pill with its dot, the',
+          'squarer category chip, counts, and the unread marker.',
           '',
           "Ported from the merged console on 4 September 2026: the previous Badge's spacing, the",
           "console's colours, and no stroke by default. The previous component is `BadgeOld`,",
@@ -23,17 +24,18 @@ const meta: Meta<typeof Badge> = {
           '| Rule | |',
           '| --- | --- |',
           '| **Fill only** | No stroke on any badge by default. `outline` is a light tinted stroke, opt-in. `solid` is for counts. |',
-          '| **Two shapes** | `pill` for states; `square` (a 4px corner) for tags, categories and filter chips. |',
+          '| **Two shapes** | `pill` for states; `square` (a 4px corner) for categories, sources and counts like +N. |',
           '| **Three sizes** | 20, 24 and 28px tall. |',
           '| **Small is text or dot** | An icon handed to a small badge is dropped. Medium and large take a 14 or 16px icon. |',
           '| **Eight tones with a meaning** | Category colours (LDAP, SCIM…) come in through `palette`, never as new tones. |',
           '| **Capital first letter** | Every label starts with a capital. A lowercase-only word sits in the lower half of the line box and reads as low, whatever the line-height. |',
           '| **Counts** | `emphasis="solid"`, and `max={99}` renders 1284 as 99+. |',
+          '| **Nobody removes a badge** | The system sets it. A label a person adds and can take away is `TagPill`, which has the ×. |',
           '',
           '**Coming from `BadgeOld`:** `emphasis="subtle"` is now `fill` (still the default, now',
           'without a stroke); `slate` and `inverse` join the tones and `ai` stays; the 12px icon at',
-          'small is gone; `max`, `truncate` and the dot on its own work as before; `palette` and',
-          '`onRemove` are new.',
+          'small is gone; `max`, `truncate` and the dot on its own work as before; `palette` is',
+          'new. There is no ×: a label a person can remove is `TagPill`.',
           '',
           "The dot is the strong tone colour, 6px, 8px at large. Six of the console's colours have no",
           "palette name yet and are flagged in `badge.css`. Dark mode carries the previous Badge's",
@@ -144,16 +146,6 @@ function Matrix({ shape }: { shape: BadgeShape }) {
                 icon={<Icon name="shield" size={px[size]} />}
                 aria-label="Protected"
               />
-              <Badge
-                shape={shape}
-                size={size}
-                tone="neutral"
-                onRemove={() => {
-                  /* the story only shows the ×; the product decides what removing means */
-                }}
-              >
-                Filter
-              </Badge>
             </>
           )}
         </Row>
@@ -171,7 +163,7 @@ export const Pill: Story = {
   render: () => <Matrix shape="pill" />,
 };
 
-/** Rounded square: the 4px corner. Tags, categories, filter chips and "+N" wear this shape. */
+/** Rounded square: the 4px corner. Categories, sources and "+N" wear this shape. */
 export const RoundedSquare: Story = {
   render: () => <Matrix shape="square" />,
 };
@@ -312,7 +304,7 @@ export const LongLabels: Story = {
   },
 };
 
-/** Where each one lives in the product: a table row, the sidebar's Soon row, tab counts, filter chips. */
+/** Where each one lives in the product: a table row, the sidebar's Soon row, tab counts; and beside them the tags a person can remove, which are TagPill. */
 export const InPlace: Story = {
   render: function InPlaceStory() {
     const [filters, setFilters] = useState(['Status: Active', 'Source: LDAP', 'Team: Platform']);
@@ -403,18 +395,18 @@ export const InPlace: Story = {
             </Badge>
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ color: muted, fontSize: 12 }}>TagPill, not Badge:</span>
           {filters.map((f) => (
-            <Badge
+            <TagPill
               key={f}
               shape="square"
               onRemove={() => {
                 setFilters((cur) => cur.filter((x) => x !== f));
               }}
-              removeLabel={`Remove ${f}`}
             >
               {f}
-            </Badge>
+            </TagPill>
           ))}
           {filters.length === 0 ? (
             <span style={{ color: muted, fontSize: 13 }}>No filters</span>
@@ -447,6 +439,5 @@ export const Playground: Story = {
     children: { control: 'text' },
     icon: { control: false },
     palette: { control: false },
-    onRemove: { control: false },
   },
 };

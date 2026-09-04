@@ -32,13 +32,24 @@ export const tagPillVariants = cva(
     // chip read as a dark-edged object rather than a soft one - and on a white
     // page that is heavier still. The fill alone carries the shape at 1.22
     // against the page, which is what a subtle chip is supposed to do.
-    // Neutral only. Colour is a separate decision - see TagPill.types.ts.
-    'mdt-bg-neutral-20 mdt-text-neutral-110',
+    // Neutral only, by ruling (4 September 2026): the same neutral as Badge, so the
+    // pair reads as one family. Colour on a chip means the system set it: a Badge.
+    'mdt-bg-neutral-10 mdt-text-neutral-130',
     'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
   {
     variants: {
+      /**
+       * Fill is the default: the same neutral tint as a neutral Badge, no stroke.
+       * Outline clears the fill and draws a light inset stroke, so the geometry
+       * does not change and nothing beside it moves.
+       */
+      emphasis: {
+        fill: '',
+        outline:
+          'mdt-bg-transparent mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-30))] dark:mdt-bg-transparent dark:mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-100))]',
+      },
       shape: {
         pill: 'mdt-rounded-full',
         square: 'mdt-rounded-sm',
@@ -65,7 +76,7 @@ export const tagPillVariants = cva(
        * than a hover. The palette has nothing between them.
        */
       interactive: {
-        true: 'hover:mdt-bg-neutral-30 dark:hover:mdt-bg-neutral-110',
+        true: 'hover:mdt-bg-neutral-20 dark:hover:mdt-bg-neutral-110',
         false: '',
       },
       disabled: {
@@ -79,6 +90,7 @@ export const tagPillVariants = cva(
     },
     defaultVariants: {
       shape: 'pill',
+      emphasis: 'fill',
       hasAvatar: false,
       removable: false,
       interactive: false,
@@ -104,7 +116,7 @@ const REMOVE_CLASSES = [
   'mdt-text-muted-foreground mdt-transition-colors',
   // One step above the hovered chip. Two steps measured 2.18 against it and
   // read as a hard grey blob rather than a surface.
-  'hover:mdt-bg-neutral-40 hover:mdt-text-neutral-110',
+  'hover:mdt-bg-neutral-30 hover:mdt-text-neutral-130',
   'dark:hover:mdt-bg-neutral-100 dark:hover:mdt-text-neutral-30',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
   'disabled:mdt-pointer-events-none',
@@ -132,6 +144,7 @@ const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
   (
     {
       shape,
+      emphasis,
       icon,
       avatar,
       onRemove,
@@ -155,6 +168,7 @@ const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
         className={cn(
           tagPillVariants({
             shape,
+            emphasis,
             hasAvatar,
             removable,
             interactive: removable && !disabled,

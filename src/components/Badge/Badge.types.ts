@@ -31,7 +31,7 @@ export type BadgeTone =
  */
 export type BadgeEmphasis = 'fill' | 'outline' | 'solid';
 
-/** `pill` for states. `square` (a 4px corner) for tags, categories and filter chips. */
+/** `pill` for states. `square` (a 4px corner) for categories, sources and counts like +N. */
 export type BadgeShape = 'pill' | 'square';
 
 /** 20, 24 and 28px tall. Small is text or dot only. */
@@ -93,12 +93,6 @@ export interface BadgeOwnProps {
    * @default false
    */
   truncate?: boolean;
-
-  /** Renders a × after the label at medium and large, for filter chips. Ignored at small. */
-  onRemove?: () => void;
-
-  /** The accessible name of the ×. @default 'Remove' */
-  removeLabel?: string;
 
   /** The label. */
   children?: ReactNode;

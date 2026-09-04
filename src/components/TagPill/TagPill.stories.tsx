@@ -21,6 +21,7 @@ const meta: Meta<typeof TagPill> = {
           '| Prop | What it does |',
           '| --- | --- |',
           '| `shape` | pill · square |',
+          '| `emphasis` | fill (default) · outline — a light inset stroke, no fill, on request |',
           '| `icon` | a 12px mark before the label |',
           '| `avatar` | a 20px person or thing before the label |',
           '| `onRemove` | adds the cross |',
@@ -28,10 +29,9 @@ const meta: Meta<typeof TagPill> = {
           '| `disabled` | yours, but not right now |',
           '| `truncate` | cut a long label off |',
           '',
-          '**Neutral only for now.** Whether a tag colour carries meaning or is a free',
-          'choice is a design decision that has not been made. Three of the ten colours',
-          'this component used to offer — pink, teal and cyan — are not in the palette at',
-          'all, so they were never really on offer.',
+          '**Neutral only, by ruling.** Colour on a chip means the system set it, which makes it',
+          "a Badge. A tag is the person's, so it keeps the neutral Badge tint and the eye reads",
+          'the two as one family.',
           '',
           '**One size, 24px.** A remove control needs a 24 × 24 target to be reliably',
           'hittable, and a shorter chip cannot hold one.',
@@ -109,6 +109,39 @@ export const States: Story = {
         <Row>
           <TagPill>Production</TagPill>
           <TagPill shape="square">Production</TagPill>
+        </Row>
+      </div>
+    </Group>
+  ),
+};
+
+/** Fill is the default. Outline clears the fill and draws a light inset stroke; nothing moves. */
+export const Emphasis: Story = {
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: (args) => (
+    <Group>
+      <div>
+        <Label>Fill — the default, the same neutral as a Badge</Label>
+        <Row>
+          <TagPill onRemove={args.onRemove}>Production</TagPill>
+          <TagPill shape="square" onRemove={args.onRemove}>
+            Production
+          </TagPill>
+          <TagPill readOnly>Owned by IAM</TagPill>
+        </Row>
+      </div>
+      <div>
+        <Label>Outline — on request, never by default</Label>
+        <Row>
+          <TagPill emphasis="outline" onRemove={args.onRemove}>
+            Production
+          </TagPill>
+          <TagPill emphasis="outline" shape="square" onRemove={args.onRemove}>
+            Production
+          </TagPill>
+          <TagPill emphasis="outline" readOnly>
+            Owned by IAM
+          </TagPill>
         </Row>
       </div>
     </Group>
