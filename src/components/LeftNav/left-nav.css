@@ -1177,3 +1177,15 @@ button.snv-chip:hover {
   margin: 0 auto 2px;
   justify-content: center;
 }
+
+/* ── 2026-09-03, found by the Long labels page: the current crumb could not
+ * shrink, so a long floor name ran off the rail and pushed the magnifier out
+ * of view. The current chip now gives way (its text already carries the
+ * ellipsis) and the magnifier keeps its width. The console has the same flaw;
+ * this is the second deliberate deviation from it, after the collapsed gear. ── */
+.snv-chip[data-now='true'] {
+  flex: 0 1 auto;
+}
+.snv-sic {
+  flex: 0 0 auto;
+}
