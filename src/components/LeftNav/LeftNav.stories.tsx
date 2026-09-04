@@ -13,7 +13,61 @@ const meta: Meta<typeof LeftNav> = {
   title: 'Components/LeftNav',
   component: LeftNav,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component: [
+          'The product navigation, ported from the merged console and held to it pixel for pixel.',
+          'One rail, three floors:',
+          '',
+          '| Floor | What it holds | How you get there |',
+          '| --- | --- | --- |',
+          '| **Workspace** | Account card, search, Inbox and Explore, the folder tree of collections and boards, Favorite, and Settings pinned at the bottom | Where the product lands |',
+          '| **Settings** | The categories of settings pages (People & Access, Administration, Customization, Operations, Discovery) | The pinned Settings row |',
+          "| **Agent Fleet** | The fleet module's seven groups | The Agent Fleet entry on the Settings floor |",
+          '',
+          'On the two lower floors a **crumb strip** replaces the heading: home › Settings › Agent Fleet,',
+          'every earlier step clickable. That strip is the only way back up; there is no exit row.',
+          '',
+          '### When to use it',
+          '',
+          'As the left edge of an application shell, 256px wide, full height. It is not a menu inside a',
+          'page and not a settings panel on its own: for a self-contained settings list the deprecated',
+          '`LeftNavOld` still exists for comparison, but nothing new should start on it.',
+          '',
+          '### Behaviour worth knowing',
+          '',
+          '- **Search** filters the current floor. It forces closed folders open when a board matches,',
+          '  and Escape clears it. On the lower floors, scrolling the list tucks the search into the',
+          "  crumb strip's right end; the magnifier there scrolls it back.",
+          '- **Collapsed**, the rail is 56px: names become tooltips, a folder opens its boards in a flyout',
+          '  with a short grace timer for the pointer, and the crumb strip folds into stacked icon',
+          '  buttons. The collapse trigger lives in the page header band, exported as `LeftNavTrigger`.',
+          "- **Descending picks the floor's first page**, exactly as the product routes: Settings lands on",
+          '  Users, Agent Fleet on its command center. `onSelect` reports it like any other pick.',
+          '- **One key space.** `activeKey` names a board or a page on any floor; the collection holding',
+          '  a board is highlighted with it.',
+          '- **Inbox and Explore are inert** because they are inert in the console. Replicate means',
+          '  replicate.',
+          '',
+          '### Keyboard',
+          '',
+          '- Tab moves through the account card, the search, every row and the crumb chips; Enter or',
+          "  Space activates. Every stop shows the library's focus ring.",
+          '- Ctrl/⌘ K hands the search the caret from anywhere on the page.',
+          '- Escape clears the search; a second Escape in the account panel closes it.',
+          '',
+          '### Colour, and the one exception',
+          '',
+          'Every colour is a palette step. The two small headings, **Collections** and **Favorite**, use',
+          '`muted-foreground-subtle` (ink-400, #9B9EAA), which measures 2.67:1 on the panel: an accepted',
+          'exception, chosen so a heading whispers. The six avatar tone pairs in the account panel are',
+          'intentional and outside the palette by decision. Dark mode is carried but not yet audited.',
+        ].join('\n'),
+      },
+    },
+  },
 };
 
 export default meta;
@@ -203,12 +257,18 @@ function WorkspaceDemo({
   startActive = 'warroom',
   startView = 'workspace',
   collections = COLLECTIONS,
+  settings = SETTINGS,
+  fleet = FLEET,
+  orgs = ORGS,
 }: {
   startCollapsed?: boolean;
   startOrg?: string | null;
   startActive?: string;
   startView?: LeftNavView;
   collections?: LeftNavCollection[];
+  settings?: LeftNavSettingsSection[];
+  fleet?: LeftNavSettingsSection[];
+  orgs?: typeof ORGS;
 }) {
   const [active, setActive] = useState(startActive);
   const [view, setView] = useState<LeftNavView>(startView);
@@ -217,7 +277,7 @@ function WorkspaceDemo({
   const [theme, setTheme] = useState<LeftNavTheme>('light');
   const account: LeftNavAccount = {
     email: 'demo.admin@motadata.com',
-    orgs: ORGS,
+    orgs,
     totalMembers: MSP_TOTAL,
     currentOrgId: orgId,
     onSwitchOrg: setOrgId,
@@ -238,8 +298,8 @@ function WorkspaceDemo({
       >
         <LeftNav
           collections={collections}
-          settings={SETTINGS}
-          fleet={FLEET}
+          settings={settings}
+          fleet={fleet}
           view={view}
           onViewChange={setView}
           activeKey={active}
@@ -363,6 +423,119 @@ export const RowStates: Story = {
         },
         ...COLLECTIONS,
       ]}
+    />
+  ),
+};
+
+const ACTIVE_BY_FLOOR: Record<LeftNavView, string> = {
+  workspace: 'warroom',
+  settings: 'users',
+  fleet: 'home',
+};
+
+/**
+ * Every option on one page, driven by the Controls panel: collapse the rail,
+ * start on any floor. Each change re-seeds the frame so the floor you pick is
+ * the floor you see.
+ */
+export const Playground: Story = {
+  args: { collapsed: false, defaultView: 'workspace' },
+  argTypes: {
+    collapsed: { control: 'boolean' },
+    defaultView: { control: 'radio', options: ['workspace', 'settings', 'fleet'] },
+  },
+  render: (args) => {
+    const view: LeftNavView = args.defaultView ?? 'workspace';
+    const collapsed = args.collapsed ?? false;
+    return (
+      <WorkspaceDemo
+        key={`${String(collapsed)}-${view}`}
+        startCollapsed={collapsed}
+        startView={view}
+        startActive={ACTIVE_BY_FLOOR[view]}
+        startOrg={null}
+      />
+    );
+  },
+};
+
+/* The longest names a customer could plausibly type, everywhere a name can go. */
+const LONG_COLLECTIONS: LeftNavCollection[] = [
+  {
+    key: 'long',
+    label: 'Enterprise Infrastructure Monitoring and Capacity Planning Programme',
+    defaultOpen: true,
+    children: [
+      {
+        key: 'long-a',
+        label: 'Quarterly Business Continuity and Disaster Recovery Readiness Review Board',
+        live: true,
+      },
+      {
+        key: 'long-b',
+        label: 'Customer-Facing Service Level Agreement Breach Investigations',
+        live: true,
+      },
+      {
+        key: 'long-c',
+        label: 'Regional Data Centre Power and Cooling Anomaly Watchlist',
+        soon: true,
+      },
+    ],
+  },
+  ...COLLECTIONS,
+];
+const LONG_ORGS = [
+  {
+    id: 'long-org',
+    name: 'Northwind Manufacturing and Logistics Holdings International Limited',
+    memberCount: 1391,
+  },
+  ...ORGS.slice(1),
+];
+const LONG_SETTINGS: LeftNavSettingsSection[] = SETTINGS.map((sec) =>
+  sec.key === 'operations'
+    ? {
+        ...sec,
+        items: [
+          {
+            key: 'fleet',
+            label: 'Agent Fleet Management and Remote Operations Centre',
+            icon: 'cpu',
+            section: 'fleet',
+          },
+        ],
+      }
+    : sec.key === 'custom'
+      ? {
+          ...sec,
+          items: [
+            {
+              key: 'fields',
+              label: 'User attributes and custom profile field definitions',
+              icon: 'user-cog',
+            },
+            ...sec.items.slice(1),
+          ],
+        }
+      : sec
+);
+
+/**
+ * Long names in every place a name can go: the account card, a collection, its
+ * boards, a settings page, and the fleet entry, whose label becomes the current
+ * crumb on the fleet floor. Rows truncate with an ellipsis and keep their full
+ * name as a tooltip; the crumb strip gives the current step what is left after
+ * the earlier steps and the magnifier.
+ */
+export const LongLabels: Story = {
+  render: () => (
+    <WorkspaceDemo
+      startOrg="long-org"
+      startActive="long-a"
+      collections={LONG_COLLECTIONS}
+      settings={LONG_SETTINGS}
+      orgs={LONG_ORGS}
     />
   ),
 };
