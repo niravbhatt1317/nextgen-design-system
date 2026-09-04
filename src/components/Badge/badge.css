@@ -1,0 +1,167 @@
+/* Badge — the console's colours, carried as component variables.
+ *
+ * Pranjal's ruling, 3 September 2026: the previous Badge's spacing, the
+ * console's colours, no stroke by default. Every tone sets three variables
+ * (fill, ink, dot); the emphasis classes read them. Wherever a console value
+ * already IS a palette step it is written by name. Six values are NEW to the
+ * palette and are written as raw triplets, flagged, for the naming session
+ * with Nirav: the success fill and ink, the warning ink and dot, the danger
+ * fill and ink.
+ *
+ * Dark mode carries the previous Badge's pairings (the tone's 90 step as the
+ * fill, its 30 step as the ink) until the console's dark pass; the dot keeps
+ * its strong colour in both modes, as it did before. */
+
+.bdg,
+.bdg-mark,
+.bdg-neutral {
+  --bdg-fill: hsl(var(--mdt-neutral-10));
+  --bdg-ink: hsl(var(--mdt-neutral-130));
+  --bdg-dot: hsl(var(--mdt-neutral-50));
+}
+.bdg-slate {
+  --bdg-fill: hsl(var(--mdt-neutral-20));
+  --bdg-ink: hsl(var(--mdt-neutral-90));
+  --bdg-dot: hsl(var(--mdt-neutral-50));
+}
+.bdg-success {
+  --bdg-fill: hsl(140 52% 91%); /* NEW #DCF4E4 — the console's green-10; the library's is #D4F2E3 */
+  --bdg-ink: hsl(135 59% 32%); /* NEW #21823A — the console's green-80; the library's is #1B6540 */
+  --bdg-dot: hsl(var(--mdt-emerald-60));
+}
+.bdg-warning {
+  --bdg-fill: hsl(var(--mdt-yellow-05));
+  --bdg-ink: hsl(37 95% 32%); /* NEW #A06304 — the console's orange-80 */
+  --bdg-dot: hsl(36 98% 62%); /* NEW #FDB241 — the console's warning */
+}
+.bdg-danger {
+  --bdg-fill: hsl(353 82% 94%); /* NEW #FCE1E4 — the console's red-10 */
+  --bdg-ink: hsl(353 82% 39%); /* NEW #B41226 — the console's red-70 */
+  --bdg-dot: hsl(var(--mdt-red-60));
+}
+.bdg-info {
+  --bdg-fill: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-white)));
+  --bdg-ink: hsl(var(--mdt-azure-60));
+  --bdg-dot: hsl(var(--mdt-azure-60));
+}
+/* AI keeps the library's purple pairing: the 90 step as ink because purple's
+ * mid steps run light (80 on a purple 10 tint measures 5.37, 90 measures 7.31). */
+.bdg-ai {
+  --bdg-fill: hsl(var(--mdt-purple-10));
+  --bdg-ink: hsl(var(--mdt-purple-90));
+  --bdg-dot: hsl(var(--mdt-purple-80));
+}
+.bdg-inverse {
+  --bdg-fill: hsl(var(--mdt-neutral-130));
+  --bdg-ink: hsl(var(--mdt-white));
+  --bdg-dot: hsl(var(--mdt-white) / 0.7);
+}
+
+/* ── dark mode: the previous Badge's pairings ── */
+.dark .bdg,
+.dark .bdg-mark,
+.dark .bdg-neutral {
+  --bdg-fill: hsl(var(--mdt-neutral-120));
+  --bdg-ink: hsl(var(--mdt-neutral-30));
+  --bdg-dot: hsl(var(--mdt-muted-foreground));
+}
+.dark .bdg-slate {
+  --bdg-fill: hsl(var(--mdt-neutral-110));
+  --bdg-ink: hsl(var(--mdt-neutral-40));
+  --bdg-dot: hsl(var(--mdt-muted-foreground));
+}
+.dark .bdg-success {
+  --bdg-fill: hsl(var(--mdt-green-90));
+  --bdg-ink: hsl(var(--mdt-green-30));
+}
+.dark .bdg-warning {
+  --bdg-fill: hsl(var(--mdt-orange-90));
+  --bdg-ink: hsl(var(--mdt-orange-30));
+}
+.dark .bdg-danger {
+  --bdg-fill: hsl(var(--mdt-red-90));
+  --bdg-ink: hsl(var(--mdt-red-30));
+}
+.dark .bdg-info {
+  --bdg-fill: hsl(var(--mdt-blue-90));
+  --bdg-ink: hsl(var(--mdt-blue-30));
+}
+.dark .bdg-ai {
+  --bdg-fill: hsl(var(--mdt-purple-100));
+  --bdg-ink: hsl(var(--mdt-purple-30));
+}
+.dark .bdg-inverse {
+  --bdg-fill: hsl(var(--mdt-neutral-30));
+  --bdg-ink: hsl(var(--mdt-neutral-130));
+  --bdg-dot: hsl(var(--mdt-neutral-130) / 0.7);
+}
+
+/* ── emphasis ── */
+.bdg-fill {
+  background: var(--bdg-fill);
+  color: var(--bdg-ink);
+  border-color: transparent;
+}
+.bdg-outline {
+  background: transparent;
+  color: var(--bdg-ink);
+  /* the light tinted stroke: the tone at a third of its strength, never the ink */
+  border-color: color-mix(in srgb, var(--bdg-dot) 35%, transparent);
+}
+.bdg-solid {
+  background: var(--bdg-dot);
+  color: hsl(var(--mdt-white));
+  border-color: transparent;
+}
+.bdg-inverse.bdg-solid {
+  background: var(--bdg-fill);
+  color: var(--bdg-ink);
+}
+
+/* ── the dot ── */
+.bdg-dot {
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--bdg-dot);
+}
+/* On a filled chip the tone colour would vanish into the fill, so the dot borrows the text colour. */
+.bdg-solid .bdg-dot {
+  background: currentColor;
+  opacity: 0.8;
+}
+/* The unread marker: a dot with no chip around it. */
+.bdg-mark {
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--bdg-dot);
+}
+
+/* ── the × on removable chips ── */
+.bdg-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 2px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+}
+.bdg-remove:hover {
+  opacity: 1;
+}
+.bdg-remove:focus-visible {
+  outline: none;
+  opacity: 1;
+  box-shadow:
+    0 0 0 2px hsl(var(--mdt-background)),
+    0 0 0 4px hsl(var(--mdt-ring));
+}

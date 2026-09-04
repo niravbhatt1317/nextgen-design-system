@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 878,
+  "capabilityCount": 890,
   "counts": {
-    "story": 642,
-    "component": 198,
+    "story": 653,
+    "component": 199,
     "utility": 16,
     "hook": 22
   },
@@ -415,7 +415,17 @@
       "file": "src/components/Badge/Badge.tsx",
       "area": "Badge",
       "summary": "Badge - a small label that says what something is.",
-      "doc": "Badge - a small label that says what something is. ```tsx <Badge tone=\"success\" dot>Active</Badge> <Badge tone=\"info\" shape=\"square\">3 users</Badge> <Badge tone=\"danger\" emphasis=\"solid\" max={99}>1284</Badge> <Badge tone=\"danger\" icon={<Icon name=\"x\" />} aria-label=\"Failed\" /> <Badge tone=\"success\" dot aria-label=\"Healthy\" /> ```",
+      "doc": "Badge - a small label that says what something is. ```tsx <Badge tone=\"success\" dot>Active</Badge> <Badge tone=\"info\" shape=\"square\">3 users</Badge> <Badge tone=\"danger\" emphasis=\"solid\" size=\"sm\" max={99}>1284</Badge> <Badge shape=\"square\" palette={{ fill: '#F2F3FD', ink: '#4F5BC4' }}>LDAP</Badge> <Badge shape=\"square\" onRemove={clear}>Status: Active</Badge> <Badge tone=\"success\" dot aria-label=\"Online\" /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "BadgeOld",
+      "kind": "component",
+      "file": "src/components/BadgeOld/BadgeOld.tsx",
+      "area": "BadgeOld",
+      "summary": "BadgeOld - a small label that says what something is.",
+      "doc": "BadgeOld - a small label that says what something is. ```tsx <BadgeOld tone=\"success\" dot>Active</BadgeOld> <BadgeOld tone=\"info\" shape=\"square\">3 users</BadgeOld> <BadgeOld tone=\"danger\" emphasis=\"solid\" max={99}>1284</BadgeOld> <BadgeOld tone=\"danger\" icon={<Icon name=\"x\" />} aria-label=\"Failed\" /> <BadgeOld tone=\"success\" dot aria-label=\"Healthy\" /> ``` instead. This version stays only for side-by-side comparison until the removal pull request.",
       "props": [],
       "propDocs": ""
     },
@@ -1262,10 +1272,10 @@
     {
       "name": "Content",
       "kind": "story",
-      "file": "src/components/Badge/Badge.stories.tsx",
-      "area": "Badge",
-      "summary": "Story: Components/Badge / Content",
-      "doc": "Components/Badge Content",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / Content",
+      "doc": "Deprecated/Badge Old Content",
       "props": [],
       "propDocs": ""
     },
@@ -1396,6 +1406,16 @@
       "area": "Combobox",
       "summary": "Story: Components/Combobox / CountrySelector",
       "doc": "Components/Combobox CountrySelector",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Counts",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / Counts",
+      "doc": "Components/Badge Counts",
       "props": [],
       "propDocs": ""
     },
@@ -1761,6 +1781,16 @@
       "area": "Badge",
       "summary": "Story: Components/Badge / Default",
       "doc": "Components/Badge Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / Default",
+      "doc": "Deprecated/Badge Old Default",
       "props": [],
       "propDocs": ""
     },
@@ -2923,6 +2953,16 @@
       "propDocs": ""
     },
     {
+      "name": "Emphasis",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / Emphasis",
+      "doc": "Components/Badge Emphasis",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "EmptyState",
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
@@ -2965,10 +3005,10 @@
     {
       "name": "EveryCombination",
       "kind": "story",
-      "file": "src/components/Badge/Badge.stories.tsx",
-      "area": "Badge",
-      "summary": "Story: Components/Badge / EveryCombination",
-      "doc": "Components/Badge EveryCombination",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / EveryCombination",
+      "doc": "Deprecated/Badge Old EveryCombination",
       "props": [],
       "propDocs": ""
     },
@@ -3856,6 +3896,16 @@
     {
       "name": "InPlace",
       "kind": "story",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / InPlace",
+      "doc": "Deprecated/Badge Old InPlace",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InPlace",
+      "kind": "story",
       "file": "src/components/TagPill/TagPill.stories.tsx",
       "area": "TagPill",
       "summary": "Story: Components/TagPill / InPlace",
@@ -4569,6 +4619,26 @@
     {
       "name": "LongLabels",
       "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / LongLabels",
+      "doc": "Components/Badge LongLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LongLabels",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / LongLabels",
+      "doc": "Components/LeftNav LongLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LongLabels",
+      "kind": "story",
       "file": "src/components/TagPill/TagPill.stories.tsx",
       "area": "TagPill",
       "summary": "Story: Components/TagPill / LongLabels",
@@ -5265,6 +5335,16 @@
       "propDocs": ""
     },
     {
+      "name": "Pill",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / Pill",
+      "doc": "Components/Badge Pill",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PillHoverCards",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -5291,6 +5371,26 @@
       "area": "Kbd",
       "summary": "Story: Components/Kbd / Platform",
       "doc": "Components/Kbd Platform",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / Playground",
+      "doc": "Components/Badge Playground",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
+      "file": "src/components/LeftNav/LeftNav.stories.tsx",
+      "area": "LeftNav",
+      "summary": "Story: Components/LeftNav / Playground",
+      "doc": "Components/LeftNav Playground",
       "props": [],
       "propDocs": ""
     },
@@ -5705,6 +5805,16 @@
       "propDocs": ""
     },
     {
+      "name": "RoundedSquare",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: Components/Badge / RoundedSquare",
+      "doc": "Components/Badge RoundedSquare",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "RowActions",
       "kind": "story",
       "file": "src/components/Table/TableCellRecipes.stories.tsx",
@@ -6067,10 +6177,10 @@
     {
       "name": "Shapes",
       "kind": "story",
-      "file": "src/components/Badge/Badge.stories.tsx",
-      "area": "Badge",
-      "summary": "Story: Components/Badge / Shapes",
-      "doc": "Components/Badge Shapes",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / Shapes",
+      "doc": "Deprecated/Badge Old Shapes",
       "props": [],
       "propDocs": ""
     },
@@ -6387,10 +6497,10 @@
     {
       "name": "Sizes",
       "kind": "story",
-      "file": "src/components/Badge/Badge.stories.tsx",
-      "area": "Badge",
-      "summary": "Story: Components/Badge / Sizes",
-      "doc": "Components/Badge Sizes",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / Sizes",
+      "doc": "Deprecated/Badge Old Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -7544,6 +7654,16 @@
       "area": "Badge",
       "summary": "Story: Components/Badge / Tones",
       "doc": "Components/Badge Tones",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Tones",
+      "kind": "story",
+      "file": "src/components/BadgeOld/BadgeOld.stories.tsx",
+      "area": "Badge Old",
+      "summary": "Story: Deprecated/Badge Old / Tones",
+      "doc": "Deprecated/Badge Old Tones",
       "props": [],
       "propDocs": ""
     },

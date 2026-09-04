@@ -5,52 +5,54 @@ import type { badgeVariants } from './Badge';
 export type BadgeVariantsType = VariantProps<typeof badgeVariants>;
 
 /**
- * What the badge means, not what colour it is.
+ * What the badge means, not what colour it is. `tone="danger"` still reads
+ * correctly if the brand red changes.
  *
- * Naming by meaning rather than by colour is deliberate. `tone="danger"` still
- * reads correctly if the brand red ever changes, and it tells a reader - human
- * or AI - what the badge is for. `red` tells them neither.
- *
- * `ai` was called `purple` until the tone set was settled. Same colour, but the
- * name now says what it is for, and it matches the `ai` variant Button already
- * ships.
+ * Category colours (LDAP indigo, SCIM teal, a customer's own hue) are not
+ * tones: they mean nothing on their own and come in through `palette`.
  */
-export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'ai';
+export type BadgeTone =
+  | 'neutral'
+  | 'slate'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info'
+  | 'ai'
+  | 'inverse';
 
 /**
  * How loud the badge is.
  *
- * - `subtle`  a pale tint with strong text. The default, and what almost
- *             everything should use.
- * - `outline` no fill at all, just an edge and the label.
- * - `solid`   a filled chip with reversed text. **Counts only** - a
- *             notification total whose whole job is to be seen. A solid badge
- *             used as a status label shouts down everything around it.
- *
- * There is no `bare`. It was an emphasis level pretending to be a shape, it
- * made `shape` meaningless, and nothing outside this folder ever used it.
+ * - `fill`    a pale tint with strong text and no stroke. The default, and what
+ *             almost everything should use.
+ * - `outline` no fill; a light tinted stroke and the label carry the tone.
+ * - `solid`   the strong colour with reversed text. **Counts only.**
  */
-export type BadgeEmphasis = 'subtle' | 'outline' | 'solid';
+export type BadgeEmphasis = 'fill' | 'outline' | 'solid';
 
-/**
- * The badge's outline.
- *
- * - `pill`   fully rounded. Reads as an object sitting on the page.
- * - `square` gently rounded. Sits into a table cell or a column of data more
- *            quietly.
- *
- * `tag` was the old name for `square`. It was renamed because `TagPill` is a
- * separate component and one word cannot mean two things.
- */
+/** `pill` for states. `square` (a 4px corner) for tags, categories and filter chips. */
 export type BadgeShape = 'pill' | 'square';
 
+/** 20, 24 and 28px tall. Small is text or dot only. */
 export type BadgeSize = 'sm' | 'md' | 'lg';
+
+/**
+ * A category colour a product passes in when no tone fits: the fill, the ink,
+ * and the dot (defaults to the ink). Values are whatever CSS accepts; the
+ * component itself stays on tokens.
+ */
+export interface BadgePalette {
+  fill: string;
+  ink: string;
+  dot?: string;
+}
 
 export interface BadgeOwnProps {
   /** What the badge means. @default 'neutral' */
   tone?: BadgeTone;
 
-  /** How loud the badge is. @default 'subtle' */
+  /** How loud the badge is. @default 'fill' */
   emphasis?: BadgeEmphasis;
 
   /** The badge's outline. @default 'pill' */
@@ -60,45 +62,43 @@ export interface BadgeOwnProps {
   size?: BadgeSize;
 
   /**
-   * Shows a small filled dot before the label.
+   * A dot before the label, in the strong tone colour: 6px, 8px at large.
    *
-   * Use it for a live state - active, connected, expired. Do not combine it
-   * with `icon`; a dot and an icon in the same badge encode the same thing
-   * twice, which is a drift the source systems already fell into.
-   *
-   * With no `children` it becomes a dot on its own - the unread marker.
+   * With no label and no icon it becomes a dot on its own, the unread marker,
+   * which steps up at every size so it stays findable without a chip around it.
    * @default false
    */
   dot?: boolean;
 
   /**
-   * Icon shown before the label.
-   *
-   * The badge sizes it for you - 12, 14 and 16px for `sm`, `md` and `lg` - so
-   * the caller never has to pick a size that matches the chip. Whatever `size`
-   * you set on an `<Icon>` here is overridden.
-   *
-   * With no `children` the chip drops its padding and becomes a true circle or
-   * square. That form has no label, so it **needs an `aria-label`**.
+   * A 14px icon at medium, 16px at large. Small is text or dot only, so an
+   * icon handed to it is dropped rather than shrunk. With no label the badge
+   * becomes a square of its own height; give it an `aria-label` then.
    */
   icon?: ReactNode;
 
+  /** Category colours for a badge the tones do not cover. Overrides `tone`. */
+  palette?: BadgePalette;
+
   /**
    * Caps a numeric label. `<Badge max={99}>1284</Badge>` renders `99+`.
-   *
-   * Only applies when `children` is a number. Without it, a four-figure count
-   * stretches whatever it sits in.
+   * Only applies when the label is a number; anything else is left alone.
    */
   max?: number;
 
   /**
    * Cuts a long label off with an ellipsis instead of letting the badge widen.
-   *
-   * Off by default, because silently hiding text is worse than a wide badge
-   * unless you know the space is fixed - a table column, a sidebar row.
+   * Off by default: silently hiding text is worse than a wide badge unless the
+   * space is fixed, such as a table column.
    * @default false
    */
   truncate?: boolean;
+
+  /** Renders a × after the label at medium and large, for filter chips. Ignored at small. */
+  onRemove?: () => void;
+
+  /** The accessible name of the ×. @default 'Remove' */
+  removeLabel?: string;
 
   /** The label. */
   children?: ReactNode;

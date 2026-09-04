@@ -681,6 +681,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
               about their precedence, and people reasonably assume the leftmost
               column decides - it does not, the stack does. Loose next to each
               other the two read as separate facts; in a chip they read as one.
+              Medium, not small: a small badge is text or dot only, and this chip carries the arrow.
             */}
             {sortIndex === undefined ? (
               <Icon
@@ -693,7 +694,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
               <Badge
                 tone="info"
                 shape="pill"
-                size="sm"
+                size="md"
                 icon={<Icon name={SORT_ICON[key]} aria-hidden />}
                 className="mdt-tabular-nums"
               >
