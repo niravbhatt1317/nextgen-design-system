@@ -180,7 +180,13 @@ export default tseslint.config(
      * component reaching for a deprecated one - still fails, which is the
      * behaviour worth keeping.
      */
-    files: ['**/Sidebar/**', '**/LeftNavOld/**', '**/BadgeOld/**', 'src/components/index.ts'],
+    files: [
+      '**/Sidebar/**',
+      '**/LeftNavOld/**',
+      '**/BadgeOld/**',
+      '**/TagPillOld/**',
+      'src/components/index.ts',
+    ],
     rules: {
       '@typescript-eslint/no-deprecated': 'off',
     },

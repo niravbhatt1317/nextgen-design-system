@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 43,
-  "variantGroupCount": 148,
-  "variantValueCount": 480,
+  "componentCount": 44,
+  "variantGroupCount": 155,
+  "variantValueCount": 494,
   "components": [
     {
       "component": "Avatar",
@@ -799,6 +799,33 @@
       "definitions": [
         {
           "name": "tagPillVariants",
+          "variants": {
+            "emphasis": ["fill", "outline"],
+            "shape": ["pill", "square"],
+            "hasAvatar": ["true", "false"],
+            "removable": ["true", "false"],
+            "interactive": ["true", "false"],
+            "disabled": ["true", "false"],
+            "truncate": ["true", "false"]
+          },
+          "defaults": {
+            "shape": "pill",
+            "emphasis": "fill",
+            "hasAvatar": "false",
+            "removable": "false",
+            "interactive": "false",
+            "disabled": "false",
+            "truncate": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "TagPillOld",
+      "file": "src/components/TagPillOld/TagPillOld.tsx",
+      "definitions": [
+        {
+          "name": "tagPillOldVariants",
           "variants": {
             "shape": ["pill", "square"],
             "hasAvatar": ["true", "false"],

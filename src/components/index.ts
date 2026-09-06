@@ -634,6 +634,16 @@ export type {
   TagPillEmphasis,
 } from './TagPill';
 
+// TagPillOld — the previous tag (24px, 10px inset, 4px square corner, no outline).
+// DEPRECATED 2026-09-04: use TagPill.
+export { TagPillOld, tagPillOldVariants } from './TagPillOld';
+export type {
+  TagPillOldProps,
+  TagPillOldOwnProps,
+  TagPillOldVariants,
+  TagPillOldShape,
+} from './TagPillOld';
+
 // Textarea
 export { Textarea, textareaVariants } from './Textarea';
 export type { TextareaProps, TextareaVariants } from './Textarea';
