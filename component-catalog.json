@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
   "componentCount": 44,
-  "variantGroupCount": 155,
-  "variantValueCount": 494,
+  "variantGroupCount": 158,
+  "variantValueCount": 501,
   "components": [
     {
       "component": "Avatar",
@@ -941,7 +941,7 @@
         {
           "name": "toolbarVariants",
           "variants": {
-            "variant": ["default", "compact", "spacious"],
+            "variant": ["default", "compact", "spacious", "band"],
             "border": ["true", "false"],
             "noPaddingLeft": ["true", "false"],
             "noPaddingRight": ["true", "false"],
@@ -955,6 +955,19 @@
             "noPaddingRight": "false",
             "noPaddingTop": "false",
             "noPaddingBottom": "false"
+          }
+        },
+        {
+          "name": "toolbarButtonVariants",
+          "variants": {
+            "shape": ["label", "square"],
+            "open": ["true", "false"],
+            "active": ["true", "false"]
+          },
+          "defaults": {
+            "shape": "label",
+            "open": "false",
+            "active": "false"
           }
         }
       ]

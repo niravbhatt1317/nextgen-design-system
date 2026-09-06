@@ -14,6 +14,12 @@ export const toolbarVariants = cva(
         default: '',
         compact: 'mdt-p-2',
         spacious: 'mdt-p-4',
+        /**
+         * The console's list-page band (Pranjal, 4 September 2026): 60px tall, a
+         * 24px inset, 10px between the controls. Put the right-hand run in a
+         * ToolbarSection after a ToolbarSpacer; a section keeps the library's 8px.
+         */
+        band: 'mdt-h-[60px] mdt-gap-2.5 mdt-px-6 mdt-py-0',
       },
       border: {
         true: 'mdt-border-b mdt-border-border',
@@ -54,11 +60,11 @@ export const toolbarVariants = cva(
  * ```tsx
  * <Toolbar>
  *   <ToolbarSection>
- *     <ToolbarSearch placeholder="Search..." />
+ *     <Input size="sm" placeholder="Search…" />
  *   </ToolbarSection>
  *   <ToolbarSection>
- *     <ToolbarButton>Filters</ToolbarButton>
- *     <ToolbarButton>New</ToolbarButton>
+ *     <ToolbarButton icon={<Icon name="list-filter" />} count={2}>Filters</ToolbarButton>
+ *     <ToolbarButton icon={<Icon name="arrow-up-down" />} dot aria-label="Sort" />
  *   </ToolbarSection>
  * </Toolbar>
  * ```

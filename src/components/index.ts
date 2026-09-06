@@ -680,9 +680,24 @@ export type {
   ToggleGroupItemVariants,
 } from './ToggleGroup';
 
-// Toolbar
-export { Toolbar, ToolbarSection, ToolbarSpacer, toolbarVariants } from './Toolbar';
-export type { ToolbarProps, ToolbarVariants } from './Toolbar';
+// Toolbar — the strip, its sections, and ToolbarButton: the 32px control with the
+// four states (rest, hover, open, active with a count or a dot). Band variant = the
+// console's 60px list-page strip. Ported 2026-09-04.
+export {
+  Toolbar,
+  ToolbarSection,
+  ToolbarSpacer,
+  ToolbarButton,
+  toolbarVariants,
+  toolbarButtonVariants,
+} from './Toolbar';
+export type {
+  ToolbarProps,
+  ToolbarVariants,
+  ToolbarButtonProps,
+  ToolbarButtonOwnProps,
+  ToolbarButtonVariants,
+} from './Toolbar';
 
 // Tooltip
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';

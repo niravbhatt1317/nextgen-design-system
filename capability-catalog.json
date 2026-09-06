@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 898,
+  "capabilityCount": 904,
   "counts": {
-    "story": 660,
-    "component": 200,
+    "story": 665,
+    "component": 201,
     "utility": 16,
     "hook": 22
   },
@@ -296,6 +296,16 @@
       "area": "Callout",
       "summary": "Story: Components/Callout / Announcing",
       "doc": "Components/Callout Announcing",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AsATrigger",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / AsATrigger",
+      "doc": "Components/ToolbarButton AsATrigger",
       "props": [],
       "propDocs": ""
     },
@@ -2277,6 +2287,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / Default",
+      "doc": "Components/ToolbarButton Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Tooltip/Tooltip.stories.tsx",
       "area": "Tooltip",
       "summary": "Story: Components/Tooltip / Default",
@@ -4181,6 +4201,16 @@
       "propDocs": ""
     },
     {
+      "name": "InTheBand",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / InTheBand",
+      "doc": "Components/ToolbarButton InTheBand",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InUse",
       "kind": "story",
       "file": "src/components/AiMark/AiMark.stories.tsx",
@@ -5441,6 +5471,16 @@
       "area": "LeftNav",
       "summary": "Story: Components/LeftNav / Playground",
       "doc": "Components/LeftNav Playground",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / Playground",
+      "doc": "Components/ToolbarButton Playground",
       "props": [],
       "propDocs": ""
     },
@@ -6875,6 +6915,16 @@
       "propDocs": ""
     },
     {
+      "name": "States",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / States",
+      "doc": "Components/ToolbarButton States",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "StatusBadge",
       "kind": "component",
       "file": "src/components/_internal/StatusBadge/StatusBadge.tsx",
@@ -7793,7 +7843,7 @@
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
       "summary": "Toolbar component for displaying search, filters, and action buttons.",
-      "doc": "Toolbar component for displaying search, filters, and action buttons. ```tsx <Toolbar> <ToolbarSection> <ToolbarSearch placeholder=\"Search...\" /> </ToolbarSection> <ToolbarSection> <ToolbarButton>Filters</ToolbarButton> <ToolbarButton>New</ToolbarButton> </ToolbarSection> </Toolbar> ```",
+      "doc": "Toolbar component for displaying search, filters, and action buttons. ```tsx <Toolbar> <ToolbarSection> <Input size=\"sm\" placeholder=\"Search…\" /> </ToolbarSection> <ToolbarSection> <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} dot aria-label=\"Sort\" /> </ToolbarSection> </Toolbar> ```",
       "props": ["children"],
       "propDocs": "Content to display inside the toolbar"
     },
@@ -7814,6 +7864,16 @@
       "area": "Toolbar",
       "summary": "Story: Components/Table/Toolbar / Toolbar",
       "doc": "Components/Table/Toolbar Toolbar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ToolbarButton",
+      "kind": "component",
+      "file": "src/components/Toolbar/ToolbarButton.tsx",
+      "area": "Toolbar",
+      "summary": "ToolbarButton - a control in a Toolbar strip: Filters, a quick filter, Sort, Columns.",
+      "doc": "ToolbarButton - a control in a Toolbar strip: Filters, a quick filter, Sort, Columns. ```tsx <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <PopoverTrigger asChild><ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /></PopoverTrigger> ```",
       "props": [],
       "propDocs": ""
     },

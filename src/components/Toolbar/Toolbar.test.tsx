@@ -127,4 +127,13 @@ describe('Toolbar integration', () => {
     expect(screen.getByText('Left')).toBeInTheDocument();
     expect(screen.getByText('Right')).toBeInTheDocument();
   });
+  it('applies the band variant: 60px tall, 24px inset, 10px gap', () => {
+    render(
+      <Toolbar variant="band">
+        {' '}
+        <span>Filters</span>{' '}
+      </Toolbar>
+    );
+    expect(screen.getByRole('toolbar')).toHaveClass('mdt-h-[60px]', 'mdt-px-6', 'mdt-gap-2.5');
+  });
 });
