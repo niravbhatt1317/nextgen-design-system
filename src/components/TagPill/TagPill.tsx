@@ -12,21 +12,20 @@ import type { TagPillProps } from './TagPill.types';
  *
  * ## The geometry, and why
  *
- * The chip is 24px tall because the remove control needs a 24 x 24 target to be
- * reliably hittable, and a shorter chip cannot hold one. That is also why there
- * is only one size: a small tag would ship a cross people miss.
+ * The chip is 28px tall, with a 12px left inset and, on the square shape, an
+ * 8px corner: the console's numbers, by Pranjal's ruling of 4 September 2026.
+ * The 8px gap before the cross, the hover lift and the cross itself are the
+ * library's. There is still one size: a shorter chip could not hold the
+ * cross's 24 x 24 pointer target.
  *
- * A plain word or an icon sits 10px in. An avatar sits 2px in, because a 20px
- * filled circle already leaves 2px above and below - give it the same 10px as a
- * word and it reads pushed off-centre against its own breathing room.
- *
- * Measured from the ink rather than the boxes, a tag with an icon comes out at
- * 12px of air on each side.
+ * A plain word or an icon sits 12px in. An avatar sits 4px in, because a 20px
+ * filled circle already leaves 4px above and below - give it the same 12px as
+ * a word and it reads pushed off-centre against its own breathing room.
  */
 export const tagPillVariants = cva(
   [
     'mdt-inline-flex mdt-shrink-0 mdt-items-center',
-    'mdt-h-6 mdt-gap-2',
+    'mdt-h-7 mdt-gap-2',
     'mdt-whitespace-nowrap mdt-text-xs mdt-font-medium',
     // No border. The edge sat a full step darker than the fill, which made the
     // chip read as a dark-edged object rather than a soft one - and on a white
@@ -52,20 +51,20 @@ export const tagPillVariants = cva(
       },
       shape: {
         pill: 'mdt-rounded-full',
-        square: 'mdt-rounded-sm',
+        square: 'mdt-rounded-lg',
       },
       /** An avatar hugs the edge; anything else sits back. */
       hasAvatar: {
-        true: 'mdt-pl-0.5',
-        false: 'mdt-pl-2.5',
+        true: 'mdt-pl-1',
+        false: 'mdt-pl-3',
       },
       /**
-       * With a cross, the right inset is only 2px - the cross's own 24px well
-       * supplies the rest, and its glyph lands 12px from the edge either way.
+       * With a cross, the right inset drops to 8px: the 16px well adds 2px around
+       * its 12px glyph, so the glyph lands 10px from the edge, as on the console.
        */
       removable: {
-        true: 'mdt-pr-0.5',
-        false: 'mdt-pr-2.5',
+        true: 'mdt-pr-2',
+        false: 'mdt-pr-3',
       },
       /**
        * The chip lifts on hover. It does not change width; a tag that grows
@@ -103,16 +102,18 @@ export const tagPillVariants = cva(
 /**
  * The remove control.
  *
- * The button is the full height of the chip and 24 wide, so the target is
- * 24 x 24 even though the cross inside it is 12. It has its own hover surface
+ * The visible well is 16 x 16 around a 12px cross; an invisible 4px ring drawn
+ * before it keeps the pointer target at 24 x 24. It has its own hover surface
  * on top of the chip's, so it is clear which of the two you are about to hit.
  *
  * It sits *beside* the label rather than inside it: a button nested in another
  * button is invalid and leaves the cross unreachable by keyboard.
  */
 const REMOVE_CLASSES = [
-  'mdt-inline-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
-  'mdt-rounded-[inherit] mdt-border-0 mdt-bg-transparent mdt-p-0',
+  'mdt-relative mdt-inline-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
+  // The visible well is 16px; this invisible ring keeps the pointer target at 24 x 24.
+  "before:mdt-absolute before:-mdt-inset-1 before:mdt-content-['']",
+  'mdt-rounded-full mdt-border-0 mdt-bg-transparent mdt-p-0',
   'mdt-text-muted-foreground mdt-transition-colors',
   // One step above the hovered chip. Two steps measured 2.18 against it and
   // read as a hard grey blob rather than a surface.

@@ -297,7 +297,7 @@ describe('CheckboxGroup · chips', () => {
 
   it('is taller than a TagPill, which is what keeps the two apart', () => {
     const { container: md } = render3();
-    expect(chips(md)[0]).toHaveClass('mdt-h-8'); // 32px, against TagPill's 24
+    expect(chips(md)[0]).toHaveClass('mdt-h-8'); // 32px, against TagPill's 28
     const { container: sm } = render3({ size: 'sm' });
     expect(chips(sm)[0]).toHaveClass('mdt-h-7');
   });

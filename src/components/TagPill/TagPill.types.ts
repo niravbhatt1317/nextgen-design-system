@@ -37,8 +37,8 @@ export type TagPillEmphasis = 'fill' | 'outline';
  * - **Clicking the tag itself**, renaming in place, and a field that creates
  *   tags. Those are three separate pieces of work, and two of them are the same
  *   problem twice over.
- * - **More than one size.** A remove control needs a 24 x 24 target to be
- *   reliably hittable, and a chip shorter than 24px cannot hold one.
+ * - **More than one size.** One 28px chip, the console's height. The cross keeps a
+ *   24 x 24 pointer target around its 16px well, which a shorter chip could not hold.
  * - **Removing with Backspace.** Tab still reaches the cross and Enter still
  *   fires it, so nothing is lost.
  * - **Moving focus after a removal.** Decided against.

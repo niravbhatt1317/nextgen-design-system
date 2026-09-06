@@ -83,7 +83,7 @@ export const checkboxVariants = cva([], {
       // not actions. Choosing one puts the edge at full strength and lifts the
       // ground a step; the tick on the right does the rest.
       //
-      // 32px and an 8px corner, deliberately unlike TagPill's 24px pill with a
+      // 32px and an 8px corner, deliberately unlike TagPill's 28px pill with a
       // cross. Same shape, opposite meaning: a tag says "this is already chosen,
       // press the cross to take it away", a chip says "press me to choose".
       // Build them alike and people press the tick expecting the option to
@@ -139,7 +139,7 @@ const CheckboxGroupContext = createContext<CheckboxGroupContextValue>({
 });
 
 /**
- * 32px, comfortably above the 24px a TagPill sits at. That gap is doing work:
+ * 32px, comfortably above the 28px a TagPill sits at. That gap is doing work:
  * it is one of the two things keeping "press me to choose" visibly apart from
  * "press the cross to remove this".
  */

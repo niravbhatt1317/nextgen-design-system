@@ -46,11 +46,11 @@ describe('TagPill', () => {
       expect(screen.getByTestId('mine')).toBeInTheDocument();
     });
 
-    // A remove control needs a 24 x 24 target, and a shorter chip cannot hold
+    // 28px, the console's height; the cross keeps a 24 x 24 pointer target, which a shorter chip cannot hold
     // one. That is why there is exactly one size.
     it('is one fixed height', () => {
       render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-h-6');
+      expect(getTag()).toHaveClass('mdt-h-7');
     });
 
     // The edge sat a full step darker than the fill, so the chip read as a
@@ -70,7 +70,7 @@ describe('TagPill', () => {
   describe('shapes', () => {
     const cases: Array<[TagPillShape, string]> = [
       ['pill', 'mdt-rounded-full'],
-      ['square', 'mdt-rounded-sm'],
+      ['square', 'mdt-rounded-lg'],
     ];
 
     it.each(cases)('applies the %s shape', (shape, expected) => {
@@ -97,7 +97,7 @@ describe('TagPill', () => {
       expect(getTag()).toHaveClass('mdt-bg-transparent');
       expect(getTag().className).toContain('mdt-shadow-[inset_0_0_0_1px');
       expect(getTag()).not.toHaveClass('mdt-bg-neutral-10');
-      expect(getTag()).toHaveClass('mdt-h-6');
+      expect(getTag()).toHaveClass('mdt-h-7');
       expect(getTag().className).not.toContain('mdt-border');
     });
   });
@@ -111,6 +111,13 @@ describe('TagPill', () => {
     it('shows the cross when a handler is given', () => {
       render(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
       expect(screen.getByTestId(REMOVE)).toBeInTheDocument();
+    });
+
+    it('draws the cross in a 16px well with a 24px pointer target around it', () => {
+      render(<TagPill onRemove={() => undefined}>Production</TagPill>);
+      const cross = screen.getByTestId('tag-remove');
+      expect(cross).toHaveClass('mdt-h-4', 'mdt-w-4');
+      expect(cross.className).toContain('before:-mdt-inset-1');
     });
 
     it('calls the handler when clicked', async () => {
@@ -146,9 +153,9 @@ describe('TagPill', () => {
 
     it('tightens the right inset when the cross is there', () => {
       const { rerender } = render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-pr-2.5');
+      expect(getTag()).toHaveClass('mdt-pr-3');
       rerender(<TagPill onRemove={vi.fn()}>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-pr-0.5');
+      expect(getTag()).toHaveClass('mdt-pr-2');
     });
   });
 
@@ -184,7 +191,7 @@ describe('TagPill', () => {
           {TEXT}
         </TagPill>
       );
-      expect(getTag()).toHaveClass('mdt-pr-2.5');
+      expect(getTag()).toHaveClass('mdt-pr-3');
     });
   });
 
@@ -258,11 +265,11 @@ describe('TagPill', () => {
     // A filled circle carries no air, so padding it like a word reads lopsided.
     it('pulls the chip in for an avatar and holds it back for anything else', () => {
       const { rerender } = render(<TagPill>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-pl-2.5');
+      expect(getTag()).toHaveClass('mdt-pl-3');
       rerender(<TagPill icon={<svg />}>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-pl-2.5');
+      expect(getTag()).toHaveClass('mdt-pl-3');
       rerender(<TagPill avatar={<span />}>{TEXT}</TagPill>);
-      expect(getTag()).toHaveClass('mdt-pl-0.5');
+      expect(getTag()).toHaveClass('mdt-pl-1');
     });
 
     // A tag has one leading mark, not two.
