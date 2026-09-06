@@ -544,6 +544,7 @@ export {
   tableCellVariants,
   tableRowVariants,
   tableGroupRowVariants,
+  // DEPRECATED 2026-09-04: Toolbar variant="band" + ToolbarButton replace these two
   TableToolbar,
   TableToolbarActions,
   TableSortMenu,
@@ -555,6 +556,7 @@ export {
   TableBulkSeparator,
   DataTable,
   TableFilterMenu,
+  // DEPRECATED 2026-09-04: applied filters are never shown as chips
   TableFilterChips,
   TableColumnMenu,
   TableColumnBoundary,

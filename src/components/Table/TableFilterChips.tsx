@@ -22,6 +22,9 @@ import type { TableFilterChipsProps } from './Table.types';
  * screen reader hears "Remove" once per chip with nothing to tell them apart.
  * The chip's own text carries the answer visually, but not to anyone listening.
  * Naming that control needs a prop on `TagPill`; it cannot be fixed from here.
+ *
+ * @deprecated Since 0.4.0. Applied filters are never shown as chips; the Filters
+ * `ToolbarButton` carries a count instead (ruling of 4 September 2026).
  */
 const TableFilterChips = ({
   filters,
