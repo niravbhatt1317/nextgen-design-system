@@ -4,124 +4,78 @@ import { cn } from '@/utils';
 import type { ToolbarProps } from './Toolbar.types';
 
 /**
- * Toolbar variants using Class Variance Authority (CVA)
+ * Toolbar styles.
+ *
+ * The strip above a list, as the merged console draws it (Pranjal's ruling of
+ * 4 September 2026): 60px tall, a 24px inset, 10px between the controls, on
+ * the page ground. It has no sizes: every list page wears the same strip, and
+ * its controls are ToolbarButton, which are all 32px.
+ *
+ * The right-hand run goes in a ToolbarSection after a ToolbarSpacer; a section
+ * keeps 8px between its own controls.
+ *
+ * The previous general-purpose strip, with its compact and spacious sizes and
+ * padding switches, is ToolbarOld, deprecated.
  */
 export const toolbarVariants = cva(
-  ['mdt-flex mdt-items-center mdt-gap-2', 'mdt-p-3', 'mdt-bg-background'],
+  [
+    'mdt-flex mdt-w-full mdt-items-center mdt-gap-2.5',
+    'mdt-h-[60px] mdt-px-6',
+    'mdt-bg-background',
+  ],
   {
     variants: {
-      variant: {
-        default: '',
-        compact: 'mdt-p-2',
-        spacious: 'mdt-p-4',
-        /**
-         * The console's list-page band (Pranjal, 4 September 2026): 60px tall, a
-         * 24px inset, 10px between the controls. Put the right-hand run in a
-         * ToolbarSection after a ToolbarSpacer; a section keeps the library's 8px.
-         */
-        band: 'mdt-h-[60px] mdt-gap-2.5 mdt-px-6 mdt-py-0',
-      },
+      /** A hairline under the strip, for when the table below has no card of its own. */
       border: {
         true: 'mdt-border-b mdt-border-border',
         false: '',
       },
-      noPaddingLeft: {
-        true: 'mdt-pl-0',
-        false: '',
-      },
-      noPaddingRight: {
-        true: 'mdt-pr-0',
-        false: '',
-      },
-      noPaddingTop: {
-        true: 'mdt-pt-0',
-        false: '',
-      },
-      noPaddingBottom: {
-        true: 'mdt-pb-0',
-        false: '',
-      },
     },
     defaultVariants: {
-      variant: 'default',
-      border: true,
-      noPaddingLeft: false,
-      noPaddingRight: false,
-      noPaddingTop: false,
-      noPaddingBottom: false,
+      border: false,
     },
   }
 );
 
 /**
- * Toolbar component for displaying search, filters, and action buttons.
+ * Toolbar - the strip above a list: search, filters, then sort and columns on the right.
  *
  * @example
  * ```tsx
- * <Toolbar>
+ * <Toolbar label="User controls">
+ *   <Input size="sm" placeholder="Search by name or email" startAdornment={<Icon name="search" size={14} />} />
+ *   <ToolbarButton icon={<Icon name="list-filter" />} count={2} onClick={openDrawer}>Filters</ToolbarButton>
+ *   <ToolbarButton icon={<Icon name="check-circle" />} dot aria-label="Status" />
+ *   <ToolbarSpacer />
  *   <ToolbarSection>
- *     <Input size="sm" placeholder="Search…" />
- *   </ToolbarSection>
- *   <ToolbarSection>
- *     <ToolbarButton icon={<Icon name="list-filter" />} count={2}>Filters</ToolbarButton>
- *     <ToolbarButton icon={<Icon name="arrow-up-down" />} dot aria-label="Sort" />
+ *     <ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" />
+ *     <ToolbarButton icon={<Icon name="columns" />} aria-label="Columns" />
  *   </ToolbarSection>
  * </Toolbar>
  * ```
  */
-const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
-  (
-    {
-      className,
-      variant,
-      border,
-      noPaddingLeft,
-      noPaddingRight,
-      noPaddingTop,
-      noPaddingBottom,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          toolbarVariants({
-            variant,
-            border,
-            noPaddingLeft,
-            noPaddingRight,
-            noPaddingTop,
-            noPaddingBottom,
-          }),
-          className
-        )}
-        role="toolbar"
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-);
+const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(function Toolbar(
+  { className, border, label = 'Toolbar', children, ...props },
+  ref
+) {
+  return (
+    <div
+      ref={ref}
+      role="toolbar"
+      aria-label={label}
+      className={cn(toolbarVariants({ border }), className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
 
 Toolbar.displayName = 'Toolbar';
 
-/**
- * ToolbarSection component for grouping toolbar items.
- *
- * @example
- * ```tsx
- * <ToolbarSection>
- *   <button>Action 1</button>
- *   <button>Action 2</button>
- * </ToolbarSection>
- * ```
- */
+/** A run of controls that keeps 8px between them: the right-hand end of the strip. */
 const ToolbarSection = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(
-  ({ className, children, ...props }, ref) => {
+  function ToolbarSection({ className, children, ...props }, ref) {
     return (
       <div ref={ref} className={cn('mdt-flex mdt-items-center mdt-gap-2', className)} {...props}>
         {children}
@@ -132,21 +86,10 @@ const ToolbarSection = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef
 
 ToolbarSection.displayName = 'ToolbarSection';
 
-/**
- * ToolbarSpacer component for adding flexible space between toolbar sections.
- *
- * @example
- * ```tsx
- * <Toolbar>
- *   <ToolbarSection>Left content</ToolbarSection>
- *   <ToolbarSpacer />
- *   <ToolbarSection>Right content</ToolbarSection>
- * </Toolbar>
- * ```
- */
+/** Pushes what follows it to the far end of the strip. */
 const ToolbarSpacer = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(
-  ({ className, ...props }, ref) => {
-    return <div ref={ref} className={cn('mdt-flex-1', className)} {...props} />;
+  function ToolbarSpacer({ className, ...props }, ref) {
+    return <div ref={ref} className={cn('mdt-flex-1', className)} aria-hidden="true" {...props} />;
   }
 );
 

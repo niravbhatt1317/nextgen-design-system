@@ -145,7 +145,7 @@ export const AsATrigger: Story = {
 };
 
 /**
- * The Users toolbar: the strip's `band` variant, 60px tall with a 24px inset,
+ * The Users toolbar: the strip, 60px tall with a 24px inset,
  * 10px between the controls on the left and 8px on the right. Filters has two
  * applied, the status quick filter one, and a sort is on. No chips.
  */
@@ -154,7 +154,7 @@ export const InTheBand: Story = {
   render: function InTheBandStory() {
     const [open, setOpen] = useState(false);
     return (
-      <Toolbar variant="band">
+      <Toolbar label="User controls">
         <Input
           size="sm"
           placeholder="Search by name or email"

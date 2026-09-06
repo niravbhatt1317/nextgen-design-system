@@ -544,7 +544,7 @@ export {
   tableCellVariants,
   tableRowVariants,
   tableGroupRowVariants,
-  // DEPRECATED 2026-09-04: Toolbar variant="band" + ToolbarButton replace these two
+  // DEPRECATED 2026-09-04: Toolbar + ToolbarButton replace these two
   TableToolbar,
   TableToolbarActions,
   TableSortMenu,
@@ -683,8 +683,8 @@ export type {
 } from './ToggleGroup';
 
 // Toolbar — the strip, its sections, and ToolbarButton: the 32px control with the
-// four states (rest, hover, open, active with a count or a dot). Band variant = the
-// console's 60px list-page strip. Ported 2026-09-04.
+// four states (rest, hover, open, active with a count or a dot). Toolbar IS the
+// console's 60px list-page strip; the old general strip is ToolbarOld. Ported 2026-09-04.
 export {
   Toolbar,
   ToolbarSection,
@@ -700,6 +700,11 @@ export type {
   ToolbarButtonOwnProps,
   ToolbarButtonVariants,
 } from './Toolbar';
+
+// ToolbarOld — the previous general-purpose strip (compact, spacious, padding
+// switches). DEPRECATED 2026-09-04: use Toolbar.
+export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
+export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
 
 // Tooltip
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';

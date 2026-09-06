@@ -185,6 +185,7 @@ export default tseslint.config(
       '**/LeftNavOld/**',
       '**/BadgeOld/**',
       '**/TagPillOld/**',
+      '**/ToolbarOld/**',
       '**/Table/TableToolbar.tsx',
       '**/Table/TableToolbar.stories.tsx',
       '**/Table/TableFilterChips.tsx',

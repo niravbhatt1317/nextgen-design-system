@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 44,
-  "variantGroupCount": 158,
-  "variantValueCount": 501,
+  "componentCount": 45,
+  "variantGroupCount": 159,
+  "variantValueCount": 502,
   "components": [
     {
       "component": "Avatar",
@@ -941,20 +941,10 @@
         {
           "name": "toolbarVariants",
           "variants": {
-            "variant": ["default", "compact", "spacious", "band"],
-            "border": ["true", "false"],
-            "noPaddingLeft": ["true", "false"],
-            "noPaddingRight": ["true", "false"],
-            "noPaddingTop": ["true", "false"],
-            "noPaddingBottom": ["true", "false"]
+            "border": ["true", "false"]
           },
           "defaults": {
-            "variant": "default",
-            "border": "true",
-            "noPaddingLeft": "false",
-            "noPaddingRight": "false",
-            "noPaddingTop": "false",
-            "noPaddingBottom": "false"
+            "border": "false"
           }
         },
         {
@@ -968,6 +958,31 @@
             "shape": "label",
             "open": "false",
             "active": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "ToolbarOld",
+      "file": "src/components/ToolbarOld/ToolbarOld.tsx",
+      "definitions": [
+        {
+          "name": "toolbarOldVariants",
+          "variants": {
+            "variant": ["default", "compact", "spacious"],
+            "border": ["true", "false"],
+            "noPaddingLeft": ["true", "false"],
+            "noPaddingRight": ["true", "false"],
+            "noPaddingTop": ["true", "false"],
+            "noPaddingBottom": ["true", "false"]
+          },
+          "defaults": {
+            "variant": "default",
+            "border": "true",
+            "noPaddingLeft": "false",
+            "noPaddingRight": "false",
+            "noPaddingTop": "false",
+            "noPaddingBottom": "false"
           }
         }
       ]

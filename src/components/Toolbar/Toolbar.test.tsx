@@ -1,139 +1,99 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
+import { createRef } from 'react';
 import { Toolbar, ToolbarSection, ToolbarSpacer } from './Toolbar';
 
 describe('Toolbar', () => {
-  it('renders correctly with children', () => {
+  it('is a toolbar landmark with a spoken name', () => {
+    render(<Toolbar>controls</Toolbar>);
+    expect(screen.getByRole('toolbar', { name: 'Toolbar' })).toBeInTheDocument();
+  });
+
+  it('takes a spoken name of its own', () => {
+    render(<Toolbar label="User controls">controls</Toolbar>);
+    expect(screen.getByRole('toolbar', { name: 'User controls' })).toBeInTheDocument();
+  });
+
+  it('is the console strip: 60px tall, 24px inset, 10px between controls, on the page ground', () => {
+    render(<Toolbar>controls</Toolbar>);
+    expect(screen.getByRole('toolbar')).toHaveClass(
+      'mdt-h-[60px]',
+      'mdt-px-6',
+      'mdt-gap-2.5',
+      'mdt-bg-background'
+    );
+  });
+
+  it('has no hairline unless asked', () => {
+    const { rerender } = render(<Toolbar>controls</Toolbar>);
+    expect(screen.getByRole('toolbar')).not.toHaveClass('mdt-border-b');
+    rerender(<Toolbar border>controls</Toolbar>);
+    expect(screen.getByRole('toolbar')).toHaveClass('mdt-border-b', 'mdt-border-border');
+  });
+
+  it('merges a custom className and forwards the ref', () => {
+    const ref = createRef<HTMLDivElement>();
     render(
-      <Toolbar>
-        <div>Content</div>
+      <Toolbar ref={ref} className="mine">
+        controls
       </Toolbar>
     );
-    expect(screen.getByText('Content')).toBeInTheDocument();
-  });
-
-  it('has toolbar role', () => {
-    render(<Toolbar>Toolbar</Toolbar>);
-    expect(screen.getByRole('toolbar')).toBeInTheDocument();
-  });
-
-  it('applies default variant classes', () => {
-    render(<Toolbar>Content</Toolbar>);
-    const toolbar = screen.getByRole('toolbar');
-    expect(toolbar).toHaveClass('mdt-flex', 'mdt-items-center', 'mdt-p-3');
-  });
-
-  it('applies compact variant classes', () => {
-    render(<Toolbar variant="compact">Content</Toolbar>);
-    const toolbar = screen.getByRole('toolbar');
-    expect(toolbar).toHaveClass('mdt-p-2');
-  });
-
-  it('applies spacious variant classes', () => {
-    render(<Toolbar variant="spacious">Content</Toolbar>);
-    const toolbar = screen.getByRole('toolbar');
-    expect(toolbar).toHaveClass('mdt-p-4');
-  });
-
-  it('accepts custom className', () => {
-    render(<Toolbar className="custom-class">Content</Toolbar>);
-    expect(screen.getByRole('toolbar')).toHaveClass('custom-class');
-  });
-
-  it('forwards ref correctly', () => {
-    const ref = { current: null };
-    render(<Toolbar ref={ref}>Content</Toolbar>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveClass('mine');
   });
 
-  it('has border bottom', () => {
-    render(<Toolbar>Content</Toolbar>);
-    expect(screen.getByRole('toolbar')).toHaveClass('mdt-border-b');
+  it('passes other attributes through', () => {
+    render(<Toolbar data-testid="strip">controls</Toolbar>);
+    expect(screen.getByTestId('strip')).toBeInTheDocument();
   });
 });
 
 describe('ToolbarSection', () => {
-  it('renders correctly with children', () => {
-    render(<ToolbarSection>Section Content</ToolbarSection>);
-    expect(screen.getByText('Section Content')).toBeInTheDocument();
-  });
-
-  it('applies flex classes', () => {
-    const { container } = render(<ToolbarSection>Section</ToolbarSection>);
-    const section = container.firstChild;
-    expect(section).toHaveClass('mdt-flex', 'mdt-items-center', 'mdt-gap-2');
-  });
-
-  it('accepts custom className', () => {
-    const { container } = render(<ToolbarSection className="custom-class">Section</ToolbarSection>);
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
-
-  it('forwards ref correctly', () => {
-    const ref = { current: null };
-    render(<ToolbarSection ref={ref}>Section</ToolbarSection>);
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
-  });
-
-  it('renders multiple children', () => {
+  it('keeps 8px between its controls and forwards the ref', () => {
+    const ref = createRef<HTMLDivElement>();
     render(
-      <ToolbarSection>
-        <button>Button 1</button>
-        <button>Button 2</button>
+      <ToolbarSection ref={ref} className="mine" data-testid="section">
+        <span>Sort</span>
+        <span>Columns</span>
       </ToolbarSection>
     );
-    expect(screen.getByText('Button 1')).toBeInTheDocument();
-    expect(screen.getByText('Button 2')).toBeInTheDocument();
+    expect(screen.getByTestId('section')).toHaveClass(
+      'mdt-flex',
+      'mdt-items-center',
+      'mdt-gap-2',
+      'mine'
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByText('Sort')).toBeInTheDocument();
+    expect(screen.getByText('Columns')).toBeInTheDocument();
   });
 });
 
 describe('ToolbarSpacer', () => {
-  it('renders correctly', () => {
-    const { container } = render(<ToolbarSpacer />);
-    expect(container.firstChild).toBeInTheDocument();
-  });
-
-  it('applies flex-1 class for spacing', () => {
-    const { container } = render(<ToolbarSpacer />);
-    expect(container.firstChild).toHaveClass('mdt-flex-1');
-  });
-
-  it('accepts custom className', () => {
-    const { container } = render(<ToolbarSpacer className="custom-class" />);
-    expect(container.firstChild).toHaveClass('custom-class', 'mdt-flex-1');
-  });
-
-  it('forwards ref correctly', () => {
-    const ref = { current: null };
-    render(<ToolbarSpacer ref={ref} />);
+  it('fills the middle and is not read out', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<ToolbarSpacer ref={ref} data-testid="spacer" className="mine" />);
+    const spacer = screen.getByTestId('spacer');
+    expect(spacer).toHaveClass('mdt-flex-1', 'mine');
+    expect(spacer).toHaveAttribute('aria-hidden', 'true');
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
 });
 
-describe('Toolbar integration', () => {
-  it('renders toolbar with sections and spacer', () => {
+describe('the strip assembled', () => {
+  it('holds a left run, a spacer and a right-hand section', () => {
     render(
-      <Toolbar>
-        <ToolbarSection>
-          <span>Left</span>
-        </ToolbarSection>
+      <Toolbar label="User controls">
+        <span>Search</span>
+        <span>Filters</span>
         <ToolbarSpacer />
         <ToolbarSection>
-          <span>Right</span>
+          <span>Sort</span>
+          <span>Columns</span>
         </ToolbarSection>
       </Toolbar>
     );
-
-    expect(screen.getByText('Left')).toBeInTheDocument();
-    expect(screen.getByText('Right')).toBeInTheDocument();
-  });
-  it('applies the band variant: 60px tall, 24px inset, 10px gap', () => {
-    render(
-      <Toolbar variant="band">
-        {' '}
-        <span>Filters</span>{' '}
-      </Toolbar>
-    );
-    expect(screen.getByRole('toolbar')).toHaveClass('mdt-h-[60px]', 'mdt-px-6', 'mdt-gap-2.5');
+    const strip = screen.getByRole('toolbar', { name: 'User controls' });
+    expect(strip).toContainElement(screen.getByText('Search'));
+    expect(strip).toContainElement(screen.getByText('Columns'));
   });
 });

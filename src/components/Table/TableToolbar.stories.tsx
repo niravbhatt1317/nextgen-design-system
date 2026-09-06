@@ -37,15 +37,15 @@ const meta: Meta = {
       deprecation: {
         deprecatedSince: '0.4.0',
         removalIn: '1.0.0',
-        replacement: 'Toolbar variant="band" with ToolbarButton',
+        replacement: 'Toolbar with ToolbarButton',
         message:
-          'The merged console strip replaced this one on 4 September 2026: Toolbar variant="band" (60px, 24px inset, 10px gaps) holding ToolbarButton controls with the four states. Applied filters are never shown as chips. It stays for side-by-side comparison until the removal pull request.',
+          'The merged console strip replaced this one on 4 September 2026: Toolbar (60px, 24px inset, 10px gaps) holding ToolbarButton controls with the four states. Applied filters are never shown as chips. It stays for side-by-side comparison until the removal pull request.',
       },
     },
     docs: {
       description: {
         component: [
-          '## ⚠️ Deprecated — use `Toolbar variant="band"` with `ToolbarButton`',
+          '## ⚠️ Deprecated — use `Toolbar` with `ToolbarButton`',
           '',
           'The strip the merged console uses replaced this one: 60px tall, a 24px inset, 10px between',
           'controls, and one 32px control with four states for Filters, the quick filter, Sort and',

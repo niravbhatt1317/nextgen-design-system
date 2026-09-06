@@ -38,7 +38,7 @@ const TOOLBAR = [
  * </TableToolbar>
  * ```
  *
- * @deprecated Since 0.4.0. Use `Toolbar variant="band"` with `ToolbarButton`
+ * @deprecated Since 0.4.0. Use `Toolbar` with `ToolbarButton`
  * controls instead (ruling of 4 September 2026). This strip stays only for
  * side-by-side comparison until the removal pull request.
  */
@@ -68,7 +68,7 @@ TableToolbar.displayName = 'TableToolbar';
  * many controls each side has.
  *
  * @deprecated Since 0.4.0. Use a `ToolbarSection` after a `ToolbarSpacer` inside
- * `Toolbar variant="band"` instead.
+ * `Toolbar` instead.
  */
 const TableToolbarActions = forwardRef<HTMLDivElement, TableToolbarActionsProps>(
   ({ className, ...props }, ref) => (
