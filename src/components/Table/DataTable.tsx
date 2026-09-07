@@ -27,6 +27,8 @@ import {
   TableRow,
   TableSelectAll,
   TableSelectionCell,
+  TableNumberCell,
+  TableNumberHead,
   TableTailCell,
   TableViewport,
   tableMorphOf,
@@ -34,6 +36,8 @@ import {
 import { TableBulkBar } from './TableBulkBar';
 import { TableLoadMore, TablePager } from './TablePager';
 import { TableColumnsPanel, TableInsertPanel } from './TablePanels';
+import type { TableColumnsPanelColumn } from './TablePanels';
+import type { UseTableColumns } from './useTableColumns';
 import { TableScopeMenu } from './TableScopeMenu';
 import { TableBlank, TableSkeleton } from './TableStates';
 import { useColumnDrag } from './useColumnDrag';
@@ -46,6 +50,75 @@ import type { TableColumnDef, TableSortDirection } from './Table.types';
 
 const ACTION_WIDTH = 100;
 const NAME_KEY = '__name';
+const ROWNUM_KEY = '__rownum';
+
+/** Whether the row numbers are shown, remembered next to the column layout. */
+function loadNumbers(storageKey: string | undefined): boolean {
+  if (!storageKey) return true;
+  try {
+    return localStorage.getItem(`${storageKey}.rowNumbers`) !== 'off';
+  } catch {
+    return true;
+  }
+}
+/**
+ * What the Columns panel lists and does. Without selection the row numbers are
+ * an ordinary entry, first in the list; with selection that column carries the
+ * checkboxes, so it is locked.
+ */
+function columnsPanel<Row>(opts: {
+  selectable: boolean;
+  numbers: boolean;
+  setNumbers: (on: boolean) => void;
+  layout: UseTableColumns<Row>;
+  labelOf: (key: string) => string;
+  nameLabel: string;
+  hasActions: boolean;
+}) {
+  const { selectable, numbers, setNumbers, layout, labelOf, nameLabel, hasActions } = opts;
+  const isVisible = (k: string) => layout.visible.some((c) => c.key === k);
+  const own: TableColumnsPanelColumn[] = layout.order.map((k) => ({
+    key: k,
+    label: labelOf(k),
+    hidden: !isVisible(k),
+  }));
+  const rowNumber: TableColumnsPanelColumn = {
+    key: ROWNUM_KEY,
+    label: 'Row number',
+    hidden: !numbers,
+  };
+  const lockedNames = [nameLabel, ...(hasActions ? ['Action'] : [])];
+  return {
+    columns: selectable ? own : [rowNumber, ...own],
+    locked: selectable ? ['Row number', ...lockedNames] : lockedNames,
+    onToggle: (k: string) => {
+      if (k === ROWNUM_KEY) setNumbers(!numbers);
+      else if (isVisible(k)) layout.hide(k);
+      else layout.show(k);
+    },
+    onHideAll: () => {
+      layout.hideAll();
+      if (!selectable) setNumbers(false);
+    },
+    onShowAll: () => {
+      layout.showAll();
+      setNumbers(true);
+    },
+    onReset: () => {
+      layout.reset();
+      setNumbers(true);
+    },
+  };
+}
+
+function saveNumbers(storageKey: string | undefined, on: boolean): void {
+  if (!storageKey) return;
+  try {
+    localStorage.setItem(`${storageKey}.rowNumbers`, on ? 'on' : 'off');
+  } catch {
+    // a browser that refuses storage still gets a working table
+  }
+}
 
 /**
  * DataTable - the merged console Users table, assembled: the Toolbar strip
@@ -92,6 +165,10 @@ function DataTable<Row>({
   const pagingState = useTablePaging({ pageSize, mode: paging });
   const selection = useTableSelection();
   const layout = useTableColumns({ columns, storageKey });
+  const [numbers, setNumbers] = useState(() => loadNumbers(storageKey));
+  useEffect(() => {
+    saveNumbers(storageKey, numbers);
+  }, [storageKey, numbers]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [scopeAnchor, setScopeAnchor] = useState<HTMLElement | null>(null);
@@ -146,6 +223,8 @@ function DataTable<Row>({
     [sorted, inert, getRowId]
   );
   const selectable = bulkActions !== undefined;
+  /** The first column: checkboxes when there is selection, plain numbers otherwise (unless hidden). */
+  const leading = selectable || numbers;
   const hasFiltering = query.trim() !== '' || quick.size > 0 || filterCount > 0;
 
   const resetPaging = pagingState.reset;
@@ -160,15 +239,15 @@ function DataTable<Row>({
   const visible = layout.visible;
   const widths = useMemo(
     () => [
-      ...(selectable ? [TABLE_GUTTER] : []),
+      ...(leading ? [TABLE_GUTTER] : []),
       nameWidth,
       ...(hasActions ? [ACTION_WIDTH] : []),
       ...visible.map((c) => layout.widthOf(c.key)),
     ],
-    [selectable, nameWidth, hasActions, visible, layout]
+    [leading, nameWidth, hasActions, visible, layout]
   );
   const tableWidth = widths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
-  const nameLeft = selectable ? TABLE_GUTTER : 0;
+  const nameLeft = leading ? TABLE_GUTTER : 0;
   const actionLeft = nameLeft + nameWidth;
 
   // ── drag, insert ──
@@ -478,19 +557,15 @@ function DataTable<Row>({
           </DropdownMenu>
           <TableColumnsPanel
             trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
-            columns={layout.order.map((k) => ({
-              key: k,
-              label: labelOf(k),
-              hidden: !visible.some((c) => c.key === k),
-            }))}
-            locked={[nameColumn.label ?? 'Name', ...(hasActions ? ['Action'] : [])]}
-            onToggle={(k) => {
-              if (visible.some((c) => c.key === k)) layout.hide(k);
-              else layout.show(k);
-            }}
-            onHideAll={layout.hideAll}
-            onShowAll={layout.showAll}
-            onReset={layout.reset}
+            {...columnsPanel({
+              selectable,
+              numbers,
+              setNumbers,
+              layout,
+              labelOf,
+              nameLabel: nameColumn.label ?? 'Name',
+              hasActions,
+            })}
           />
         </ToolbarSection>
       </Toolbar>
@@ -522,6 +597,7 @@ function DataTable<Row>({
                   frozen={0}
                 />
               )}
+              {!selectable && numbers && <TableNumberHead frozen={0} />}
               <TableHead
                 columnKey={NAME_KEY}
                 label={nameColumn.label ?? 'Name'}
@@ -625,6 +701,9 @@ function DataTable<Row>({
                           }}
                           frozen={0}
                         />
+                      )}
+                      {!selectable && numbers && (
+                        <TableNumberCell index={rowIndex(i)} inert={isInert} frozen={0} />
                       )}
                       <TableCell frozen={nameLeft} frozenEdge={!hasActions}>
                         {nameColumn.cell(row)}

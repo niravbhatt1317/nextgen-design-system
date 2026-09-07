@@ -10,6 +10,8 @@ import {
   TableRow,
   TableSelectAll,
   TableSelectionCell,
+  TableNumberCell,
+  TableNumberHead,
   TableTailCell,
   TableViewport,
 } from './Table';
@@ -191,6 +193,34 @@ describe('Table', () => {
     expect(box.className.split(' ')).not.toContain('mdt-border-neutral-40');
     const all = screen.getByRole('checkbox', { name: 'Select all on this page' });
     expect(all.className.split(' ')).not.toContain('mdt-border-neutral-40');
+  });
+});
+
+describe('TableNumberCell', () => {
+  it('is a plain number under a named blank heading, with no checkbox to swap to', () => {
+    render(
+      <Table label="People">
+        <TableViewport tableWidth={260}>
+          <TableColGroup widths={[60, 200]} />
+          <TableHeader>
+            <tr>
+              <TableNumberHead />
+              <TableHead columnKey="name" label="Name" width={200} />
+            </tr>
+          </TableHeader>
+          <TableBody>
+            <TableRow inert>
+              <TableNumberCell index={7} inert />
+              <TableCell>Priya Natarajan</TableCell>
+            </TableRow>
+          </TableBody>
+        </TableViewport>
+      </Table>
+    );
+    expect(screen.getByRole('columnheader', { name: 'Row number' })).toBeInTheDocument();
+    expect(screen.getByText('7')).toHaveClass('tbl-num', 'mdt-opacity-60');
+    expect(screen.queryByRole('checkbox', { hidden: true })).not.toBeInTheDocument();
+    expect(document.querySelector('.tbl-rowsel')).toBeNull();
   });
 });
 

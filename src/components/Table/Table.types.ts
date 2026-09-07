@@ -162,6 +162,18 @@ export interface TableSelectionCellProps {
   frozen?: number | undefined;
 }
 
+/** A plain row number for a table without selection: it stays a number on hover. */
+export interface TableNumberCellProps {
+  index: number;
+  /** An invited person: the number is dimmed. */
+  inert?: boolean | undefined;
+  frozen?: number | undefined;
+}
+
+export interface TableNumberHeadProps {
+  frozen?: number | undefined;
+}
+
 export interface TableSelectAllProps {
   /** none, some or all of the selectable rows on the page are picked. */
   state: 'none' | 'some' | 'all';

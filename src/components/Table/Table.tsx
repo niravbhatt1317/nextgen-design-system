@@ -15,6 +15,8 @@ import type {
   TableCellProps,
   TableColGroupProps,
   TableHeadProps,
+  TableNumberCellProps,
+  TableNumberHeadProps,
   TableProps,
   TableRowProps,
   TableSelectAllProps,
@@ -534,6 +536,42 @@ function TableSelectionCell({
   );
 }
 
+/** A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel. */
+function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellProps) {
+  return (
+    <td
+      className={cn(
+        tableCellVariants({ frozen: true, align: 'center' }),
+        'tbl-sel mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen }}
+    >
+      <span className="tbl-rownum mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
+        <span
+          className={cn(
+            'tbl-num mdt-font-medium mdt-text-muted-foreground',
+            inert && 'mdt-opacity-60'
+          )}
+        >
+          {index}
+        </span>
+      </span>
+    </td>
+  );
+}
+
+/** The blank heading over the row numbers; named for screen readers. */
+function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
+  return (
+    <th
+      scope="col"
+      aria-label="Row number"
+      className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
+      style={{ left: frozen, width: TABLE_GUTTER }}
+    />
+  );
+}
+
 /** The header's checkbox and the chevron that opens the scope menu. */
 function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAllProps) {
   return (
@@ -592,5 +630,7 @@ export {
   TableHead,
   TableSelectionCell,
   TableSelectAll,
+  TableNumberCell,
+  TableNumberHead,
   TableTailCell,
 };

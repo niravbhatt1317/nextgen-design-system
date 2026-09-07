@@ -270,7 +270,7 @@ export const Users: Story = {};
 /** The other footer: a count and a "Load more" button that also fires as you scroll near the bottom. */
 export const LoadMore: Story = { args: { paging: 'loadMore' } };
 
-/** No selection: no row-number column, no bulk bar. */
+/** No selection: the row numbers stay numbers on hover, and "Row number" can be hidden from the Columns panel. No bulk bar. */
 export const WithoutSelection: Story = { args: { bulkActions: undefined } };
 
 /** Five grey rows while the list loads. */

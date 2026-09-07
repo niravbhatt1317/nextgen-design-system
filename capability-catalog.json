@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 963,
+  "capabilityCount": 965,
   "counts": {
     "story": 685,
-    "component": 232,
+    "component": 234,
     "utility": 18,
     "hook": 28
   },
@@ -1785,7 +1785,7 @@
         "docked",
         "className"
       ],
-      "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. How tall the rows may grow before they scroll. Once `docked`, the card's own height. The card becomes the page: `true` docked, a number the in-between while the page scrolls it to its dock line. See Table's `docked`."
+      "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection: its rows then carry plain numbers that never become checkboxes, and \"Row number\" can be hidden from the Columns panel. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. How tall the rows may grow before they scroll. Once `docked`, the card's own height. The card becomes the page: `true` docked, a number the in-between while the page scrolls it to its dock line. See Table's `docked`"
     },
     {
       "name": "DataTableOld",
@@ -7724,6 +7724,26 @@
       "summary": "`docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card.",
       "doc": "`docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card.",
       "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TableNumberCell",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "A plain row number, for a table without selection: it never becomes a checkbox.",
+      "doc": "A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel.",
+      "props": ["index", "inert", "frozen"],
+      "propDocs": "An invited person: the number is dimmed."
+    },
+    {
+      "name": "TableNumberHead",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The blank heading over the row numbers; named for screen readers.",
+      "doc": "The blank heading over the row numbers; named for screen readers.",
+      "props": ["frozen"],
       "propDocs": ""
     },
     {

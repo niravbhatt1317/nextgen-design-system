@@ -7,3 +7,4 @@ Table is the merged console Users table (7 September 2026): a card with 54px row
 - `docked` on Table and DataTable: the card becomes the page. Square corners, no side edges, a 24px inset on the end cells, header and pager pinned while the rows scroll inside; a number from 0 to 1 is the in-between while the page scrolls the card to its dock line. The page decides when; the table only decides how it looks.
 - The header checkbox sits on the selection column's axis; the scope chevron hangs off its right edge instead of pushing it left.
 - A picked checkbox is one solid fill: the grey border is drawn only while unchecked.
+- A table without selection keeps its row-number column: the numbers never become checkboxes, and "Row number" is a toggle in the Columns panel (remembered with the layout). In a table with selection the column is locked, since it carries the checkboxes.

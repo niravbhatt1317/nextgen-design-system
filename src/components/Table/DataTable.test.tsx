@@ -171,6 +171,29 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.getByRole('columnheader', { name: /Role/ })).toBeInTheDocument();
   });
 
+  it('keeps plain row numbers without selection, and lets the Columns panel hide them', async () => {
+    render(<Users bulkActions={undefined} />);
+    expect(screen.getByRole('columnheader', { name: 'Row number' })).toBeInTheDocument();
+    const firstRow = screen.getAllByRole('row')[1] as HTMLElement;
+    expect(within(firstRow).getAllByRole('cell')[0]).toHaveTextContent('1');
+    expect(document.querySelector('.tbl-cb')).toBeNull();
+    await userEvent.hover(firstRow);
+    expect(document.querySelector('.tbl-cb')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Manage columns' }));
+    await userEvent.click(screen.getByRole('button', { name: /^Row number$/ }));
+    expect(screen.queryByRole('columnheader', { name: 'Row number' })).not.toBeInTheDocument();
+    expect(screen.getByText('Hidden in table')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
+    expect(screen.getByRole('columnheader', { name: 'Row number' })).toBeInTheDocument();
+  });
+
+  it('locks the row-number column when there is selection, since it carries the checkboxes', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByRole('button', { name: 'Manage columns' }));
+    expect(screen.queryByRole('button', { name: /^Row number$/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Row number is always shown')).toBeDisabled();
+  });
+
   it('switches to a Load more footer', async () => {
     render(<Users paging="loadMore" />);
     expect(screen.getByText('Showing 25 of 60 users')).toBeInTheDocument();

@@ -71,7 +71,11 @@ export interface DataTableProps<Row> {
   paging?: TablePagingMode | undefined;
   /** Remember column order, hidden columns and widths in this browser. */
   storageKey?: string | undefined;
-  /** Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection. */
+  /**
+   * Bulk-bar actions, as TableBulkAction elements. Leave unset for a table
+   * without selection: its rows then carry plain numbers that never become
+   * checkboxes, and "Row number" can be hidden from the Columns panel.
+   */
   bulkActions?: ((selectedIds: string[], clear: () => void) => ReactNode) | undefined;
   loading?: boolean | undefined;
   refreshing?: boolean | undefined;
