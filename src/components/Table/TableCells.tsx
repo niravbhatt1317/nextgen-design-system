@@ -39,7 +39,7 @@ function PersonCell({ name, avatar, owner = false, muted = false, className }: P
           'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
           muted
             ? 'mdt-font-normal mdt-text-muted-foreground'
-            : 'mdt-font-medium mdt-text-neutral-130'
+            : 'mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10'
         )}
         title={name}
       >
@@ -73,7 +73,7 @@ function ContactChips({ email, phone, onCopy }: ContactChipsProps) {
     <button
       type="button"
       key={kind}
-      className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-neutral-90 [&+&]:-mdt-ml-1.5"
+      className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-neutral-90 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 [&+&]:-mdt-ml-1.5"
       title={`Copy ${kind}`}
       aria-label={`Copy ${kind}: ${value}`}
       onClick={(e) => {

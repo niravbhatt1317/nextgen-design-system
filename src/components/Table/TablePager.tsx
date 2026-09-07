@@ -13,7 +13,7 @@ import type { TableLoadMoreProps, TablePagerProps } from './Table.types';
 const fmt = (n: number) => n.toLocaleString('en-US');
 
 const CONTROL =
-  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-border-neutral-90 hover:mdt-bg-neutral-10 disabled:mdt-cursor-default disabled:mdt-opacity-40 disabled:hover:mdt-border-neutral-30 disabled:hover:mdt-bg-background';
+  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 dark:mdt-border-neutral-110 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40 hover:mdt-border-neutral-90 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130 disabled:mdt-cursor-default disabled:mdt-opacity-40 disabled:hover:mdt-border-neutral-30 disabled:hover:mdt-bg-background';
 
 /**
  * The pager on the card's foot: the count on the left, rows per page, first,
@@ -48,7 +48,7 @@ function TablePager({
   const disabled = total === 0;
 
   return (
-    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90">
+    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
       <span className="tbl-count">
         {message ?? `${fmt(from)}–${fmt(to)} of ${fmt(total)} ${noun}`}
       </span>
@@ -105,7 +105,7 @@ function TablePager({
         <input
           className={cn(
             CONTROL,
-            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
+            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90 dark:mdt-text-neutral-10'
           )}
           value={typed}
           inputMode="numeric"
@@ -148,7 +148,7 @@ function TablePager({
 /** The other footer: a count and a "Load more" button that the table also presses as you scroll near the bottom. */
 function TableLoadMore({ shown, total, noun, loading = false, onMore }: TableLoadMoreProps) {
   return (
-    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
+    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
       <span>
         Showing {fmt(Math.min(shown, total))} of {fmt(total)} {noun}
       </span>

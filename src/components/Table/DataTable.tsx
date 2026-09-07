@@ -259,7 +259,11 @@ function DataTable<Row>({
               sort.set(c.key, 'asc');
             }}
           >
-            <Icon name="arrow-up-narrow-wide" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
+            <Icon
+              name="arrow-up-narrow-wide"
+              size={16}
+              className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+            />
             Sort A to Z
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -270,7 +274,7 @@ function DataTable<Row>({
             <Icon
               name="arrow-down-wide-narrow"
               size={16}
-              className="mdt-mr-2 mdt-text-neutral-90"
+              className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
             />
             Sort Z to A
           </DropdownMenuItem>
@@ -282,7 +286,11 @@ function DataTable<Row>({
           layout.hide(c.key);
         }}
       >
-        <Icon name="eye-off" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
+        <Icon
+          name="eye-off"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
         Hide column
       </DropdownMenuItem>
       <DropdownMenuItem
@@ -290,7 +298,11 @@ function DataTable<Row>({
           layout.moveToStart(c.key);
         }}
       >
-        <Icon name="chevrons-left" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
+        <Icon
+          name="chevrons-left"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
         Move to start
       </DropdownMenuItem>
       <DropdownMenuItem
@@ -298,7 +310,11 @@ function DataTable<Row>({
           layout.moveToEnd(c.key);
         }}
       >
-        <Icon name="chevrons-right" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
+        <Icon
+          name="chevrons-right"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
         Move to end
       </DropdownMenuItem>
     </>
@@ -341,12 +357,12 @@ function DataTable<Row>({
               aria-label="Filters"
             >
               <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
-                <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130">
+                <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
                   Filters
                 </span>
                 <button
                   type="button"
-                  className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10"
+                  className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
                   onClick={() => {
                     setTicked({});
                     resetPaging();
@@ -357,7 +373,7 @@ function DataTable<Row>({
               </div>
               {filters.map((g) => (
                 <div key={g.key}>
-                  <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90">
+                  <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
                     {g.label}
                   </div>
                   {g.options.map((o) => {
@@ -365,10 +381,10 @@ function DataTable<Row>({
                     return (
                       <label
                         key={o}
-                        className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10"
+                        className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
                       >
                         <Checkbox
-                          className="mdt-border-neutral-40"
+                          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
                           checked={on}
                           onCheckedChange={(v) => {
                             setTicked((t) => {
@@ -611,7 +627,7 @@ function DataTable<Row>({
                             <DropdownMenuTrigger asChild>
                               <button
                                 type="button"
-                                className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90"
+                                className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40 dark:data-[state=open]:mdt-bg-neutral-120 dark:data-[state=open]:mdt-text-neutral-40"
                                 aria-label="Row actions"
                                 tabIndex={-1}
                               >
@@ -722,7 +738,7 @@ function DataTable<Row>({
           <button
             ref={insertBtn}
             type="button"
-            className="mdt-absolute mdt-z-[8] mdt-inline-flex mdt-h-5 mdt-w-5 -mdt-translate-x-1/2 -mdt-translate-y-1/2 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 mdt-shadow-sm hover:mdt-border-neutral-90 hover:mdt-text-neutral-130"
+            className="mdt-absolute mdt-z-[8] mdt-inline-flex mdt-h-5 mdt-w-5 -mdt-translate-x-1/2 -mdt-translate-y-1/2 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 mdt-shadow-sm hover:mdt-border-neutral-90 hover:mdt-text-neutral-130 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 dark:hover:mdt-text-neutral-10"
             style={{ left: insert.x, top: insert.y }}
             aria-label={`Insert a column after ${labelOf(insert.key)}`}
             onPointerEnter={() => {
@@ -778,11 +794,15 @@ function DataTable<Row>({
       {drag.drag && (
         <>
           <div
-            className="mdt-pointer-events-none mdt-fixed mdt-z-[40] mdt-inline-flex mdt-h-10 mdt-w-[200px] mdt-items-center mdt-gap-2.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-pl-3 mdt-pr-4 mdt-text-[11px] mdt-leading-[1.5] mdt-text-neutral-90 mdt-shadow-[0_12px_32px_rgba(29,43,62,0.18)]"
+            className="mdt-pointer-events-none mdt-fixed mdt-z-[40] mdt-inline-flex mdt-h-10 mdt-w-[200px] mdt-items-center mdt-gap-2.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-pl-3 mdt-pr-4 mdt-text-[11px] mdt-leading-[1.5] mdt-text-neutral-90 mdt-shadow-[0_12px_32px_rgba(29,43,62,0.18)] dark:mdt-border-neutral-110 dark:mdt-text-neutral-40"
             style={{ left: drag.drag.x - 20, top: drag.drag.y - 20 }}
             aria-hidden="true"
           >
-            <Icon name="grip-vertical" size={14} className="mdt-text-neutral-40" />
+            <Icon
+              name="grip-vertical"
+              size={14}
+              className="mdt-text-neutral-40 dark:mdt-text-neutral-90"
+            />
             {drag.drag.label}
           </div>
           <div

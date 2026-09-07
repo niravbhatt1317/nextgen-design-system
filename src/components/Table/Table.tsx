@@ -44,7 +44,7 @@ export const tableCellVariants = cva(
   [
     'tbl-cell mdt-h-[54px] mdt-px-4 mdt-py-[5px] mdt-align-middle',
     'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
-    'mdt-bg-background mdt-text-neutral-130',
+    'mdt-bg-background mdt-text-neutral-130 dark:mdt-text-neutral-10',
   ],
   {
     variants: {
@@ -62,7 +62,7 @@ export const tableCellVariants = cva(
 export const tableHeadVariants = cva(
   [
     'tbl-head mdt-relative mdt-h-10 mdt-px-4 mdt-py-px mdt-align-middle',
-    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90',
+    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-text-neutral-40',
     'mdt-select-none mdt-whitespace-nowrap mdt-bg-background',
     'mdt-sticky mdt-top-0 mdt-z-[3]',
   ],
@@ -109,8 +109,8 @@ const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
       aria-label={label}
       data-divider={divider}
       className={cn(
-        'tbl mdt-relative mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background',
-        'mdt-font-sans mdt-text-neutral-130',
+        'tbl mdt-relative mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
+        'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
         className
       )}
       {...props}
@@ -383,7 +383,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
       {movable && (
         <button
           type="button"
-          className="tbl-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing"
+          className="tbl-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90"
           aria-label={`Move column ${label}. Arrow keys move it one place`}
           onPointerDown={onGripPointerDown}
           onKeyDown={gripKey}
@@ -407,7 +407,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           : {})}
       >
         {glyph && (
-          <span className="tbl-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 [&_svg]:mdt-size-3.5">
+          <span className="tbl-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 dark:mdt-text-neutral-40 [&_svg]:mdt-size-3.5">
             {glyph}
           </span>
         )}
@@ -426,7 +426,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="tbl-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90"
+              className="tbl-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90 dark:mdt-text-neutral-40"
               aria-label={`Options for ${label}`}
             >
               <Icon name="more-horizontal" size={14} />
@@ -456,7 +456,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
         />
       )}
       <span
-        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30"
+        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
         aria-hidden="true"
       />
     </th>
@@ -491,7 +491,7 @@ function TableSelectionCell({
         </span>
         {!inert && (
           <Checkbox
-            className="tbl-cb mdt-border-neutral-40"
+            className="tbl-cb mdt-border-neutral-40 dark:mdt-border-neutral-90"
             checked={selected}
             tabIndex={-1}
             aria-label={`Select ${label}`}
@@ -517,7 +517,7 @@ function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAll
     >
       <span className="mdt-inline-flex mdt-items-center mdt-justify-center mdt-gap-1">
         <Checkbox
-          className="mdt-border-neutral-40"
+          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
           checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
           onCheckedChange={onToggle}
           aria-label="Select all on this page"

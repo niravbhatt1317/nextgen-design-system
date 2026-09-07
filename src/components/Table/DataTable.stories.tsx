@@ -122,7 +122,11 @@ function UsersTable(
                 setNote(`Edit ${u.name}`);
               }}
             >
-              <Icon name="pencil" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
+              <Icon
+                name="pencil"
+                size={16}
+                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              />
               Edit details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -133,7 +137,7 @@ function UsersTable(
               <Icon
                 name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'}
                 size={16}
-                className="mdt-mr-2 mdt-text-neutral-90"
+                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
               />
               {u.status === 'Active' ? 'Deactivate user' : 'Activate user'}
             </DropdownMenuItem>
@@ -283,9 +287,3 @@ export const CouldNotLoad: Story = { args: { error: true } };
 
 /** Today's lighter row line, for the divider decision. */
 export const LighterDividers: Story = { args: { divider: 'light' } };
-
-/** The same table in dark mode, through the library tokens. */
-export const Dark: Story = {
-  globals: { theme: 'dark' },
-  parameters: { backgrounds: { default: 'dark' } },
-};

@@ -61,26 +61,26 @@ function TableScopeMenu({
               onClick={() => {
                 setChoice(o.value);
               }}
-              className="mdt-flex mdt-min-h-8 mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10"
+              className="mdt-flex mdt-min-h-8 mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
             >
               <span
                 className={cn(
                   'mdt-inline-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid',
                   choice === o.value
                     ? 'mdt-border-neutral-150 after:mdt-block after:mdt-h-2 after:mdt-w-2 after:mdt-rounded-full after:mdt-bg-neutral-150 after:mdt-content-[""]'
-                    : 'mdt-border-neutral-40'
+                    : 'mdt-border-neutral-40 dark:mdt-border-neutral-90'
                 )}
                 aria-hidden="true"
               />
               <span>{o.label}</span>
               {o.count !== null ? (
-                <span className="mdt-ml-auto mdt-rounded-full mdt-bg-neutral-10 mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-tabular-nums mdt-text-neutral-90">
+                <span className="mdt-ml-auto mdt-rounded-full mdt-bg-neutral-10 mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-tabular-nums mdt-text-neutral-90 dark:mdt-bg-neutral-130 dark:mdt-text-neutral-40">
                   {fmt(o.count)}
                 </span>
               ) : (
                 choice === 'custom' && (
                   <input
-                    className="mdt-ml-auto mdt-h-7 mdt-w-16 mdt-rounded-md mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-px-2 mdt-text-[13px] mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90"
+                    className="mdt-ml-auto mdt-h-7 mdt-w-16 mdt-rounded-md mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-px-2 mdt-text-[13px] mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90 dark:mdt-border-neutral-110 dark:mdt-text-neutral-10"
                     value={custom}
                     inputMode="numeric"
                     aria-label="How many"
@@ -99,10 +99,10 @@ function TableScopeMenu({
             </button>
           ))}
         </div>
-        <div className="mdt-mt-2.5 mdt-flex mdt-justify-end mdt-gap-2 mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-pt-2.5">
+        <div className="mdt-mt-2.5 mdt-flex mdt-justify-end mdt-gap-2 mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-pt-2.5 dark:mdt-border-neutral-120">
           <button
             type="button"
-            className="mdt-h-8 mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-px-3 mdt-text-[13px] mdt-font-semibold mdt-text-neutral-90 hover:mdt-bg-neutral-10"
+            className="mdt-h-8 mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-px-3 mdt-text-[13px] mdt-font-semibold mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
             onClick={() => {
               onOpenChange(false);
             }}
