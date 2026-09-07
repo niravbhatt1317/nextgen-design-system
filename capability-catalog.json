@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 912,
+  "capabilityCount": 959,
   "counts": {
-    "story": 669,
-    "component": 205,
-    "utility": 16,
-    "hook": 22
+    "story": 684,
+    "component": 231,
+    "utility": 17,
+    "hook": 27
   },
   "capabilities": [
     {
@@ -460,6 +460,16 @@
       "propDocs": ""
     },
     {
+      "name": "BlankStates",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / BlankStates",
+      "doc": "Components/Table/Pieces BlankStates",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Blocking",
       "kind": "story",
       "file": "src/components/Dialog/Dialog.stories.tsx",
@@ -767,6 +777,16 @@
       "area": "Radio",
       "summary": "Story: Components/Radio / CardWithRadio",
       "doc": "Components/Radio CardWithRadio",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Cells",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / Cells",
+      "doc": "Components/Table/Pieces Cells",
       "props": [],
       "propDocs": ""
     },
@@ -1270,6 +1290,16 @@
       "propDocs": ""
     },
     {
+      "name": "ContactChips",
+      "kind": "component",
+      "file": "src/components/Table/TableCells.tsx",
+      "area": "Table",
+      "summary": "The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing.",
+      "doc": "The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Container",
       "kind": "component",
       "file": "src/components/Container/Container.tsx",
@@ -1416,6 +1446,16 @@
       "area": "CodeWell",
       "summary": "Story: Components/CodeWell / Copyable",
       "doc": "Components/CodeWell Copyable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CouldNotLoad",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / CouldNotLoad",
+      "doc": "Components/Table CouldNotLoad",
       "props": [],
       "propDocs": ""
     },
@@ -1650,6 +1690,16 @@
       "propDocs": ""
     },
     {
+      "name": "Dark",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / Dark",
+      "doc": "Components/Table Dark",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Darker",
       "kind": "story",
       "file": "src/components/Skeleton/Skeleton.stories.tsx",
@@ -1708,6 +1758,43 @@
       "doc": "DataLeftNav - the whole navigation from one configuration object. `LeftNavOld` is parts; this is what you reach for when the navigation is data rather than markup - which it usually is. Permissions decide what a person sees, a server decides what a plan includes, and neither belongs in JSX. **The configuration is JSON.** Icons are names, not `ReactNode`s, so a whole navigation can come from an API, sit in a database, be diffed in a pull request, or be written by a model - which is the point of this library. `DataDrivenSidebar`, the thing this replaces, took `ReactNode` icons and so could only ever be written by hand in TypeScript. **Two levels, still.** An entry with `items` at the root opens the second level; the same shape inside the second level folds open in place. A third level is not expressible - nesting deeper is ignored rather than honoured, because the alternative is a config that quietly produces a navigation nobody can get back out of. ```tsx <DataLeftNav activeKey={page} onSelect={(key) => { setPage(key); }} config={{ home: { label: 'Go to home', href: '/' }, search: {}, items: [ { key: 'profile', label: 'Profile', icon: 'user', group: 'Personal' }, { key: 'observabili",
       "props": ["config", "activeKey", "onSelect", "onHome", "initialSection", "footer", "label"],
       "propDocs": "The whole navigation, as data. Which entry is the page being shown. Called with the entry that was chosen. Only for entries that lead to a page. Opening a section and folding a group are the component's own business and are not reported - a product that had to handle those would be reimplementing the navigation to use it. Called when the home control is pressed. Which section to open on. Pinned to the bottom edge. Not part of the config, because it is markup. The panel's accessible name. @default 'Settings'"
+    },
+    {
+      "name": "DataTable",
+      "kind": "component",
+      "file": "src/components/Table/DataTable.tsx",
+      "area": "Table",
+      "summary": "DataTable - the merged console Users table, assembled: the Toolbar strip with search, Filters, a quick filter, Sort and Columns; the table with its frozen row-number, Name and Action columns; a bulk bar; a pager or a \"Load more\" footer; and the loading, empty, first-run and error states.",
+      "doc": "DataTable - the merged console Users table, assembled: the Toolbar strip with search, Filters, a quick filter, Sort and Columns; the table with its frozen row-number, Name and Action columns; a bulk bar; a pager or a \"Load more\" footer; and the loading, empty, first-run and error states. Every pill inside is the library Badge; every control is a ToolbarButton.",
+      "props": [
+        "label",
+        "noun",
+        "rows",
+        "getRowId",
+        "nameColumn",
+        "columns",
+        "rowActions",
+        "isRowInert",
+        "onRowOpen",
+        "search",
+        "initialQuery",
+        "quickFilter",
+        "filters",
+        "sortFields",
+        "pageSize",
+        "pageSizes",
+        "paging",
+        "storageKey",
+        "bulkActions",
+        "loading",
+        "refreshing",
+        "error",
+        "blank",
+        "divider",
+        "maxHeight",
+        "className"
+      ],
+      "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today."
     },
     {
       "name": "DataTableOld",
@@ -3183,6 +3270,16 @@
       "propDocs": ""
     },
     {
+      "name": "Footers",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / Footers",
+      "doc": "Components/Table/Pieces Footers",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Form",
       "kind": "component",
       "file": "src/components/Form/Form.tsx",
@@ -3589,6 +3686,16 @@
       "area": "Table Old Column Controls",
       "summary": "Story: Deprecated/Table Old Column Controls / HeaderMenu",
       "doc": "Deprecated/Table Old Column Controls HeaderMenu",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Headings",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / Headings",
+      "doc": "Components/Table/Pieces Headings",
       "props": [],
       "propDocs": ""
     },
@@ -4597,6 +4704,16 @@
       "propDocs": ""
     },
     {
+      "name": "LighterDividers",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / LighterDividers",
+      "doc": "Components/Table LighterDividers",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Link",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -4659,6 +4776,16 @@
     {
       "name": "Loading",
       "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / Loading",
+      "doc": "Components/Table Loading",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Loading",
+      "kind": "story",
       "file": "src/components/TableOld/DataTableOld.stories.tsx",
       "area": "DataTable Old",
       "summary": "Story: Deprecated/DataTable Old / Loading",
@@ -4683,6 +4810,16 @@
       "area": "InputGroup",
       "summary": "Story: Components/InputGroup / LoadingState",
       "doc": "Components/InputGroup LoadingState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LoadMore",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / LoadMore",
+      "doc": "Components/Table LoadMore",
       "props": [],
       "propDocs": ""
     },
@@ -5105,6 +5242,26 @@
       "propDocs": ""
     },
     {
+      "name": "NothingFound",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / NothingFound",
+      "doc": "Components/Table NothingFound",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "NoUsersYet",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / NoUsersYet",
+      "doc": "Components/Table NoUsersYet",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Numeric",
       "kind": "story",
       "file": "src/components/TableOld/TableCellRecipes.stories.tsx",
@@ -5431,6 +5588,16 @@
       "area": "Dialog",
       "summary": "Story: Components/Dialog / Pending",
       "doc": "Components/Dialog Pending",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "PersonCell",
+      "kind": "component",
+      "file": "src/components/Table/TableCells.tsx",
+      "area": "Table",
+      "summary": "The Name cell: a 32px avatar, the name at 12px medium, and the owner mark when it applies.",
+      "doc": "The Name cell: a 32px avatar, the name at 12px medium, and the owner mark when it applies.",
       "props": [],
       "propDocs": ""
     },
@@ -5965,6 +6132,16 @@
       "propDocs": ""
     },
     {
+      "name": "sampleUsers",
+      "kind": "utility",
+      "file": "src/components/Table/sampleUsers.ts",
+      "area": "Table",
+      "summary": "",
+      "doc": "",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "SavedViews",
       "kind": "story",
       "file": "src/components/TableOld/DataTableOld.stories.tsx",
@@ -6181,6 +6358,16 @@
       "area": "Select",
       "summary": "Story: Components/Select / SelectedOnTopSingle",
       "doc": "Components/Select SelectedOnTopSingle",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Selection",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / Selection",
+      "doc": "Components/Table/Pieces Selection",
       "props": [],
       "propDocs": ""
     },
@@ -6815,6 +7002,16 @@
       "propDocs": ""
     },
     {
+      "name": "Skeleton",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / Skeleton",
+      "doc": "Components/Table/Pieces Skeleton",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Small",
       "kind": "story",
       "file": "src/components/OTPInput/OTPInput.stories.tsx",
@@ -7126,11 +7323,41 @@
     },
     {
       "name": "Table",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "Table - the card that holds a list: rows, a bulk bar and a pager.",
+      "doc": "Table - the card that holds a list: rows, a bulk bar and a pager. ```tsx <Table label=\"Users\"> <TableViewport tableWidth={1637} maxHeight={600}> <TableColGroup widths={[60, 200, 100, 217, 200]} /> <TableHeader>…</TableHeader> <TableBody>…</TableBody> </TableViewport> <TablePager … /> </Table> ```",
+      "props": ["label", "divider", "children"],
+      "propDocs": "Spoken name of the table. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today."
+    },
+    {
+      "name": "Table",
       "kind": "story",
       "file": "src/components/Skeleton/Skeleton.stories.tsx",
       "area": "Skeleton",
       "summary": "Story: Components/Skeleton / Table",
       "doc": "Components/Skeleton Table",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TableBlank",
+      "kind": "component",
+      "file": "src/components/Table/TableStates.tsx",
+      "area": "Table",
+      "summary": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load.",
+      "doc": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load. An icon, a title, one line, one button.",
+      "props": ["kind", "title", "body", "action", "onAction"],
+      "propDocs": "Titles and lines default to the Users wording."
+    },
+    {
+      "name": "TableBody",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "",
+      "doc": "",
       "props": [],
       "propDocs": ""
     },
@@ -7145,6 +7372,16 @@
       "propDocs": ""
     },
     {
+      "name": "TableBulkAction",
+      "kind": "component",
+      "file": "src/components/Table/TableBulkBar.tsx",
+      "area": "Table",
+      "summary": "One action in the bar: a 32px text button with a 16px icon.",
+      "doc": "One action in the bar: a 32px text button with a 16px icon.",
+      "props": ["icon", "danger"],
+      "propDocs": "A destructive action is red."
+    },
+    {
       "name": "TableBulkActionOld",
       "kind": "component",
       "file": "src/components/TableOld/TableBulkBar.tsx",
@@ -7155,6 +7392,16 @@
       "propDocs": "The glyph, before the label."
     },
     {
+      "name": "TableBulkBar",
+      "kind": "component",
+      "file": "src/components/Table/TableBulkBar.tsx",
+      "area": "Table",
+      "summary": "The dark pill that appears once rows are picked.",
+      "doc": "The dark pill that appears once rows are picked. It sits inside the card, 13px above the pager, and reads its count aloud as it changes.",
+      "props": ["count", "onScope", "onClear", "children"],
+      "propDocs": "How many rows are picked. The bar is not rendered at zero. \"N selected\" opens the scope menu."
+    },
+    {
       "name": "TableBulkBarOld",
       "kind": "component",
       "file": "src/components/TableOld/TableBulkBar.tsx",
@@ -7163,6 +7410,16 @@
       "doc": "TableBulkBarOld - what you can do with the rows you have selected. **It sits alongside the toolbar rather than replacing it.** Replacing was the first instinct - selecting rows changes what the controls above are for - and it is wrong, because a selection deliberately survives filtering. Building a selection across two searches is a thing people do, and hiding the search box the moment they tick a row makes it impossible. **It is an inverted surface**, which is what separates it from the table rather than a border would. The table is a field of white rows; a bar that matches them has to shout with weight or colour to be noticed, and one that inverts is simply somewhere else. **The count is announced.** A bar that appears silently is invisible to anyone not watching that part of the screen, and the number is the whole point - \"delete\" means something very different at 3 than at 300. Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
       "props": ["count", "onClear", "label", "children"],
       "propDocs": "How many rows are selected. At zero the bar renders nothing. Called to drop the selection. Omit it and no Clear control appears. What the bar says instead of \"3 selected\". For when rows are not rows - \"3 tickets\", \"3 files\". The default counts without naming, which is right when the noun is obvious from the table. The actions, usually `TableBulkActionOld`."
+    },
+    {
+      "name": "TableBulkSeparator",
+      "kind": "component",
+      "file": "src/components/Table/TableBulkBar.tsx",
+      "area": "Table",
+      "summary": "The thin divider between groups of actions.",
+      "doc": "The thin divider between groups of actions.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "TableBulkSeparatorOld",
@@ -7185,6 +7442,16 @@
       "propDocs": ""
     },
     {
+      "name": "TableCell",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "",
+      "doc": "",
+      "props": ["frozen", "frozenEdge", "align", "dragging"],
+      "propDocs": "Stays put while the table scrolls sideways; the value is its left offset in px. The last frozen cell draws the boundary line while scrolled. The column is being dragged: dims to 40%."
+    },
+    {
       "name": "TableCellOld",
       "kind": "component",
       "file": "src/components/TableOld/TableOld.tsx",
@@ -7193,6 +7460,16 @@
       "doc": "TableCellOld component - A table data cell. ```tsx <TableCellOld>Ada Lovelace</TableCellOld> <TableCellOld align=\"right\">1,204.00</TableCellOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
       "props": ["align", "indent", "columnKey", "frozen"],
       "propDocs": "Which edge the content sits against. Numbers belong on the right. Indents the content, for a row nested under a parent. Use it on the first cell only - indenting every cell shifts the whole row and breaks the column alignment that makes a table readable. Which column this cell belongs to. Emitted as `data-column-key`. Reordering measures the header row to work out where a dragged column would land, and it needs to know which cell is which - position alone is not enough once things start moving. Pins this column to the left edge while the table scrolls sideways. `true` pins it as the first frozen column. Pass an index to pin more than one - `frozen={1}` is the second, and it sits at the measured width of the first rather than at a width you have to work out yourself. Put it on the same column in every row, header included, or the column will pin in some rows and not others. Needs the table to actually scroll horizontally - a table narrower than its container has nothing to pin against. Like the row's `sticky`, the edge only asserts itself once something has slid underneath: at rest a frozen column looks like any other."
+    },
+    {
+      "name": "TableColGroup",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "One `<col>` per visible column plus the 60px elastic tail.",
+      "doc": "One `<col>` per visible column plus the 60px elastic tail.",
+      "props": ["widths"],
+      "propDocs": "Widths in px, one per column, in display order. The 60px tail is added."
     },
     {
       "name": "TableColumnBoundaryOld",
@@ -7240,6 +7517,26 @@
         "children"
       ],
       "propDocs": "The column's name. Used as the trigger's label and its accessible name. Adds a Filter item. Omit it and no Filter item appears. Adds a Group item. Adds a Sort item. Whether this column is currently pinned. Switches the item's wording. Whether pinning is available here at all. False hides the item rather than disabling it. Past the freeze limit \"pin this column\" is not a thing that could happen - there would be unpinned columns to its left - so offering it greyed out explains nothing. Called when Freeze or Unfreeze is chosen. Adds a Move to start item. Adds a Move to end item. Adds a Hide this column item. Content above the items. Where the active sort stack goes once multi-column sorting lands: a statement of what is already true, which is why it sits above the list of things you can do rather than inside it. Which edge of the trigger the menu lines up with. @default 'start' Extra classes for the trigger. Trigger content, when the column header is more than its name."
+    },
+    {
+      "name": "TableColumnsPanel",
+      "kind": "component",
+      "file": "src/components/Table/TablePanels.tsx",
+      "area": "Table",
+      "summary": "The Columns panel behind the toolbar's Columns button: search, Shown and Hidden groups, Hide all, Show all, Reset.",
+      "doc": "The Columns panel behind the toolbar's Columns button: search, Shown and Hidden groups, Hide all, Show all, Reset. Locked columns are ticked and dimmed.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TableEmptyValue",
+      "kind": "component",
+      "file": "src/components/Table/TableCells.tsx",
+      "area": "Table",
+      "summary": "A missing value: an em-dash that reads \"Not set\".",
+      "doc": "A missing value: an em-dash that reads \"Not set\".",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "TableExpandTriggerOld",
@@ -7300,6 +7597,47 @@
       "propDocs": "How many columns the group header spans. Set it to the number of columns in the table, or the heading will not reach across it. How many rows are in the group. Rendered after the label, quietly. Whether the group is open. Leave `onToggle` off for a group that is always open - the control is then not rendered at all, rather than rendered dead. Called when the disclosure control is used. Omit for a static group. What a screen reader says for the disclosure control. Falls back to \"Toggle group\" when the label is not plain text."
     },
     {
+      "name": "TableHead",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "A heading.",
+      "doc": "A heading. Sortable ones sort on click. Movable ones show a grip and a \"⋯\" menu on hover; resizable ones carry a handle on their right boundary that drags, or moves 16px per arrow key.",
+      "props": [
+        "columnKey",
+        "label",
+        "width",
+        "minWidth",
+        "frozen",
+        "frozenEdge",
+        "align",
+        "sortable",
+        "sort",
+        "onSort",
+        "movable",
+        "onGripPointerDown",
+        "onGripMove",
+        "menu",
+        "glyph",
+        "filtered",
+        "dragging",
+        "resizable",
+        "onResize",
+        "onBoundaryHover"
+      ],
+      "propDocs": "Column key, for the drag and insert machinery. Clicking the label sorts. The heading can be dragged to a new place, and carries the \"⋯\" menu. Pointer down on the grip. The DataTable's drag hook takes over from here. Arrow keys on a focused grip move the column one place. The \"⋯\" menu's items. Rendered inside a DropdownMenu. A 14px glyph before the label. The quick filter is on: blue-10 wash and an azure glyph. The column is being dragged: dims to 40%. Drag or arrow-key the boundary to resize. The pointer is over the boundary: the DataTable may show the insert \"+\"."
+    },
+    {
+      "name": "TableHeader",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "",
+      "doc": "",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TableHeaderOld",
       "kind": "component",
       "file": "src/components/TableOld/TableOld.tsx",
@@ -7338,6 +7676,26 @@
       "propDocs": "Which edge the header label sits against. Match it to the cells below. Turns the header into a sort control - a real button, so it is reachable by keyboard, with `aria-sort` set for screen readers. Which way this column is currently sorted, or `null` if it is sortable but not the active column. Ignored unless `sortable` is set. This column's place in a multi-column sort, 1-based. Shown as a small number beside the arrow. Leave it out when only one column ever sorts - a lone \"1\" is noise. With two or more it is not optional: an arrow on three columns says all three are sorted and nothing about which one wins, and people reasonably assume the leftmost does. Called when the sort control is used. Ignored unless `sortable` is set. Adds a drag handle on the column's trailing edge. Resizing is a contract, not an implementation: the handle and its keyboard behaviour are provided here, the width itself stays yours. `useColumnWidthsOld` holds the arithmetic if you want it. **Needs `layout=\"fixed\"` on the table.** Under the default `auto` layout the browser re-derives column widths from content and will fight whatever you set. The column's current width in pixels. Applied as an inline width. "
     },
     {
+      "name": "TableInsertPanel",
+      "kind": "component",
+      "file": "src/components/Table/TablePanels.tsx",
+      "area": "Table",
+      "summary": "The insert-in-place panel: the same parts as the Columns panel, listing the hidden columns with a \"+\".",
+      "doc": "The insert-in-place panel: the same parts as the Columns panel, listing the hidden columns with a \"+\".",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TableLoadMore",
+      "kind": "component",
+      "file": "src/components/Table/TablePager.tsx",
+      "area": "Table",
+      "summary": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
+      "doc": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
+      "props": ["shown", "total", "noun", "loading", "onMore"],
+      "propDocs": ""
+    },
+    {
       "name": "TableOld",
       "kind": "component",
       "file": "src/components/TableOld/TableOld.tsx",
@@ -7346,6 +7704,25 @@
       "doc": "TableOld component - Root table element. ```tsx <TableOld density=\"condensed\" striped stickyHeader> <TableHeaderOld> <TableRowOld> <TableHeadOld sortable sortOrder=\"ascend\" onSort={sortByName}>Name</TableHeadOld> <TableHeadOld align=\"right\">Amount</TableHeadOld> </TableRowOld> </TableHeaderOld> <TableBodyOld> <TableRowOld selected> <TableCellOld>Ada Lovelace</TableCellOld> <TableCellOld align=\"right\">1,204.00</TableCellOld> </TableRowOld> </TableBodyOld> </TableOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
       "props": ["density", "striped", "stickyHeader", "maxHeight", "containerClassName", "layout"],
       "propDocs": "Row height and cell padding. Zebra-stripe alternate body rows. Off by default. A single subtle row divider carries the structure in most tables, and stripes compete with the data for attention - but long, dense tables genuinely read better with them. Keep the header row visible while the body scrolls. Becomes necessary the moment a table is tall enough that the column titles scroll out of view. **Needs `maxHeight` to do anything.** Sticky positions against the nearest scrolling ancestor, and without a height the table's own scroll container never scrolls, so the header has nothing to stick within. Caps the table's height and makes it scroll internally. This is what `stickyHeader` and a sticky summary row pin against. Accepts anything CSS does - `'24rem'`, `'50vh'`, `400`. Classes for the scroll container that wraps the table. This is the element that actually clips, so a border radius has to go here rather than on a wrapper of your own - put it outside and the sticky header paints straight over the rounded corner. How column widths are decided. Use `fixed` for a table whose rows appear and disappear - collapsing a group in an `auto` table visibly resizes every column, because the b"
+    },
+    {
+      "name": "TablePager",
+      "kind": "component",
+      "file": "src/components/Table/TablePager.tsx",
+      "area": "Table",
+      "summary": "The pager on the card's foot: the count on the left, rows per page, first, previous, a typed page box, next and last on the right.",
+      "doc": "The pager on the card's foot: the count on the left, rows per page, first, previous, a typed page box, next and last on the right. Thousands get a comma. Built for 401 pages.",
+      "props": [
+        "total",
+        "page",
+        "pageSize",
+        "pageSizes",
+        "onPage",
+        "onPageSize",
+        "noun",
+        "message"
+      ],
+      "propDocs": "Rows matching the search and filters. \"users\", for \"1–25 of 10,001 users\". Replaces the count text while the table is not showing rows."
     },
     {
       "name": "TablePaginationOld",
@@ -7368,6 +7745,16 @@
       "propDocs": "The page being shown, 1-based. How many pages there are. The numbers hide when this is 1. The 0-based index of the first row on this page, and one past the last. How many rows there are altogether. What the count is counting. Rows per page. What the rows-per-page control offers. @default [10, 25, 50, 100] Called with the page that was asked for. Clamping is the caller's business. Adds the rows-per-page control. Omit it and none appears. Optional because it is a real decision, not a default: a table backed by an expensive query may not want to offer 100 at all."
     },
     {
+      "name": "TableRow",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "A row.",
+      "doc": "A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the next row. A click on the row body opens it; clicks on controls inside do not.",
+      "props": ["selected", "inert", "onOpen", "onToggle", "onArrow"],
+      "propDocs": "The row is picked. An invited person: muted, not selectable, does not open. Enter, or a click on the row body. Space. `extend` is true with Shift held. Move focus to the row above or below with the arrow keys."
+    },
+    {
       "name": "TableRowOld",
       "kind": "component",
       "file": "src/components/TableOld/TableOld.tsx",
@@ -7376,6 +7763,46 @@
       "doc": "TableRowOld component - A table row. ```tsx <TableRowOld selected> <TableCellOld>Cell</TableCellOld> </TableRowOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
       "props": ["selected", "sticky", "interactive", "summary"],
       "propDocs": "Marks the row as selected. A selected row always wins over a stripe - the stripe is simply not applied to it - so selection stays readable in a striped table. Pins the row to the top or bottom of the scroll area. Needs `maxHeight` on the table, same as `stickyHeader`. The row picks up a shadow only while there is content scrolled underneath it, so a pinned total sitting at the true end of the data stays flat. Whether the row responds to hover. Body rows offer hover feedback by default, because most of them are targets. A row that is not a record should say so: an expanded detail panel, a spacer, a row holding a chart. Hover feedback on one of those says \"click me\" about something that does nothing. A `summary` row already opts out on its own. This is the same thing for every other case, and it exists because the alternative - a `hover:bg-transparent` override at the call site - relies on knowing what the row set in the first place. Leave it unset for the default: on for body rows, off everywhere else. Marks the row as a total or subtotal. `TableFooterOld` already treats its rows this way, so this is for a summary that sits somewhere else - at the top of the table, or at the foot of"
+    },
+    {
+      "name": "TableScopeMenu",
+      "kind": "component",
+      "file": "src/components/Table/TableScopeMenu.tsx",
+      "area": "Table",
+      "summary": "What a select-all should take: this page, every row that matches, or a number you type.",
+      "doc": "What a select-all should take: this page, every row that matches, or a number you type. Opened from the header chevron and from the bulk bar's count.",
+      "props": ["open", "onOpenChange", "anchor", "pageCount", "allCount", "noun", "onApply"],
+      "propDocs": "Selectable rows on this page. Selectable rows matching the search and filters, across pages. What the table calls its rows: \"users\"."
+    },
+    {
+      "name": "TableSelectAll",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The header's checkbox and the chevron that opens the scope menu.",
+      "doc": "The header's checkbox and the chevron that opens the scope menu.",
+      "props": ["state", "onToggle", "onScope", "frozen"],
+      "propDocs": "none, some or all of the selectable rows on the page are picked. Opens the scope menu."
+    },
+    {
+      "name": "TableSelectionCell",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
+      "doc": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
+      "props": ["index", "selected", "inert", "label", "onToggle", "frozen"],
+      "propDocs": "The row number shown at rest. An invited person: number only, no checkbox. Spoken name for the checkbox: \"Select Sarah Johnson\"."
+    },
+    {
+      "name": "TableSkeleton",
+      "kind": "component",
+      "file": "src/components/Table/TableStates.tsx",
+      "area": "Table",
+      "summary": "Five grey rows while the list loads.",
+      "doc": "Five grey rows while the list loads. Bars fall where the content will.",
+      "props": ["widths", "rows"],
+      "propDocs": "One width per visible column, so the bars line up under the headings."
     },
     {
       "name": "TableSortMenuOld",
@@ -7396,6 +7823,16 @@
         "className"
       ],
       "propDocs": "Every column that can be sorted, in the order to list them. The active sort, most significant first. Reverses one column's direction. Stops sorting by one column. Moves a rule within the stack, changing which sort wins. Drops every rule. Starts sorting by a column that is not in the stack yet. What a screen reader calls the trigger. @default 'Sort' Extra classes for the trigger."
+    },
+    {
+      "name": "TableTailCell",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The blank 60px tail that soaks up leftover width.",
+      "doc": "The blank 60px tail that soaks up leftover width.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "TableToolbarActionsOld",
@@ -7445,6 +7882,24 @@
       "doc": "Naming a view, whether it is new or being renamed. One panel for both because they are the same act with a different starting value, and two of them would be two places to fix the day someone decides a view name can be 40 characters.",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "TableViewport",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The scrolling region and the `<table>` inside it.",
+      "doc": "The scrolling region and the `<table>` inside it. Headings stick to its top.",
+      "props": [
+        "maxHeight",
+        "tableWidth",
+        "rowCount",
+        "refreshing",
+        "hasSelection",
+        "label",
+        "children"
+      ],
+      "propDocs": "How tall the scrolling region may grow before rows scroll under the header. Total table width in px: the sum of the column widths plus the 60px tail. How many rows there are in all, for screen readers. Dims the rows to 60% while a refresh is in flight. At least one row is picked: every row shows its checkbox instead of its number. Spoken name of the grid itself."
     },
     {
       "name": "TableViewSwitcherOld",
@@ -7537,6 +7992,16 @@
         "disabled"
       ],
       "propDocs": "The value of the tab. Must be unique within the Tabs component. A glyph before the label. A prop rather than something you put in `children` so the spacing is the same on every tab in the product. Hand-placing it meant each caller picked their own margin, and they did not agree. A count or status after the label - usually a `Badge`. Pairs with `icon`: a tab can carry a glyph, a label and a count all at once, which is the shape most navigation actually needs. Shows a close control on the tab. For tab bars the person builds themselves - a set of open documents, a saved view per tab - rather than fixed navigation. Fixed sections should not be closable; there is nothing to put back. Called when the close control is used. What a screen reader says for the close control. Falls back to \"Close <label>\" when the tab's label is plain text. Visual style variant (should match TabsList variant) Whether the tab trigger should take full width Whether the tab is disabled"
+    },
+    {
+      "name": "TagList",
+      "kind": "component",
+      "file": "src/components/Table/TableCells.tsx",
+      "area": "Table",
+      "summary": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" that lists the rest on hover.",
+      "doc": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" that lists the rest on hover.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "TagList",
@@ -8106,6 +8571,16 @@
       "propDocs": ""
     },
     {
+      "name": "useColumnDrag",
+      "kind": "hook",
+      "file": "src/components/Table/useColumnDrag.ts",
+      "area": "Table",
+      "summary": "Drag a heading to a new place: the column dims, a copy of the heading follows the pointer, a 2px line marks the landing, the region scrolls when the pointer nears an edge.",
+      "doc": "Drag a heading to a new place: the column dims, a copy of the heading follows the pointer, a 2px line marks the landing, the region scrolls when the pointer nears an edge. The frozen columns are never targets, so they cannot be passed.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useColumnReorderOld",
       "kind": "hook",
       "file": "src/components/TableOld/useColumnReorder.ts",
@@ -8236,6 +8711,16 @@
       "propDocs": ""
     },
     {
+      "name": "Users",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / Users",
+      "doc": "Components/Table Users",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useSavedViewsOld",
       "kind": "hook",
       "file": "src/components/TableOld/useSavedViews.ts",
@@ -8252,6 +8737,16 @@
       "area": "Dialog",
       "summary": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action.",
       "doc": "⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action. **Not plain Enter.** A dialog is full of fields, and Enter belongs to the one you are in - it moves between them, it opens a select, it adds a line to a textarea. Requiring the modifier is what lets a form with a `<textarea>` in it have a keyboard submit at all. **Say so in the button.** The shortcut nobody knows about is worth nothing; every product that ships this renders the keys next to the label. `Button` takes the hint as part of its children. Listens on the document rather than on the dialog, because focus may be anywhere inside it - or, while a native select is open, briefly nowhere. ```tsx useSubmitShortcut({ onSubmit: save, enabled: open && !busy }); <Button loading={busy}>Finish setup <CommandShortcut>⌘↵</CommandShortcut></Button> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTableColumns",
+      "kind": "hook",
+      "file": "src/components/Table/useTableColumns.ts",
+      "area": "Table",
+      "summary": "Column layout for a DataTable: order, hidden columns and widths, remembered in the browser when a `storageKey` is given.",
+      "doc": "Column layout for a DataTable: order, hidden columns and widths, remembered in the browser when a `storageKey` is given. The three fixed columns (row number, Name, Action) are not part of this; only the content columns move.",
       "props": [],
       "propDocs": ""
     },
@@ -8286,12 +8781,42 @@
       "propDocs": ""
     },
     {
+      "name": "useTablePaging",
+      "kind": "hook",
+      "file": "src/components/Table/useTablePaging.ts",
+      "area": "Table",
+      "summary": "Pages by default; a \"Load more\" mode for lists that prefer it.",
+      "doc": "Pages by default; a \"Load more\" mode for lists that prefer it. Users keeps pages.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTableSelection",
+      "kind": "hook",
+      "file": "src/components/Table/useTableSelection.ts",
+      "area": "Table",
+      "summary": "Row selection for a DataTable.",
+      "doc": "Row selection for a DataTable. Ids, not rows, so a pick survives sorting, searching and paging, as it does on the console.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useTableSelectionOld",
       "kind": "hook",
       "file": "src/components/TableOld/useTableSelection.ts",
       "area": "TableOld",
       "summary": "Holds which rows are selected.",
       "doc": "Holds which rows are selected. Like the rest of TableOld it holds state and never touches your rows: it reports which ids are selected, and what happens to them - a bulk delete, an export, an assignment - is the product's business. ```tsx const selection = useTableSelectionOld({ rowIds: rows.map((row) => row.id) }); <Checkbox checked={selection.headerState} onCheckedChange={selection.toggleAll} aria-label=\"Select all rows\" /> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTableSort",
+      "kind": "hook",
+      "file": "src/components/Table/useTableSort.ts",
+      "area": "Table",
+      "summary": "One sort at a time, as on the console.",
+      "doc": "One sort at a time, as on the console. The heading and the toolbar Sort menu share it.",
       "props": [],
       "propDocs": ""
     },
@@ -9182,6 +9707,16 @@
       "area": "Item",
       "summary": "Story: Components/Item / WithoutIcon",
       "doc": "Components/Item WithoutIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithoutSelection",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / WithoutSelection",
+      "doc": "Components/Table WithoutSelection",
       "props": [],
       "propDocs": ""
     },

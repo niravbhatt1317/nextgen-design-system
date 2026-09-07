@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 45,
-  "variantGroupCount": 159,
-  "variantValueCount": 502,
+  "componentCount": 46,
+  "variantGroupCount": 164,
+  "variantValueCount": 508,
   "components": [
     {
       "component": "Avatar",
@@ -744,6 +744,43 @@
           },
           "defaults": {
             "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "Table",
+      "file": "src/components/Table/Table.tsx",
+      "definitions": [
+        {
+          "name": "tableCellVariants",
+          "variants": {
+            "frozen": ["true", "false"],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
+          "name": "tableHeadVariants",
+          "variants": {
+            "frozen": ["true", "false"],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
+          "name": "tableRowVariants",
+          "variants": {
+            "inert": ["true", "false"]
+          },
+          "defaults": {
+            "inert": "false"
           }
         }
       ]
