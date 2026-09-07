@@ -73,10 +73,9 @@ function Grid({
 describe('Table', () => {
   it('is a named region holding a named grid with the console geometry', () => {
     render(<Grid />);
-    expect(screen.getByRole('region', { name: 'People' })).toHaveClass(
-      'mdt-rounded-xl',
-      'mdt-border-neutral-20'
-    );
+    const card = screen.getByRole('region', { name: 'People' });
+    expect(card).toHaveClass('tbl', 'mdt-border-neutral-20');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('0');
     const th = screen.getByRole('columnheader', { name: /Name/ });
     expect(th).toHaveClass('mdt-h-10', 'mdt-text-[11px]', 'mdt-text-neutral-90', 'mdt-sticky');
     const cell = screen.getByText('sarah@company.com').closest('td');
@@ -175,6 +174,65 @@ describe('Table', () => {
       'aria-haspopup',
       'dialog'
     );
+  });
+
+  it('keeps the header checkbox on the column axis: the chevron hangs off it, not beside it', () => {
+    render(<Grid />);
+    const chevron = screen.getByRole('button', { name: 'Choose what to select' });
+    expect(chevron.className).toContain('mdt-absolute');
+    expect(chevron.parentElement?.className).toContain('mdt-relative');
+  });
+
+  it('draws the checkbox border only while unchecked, so a picked box is one solid fill', () => {
+    render(<Grid selected hasSelection />);
+    const box = screen.getByRole('checkbox', { name: 'Select Sarah Johnson', hidden: true });
+    expect(box).toHaveAttribute('data-state', 'checked');
+    expect(box.className).toContain('data-[state=unchecked]:mdt-border-neutral-40');
+    expect(box.className.split(' ')).not.toContain('mdt-border-neutral-40');
+    const all = screen.getByRole('checkbox', { name: 'Select all on this page' });
+    expect(all.className.split(' ')).not.toContain('mdt-border-neutral-40');
+  });
+});
+
+describe('Table docking', () => {
+  const Card = ({ docked }: { docked?: boolean | number }) => (
+    <Table label="People" docked={docked} style={{ height: 600 }}>
+      <TableViewport tableWidth={537} maxHeight={480}>
+        <tbody />
+      </TableViewport>
+    </Table>
+  );
+  const parts = () => {
+    const card = screen.getByRole('region', { name: 'People' });
+    const viewport = card.querySelector('.tbl-viewport') as HTMLElement;
+    return { card, viewport };
+  };
+
+  it('at rest is a rounded card whose rows scroll within the max height', () => {
+    render(<Card />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('0');
+    expect(viewport.style.maxHeight).toBe('480px');
+    expect(viewport).toHaveAttribute('data-clip', 'false');
+  });
+
+  it('docked, it squares off, drops the max height and takes the height the page gives it', () => {
+    render(<Card docked />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'true');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('1');
+    expect(card.style.height).toBe('600px');
+    expect(viewport.style.maxHeight).toBe('');
+    expect(viewport).toHaveAttribute('data-clip', 'false');
+  });
+
+  it('half way, the morph is the number given and the rows are still clipped to the page scroll', () => {
+    render(<Card docked={0.5} />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('0.5');
+    expect(viewport).toHaveAttribute('data-clip', 'true');
   });
 });
 

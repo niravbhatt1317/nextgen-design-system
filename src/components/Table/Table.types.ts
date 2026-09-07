@@ -60,6 +60,15 @@ export interface TableProps extends ComponentPropsWithoutRef<'div'> {
   label: string;
   /** Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. */
   divider?: 'default' | 'light' | undefined;
+  /**
+   * The card becomes the page. `true` squares the corners, drops the side
+   * edges, grows the first and last cell inset from 16 to 24 and lets the
+   * rows scroll inside the card, with the header and pager pinned. A number
+   * from 0 to 1 is the in-between while the page scrolls the card up to its
+   * dock line; the page decides when, the table only decides how it looks.
+   * The page also sets the card's height once docked (`style.height`).
+   */
+  docked?: boolean | number | undefined;
   children: ReactNode;
 }
 

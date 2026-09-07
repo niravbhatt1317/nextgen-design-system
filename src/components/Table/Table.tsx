@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority';
-import { forwardRef, useCallback, useRef, useState } from 'react';
+import { createContext, forwardRef, useCallback, useContext, useRef, useState } from 'react';
 import type {
   KeyboardEvent,
   MouseEvent,
@@ -84,6 +84,25 @@ export const tableRowVariants = cva(['tbl-row mdt-outline-none'], {
 });
 
 /**
+ * How far the card has become the page: 0 at rest, 1 docked. `driven` means a
+ * page is scrolling this card to its dock line, so the card takes the page's
+ * height and its rows are clipped, not scrolled, until the dock.
+ */
+export interface TableMorph {
+  morph: number;
+  driven: boolean;
+}
+const TableMorphContext = createContext<TableMorph>({ morph: 0, driven: false });
+export const useTableMorph = (): TableMorph => useContext(TableMorphContext);
+
+/** `docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card. */
+export function tableMorphOf(docked: boolean | number | undefined): TableMorph {
+  if (docked === true) return { morph: 1, driven: true };
+  if (docked === false || docked === undefined) return { morph: 0, driven: false };
+  return { morph: Math.min(1, Math.max(0, docked)), driven: true };
+}
+
+/**
  * Table - the card that holds a list: rows, a bulk bar and a pager.
  *
  * @example
@@ -99,24 +118,30 @@ export const tableRowVariants = cva(['tbl-row mdt-outline-none'], {
  * ```
  */
 const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
-  { className, label, divider = 'default', children, ...props },
+  { className, label, divider = 'default', docked, style, children, ...props },
   ref
 ) {
+  const state = tableMorphOf(docked);
+  const { morph } = state;
   return (
-    <div
-      ref={ref}
-      role="region"
-      aria-label={label}
-      data-divider={divider}
-      className={cn(
-        'tbl mdt-relative mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
-        'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
+    <TableMorphContext.Provider value={state}>
+      <div
+        ref={ref}
+        role="region"
+        aria-label={label}
+        data-divider={divider}
+        data-docked={morph >= 1}
+        className={cn(
+          'tbl mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
+          'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
+          className
+        )}
+        style={{ ...style, '--tbl-morph': morph } as React.CSSProperties}
+        {...props}
+      >
+        {children}
+      </div>
+    </TableMorphContext.Provider>
   );
 });
 Table.displayName = 'Table';
@@ -137,6 +162,7 @@ const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function Ta
   ref
 ) {
   const [scrolledX, setScrolledX] = useState(false);
+  const { morph, driven } = useTableMorph();
   const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrolledX(e.currentTarget.scrollLeft > 0);
   }, []);
@@ -144,9 +170,10 @@ const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function Ta
     <div
       ref={ref}
       data-scrolled-x={scrolledX}
+      data-clip={driven && morph < 1}
       onScroll={onScroll}
-      className={cn('tbl-viewport mdt-relative mdt-overflow-auto mdt-rounded-t-xl', className)}
-      style={{ maxHeight }}
+      className={cn('tbl-viewport mdt-relative mdt-overflow-auto', className)}
+      style={driven ? undefined : { maxHeight }}
       {...props}
     >
       <table
@@ -491,7 +518,7 @@ function TableSelectionCell({
         </span>
         {!inert && (
           <Checkbox
-            className="tbl-cb mdt-border-neutral-40 dark:mdt-border-neutral-90"
+            className="tbl-cb data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
             checked={selected}
             tabIndex={-1}
             aria-label={`Select ${label}`}
@@ -515,16 +542,16 @@ function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAll
       className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
       style={{ left: frozen, width: TABLE_GUTTER }}
     >
-      <span className="mdt-inline-flex mdt-items-center mdt-justify-center mdt-gap-1">
+      <span className="tbl-selall mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center">
         <Checkbox
-          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
+          className="data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
           checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
           onCheckedChange={onToggle}
           aria-label="Select all on this page"
         />
         <button
           type="button"
-          className="mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground"
+          className="tbl-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40"
           aria-label="Choose what to select"
           aria-haspopup="dialog"
           onClick={(e) => {
@@ -555,6 +582,7 @@ function TableTailCell({ head = false }: { head?: boolean }) {
 export type { ReactNode };
 export {
   Table,
+  TableMorphContext,
   TableViewport,
   TableColGroup,
   TableHeader,

@@ -48,7 +48,7 @@ function TablePager({
   const disabled = total === 0;
 
   return (
-    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
+    <div className="tbl-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
       <span className="tbl-count">
         {message ?? `${fmt(from)}–${fmt(to)} of ${fmt(total)} ${noun}`}
       </span>
@@ -148,7 +148,7 @@ function TablePager({
 /** The other footer: a count and a "Load more" button that the table also presses as you scroll near the bottom. */
 function TableLoadMore({ shown, total, noun, loading = false, onMore }: TableLoadMoreProps) {
   return (
-    <div className="mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-rounded-b-xl mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
+    <div className="tbl-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
       <span>
         Showing {fmt(Math.min(shown, total))} of {fmt(total)} {noun}
       </span>

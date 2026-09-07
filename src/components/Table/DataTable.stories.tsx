@@ -287,3 +287,6 @@ export const CouldNotLoad: Story = { args: { error: true } };
 
 /** Today's lighter row line, for the divider decision. */
 export const LighterDividers: Story = { args: { divider: 'light' } };
+
+/** The card as the page: square corners, no side edges, a 24px inset on the end cells, the header and pager pinned while the rows scroll inside. `maxHeight` is the card's height here. The page decides when this happens; see Pieces → Docks On Scroll. */
+export const Docked: Story = { args: { docked: true, maxHeight: 520 } };

@@ -8,6 +8,52 @@
   --tbl-divider: hsl(var(--mdt-neutral-30));
   --tbl-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
   --tbl-hover: hsl(var(--mdt-neutral-10));
+  /* the card-to-page morph: 0 at rest, 1 docked (set by the docked prop) */
+  --tbl-morph: 0;
+  --tbl-radius: 12px;
+  /* the first and last cell inset grows 16 -> 24 as the card gives up the page's margin */
+  --tbl-edge: calc(16px + 8px * var(--tbl-morph));
+  border-radius: calc(var(--tbl-radius) * (1 - var(--tbl-morph)));
+  transition: border-color 0.12s ease-out;
+}
+/* docked: the side edges go (no gradual fade), the rows scroll inside the card, header and pager pinned */
+.tbl[data-docked='true'] {
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.tbl > .tbl-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* a page is scrolling the card to its dock line: until it lands, the rows are clipped, not scrolled */
+.tbl-viewport[data-clip='true'] {
+  overflow-y: clip;
+}
+.tbl-viewport {
+  border-top-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  border-top-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+}
+.tbl-foot {
+  margin-top: auto;
+  flex-shrink: 0;
+  border-bottom-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  border-bottom-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  padding-left: var(--tbl-edge);
+  padding-right: var(--tbl-edge);
+}
+.tbl-table > * > tr > :first-child {
+  padding-left: var(--tbl-edge);
+}
+.tbl-table > * > tr > :last-child {
+  padding-right: var(--tbl-edge);
+}
+/* the 60px selection column keeps its mark centred while the inset grows: the wrappers take the offset */
+.tbl-selall {
+  margin-left: calc(8px * var(--tbl-morph));
+}
+.tbl-sel .tbl-rowsel {
+  width: calc(100% - 8px * var(--tbl-morph));
+  margin-left: calc(8px * var(--tbl-morph));
 }
 .tbl[data-divider='light'] {
   --tbl-divider: hsl(var(--mdt-neutral-20));

@@ -29,6 +29,7 @@ import {
   TableSelectionCell,
   TableTailCell,
   TableViewport,
+  tableMorphOf,
 } from './Table';
 import { TableBulkBar } from './TableBulkBar';
 import { TableLoadMore, TablePager } from './TablePager';
@@ -80,6 +81,7 @@ function DataTable<Row>({
   blank,
   divider = 'default',
   maxHeight = 600,
+  docked,
   className,
 }: DataTableProps<Row>) {
   // ── state ──
@@ -493,7 +495,13 @@ function DataTable<Row>({
         </ToolbarSection>
       </Toolbar>
 
-      <Table ref={cardRef} label={label} divider={divider}>
+      <Table
+        ref={cardRef}
+        label={label}
+        divider={divider}
+        docked={docked}
+        style={tableMorphOf(docked).driven ? { height: maxHeight } : undefined}
+      >
         <TableViewport
           ref={viewportRef}
           tableWidth={tableWidth}

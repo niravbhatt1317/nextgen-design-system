@@ -80,6 +80,12 @@ export interface DataTableProps<Row> {
   blank?: Partial<Record<TableBlankKind, DataTableBlankCopy>> | undefined;
   /** Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. */
   divider?: 'default' | 'light' | undefined;
+  /** How tall the rows may grow before they scroll. Once `docked`, the card's own height. */
   maxHeight?: number | string | undefined;
+  /**
+   * The card becomes the page: `true` docked, a number the in-between while the
+   * page scrolls it to its dock line. See Table's `docked`.
+   */
+  docked?: boolean | number | undefined;
   className?: string | undefined;
 }
