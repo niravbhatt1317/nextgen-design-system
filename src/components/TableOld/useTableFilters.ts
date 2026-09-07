@@ -1,0 +1,166 @@
+import { useCallback, useMemo, useState } from 'react';
+
+/**
+ * One filter: an attribute, and the values chosen for it.
+ *
+ * Values are a list because "status is Open **or** In Process" is the common
+ * case, and a single-value shape would force a product to choose between
+ * modelling it as several filters on the same attribute or not at all.
+ */
+export interface TableFilterOld<K extends string = string> {
+  attribute: K;
+  values: string[];
+}
+
+export interface UseTableFiltersOldOptions<K extends string = string> {
+  /** Where the table starts out. Captured once. */
+  initial?: TableFilterOld<K>[];
+}
+
+export interface UseTableFiltersOld<K extends string = string> {
+  /** Every active filter, in the order they were added. */
+  filters: TableFilterOld<K>[];
+
+  /** The values chosen for one attribute, or an empty list. */
+  valuesFor: (attribute: K) => string[];
+
+  /** Whether an attribute is filtered at all. */
+  isFiltered: (attribute: K) => boolean;
+
+  /**
+   * Adds or removes one value.
+   *
+   * Removing the last value drops the filter rather than leaving it empty: an
+   * attribute filtered to nothing matches everything, so keeping it would show
+   * a chip that does not do anything.
+   */
+  toggleValue: (attribute: K, value: string) => void;
+
+  /** Replaces every value for one attribute. */
+  setValues: (attribute: K, values: string[]) => void;
+
+  /** Drops one attribute's filter entirely. */
+  remove: (attribute: K) => void;
+
+  /** Drops everything. */
+  clear: () => void;
+
+  /**
+   * Replaces every filter in one go.
+   *
+   * What a saved view applies through, for the same reason `useTableSortOld` has
+   * one: a state decided elsewhere arrives whole, and rebuilding it value by
+   * value would fire a callback per value and re-fetch a table per keystroke.
+   */
+  restore: (filters: TableFilterOld<K>[]) => void;
+
+  /** How many attributes are filtered. Not how many values. */
+  count: number;
+
+  /** Whether anything is filtered. */
+  isActive: boolean;
+}
+
+/**
+ * Holds which filters are applied.
+ *
+ * As with the rest of TableOld it **holds state and never touches your rows**. It
+ * reports "status is Open or In Process, assignee is Ada"; turning that into a
+ * predicate or a query string is the product's business, and a table backed by
+ * a server could not work any other way.
+ *
+ * It deliberately stops at attribute-and-values. Operators - is, is not,
+ * contains, before, between - are a query builder, which is a feature in its
+ * own right rather than a table control, and building half of one here would
+ * settle its shape by accident.
+ *
+ * @example
+ * ```tsx
+ * const filters = useTableFiltersOld<ColumnKey>();
+ * filters.toggleValue('status', 'Open');
+ * // filters.filters -> [{ attribute: 'status', values: ['Open'] }]
+ * ```
+ *
+ * @deprecated Since 0.4.0. Use `Table` / `DataTable`, now the merged console
+ * Users table. This earlier family stays only for side-by-side comparison until
+ * the removal pull request.
+ */
+export function useTableFiltersOld<K extends string>({
+  initial = [],
+}: UseTableFiltersOldOptions<K> = {}): UseTableFiltersOld<K> {
+  const [start] = useState<TableFilterOld<K>[]>(initial);
+  const [filters, setFilters] = useState<TableFilterOld<K>[]>(start);
+
+  const valuesFor = useCallback(
+    (attribute: K) => filters.find((filter) => filter.attribute === attribute)?.values ?? [],
+    [filters]
+  );
+
+  const isFiltered = useCallback(
+    (attribute: K) => filters.some((filter) => filter.attribute === attribute),
+    [filters]
+  );
+
+  const setValues = useCallback((attribute: K, values: string[]) => {
+    setFilters((prev) => {
+      const rest = prev.filter((filter) => filter.attribute !== attribute);
+      // An attribute filtered to nothing matches everything, so it is not a
+      // filter - it is a chip that does not do anything.
+      if (values.length === 0) return rest;
+      const existing = prev.find((filter) => filter.attribute === attribute);
+      // Kept in place when it already exists: a filter jumping to the end of
+      // the row because you changed one of its values is a small nonsense.
+      if (!existing) return [...prev, { attribute, values }];
+      return prev.map((filter) =>
+        filter.attribute === attribute ? { attribute, values } : filter
+      );
+    });
+  }, []);
+
+  const toggleValue = useCallback((attribute: K, value: string) => {
+    setFilters((prev) => {
+      const existing = prev.find((filter) => filter.attribute === attribute);
+      const next =
+        existing === undefined
+          ? [value]
+          : existing.values.includes(value)
+            ? existing.values.filter((v) => v !== value)
+            : [...existing.values, value];
+
+      const rest = prev.filter((filter) => filter.attribute !== attribute);
+      if (next.length === 0) return rest;
+      if (existing === undefined) return [...prev, { attribute, values: next }];
+      return prev.map((filter) =>
+        filter.attribute === attribute ? { attribute, values: next } : filter
+      );
+    });
+  }, []);
+
+  const remove = useCallback((attribute: K) => {
+    setFilters((prev) => prev.filter((filter) => filter.attribute !== attribute));
+  }, []);
+
+  const clear = useCallback(() => {
+    setFilters([]);
+  }, []);
+
+  const restore = useCallback((next: TableFilterOld<K>[]) => {
+    // Deep enough to matter: the values array is what a chip edits, and sharing
+    // it with a stored view lets the table rewrite the view it was applied
+    // from.
+    setFilters(next.map((filter) => ({ ...filter, values: [...filter.values] })));
+  }, []);
+
+  return {
+    filters,
+    valuesFor,
+    isFiltered,
+    toggleValue,
+    setValues,
+    remove,
+    clear,
+    restore,
+    count: filters.length,
+    isActive: useMemo(() => filters.length > 0, [filters]),
+  };
+}

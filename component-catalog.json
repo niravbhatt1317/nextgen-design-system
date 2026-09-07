@@ -749,11 +749,11 @@
       ]
     },
     {
-      "component": "Table",
-      "file": "src/components/Table/Table.tsx",
+      "component": "TableOld",
+      "file": "src/components/TableOld/TableOld.tsx",
       "definitions": [
         {
-          "name": "tableHeadVariants",
+          "name": "tableHeadOldVariants",
           "variants": {
             "density": ["short", "compact", "default", "relaxed"],
             "align": ["left", "center", "right"]
@@ -764,7 +764,7 @@
           }
         },
         {
-          "name": "tableCellVariants",
+          "name": "tableCellOldVariants",
           "variants": {
             "density": ["short", "compact", "default", "relaxed"],
             "align": ["left", "center", "right"],
@@ -777,7 +777,7 @@
           }
         },
         {
-          "name": "tableRowVariants",
+          "name": "tableRowOldVariants",
           "variants": {
             "interactive": ["true", "false"],
             "striped": ["true", "false"],

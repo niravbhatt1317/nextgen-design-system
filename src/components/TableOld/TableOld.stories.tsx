@@ -1,0 +1,1398 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Fragment, useState } from 'react';
+import { Button } from '../Button';
+import { Badge } from '../Badge';
+import { Checkbox } from '../Checkbox';
+import { Icon } from '../Icon';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '../Pagination';
+import { Skeleton } from '../Skeleton';
+import {
+  TableOld,
+  TableBodyOld,
+  TableCaptionOld,
+  TableCellOld,
+  TableFooterOld,
+  TableExpandTriggerOld,
+  TableGroupRowOld,
+  TableHeadOld,
+  TableHeaderOld,
+  TableRowOld,
+} from './TableOld';
+import type { TableSortOrderOld } from './TableOld.types';
+import { useColumnWidthsOld } from './useColumnWidths';
+import { useTableSelectionOld } from './useTableSelection';
+
+const meta: Meta<typeof TableOld> = {
+  title: 'Deprecated/Table Old',
+  component: TableOld,
+  tags: ['autodocs'],
+  parameters: {
+    status: {
+      type: 'deprecated',
+      since: '0.4.0',
+      deprecation: {
+        deprecatedSince: '0.4.0',
+        removalIn: '1.0.0',
+        replacement: 'Table',
+        message:
+          'The Table family is now the merged console Users table (7 September 2026): 54px rows under a 40px header, row numbers that become checkboxes, a select-all scope, header sort, a column menu, drag-to-move, insert-in-place, and the library Badge in every cell. This is the earlier family, kept for side-by-side comparison until the removal pull request.',
+      },
+    },
+    layout: 'padded',
+    docs: {
+      description: {
+        component:
+          '## ⚠️ Deprecated — use `Table`. The Table family is now the merged console Users table (7 September 2026); this earlier family stays only for side-by-side comparison. ' +
+          'A semantic HTML table component with sub-components for building accessible and well-structured data tables. Includes support for headers, body, footer, captions, and various interactive features.',
+      },
+    },
+    controls: {
+      exclude: ['class'],
+    },
+  },
+  argTypes: {
+    density: {
+      control: 'inline-radio',
+      options: ['short', 'compact', 'default', 'relaxed'],
+      description:
+        'Row height and cell padding. Four steps, following Airtable — the only reference that ships a row-height picker to the user rather than fixing it at design time.',
+      table: {
+        type: { summary: "'short' | 'compact' | 'default' | 'relaxed'" },
+        defaultValue: { summary: 'compact' },
+      },
+    },
+    striped: {
+      control: 'boolean',
+      description:
+        'Zebra-stripe alternate body rows. Off by default — a single row divider carries the structure in most tables, but long dense ones read better striped.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    stickyHeader: {
+      control: 'boolean',
+      description:
+        'Keep the header visible while the body scrolls. **Needs `maxHeight`** — sticky positions against the nearest scrolling ancestor, and without a height the table never scrolls.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    maxHeight: {
+      control: 'text',
+      description:
+        'Caps the height and makes the table scroll internally. This is what a sticky header and a pinned summary row hold onto. Accepts anything CSS does.',
+      table: { type: { summary: 'string | number' } },
+    },
+    layout: {
+      control: 'inline-radio',
+      options: ['auto', 'fixed'],
+      description:
+        'How column widths are decided. Use `fixed` when rows appear and disappear — collapsing a group in an `auto` table visibly resizes every column.',
+      table: { type: { summary: "'auto' | 'fixed'" }, defaultValue: { summary: 'auto' } },
+    },
+    containerClassName: {
+      control: 'text',
+      description:
+        'Classes for the scroll container. A border radius has to go here rather than on a wrapper of your own — the scroll container is what clips, so a radius outside it gets painted over by the sticky header.',
+      table: { type: { summary: 'string' } },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes applied to the `<table>` element',
+      table: { type: { summary: 'string' } },
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Sample data
+const invoices = [
+  {
+    invoice: 'INV001',
+    paymentStatus: 'Paid',
+    totalAmount: '$250.00',
+    paymentMethod: 'Credit Card',
+  },
+  {
+    invoice: 'INV002',
+    paymentStatus: 'Pending',
+    totalAmount: '$150.00',
+    paymentMethod: 'PayPal',
+  },
+  {
+    invoice: 'INV003',
+    paymentStatus: 'Unpaid',
+    totalAmount: '$350.00',
+    paymentMethod: 'Bank Transfer',
+  },
+  {
+    invoice: 'INV004',
+    paymentStatus: 'Paid',
+    totalAmount: '$450.00',
+    paymentMethod: 'Credit Card',
+  },
+  {
+    invoice: 'INV005',
+    paymentStatus: 'Paid',
+    totalAmount: '$550.00',
+    paymentMethod: 'PayPal',
+  },
+  {
+    invoice: 'INV006',
+    paymentStatus: 'Pending',
+    totalAmount: '$200.00',
+    paymentMethod: 'Bank Transfer',
+  },
+  {
+    invoice: 'INV007',
+    paymentStatus: 'Unpaid',
+    totalAmount: '$300.00',
+    paymentMethod: 'Credit Card',
+  },
+];
+
+const users = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
+  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User', status: 'Inactive' },
+  { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'Editor', status: 'Active' },
+  { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'User', status: 'Active' },
+];
+
+/**
+ * Default table with basic invoice data.
+ */
+export const Default: Story = {
+  args: { density: 'compact', striped: false, layout: 'auto' },
+  render: (args) => (
+    <TableOld {...args}>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld className="mdt-w-[100px]">Invoice</TableHeadOld>
+          <TableHeadOld>Status</TableHeadOld>
+          <TableHeadOld>Method</TableHeadOld>
+          <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {invoices.map((invoice) => (
+          <TableRowOld key={invoice.invoice}>
+            <TableCellOld className="mdt-font-medium">{invoice.invoice}</TableCellOld>
+            <TableCellOld>{invoice.paymentStatus}</TableCellOld>
+            <TableCellOld>{invoice.paymentMethod}</TableCellOld>
+            <TableCellOld className="mdt-text-right">{invoice.totalAmount}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * TableOld with a caption describing the data.
+ */
+export const WithCaption: Story = {
+  render: () => (
+    <TableOld>
+      <TableCaptionOld>A list of your recent invoices.</TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld className="mdt-w-[100px]">Invoice</TableHeadOld>
+          <TableHeadOld>Status</TableHeadOld>
+          <TableHeadOld>Method</TableHeadOld>
+          <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {invoices.slice(0, 5).map((invoice) => (
+          <TableRowOld key={invoice.invoice}>
+            <TableCellOld className="mdt-font-medium">{invoice.invoice}</TableCellOld>
+            <TableCellOld>{invoice.paymentStatus}</TableCellOld>
+            <TableCellOld>{invoice.paymentMethod}</TableCellOld>
+            <TableCellOld className="mdt-text-right">{invoice.totalAmount}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * TableOld with a footer row showing totals.
+ */
+export const WithFooter: Story = {
+  render: () => (
+    <TableOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld className="mdt-w-[100px]">Invoice</TableHeadOld>
+          <TableHeadOld>Status</TableHeadOld>
+          <TableHeadOld>Method</TableHeadOld>
+          <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {invoices.slice(0, 5).map((invoice) => (
+          <TableRowOld key={invoice.invoice}>
+            <TableCellOld className="mdt-font-medium">{invoice.invoice}</TableCellOld>
+            <TableCellOld>{invoice.paymentStatus}</TableCellOld>
+            <TableCellOld>{invoice.paymentMethod}</TableCellOld>
+            <TableCellOld className="mdt-text-right">{invoice.totalAmount}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+      <TableFooterOld>
+        <TableRowOld>
+          <TableCellOld colSpan={3}>Total</TableCellOld>
+          <TableCellOld className="mdt-text-right">$2,500.00</TableCellOld>
+        </TableRowOld>
+      </TableFooterOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * TableOld with alternating row colors (striped).
+ */
+export const StripedRows: Story = {
+  render: () => (
+    <TableOld striped>
+      <TableCaptionOld>
+        One prop. Striping applies to body rows only — a striped header reads as a mistake.
+      </TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>Name</TableHeadOld>
+          <TableHeadOld>Email</TableHeadOld>
+          <TableHeadOld>Role</TableHeadOld>
+          <TableHeadOld>Status</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {users.map((user) => (
+          <TableRowOld key={user.id}>
+            <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+            <TableCellOld>{user.email}</TableCellOld>
+            <TableCellOld>{user.role}</TableCellOld>
+            <TableCellOld>{user.status}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * All three densities, side by side. `default` is exactly the spacing this table
+ * had before density existed, so an existing table does not move.
+ */
+export const Density: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-8">
+      {(['short', 'compact', 'default', 'relaxed'] as const).map((density) => (
+        <div key={density}>
+          <p className="mdt-mb-2 mdt-text-sm mdt-font-medium mdt-text-muted-foreground">
+            density=&quot;{density}&quot;
+          </p>
+          <TableOld density={density}>
+            <TableHeaderOld>
+              <TableRowOld>
+                <TableHeadOld>Name</TableHeadOld>
+                <TableHeadOld>Email</TableHeadOld>
+                <TableHeadOld>Role</TableHeadOld>
+              </TableRowOld>
+            </TableHeaderOld>
+            <TableBodyOld>
+              {users.slice(0, 2).map((user) => (
+                <TableRowOld key={user.id}>
+                  <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+                  <TableCellOld>{user.email}</TableCellOld>
+                  <TableCellOld>{user.role}</TableCellOld>
+                </TableRowOld>
+              ))}
+            </TableBodyOld>
+          </TableOld>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * Alignment follows the **data type**, not preference: text left, numbers right
+ * so digits line up by place value and magnitudes compare at a glance.
+ */
+export const Alignment: Story = {
+  render: () => (
+    <TableOld>
+      <TableCaptionOld>
+        Numbers on the right. This one rule fixes most “messy table” complaints.
+      </TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>Item</TableHeadOld>
+          <TableHeadOld align="center">Qty</TableHeadOld>
+          <TableHeadOld align="right">Unit price</TableHeadOld>
+          <TableHeadOld align="right">Total</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {[
+          { item: 'Annual licence', qty: 12, unit: '1,204.00', total: '14,448.00' },
+          { item: 'Support hours', qty: 3, unit: '95.50', total: '286.50' },
+          { item: 'Onboarding', qty: 1, unit: '2,000.00', total: '2,000.00' },
+        ].map((row) => (
+          <TableRowOld key={row.item}>
+            <TableCellOld className="mdt-font-medium">{row.item}</TableCellOld>
+            <TableCellOld align="center">{row.qty}</TableCellOld>
+            <TableCellOld align="right">{row.unit}</TableCellOld>
+            <TableCellOld align="right">{row.total}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+      <TableFooterOld>
+        <TableRowOld>
+          <TableCellOld colSpan={3}>Total</TableCellOld>
+          <TableCellOld align="right">16,734.50</TableCellOld>
+        </TableRowOld>
+      </TableFooterOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * A sticky header becomes necessary the moment a table is tall enough that the
+ * column titles scroll out of view. Scroll the area below to see it hold.
+ */
+export const StickyHeader: Story = {
+  render: () => (
+    <TableOld
+      stickyHeader
+      maxHeight="16rem"
+      density="short"
+      containerClassName="mdt-rounded-md mdt-border"
+    >
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>#</TableHeadOld>
+          <TableHeadOld>Name</TableHeadOld>
+          <TableHeadOld>Email</TableHeadOld>
+          <TableHeadOld align="right">Score</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {Array.from({ length: 30 }, (_, i) => (
+          <TableRowOld key={i}>
+            <TableCellOld>{i + 1}</TableCellOld>
+            <TableCellOld className="mdt-font-medium">Row {i + 1}</TableCellOld>
+            <TableCellOld>row{i + 1}@example.com</TableCellOld>
+            <TableCellOld align="right">{(i + 1) * 7}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * Sorting is a contract, not an implementation. `TableHeadOld` renders the control
+ * and the affordance and sets `aria-sort`; the sorting itself stays yours, so
+ * you can sort locally, on a server, or through TanStack TableOld without the
+ * component getting in the way.
+ *
+ * A column that is sortable but not currently sorted shows a neutral
+ * double-arrow rather than an arrow pointing somewhere arbitrary — an arrow with
+ * no state is the commonest sort bug there is.
+ */
+export const SortableHeaders: Story = {
+  render: function SortableTable() {
+    type SortKey = 'name' | 'email' | 'role' | 'status';
+
+    const [sortKey, setSortKey] = useState<SortKey | null>(null);
+    const [sortOrder, setSortOrder] = useState<TableSortOrderOld>(null);
+
+    // Ascending, then descending, then off. Cycling back to unsorted matters:
+    // without it there is no way back to the data's natural order.
+    const handleSort = (key: SortKey) => {
+      if (sortKey !== key) {
+        setSortKey(key);
+        setSortOrder('ascend');
+        return;
+      }
+      if (sortOrder === 'ascend') {
+        setSortOrder('descend');
+        return;
+      }
+      setSortKey(null);
+      setSortOrder(null);
+    };
+
+    const sortedUsers = [...users].sort((a, b) => {
+      if (!sortKey || !sortOrder) return 0;
+      const direction = sortOrder === 'ascend' ? 1 : -1;
+      return a[sortKey] > b[sortKey] ? direction : -direction;
+    });
+
+    const columns: { key: SortKey; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+      { key: 'status', label: 'Status' },
+    ];
+
+    return (
+      <TableOld>
+        <TableCaptionOld>
+          Click a header to sort. Third click returns to the unsorted order.
+        </TableCaptionOld>
+        <TableHeaderOld>
+          <TableRowOld>
+            {columns.map((column) => (
+              <TableHeadOld
+                key={column.key}
+                sortable
+                sortOrder={sortKey === column.key ? sortOrder : null}
+                onSort={() => {
+                  handleSort(column.key);
+                }}
+              >
+                {column.label}
+              </TableHeadOld>
+            ))}
+          </TableRowOld>
+        </TableHeaderOld>
+        <TableBodyOld>
+          {sortedUsers.map((user) => (
+            <TableRowOld key={user.id}>
+              <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+              <TableCellOld>{user.email}</TableCellOld>
+              <TableCellOld>{user.role}</TableCellOld>
+              <TableCellOld>{user.status}</TableCellOld>
+            </TableRowOld>
+          ))}
+        </TableBodyOld>
+      </TableOld>
+    );
+  },
+};
+
+/**
+ * TableOld with selectable rows using checkboxes.
+ */
+export const SelectableRows: Story = {
+  render: function Selectable() {
+    // `useTableSelectionOld` rather than a hand-rolled array: it brings shift-click
+    // ranges and the indeterminate header state, both of which this story used
+    // to be missing.
+    const selection = useTableSelectionOld({ rowIds: users.map((user) => user.id) });
+
+    return (
+      <div>
+        <div className="mdt-mb-4 mdt-text-sm mdt-text-muted-foreground">
+          {selection.count} of {users.length} row(s) selected.
+        </div>
+        <TableOld>
+          <TableHeaderOld>
+            <TableRowOld>
+              <TableHeadOld className="mdt-w-[50px]">
+                <Checkbox
+                  checked={selection.headerState}
+                  onCheckedChange={selection.toggleAll}
+                  aria-label="Select all rows"
+                />
+              </TableHeadOld>
+              <TableHeadOld>Name</TableHeadOld>
+              <TableHeadOld>Email</TableHeadOld>
+              <TableHeadOld>Role</TableHeadOld>
+              <TableHeadOld>Status</TableHeadOld>
+            </TableRowOld>
+          </TableHeaderOld>
+          <TableBodyOld>
+            {users.map((user) => (
+              <TableRowOld key={user.id} selected={selection.isSelected(user.id)}>
+                <TableCellOld>
+                  {/*
+                    The shift key arrives on the click, not the change:
+                    `onCheckedChange` reports the new value and nothing about
+                    the modifiers.
+                  */}
+                  <Checkbox
+                    checked={selection.isSelected(user.id)}
+                    onClick={(event) => {
+                      selection.toggle(user.id, { extend: event.shiftKey });
+                    }}
+                    aria-label={`Select ${user.name}`}
+                  />
+                </TableCellOld>
+                <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+                <TableCellOld>{user.email}</TableCellOld>
+                <TableCellOld>{user.role}</TableCellOld>
+                <TableCellOld>{user.status}</TableCellOld>
+              </TableRowOld>
+            ))}
+          </TableBodyOld>
+        </TableOld>
+      </div>
+    );
+  },
+};
+
+export const CompactDense: Story = {
+  render: () => (
+    <TableOld density="short">
+      <TableCaptionOld>One prop on the table, not a class on every cell.</TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld align="right">ID</TableHeadOld>
+          <TableHeadOld>Name</TableHeadOld>
+          <TableHeadOld>Email</TableHeadOld>
+          <TableHeadOld>Role</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {users.map((user) => (
+          <TableRowOld key={user.id}>
+            <TableCellOld align="right">{user.id}</TableCellOld>
+            <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+            <TableCellOld>{user.email}</TableCellOld>
+            <TableCellOld>{user.role}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * TableOld showing loading state with skeletons.
+ */
+export const WithLoadingState: Story = {
+  render: () => (
+    <TableOld>
+      <TableCaptionOld>Loading table data...</TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>Invoice</TableHeadOld>
+          <TableHeadOld>Status</TableHeadOld>
+          <TableHeadOld>Method</TableHeadOld>
+          <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <TableRowOld key={i}>
+            <TableCellOld>
+              <Skeleton className="mdt-h-4 mdt-w-[80px]" />
+            </TableCellOld>
+            <TableCellOld>
+              <Skeleton className="mdt-h-4 mdt-w-[100px]" />
+            </TableCellOld>
+            <TableCellOld>
+              <Skeleton className="mdt-h-4 mdt-w-[120px]" />
+            </TableCellOld>
+            <TableCellOld className="mdt-text-right">
+              <Skeleton className="mdt-ml-auto mdt-h-4 mdt-w-[80px]" />
+            </TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * TableOld with pagination controls.
+ */
+export const WithPagination: Story = {
+  render: function PaginatedTable() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+    const totalPages = Math.ceil(invoices.length / itemsPerPage);
+
+    const paginatedData = invoices.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+
+    return (
+      <div className="mdt-space-y-4">
+        <TableOld>
+          <TableCaptionOld>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, invoices.length)} of {invoices.length} invoices.
+          </TableCaptionOld>
+          <TableHeaderOld>
+            <TableRowOld>
+              <TableHeadOld className="mdt-w-[100px]">Invoice</TableHeadOld>
+              <TableHeadOld>Status</TableHeadOld>
+              <TableHeadOld>Method</TableHeadOld>
+              <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+            </TableRowOld>
+          </TableHeaderOld>
+          <TableBodyOld>
+            {paginatedData.map((invoice) => (
+              <TableRowOld key={invoice.invoice}>
+                <TableCellOld className="mdt-font-medium">{invoice.invoice}</TableCellOld>
+                <TableCellOld>{invoice.paymentStatus}</TableCellOld>
+                <TableCellOld>{invoice.paymentMethod}</TableCellOld>
+                <TableCellOld className="mdt-text-right">{invoice.totalAmount}</TableCellOld>
+              </TableRowOld>
+            ))}
+          </TableBodyOld>
+        </TableOld>
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage((prev) => Math.max(1, prev - 1));
+                }}
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <PaginationItem key={i + 1}>
+                <PaginationLink
+                  href="#"
+                  isActive={currentPage === i + 1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(i + 1);
+                  }}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  },
+};
+
+/**
+ * TableOld showing empty state.
+ */
+/**
+ * Three states, three different messages - and getting two of them the wrong
+ * way round is the common mistake.
+ *
+ * - **Empty** is the honest "there is nothing here yet", and offers the way to
+ *   make something.
+ * - **Filtered empty** has data; you just cannot see it. The way out is to undo
+ *   the filter, not to create a record you do not need. Saying "no invoices
+ *   yet" here sends someone off to duplicate something they already have.
+ * - **Loading** says nothing, because it does not know yet. See the
+ *   `WithLoadingState` story - skeleton rows keep the table's shape so the page
+ *   does not jump when the data lands.
+ */
+export const EmptyState: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-8">
+      {[
+        {
+          state: 'Empty',
+          icon: 'inbox' as const,
+          title: 'No invoices yet.',
+          body: 'Raise one and it will appear here.',
+          action: 'New invoice',
+        },
+        {
+          state: 'Filtered empty',
+          icon: 'search-x' as const,
+          title: 'No invoices match your filters.',
+          body: 'There are 248 invoices, none of them in this view.',
+          action: 'Clear filters',
+        },
+      ].map((empty) => (
+        <div key={empty.state} className="mdt-flex mdt-flex-col mdt-gap-2">
+          <p className="mdt-text-xs mdt-font-medium mdt-text-muted-foreground">{empty.state}</p>
+          <TableOld>
+            <TableHeaderOld>
+              <TableRowOld>
+                <TableHeadOld className="mdt-w-[100px]">Invoice</TableHeadOld>
+                <TableHeadOld>Status</TableHeadOld>
+                <TableHeadOld>Method</TableHeadOld>
+                <TableHeadOld className="mdt-text-right">Amount</TableHeadOld>
+              </TableRowOld>
+            </TableHeaderOld>
+            <TableBodyOld>
+              <TableRowOld interactive={false}>
+                <TableCellOld colSpan={4} className="mdt-p-0">
+                  <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-2 mdt-py-10">
+                    <Icon name={empty.icon} size="xl" color="muted" className="mdt-opacity-50" />
+                    <p className="mdt-text-sm mdt-font-medium">{empty.title}</p>
+                    <p className="mdt-text-sm mdt-text-muted-foreground">{empty.body}</p>
+                    <Button variant={empty.state === 'Empty' ? 'primary' : 'outline'} size="sm">
+                      {empty.action}
+                    </Button>
+                  </div>
+                </TableCellOld>
+              </TableRowOld>
+            </TableBodyOld>
+          </TableOld>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const FullFeatured: Story = {
+  render: function FullFeaturedTable() {
+    type SortKey = 'name' | 'email' | 'role' | 'status';
+
+    const [sortKey, setSortKey] = useState<SortKey | null>(null);
+    const [sortOrder, setSortOrder] = useState<TableSortOrderOld>(null);
+    const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+    const handleSort = (key: SortKey) => {
+      if (sortKey !== key) {
+        setSortKey(key);
+        setSortOrder('ascend');
+        return;
+      }
+      if (sortOrder === 'ascend') {
+        setSortOrder('descend');
+        return;
+      }
+      setSortKey(null);
+      setSortOrder(null);
+    };
+
+    const sortedUsers = [...users].sort((a, b) => {
+      if (!sortKey || !sortOrder) return 0;
+      const direction = sortOrder === 'ascend' ? 1 : -1;
+      return a[sortKey] > b[sortKey] ? direction : -direction;
+    });
+
+    const toggleRow = (id: number) => {
+      setSelectedRows((prev) =>
+        prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+      );
+    };
+
+    const allSelected = selectedRows.length === users.length;
+
+    const columns: { key: SortKey; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+      { key: 'status', label: 'Status' },
+    ];
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-4">
+        <p className="mdt-text-sm mdt-text-muted-foreground">
+          {selectedRows.length} of {users.length} row(s) selected.
+        </p>
+
+        <TableOld
+          stickyHeader
+          maxHeight="18rem"
+          layout="fixed"
+          containerClassName="mdt-rounded-md mdt-border"
+        >
+          <TableHeaderOld>
+            <TableRowOld>
+              <TableHeadOld className="mdt-w-12">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={() => {
+                    setSelectedRows(allSelected ? [] : users.map((u) => u.id));
+                  }}
+                  aria-label="Select all rows"
+                />
+              </TableHeadOld>
+              {columns.map((column) => (
+                <TableHeadOld
+                  key={column.key}
+                  sortable
+                  sortOrder={sortKey === column.key ? sortOrder : null}
+                  onSort={() => {
+                    handleSort(column.key);
+                  }}
+                >
+                  {column.label}
+                </TableHeadOld>
+              ))}
+            </TableRowOld>
+          </TableHeaderOld>
+          <TableBodyOld>
+            {sortedUsers.map((user) => (
+              <TableRowOld key={user.id} selected={selectedRows.includes(user.id)}>
+                <TableCellOld>
+                  <Checkbox
+                    checked={selectedRows.includes(user.id)}
+                    onCheckedChange={() => {
+                      toggleRow(user.id);
+                    }}
+                    aria-label={`Select ${user.name}`}
+                  />
+                </TableCellOld>
+                <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+                <TableCellOld>{user.email}</TableCellOld>
+                <TableCellOld>{user.role}</TableCellOld>
+                <TableCellOld>{user.status}</TableCellOld>
+              </TableRowOld>
+            ))}
+          </TableBodyOld>
+        </TableOld>
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#" isActive>
+                1
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  },
+};
+
+/**
+ * Grouped rows were the commonest structure across the reference tables — Jira,
+ * Height, ClickUp, GitHub Projects, Attio and bank statements all use them.
+ *
+ * `TableGroupRowOld` spans the whole table. Pass `onToggle` to make it collapsible;
+ * leave it off and no control is rendered, rather than a dead one.
+ */
+export const GroupedRows: Story = {
+  render: function Grouped() {
+    const groups = [
+      { name: 'Mobile App', rows: users.slice(0, 2) },
+      { name: 'Platform', rows: users.slice(2, 5) },
+    ];
+    const [collapsed, setCollapsed] = useState<string[]>([]);
+
+    const toggle = (name: string) => {
+      setCollapsed((prev) =>
+        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+      );
+    };
+
+    return (
+      <TableOld layout="fixed">
+        <TableCaptionOld>
+          Click a group heading to collapse it. `layout=&quot;fixed&quot;` keeps the columns still —
+          without it the browser re-measures from whatever rows are left and every column jumps.
+        </TableCaptionOld>
+        <TableHeaderOld>
+          <TableRowOld>
+            <TableHeadOld className="mdt-w-1/3">Name</TableHeadOld>
+            <TableHeadOld className="mdt-w-1/2">Email</TableHeadOld>
+            <TableHeadOld>Role</TableHeadOld>
+          </TableRowOld>
+        </TableHeaderOld>
+        <TableBodyOld>
+          {groups.map((group) => (
+            <Fragment key={group.name}>
+              <TableGroupRowOld
+                colSpan={3}
+                count={group.rows.length}
+                expanded={!collapsed.includes(group.name)}
+                onToggle={() => {
+                  toggle(group.name);
+                }}
+              >
+                {group.name}
+              </TableGroupRowOld>
+              {!collapsed.includes(group.name) &&
+                group.rows.map((user) => (
+                  <TableRowOld key={user.id}>
+                    <TableCellOld className="mdt-font-medium">{user.name}</TableCellOld>
+                    <TableCellOld>{user.email}</TableCellOld>
+                    <TableCellOld>{user.role}</TableCellOld>
+                  </TableRowOld>
+                ))}
+            </Fragment>
+          ))}
+        </TableBodyOld>
+      </TableOld>
+    );
+  },
+};
+
+/**
+ * A row that reveals child rows beneath it. `TableExpandTriggerOld` is a control you
+ * place in a cell rather than a prop on the row — where the chevron belongs
+ * differs from table to table, and the component has no business owning your
+ * tree state.
+ *
+ * Child rows use `indent` on their **first cell only**. Indenting every cell
+ * shifts the whole row and breaks the column alignment that makes a table
+ * readable.
+ */
+export const ExpandableRows: Story = {
+  render: function Expandable() {
+    const [open, setOpen] = useState<number[]>([1]);
+    const entries: Record<number, { label: string; hours: string }[]> = {
+      1: [
+        { label: '06:51 – 09:21', hours: '2h 30m' },
+        { label: '09:20 – 09:21', hours: '0h' },
+      ],
+      2: [{ label: '10:00 – 10:39', hours: '38m' }],
+    };
+
+    const toggle = (id: number) => {
+      setOpen((prev) => (prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]));
+    };
+
+    return (
+      <TableOld>
+        <TableCaptionOld>Expand a task to see its time entries.</TableCaptionOld>
+        <TableHeaderOld>
+          <TableRowOld>
+            <TableHeadOld>Task</TableHeadOld>
+            <TableHeadOld align="right">Total</TableHeadOld>
+          </TableRowOld>
+        </TableHeaderOld>
+        <TableBodyOld>
+          {[1, 2].map((id) => (
+            <Fragment key={id}>
+              <TableRowOld>
+                <TableCellOld>
+                  <span className="mdt-inline-flex mdt-items-center mdt-gap-2">
+                    <TableExpandTriggerOld
+                      expanded={open.includes(id)}
+                      onToggle={() => {
+                        toggle(id);
+                      }}
+                      label={`Show entries for task ${String(id)}`}
+                    />
+                    <span className="mdt-font-medium">Feature {id === 1 ? 'A' : 'B'}</span>
+                  </span>
+                </TableCellOld>
+                <TableCellOld align="right">{id === 1 ? '2h 30m' : '38m'}</TableCellOld>
+              </TableRowOld>
+              {open.includes(id) &&
+                entries[id]?.map((entry) => (
+                  <TableRowOld key={entry.label}>
+                    <TableCellOld indent={1} className="mdt-text-muted-foreground">
+                      {entry.label}
+                    </TableCellOld>
+                    <TableCellOld align="right">{entry.hours}</TableCellOld>
+                  </TableRowOld>
+                ))}
+            </Fragment>
+          ))}
+        </TableBodyOld>
+      </TableOld>
+    );
+  },
+};
+
+/**
+ * **Expanded row content** - the panel behind a chevron, and what may live in
+ * it.
+ *
+ * The Expandable rows story shows one shape: expanding into **more rows of the
+ * same columns**, a parent with children. That is not the only shape, and the
+ * other one has different rules. Here the row opens into a **panel spanning
+ * every column**, holding a layout of its own - key/value pairs, an activity
+ * trail, a status block. The columns above it mean nothing to it.
+ *
+ * Four things this arrangement has to get right, and three of them are easy to
+ * miss:
+ *
+ * - **One cell, `colSpan` across the lot.** The panel is not a row of cells. If
+ *   you build it as cells it inherits the column widths, and a detail layout
+ *   has no reason to agree with them.
+ * - **It is not a record, so it must not behave like one.** Every body row gets
+ *   hover feedback, which on a panel says "click me" about something that does
+ *   nothing. It is switched off here. `TableRowOld` has no prop for this - a
+ *   `summary` row opts out the same way and *does* have one, so this is a gap
+ *   worth closing rather than a class worth copying.
+ * - **It breaks striping.** A panel row is a row, so in a striped table it
+ *   takes a stripe of its own and flips the odd/even parity of everything
+ *   below it. Stripes and expandable panels do not combine; pick one.
+ * - **`aria-controls` both ways.** The chevron says which panel it opens and
+ *   the panel says nothing on its own, so the two need wiring by id. The
+ *   trigger already handles `aria-expanded`.
+ *
+ * The panel indents to the first *content* column rather than the chevron, so
+ * the detail lines up with the thing it belongs to.
+ */
+export const ExpandedRowContent: Story = {
+  render: function ExpandedRowContentRecipe() {
+    const [open, setOpen] = useState<string[]>(['DAL03']);
+    const toggle = (id: string) => {
+      setOpen((prev) => (prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]));
+    };
+
+    const sites = [
+      { id: 'DAL03', name: 'Dallas-03', provider: 'Equinix', kind: 'Connect', status: 'inProcess' },
+      { id: 'LON01', name: 'London-01', provider: 'Telehouse', kind: 'Direct', status: 'resolved' },
+    ] as const;
+
+    const detail = [
+      ['Date created', 'Mon, 15 Jul 2019 17:52:57 GMT'],
+      ['User IP address', '10.123.11/29'],
+      ['BGP ASN', '63888'],
+      ['Router', 'ZCV-DRK-TZ-03'],
+    ];
+
+    const activity = [
+      {
+        icon: 'info' as const,
+        tone: 'mdt-text-muted-foreground',
+        when: '10/23/2018 9:30AM',
+        what: 'LOA awaiting action',
+      },
+      {
+        icon: 'check-circle' as const,
+        tone: 'mdt-text-success',
+        when: '10/23/2018 9:31AM',
+        what: 'LOA approved',
+      },
+    ];
+
+    return (
+      <TableOld>
+        <TableHeaderOld>
+          <TableRowOld>
+            <TableHeadOld>Name</TableHeadOld>
+            <TableHeadOld>Site</TableHeadOld>
+            <TableHeadOld>Provider</TableHeadOld>
+            <TableHeadOld>Status</TableHeadOld>
+          </TableRowOld>
+        </TableHeaderOld>
+        <TableBodyOld>
+          {sites.map((site) => {
+            const isOpen = open.includes(site.id);
+            const panelId = `panel-${site.id}`;
+            return (
+              <Fragment key={site.id}>
+                <TableRowOld>
+                  <TableCellOld>
+                    <span className="mdt-inline-flex mdt-items-center mdt-gap-2">
+                      <TableExpandTriggerOld
+                        expanded={isOpen}
+                        onToggle={() => {
+                          toggle(site.id);
+                        }}
+                        label={`Show details for ${site.name}`}
+                        aria-controls={panelId}
+                      />
+                      <span className="mdt-font-medium">{site.name}</span>
+                    </span>
+                  </TableCellOld>
+                  <TableCellOld>{site.id}</TableCellOld>
+                  <TableCellOld>{site.provider}</TableCellOld>
+                  <TableCellOld>
+                    <Badge
+                      tone={site.status === 'inProcess' ? 'warning' : 'success'}
+                      shape="square"
+                      size="sm"
+                      dot
+                    >
+                      {site.status === 'inProcess' ? 'In Process' : 'Resolved'}
+                    </Badge>
+                  </TableCellOld>
+                </TableRowOld>
+                {isOpen && (
+                  <TableRowOld
+                    // Not a record: no hover feedback, and a quiet surface so it
+                    // reads as a drawer behind the row rather than another one.
+                    className="hover:mdt-bg-transparent"
+                  >
+                    <TableCellOld
+                      colSpan={4}
+                      id={panelId}
+                      className="mdt-bg-muted/30 mdt-p-6 mdt-pl-14"
+                    >
+                      <div className="mdt-grid mdt-gap-8 md:mdt-grid-cols-3">
+                        <dl className="mdt-grid mdt-grid-cols-[auto_1fr] mdt-gap-x-6 mdt-gap-y-2 mdt-text-sm">
+                          {detail.map(([label, value]) => (
+                            <Fragment key={label}>
+                              <dt className="mdt-font-medium">{label}</dt>
+                              <dd className="mdt-text-muted-foreground">{value}</dd>
+                            </Fragment>
+                          ))}
+                        </dl>
+
+                        <div>
+                          <h4 className="mdt-mb-3 mdt-text-sm mdt-font-medium">Latest activity</h4>
+                          <ol className="mdt-space-y-3">
+                            {activity.map((item, index) => (
+                              <li key={item.what} className="mdt-flex mdt-gap-3">
+                                <div className="mdt-flex mdt-flex-col mdt-items-center">
+                                  <Icon
+                                    name={item.icon}
+                                    size="sm"
+                                    className={item.tone}
+                                    aria-hidden
+                                  />
+                                  {/* The connector stops after the last entry. */}
+                                  {index < activity.length - 1 && (
+                                    <span className="mdt-mt-1 mdt-w-px mdt-flex-1 mdt-bg-border" />
+                                  )}
+                                </div>
+                                <div className="mdt-text-sm mdt-leading-tight">
+                                  <div>{item.when}</div>
+                                  <div className="mdt-text-muted-foreground">{item.what}</div>
+                                </div>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+
+                        <div>
+                          <h4 className="mdt-mb-3 mdt-text-sm mdt-font-medium">Provision status</h4>
+                          <p className="mdt-text-sm mdt-leading-snug mdt-text-muted-foreground">
+                            Case{' '}
+                            <a
+                              href="#case"
+                              className="mdt-font-medium mdt-text-foreground mdt-underline mdt-underline-offset-2"
+                            >
+                              #00001
+                            </a>
+                            , created by RJ Smithson on 02/09/2019 9:30AM
+                          </p>
+                        </div>
+                      </div>
+                    </TableCellOld>
+                  </TableRowOld>
+                )}
+              </Fragment>
+            );
+          })}
+        </TableBodyOld>
+      </TableOld>
+    );
+  },
+};
+
+/**
+ * A total that sits somewhere other than the table foot. `TableFooterOld` already
+ * treats its rows as summaries — `summary` is for a subtotal inside the body, or
+ * a total row at the top, which is what the analytics references do.
+ */
+export const SummaryRows: Story = {
+  render: () => (
+    <TableOld striped>
+      <TableCaptionOld>
+        A summary row is never striped and offers no hover — it is a conclusion, not a record.
+      </TableCaptionOld>
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>Post</TableHeadOld>
+          <TableHeadOld align="right">Impressions</TableHeadOld>
+          <TableHeadOld align="right">Engagements</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        <TableRowOld summary>
+          <TableCellOld>3 posts</TableCellOld>
+          <TableCellOld align="right">53</TableCellOld>
+          <TableCellOld align="right">11</TableCellOld>
+        </TableRowOld>
+        {[
+          { post: 'Launch announcement', impressions: 29, engagements: 5 },
+          { post: 'Design system update', impressions: 13, engagements: 5 },
+          { post: 'Hiring: product designer', impressions: 11, engagements: 1 },
+        ].map((row) => (
+          <TableRowOld key={row.post}>
+            <TableCellOld>{row.post}</TableCellOld>
+            <TableCellOld align="right">{row.impressions}</TableCellOld>
+            <TableCellOld align="right">{row.engagements}</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * A summary row pinned to the top or bottom of the scroll area.
+ *
+ * The shadow appears **only while something is scrolled underneath** the pinned
+ * row. Scroll the table and watch the top row gain a shadow; scroll to the very
+ * bottom and the pinned total loses its own, because at that point it is not
+ * floating over anything.
+ */
+export const StickySummaryRows: Story = {
+  render: () => (
+    <TableOld maxHeight="16rem" layout="fixed" containerClassName="mdt-rounded-md mdt-border">
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld>Post</TableHeadOld>
+          <TableHeadOld align="right">Impressions</TableHeadOld>
+          <TableHeadOld align="right">Engagements</TableHeadOld>
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        <TableRowOld summary sticky="top">
+          <TableCellOld>20 posts</TableCellOld>
+          <TableCellOld align="right">1,204</TableCellOld>
+          <TableCellOld align="right">318</TableCellOld>
+        </TableRowOld>
+        {Array.from({ length: 20 }, (_, i) => (
+          <TableRowOld key={i}>
+            <TableCellOld>Post {i + 1}</TableCellOld>
+            <TableCellOld align="right">{(i + 1) * 13}</TableCellOld>
+            <TableCellOld align="right">{(i + 1) * 3}</TableCellOld>
+          </TableRowOld>
+        ))}
+        <TableRowOld summary sticky="bottom">
+          <TableCellOld>Average</TableCellOld>
+          <TableCellOld align="right">60</TableCellOld>
+          <TableCellOld align="right">16</TableCellOld>
+        </TableRowOld>
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * A first column pinned while the rest scrolls sideways — the pattern Jira,
+ * crypto exchanges and booking tables all use when a row has more columns than
+ * fit.
+ *
+ * Put `frozen` on the same column in **every** row, header included, or it will
+ * pin in some rows and not others. Like a pinned row, the edge only asserts
+ * itself once something has actually slid underneath: at rest it looks like any
+ * other column.
+ */
+export const FrozenColumn: Story = {
+  render: () => (
+    <TableOld
+      stickyHeader
+      maxHeight="18rem"
+      // The scroll container is capped so the demo overflows at any viewport. On
+      // a wide screen the table simply fitted, so there was nothing to scroll
+      // and the frozen column had nothing to prove - it worked in the docs page,
+      // where the container is narrow, and looked broken in the story canvas.
+      containerClassName="mdt-max-w-2xl mdt-rounded-md mdt-border"
+      // `w-full` alone would squeeze the columns back to the container width.
+      className="mdt-min-w-max"
+    >
+      <TableHeaderOld>
+        <TableRowOld>
+          <TableHeadOld frozen className="mdt-w-44">
+            Market
+          </TableHeadOld>
+          {['Base', 'Quote', 'Price', '24h low', '24h high', '24h change', 'Funding'].map((h) => (
+            <TableHeadOld key={h} align="right" className="mdt-w-32">
+              {h}
+            </TableHeadOld>
+          ))}
+        </TableRowOld>
+      </TableHeaderOld>
+      <TableBodyOld>
+        {Array.from({ length: 14 }, (_, i) => (
+          <TableRowOld key={i}>
+            <TableCellOld frozen className="mdt-font-medium">
+              PAIR-{i + 1}
+            </TableCellOld>
+            <TableCellOld align="right">Bitcoin</TableCellOld>
+            <TableCellOld align="right">US Dollar</TableCellOld>
+            <TableCellOld align="right">{(90000 + i * 137).toLocaleString()}</TableCellOld>
+            <TableCellOld align="right">{(87000 + i * 91).toLocaleString()}</TableCellOld>
+            <TableCellOld align="right">{(91000 + i * 113).toLocaleString()}</TableCellOld>
+            <TableCellOld align="right">{(i * 0.13).toFixed(2)}%</TableCellOld>
+            <TableCellOld align="right">0.000{i}%</TableCellOld>
+          </TableRowOld>
+        ))}
+      </TableBodyOld>
+    </TableOld>
+  ),
+};
+
+/**
+ * Drag any column edge, or focus a handle and use the arrow keys — `Home` and
+ * `End` jump to the bounds.
+ *
+ * Resizing is a contract, not an implementation: `TableHeadOld` provides the handle
+ * and its keyboard behaviour, the width stays yours. `useColumnWidthsOld` holds the
+ * arithmetic if you want it, the same way `useEditableTabs` holds the rules for
+ * an editable tab bar.
+ *
+ * **`layout="fixed"` is required.** Under the default `auto` layout the browser
+ * re-derives widths from content and fights whatever you set.
+ */
+export const ResizableColumns: Story = {
+  render: function Resizable() {
+    // Status carries no width on purpose. A fixed-layout table still fills its
+    // container, so if every column is sized the browser scales all of them to
+    // cover the difference and the handle stops tracking the cursor. One
+    // unsized column absorbs the slack instead.
+    const { widths, setWidth, reset, isResized } = useColumnWidthsOld({
+      name: 200,
+      email: 260,
+      role: 140,
+    });
+
+    const columns: { key: keyof typeof widths; label: string }[] = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+    ];
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-3">
+        <Button variant="outline" size="sm" onClick={reset} disabled={!isResized}>
+          Reset widths
+        </Button>
+        <TableOld layout="fixed" containerClassName="mdt-rounded-md mdt-border">
+          <TableHeaderOld>
+            <TableRowOld>
+              {columns.map((column) => (
+                <TableHeadOld
+                  key={column.key}
+                  resizable
+                  width={widths[column.key]}
+                  onResize={(w) => {
+                    setWidth(column.key, w);
+                  }}
+                >
+                  {column.label}
+                </TableHeadOld>
+              ))}
+              <TableHeadOld>Status</TableHeadOld>
+            </TableRowOld>
+          </TableHeaderOld>
+          <TableBodyOld>
+            {users.map((user) => (
+              <TableRowOld key={user.id}>
+                <TableCellOld className="mdt-truncate mdt-font-medium">{user.name}</TableCellOld>
+                <TableCellOld className="mdt-truncate">{user.email}</TableCellOld>
+                <TableCellOld className="mdt-truncate">{user.role}</TableCellOld>
+                <TableCellOld className="mdt-truncate">{user.status}</TableCellOld>
+              </TableRowOld>
+            ))}
+          </TableBodyOld>
+        </TableOld>
+      </div>
+    );
+  },
+};
