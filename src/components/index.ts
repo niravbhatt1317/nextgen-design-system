@@ -544,6 +544,7 @@ export {
   tableCellVariants,
   tableRowVariants,
   tableGroupRowVariants,
+  // DEPRECATED 2026-09-04: Toolbar + ToolbarButton replace these two
   TableToolbar,
   TableToolbarActions,
   TableSortMenu,
@@ -555,6 +556,7 @@ export {
   TableBulkSeparator,
   DataTable,
   TableFilterMenu,
+  // DEPRECATED 2026-09-04: applied filters are never shown as chips
   TableFilterChips,
   TableColumnMenu,
   TableColumnBoundary,
@@ -680,9 +682,29 @@ export type {
   ToggleGroupItemVariants,
 } from './ToggleGroup';
 
-// Toolbar
-export { Toolbar, ToolbarSection, ToolbarSpacer, toolbarVariants } from './Toolbar';
-export type { ToolbarProps, ToolbarVariants } from './Toolbar';
+// Toolbar — the strip, its sections, and ToolbarButton: the 32px control with the
+// four states (rest, hover, open, active with a count or a dot). Toolbar IS the
+// console's 60px list-page strip; the old general strip is ToolbarOld. Ported 2026-09-04.
+export {
+  Toolbar,
+  ToolbarSection,
+  ToolbarSpacer,
+  ToolbarButton,
+  toolbarVariants,
+  toolbarButtonVariants,
+} from './Toolbar';
+export type {
+  ToolbarProps,
+  ToolbarVariants,
+  ToolbarButtonProps,
+  ToolbarButtonOwnProps,
+  ToolbarButtonVariants,
+} from './Toolbar';
+
+// ToolbarOld — the previous general-purpose strip (compact, spacious, padding
+// switches). DEPRECATED 2026-09-04: use Toolbar.
+export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
+export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
 
 // Tooltip
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';

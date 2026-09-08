@@ -37,6 +37,10 @@ const TOOLBAR = [
  *   </TableToolbarActions>
  * </TableToolbar>
  * ```
+ *
+ * @deprecated Since 0.4.0. Use `Toolbar` with `ToolbarButton`
+ * controls instead (ruling of 4 September 2026). This strip stays only for
+ * side-by-side comparison until the removal pull request.
  */
 const TableToolbar = forwardRef<HTMLDivElement, TableToolbarProps>(
   ({ className, label = 'Table controls', ...props }, ref) => (
@@ -62,6 +66,9 @@ TableToolbar.displayName = 'TableToolbar';
  * child, `justify-between` leaves it on the left, and with three it spreads
  * them across the width. Pushing one group to the end behaves the same however
  * many controls each side has.
+ *
+ * @deprecated Since 0.4.0. Use a `ToolbarSection` after a `ToolbarSpacer` inside
+ * `Toolbar` instead.
  */
 const TableToolbarActions = forwardRef<HTMLDivElement, TableToolbarActionsProps>(
   ({ className, ...props }, ref) => (

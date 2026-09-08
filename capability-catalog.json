@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 898,
+  "capabilityCount": 911,
   "counts": {
-    "story": 660,
-    "component": 200,
+    "story": 669,
+    "component": 204,
     "utility": 16,
     "hook": 22
   },
@@ -305,6 +305,16 @@
       "propDocs": ""
     },
     {
+      "name": "AsATrigger",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / AsATrigger",
+      "doc": "Components/ToolbarButton AsATrigger",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "AskAI",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -473,10 +483,10 @@
     {
       "name": "Borderless",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / Borderless",
-      "doc": "Components/Toolbar Borderless",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / Borderless",
+      "doc": "Deprecated/Toolbar Old Borderless",
       "props": [],
       "propDocs": ""
     },
@@ -1250,10 +1260,10 @@
     {
       "name": "Compact",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / Compact",
-      "doc": "Components/Toolbar Compact",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / Compact",
+      "doc": "Deprecated/Toolbar Old Compact",
       "props": [],
       "propDocs": ""
     },
@@ -1414,6 +1424,16 @@
       "area": "Tabs",
       "summary": "Story: Components/Tabs / ControlledState",
       "doc": "Components/Tabs ControlledState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ControlsOnly",
+      "kind": "story",
+      "file": "src/components/Toolbar/Toolbar.stories.tsx",
+      "area": "Toolbar",
+      "summary": "Story: Components/Toolbar / ControlsOnly",
+      "doc": "Components/Toolbar ControlsOnly",
       "props": [],
       "propDocs": ""
     },
@@ -2307,6 +2327,26 @@
       "area": "Toolbar",
       "summary": "Story: Components/Toolbar / Default",
       "doc": "Components/Toolbar Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / Default",
+      "doc": "Components/ToolbarButton Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / Default",
+      "doc": "Deprecated/Toolbar Old Default",
       "props": [],
       "propDocs": ""
     },
@@ -4284,6 +4324,16 @@
       "propDocs": ""
     },
     {
+      "name": "InTheBand",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / InTheBand",
+      "doc": "Components/ToolbarButton InTheBand",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InUse",
       "kind": "story",
       "file": "src/components/AiMark/AiMark.stories.tsx",
@@ -4504,10 +4554,10 @@
     {
       "name": "LeftAligned",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / LeftAligned",
-      "doc": "Components/Toolbar LeftAligned",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / LeftAligned",
+      "doc": "Deprecated/Toolbar Old LeftAligned",
       "props": [],
       "propDocs": ""
     },
@@ -5163,30 +5213,30 @@
     {
       "name": "NoPaddingHorizontal",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / NoPaddingHorizontal",
-      "doc": "Components/Toolbar NoPaddingHorizontal",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / NoPaddingHorizontal",
+      "doc": "Deprecated/Toolbar Old NoPaddingHorizontal",
       "props": [],
       "propDocs": ""
     },
     {
       "name": "NoPaddingLeft",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / NoPaddingLeft",
-      "doc": "Components/Toolbar NoPaddingLeft",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / NoPaddingLeft",
+      "doc": "Deprecated/Toolbar Old NoPaddingLeft",
       "props": [],
       "propDocs": ""
     },
     {
       "name": "NoPaddingRight",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / NoPaddingRight",
-      "doc": "Components/Toolbar NoPaddingRight",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / NoPaddingRight",
+      "doc": "Deprecated/Toolbar Old NoPaddingRight",
       "props": [],
       "propDocs": ""
     },
@@ -5591,6 +5641,16 @@
       "area": "LeftNav",
       "summary": "Story: Components/LeftNav / Playground",
       "doc": "Components/LeftNav Playground",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / Playground",
+      "doc": "Components/ToolbarButton Playground",
       "props": [],
       "propDocs": ""
     },
@@ -6012,10 +6072,10 @@
     {
       "name": "RightAligned",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / RightAligned",
-      "doc": "Components/Toolbar RightAligned",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / RightAligned",
+      "doc": "Deprecated/Toolbar Old RightAligned",
       "props": [],
       "propDocs": ""
     },
@@ -7018,10 +7078,10 @@
     {
       "name": "Spacious",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / Spacious",
-      "doc": "Components/Toolbar Spacious",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / Spacious",
+      "doc": "Deprecated/Toolbar Old Spacious",
       "props": [],
       "propDocs": ""
     },
@@ -7098,6 +7158,16 @@
       "area": "TagPill Old",
       "summary": "Story: Deprecated/TagPill Old / States",
       "doc": "Deprecated/TagPill Old States",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "States",
+      "kind": "story",
+      "file": "src/components/Toolbar/ToolbarButton.stories.tsx",
+      "area": "ToolbarButton",
+      "summary": "Story: Components/ToolbarButton / States",
+      "doc": "Components/ToolbarButton States",
       "props": [],
       "propDocs": ""
     },
@@ -7440,7 +7510,7 @@
       "file": "src/components/Table/TableFilterChips.tsx",
       "area": "Table",
       "summary": "TableFilterChips - what is currently narrowing the table.",
-      "doc": "TableFilterChips - what is currently narrowing the table. **A filter you cannot see is a bug report.** A table showing four rows out of two hundred, with the reason hidden inside a panel, is the single most common way people conclude their data is missing. The chips are the answer to \"why am I not seeing it\". `TagPill` rather than `Badge`, deliberately: a tag is something a person put there and can take away, a badge is something the system applied. These are the former, and they carry the remove control to prove it. **Each chip names its attribute.** \"Open\" alone is ambiguous the moment two attributes share a value; \"Status: Open\" never is. **Known gap:** `TagPill` hardcodes `aria-label=\"Remove\"` on its cross, so a screen reader hears \"Remove\" once per chip with nothing to tell them apart. The chip's own text carries the answer visually, but not to anyone listening. Naming that control needs a prop on `TagPill`; it cannot be fixed from here.",
+      "doc": "TableFilterChips - what is currently narrowing the table. **A filter you cannot see is a bug report.** A table showing four rows out of two hundred, with the reason hidden inside a panel, is the single most common way people conclude their data is missing. The chips are the answer to \"why am I not seeing it\". `TagPill` rather than `Badge`, deliberately: a tag is something a person put there and can take away, a badge is something the system applied. These are the former, and they carry the remove control to prove it. **Each chip names its attribute.** \"Open\" alone is ambiguous the moment two attributes share a value; \"Status: Open\" never is. **Known gap:** `TagPill` hardcodes `aria-label=\"Remove\"` on its cross, so a screen reader hears \"Remove\" once per chip with nothing to tell them apart. The chip's own text carries the answer visually, but not to anyone listening. Naming that control needs a prop on `TagPill`; it cannot be fixed from here. `ToolbarButton` carries a count instead (ruling of 4 September 2026).",
       "props": [
         "filters",
         "labelFor",
@@ -7592,7 +7662,7 @@
       "file": "src/components/Table/TableToolbar.tsx",
       "area": "Table",
       "summary": "TableToolbar - the controls that act on the whole table.",
-      "doc": "TableToolbar - the controls that act on the whole table. The line between this and `TableColumnMenu` is what each one acts on. The column menu asks \"what about this column\"; the toolbar asks \"what should this table show at all\" - search, filters, sorting, grouping, which columns exist. **It is a shell, not a set of controls.** Four product teams need the same spacing, the same alignment and the same wrap behaviour, and completely different buttons - a service desk needs a priority quick-filter, a billing table does not. Fixing the contents here would be wrong in three of the four cases; fixing the arrangement is right in all of them. Put the searching and filtering first and the view controls in `TableToolbarActions`, which pushes them to the trailing edge. ```tsx <TableToolbar> <Input type=\"search\" aria-label=\"Search tickets\" /> <Button variant=\"outline\" size=\"sm\">Filters</Button> <TableToolbarActions> <TableSortMenu ... /> <TableViewMenu ... /> </TableToolbarActions> </TableToolbar> ```",
+      "doc": "TableToolbar - the controls that act on the whole table. The line between this and `TableColumnMenu` is what each one acts on. The column menu asks \"what about this column\"; the toolbar asks \"what should this table show at all\" - search, filters, sorting, grouping, which columns exist. **It is a shell, not a set of controls.** Four product teams need the same spacing, the same alignment and the same wrap behaviour, and completely different buttons - a service desk needs a priority quick-filter, a billing table does not. Fixing the contents here would be wrong in three of the four cases; fixing the arrangement is right in all of them. Put the searching and filtering first and the view controls in `TableToolbarActions`, which pushes them to the trailing edge. ```tsx <TableToolbar> <Input type=\"search\" aria-label=\"Search tickets\" /> <Button variant=\"outline\" size=\"sm\">Filters</Button> <TableToolbarActions> <TableSortMenu ... /> <TableViewMenu ... /> </TableToolbarActions> </TableToolbar> ``` controls instead (ruling of 4 September 2026). This strip stays only for side-by-side comparison until the removal pull request.",
       "props": [
         "label"
       ],
@@ -7604,7 +7674,7 @@
       "file": "src/components/Table/TableToolbar.tsx",
       "area": "Table",
       "summary": "The trailing group of a toolbar.",
-      "doc": "The trailing group of a toolbar. `ml-auto` rather than `justify-between` on the toolbar itself: with a single child, `justify-between` leaves it on the left, and with three it spreads them across the width. Pushing one group to the end behaves the same however many controls each side has.",
+      "doc": "The trailing group of a toolbar. `ml-auto` rather than `justify-between` on the toolbar itself: with a single child, `justify-between` leaves it on the left, and with three it spreads them across the width. Pushing one group to the end behaves the same however many controls each side has. `Toolbar` instead.",
       "props": [],
       "propDocs": ""
     },
@@ -7876,10 +7946,10 @@
     {
       "name": "ThreeSections",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / ThreeSections",
-      "doc": "Components/Toolbar ThreeSections",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / ThreeSections",
+      "doc": "Deprecated/Toolbar Old ThreeSections",
       "props": [],
       "propDocs": ""
     },
@@ -8099,12 +8169,13 @@
       "kind": "component",
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
-      "summary": "Toolbar component for displaying search, filters, and action buttons.",
-      "doc": "Toolbar component for displaying search, filters, and action buttons. ```tsx <Toolbar> <ToolbarSection> <ToolbarSearch placeholder=\"Search...\" /> </ToolbarSection> <ToolbarSection> <ToolbarButton>Filters</ToolbarButton> <ToolbarButton>New</ToolbarButton> </ToolbarSection> </Toolbar> ```",
+      "summary": "Toolbar - the strip above a list: search, filters, then sort and columns on the right.",
+      "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
       "props": [
-        "children"
+        "children",
+        "label"
       ],
-      "propDocs": "Content to display inside the toolbar"
+      "propDocs": "The controls. Put the right-hand run in a ToolbarSection after a ToolbarSpacer. The strip's spoken name. @default 'Toolbar'"
     },
     {
       "name": "Toolbar",
@@ -8120,9 +8191,51 @@
       "name": "Toolbar",
       "kind": "story",
       "file": "src/components/Table/TableToolbar.stories.tsx",
+      "area": "Table Toolbar",
+      "summary": "Story: Deprecated/Table Toolbar / Toolbar",
+      "doc": "Deprecated/Table Toolbar Toolbar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ToolbarButton",
+      "kind": "component",
+      "file": "src/components/Toolbar/ToolbarButton.tsx",
       "area": "Toolbar",
-      "summary": "Story: Components/Table/Toolbar / Toolbar",
-      "doc": "Components/Table/Toolbar Toolbar",
+      "summary": "ToolbarButton - a control in a Toolbar strip: Filters, a quick filter, Sort, Columns.",
+      "doc": "ToolbarButton - a control in a Toolbar strip: Filters, a quick filter, Sort, Columns. ```tsx <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <PopoverTrigger asChild><ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /></PopoverTrigger> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ToolbarOld",
+      "kind": "component",
+      "file": "src/components/ToolbarOld/ToolbarOld.tsx",
+      "area": "ToolbarOld",
+      "summary": "ToolbarOld component for displaying search, filters, and action buttons.",
+      "doc": "ToolbarOld component for displaying search, filters, and action buttons. ```tsx <ToolbarOld> <ToolbarOldSection> <ToolbarSearch placeholder=\"Search...\" /> </ToolbarOldSection> <ToolbarOldSection> <ToolbarButton>Filters</ToolbarButton> <ToolbarButton>New</ToolbarButton> </ToolbarOldSection> </ToolbarOld> ``` `ToolbarButton` controls. This general-purpose strip stays only for side-by-side comparison until the removal pull request.",
+      "props": [
+        "children"
+      ],
+      "propDocs": "Content to display inside the toolbar"
+    },
+    {
+      "name": "ToolbarOldSection",
+      "kind": "component",
+      "file": "src/components/ToolbarOld/ToolbarOld.tsx",
+      "area": "ToolbarOld",
+      "summary": "ToolbarOldSection component for grouping toolbar items.",
+      "doc": "ToolbarOldSection component for grouping toolbar items. ```tsx <ToolbarOldSection> <button>Action 1</button> <button>Action 2</button> </ToolbarOldSection> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ToolbarOldSpacer",
+      "kind": "component",
+      "file": "src/components/ToolbarOld/ToolbarOld.tsx",
+      "area": "ToolbarOld",
+      "summary": "ToolbarOldSpacer component for adding flexible space between toolbar sections.",
+      "doc": "ToolbarOldSpacer component for adding flexible space between toolbar sections. ```tsx <ToolbarOld> <ToolbarOldSection>Left content</ToolbarOldSection> <ToolbarOldSpacer /> <ToolbarOldSection>Right content</ToolbarOldSection> </ToolbarOld> ```",
       "props": [],
       "propDocs": ""
     },
@@ -8131,8 +8244,8 @@
       "kind": "component",
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
-      "summary": "ToolbarSection component for grouping toolbar items.",
-      "doc": "ToolbarSection component for grouping toolbar items. ```tsx <ToolbarSection> <button>Action 1</button> <button>Action 2</button> </ToolbarSection> ```",
+      "summary": "A run of controls that keeps 8px between them: the right-hand end of the strip.",
+      "doc": "A run of controls that keeps 8px between them: the right-hand end of the strip.",
       "props": [],
       "propDocs": ""
     },
@@ -8141,8 +8254,8 @@
       "kind": "component",
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
-      "summary": "ToolbarSpacer component for adding flexible space between toolbar sections.",
-      "doc": "ToolbarSpacer component for adding flexible space between toolbar sections. ```tsx <Toolbar> <ToolbarSection>Left content</ToolbarSection> <ToolbarSpacer /> <ToolbarSection>Right content</ToolbarSection> </Toolbar> ```",
+      "summary": "Pushes what follows it to the far end of the strip.",
+      "doc": "Pushes what follows it to the far end of the strip.",
       "props": [],
       "propDocs": ""
     },
@@ -8800,6 +8913,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithBorder",
+      "kind": "story",
+      "file": "src/components/Toolbar/Toolbar.stories.tsx",
+      "area": "Toolbar",
+      "summary": "Story: Components/Toolbar / WithBorder",
+      "doc": "Components/Toolbar WithBorder",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithBothAdornments",
       "kind": "story",
       "file": "src/components/Input/Input.stories.tsx",
@@ -9322,10 +9445,10 @@
     {
       "name": "WithMultipleActions",
       "kind": "story",
-      "file": "src/components/Toolbar/Toolbar.stories.tsx",
-      "area": "Toolbar",
-      "summary": "Story: Components/Toolbar / WithMultipleActions",
-      "doc": "Components/Toolbar WithMultipleActions",
+      "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
+      "area": "Toolbar Old",
+      "summary": "Story: Deprecated/Toolbar Old / WithMultipleActions",
+      "doc": "Deprecated/Toolbar Old WithMultipleActions",
       "props": [],
       "propDocs": ""
     },
@@ -9536,6 +9659,16 @@
       "area": "ToggleGroup",
       "summary": "Story: Components/ToggleGroup / WithTextLabels",
       "doc": "Components/ToggleGroup WithTextLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithThingsApplied",
+      "kind": "story",
+      "file": "src/components/Toolbar/Toolbar.stories.tsx",
+      "area": "Toolbar",
+      "summary": "Story: Components/Toolbar / WithThingsApplied",
+      "doc": "Components/Toolbar WithThingsApplied",
       "props": [],
       "propDocs": ""
     },

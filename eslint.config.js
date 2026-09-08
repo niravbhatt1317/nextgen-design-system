@@ -185,6 +185,16 @@ export default tseslint.config(
       '**/LeftNavOld/**',
       '**/BadgeOld/**',
       '**/TagPillOld/**',
+      '**/ToolbarOld/**',
+      '**/Table/TableToolbar.tsx',
+      '**/Table/TableToolbar.stories.tsx',
+      '**/Table/TableFilterChips.tsx',
+      '**/Table/TableSortMenu.test.tsx',
+      // DataTable still renders the deprecated strip and chips until the table port (2026-09-04)
+      '**/Table/DataTable.tsx',
+      '**/Table/TableFilters.stories.tsx',
+      '**/Table/TableSelection.stories.tsx',
+      '**/Table/index.ts',
       'src/components/index.ts',
     ],
     rules: {

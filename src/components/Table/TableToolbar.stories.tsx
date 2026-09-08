@@ -27,9 +27,37 @@ import { useTableSort } from './useTableSort';
  * own rows to show the reporting is real.
  */
 const meta: Meta = {
-  title: 'Components/Table/Toolbar',
+  title: 'Deprecated/Table Toolbar',
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    status: {
+      type: 'deprecated',
+      since: '0.4.0',
+      deprecation: {
+        deprecatedSince: '0.4.0',
+        removalIn: '1.0.0',
+        replacement: 'Toolbar with ToolbarButton',
+        message:
+          'The merged console strip replaced this one on 4 September 2026: Toolbar (60px, 24px inset, 10px gaps) holding ToolbarButton controls with the four states. Applied filters are never shown as chips. It stays for side-by-side comparison until the removal pull request.',
+      },
+    },
+    docs: {
+      description: {
+        component: [
+          '## ⚠️ Deprecated — use `Toolbar` with `ToolbarButton`',
+          '',
+          'The strip the merged console uses replaced this one: 60px tall, a 24px inset, 10px between',
+          'controls, and one 32px control with four states for Filters, the quick filter, Sort and',
+          'Columns. Applied filters light the Filters button with a count; they are never shown as',
+          'chips, so `TableFilterChips` is deprecated with it.',
+          '',
+          '**Do not start anything new on it.** The sort and view menus stay: they are used inside the',
+          'new strip.',
+        ].join('\n'),
+      },
+    },
+  },
 };
 
 export default meta;
