@@ -1,11 +1,11 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 978,
+  "capabilityCount": 999,
   "counts": {
-    "story": 694,
-    "component": 238,
-    "utility": 18,
+    "story": 710,
+    "component": 242,
+    "utility": 19,
     "hook": 28
   },
   "capabilities": [
@@ -977,6 +977,16 @@
       "area": "Item",
       "summary": "Story: Components/Item / Clickable",
       "doc": "Components/Item Clickable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Clickable",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / Clickable",
+      "doc": "Components/KPI Card Clickable",
       "props": [],
       "propDocs": ""
     },
@@ -2119,6 +2129,16 @@
       "area": "Kbd",
       "summary": "Story: Components/Kbd / Default",
       "doc": "Components/Kbd Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / Default",
+      "doc": "Components/KPI Card Default",
       "props": [],
       "propDocs": ""
     },
@@ -3281,6 +3301,16 @@
       "propDocs": ""
     },
     {
+      "name": "Fits",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Fits",
+      "doc": "Components/KPI Card/Strip Fits",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "FixedLength",
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
@@ -3357,6 +3387,16 @@
       "area": "Upload",
       "summary": "1 KB is 1024 bytes here, matching what an operating system reports.",
       "doc": "1 KB is 1024 bytes here, matching what an operating system reports.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "formatKpiValue",
+      "kind": "utility",
+      "file": "src/components/KpiCard/KpiCard.tsx",
+      "area": "KpiCard",
+      "summary": "One decimal with k or M, the console's rounding: 7640 → \"7.6k\", 8200 → \"8.2k\", 10001 → \"10k\", 256 → \"256\", 1204 → \"1.2k\".",
+      "doc": "One decimal with k or M, the console's rounding: 7640 → \"7.6k\", 8200 → \"8.2k\", 10001 → \"10k\", 256 → \"256\", 1204 → \"1.2k\".",
       "props": [],
       "propDocs": ""
     },
@@ -3671,6 +3711,26 @@
       "propDocs": ""
     },
     {
+      "name": "Group",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / Group",
+      "doc": "Components/KPI Card Group",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "GroupClickable",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / GroupClickable",
+      "doc": "Components/KPI Card GroupClickable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Grouped",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -3691,12 +3751,32 @@
       "propDocs": ""
     },
     {
+      "name": "GroupOfFour",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / GroupOfFour",
+      "doc": "Components/KPI Card GroupOfFour",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "GroupsAndExpanding",
       "kind": "story",
       "file": "src/components/LeftNavOld/LeftNavOld.stories.tsx",
       "area": "LeftNav Old",
       "summary": "Story: Deprecated/LeftNav Old / GroupsAndExpanding",
       "doc": "Deprecated/LeftNav Old GroupsAndExpanding",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "GroupWithCharts",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / GroupWithCharts",
+      "doc": "Components/KPI Card GroupWithCharts",
       "props": [],
       "propDocs": ""
     },
@@ -4470,6 +4550,46 @@
       "propDocs": ""
     },
     {
+      "name": "KpiBars",
+      "kind": "component",
+      "file": "src/components/KpiCard/KpiCharts.tsx",
+      "area": "KpiCard",
+      "summary": "Recent readings as bars, with a base line and a threshold line in the danger colour.",
+      "doc": "Recent readings as bars, with a base line and a threshold line in the danger colour.",
+      "props": ["values", "base", "threshold", "baseLabel", "thresholdLabel", "label"],
+      "propDocs": "Six or so recent readings, oldest first. The base line. The threshold line, drawn in the danger colour.   Spoken description."
+    },
+    {
+      "name": "KpiCard",
+      "kind": "component",
+      "file": "src/components/KpiCard/KpiCard.tsx",
+      "area": "KpiCard",
+      "summary": "KpiCard - one metric on one card, or a group of related metrics sharing a card.",
+      "doc": "KpiCard - one metric on one card, or a group of related metrics sharing a card. A plain card has a 174px floor and no ceiling; a chart card no floor and 270 natural; a group is the sum of its segments. In a KpiStrip the cards grow evenly until the row is full and the strip scrolls past the fit. ```tsx <KpiCard label=\"Total users\" value={8200} hint=\"across all organisations\" /> <KpiCard items={[{ label: 'Pending invites', value: 11, onClick: openInvites }, { label: 'Active links', value: 4 }]} label=\"Invitations\" /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "KpiGauge",
+      "kind": "component",
+      "file": "src/components/KpiCard/KpiCharts.tsx",
+      "area": "KpiCard",
+      "summary": "A half ring: a share of a limit, the percent inside, a caption under it.",
+      "doc": "A half ring: a share of a limit, the percent inside, a caption under it.",
+      "props": ["percent", "caption", "label"],
+      "propDocs": "0 to 100. The word under the number: \"capacity\". Spoken description; defaults to \"<percent>% <caption>\"."
+    },
+    {
+      "name": "KpiStrip",
+      "kind": "component",
+      "file": "src/components/KpiCard/KpiStrip.tsx",
+      "area": "KpiCard",
+      "summary": "KpiStrip - the row that holds KpiCards.",
+      "doc": "KpiStrip - the row that holds KpiCards. Every card keeps its floor, they grow evenly until the row is full, and past the fit the row scrolls sideways instead of squeezing. It bleeds through the page's side margin so a cut card is cut at the page edge. Reachable by keyboard; arrow keys scroll it.",
+      "props": ["children", "inset", "gap", "label", "snap", "className", "style"],
+      "propDocs": "The page's side margin the strip bleeds through, so a cut card is cut at the page edge. @default 24  Spoken name of the row (\"Key figures\"). Scrolling stops on a card's left edge. @default false"
+    },
+    {
       "name": "Label",
       "kind": "component",
       "file": "src/components/Label/Label.tsx",
@@ -4915,6 +5035,16 @@
       "propDocs": ""
     },
     {
+      "name": "LongLabel",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / LongLabel",
+      "doc": "Components/KPI Card LongLabel",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LongLabels",
       "kind": "story",
       "file": "src/components/Badge/Badge.stories.tsx",
@@ -5055,6 +5185,16 @@
       "propDocs": ""
     },
     {
+      "name": "Mixed",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Mixed",
+      "doc": "Components/KPI Card/Strip Mixed",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "MixedStates",
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
@@ -5189,6 +5329,16 @@
       "area": "Tabs",
       "summary": "Story: Components/Tabs / MultiStepForm",
       "doc": "Components/Tabs MultiStepForm",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Narrow",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Narrow",
+      "doc": "Components/KPI Card/Strip Narrow",
       "props": [],
       "propDocs": ""
     },
@@ -6283,6 +6433,16 @@
       "propDocs": "Scrollbar orientation"
     },
     {
+      "name": "Scrolls",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Scrolls",
+      "doc": "Components/KPI Card/Strip Scrolls",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Searchable",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -7119,6 +7279,16 @@
       "area": "Select",
       "summary": "Story: Components/Select / Small",
       "doc": "Components/Select Small",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Snapping",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Snapping",
+      "doc": "Components/KPI Card/Strip Snapping",
       "props": [],
       "propDocs": ""
     },
@@ -9093,6 +9263,16 @@
       "propDocs": ""
     },
     {
+      "name": "Variations",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / Variations",
+      "doc": "Components/KPI Card Variations",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Vertical",
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
@@ -9225,6 +9405,16 @@
     {
       "name": "Wide",
       "kind": "story",
+      "file": "src/components/KpiCard/KpiStrip.stories.tsx",
+      "area": "Strip",
+      "summary": "Story: Components/KPI Card/Strip / Wide",
+      "doc": "Components/KPI Card/Strip Wide",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Wide",
+      "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / Wide",
@@ -9349,6 +9539,16 @@
       "area": "Textarea",
       "summary": "Story: Components/Textarea / WithCharacterCount",
       "doc": "Components/Textarea WithCharacterCount",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithChart",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / WithChart",
+      "doc": "Components/KPI Card WithChart",
       "props": [],
       "propDocs": ""
     },
@@ -10099,6 +10299,16 @@
       "area": "Toolbar",
       "summary": "Story: Components/Toolbar / WithThingsApplied",
       "doc": "Components/Toolbar WithThingsApplied",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithTrendChip",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: Components/KPI Card / WithTrendChip",
+      "doc": "Components/KPI Card WithTrendChip",
       "props": [],
       "propDocs": ""
     },
