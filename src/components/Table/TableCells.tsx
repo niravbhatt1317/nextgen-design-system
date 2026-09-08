@@ -73,8 +73,9 @@ const CHIP =
 
 /**
  * One chip: the value in an instant bubble with the click-to-copy hint; after a
- * click the bubble says "Copied!" until the pointer leaves. The bubble is held
- * open through the click, which would otherwise close it.
+ * click the bubble says "Copied!" until the pointer leaves. The engine closes a
+ * bubble on pointer-down and on click; while the pointer is still on the chip
+ * those closes are ignored, so the bubble is held open through the click.
  */
 function ContactChip({
   kind,
@@ -89,16 +90,13 @@ function ContactChip({
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const clicked = useRef(false);
+  const hovering = useRef(false);
   return (
     <Tooltip
       instant
       open={open}
       onOpenChange={(next) => {
-        if (!next && clicked.current) {
-          clicked.current = false;
-          return;
-        }
+        if (!next && hovering.current) return;
         setOpen(next);
         if (!next) setCopied(false);
       }}
@@ -108,10 +106,15 @@ function ContactChip({
           type="button"
           className={CHIP}
           aria-label={`Copy ${kind}: ${value}`}
+          onPointerEnter={() => {
+            hovering.current = true;
+          }}
+          onPointerLeave={() => {
+            hovering.current = false;
+          }}
           onClick={(e) => {
             e.stopPropagation();
             void navigator.clipboard.writeText(value);
-            clicked.current = true;
             setCopied(true);
             setOpen(true);
             onCopy?.(value, kind);
