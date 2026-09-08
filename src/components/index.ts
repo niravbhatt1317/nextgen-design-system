@@ -26,9 +26,9 @@ export type {
   AvatarShape,
 } from './Avatar';
 
-// Badge — one atom covering status pills, chips, counts, protocol pills and
-// icon-only status marks, which the source systems built as five components.
-// Four switches: what it means, how loud it is, its corner radius and its size.
+// Badge — the badge ported from the merged console: status pills, sources, counts,
+// category chips and the unread marker; never removable (that is TagPill). No stroke;
+// small is text or dot only. Replaced the previous Badge (now BadgeOld) 2026-09-04.
 export { Badge, badgeVariants } from './Badge';
 export type {
   BadgeProps,
@@ -38,7 +38,20 @@ export type {
   BadgeEmphasis,
   BadgeShape,
   BadgeSize,
+  BadgePalette,
 } from './Badge';
+
+// BadgeOld — the previous badge. DEPRECATED 2026-09-04: use Badge.
+export { BadgeOld, badgeOldVariants } from './BadgeOld';
+export type {
+  BadgeOldProps,
+  BadgeOldOwnProps,
+  BadgeOldVariantsType,
+  BadgeOldTone,
+  BadgeOldEmphasis,
+  BadgeOldShape,
+  BadgeOldSize,
+} from './BadgeOld';
 
 // Banner — a message that sits in the page and stays there. Shares Toast's six
 // tones and palette on purpose; shares nothing about how it behaves. If you
@@ -613,7 +626,23 @@ export type {
 // TagPill — a label a person put there and can take away. Badge is the other
 // half of the pair: a label the system applies, which nobody removes.
 export { TagPill, tagPillVariants } from './TagPill';
-export type { TagPillProps, TagPillOwnProps, TagPillVariants, TagPillShape } from './TagPill';
+export type {
+  TagPillProps,
+  TagPillOwnProps,
+  TagPillVariants,
+  TagPillShape,
+  TagPillEmphasis,
+} from './TagPill';
+
+// TagPillOld — the previous tag (24px, 10px inset, 4px square corner, no outline).
+// DEPRECATED 2026-09-04: use TagPill.
+export { TagPillOld, tagPillOldVariants } from './TagPillOld';
+export type {
+  TagPillOldProps,
+  TagPillOldOwnProps,
+  TagPillOldVariants,
+  TagPillOldShape,
+} from './TagPillOld';
 
 // Textarea
 export { Textarea, textareaVariants } from './Textarea';

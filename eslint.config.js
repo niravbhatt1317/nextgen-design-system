@@ -183,6 +183,8 @@ export default tseslint.config(
     files: [
       '**/Sidebar/**',
       '**/LeftNavOld/**',
+      '**/BadgeOld/**',
+      '**/TagPillOld/**',
       'src/components/index.ts',
     ],
     rules: {

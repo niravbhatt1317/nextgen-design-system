@@ -454,7 +454,7 @@ export function DataTable<Row>({
                       <Badge
                         tone="info"
                         shape="pill"
-                        size="sm"
+                        size="md"
                         icon={
                           <Icon
                             name={

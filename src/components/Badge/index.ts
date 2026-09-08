@@ -7,4 +7,5 @@ export type {
   BadgeEmphasis,
   BadgeShape,
   BadgeSize,
+  BadgePalette,
 } from './Badge.types';

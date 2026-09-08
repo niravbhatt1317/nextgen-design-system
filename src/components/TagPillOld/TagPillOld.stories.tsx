@@ -1,18 +1,38 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { TagPill } from './TagPill';
+import { TagPillOld } from './TagPillOld';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 
-const meta: Meta<typeof TagPill> = {
-  title: 'Components/TagPill',
-  component: TagPill,
+const meta: Meta<typeof TagPillOld> = {
+  title: 'Deprecated/TagPill Old',
+  component: TagPillOld,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    status: {
+      type: 'deprecated',
+      since: '0.4.0',
+      deprecation: {
+        deprecatedSince: '0.4.0',
+        removalIn: '1.0.0',
+        replacement: 'TagPill',
+        message:
+          'TagPill was brought to the merged console tag on 4 September 2026: 28px tall, a 12px left inset, an 8px square corner, the neutral Badge tint and an opt-in outline, with the cross in a 16px well. This is the previous 24px tag, kept for side-by-side comparison until the removal pull request.',
+      },
+    },
     docs: {
       description: {
         component: [
+          '## ⚠️ Deprecated — use `TagPill`',
+          '',
+          "`TagPill` now follows the merged console's tag: 28px tall, a 12px left inset, an 8px",
+          'corner on the square shape, the same neutral tint as a neutral Badge, an opt-in outline,',
+          'and the cross in a 16px well. This is the previous 24px tag, kept so the two can be',
+          'reviewed side by side.',
+          '',
+          '**Do not start anything new on it.**',
+          '',
           'A label a person put there and can take away.',
           '',
           '`Badge` is the other half of that pair — a label the *system* applies, which',
@@ -21,7 +41,6 @@ const meta: Meta<typeof TagPill> = {
           '| Prop | What it does |',
           '| --- | --- |',
           '| `shape` | pill · square |',
-          '| `emphasis` | fill (default) · outline — a light inset stroke, no fill, on request |',
           '| `icon` | a 12px mark before the label |',
           '| `avatar` | a 20px person or thing before the label |',
           '| `onRemove` | adds the cross |',
@@ -29,12 +48,13 @@ const meta: Meta<typeof TagPill> = {
           '| `disabled` | yours, but not right now |',
           '| `truncate` | cut a long label off |',
           '',
-          '**Neutral only, by ruling.** Colour on a chip means the system set it, which makes it',
-          "a Badge. A tag is the person's, so it keeps the neutral Badge tint and the eye reads",
-          'the two as one family.',
+          '**Neutral only for now.** Whether a tag colour carries meaning or is a free',
+          'choice is a design decision that has not been made. Three of the ten colours',
+          'this component used to offer — pink, teal and cyan — are not in the palette at',
+          'all, so they were never really on offer.',
           '',
-          "**One size, 28px.** The console's height, corner and left inset; the library's gap, hover",
-          'and cross. The × sits in a 16px well with an invisible 24 × 24 pointer target around it.',
+          '**One size, 24px.** A remove control needs a 24 × 24 target to be reliably',
+          'hittable, and a shorter chip cannot hold one.',
           '',
           '**The cross is always visible.** It never appears on hover: there is no hover on',
           'a phone, and a chip that grows to reveal a control shoves its neighbours',
@@ -78,70 +98,37 @@ export const States: Story = {
       <div>
         <Label>Removable — hover the chip, then hover the cross</Label>
         <Row>
-          <TagPill onRemove={args.onRemove}>Infrastructure</TagPill>
-          <TagPill shape="square" onRemove={args.onRemove}>
+          <TagPillOld onRemove={args.onRemove}>Infrastructure</TagPillOld>
+          <TagPillOld shape="square" onRemove={args.onRemove}>
             Infrastructure
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
       <div>
         <Label>Read-only — never yours to remove. No cross, no hover, skipped by Tab</Label>
         <Row>
-          <TagPill readOnly>Owned by IAM</TagPill>
-          <TagPill shape="square" readOnly>
+          <TagPillOld readOnly>Owned by IAM</TagPillOld>
+          <TagPillOld shape="square" readOnly>
             Owned by IAM
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
       <div>
         <Label>Disabled — yours, but not at this moment. Still visible, still readable</Label>
         <Row>
-          <TagPill disabled onRemove={args.onRemove}>
+          <TagPillOld disabled onRemove={args.onRemove}>
             Infrastructure
-          </TagPill>
-          <TagPill shape="square" disabled onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld shape="square" disabled onRemove={args.onRemove}>
             Infrastructure
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
       <div>
         <Label>A plain label — nothing to remove, but not read-only either</Label>
         <Row>
-          <TagPill>Production</TagPill>
-          <TagPill shape="square">Production</TagPill>
-        </Row>
-      </div>
-    </Group>
-  ),
-};
-
-/** Fill is the default. Outline clears the fill and draws a light inset stroke; nothing moves. */
-export const Emphasis: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: (args) => (
-    <Group>
-      <div>
-        <Label>Fill — the default, the same neutral as a Badge</Label>
-        <Row>
-          <TagPill onRemove={args.onRemove}>Production</TagPill>
-          <TagPill shape="square" onRemove={args.onRemove}>
-            Production
-          </TagPill>
-          <TagPill readOnly>Owned by IAM</TagPill>
-        </Row>
-      </div>
-      <div>
-        <Label>Outline — on request, never by default</Label>
-        <Row>
-          <TagPill emphasis="outline" onRemove={args.onRemove}>
-            Production
-          </TagPill>
-          <TagPill emphasis="outline" shape="square" onRemove={args.onRemove}>
-            Production
-          </TagPill>
-          <TagPill emphasis="outline" readOnly>
-            Owned by IAM
-          </TagPill>
+          <TagPillOld>Production</TagPillOld>
+          <TagPillOld shape="square">Production</TagPillOld>
         </Row>
       </div>
     </Group>
@@ -159,31 +146,31 @@ export const Shapes: Story = {
       <div>
         <Label>Pill</Label>
         <Row>
-          <TagPill onRemove={args.onRemove}>Production</TagPill>
-          <TagPill icon={<Icon name="tag" />} onRemove={args.onRemove}>
+          <TagPillOld onRemove={args.onRemove}>Production</TagPillOld>
+          <TagPillOld icon={<Icon name="tag" />} onRemove={args.onRemove}>
             Platform
-          </TagPill>
-          <TagPill avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
             Nirav Bhatt
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
       <div>
         <Label>Square — the avatar takes the matching corner</Label>
         <Row>
-          <TagPill shape="square" onRemove={args.onRemove}>
+          <TagPillOld shape="square" onRemove={args.onRemove}>
             Production
-          </TagPill>
-          <TagPill shape="square" icon={<Icon name="tag" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld shape="square" icon={<Icon name="tag" />} onRemove={args.onRemove}>
             Platform
-          </TagPill>
-          <TagPill
+          </TagPillOld>
+          <TagPillOld
             shape="square"
             avatar={<Avatar name="Nirav Bhatt" size="xs" shape="rounded" />}
             onRemove={args.onRemove}
           >
             Nirav Bhatt
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
     </Group>
@@ -206,31 +193,31 @@ export const LeadingSlot: Story = {
       <div>
         <Label>Nothing · icon at 12px · avatar at 20px</Label>
         <Row>
-          <TagPill onRemove={args.onRemove}>Production</TagPill>
-          <TagPill icon={<Icon name="tag" />} onRemove={args.onRemove}>
+          <TagPillOld onRemove={args.onRemove}>Production</TagPillOld>
+          <TagPillOld icon={<Icon name="tag" />} onRemove={args.onRemove}>
             Platform
-          </TagPill>
-          <TagPill avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
             Nirav Bhatt
-          </TagPill>
+          </TagPillOld>
         </Row>
       </div>
       <div>
         <Label>A row of people, an icon and a plain word — the left edges line up</Label>
         <Row>
-          <TagPill avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
+          <TagPillOld avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
             Nirav Bhatt
-          </TagPill>
-          <TagPill avatar={<Avatar name="Om Vekariya" size="xs" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld avatar={<Avatar name="Om Vekariya" size="xs" />} onRemove={args.onRemove}>
             Om Vekariya
-          </TagPill>
-          <TagPill avatar={<Avatar name="Kaivalya Pandit" size="xs" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld avatar={<Avatar name="Kaivalya Pandit" size="xs" />} onRemove={args.onRemove}>
             Kaivalya Pandit
-          </TagPill>
-          <TagPill icon={<Icon name="tag" />} onRemove={args.onRemove}>
+          </TagPillOld>
+          <TagPillOld icon={<Icon name="tag" />} onRemove={args.onRemove}>
             Platform
-          </TagPill>
-          <TagPill onRemove={args.onRemove}>Production</TagPill>
+          </TagPillOld>
+          <TagPillOld onRemove={args.onRemove}>Production</TagPillOld>
         </Row>
       </div>
     </Group>
@@ -245,10 +232,10 @@ export const LongLabels: Story = {
   parameters: { controls: { disable: true }, layout: 'padded' },
   render: (args) => (
     <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-3">
-      <TagPill truncate onRemove={args.onRemove}>
+      <TagPillOld truncate onRemove={args.onRemove}>
         Infrastructure and platform
-      </TagPill>
-      <TagPill onRemove={args.onRemove}>Infrastructure and platform</TagPill>
+      </TagPillOld>
+      <TagPillOld onRemove={args.onRemove}>Infrastructure and platform</TagPillOld>
       <p className="mdt-text-xs mdt-text-muted-foreground">Cut off above, loose below.</p>
     </div>
   ),
@@ -264,17 +251,17 @@ export const InPlace: Story = {
     <div className="mdt-flex mdt-w-full mdt-max-w-xl mdt-flex-col mdt-gap-3">
       <p className="mdt-text-xs mdt-text-muted-foreground">Applied to payments-gateway</p>
       <Row>
-        <TagPill icon={<Icon name="tag" />} onRemove={args.onRemove}>
+        <TagPillOld icon={<Icon name="tag" />} onRemove={args.onRemove}>
           Infrastructure
-        </TagPill>
-        <TagPill onRemove={args.onRemove}>Production</TagPill>
-        <TagPill avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
+        </TagPillOld>
+        <TagPillOld onRemove={args.onRemove}>Production</TagPillOld>
+        <TagPillOld avatar={<Avatar name="Nirav Bhatt" size="xs" />} onRemove={args.onRemove}>
           Nirav Bhatt
-        </TagPill>
-        <TagPill truncate onRemove={args.onRemove}>
+        </TagPillOld>
+        <TagPillOld truncate onRemove={args.onRemove}>
           Needs security review
-        </TagPill>
-        <TagPill readOnly>Owned by IAM</TagPill>
+        </TagPillOld>
+        <TagPillOld readOnly>Owned by IAM</TagPillOld>
       </Row>
       <p className="mdt-text-xs mdt-text-muted-foreground">
         The last one is read-only — applied by a policy, not by a person, so there is nothing to

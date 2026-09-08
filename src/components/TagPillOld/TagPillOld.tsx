@@ -2,69 +2,59 @@ import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
-import type { TagPillProps } from './TagPill.types';
+import type { TagPillOldProps } from './TagPillOld.types';
 
 /**
- * TagPill styles.
+ * TagPillOld styles.
  *
  * A tag is something a person put there and can take away. `Badge` is the other
  * half of the pair - a label the system applies, which nobody removes.
  *
  * ## The geometry, and why
  *
- * The chip is 28px tall, with a 12px left inset and, on the square shape, an
- * 8px corner: the console's numbers, by Pranjal's ruling of 4 September 2026.
- * The 8px gap before the cross, the hover lift and the cross itself are the
- * library's. There is still one size: a shorter chip could not hold the
- * cross's 24 x 24 pointer target.
+ * The chip is 24px tall because the remove control needs a 24 x 24 target to be
+ * reliably hittable, and a shorter chip cannot hold one. That is also why there
+ * is only one size: a small tag would ship a cross people miss.
  *
- * A plain word or an icon sits 12px in. An avatar sits 4px in, because a 20px
- * filled circle already leaves 4px above and below - give it the same 12px as
- * a word and it reads pushed off-centre against its own breathing room.
+ * A plain word or an icon sits 10px in. An avatar sits 2px in, because a 20px
+ * filled circle already leaves 2px above and below - give it the same 10px as a
+ * word and it reads pushed off-centre against its own breathing room.
+ *
+ * Measured from the ink rather than the boxes, a tag with an icon comes out at
+ * 12px of air on each side.
  */
-export const tagPillVariants = cva(
+export const tagPillOldVariants = cva(
   [
     'mdt-inline-flex mdt-shrink-0 mdt-items-center',
-    'mdt-h-7 mdt-gap-2',
+    'mdt-h-6 mdt-gap-2',
     'mdt-whitespace-nowrap mdt-text-xs mdt-font-medium',
     // No border. The edge sat a full step darker than the fill, which made the
     // chip read as a dark-edged object rather than a soft one - and on a white
     // page that is heavier still. The fill alone carries the shape at 1.22
     // against the page, which is what a subtle chip is supposed to do.
-    // Neutral only, by ruling (4 September 2026): the same neutral as Badge, so the
-    // pair reads as one family. Colour on a chip means the system set it: a Badge.
-    'mdt-bg-neutral-10 mdt-text-neutral-130',
+    // Neutral only. Colour is a separate decision - see TagPillOld.types.ts.
+    'mdt-bg-neutral-20 mdt-text-neutral-110',
     'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
   {
     variants: {
-      /**
-       * Fill is the default: the same neutral tint as a neutral Badge, no stroke.
-       * Outline clears the fill and draws a light inset stroke, so the geometry
-       * does not change and nothing beside it moves.
-       */
-      emphasis: {
-        fill: '',
-        outline:
-          'mdt-bg-transparent mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-30))] dark:mdt-bg-transparent dark:mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-100))]',
-      },
       shape: {
         pill: 'mdt-rounded-full',
-        square: 'mdt-rounded-lg',
+        square: 'mdt-rounded-sm',
       },
       /** An avatar hugs the edge; anything else sits back. */
       hasAvatar: {
-        true: 'mdt-pl-1',
-        false: 'mdt-pl-3',
+        true: 'mdt-pl-0.5',
+        false: 'mdt-pl-2.5',
       },
       /**
-       * With a cross, the right inset drops to 8px: the 16px well adds 2px around
-       * its 12px glyph, so the glyph lands 10px from the edge, as on the console.
+       * With a cross, the right inset is only 2px - the cross's own 24px well
+       * supplies the rest, and its glyph lands 12px from the edge either way.
        */
       removable: {
-        true: 'mdt-pr-2',
-        false: 'mdt-pr-3',
+        true: 'mdt-pr-0.5',
+        false: 'mdt-pr-2.5',
       },
       /**
        * The chip lifts on hover. It does not change width; a tag that grows
@@ -75,7 +65,7 @@ export const tagPillVariants = cva(
        * than a hover. The palette has nothing between them.
        */
       interactive: {
-        true: 'hover:mdt-bg-neutral-20 dark:hover:mdt-bg-neutral-110',
+        true: 'hover:mdt-bg-neutral-30 dark:hover:mdt-bg-neutral-110',
         false: '',
       },
       disabled: {
@@ -89,7 +79,6 @@ export const tagPillVariants = cva(
     },
     defaultVariants: {
       shape: 'pill',
-      emphasis: 'fill',
       hasAvatar: false,
       removable: false,
       interactive: false,
@@ -102,22 +91,20 @@ export const tagPillVariants = cva(
 /**
  * The remove control.
  *
- * The visible well is 16 x 16 around a 12px cross; an invisible 4px ring drawn
- * before it keeps the pointer target at 24 x 24. It has its own hover surface
+ * The button is the full height of the chip and 24 wide, so the target is
+ * 24 x 24 even though the cross inside it is 12. It has its own hover surface
  * on top of the chip's, so it is clear which of the two you are about to hit.
  *
  * It sits *beside* the label rather than inside it: a button nested in another
  * button is invalid and leaves the cross unreachable by keyboard.
  */
 const REMOVE_CLASSES = [
-  'mdt-relative mdt-inline-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
-  // The visible well is 16px; this invisible ring keeps the pointer target at 24 x 24.
-  "before:mdt-absolute before:-mdt-inset-1 before:mdt-content-['']",
-  'mdt-rounded-full mdt-border-0 mdt-bg-transparent mdt-p-0',
+  'mdt-inline-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center',
+  'mdt-rounded-[inherit] mdt-border-0 mdt-bg-transparent mdt-p-0',
   'mdt-text-muted-foreground mdt-transition-colors',
   // One step above the hovered chip. Two steps measured 2.18 against it and
   // read as a hard grey blob rather than a surface.
-  'hover:mdt-bg-neutral-30 hover:mdt-text-neutral-130',
+  'hover:mdt-bg-neutral-40 hover:mdt-text-neutral-110',
   'dark:hover:mdt-bg-neutral-100 dark:hover:mdt-text-neutral-30',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
   'disabled:mdt-pointer-events-none',
@@ -131,21 +118,24 @@ const ICON_SLOT =
   'mdt-inline-flex mdt-h-3 mdt-w-3 mdt-shrink-0 mdt-items-center [&_svg]:mdt-size-3 [&_svg]:mdt-shrink-0';
 
 /**
- * TagPill - a label a person put there and can take away.
+ * TagPillOld - a label a person put there and can take away.
  *
  * @example
  * ```tsx
- * <TagPill onRemove={() => drop('production')}>Production</TagPill>
- * <TagPill shape="square" icon={<Icon name="tag" />}>Platform</TagPill>
- * <TagPill avatar={<Avatar name="Nirav Bhatt" size="xs" />}>Nirav Bhatt</TagPill>
- * <TagPill readOnly>Owned by IAM</TagPill>
+ * <TagPillOld onRemove={() => drop('production')}>Production</TagPillOld>
+ * <TagPillOld shape="square" icon={<Icon name="tag" />}>Platform</TagPillOld>
+ * <TagPillOld avatar={<Avatar name="Nirav Bhatt" size="xs" />}>Nirav Bhatt</TagPillOld>
+ * <TagPillOld readOnly>Owned by IAM</TagPillOld>
  * ```
+ *
+ * @deprecated Since 0.4.0. Use `TagPill`, brought to the merged console's tag,
+ * instead. This 24px version stays only for side-by-side comparison until the
+ * removal pull request.
  */
-const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
+const TagPillOld = forwardRef<HTMLSpanElement, TagPillOldProps>(
   (
     {
       shape,
-      emphasis,
       icon,
       avatar,
       onRemove,
@@ -167,9 +157,8 @@ const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
       <span
         ref={ref}
         className={cn(
-          tagPillVariants({
+          tagPillOldVariants({
             shape,
-            emphasis,
             hasAvatar,
             removable,
             interactive: removable && !disabled,
@@ -212,6 +201,6 @@ const TagPill = forwardRef<HTMLSpanElement, TagPillProps>(
   }
 );
 
-TagPill.displayName = 'TagPill';
+TagPillOld.displayName = 'TagPillOld';
 
-export { TagPill };
+export { TagPillOld };

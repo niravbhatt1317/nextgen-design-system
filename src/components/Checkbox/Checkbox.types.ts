@@ -23,7 +23,7 @@ export type CheckboxVariants = VariantProps<typeof CheckboxVariantsCVA>;
  */
 export type CheckboxGroupVariant = 'default' | 'chip';
 
-/** Chip height. `md` is 32px, clear of TagPill's 24px. */
+/** Chip height. `md` is 32px, clear of TagPill's 28px. */
 export type CheckboxSize = 'sm' | 'md';
 
 /** Carried from the group to its chips, so it is written once. */

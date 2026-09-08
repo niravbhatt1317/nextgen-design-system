@@ -1,41 +1,45 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Badge } from './Badge';
+import { useState } from 'react';
 import { Icon } from '../Icon';
+import { TagPill } from '../TagPill';
+import { Badge } from './Badge';
+import type { BadgePalette, BadgeShape, BadgeSize, BadgeTone } from './Badge.types';
 
 const meta: Meta<typeof Badge> = {
   title: 'Components/Badge',
   component: Badge,
   tags: ['autodocs'],
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
         component: [
-          'A small label that says what something is.',
+          'A small label the system applies and nobody removes: the status pill with its dot, the',
+          'squarer category chip, counts, and the unread marker.',
           '',
-          'One component covering what the four product systems built as five:',
-          'the status pill with its dot, the squarer meta chip, count and confidence',
-          'badges, tinted protocol pills, and icon-only status marks.',
+          "Ported from the merged console on 4 September 2026: the previous Badge's spacing, the",
+          "console's colours, and no stroke by default. The previous component is `BadgeOld`,",
+          'deprecated and shown under Deprecated.',
           '',
-          '| Prop | Values |',
+          '| Rule | |',
           '| --- | --- |',
-          '| `tone` | neutral · info · success · warning · danger · ai |',
-          '| `emphasis` | subtle · outline · solid |',
-          '| `shape` | pill · square |',
-          '| `size` | sm · md · lg |',
-          '| `dot` | on / off |',
+          '| **Fill only** | No stroke on any badge by default. `outline` is a light tinted stroke, opt-in. `solid` is for counts. |',
+          '| **Two shapes** | `pill` for states; `square` (a 4px corner) for categories, sources and counts like +N. |',
+          '| **Three sizes** | 20, 24 and 28px tall. |',
+          '| **Small is text or dot** | An icon handed to a small badge is dropped. Medium and large take a 14 or 16px icon. |',
+          '| **Eight tones with a meaning** | Category colours (LDAP, SCIM…) come in through `palette`, never as new tones. |',
+          '| **Capital first letter** | Every label starts with a capital. A lowercase-only word sits in the lower half of the line box and reads as low, whatever the line-height. |',
+          '| **Counts** | `emphasis="solid"`, and `max={99}` renders 1284 as 99+. |',
+          '| **Nobody removes a badge** | The system sets it. A label a person adds and can take away is `TagPill`, which has the ×. |',
           '',
-          '**Tones are named by meaning, not colour.** `tone="danger"` still reads',
-          'correctly if the brand red changes, and it tells a reader what the badge is',
-          'for. `red` tells them neither.',
+          '**Coming from `BadgeOld`:** `emphasis="subtle"` is now `fill` (still the default, now',
+          'without a stroke); `slate` and `inverse` join the tones and `ai` stays; the 12px icon at',
+          'small is gone; `max`, `truncate` and the dot on its own work as before; `palette` is',
+          'new. There is no ×: a label a person can remove is `TagPill`.',
           '',
-          '**`emphasis="solid"` is for counts.** A filled chip whose whole job is to be',
-          'seen — a notification total. Used as a status label it shouts down everything',
-          'around it, so `subtle` is the default and should stay the common case.',
-          '',
-          '**The icon sizes itself.** 12, 14 and 16px at `sm`, `md` and `lg`. Whatever',
-          '`size` you set on an `<Icon>` passed to `icon` is overridden, so nobody has to',
-          'pick a glyph size that matches the chip.',
+          "The dot is the strong tone colour, 6px, 8px at large. Six of the console's colours have no",
+          "palette name yet and are flagged in `badge.css`. Dark mode carries the previous Badge's",
+          "pairings until the console's dark pass.",
         ].join('\n'),
       },
     },
@@ -45,405 +49,395 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const Row = ({ children }: { children: React.ReactNode }) => (
-  <div className="mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2">{children}</div>
+const TONES: BadgeTone[] = [
+  'success',
+  'warning',
+  'danger',
+  'info',
+  'ai',
+  'neutral',
+  'slate',
+  'inverse',
+];
+const TONE_LABEL: Record<BadgeTone, string> = {
+  success: 'Active',
+  warning: 'Invited',
+  danger: 'Expired',
+  info: 'Open',
+  ai: 'AI',
+  neutral: 'Manual',
+  slate: 'Inactive',
+  inverse: 'Offboarded',
+};
+/* Labels start with a capital: a lowercase-only word sits in the lower half of the line box and reads as low. */
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/* Category colours, as a product would pass them. Not tones: they mean nothing. */
+const LDAP: BadgePalette = { fill: '#F2F3FD', ink: '#4F5BC4' };
+const SCIM: BadgePalette = { fill: '#EDF8F7', ink: '#1F7A71', dot: '#22857B' };
+const CATEGORY: { name: string; palette: BadgePalette }[] = [
+  { name: 'LDAP', palette: LDAP },
+  { name: 'SCIM', palette: SCIM },
+  { name: 'Okta', palette: { fill: '#FDE1EE', ink: '#AF1D7A' } },
+];
+
+const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 40 }}>
+    <span
+      style={{
+        width: 120,
+        flex: 'none',
+        fontSize: 11,
+        letterSpacing: '.08em',
+        textTransform: 'uppercase',
+        color: 'hsl(var(--mdt-muted-foreground))',
+        fontWeight: 600,
+      }}
+    >
+      {label}
+    </span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+      {children}
+    </div>
+  </div>
 );
 
-const Group = ({ children }: { children: React.ReactNode }) => (
-  <div className="mdt-flex mdt-flex-col mdt-gap-6">{children}</div>
+const Stack = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{children}</div>
 );
 
-const Label = ({ children }: { children: React.ReactNode }) => (
-  <p className="mdt-mb-2 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">{children}</p>
-);
+/** One shape, three sizes down, every content type across. Small has no icon column. */
+function Matrix({ shape }: { shape: BadgeShape }) {
+  const sizes: BadgeSize[] = ['sm', 'md', 'lg'];
+  const px: Record<BadgeSize, number> = { sm: 12, md: 14, lg: 16 };
+  return (
+    <Stack>
+      {sizes.map((size) => (
+        <Row key={size} label={`${size} · ${String({ sm: 20, md: 24, lg: 28 }[size])}px`}>
+          <Badge shape={shape} size={size} tone="success">
+            Active
+          </Badge>
+          <Badge shape={shape} size={size} tone="success" dot>
+            Active
+          </Badge>
+          {size === 'sm' ? (
+            <span
+              style={{
+                fontSize: 12,
+                color: 'hsl(var(--mdt-muted-foreground))',
+                fontStyle: 'italic',
+              }}
+            >
+              no icon at small
+            </span>
+          ) : (
+            <>
+              <Badge
+                shape={shape}
+                size={size}
+                tone="success"
+                icon={<Icon name="check" size={px[size]} />}
+              >
+                Verified
+              </Badge>
+              <Badge
+                shape={shape}
+                size={size}
+                tone="success"
+                icon={<Icon name="shield" size={px[size]} />}
+                aria-label="Protected"
+              />
+            </>
+          )}
+        </Row>
+      ))}
+    </Stack>
+  );
+}
 
 export const Default: Story = {
-  args: { children: 'Label' },
+  args: { children: 'Active', tone: 'success', dot: true },
 };
 
-/** Six tones, each named for what it means rather than what colour it is. */
+/** Pill: three sizes, every content type. States wear this shape. */
+export const Pill: Story = {
+  render: () => <Matrix shape="pill" />,
+};
+
+/** Rounded square: the 4px corner. Categories, sources and "+N" wear this shape. */
+export const RoundedSquare: Story = {
+  render: () => <Matrix shape="square" />,
+};
+
+/**
+ * The eight tones with a meaning, in the console's colours, then category
+ * colours passed in through `palette`. Every ink passes 4.5:1 on its fill.
+ */
 export const Tones: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
   render: () => (
-    <Group>
-      <div>
-        <Label>Subtle — the default, and what almost everything should use</Label>
-        <Row>
-          <Badge tone="neutral">Draft</Badge>
-          <Badge tone="info">Reviewing</Badge>
-          <Badge tone="success">Active</Badge>
-          <Badge tone="warning">Expiring</Badge>
-          <Badge tone="danger">Failed</Badge>
-          <Badge tone="ai">AI</Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>Outline — no fill; the edge and the label carry the tone</Label>
-        <Row>
-          <Badge tone="neutral" emphasis="outline">
-            Draft
-          </Badge>
-          <Badge tone="info" emphasis="outline">
-            Reviewing
-          </Badge>
-          <Badge tone="success" emphasis="outline">
-            Active
-          </Badge>
-          <Badge tone="warning" emphasis="outline">
-            Expiring
-          </Badge>
-          <Badge tone="danger" emphasis="outline">
-            Failed
-          </Badge>
-          <Badge tone="ai" emphasis="outline">
-            AI
-          </Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>Solid — counts only. Not for status labels</Label>
-        <Row>
-          <Badge tone="neutral" emphasis="solid">
-            12
-          </Badge>
-          <Badge tone="info" emphasis="solid">
-            4
-          </Badge>
-          <Badge tone="success" emphasis="solid">
-            9
-          </Badge>
-          <Badge tone="warning" emphasis="solid">
-            7
-          </Badge>
-          <Badge tone="danger" emphasis="solid">
-            3
-          </Badge>
-          <Badge tone="ai" emphasis="solid">
-            2
-          </Badge>
-        </Row>
-      </div>
-    </Group>
-  ),
-};
-
-/**
- * A pill reads as an object sitting on the page. A square sits into a table
- * cell or a column of data more quietly. Same tones, same rules.
- */
-export const Shapes: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: () => (
-    <Group>
-      <div>
-        <Label>Pill</Label>
-        <Row>
-          <Badge tone="neutral">Draft</Badge>
-          <Badge tone="info">Reviewing</Badge>
-          <Badge tone="success">Active</Badge>
-          <Badge tone="warning">Expiring</Badge>
-          <Badge tone="danger">Failed</Badge>
-          <Badge tone="ai">AI</Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>Square</Label>
-        <Row>
-          <Badge shape="square" tone="neutral">
-            Draft
-          </Badge>
-          <Badge shape="square" tone="info">
-            Reviewing
-          </Badge>
-          <Badge shape="square" tone="success">
-            Active
-          </Badge>
-          <Badge shape="square" tone="warning">
-            Expiring
-          </Badge>
-          <Badge shape="square" tone="danger">
-            Failed
-          </Badge>
-          <Badge shape="square" tone="ai">
-            AI
-          </Badge>
-        </Row>
-      </div>
-    </Group>
-  ),
-};
-
-/**
- * Three sizes. The icon has its own step — 12, 14 and 16px — so it grows with
- * the chip instead of sitting undersized in a large one.
- */
-export const Sizes: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: () => (
-    <Group>
-      <div>
-        <Label>Small · 20px chip, 12px icon</Label>
-        <Row>
-          <Badge size="sm" tone="success">
-            Active
-          </Badge>
-          <Badge size="sm" shape="square" tone="warning">
-            Expiring
-          </Badge>
-          <Badge size="sm" tone="info" emphasis="outline">
-            Draft
-          </Badge>
-          <Badge size="sm" tone="danger" dot>
-            Offline
-          </Badge>
-          <Badge size="sm" tone="success" icon={<Icon name="check" />}>
-            Verified
-          </Badge>
-          <Badge size="sm" tone="danger" icon={<Icon name="x" />} aria-label="Failed" />
-          <Badge size="sm" tone="danger" emphasis="solid">
-            3
-          </Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>Medium · 24px chip, 14px icon</Label>
-        <Row>
-          <Badge tone="success">Active</Badge>
-          <Badge shape="square" tone="warning">
-            Expiring
-          </Badge>
-          <Badge tone="info" emphasis="outline">
-            Draft
-          </Badge>
-          <Badge tone="danger" dot>
-            Offline
-          </Badge>
-          <Badge tone="success" icon={<Icon name="check" />}>
-            Verified
-          </Badge>
-          <Badge tone="danger" icon={<Icon name="x" />} aria-label="Failed" />
-          <Badge tone="danger" emphasis="solid">
-            3
-          </Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>Large · 28px chip, 16px icon</Label>
-        <Row>
-          <Badge size="lg" tone="success">
-            Active
-          </Badge>
-          <Badge size="lg" shape="square" tone="warning">
-            Expiring
-          </Badge>
-          <Badge size="lg" tone="info" emphasis="outline">
-            Draft
-          </Badge>
-          <Badge size="lg" tone="danger" dot>
-            Offline
-          </Badge>
-          <Badge size="lg" tone="success" icon={<Icon name="check" />}>
-            Verified
-          </Badge>
-          <Badge size="lg" tone="danger" icon={<Icon name="x" />} aria-label="Failed" />
-          <Badge size="lg" tone="danger" emphasis="solid">
-            3
-          </Badge>
-        </Row>
-      </div>
-    </Group>
-  ),
-};
-
-/** Everything that can sit inside a badge. */
-export const Content: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: () => (
-    <Group>
-      <div>
-        <Label>Text · icon and text · icon on its own</Label>
-        <Row>
-          <Badge tone="success">Active</Badge>
-          <Badge tone="warning" icon={<Icon name="clock" />}>
-            Timed out
-          </Badge>
-          <Badge tone="danger" icon={<Icon name="x" />} aria-label="Failed" />
-          <Badge shape="square" tone="success" icon={<Icon name="check" />} aria-label="Verified" />
-        </Row>
-      </div>
-      <div>
-        <Label>A dot for live state — and a dot on its own for the unread marker</Label>
-        <Row>
-          <Badge tone="success" dot>
-            Healthy
-          </Badge>
-          <Badge tone="warning" dot>
-            Degraded
-          </Badge>
-          <Badge tone="danger" dot>
-            Offline
-          </Badge>
-          <Badge tone="success" dot aria-label="Healthy" />
-          <Badge tone="danger" dot aria-label="Offline" />
-        </Row>
-      </div>
-      <div>
-        <Label>Counts — and a cap, so a four-figure total cannot stretch a sidebar</Label>
-        <Row>
-          <Badge tone="danger" emphasis="solid">
-            3
-          </Badge>
-          <Badge tone="neutral" emphasis="solid">
-            18
-          </Badge>
-          <Badge tone="danger" emphasis="solid" max={99}>
-            1284
-          </Badge>
-          <Badge tone="danger" emphasis="solid" max={9}>
-            42
-          </Badge>
-        </Row>
-      </div>
-      <div>
-        <Label>
-          A long label, cut off rather than widening its column — truncated above, loose below
-        </Label>
-        <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-2">
-          <Badge tone="info" truncate>
-            Partially reconciled, pending review
-          </Badge>
-          <Badge tone="info">Partially reconciled, pending review</Badge>
-        </div>
-      </div>
-    </Group>
-  ),
-};
-
-/**
- * Badges never appear alone. This is the same set doing its actual job — the
- * check that matters, because a tone that looks fine on its own can still be
- * wrong beside its neighbours.
- */
-export const InPlace: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: () => (
-    <div className="mdt-w-full mdt-max-w-2xl">
-      <table className="mdt-w-full mdt-text-sm">
-        <thead>
-          <tr className="mdt-border-b mdt-border-border mdt-text-left mdt-text-muted-foreground">
-            <th className="mdt-py-2 mdt-font-medium">Integration</th>
-            <th className="mdt-py-2 mdt-font-medium">State</th>
-            <th className="mdt-py-2 mdt-font-medium">Plan</th>
-            <th className="mdt-py-2 mdt-text-right mdt-font-medium">Alerts</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="mdt-border-b mdt-border-border">
-            <td className="mdt-py-3">Payments gateway</td>
-            <td className="mdt-py-3">
-              <Badge size="sm" tone="success" dot>
-                Healthy
-              </Badge>
-            </td>
-            <td className="mdt-py-3">
-              <Badge size="sm" shape="square" tone="neutral">
-                Standard
-              </Badge>
-            </td>
-            <td className="mdt-py-3 mdt-text-right mdt-text-muted-foreground">—</td>
-          </tr>
-          <tr className="mdt-border-b mdt-border-border">
-            <td className="mdt-py-3">Identity provider</td>
-            <td className="mdt-py-3">
-              <Badge size="sm" tone="warning" dot>
-                Degraded
-              </Badge>
-            </td>
-            <td className="mdt-py-3">
-              <Badge size="sm" shape="square" tone="info">
-                Enterprise
-              </Badge>
-            </td>
-            <td className="mdt-py-3 mdt-text-right">
-              <Badge size="sm" tone="warning" emphasis="solid">
-                7
-              </Badge>
-            </td>
-          </tr>
-          <tr className="mdt-border-b mdt-border-border">
-            <td className="mdt-py-3">Log forwarder</td>
-            <td className="mdt-py-3">
-              <Badge size="sm" tone="danger" dot>
-                Offline
-              </Badge>
-            </td>
-            <td className="mdt-py-3">
-              <Badge size="sm" shape="square" tone="neutral">
-                Standard
-              </Badge>
-            </td>
-            <td className="mdt-py-3 mdt-text-right">
-              <Badge size="sm" tone="danger" emphasis="solid" max={99}>
-                1284
-              </Badge>
-            </td>
-          </tr>
-          <tr>
-            <td className="mdt-py-3">Anomaly detection</td>
-            <td className="mdt-py-3">
-              <Badge size="sm" tone="ai" dot>
-                Generating
-              </Badge>
-            </td>
-            <td className="mdt-py-3">
-              <Badge size="sm" shape="square" tone="ai">
-                Beta
-              </Badge>
-            </td>
-            <td className="mdt-py-3 mdt-text-right mdt-text-muted-foreground">—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  ),
-};
-
-/**
- * Every tone against every emphasis, in one place. This is the page to look at
- * after any change to the colours — in both themes.
- */
-export const EveryCombination: Story = {
-  parameters: { controls: { disable: true }, layout: 'padded' },
-  render: () => (
-    <div className="mdt-flex mdt-flex-col mdt-gap-3">
-      {(['neutral', 'info', 'success', 'warning', 'danger', 'ai'] as const).map((tone) => (
-        <div key={tone} className="mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2">
-          <span className="mdt-w-16 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
-            {tone}
-          </span>
-          <Badge tone={tone}>Pill</Badge>
-          <Badge tone={tone} shape="square">
-            Square
-          </Badge>
-          <Badge tone={tone} emphasis="outline">
-            Outline
-          </Badge>
-          <Badge tone={tone} emphasis="outline" shape="square">
-            Outline
-          </Badge>
-          <Badge tone={tone} emphasis="solid">
-            8
-          </Badge>
+    <Stack>
+      {TONES.map((tone) => (
+        <Row key={tone} label={tone}>
           <Badge tone={tone} dot>
-            Dot
+            {TONE_LABEL[tone]}
           </Badge>
-          <Badge tone={tone} icon={<Icon name="circle" />}>
-            Icon
+          <Badge tone={tone} shape="square">
+            {TONE_LABEL[tone]}
           </Badge>
-          <Badge tone={tone} icon={<Icon name="circle" />} aria-label={`${tone} mark`} />
-          <Badge tone={tone} dot aria-label={`${tone} state`} />
-        </div>
+          <Badge tone={tone} size="sm" dot>
+            {TONE_LABEL[tone]}
+          </Badge>
+        </Row>
       ))}
-    </div>
+      <Row label="category">
+        {CATEGORY.map((c) => (
+          <Badge key={c.name} shape="square" palette={c.palette}>
+            {c.name}
+          </Badge>
+        ))}
+      </Row>
+    </Stack>
   ),
+};
+
+/** Fill is the default. Outline is the light tinted stroke, opt-in. Solid is for counts. */
+export const Emphasis: Story = {
+  render: () => (
+    <Stack>
+      <Row label="fill · default">
+        {TONES.filter((t) => t !== 'inverse').map((tone) => (
+          <Badge key={tone} tone={tone} dot>
+            {cap(tone)}
+          </Badge>
+        ))}
+      </Row>
+      <Row label="outline">
+        {TONES.filter((t) => t !== 'inverse').map((tone) => (
+          <Badge key={tone} tone={tone} emphasis="outline">
+            {cap(tone)}
+          </Badge>
+        ))}
+      </Row>
+      <Row label="solid · counts">
+        {(
+          [
+            ['inverse', '12'],
+            ['info', '4'],
+            ['success', '9'],
+            ['warning', '7'],
+            ['danger', '3'],
+            ['ai', '2'],
+          ] as [BadgeTone, string][]
+        ).map(([tone, n]) => (
+          <Badge key={tone} tone={tone} emphasis="solid" size="sm">
+            {n}
+          </Badge>
+        ))}
+      </Row>
+    </Stack>
+  ),
+};
+
+/** Solid is for counts. `max` caps a runaway number. The dot on its own is the unread marker. */
+export const Counts: Story = {
+  render: () => (
+    <Stack>
+      <Row label="counts · small">
+        <Badge tone="inverse" emphasis="solid" size="sm">
+          3
+        </Badge>
+        <Badge tone="info" emphasis="solid" size="sm">
+          12
+        </Badge>
+        <Badge tone="danger" emphasis="solid" size="sm" max={99}>
+          1284
+        </Badge>
+        <Badge tone="slate" size="sm">
+          +2
+        </Badge>
+      </Row>
+      <Row label="max={99}">
+        <Badge tone="danger" emphasis="solid" max={99}>
+          42
+        </Badge>
+        <Badge tone="danger" emphasis="solid" max={99}>
+          99
+        </Badge>
+        <Badge tone="danger" emphasis="solid" max={99}>
+          1284
+        </Badge>
+      </Row>
+      <Row label="unread marker">
+        <Badge tone="success" dot size="sm" aria-label="Online" />
+        <Badge tone="success" dot aria-label="Online" />
+        <Badge tone="success" dot size="lg" aria-label="Online" />
+        <Badge tone="danger" dot aria-label="Needs attention" />
+        <Badge tone="info" dot aria-label="Unread" />
+      </Row>
+    </Stack>
+  ),
+};
+
+/** `truncate` holds the badge to 128px and cuts the label with an ellipsis. Off by default. */
+export const LongLabels: Story = {
+  render: () => {
+    const long = 'Waiting for the identity provider to confirm the invitation';
+    return (
+      <Stack>
+        <Row label="truncate off">
+          <Badge shape="square" tone="warning">
+            {long}
+          </Badge>
+        </Row>
+        <Row label="truncate">
+          <Badge shape="square" tone="warning" truncate>
+            {long}
+          </Badge>
+          <Badge tone="info" dot truncate>
+            {long}
+          </Badge>
+          <Badge tone="info" dot truncate size="lg">
+            {long}
+          </Badge>
+        </Row>
+      </Stack>
+    );
+  },
+};
+
+/** Where each one lives in the product: a table row, the sidebar's Soon row, tab counts; and beside them the tags a person can remove, which are TagPill. */
+export const InPlace: Story = {
+  render: function InPlaceStory() {
+    const [filters, setFilters] = useState(['Status: Active', 'Source: LDAP', 'Team: Platform']);
+    const ink = 'hsl(var(--mdt-foreground))';
+    const muted = 'hsl(var(--mdt-muted-foreground))';
+    const line = '1px solid hsl(var(--mdt-neutral-20))';
+    const rows: [string, string, BadgeTone, string, BadgePalette | undefined, string][] = [
+      ['Sarah Johnson', 'sarah.johnson@company.com', 'success', 'Active', undefined, 'Manual'],
+      ['Michael Smith', 'michael.smith@company.com', 'slate', 'Inactive', undefined, 'Manual'],
+      ['Emily Davis', 'emily.davis@company.com', 'warning', 'Invited', LDAP, 'LDAP'],
+      ['Olivia Jones', 'olivia.jones@company.com', 'danger', 'Expired', SCIM, 'SCIM'],
+    ];
+    return (
+      <div style={{ display: 'grid', gap: 18, maxWidth: 720, color: ink, fontSize: 14 }}>
+        <div>
+          {rows.map(([name, mail, tone, status, palette, source]) => (
+            <div
+              key={name}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                height: 44,
+                borderBottom: line,
+              }}
+            >
+              <span style={{ flex: 1, fontWeight: 500 }}>{name}</span>
+              <span style={{ width: 200, color: muted, fontSize: 13 }}>{mail}</span>
+              <Badge size="sm" tone={tone} dot>
+                {status}
+              </Badge>
+              {palette ? (
+                <Badge size="sm" shape="square" palette={palette}>
+                  {source}
+                </Badge>
+              ) : (
+                <Badge size="sm" shape="square">
+                  {source}
+                </Badge>
+              )}
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            height: 32,
+            padding: '0 8px',
+            color: muted,
+            opacity: 0.55,
+            fontSize: 13,
+          }}
+        >
+          <span style={{ flex: 1 }}>Permissions</span>
+          <Badge size="sm" tone="slate">
+            Soon
+          </Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 18, borderBottom: line, fontSize: 13 }}>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 0',
+              boxShadow: `inset 0 -2px 0 ${ink}`,
+            }}
+          >
+            Members
+            <Badge size="sm" tone="inverse" emphasis="solid">
+              24
+            </Badge>
+          </span>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 0',
+              color: muted,
+            }}
+          >
+            Invitations
+            <Badge size="sm" tone="slate">
+              11
+            </Badge>
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ color: muted, fontSize: 12 }}>TagPill, not Badge:</span>
+          {filters.map((f) => (
+            <TagPill
+              key={f}
+              shape="square"
+              onRemove={() => {
+                setFilters((cur) => cur.filter((x) => x !== f));
+              }}
+            >
+              {f}
+            </TagPill>
+          ))}
+          {filters.length === 0 ? (
+            <span style={{ color: muted, fontSize: 13 }}>No filters</span>
+          ) : null}
+        </div>
+      </div>
+    );
+  },
+};
+
+/** Every option on one page, driven by the Controls panel. */
+export const Playground: Story = {
+  args: {
+    children: 'Active',
+    tone: 'success',
+    emphasis: 'fill',
+    shape: 'pill',
+    size: 'md',
+    dot: true,
+    truncate: false,
+  },
+  argTypes: {
+    tone: { control: 'select', options: TONES },
+    emphasis: { control: 'radio', options: ['fill', 'outline', 'solid'] },
+    shape: { control: 'radio', options: ['pill', 'square'] },
+    size: { control: 'radio', options: ['sm', 'md', 'lg'] },
+    dot: { control: 'boolean' },
+    truncate: { control: 'boolean' },
+    max: { control: 'number' },
+    children: { control: 'text' },
+    icon: { control: false },
+    palette: { control: false },
+  },
 };
