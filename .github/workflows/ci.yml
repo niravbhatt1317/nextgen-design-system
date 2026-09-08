@@ -3,10 +3,26 @@ name: CI
 on:
   push:
     branches: [main]
+  # No `branches:` filter, deliberately.
+  #
+  # A stacked pull request - one based on another branch rather than on `main` -
+  # matched nothing here. Six of them sat for eighteen hours with no checks at
+  # all: not failing, never run, which on the pull request page is indis-
+  # tinguishable from having passed. 27,000 lines looked reviewed and were not.
+  #
+  # Nothing needed the filter. The deploy job and both Pages steps are each
+  # already gated on `github.ref == 'refs/heads/main'`, so a pull request against
+  # any base builds Storybook to prove it compiles and then throws it away.
+  #
+  # One limit to know: `pull_request` reads this file from the merge of head into
+  # base, so a stacked pull request only gains checks once this change exists in
+  # its base branch - in practice, as each becomes the bottom of the stack and
+  # retargets to `main`. To check a branch before then, dispatch it by hand.
   pull_request:
-    branches: [main]
   # Lets you redeploy the current `main` from the Actions tab without an empty
   # commit - the one thing the separate deploy workflow was still useful for.
+  # Also the way to run these checks against any branch on demand, which is what
+  # rescued the stack above.
   workflow_dispatch:
 
 # Needed by the deploy job. `contents: read` is everything the checks require;
