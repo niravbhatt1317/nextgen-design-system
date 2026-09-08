@@ -57,6 +57,7 @@ const config: Config = {
         muted: {
           DEFAULT: 'hsl(var(--mdt-muted) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-muted-foreground) / <alpha-value>)',
+          'foreground-subtle': 'hsl(var(--mdt-muted-foreground-subtle) / <alpha-value>)',
         },
         accent: {
           DEFAULT: 'hsl(var(--mdt-accent) / <alpha-value>)',
@@ -131,6 +132,17 @@ const config: Config = {
         black: 'hsl(var(--mdt-black) / <alpha-value>)',
 
         // Neutral scale - both hex and CSS variables
+        // Console foundation colours (2026-09-03), names provisional
+        ink: {
+          400: 'hsl(var(--mdt-ink-400) / <alpha-value>)',
+          500: 'hsl(var(--mdt-ink-500) / <alpha-value>)',
+        },
+        azure: {
+          60: 'hsl(var(--mdt-azure-60) / <alpha-value>)',
+        },
+        emerald: {
+          60: 'hsl(var(--mdt-emerald-60) / <alpha-value>)',
+        },
         neutral: {
           10: 'hsl(var(--mdt-neutral-10) / <alpha-value>)',
           20: 'hsl(var(--mdt-neutral-20) / <alpha-value>)',

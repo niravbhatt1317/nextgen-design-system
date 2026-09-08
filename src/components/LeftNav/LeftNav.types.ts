@@ -1,212 +1,145 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import type { IconName } from '../Icon';
 
-export interface LeftNavProps extends ComponentPropsWithoutRef<'nav'> {
+/**
+ * One board (a leaf destination) inside a collection.
+ */
+export interface LeftNavBoard {
+  key: string;
+  label: string;
   /**
-   * The accessible name. Two navigations on one page must be told apart.
-   *
-   * @default 'Settings'
+   * A board that is wired up and can be opened. One that is not keeps its
+   * normal look but refuses the click — the faded not-live look was rejected
+   * in the console because it broke the colour standard.
    */
-  label?: string;
-}
-
-export interface LeftNavExitProps extends Omit<ComponentPropsWithoutRef<'a'>, 'href'> {
+  live?: boolean;
   /**
-   * Where it goes. An anchor with one, a button without.
-   *
-   * The same rule `PaginationLink` follows: leaving settings is usually a real
-   * address worth opening in a new tab, and sometimes it is a router call.
+   * Not built yet: the row fades to 40% and wears the "Soon" badge at full
+   * strength, and refuses the click.
    */
-  href?: string;
-
-  /** What it says. Names the destination, never just "Back". @default 'Back to app' */
-  children?: ReactNode;
-}
-
-export interface LeftNavSearchProps extends Omit<
-  ComponentPropsWithoutRef<'input'>,
-  'type' | 'size'
-> {
-  /** The accessible name and the placeholder. @default 'Search' */
-  label?: string;
-}
-
-export interface LeftNavBodyProps extends ComponentPropsWithoutRef<'div'> {
-  /**
-   * Which level is showing. Published as `data-level`, and nothing else.
-   *
-   * The component does not animate the move. A product that wants it to can
-   * hang a transition off `data-level`, where the mechanism is visible.
-   */
-  level?: 1 | 2;
-
-  /**
-   * Which way the last move went, from `useLeftNavLevels`.
-   *
-   * Drives an 8px slip in the direction of travel. Omit it and the list simply
-   * appears, which is what a panel that never changes level should do.
-   */
-  direction?: 'forward' | 'back' | null;
-
-  /**
-   * A name for the view being shown, so React remounts on a change.
-   *
-   * `level` is not enough on its own: moving between two second-level sections
-   * leaves it at 2, and without a remount the animation never replays.
-   * `useLeftNavLevels` reports one as `viewKey`.
-   */
-  viewKey?: string | number;
-}
-
-export interface LeftNavSectionProps extends Omit<ComponentPropsWithoutRef<'div'>, 'title'> {
-  /** The section you are inside. Answers "where am I", not "how do I leave". */
-  title: ReactNode;
-
-  /** Back to the root list. */
-  onBack: () => void;
-
-  /** The back control's accessible name. @default 'Back to all settings' */
-  backLabel?: string;
-}
-
-export interface LeftNavGroupProps extends ComponentPropsWithoutRef<'div'> {
-  /** The heading above the group. Omit it for an unlabelled block. */
-  label?: ReactNode;
-}
-
-export interface LeftNavExpandableProps extends Omit<ComponentPropsWithoutRef<'div'>, 'onChange'> {
-  /** The glyph on the trigger row. */
-  icon?: ReactNode;
-
-  /** The setting's name. */
-  label: ReactNode;
-
-  /** Whether it starts open. @default false */
-  defaultOpen?: boolean;
-
-  /** Controlled open state. Pass `onOpenChange` with it. */
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}
-
-export interface LeftNavItemProps extends Omit<ComponentPropsWithoutRef<'a'>, 'href'> {
-  /** Where it goes. An anchor with one, a button without. */
-  href?: string;
-
-  /** The glyph. Always an `<Icon>`; never an inline `<svg>`. */
-  icon?: ReactNode;
-
-  /**
-   * Whether this is the page being shown.
-   *
-   * Renders `aria-current="page"`, which is the part a screen reader hears. The
-   * grey pill is the part everyone else sees, and one without the other leaves
-   * somebody out.
-   */
-  active?: boolean;
-
-  /**
-   * Marks the item as opening a second level.
-   *
-   * Adds the trailing chevron, and says so to a screen reader: this one does
-   * not go to a page, it opens a list. Without that they are indistinguishable
-   * until you press one.
-   */
-  hasChildren?: boolean;
-
-  /** A count or a status, on the trailing edge. A `Badge`, usually. */
-  meta?: ReactNode;
-
-  /** Dims it and stops it responding. */
-  disabled?: boolean;
-}
-
-export interface LeftNavFooterProps extends ComponentPropsWithoutRef<'div'> {
-  /** Nothing of its own - a slot pinned to the bottom edge. */
-  children?: ReactNode;
+  soon?: boolean;
 }
 
 /**
- * One entry in a `LeftNav` configuration.
- *
- * **Deliberately serialisable.** The icon is a name rather than a `ReactNode`,
- * so a whole navigation is JSON: it can come from an API, sit in a database,
- * be diffed in a pull request, or be written by a model. `DataDrivenSidebar`
- * took `ReactNode` icons, which meant its config could only ever be written in
- * TypeScript by hand.
+ * A collection: a folder of boards. The folder glyph IS the open/closed
+ * state — solid-open when open, outline when closed. No chevron.
  */
-export interface LeftNavConfigItem {
-  /** Stable identity. What `activeKey` and `onSelect` speak in. */
+export interface LeftNavCollection {
   key: string;
-
-  /** What it says. */
   label: string;
-
-  /** An icon by name, from the library's own set. */
-  icon?: IconName;
-
-  /** Where it goes. With one it is a link; without, a button. */
-  href?: string;
-
-  /** A short status or count on the trailing edge - "Beta", "3". */
-  badge?: string;
-
-  /** Dims it and stops it responding. */
-  disabled?: boolean;
-
-  /**
-   * The heading this entry sits under. Entries sharing one are grouped, in the
-   * order the headings first appear. Leave it off for an unheaded block.
-   */
-  group?: string;
-
-  /**
-   * Its own pages.
-   *
-   * At the root, an entry with these opens the second level. Inside the second
-   * level, it folds open in place instead. Anything nested below that is
-   * ignored - there is no third level, and a config that asks for one is
-   * asking for something the component will not do.
-   */
-  items?: LeftNavConfigItem[];
+  /** Start open. */
+  defaultOpen?: boolean;
+  children: LeftNavBoard[];
 }
 
-export interface LeftNavConfig {
-  /** The way out. Omit it and no home control is rendered. */
-  home?: { label?: string; href?: string };
-
-  /** The search field. Omit it and none is rendered. */
-  search?: { label?: string };
-
-  /** The root list. */
-  items: LeftNavConfigItem[];
+/** One organization the account can travel to. */
+export interface LeftNavOrg {
+  id: string;
+  name: string;
+  memberCount: number;
 }
 
-export interface DataLeftNavProps extends Omit<ComponentPropsWithoutRef<'nav'>, 'onSelect'> {
-  /** The whole navigation, as data. */
-  config: LeftNavConfig;
+export type LeftNavTheme = 'light' | 'dark' | 'system';
 
-  /** Which entry is the page being shown. */
+/**
+ * Everything the account card at the rail top needs. The card wears the
+ * PLACE (current organization, or the MSP-wide view), the login email
+ * beneath, and opens the destination panel to its right.
+ */
+export interface LeftNavAccount {
+  email: string;
+  orgs: LeftNavOrg[];
+  /**
+   * The MSP-wide user population shown on the "where you are" strip. When a
+   * demo trims the org list, this keeps the strip's number honest to the
+   * full roster. Defaults to the sum of `orgs`.
+   */
+  totalMembers?: number;
+  /** Which organization the viewer is inside. `null` is the MSP-wide view. */
+  currentOrgId?: string | null;
+  /** Travel. `null` asks for the MSP-wide view. */
+  onSwitchOrg?: (id: string | null) => void;
+  /** The + in the panel's list header. */
+  onAddOrg?: () => void;
+  onLogout?: () => void;
+  theme?: LeftNavTheme;
+  onThemeChange?: (theme: LeftNavTheme) => void;
+}
+
+/**
+ * Which floor the rail is showing. `workspace` is the product's home rail;
+ * `settings` and `fleet` are the two floors beneath it, reached through the
+ * pinned Settings row and then the Agent Fleet entry. Three floors, never
+ * more: the crumb strip is the way back up.
+ */
+export type LeftNavView = 'workspace' | 'settings' | 'fleet';
+
+/** One page on the settings or fleet floor. */
+export interface LeftNavSettingsItem {
+  key: string;
+  label: string;
+  /** One glyph per row; the category labels carry none. */
+  icon: IconName;
+  /** Not built yet: reads disabled with the neutral "soon" badge. */
+  soon?: boolean;
+  /**
+   * An item that descends to the fleet floor instead of opening a page. Its
+   * label becomes the current crumb down there.
+   */
+  section?: 'fleet';
+}
+
+/** A category on the settings or fleet floor: a label, then its pages. */
+export interface LeftNavSettingsSection {
+  key: string;
+  label: string;
+  items: LeftNavSettingsItem[];
+}
+
+export interface LeftNavProps {
+  collections: LeftNavCollection[];
+  /**
+   * The settings floor, as categories of pages. Supplying it makes the pinned
+   * Settings row descend into it (and selects its first page, as the product
+   * does). Omit it and Settings only fires `onSettings`.
+   */
+  settings?: LeftNavSettingsSection[];
+  /** The fleet floor, reached from the settings item marked `section: 'fleet'`. */
+  fleet?: LeftNavSettingsSection[];
+  /** Controlled floor. Leave it out and the rail keeps the floor itself. */
+  view?: LeftNavView;
+  /** The floor to start on when uncontrolled. @default 'workspace' */
+  defaultView?: LeftNavView;
+  /** Every floor change, including the ones the crumb strip makes. */
+  onViewChange?: (view: LeftNavView) => void;
+  /**
+   * The selected board, or the selected settings/fleet page. One key space
+   * across all three floors; the collection holding a board is highlighted too.
+   */
   activeKey?: string;
-
+  /** A board or a page was picked. Descending a floor picks its first page. */
+  onSelect?: (key: string) => void;
+  /** The pinned Settings row at the rail's bottom, whether or not `settings` is given. */
+  onSettings?: () => void;
+  /** Omit it and the rail renders without the account card. */
+  account?: LeftNavAccount;
   /**
-   * Called with the entry that was chosen.
-   *
-   * Only for entries that lead to a page. Opening a section and folding a group
-   * are the component's own business and are not reported - a product that had
-   * to handle those would be reimplementing the navigation to use it.
+   * The 56px icon rail. The state lives with the caller because the product's
+   * trigger sits in the page header band, outside the nav.
    */
-  onSelect?: (key: string, item: LeftNavConfigItem) => void;
-
-  /** Called when the home control is pressed. */
-  onHome?: () => void;
-
-  /** Which section to open on. */
-  initialSection?: string | null;
-
-  /** Pinned to the bottom edge. Not part of the config, because it is markup. */
-  footer?: ReactNode;
-
-  /** The panel's accessible name. @default 'Settings' */
+  collapsed?: boolean;
+  /** The accessible name. @default 'Workspace' */
   label?: string;
+  className?: string;
+  style?: CSSProperties;
+}
+
+/**
+ * The collapse control: [panel icon] then a short divider when breadcrumbs
+ * follow. It lives in the page header band, not inside the rail.
+ */
+export interface LeftNavTriggerProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  withDivider?: boolean;
 }

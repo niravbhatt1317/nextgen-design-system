@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* LeftNav New — the merged console's approved workspace navigation, ported
+/* LeftNav — the merged console's approved workspace navigation, ported
  * verbatim as a PARALLEL component for review. The existing LeftNav is
  * untouched; this file is the console's `sidebarNav.css` + `orgSwitcher.css`
  * merged, with two changes made for this port:
@@ -10,9 +10,15 @@
  *   2. Rows gained the design system's focus-visible ring (the one thing the
  *      console version lacked against the LeftNav parity audit).
  *
- * The remaining raw hexes are values the token set does not name yet (dark
- * hover/section greys, the six avatar tone pairs). They are flagged, not
- * hidden — naming them is part of this PR's review. */
+ * 2026-09-03 (Pranjal's colour ruling): the light-mode palette layer below
+ * shrank to two re-points. The console's muted grey, heading grey, interactive
+ * blue and success green are library tokens now (ink-500, ink-400, azure-60,
+ * emerald-60) and the library's own muted-foreground / info / ring / success
+ * point at them, so the overrides for those went away. Three near-misses
+ * snapped to palette steps: the control border (neutral-30), the chip tint
+ * (blue-10) and the Soon badge fill (neutral-30). Still raw, by his call:
+ * the six avatar tone pairs (intentional, no change wanted) and every
+ * dark-mode value (set aside for a later pass). */
 
 /* ══ the console's palette layer, carried WITH the component ══
  *
@@ -37,15 +43,12 @@
     sans-serif;
 }
 :root:not(.dark) .lnn-scope {
-  --mdt-border: var(--mdt-neutral-20); /* the console's one-border-grey ruling */
-  --mdt-neutral-30: 220 37% 92%; /* ink-200 default border (#E3E8F2) */
-  --mdt-muted-foreground: 240 7% 48%; /* ink-500 muted (#727283) */
-  --mdt-foreground: 218 63% 7%; /* ink-900 reading text */
-  --mdt-info: 214 98% 44%; /* the interactive blue (#0262DE) */
-  --mdt-blue-10: 214 90% 97%; /* chip/tint background */
-  --mdt-success: 136 53% 43%; /* rgb(52,168,83) */
-  --mdt-destructive: 353 84% 47%; /* rgb(219,19,42) */
-  --mdt-ring: 214 98% 44%; /* the console's ring token is the interactive blue */
+  --mdt-border: var(
+    --mdt-neutral-20
+  ); /* the console's one-border-grey ruling: a re-point of an existing step, still open */
+  --mdt-destructive: var(
+    --mdt-red-60
+  ); /* the console's danger red; the library default is red-65, still open */
 }
 
 /* ── the design system's focus recipe (ring-2 ring-ring offset-1) in plain CSS ── */
@@ -262,7 +265,7 @@
 
 /* ── section labels: 12px on a 24px slot; a hairline separator lives in the gap
  *    above — none above the first. The label grey is an ACCEPTED contrast
- *    exception in the console (#9B9EAA, 2.55:1 — intentional). ── */
+ *    exception (ink-400 via --mdt-muted-foreground-subtle, 2.67:1 on white — intentional). ── */
 .snv-label {
   position: relative;
   display: flex;
@@ -272,7 +275,7 @@
   padding: 0 2px;
   font-size: 12px;
   font-weight: 500;
-  color: #9b9eaa;
+  color: hsl(var(--mdt-muted-foreground-subtle));
 }
 .dark .snv-label {
   color: #a7b0bf;
@@ -391,7 +394,7 @@
   line-height: 16px;
   color: hsl(var(--mdt-foreground));
   opacity: 0.7;
-  background: #e4e7eb;
+  background: hsl(var(--mdt-neutral-30));
   border-radius: 99px;
   padding: 1px 7px;
 }
@@ -490,6 +493,11 @@
 .snv-railwrap[data-collapsed='true'] .snv-pinned .snv-row {
   width: 32px;
   margin: 0 auto;
+  /* 2026-09-03 (Pranjal): the collapsed gear read off-centre — the console rule
+   * keeps the row's 12px side padding, so the glyph sits 3px left. Centre it
+   * like every other collapsed row. */
+  padding: 0;
+  justify-content: center;
 }
 /* the first label-bar would double the card hairline right above it — drop it */
 .snv-railwrap[data-collapsed='true'] .snv-body > .snv-label:first-child {
@@ -500,7 +508,7 @@
 .snv-flyhead {
   font-size: 12px;
   font-weight: 500;
-  color: #9b9eaa;
+  color: hsl(var(--mdt-muted-foreground-subtle));
   padding: 4px 8px 6px;
 }
 .dark .snv-flyhead {
@@ -1006,4 +1014,178 @@
 .dark .ogsw-t5 {
   background: #232a34;
   color: #9aa8bc;
+}
+
+/* ══ the settings floors: Settings, and Agent Fleet beneath it (ported verbatim
+ * from the console's sidebarNav.css, 2026-09-03) ══
+ * The breadcrumb strip is both the heading and the way back; scrolling the list
+ * tucks the search into the trail's right end. The one change: the separator
+ * chevron's grey is the ink-400 token instead of its raw hex. Dark values stay
+ * raw, by Pranjal's call (dark mode set aside). */
+.snv-body > .snv-label:first-child,
+.snv-group:first-child .snv-label {
+  margin-top: 6px;
+}
+
+.snv-body > .snv-label:first-child::before,
+.snv-group:first-child .snv-label::before {
+  display: none;
+}
+
+/* ── the breadcrumb strip (settings + fleet): every step keeps the pill's side padding at
+ *    rest (space reserved — hover paints the fill and nothing moves; the jiggle was rejected
+ *    2026-08-24). Colour alone marks the current step. Strip inset 4 + chip 8 = the 12px line. ── */
+.snv-crumb {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 36px;
+  padding: 0 12px 0 10px;
+  margin-bottom: 2px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.snv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: hsl(var(--mdt-muted-foreground));
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.snv-chip svg {
+  flex: 0 0 auto;
+}
+
+button.snv-chip {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+button.snv-chip:hover {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark button.snv-chip:hover {
+  background: #222933;
+}
+
+.snv-chip[data-now='true'] {
+  color: hsl(var(--mdt-foreground));
+}
+
+.snv-btxt {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snv-csep {
+  color: hsl(var(--mdt-muted-foreground-subtle));
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.dark .snv-csep {
+  color: #a7b0bf;
+}
+
+/* scrolling the list tucks the search into the trail's right end; back at the top it returns */
+.snv-sic {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  color: hsl(var(--mdt-muted-foreground));
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+  pointer-events: none;
+}
+
+.snv-sic:hover {
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+}
+
+.dark .snv-sic:hover {
+  background: #222933;
+}
+
+.snv-mid[data-scrolled='true'] .snv-sic {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.snv-mid[data-scrolled='true'] .snv-line {
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.snv-mid[data-scrolled='true'] .snv-crumb {
+  box-shadow: 0 1px 0 hsl(var(--mdt-neutral-20));
+}
+
+.dark .snv-mid[data-scrolled='true'] .snv-crumb {
+  box-shadow: 0 1px 0 #222933;
+}
+
+.snv-railwrap[data-collapsed='true'] .snv-line,
+.snv-railwrap[data-collapsed='true'] .snv-crumb {
+  display: none;
+}
+
+/* collapsed trail: home + one-level-up stacked, a hairline before the options (2026-08-24) */
+.snv-ccol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  flex: 0 0 auto;
+  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+}
+
+.dark .snv-ccol {
+  border-bottom-color: #222933;
+}
+
+.snv-ccol .snv-row {
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0 auto 2px;
+  justify-content: center;
+}
+
+/* ── 2026-09-03, found by the Long labels page: the current crumb could not
+ * shrink, so a long floor name ran off the rail and pushed the magnifier out
+ * of view. The current chip now gives way (its text already carries the
+ * ellipsis) and the magnifier keeps its width. The console has the same flaw;
+ * this is the second deliberate deviation from it, after the collapsed gear. ── */
+.snv-chip[data-now='true'] {
+  flex: 0 1 auto;
+}
+.snv-sic {
+  flex: 0 0 auto;
 }

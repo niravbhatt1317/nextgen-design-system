@@ -412,9 +412,9 @@ export type {
   SheetVariants,
 } from './Sheet';
 
-// LeftNav — the settings navigation. Two levels and never three.
+// LeftNavOld — the previous settings-only navigation. DEPRECATED 2026-09-03: use LeftNav.
 export {
-  LeftNav,
+  LeftNavOld,
   LeftNavExit,
   LeftNavSearch,
   LeftNavBody,
@@ -426,9 +426,9 @@ export {
   DataLeftNav,
   leftNavItemVariants,
   useLeftNavLevels,
-} from './LeftNav';
+} from './LeftNavOld';
 export type {
-  LeftNavProps,
+  LeftNavOldProps,
   LeftNavExitProps,
   LeftNavSearchProps,
   LeftNavBodyProps,
@@ -442,6 +442,22 @@ export type {
   LeftNavConfigItem,
   UseLeftNavLevels,
   UseLeftNavLevelsOptions,
+} from './LeftNavOld';
+
+// LeftNav — the product navigation: the workspace rail, then the Settings and
+// Agent Fleet floors. Ported from the merged console; replaced LeftNavOld 2026-09-03.
+export { LeftNav, LeftNavTrigger } from './LeftNav';
+export type {
+  LeftNavAccount,
+  LeftNavBoard,
+  LeftNavCollection,
+  LeftNavOrg,
+  LeftNavProps,
+  LeftNavTheme,
+  LeftNavTriggerProps,
+  LeftNavSettingsItem,
+  LeftNavSettingsSection,
+  LeftNavView,
 } from './LeftNav';
 
 // Sidebar
