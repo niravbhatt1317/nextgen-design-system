@@ -118,6 +118,78 @@ describe('useTableSort', () => {
     act(() => result.current.set('age', 'desc'));
     expect(result.current.apply(rows, cols).map((r) => r.age)).toEqual([41, 30, 25]);
   });
+
+  it('starts from a sort it was given', () => {
+    const { result } = renderHook(() => useTableSort({ key: 'age', direction: 'asc' }));
+    expect(result.current.apply(rows, cols).map((r) => r.age)).toEqual([25, 30, 41]);
+  });
+
+  it('moves to a new column A to Z rather than continuing the cycle', () => {
+    const { result } = renderHook(() => useTableSort({ key: 'name', direction: 'desc' }));
+    act(() => result.current.cycle('age'));
+    expect(result.current.sort).toEqual({ key: 'age', direction: 'asc' });
+  });
+
+  it('clears', () => {
+    const { result } = renderHook(() => useTableSort({ key: 'name', direction: 'asc' }));
+    act(() => result.current.clear());
+    expect(result.current.sort).toBeNull();
+  });
+});
+
+// `valueOf` has to make a sortable value out of whatever is in the row. Only
+// strings and numbers were covered; these are the rest of its cases.
+describe('useTableSort, values that are not plain text', () => {
+  interface Mixed {
+    id: string;
+    tags: string[];
+    active: boolean;
+    note: string | null;
+    meta: { rank: number };
+  }
+  const col = (key: string): TableColumnDef<Mixed> => ({ key, label: key, cell: () => null });
+  const cols = [col('tags'), col('active'), col('note'), col('meta')];
+
+  const rows: Mixed[] = [
+    { id: '1', tags: ['b', 'c'], active: true, note: 'second', meta: { rank: 2 } },
+    { id: '2', tags: ['a'], active: false, note: null, meta: { rank: 1 } },
+  ];
+
+  const sorted = (key: string, from: Mixed[] = rows) => {
+    const { result } = renderHook(() => useTableSort({ key, direction: 'asc' }));
+    return result.current.apply(from, cols).map((r) => r.id);
+  };
+
+  it('sorts a list by its joined text', () => {
+    expect(sorted('tags')).toEqual(['2', '1']);
+  });
+
+  it('sorts booleans by their words, so false comes first', () => {
+    expect(sorted('active')).toEqual(['2', '1']);
+  });
+
+  it('sorts a missing value to the front', () => {
+    expect(sorted('note')).toEqual(['2', '1']);
+  });
+
+  it('falls back to the JSON of anything else', () => {
+    expect(sorted('meta')).toEqual(['2', '1']);
+  });
+
+  it('sorts on a key with no column of its own', () => {
+    const { result } = renderHook(() => useTableSort({ key: 'id', direction: 'desc' }));
+    expect(result.current.apply(rows, cols).map((r) => r.id)).toEqual(['2', '1']);
+  });
+
+  // Two equal values must not swap places, or the table reshuffles under the
+  // reader every time it re-sorts.
+  it('leaves equal values in the order they arrived', () => {
+    const tied: Mixed[] = [
+      { id: 'first', tags: ['x'], active: true, note: 'same', meta: { rank: 0 } },
+      { id: 'second', tags: ['x'], active: true, note: 'same', meta: { rank: 0 } },
+    ];
+    expect(sorted('note', tied)).toEqual(['first', 'second']);
+  });
 });
 
 describe('useTablePaging', () => {
