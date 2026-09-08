@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 965,
+  "capabilityCount": 978,
   "counts": {
-    "story": 685,
-    "component": 234,
+    "story": 694,
+    "component": 238,
     "utility": 18,
     "hook": 28
   },
@@ -140,6 +140,16 @@
       "propDocs": ""
     },
     {
+      "name": "Alignment",
+      "kind": "story",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / Alignment",
+      "doc": "Deprecated/Tooltip Old Alignment",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Alignments",
       "kind": "story",
       "file": "src/components/HoverCard/HoverCard.stories.tsx",
@@ -162,10 +172,10 @@
     {
       "name": "AllSides",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / AllSides",
-      "doc": "Components/Tooltip AllSides",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / AllSides",
+      "doc": "Deprecated/Tooltip Old AllSides",
       "props": [],
       "propDocs": ""
     },
@@ -1295,7 +1305,7 @@
       "file": "src/components/Table/TableCells.tsx",
       "area": "Table",
       "summary": "The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing.",
-      "doc": "The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing.",
+      "doc": "The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing. Each chip carries its value in a bubble.",
       "props": [],
       "propDocs": ""
     },
@@ -1406,6 +1416,16 @@
       "area": "Tooltip",
       "summary": "Story: Components/Tooltip / Controlled",
       "doc": "Components/Tooltip Controlled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Controlled",
+      "kind": "story",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / Controlled",
+      "doc": "Deprecated/Tooltip Old Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1612,10 +1632,10 @@
     {
       "name": "CustomStyling",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / CustomStyling",
-      "doc": "Components/Tooltip CustomStyling",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / CustomStyling",
+      "doc": "Deprecated/Tooltip Old CustomStyling",
       "props": [],
       "propDocs": ""
     },
@@ -2399,6 +2419,16 @@
       "area": "Tooltip",
       "summary": "Story: Components/Tooltip / Default",
       "doc": "Components/Tooltip Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / Default",
+      "doc": "Deprecated/Tooltip Old Default",
       "props": [],
       "propDocs": ""
     },
@@ -4014,10 +4044,10 @@
     {
       "name": "InForm",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / InForm",
-      "doc": "Components/Tooltip InForm",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / InForm",
+      "doc": "Deprecated/Tooltip Old InForm",
       "props": [],
       "propDocs": ""
     },
@@ -4205,6 +4235,16 @@
       "area": "Table Old Column Controls",
       "summary": "Story: Deprecated/Table Old Column Controls / InsertionPoints",
       "doc": "Deprecated/Table Old Column Controls InsertionPoints",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Instant",
+      "kind": "story",
+      "file": "src/components/Tooltip/Tooltip.stories.tsx",
+      "area": "Tooltip",
+      "summary": "Story: Components/Tooltip / Instant",
+      "doc": "Components/Tooltip Instant",
       "props": [],
       "propDocs": ""
     },
@@ -4755,6 +4795,16 @@
       "propDocs": ""
     },
     {
+      "name": "List",
+      "kind": "story",
+      "file": "src/components/Tooltip/Tooltip.stories.tsx",
+      "area": "Tooltip",
+      "summary": "Story: Components/Tooltip / List",
+      "doc": "Components/Tooltip List",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "ListExample",
       "kind": "story",
       "file": "src/components/Separator/Separator.stories.tsx",
@@ -4851,6 +4901,16 @@
       "area": "CodeWell",
       "summary": "Story: Components/CodeWell / LongContent",
       "doc": "Components/CodeWell LongContent",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LongCopy",
+      "kind": "story",
+      "file": "src/components/Tooltip/Tooltip.stories.tsx",
+      "area": "Tooltip",
+      "summary": "Story: Components/Tooltip / LongCopy",
+      "doc": "Components/Tooltip LongCopy",
       "props": [],
       "propDocs": ""
     },
@@ -5075,10 +5135,10 @@
     {
       "name": "MultipleTooltips",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / MultipleTooltips",
-      "doc": "Components/Tooltip MultipleTooltips",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / MultipleTooltips",
+      "doc": "Deprecated/Tooltip Old MultipleTooltips",
       "props": [],
       "propDocs": ""
     },
@@ -6085,10 +6145,10 @@
     {
       "name": "RichContent",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / RichContent",
-      "doc": "Components/Tooltip RichContent",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / RichContent",
+      "doc": "Deprecated/Tooltip Old RichContent",
       "props": [],
       "propDocs": ""
     },
@@ -6759,6 +6819,16 @@
       "area": "HoverCard",
       "summary": "Story: Components/HoverCard / Sides",
       "doc": "Components/HoverCard Sides",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sides",
+      "kind": "story",
+      "file": "src/components/Tooltip/Tooltip.stories.tsx",
+      "area": "Tooltip",
+      "summary": "Story: Components/Tooltip / Sides",
+      "doc": "Components/Tooltip Sides",
       "props": [],
       "propDocs": ""
     },
@@ -8049,8 +8119,8 @@
       "kind": "component",
       "file": "src/components/Table/TableCells.tsx",
       "area": "Table",
-      "summary": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" that lists the rest on hover.",
-      "doc": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" that lists the rest on hover.",
+      "summary": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" whose bubble lists the rest.",
+      "doc": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" whose bubble lists the rest.",
       "props": [],
       "propDocs": ""
     },
@@ -8478,18 +8548,39 @@
       "kind": "component",
       "file": "src/components/Tooltip/Tooltip.tsx",
       "area": "Tooltip",
-      "summary": "Tooltip root component - controls the open state.",
-      "doc": "Tooltip root component - controls the open state.",
-      "props": [],
-      "propDocs": ""
+      "summary": "Tooltip - holds the open state.",
+      "doc": "Tooltip - holds the open state. `instant` drops the wait, for chips and counters that reveal a value.",
+      "props": ["instant"],
+      "propDocs": "No wait at all. For chips and counters that reveal a value."
     },
     {
       "name": "TooltipContent",
       "kind": "component",
       "file": "src/components/Tooltip/Tooltip.tsx",
       "area": "Tooltip",
-      "summary": "TooltipContent - the content container for the tooltip with arrow support.",
-      "doc": "TooltipContent - the content container for the tooltip with arrow support. ```tsx <Tooltip> <TooltipTrigger>Hover me</TooltipTrigger> <TooltipContent> <p>Helpful information</p> </TooltipContent> </Tooltip> ```",
+      "summary": "TooltipContent - the bubble: the console's fill and text on the library's engine.",
+      "doc": "TooltipContent - the bubble: the console's fill and text on the library's engine. Plain text wraps at `maxWidth` and reads centred; a `hint` or an `items` list reads from the left. ```tsx <TooltipContent hint=\"Click the icon to copy the mail\"> sarah.johnson@company.com </TooltipContent> ```",
+      "props": [
+        "children",
+        "className",
+        "side",
+        "sideOffset",
+        "align",
+        "showArrow",
+        "arrowClassName",
+        "hint",
+        "items",
+        "maxWidth"
+      ],
+      "propDocs": "The text. Leave it out when `items` is given. Which side of the trigger. Near a screen edge it flips by itself. Distance from the trigger in px, before the arrow. Where along the trigger the bubble sits. The 10 × 5 arrow in the fill colour. A quieter second line under the text: what a click will do. 10px at 62%. A list of values instead of text: bullet lines, scrolling past seven. The widest the bubble grows before plain text wraps and reads centred."
+    },
+    {
+      "name": "TooltipContentOld",
+      "kind": "component",
+      "file": "src/components/TooltipOld/TooltipOld.tsx",
+      "area": "TooltipOld",
+      "summary": "TooltipContentOld - the content container for the tooltip with arrow support.",
+      "doc": "TooltipContentOld - the content container for the tooltip with arrow support. ```tsx <TooltipOld> <TooltipTriggerOld>Hover me</TooltipTriggerOld> <TooltipContentOld> <p>Helpful information</p> </TooltipContentOld> </TooltipOld> ```",
       "props": [
         "children",
         "className",
@@ -8502,12 +8593,32 @@
       "propDocs": "The content to display in the tooltip Custom className for the tooltip content The preferred side of the trigger to render against when open. The distance in pixels from the trigger. The preferred alignment against the trigger. Whether to show the arrow pointing to the trigger. Custom className for the arrow element."
     },
     {
+      "name": "TooltipOld",
+      "kind": "component",
+      "file": "src/components/TooltipOld/TooltipOld.tsx",
+      "area": "TooltipOld",
+      "summary": "TooltipOld root component - controls the open state.",
+      "doc": "TooltipOld root component - controls the open state.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TooltipProvider",
       "kind": "component",
       "file": "src/components/Tooltip/Tooltip.tsx",
       "area": "Tooltip",
-      "summary": "TooltipProvider - wraps your app or component tree to provide tooltip functionality.",
-      "doc": "TooltipProvider - wraps your app or component tree to provide tooltip functionality. Must be placed at the root of components using tooltips. ```tsx <TooltipProvider> <Tooltip> <TooltipTrigger>Hover me</TooltipTrigger> <TooltipContent>Tooltip text</TooltipContent> </Tooltip> </TooltipProvider> ```",
+      "summary": "TooltipProvider - wraps the app, or a component that brings its own bubbles.",
+      "doc": "TooltipProvider - wraps the app, or a component that brings its own bubbles. 100ms before a bubble opens; neighbours within 300ms open at once. ```tsx <TooltipProvider> <Tooltip> <TooltipTrigger>Hover me</TooltipTrigger> <TooltipContent>Tooltip text</TooltipContent> </Tooltip> </TooltipProvider> ```",
+      "props": ["children", "delayDuration", "skipDelayDuration", "disableHoverableContent"],
+      "propDocs": "How long the pointer rests on a trigger before the bubble opens. Moving to a neighbouring trigger within this many ms opens it at once. Close as soon as the pointer leaves the trigger, instead of letting it travel into the bubble (a scrolling list needs the travel)."
+    },
+    {
+      "name": "TooltipProviderOld",
+      "kind": "component",
+      "file": "src/components/TooltipOld/TooltipOld.tsx",
+      "area": "TooltipOld",
+      "summary": "TooltipProviderOld - wraps your app or component tree to provide tooltip functionality.",
+      "doc": "TooltipProviderOld - wraps your app or component tree to provide tooltip functionality. Must be placed at the root of components using tooltips. ```tsx <TooltipProviderOld> <TooltipOld> <TooltipTriggerOld>Hover me</TooltipTriggerOld> <TooltipContentOld>TooltipOld text</TooltipContentOld> </TooltipOld> </TooltipProviderOld> ```",
       "props": ["children", "delayDuration", "skipDelayDuration", "disableHoverableContent"],
       "propDocs": "Content wrapped by the provider The duration from when the mouse enters a tooltip trigger until the tooltip opens. Prevents the tooltip from opening when in keyboard navigation mode. Disables the hover card"
     },
@@ -8516,8 +8627,18 @@
       "kind": "component",
       "file": "src/components/Tooltip/Tooltip.tsx",
       "area": "Tooltip",
-      "summary": "TooltipTrigger - the element that triggers the tooltip on hover.",
-      "doc": "TooltipTrigger - the element that triggers the tooltip on hover.",
+      "summary": "TooltipTrigger - the element that opens the bubble, on hover and on keyboard focus.",
+      "doc": "TooltipTrigger - the element that opens the bubble, on hover and on keyboard focus.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TooltipTriggerOld",
+      "kind": "component",
+      "file": "src/components/TooltipOld/TooltipOld.tsx",
+      "area": "TooltipOld",
+      "summary": "TooltipTriggerOld - the element that triggers the tooltip on hover.",
+      "doc": "TooltipTriggerOld - the element that triggers the tooltip on hover.",
       "props": [],
       "propDocs": ""
     },
@@ -9154,10 +9275,10 @@
     {
       "name": "WithArrow",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / WithArrow",
-      "doc": "Components/Tooltip WithArrow",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / WithArrow",
+      "doc": "Deprecated/Tooltip Old WithArrow",
       "props": [],
       "propDocs": ""
     },
@@ -9284,10 +9405,10 @@
     {
       "name": "WithDelay",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / WithDelay",
-      "doc": "Components/Tooltip WithDelay",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / WithDelay",
+      "doc": "Deprecated/Tooltip Old WithDelay",
       "props": [],
       "propDocs": ""
     },
@@ -9374,10 +9495,10 @@
     {
       "name": "WithDisabledTrigger",
       "kind": "story",
-      "file": "src/components/Tooltip/Tooltip.stories.tsx",
-      "area": "Tooltip",
-      "summary": "Story: Components/Tooltip / WithDisabledTrigger",
-      "doc": "Components/Tooltip WithDisabledTrigger",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / WithDisabledTrigger",
+      "doc": "Deprecated/Tooltip Old WithDisabledTrigger",
       "props": [],
       "propDocs": ""
     },
@@ -9538,6 +9659,16 @@
       "area": "Textarea",
       "summary": "Story: Components/Textarea / WithHelperText",
       "doc": "Components/Textarea WithHelperText",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithHint",
+      "kind": "story",
+      "file": "src/components/Tooltip/Tooltip.stories.tsx",
+      "area": "Tooltip",
+      "summary": "Story: Components/Tooltip / WithHint",
+      "doc": "Components/Tooltip WithHint",
       "props": [],
       "propDocs": ""
     },
@@ -9748,6 +9879,16 @@
       "area": "Tooltip",
       "summary": "Story: Components/Tooltip / WithoutArrow",
       "doc": "Components/Tooltip WithoutArrow",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithoutArrow",
+      "kind": "story",
+      "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
+      "area": "Tooltip Old",
+      "summary": "Story: Deprecated/Tooltip Old / WithoutArrow",
+      "doc": "Deprecated/Tooltip Old WithoutArrow",
       "props": [],
       "propDocs": ""
     },
