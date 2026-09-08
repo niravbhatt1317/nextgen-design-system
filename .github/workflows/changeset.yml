@@ -10,7 +10,11 @@ name: Changeset
 # knows whether it is a patch or a break.
 on:
   pull_request:
-    branches: [main]
+    # No `branches:` filter - see the note in `ci.yml`. A pull request based on
+    # another branch is still a pull request that changes the package, and the
+    # check already compares against its own base rather than assuming `main`
+    # (`BASE` below), so it reports on that branch's own diff and nothing else.
+    #
     # `synchronize` matters: adding the changeset in a later push should turn
     # this green without closing and reopening the pull request. `labeled` and
     # `unlabeled` matter for the same reason on the escape hatch.
