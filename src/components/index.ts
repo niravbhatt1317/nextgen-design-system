@@ -800,6 +800,28 @@ export type {
 export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
 export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
 
+// KpiCard — the merged console KPI tile: one metric or a group, and the strip that holds them (2026-09-07)
+export {
+  KpiCard,
+  KpiStrip,
+  KpiGauge,
+  KpiBars,
+  formatKpiValue,
+  KPI_FLOOR,
+  KPI_CHART_WIDTH,
+} from './KpiCard';
+export type {
+  KpiCardProps,
+  KpiSingleCardProps,
+  KpiGroupCardProps,
+  KpiMetricProps,
+  KpiTrend,
+  KpiTrendTone,
+  KpiStripProps,
+  KpiGaugeProps,
+  KpiBarsProps,
+} from './KpiCard';
+
 // Tooltip — the merged console bubble on the library engine (2026-09-07)
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
 export type {
