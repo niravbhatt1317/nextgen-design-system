@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-911 capabilities: 204 components, 22 hooks, 16 utilities, 669 stories
+965 capabilities: 234 components, 28 hooks, 18 utilities, 685 stories
 
 ## Components
 
@@ -53,10 +53,12 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `CommandList` | Command | CommandList - Scrollable list of command items. |
 | `CommandSeparator` | Command | CommandSeparator - Visual separator between command groups. |
 | `CommandShortcut` | Command | CommandShortcut - Keyboard shortcut hint. |
+| `ContactChips` | Table | The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing. |
 | `Container` | Container | Container component for consistent page layouts with max-width and padding. |
 | `DataDrivenSidebar` | Sidebar | _undocumented_ |
 | `DataLeftNav` | LeftNavOld | DataLeftNav - the whole navigation from one configuration object. |
-| `DataTable` | Table | DataTable - the whole table, assembled. |
+| `DataTable` | Table | DataTable - the merged console Users table, assembled: the Toolbar strip with search, Filters, a quick filter, Sort and Columns; the table with its frozen row-number, Name and Action columns; a bulk bar; a pager or a "Load more" footer; and the loading, empty, first-run and error states. |
+| `DataTableOld` | TableOld | DataTableOld - the whole table, assembled. |
 | `DeprecationBanner` | _internal | DeprecationBanner component Displays a warning banner for deprecated components in Storybook. |
 | `Dialog` | Dialog | Dialog - a task that interrupts, in the middle of the screen. |
 | `DialogBody` | Dialog | DialogBody - the reading between the header and the footer. |
@@ -127,6 +129,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `MotadataSwitch` | Switch | MotadataSwitch component - A toggle switch control. |
 | `OldButton` | .. | _undocumented_ |
 | `OTPInput` | OTPInput | OTPInput - One-Time Password input component A fully accessible OTP input component with the following features: - Auto-focus on first empty input - Auto-advance on input - Backspace navigation - Paste support (pastes complete OTP) - Arrow key navigation - Keyboard accessible - Supports numeric and alphanumeric modes ```tsx <OTPInput length={6} value={otp} onChange={setOtp} /> ``` |
+| `PAGE_GAPOld` | TableOld | A gap in the list of pages, where numbers have been left out. |
 | `Pagination` | Pagination | Pagination root component. |
 | `PaginationContent` | Pagination | PaginationContent - container for pagination items. |
 | `PaginationEllipsis` | Pagination | PaginationEllipsis - shows ellipsis for skipped pages. |
@@ -134,6 +137,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `PaginationLink` | Pagination | PaginationLink - one page control. |
 | `PaginationNext` | Pagination | PaginationNext - next page button. |
 | `PaginationPrevious` | Pagination | PaginationPrevious - previous page button. |
+| `PersonCell` | Table | The Name cell: a 32px avatar, the name at 12px medium, and the owner mark when it applies. |
 | `Popover` | Popover | Popover root component - controls the open state. |
 | `PopoverAnchor` | Popover | PopoverAnchor - an optional element to anchor the popover to. |
 | `PopoverClose` | Popover | PopoverClose - an optional close button for the popover. |
@@ -177,35 +181,61 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `Stack` | Stack | Stack component for consistent vertical or horizontal spacing between elements. |
 | `StatusBadge` | _internal | StatusBadge component Displays a status badge for components in Storybook. |
 | `Stepper` | Stepper | Stepper - a named, ordered journey with a place you are now. |
-| `Table` | Table | Table component - Root table element. |
-| `TableBody` | Table | TableBody component - Contains table data rows. |
-| `TableBulkAction` | Table | One action on the bar. |
-| `TableBulkBar` | Table | TableBulkBar - what you can do with the rows you have selected. |
-| `TableBulkSeparator` | Table | A divider between groups of actions - destructive from routine, usually. |
-| `TableCaption` | Table | TableCaption component - A table caption/title. |
-| `TableCell` | Table | TableCell component - A table data cell. |
-| `TableColumnBoundary` | Table | TableColumnBoundary - one line between two columns, doing both jobs. |
-| `TableColumnMenu` | Table | TableColumnMenu - the controls that belong to one column. |
-| `TableExpandTrigger` | Table | TableExpandTrigger component - the disclosure control for a row that reveals child rows beneath it. |
-| `TableFilterChips` | Table | TableFilterChips - what is currently narrowing the table. |
-| `TableFilterMenu` | Table | TableFilterMenu - choose an attribute, then choose its values. |
-| `TableFooter` | Table | TableFooter component - Contains table footer rows, usually a total. |
-| `TableGroupRow` | Table | TableGroupRow component - a heading row that spans the whole table. |
-| `TableHead` | Table | TableHead component - A table header cell, optionally a sort control. |
-| `TableHeader` | Table | TableHeader component - Contains table header rows. |
-| `TablePagination` | Table | TablePagination - the pager under a table. |
-| `TableRow` | Table | TableRow component - A table row. |
-| `TableSortMenu` | Table | TableSortMenu - which columns sort the table, and in what order. |
-| `TableToolbar` | Table | TableToolbar - the controls that act on the whole table. |
-| `TableToolbarActions` | Table | The trailing group of a toolbar. |
-| `TableViewMenu` | Table | TableViewMenu - grouping and which columns exist. |
-| `TableViewNamePanel` | Table | Naming a view, whether it is new or being renamed. |
-| `TableViewSwitcher` | Table | TableViewSwitcher - the saved views, and what you can do to them. |
+| `Table` | Table | Table - the card that holds a list: rows, a bulk bar and a pager. |
+| `TableBlank` | Table | The three blank states, centred in the visible card: nothing yet, nothing found, could not load. |
+| `TableBody` | Table | _undocumented_ |
+| `TableBodyOld` | TableOld | TableBodyOld component - Contains table data rows. |
+| `TableBulkAction` | Table | One action in the bar: a 32px text button with a 16px icon. |
+| `TableBulkActionOld` | TableOld | One action on the bar. |
+| `TableBulkBar` | Table | The dark pill that appears once rows are picked. |
+| `TableBulkBarOld` | TableOld | TableBulkBarOld - what you can do with the rows you have selected. |
+| `TableBulkSeparator` | Table | The thin divider between groups of actions. |
+| `TableBulkSeparatorOld` | TableOld | A divider between groups of actions - destructive from routine, usually. |
+| `TableCaptionOld` | TableOld | TableCaptionOld component - A table caption/title. |
+| `TableCell` | Table | _undocumented_ |
+| `TableCellOld` | TableOld | TableCellOld component - A table data cell. |
+| `TableColGroup` | Table | One `<col>` per visible column plus the 60px elastic tail. |
+| `TableColumnBoundaryOld` | TableOld | TableColumnBoundaryOld - one line between two columns, doing both jobs. |
+| `TableColumnMenuOld` | TableOld | TableColumnMenuOld - the controls that belong to one column. |
+| `TableColumnsPanel` | Table | The Columns panel behind the toolbar's Columns button: search, Shown and Hidden groups, Hide all, Show all, Reset. |
+| `TableEmptyValue` | Table | A missing value: an em-dash that reads "Not set". |
+| `TableExpandTriggerOld` | TableOld | TableExpandTriggerOld component - the disclosure control for a row that reveals child rows beneath it. |
+| `TableFilterChipsOld` | TableOld | TableFilterChipsOld - what is currently narrowing the table. |
+| `TableFilterMenuOld` | TableOld | TableFilterMenuOld - choose an attribute, then choose its values. |
+| `TableFooterOld` | TableOld | TableFooterOld component - Contains table footer rows, usually a total. |
+| `TableGroupRowOld` | TableOld | TableGroupRowOld component - a heading row that spans the whole table. |
+| `TableHead` | Table | A heading. |
+| `TableHeader` | Table | _undocumented_ |
+| `TableHeaderOld` | TableOld | TableHeaderOld component - Contains table header rows. |
+| `TableHeadOld` | TableOld | TableHeadOld component - A table header cell, optionally a sort control. |
+| `TableInsertPanel` | Table | The insert-in-place panel: the same parts as the Columns panel, listing the hidden columns with a "+". |
+| `TableLoadMore` | Table | The other footer: a count and a "Load more" button that the table also presses as you scroll near the bottom. |
+| `TableMorphContext` | Table | _undocumented_ |
+| `TableNumberCell` | Table | A plain row number, for a table without selection: it never becomes a checkbox. |
+| `TableNumberHead` | Table | The blank heading over the row numbers; named for screen readers. |
+| `TableOld` | TableOld | TableOld component - Root table element. |
+| `TablePager` | Table | The pager on the card's foot: the count on the left, rows per page, first, previous, a typed page box, next and last on the right. |
+| `TablePaginationOld` | TableOld | TablePaginationOld - the pager under a table. |
+| `TableRow` | Table | A row. |
+| `TableRowOld` | TableOld | TableRowOld component - A table row. |
+| `TableScopeMenu` | Table | What a select-all should take: this page, every row that matches, or a number you type. |
+| `TableSelectAll` | Table | The header's checkbox and the chevron that opens the scope menu. |
+| `TableSelectionCell` | Table | The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked. |
+| `TableSkeleton` | Table | Five grey rows while the list loads. |
+| `TableSortMenuOld` | TableOld | TableSortMenuOld - which columns sort the table, and in what order. |
+| `TableTailCell` | Table | The blank 60px tail that soaks up leftover width. |
+| `TableToolbarActionsOld` | TableOld | The trailing group of a toolbar. |
+| `TableToolbarOld` | TableOld | TableToolbarOld - the controls that act on the whole table. |
+| `TableViewMenuOld` | TableOld | TableViewMenuOld - grouping and which columns exist. |
+| `TableViewNamePanel` | TableOld | Naming a view, whether it is new or being renamed. |
+| `TableViewport` | Table | The scrolling region and the `<table>` inside it. |
+| `TableViewSwitcherOld` | TableOld | TableViewSwitcherOld - the saved views, and what you can do to them. |
 | `Tabs` | Tabs | Tabs root component - controls the tab state and behavior. |
 | `TabsAdd` | Tabs | TabsAdd - the control that makes a new tab. |
 | `TabsContent` | Tabs | TabsContent - content panel for each tab. |
 | `TabsList` | Tabs | TabsList - container for tab triggers. |
 | `TabsTrigger` | Tabs | TabsTrigger - individual tab button. |
+| `TagList` | Table | Teams, roles and the like: neutral square Badges, and a slate "+N" that lists the rest on hover. |
 | `TagPill` | TagPill | TagPill - a label a person put there and can take away. |
 | `TagPillOld` | TagPillOld | TagPillOld - a label a person put there and can take away. |
 | `Textarea` | Textarea | Textarea component with support for labels, error states, and character counting. |
@@ -233,8 +263,9 @@ story that already exists. They are in `capability-catalog.json` in full.
 
 | Name | Where | What it does |
 | --- | --- | --- |
-| `useColumnReorder` | Table | Drag a column sideways to move it. |
-| `useColumnWidths` | Table | Holds column widths for a resizable table. |
+| `useColumnDrag` | Table | Drag a heading to a new place: the column dims, a copy of the heading follows the pointer, a 2px line marks the landing, the region scrolls when the pointer nears an edge. |
+| `useColumnReorderOld` | TableOld | Drag a column sideways to move it. |
+| `useColumnWidthsOld` | TableOld | Holds column widths for a resizable table. |
 | `useDialogFooterTop` | Dialog | The room between the footer's rule and its buttons. |
 | `useDialogGutter` | Dialog | The left and right padding every region in this dialog shares. |
 | `useDialogScrollerPull` | Dialog | The pull that puts the footer's rule on the body's clipping edge. |
@@ -242,17 +273,22 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `useDialogScrollTail` | Dialog | The room under the last thing in a scrolling body. |
 | `useDialogTop` | Dialog | The padding above the first region. |
 | `useEditableTabs` | Tabs | The rules for a tab bar the person builds themselves. |
-| `useInfiniteScroll` | Table | Asks for more rows when the end of the list comes into view. |
+| `useInfiniteScrollOld` | TableOld | Asks for more rows when the end of the list comes into view. |
 | `useLeftNavLevels` | LeftNavOld | Which level of a settings navigation is showing. |
 | `usePlatform` | Kbd | Which machine this is, for resolving `mod` and `alt`. |
 | `usePromotionalOpen` | Toast | Whether a promotional toast is on screen. |
-| `useSavedViews` | Table | Holds a table's saved views. |
+| `useSavedViewsOld` | TableOld | Holds a table's saved views. |
 | `useSubmitShortcut` | Dialog | ⌘↵ on a Mac, Ctrl↵ elsewhere, for the dialog's primary action. |
-| `useTableColumns` | Table | Holds which columns are shown, in what order, and how many are pinned. |
-| `useTableFilters` | Table | Holds which filters are applied. |
-| `useTablePagination` | Table | Which page of a table is showing. |
-| `useTableSelection` | Table | Holds which rows are selected. |
-| `useTableSort` | Table | Holds which columns sort the table, and in what order. |
+| `useTableColumns` | Table | Column layout for a DataTable: order, hidden columns and widths, remembered in the browser when a `storageKey` is given. |
+| `useTableColumnsOld` | TableOld | Holds which columns are shown, in what order, and how many are pinned. |
+| `useTableFiltersOld` | TableOld | Holds which filters are applied. |
+| `useTableMorph` | Table | _undocumented_ |
+| `useTablePaginationOld` | TableOld | Which page of a table is showing. |
+| `useTablePaging` | Table | Pages by default; a "Load more" mode for lists that prefer it. |
+| `useTableSelection` | Table | Row selection for a DataTable. |
+| `useTableSelectionOld` | TableOld | Holds which rows are selected. |
+| `useTableSort` | Table | One sort at a time, as on the console. |
+| `useTableSortOld` | TableOld | Holds which columns sort the table, and in what order. |
 | `useTypedConfirmation` | Dialog | Makes somebody type the name of the thing before they can destroy it. |
 | `useUploadFiles` | Upload | The list, and what happens to it. |
 
@@ -268,12 +304,14 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `initialsForName` | Avatar | "Sarah Johnson" -> "SJ", "monitoring" -> "mo". |
 | `isModifier` | Kbd | Whether a key is a modifier rather than the key being modified. |
 | `matchesAccept` | Upload | Does this file match the `accept` string? The same three forms the file input itself understands: an extension (`.pdf`), a whole family (`image/*`), or an exact type (`application/pdf`). |
-| `pageList` | Table | Which page numbers to show, and where the gaps go. |
+| `pageListOld` | TableOld | Which page numbers to show, and where the gaps go. |
 | `promoStore` | Toast | _undocumented_ |
 | `resetDeprecationWarnings` | .. | Reset the warned components set (useful for testing) |
 | `resolveKey` | Kbd | One key, as a glyph to draw and a name to announce. |
+| `sampleUsers` | Table | _undocumented_ |
+| `tableMorphOf` | Table | `docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card. |
 | `toast` | Toast | Toast trigger function. |
-| `toCsv` | Table | Turns rows into CSV text. |
+| `toCsvOld` | TableOld | Turns rows into CSV text. |
 | `toneForName` | Avatar | Picks a tone from a name, so one person is always one colour. |
 | `validateSelection` | Upload | Check a selection before any of it becomes a row. |
 

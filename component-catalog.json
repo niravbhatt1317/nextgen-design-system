@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 45,
-  "variantGroupCount": 159,
-  "variantValueCount": 502,
+  "componentCount": 46,
+  "variantGroupCount": 164,
+  "variantValueCount": 508,
   "components": [
     {
       "component": "Avatar",
@@ -1195,7 +1195,53 @@
       "file": "src/components/Table/Table.tsx",
       "definitions": [
         {
+          "name": "tableCellVariants",
+          "variants": {
+            "frozen": [
+              "true",
+              "false"
+            ],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
           "name": "tableHeadVariants",
+          "variants": {
+            "frozen": [
+              "true",
+              "false"
+            ],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
+          "name": "tableRowVariants",
+          "variants": {
+            "inert": [
+              "true",
+              "false"
+            ]
+          },
+          "defaults": {
+            "inert": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "TableOld",
+      "file": "src/components/TableOld/TableOld.tsx",
+      "definitions": [
+        {
+          "name": "tableHeadOldVariants",
           "variants": {
             "density": [
               "short",
@@ -1215,7 +1261,7 @@
           }
         },
         {
-          "name": "tableCellVariants",
+          "name": "tableCellOldVariants",
           "variants": {
             "density": [
               "short",
@@ -1242,7 +1288,7 @@
           }
         },
         {
-          "name": "tableRowVariants",
+          "name": "tableRowOldVariants",
           "variants": {
             "interactive": [
               "true",

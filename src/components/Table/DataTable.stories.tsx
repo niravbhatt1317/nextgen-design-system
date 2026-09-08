@@ -1,405 +1,292 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Badge } from '../Badge';
-import { Button } from '../Button';
+import { DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import { DataTable } from './DataTable';
 import { TableBulkAction, TableBulkSeparator } from './TableBulkBar';
+import { ContactChips, PersonCell, TagList } from './TableCells';
+import { SAMPLE_ROLES, SAMPLE_TEAMS, sampleUsers } from './sampleUsers';
+import type { SampleUser } from './sampleUsers';
+import type { TableColumnDef } from './Table.types';
 
-/**
- * The whole table in one component.
- *
- * Layer 5f. Everything under `Table` is deliberately state-free - `TableHead`
- * reports that a sort was asked for, `useTableSort` remembers it, and neither
- * touches your rows. That is right for a product whose server already sorts,
- * and tiring for one with an array in memory, which is most of them.
- *
- * `DataTable` does the work. **Every piece of it can be handed back**:
- * `manualSort`, `manualFilter`, `manualSearch` and `manualPagination` each turn
- * off one half, and a table backed by a paged API turns on all four and uses
- * this as a renderer.
- *
- * The parts stay exported and stay state-free, so a product that outgrows this
- * drops down a level rather than forking it.
- */
-const meta: Meta = {
-  title: 'Components/Table/DataTable',
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
-};
+const USERS = sampleUsers(10001);
 
-export default meta;
-type Story = StoryObj;
+/** The console's own Status glyph: an eight-spoke loader, 14px. */
+const StatusGlyph = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <line x1="12" y1="2" x2="12" y2="6" />
+    <line x1="12" y1="18" x2="12" y2="22" />
+    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
+    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
+    <line x1="2" y1="12" x2="6" y2="12" />
+    <line x1="18" y1="12" x2="22" y2="12" />
+    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
+    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
+  </svg>
+);
 
-interface Ticket {
-  id: string;
-  subject: string;
-  status: 'Open' | 'In Process' | 'Resolved';
-  priority: 'High' | 'Medium' | 'Low';
-  assignee: string;
+const TONE = { Active: 'success', Inactive: 'slate', Invited: 'warning' } as const;
+const SOURCE_PALETTE = {
+  Manual: undefined,
+  LDAP: { fill: '#F2F3FD', ink: '#4F5BC4' },
+  SCIM: { fill: '#EDF8F7', ink: '#1F7A71' },
+} as const;
+
+const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
+  {
+    key: 'email',
+    label: 'Email',
+    width: 217,
+    sortable: true,
+    cell: (u) => <span className="mdt-text-muted-foreground">{u.email}</span>,
+  },
+  {
+    key: 'contact',
+    label: 'Contact',
+    cell: (u) => <ContactChips email={u.hasEmail ? u.email : null} phone={u.phone} />,
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    sortable: true,
+    glyph: <StatusGlyph />,
+    cell: (u) => (
+      <Badge size="sm" tone={TONE[u.status]} dot>
+        {u.status}
+      </Badge>
+    ),
+  },
+  {
+    key: 'source',
+    label: 'Source',
+    cell: (u) => {
+      const palette = SOURCE_PALETTE[u.source];
+      return palette ? (
+        <Badge size="sm" shape="square" palette={palette}>
+          {u.source}
+        </Badge>
+      ) : (
+        <Badge size="sm" shape="square">
+          {u.source}
+        </Badge>
+      );
+    },
+  },
+  {
+    key: 'teams',
+    label: 'Teams',
+    sortable: true,
+    sortValue: (u) => u.teams.join(','),
+    cell: (u) => <TagList items={u.teams} />,
+  },
+  { key: 'role', label: 'Role', cell: (u) => <TagList items={[u.role]} /> },
+];
+
+function UsersTable(
+  props: Partial<React.ComponentProps<typeof DataTable<SampleUser>>> & { rows?: SampleUser[] }
+) {
+  const [rows, setRows] = useState(props.rows ?? USERS);
+  const [note, setNote] = useState('');
+  const setStatus = (ids: string[], status: SampleUser['status']) => {
+    setRows((r) => r.map((u) => (ids.includes(u.id) ? { ...u, status } : u)));
+  };
+  return (
+    <div className="mdt-flex mdt-flex-col mdt-gap-3">
+      <DataTable<SampleUser>
+        label="Users"
+        noun="users"
+        getRowId={(u) => u.id}
+        nameColumn={{
+          label: 'Name',
+          sortValue: (u) => u.name,
+          cell: (u) => <PersonCell name={u.name} owner={u.owner} muted={u.status === 'Invited'} />,
+        }}
+        columns={USER_COLUMNS}
+        isRowInert={(u) => u.status === 'Invited'}
+        onRowOpen={(u) => {
+          setNote(`Opened ${u.name}. The profile drawer goes here.`);
+        }}
+        rowActions={(u) => (
+          <>
+            <DropdownMenuItem
+              onSelect={() => {
+                setNote(`Edit ${u.name}`);
+              }}
+            >
+              <Icon
+                name="pencil"
+                size={16}
+                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              />
+              Edit details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                setStatus([u.id], u.status === 'Active' ? 'Inactive' : 'Active');
+              }}
+            >
+              <Icon
+                name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'}
+                size={16}
+                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              />
+              {u.status === 'Active' ? 'Deactivate user' : 'Activate user'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="mdt-text-red-60"
+              onSelect={() => {
+                setRows((r) => r.filter((x) => x.id !== u.id));
+              }}
+            >
+              <Icon name="trash-2" size={16} className="mdt-mr-2" />
+              Delete user
+            </DropdownMenuItem>
+          </>
+        )}
+        search={{
+          placeholder: 'Search by name or email',
+          match: (u, q) => u.name.toLowerCase().includes(q) || u.email.includes(q),
+        }}
+        quickFilter={{
+          columnKey: 'status',
+          label: 'Filter by status',
+          options: ['Active', 'Inactive', 'Invited'],
+          value: (u) => u.status,
+        }}
+        filters={[
+          {
+            key: 'source',
+            label: 'Source',
+            options: ['Manual', 'LDAP', 'SCIM'],
+            match: (u, s) => s.has(u.source),
+          },
+          { key: 'role', label: 'Role', options: SAMPLE_ROLES, match: (u, s) => s.has(u.role) },
+          {
+            key: 'team',
+            label: 'Team',
+            options: SAMPLE_TEAMS.slice(0, 6),
+            match: (u, s) => u.teams.some((t) => s.has(t)),
+          },
+        ]}
+        bulkActions={(ids, clear) => {
+          const picked = rows.filter((u) => ids.includes(u.id));
+          return (
+            <>
+              <TableBulkAction
+                icon={<Icon name="toggle-right" />}
+                disabled={!picked.some((u) => u.status === 'Inactive')}
+                onClick={() => {
+                  setStatus(ids, 'Active');
+                }}
+              >
+                Activate
+              </TableBulkAction>
+              <TableBulkAction
+                icon={<Icon name="toggle-left" />}
+                disabled={!picked.some((u) => u.status === 'Active')}
+                onClick={() => {
+                  setStatus(ids, 'Inactive');
+                }}
+              >
+                Deactivate
+              </TableBulkAction>
+              <TableBulkSeparator />
+              <TableBulkAction
+                icon={<Icon name="trash-2" />}
+                onClick={() => {
+                  setRows((r) => r.filter((u) => !ids.includes(u.id)));
+                  clear();
+                }}
+              >
+                Delete
+              </TableBulkAction>
+            </>
+          );
+        }}
+        storageKey="storybook.users-table"
+        blank={{
+          first: {
+            onAction: () => {
+              setNote('The invite flow opens here.');
+            },
+          },
+          error: {
+            onAction: () => {
+              setNote('Reloading…');
+            },
+          },
+        }}
+        {...props}
+        rows={rows}
+      />
+      {note && <p className="mdt-text-sm mdt-text-muted-foreground">{note}</p>}
+    </div>
+  );
 }
 
-const STATUS_TONE = { Open: 'info', 'In Process': 'warning', Resolved: 'success' } as const;
-const NAMES = ['Ada Lovelace', 'Grace Hopper', 'Alan Turing', 'Katherine Johnson'];
-const STATUSES = ['Open', 'In Process', 'Resolved'] as const;
-const PRIORITIES = ['High', 'Medium', 'Low'] as const;
-
-const SUBJECTS = [
-  'Network connectivity problem',
-  'VPN drops every few minutes',
-  'Printer queue stuck',
-  'Password reset for contractor',
-  'Laptop will not wake from sleep',
-] as const;
-
-/**
- * Enough rows to page through, generated so the story stays short.
- *
- * `at()` with a modulo index cannot miss, but the compiler does not know that -
- * hence the fallbacks rather than assertions.
- */
-const tickets: Ticket[] = Array.from({ length: 43 }, (_, index) => ({
-  id: `TKT-${String(200 + index)}`,
-  subject: SUBJECTS[index % SUBJECTS.length] ?? SUBJECTS[0],
-  status: STATUSES[index % STATUSES.length] ?? STATUSES[0],
-  priority: PRIORITIES[index % PRIORITIES.length] ?? PRIORITIES[0],
-  assignee: NAMES[index % NAMES.length] ?? 'Ada Lovelace',
-}));
-
-const columns = [
-  { key: 'id', label: 'ID', locked: true },
-  { key: 'subject', label: 'Subject' },
-  { key: 'status', label: 'Status' },
-  { key: 'priority', label: 'Priority' },
-  { key: 'assignee', label: 'Assignee' },
-];
-
-const filterAttributes = [
-  { key: 'status', label: 'Status', values: [...STATUSES] },
-  { key: 'priority', label: 'Priority', values: [...PRIORITIES] },
-  { key: 'assignee', label: 'Assignee', values: NAMES },
-];
-
-/**
- * Six props, and the table sorts, filters, searches, hides columns and pages
- * itself.
- *
- * Everything from 5a to 5e is here, not just the toolbar: each header carries
- * its own menu, drag grip, resize line and insertion point, and `selectable`
- * brings the checkbox column and the bulk bar.
- *
- * The pager is `TablePagination`, which is the shared `Pagination` component
- * plus the two things a table needs and a general pager does not: the count
- * that says how big the table is, and rows per page.
- *
- * Worth trying: sort by two columns, drag a column sideways, hide one from its
- * own header menu, shift-click a range of rows, then search - all of it works
- * without a line of wiring, and the pagination follows the filtered count and
- * returns to the first page rather than stranding you on page 4 of something
- * you did not ask for.
- */
-export const Simple: Story = {
-  render: () => (
-    <DataTable
-      columns={columns}
-      rows={tickets}
-      getRowId={(row) => row.id}
-      filterAttributes={filterAttributes}
-      pageSize={8}
-      rowsPerPage
-      pageSizes={[8, 16, 24]}
-      renderCell={(row, key) =>
-        key === 'status' ? (
-          <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
-            {row.status}
-          </Badge>
-        ) : (
-          row[key as keyof Ticket]
-        )
-      }
-      selectable
-      bulkActions={(selected) => (
-        <>
-          <TableBulkAction icon={<Icon name="user-plus" size="sm" aria-hidden />}>
-            Assign
-          </TableBulkAction>
-          <TableBulkAction icon={<Icon name="check" size="sm" aria-hidden />}>
-            Resolve
-          </TableBulkAction>
-          <TableBulkSeparator />
-          <TableBulkAction icon={<Icon name="trash-2" size="sm" aria-hidden />}>
-            Delete {selected.length}
-          </TableBulkAction>
-        </>
-      )}
-      toolbarActions={
-        <Button variant="outline" size="sm">
-          <Icon name="download" size="sm" aria-hidden />
-          Export
-        </Button>
-      }
-    />
-  ),
-};
-
-/**
- * The same component with every job handed back.
- *
- * This is what a table backed by a paged API looks like: `DataTable` renders and
- * reports, the product answers. The readout below shows what it asked for -
- * nothing is applied here, which is the point.
- *
- * Sorting a column changes the message and leaves the rows exactly as they came
- * in. A product would turn that request into an `ORDER BY` and hand back the
- * next page.
- */
-export const ServerSide: Story = {
-  render: function ServerSideDemo() {
-    const [asked, setAsked] = useState('Nothing asked for yet.');
-
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-gap-2">
-        <DataTable
-          columns={columns}
-          rows={tickets.slice(0, 8)}
-          getRowId={(row) => row.id}
-          filterAttributes={filterAttributes}
-          manualSort
-          manualFilter
-          manualSearch
-          manualPagination
-          total={430}
-          onSortChange={(rules) => {
-            const clauses = rules.map(
-              (rule) => `${rule.column} ${rule.direction === 'ascend' ? 'ASC' : 'DESC'}`
-            );
-            setAsked(clauses.length === 0 ? 'Sort cleared' : `ORDER BY ${clauses.join(', ')}`);
-          }}
-          onFilterChange={(filters) => {
-            const clauses = filters.map(
-              (filter) => `${filter.attribute} IN (${filter.values.join(', ')})`
-            );
-            setAsked(clauses.length === 0 ? 'Filters cleared' : `WHERE ${clauses.join(' AND ')}`);
-          }}
-          onSearchChange={(query) => {
-            setAsked(query === '' ? 'Search cleared' : `Search: ${query}`);
-          }}
-        />
-        <p className="mdt-font-mono mdt-text-xs mdt-text-muted-foreground">{asked}</p>
-      </div>
-    );
+const meta: Meta<typeof UsersTable> = {
+  title: 'Components/Table',
+  component: UsersTable,
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'The merged console Users table, ported on 7 September 2026. `DataTable` assembles the pieces: the `Toolbar` strip with search, Filters, a quick filter, Sort and Columns; the card with its frozen row-number, Name and Action columns; a bulk bar; a pager or a "Load more" footer; and the blank states.',
+          '',
+          '| Part | Rule |',
+          '| --- | --- |',
+          '| Rows | 54px under a 40px header, 12px type, one hover and selected tint (neutral-10). |',
+          '| Row number | Becomes a checkbox on hover, on focus, once picked, and on every row once anything is picked. Space picks, Enter opens, ↑ ↓ move. |',
+          '| Select all | The header box takes this page; its chevron and "N selected" open the scope menu: this page, all matching, a number. |',
+          '| Headings | 16px inset, grip, 8px, label, 8px, sort arrow; "⋯" at the right edge; all on hover. Click sorts A to Z, Z to A, off. |',
+          '| Move | Drag the grip: the column dims, a copy of the heading follows, a 2px azure line marks the landing. Frozen columns cannot be passed. |',
+          '| Insert | With columns hidden, hovering a boundary shows a "+" that puts one back right there. |',
+          '| Quick filter | Washes its heading blue-10 and turns the column glyph azure; the glyph becomes the grip on hover. No chips, ever. |',
+          '| Pills | Every one is `Badge` at size sm. Pill for status, square for source, teams, roles and "+N". |',
+          '| Pager | Typed page box, first and last, rows per page; thousands get a comma. Or a "Load more" footer. |',
+        ].join('\n'),
+      },
+    },
   },
 };
+export default meta;
 
-/**
- * A view is a name for a table you have already set up.
- *
- * The columns you kept, the sort you chose, the filters you applied, the search
- * you typed - saved together, so tomorrow is one click rather than six. This is
- * what everything from 5a to 5f was for: each control already reported its
- * state, and nothing new had to be invented to write it down.
- *
- * **Try it.** Open "My open tickets" - the assignee column goes, status filters
- * to Open, and the sort changes. Then sort by something else and watch the dot
- * appear on the trigger: the view is marked, not overwritten. Save the change,
- * or discard it and land exactly back where the view was.
- *
- * **Nothing is stored here.** `onViewsChange` reports the whole list and this
- * story prints it. A product writes it to `localStorage`, to a URL, or to an
- * API where a colleague can open the same view - the third of which is the main
- * reason to have saved views, and impossible for a component that assumed the
- * first.
- */
-export const SavedViews: Story = {
-  render: function SavedViewsDemo() {
-    const [written, setWritten] = useState('Nothing saved yet.');
+type Story = StoryObj<typeof UsersTable>;
 
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-gap-3">
-        <DataTable
-          columns={columns}
-          rows={tickets}
-          getRowId={(row) => row.id}
-          filterAttributes={filterAttributes}
-          pageSize={6}
-          savedViews
-          initialViews={[
-            {
-              id: 'open',
-              name: 'My open tickets',
-              state: {
-                columns: {
-                  order: ['id', 'subject', 'status', 'priority', 'assignee'],
-                  hidden: ['assignee'],
-                  frozenCount: 0,
-                },
-                sort: [{ column: 'priority', direction: 'ascend' }],
-                filters: [{ attribute: 'status', values: ['Open'] }],
-                query: '',
-              },
-            },
-            {
-              id: 'newest',
-              name: 'Everything, newest first',
-              state: {
-                columns: {
-                  order: ['id', 'subject', 'status', 'priority', 'assignee'],
-                  hidden: [],
-                  frozenCount: 0,
-                },
-                sort: [{ column: 'id', direction: 'descend' }],
-                filters: [],
-                query: '',
-              },
-            },
-          ]}
-          onViewsChange={(views) => {
-            setWritten(views.map((view) => view.name).join(' · ') || 'No views left.');
-          }}
-          renderCell={(row, key) =>
-            key === 'status' ? (
-              <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
-                {row.status}
-              </Badge>
-            ) : (
-              row[key as keyof Ticket]
-            )
-          }
-        />
-        <p className="mdt-font-mono mdt-text-xs mdt-text-muted-foreground">
-          Written out: {written}
-        </p>
-      </div>
-    );
-  },
-};
+/** 10,001 made-up people with every control live. Column order, hidden columns and widths are remembered in this browser. */
+export const Users: Story = {};
 
-/**
- * Rows on their way, in the two states that are not the same thing.
- *
- * **Nothing yet** draws skeleton rows. They hold the table's shape, so the page
- * below barely moves when the rows land - and they say "a table is coming"
- * rather than "something is happening", which a spinner in the middle of an
- * empty box does not. Barely, not exactly: each placeholder is a line of text
- * tall, and this table's status cells hold a badge, which is two pixels more.
- * Six rows of that is 12px against a spinner's 237.
- *
- * **Refreshing** keeps the rows and dims them. Someone searching a table types
- * six characters and fires six requests; blanking the table each time is a
- * flicker, and the rows already on screen were probably still right. The body
- * carries `aria-busy`, which says the same thing to a screen reader.
- *
- * The toggle below switches between them. Watch what happens to the page height
- * on the first one, and to what you can read on the second.
- */
-export const Loading: Story = {
-  render: function LoadingDemo() {
-    const [stage, setStage] = useState<'first' | 'refresh'>('first');
+/** The other footer: a count and a "Load more" button that also fires as you scroll near the bottom. */
+export const LoadMore: Story = { args: { paging: 'loadMore' } };
 
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-gap-3">
-        <div className="mdt-flex mdt-gap-2">
-          <Button
-            variant={stage === 'first' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => {
-              setStage('first');
-            }}
-          >
-            Nothing yet
-          </Button>
-          <Button
-            variant={stage === 'refresh' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => {
-              setStage('refresh');
-            }}
-          >
-            Refreshing
-          </Button>
-        </div>
-        <DataTable
-          columns={columns}
-          rows={stage === 'first' ? [] : tickets.slice(0, 6)}
-          getRowId={(row) => row.id}
-          pageSize={6}
-          loading
-          renderCell={(row, key) =>
-            key === 'status' ? (
-              <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
-                {row.status}
-              </Badge>
-            ) : (
-              row[key as keyof Ticket]
-            )
-          }
-        />
-      </div>
-    );
-  },
-};
+/** No selection: the row numbers stay numbers on hover, and "Row number" can be hidden from the Columns panel. No bulk bar. */
+export const WithoutSelection: Story = { args: { bulkActions: undefined } };
 
-/**
- * Rows that keep coming as you reach the end.
- *
- * **It replaces the pager rather than joining it.** Two ways to reach row 300
- * that disagree about which rows are loaded is a bug waiting to be filed, so
- * `infinite` hides the pager and stops slicing - the rows you pass are the rows
- * shown, because a list that grows as you scroll has already been paged by
- * whoever is fetching it.
- *
- * **The sentinel is a button.** Scrolling is not the only way through a list: a
- * keyboard user tabs to the end and a screen reader user lands on it, and both
- * need something to press. The observer watches that same button, so the person
- * who never sees it pays nothing for it.
- *
- * Scroll to the bottom, or press Load more. The count says what is loaded out of
- * what exists - the one thing infinite scroll takes away and has to give back,
- * because without it there is no way to tell a long list from an endless one.
- */
-export const InfiniteScroll: Story = {
-  render: function InfiniteScrollDemo() {
-    const BATCH = 8;
-    const [loaded, setLoaded] = useState(BATCH);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const hasMore = loaded < tickets.length;
+/** Five grey rows while the list loads. */
+export const Loading: Story = { args: { loading: true } };
 
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-gap-2">
-        <div className="mdt-max-h-96 mdt-overflow-y-auto">
-          <DataTable
-            columns={columns}
-            rows={tickets.slice(0, loaded)}
-            getRowId={(row) => row.id}
-            infinite
-            hasMore={hasMore}
-            loadingMore={loadingMore}
-            onLoadMore={() => {
-              if (loadingMore || !hasMore) return;
-              setLoadingMore(true);
-              // A real product awaits a request here. The delay is the point of
-              // the demo: without one, the loading row never appears and the
-              // guard that stops page 2 being asked for four times is invisible.
-              setTimeout(() => {
-                setLoaded((count) => Math.min(count + BATCH, tickets.length));
-                setLoadingMore(false);
-              }, 600);
-            }}
-            renderCell={(row, key) =>
-              key === 'status' ? (
-                <Badge tone={STATUS_TONE[row.status]} shape="square" size="sm" dot>
-                  {row.status}
-                </Badge>
-              ) : (
-                row[key as keyof Ticket]
-              )
-            }
-          />
-        </div>
-        <p className="mdt-text-xs mdt-text-muted-foreground">
-          {loaded} of {tickets.length} loaded
-        </p>
-      </div>
-    );
-  },
-};
+/** Nothing matches the search: "Clear filters" puts everything back. */
+export const NothingFound: Story = { args: { initialQuery: 'zzqx' } };
+
+/** A brand-new tenant: no users at all, so an invitation instead of "Clear filters". */
+export const NoUsersYet: Story = { args: { rows: [] } };
+
+/** The list could not be loaded; search and filters are kept. */
+export const CouldNotLoad: Story = { args: { error: true } };
+
+/** Today's lighter row line, for the divider decision. */
+export const LighterDividers: Story = { args: { divider: 'light' } };
+
+/** The card as the page: square corners, no side edges, a 24px inset on the end cells, the header and pager pinned while the rows scroll inside. `maxHeight` is the card's height here. The page decides when this happens; see Pieces → Docks On Scroll. */
+export const Docked: Story = { args: { docked: true, maxHeight: 520 } };

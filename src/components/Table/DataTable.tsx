@@ -1,636 +1,911 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { cn } from '@/utils';
-import { Badge } from '../Badge';
-import { Checkbox } from '../Checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
-import { Skeleton } from '../Skeleton';
-import { Spinner } from '../Spinner';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
+import { Checkbox } from '../Checkbox';
+import { Toolbar, ToolbarButton, ToolbarSection, ToolbarSpacer } from '../Toolbar';
+import {
+  TABLE_COLUMN_MIN,
+  TABLE_COLUMN_WIDTH,
+  TABLE_GUTTER,
+  Table,
+  TableBody,
+  TableCell,
+  TableColGroup,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSelectAll,
+  TableSelectionCell,
+  TableNumberCell,
+  TableNumberHead,
+  TableTailCell,
+  TableViewport,
+  tableMorphOf,
+} from './Table';
 import { TableBulkBar } from './TableBulkBar';
-import { TableColumnMenu } from './TableColumnMenu';
-import { TablePagination } from './TablePagination';
-import { TableFilterChips } from './TableFilterChips';
-import { TableFilterMenu } from './TableFilterMenu';
-import { TableSortMenu } from './TableSortMenu';
-import { TableToolbar, TableToolbarActions } from './TableToolbar';
-import { TableViewMenu } from './TableViewMenu';
-import { TableViewSwitcher } from './TableViewSwitcher';
-import { useColumnReorder } from './useColumnReorder';
-import { useSavedViews } from './useSavedViews';
-import { useInfiniteScroll } from './useInfiniteScroll';
+import { TableLoadMore, TablePager } from './TablePager';
+import { TableColumnsPanel, TableInsertPanel } from './TablePanels';
+import type { TableColumnsPanelColumn } from './TablePanels';
+import type { UseTableColumns } from './useTableColumns';
+import { TableScopeMenu } from './TableScopeMenu';
+import { TableBlank, TableSkeleton } from './TableStates';
+import { useColumnDrag } from './useColumnDrag';
 import { useTableColumns } from './useTableColumns';
-import { useTableFilters } from './useTableFilters';
-import { useTablePagination } from './useTablePagination';
+import { useTablePaging } from './useTablePaging';
 import { useTableSelection } from './useTableSelection';
 import { useTableSort } from './useTableSort';
-import type { DataTableProps, DataTableViewState } from './Table.types';
+import type { DataTableProps } from './DataTable.types';
+import type { TableColumnDef, TableSortDirection } from './Table.types';
+
+const ACTION_WIDTH = 100;
+const NAME_KEY = '__name';
+const ROWNUM_KEY = '__rownum';
+
+/** Whether the row numbers are shown, remembered next to the column layout. */
+function loadNumbers(storageKey: string | undefined): boolean {
+  if (!storageKey) return true;
+  try {
+    return localStorage.getItem(`${storageKey}.rowNumbers`) !== 'off';
+  } catch {
+    return true;
+  }
+}
+/**
+ * What the Columns panel lists and does. Without selection the row numbers are
+ * an ordinary entry, first in the list; with selection that column carries the
+ * checkboxes, so it is locked.
+ */
+function columnsPanel<Row>(opts: {
+  selectable: boolean;
+  numbers: boolean;
+  setNumbers: (on: boolean) => void;
+  layout: UseTableColumns<Row>;
+  labelOf: (key: string) => string;
+  nameLabel: string;
+  hasActions: boolean;
+}) {
+  const { selectable, numbers, setNumbers, layout, labelOf, nameLabel, hasActions } = opts;
+  const isVisible = (k: string) => layout.visible.some((c) => c.key === k);
+  const own: TableColumnsPanelColumn[] = layout.order.map((k) => ({
+    key: k,
+    label: labelOf(k),
+    hidden: !isVisible(k),
+  }));
+  const rowNumber: TableColumnsPanelColumn = {
+    key: ROWNUM_KEY,
+    label: 'Row number',
+    hidden: !numbers,
+  };
+  const lockedNames = [nameLabel, ...(hasActions ? ['Action'] : [])];
+  return {
+    columns: selectable ? own : [rowNumber, ...own],
+    locked: selectable ? ['Row number', ...lockedNames] : lockedNames,
+    onToggle: (k: string) => {
+      if (k === ROWNUM_KEY) setNumbers(!numbers);
+      else if (isVisible(k)) layout.hide(k);
+      else layout.show(k);
+    },
+    onHideAll: () => {
+      layout.hideAll();
+      if (!selectable) setNumbers(false);
+    },
+    onShowAll: () => {
+      layout.showAll();
+      setNumbers(true);
+    },
+    onReset: () => {
+      layout.reset();
+      setNumbers(true);
+    },
+  };
+}
+
+function saveNumbers(storageKey: string | undefined, on: boolean): void {
+  if (!storageKey) return;
+  try {
+    localStorage.setItem(`${storageKey}.rowNumbers`, on ? 'on' : 'off');
+  } catch {
+    // a browser that refuses storage still gets a working table
+  }
+}
 
 /**
- * How many skeleton rows a first load draws.
+ * DataTable - the merged console Users table, assembled: the Toolbar strip
+ * with search, Filters, a quick filter, Sort and Columns; the table with its
+ * frozen row-number, Name and Action columns; a bulk bar; a pager or a
+ * "Load more" footer; and the loading, empty, first-run and error states.
  *
- * Enough to read as a table rather than as one stray row, and few enough that
- * the real rows do not shorten the page when they land. Capped against the page
- * size so a five-row table does not flash twelve placeholders.
+ * Every pill inside is the library Badge; every control is a ToolbarButton.
  */
-const SKELETON_ROWS = 6;
-
-/** The focus ring every bare control in here shares. */
-const FOCUS_RING =
-  'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring';
-
-/** One cell's raw value. */
-const cellValue = (row: unknown, key: string): unknown => (row as Record<string, unknown>)[key];
-
-/**
- * A cell's value as text, for searching, filtering and the default render.
- *
- * Anything that is not a primitive comes back empty rather than as
- * `[object Object]`. A column holding an object has no text form this component
- * could invent - it needs `renderCell`, and printing a stringified object would
- * hide that behind something that looks like data.
- */
-const text = (value: unknown): string => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  if (value instanceof Date) return value.toISOString();
-  return '';
-};
-
-/**
- * Compares two values the way a person expects a column to sort.
- *
- * Numbers numerically, everything else by locale - so "item 2" comes before
- * "item 10", which a plain string compare gets backwards. This is exactly the
- * kind of assumption a product may not share, which is why `manualSort` exists.
- */
-const compare = (left: unknown, right: unknown): number => {
-  if (left === right) return 0;
-  if (left === null || left === undefined) return -1;
-  if (right === null || right === undefined) return 1;
-  if (typeof left === 'number' && typeof right === 'number') return left - right;
-  // `text` rather than `String`: an object would otherwise sort as
-  // "[object Object]", which puts every one of them together and looks like a
-  // working sort.
-  return text(left).localeCompare(text(right), undefined, { numeric: true });
-};
-
-/**
- * DataTable - the whole table, assembled.
- *
- * Everything under `Table` is deliberately state-free: `TableHead` reports that
- * a sort was asked for, `useTableSort` remembers it, and neither touches your
- * rows. That is right for a product with a server that already sorts, and
- * tiring for one with an array in memory - which is most of them, most of the
- * time.
- *
- * So this component does the work, and every piece of it can be switched off:
- *
- * - `manualSort`, `manualFilter`, `manualSearch`, `manualPagination` each hand
- *   that job back. A table backed by a paged API turns all four on and passes
- *   the rows it was given, and `DataTable` becomes a renderer.
- *
- * The parts remain exported and remain state-free. Nothing here is reachable
- * only through this component, so a product that outgrows it drops down a level
- * rather than forking.
- *
- * @example
- * ```tsx
- * <DataTable
- *   columns={[
- *     { key: 'id', label: 'ID', locked: true },
- *     { key: 'subject', label: 'Subject' },
- *   ]}
- *   rows={tickets}
- *   getRowId={(row) => row.id}
- * />
- * ```
- */
-export function DataTable<Row>({
-  columns,
+function DataTable<Row>({
+  label,
+  noun = 'rows',
   rows,
   getRowId,
-  renderCell,
-  filterAttributes = [],
-  searchable = true,
-  searchPlaceholder = 'Search',
-  manualSort = false,
-  manualFilter = false,
-  manualSearch = false,
-  manualPagination = false,
+  nameColumn,
+  columns,
+  rowActions,
+  isRowInert,
+  onRowOpen,
+  search,
+  initialQuery = '',
+  quickFilter,
+  filters = [],
+  sortFields,
   pageSize = 25,
-  total,
-  onSortChange,
-  onFilterChange,
-  onSearchChange,
-  onPageChange,
-  toolbarActions,
-  selectable = false,
-  bulkActions,
-  columnControls = true,
-  loading = false,
-  infinite = false,
-  hasMore = false,
-  loadingMore = false,
-  onLoadMore,
-  rowsPerPage = false,
   pageSizes,
-  savedViews = false,
-  initialViews,
-  initialViewId,
-  onViewsChange,
-  emptyMessage = 'Nothing to show.',
-  filteredEmptyMessage = 'Nothing matches the current filters.',
+  paging = 'pages',
+  storageKey,
+  bulkActions,
+  loading = false,
+  refreshing = false,
+  error = false,
+  blank,
+  divider = 'default',
+  maxHeight = 600,
+  docked,
   className,
-  ...props
 }: DataTableProps<Row>) {
-  const cols = useTableColumns(columns);
+  // ── state ──
+  const [query, setQuery] = useState(initialQuery);
+  const [quick, setQuick] = useState<Set<string>>(() => new Set());
+  const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   const sort = useTableSort();
-  const filters = useTableFilters();
-  const [query, setQuery] = useState('');
-  const reorder = useColumnReorder({
-    columns: cols.visible,
-    frozenCount: cols.frozenCount,
-    onMove: (key, to) => {
-      cols.move(key, to);
-    },
-  });
-
-  const searched = useMemo(() => {
-    if (manualSearch || query.trim() === '') return rows;
-    const needle = query.trim().toLowerCase();
-    return rows.filter((row) =>
-      cols.visible.some((column) => text(cellValue(row, column.key)).toLowerCase().includes(needle))
-    );
-  }, [rows, query, manualSearch, cols.visible]);
-
-  const filtered = useMemo(() => {
-    if (manualFilter || filters.filters.length === 0) return searched;
-    // Values within an attribute are OR, attributes are AND - anything else and
-    // "Status: Open, Resolved" could never match a thing.
-    return searched.filter((row) =>
-      filters.filters.every((filter) =>
-        filter.values.includes(text(cellValue(row, filter.attribute)))
-      )
-    );
-  }, [searched, filters.filters, manualFilter]);
-
-  const sorted = useMemo(() => {
-    if (manualSort || sort.rules.length === 0) return filtered;
-    return [...filtered].sort((a, b) => {
-      for (const rule of sort.rules) {
-        const order = compare(cellValue(a, rule.column), cellValue(b, rule.column));
-        if (order !== 0) return rule.direction === 'ascend' ? order : -order;
-      }
-      return 0;
-    });
-  }, [filtered, sort.rules, manualSort]);
-
-  const pagination = useTablePagination({
-    total: total ?? sorted.length,
-    pageSize,
-  });
-
-  // Back to the first page whenever the set of rows changes underneath.
-  //
-  // Narrowing a table while standing on page 4 leaves you looking at a slice of
-  // something you did not ask for - or at "9-9 of 9", which is technically true
-  // and reads as a fault.
-  const { goTo } = pagination;
+  const pagingState = useTablePaging({ pageSize, mode: paging });
+  const selection = useTableSelection();
+  const layout = useTableColumns({ columns, storageKey });
+  const [numbers, setNumbers] = useState(() => loadNumbers(storageKey));
   useEffect(() => {
-    goTo(1);
-  }, [query, filters.filters, goTo]);
+    saveNumbers(storageKey, numbers);
+  }, [storageKey, numbers]);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [scopeAnchor, setScopeAnchor] = useState<HTMLElement | null>(null);
+  const [insert, setInsert] = useState<{ key: string; x: number; y: number } | null>(null);
+  const [insertOpen, setInsertOpen] = useState(false);
+  const insertBtn = useRef<HTMLButtonElement>(null);
+  const insertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const selection = useTableSelection({ rowIds: sorted.map((row) => String(getRowId(row))) });
+  useEffect(() => {
+    pagingState.setMode(paging);
+  }, [paging, pagingState]);
 
-  // What a saved view is, here: the four things the toolbar can change.
-  //
-  // Not the page - a view is a way of looking at the table, and reopening one
-  // on page 7 because that is where you were when you saved it is a surprise
-  // rather than a convenience. Not the selection either, which belongs to the
-  // rows rather than to the view.
-  const viewState: DataTableViewState = useMemo(
-    () => ({ columns: cols.state, sort: sort.rules, filters: filters.filters, query }),
-    [cols.state, sort.rules, filters.filters, query]
+  // ── derived rows ──
+  const allColumns = useMemo<TableColumnDef<Row>[]>(
+    () => [
+      {
+        key: NAME_KEY,
+        label: nameColumn.label ?? 'Name',
+        sortable: nameColumn.sortable ?? true,
+        cell: nameColumn.cell,
+        sortValue: nameColumn.sortValue,
+      },
+      ...columns,
+    ],
+    [nameColumn, columns]
   );
+  const filterCount = useMemo(
+    () => Object.values(ticked).reduce((n, s) => n + s.size, 0),
+    [ticked]
+  );
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((row) => {
+      if (q && search && !search.match(row, q)) return false;
+      if (quickFilter && quick.size > 0 && !quick.has(quickFilter.value(row))) return false;
+      for (const g of filters) {
+        const s = ticked[g.key];
+        if (s && s.size > 0 && !g.match(row, s)) return false;
+      }
+      return true;
+    });
+  }, [rows, query, search, quickFilter, quick, filters, ticked]);
+  const sorted = useMemo(() => sort.apply(filtered, allColumns), [sort, filtered, allColumns]);
+  const pageRows = useMemo(() => pagingState.slice(sorted), [pagingState, sorted]);
+  const inert = useCallback((row: Row) => isRowInert?.(row) ?? false, [isRowInert]);
+  const pageIds = useMemo(
+    () => pageRows.filter((r) => !inert(r)).map(getRowId),
+    [pageRows, inert, getRowId]
+  );
+  const allIds = useMemo(
+    () => sorted.filter((r) => !inert(r)).map(getRowId),
+    [sorted, inert, getRowId]
+  );
+  const selectable = bulkActions !== undefined;
+  /** The first column: checkboxes when there is selection, plain numbers otherwise (unless hidden). */
+  const leading = selectable || numbers;
+  const hasFiltering = query.trim() !== '' || quick.size > 0 || filterCount > 0;
 
-  const views = useSavedViews<DataTableViewState>({
-    current: viewState,
-    ...(initialViews ? { initial: initialViews } : {}),
-    ...(initialViewId === undefined ? {} : { initialActiveId: initialViewId }),
-    ...(onViewsChange ? { onChange: onViewsChange } : {}),
-  });
-
-  // One place that puts the table into a state, so applying a view and
-  // discarding changes cannot drift apart - they are the same act aimed at the
-  // same stored state.
-  const restoreView = (state: DataTableViewState | null) => {
-    if (state === null) return;
-    cols.restore(state.columns);
-    sort.restore(state.sort);
-    filters.restore(state.filters);
-    setQuery(state.query);
+  const resetPaging = pagingState.reset;
+  const onQuery = (v: string) => {
+    setQuery(v);
+    resetPaging();
   };
 
-  // Infinite scroll and the pager are alternatives, never both: two ways to
-  // reach row 300 that disagree about which rows are loaded is a bug waiting to
-  // be filed. Turning it on takes the pager's slicing off too - a list that
-  // grows as you scroll has already been paged by whoever is fetching it.
-  const paged = manualPagination || infinite;
-  const visible = paged ? sorted : pagination.slice(sorted);
+  // ── widths and offsets ──
+  const nameWidth = nameColumn.width ?? TABLE_COLUMN_WIDTH;
+  const hasActions = rowActions !== undefined;
+  const visible = layout.visible;
+  const widths = useMemo(
+    () => [
+      ...(leading ? [TABLE_GUTTER] : []),
+      nameWidth,
+      ...(hasActions ? [ACTION_WIDTH] : []),
+      ...visible.map((c) => layout.widthOf(c.key)),
+    ],
+    [leading, nameWidth, hasActions, visible, layout]
+  );
+  const tableWidth = widths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
+  const nameLeft = leading ? TABLE_GUTTER : 0;
+  const actionLeft = nameLeft + nameWidth;
 
-  const { sentinelRef } = useInfiniteScroll({
-    hasMore,
-    loading: loading || loadingMore,
-    disabled: !infinite || onLoadMore === undefined,
-    onLoadMore: onLoadMore ?? (() => undefined),
+  // ── drag, insert ──
+  const drag = useColumnDrag({
+    viewportRef,
+    onDrop: (key, beforeKey) => {
+      layout.moveBefore(key, beforeKey);
+    },
   });
+  const showInsert = (key: string, hovering: boolean) => {
+    if (insertTimer.current) clearTimeout(insertTimer.current);
+    if (hovering) {
+      if (layout.hidden.length === 0) return;
+      const th = viewportRef.current?.querySelector<HTMLElement>(`th[data-key="${key}"]`);
+      const card = cardRef.current;
+      if (!th || !card) return;
+      const r = th.getBoundingClientRect(),
+        c = card.getBoundingClientRect();
+      setInsert({ key, x: r.right - c.left, y: r.top - c.top });
+    } else {
+      insertTimer.current = setTimeout(() => {
+        if (!insertOpen && !insertBtn.current?.matches(':hover')) setInsert(null);
+      }, 250);
+    }
+  };
 
-  // Skeletons only when there is nothing to look at yet.
-  //
-  // Replacing a table someone is reading with placeholders on every keystroke
-  // of a search is a flicker, and it throws away the rows that were probably
-  // still right. With rows on screen, a refresh dims them and says so instead.
-  const firstLoad = loading && visible.length === 0;
-  const skeletonRows = Math.min(SKELETON_ROWS, pageSize);
+  // ── selection helpers ──
+  const pageState = selection.stateOf(pageIds);
+  const togglePage = () => {
+    if (pageState === 'all') selection.remove(pageIds);
+    else selection.add(pageIds);
+  };
+  const focusSibling = (tr: HTMLTableRowElement, direction: -1 | 1) => {
+    const next = direction > 0 ? tr.nextElementSibling : tr.previousElementSibling;
+    if (next instanceof HTMLTableRowElement && next.classList.contains('tbl-row')) next.focus();
+  };
 
-  // "Nothing here" and "nothing matches" are different sentences, and telling
-  // them apart is the difference between someone creating a record and someone
-  // clearing a filter.
-  const narrowed = query.trim() !== '' || filters.isActive;
+  // ── sort menu fields ──
+  const sortKeys = sortFields ?? allColumns.filter((c) => c.sortable).map((c) => c.key);
+  const labelOf = (key: string) => allColumns.find((c) => c.key === key)?.label ?? key;
+
+  // ── load more sentinel ──
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    const root = viewportRef.current;
+    if (!el || !root || pagingState.mode !== 'loadMore' || pagingState.loaded >= sorted.length)
+      return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          pagingState.loadMore();
+        }
+      },
+      { root, rootMargin: '200px' }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+    };
+  }, [pagingState, sorted.length, pageRows.length]);
+
+  const blankKind = error
+    ? 'error'
+    : rows.length === 0 && !hasFiltering
+      ? 'first'
+      : sorted.length === 0
+        ? 'empty'
+        : null;
+  const clearAll = () => {
+    setQuery('');
+    setQuick(new Set());
+    setTicked({});
+    resetPaging();
+  };
+  const blankAction = () => {
+    if (blankKind === 'empty') clearAll();
+    else blank?.[blankKind ?? 'empty']?.onAction?.();
+  };
+  const rowIndex = (i: number) =>
+    (pagingState.mode === 'pages' ? (pagingState.page - 1) * pagingState.pageSize : 0) + i + 1;
+
+  const headMenu = (c: TableColumnDef<Row>): ReactNode => (
+    <>
+      {c.sortable && (
+        <>
+          <DropdownMenuItem
+            onSelect={() => {
+              sort.set(c.key, 'asc');
+            }}
+          >
+            <Icon
+              name="arrow-up-narrow-wide"
+              size={16}
+              className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+            />
+            Sort A to Z
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => {
+              sort.set(c.key, 'desc');
+            }}
+          >
+            <Icon
+              name="arrow-down-wide-narrow"
+              size={16}
+              className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+            />
+            Sort Z to A
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+        </>
+      )}
+      <DropdownMenuItem
+        onSelect={() => {
+          layout.hide(c.key);
+        }}
+      >
+        <Icon
+          name="eye-off"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
+        Hide column
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onSelect={() => {
+          layout.moveToStart(c.key);
+        }}
+      >
+        <Icon
+          name="chevrons-left"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
+        Move to start
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onSelect={() => {
+          layout.moveToEnd(c.key);
+        }}
+      >
+        <Icon
+          name="chevrons-right"
+          size={16}
+          className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+        />
+        Move to end
+      </DropdownMenuItem>
+    </>
+  );
+
+  const sortDir = (key: string): TableSortDirection | null =>
+    sort.sort?.key === key ? sort.sort.direction : null;
 
   return (
-    <div className={cn('mdt-flex mdt-flex-col mdt-gap-3', className)} {...props}>
-      <TableToolbar>
-        {searchable && (
+    <div className={cn('mdt-flex mdt-flex-col mdt-gap-[22px]', className)}>
+      <Toolbar label={`${label} controls`}>
+        {search && (
           <Input
-            type="search"
             size="sm"
-            aria-label={searchPlaceholder}
-            placeholder={searchPlaceholder}
+            className="mdt-w-[300px]"
+            placeholder={search.placeholder ?? 'Search'}
+            aria-label={`Search ${noun}`}
             value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              onSearchChange?.(event.target.value);
+            onChange={(e) => {
+              onQuery(e.target.value);
             }}
-            className="mdt-w-48"
+            startAdornment={<Icon name="search" size={14} />}
           />
         )}
-
-        {filterAttributes.length > 0 && (
-          <TableFilterMenu
-            attributes={filterAttributes}
-            valuesFor={filters.valuesFor}
-            onToggleValue={(attribute, value) => {
-              filters.toggleValue(attribute, value);
-              onFilterChange?.(filters.filters);
-            }}
-            onClear={() => {
-              filters.clear();
-              onFilterChange?.([]);
-            }}
-            count={filters.count}
-          />
-        )}
-
-        <TableToolbarActions>
-          {toolbarActions}
-          {savedViews && (
-            <TableViewSwitcher
-              views={views.views.map((view) => ({ id: view.id, name: view.name }))}
-              activeId={views.activeId}
-              dirty={views.dirty}
-              onApply={(id) => {
-                restoreView(views.apply(id));
-              }}
-              onSave={views.save}
-              onSaveAs={views.saveAs}
-              onRename={views.rename}
-              onRemove={views.remove}
-              onReset={() => {
-                restoreView(views.reset());
-              }}
-            />
-          )}
-          <TableSortMenu
-            columns={cols.visible}
-            rules={sort.rules}
-            onSortBy={(column) => {
-              sort.sortBy(column, 'ascend');
-              onSortChange?.(sort.rules);
-            }}
-            onToggleDirection={(column) => {
-              sort.sortBy(column, sort.directionOf(column) === 'ascend' ? 'descend' : 'ascend');
-              onSortChange?.(sort.rules);
-            }}
-            onRemove={(column) => {
-              sort.remove(column);
-              onSortChange?.(sort.rules);
-            }}
-            onMove={sort.move}
-            onClear={sort.clear}
-          />
-          <TableViewMenu
-            columns={cols.columns.map((column) => ({
-              key: column.key,
-              label: column.label,
-              visible: column.visible,
-              ...(column.locked === true ? { locked: true } : {}),
-            }))}
-            onGroupBy={() => undefined}
-            onToggleColumn={(key) => {
-              if (cols.hidden.some((column) => column.key === key)) cols.show(key);
-              else cols.hide(key);
-            }}
-          />
-        </TableToolbarActions>
-      </TableToolbar>
-
-      <TableFilterChips
-        filters={filters.filters}
-        labelFor={(attribute) =>
-          filterAttributes.find((item) => item.key === attribute)?.label ?? attribute
-        }
-        onRemove={(attribute) => {
-          filters.remove(attribute);
-          onFilterChange?.(filters.filters);
-        }}
-        onClear={filters.clear}
-      />
-
-      <Table containerClassName="mdt-rounded-md mdt-border">
-        <TableHeader>
-          <TableRow>
-            {selectable && (
-              <TableHead className="mdt-w-10">
-                <Checkbox
-                  checked={selection.headerState}
-                  onCheckedChange={selection.toggleAll}
-                  aria-label="Select all rows"
-                />
-              </TableHead>
-            )}
-            {cols.visible.map((column, index) => (
-              <TableHead
-                key={column.key}
-                columnKey={column.key}
-                frozen={column.frozen ? column.index : false}
-                style={reorder.styleFor(column.key)}
-                {...(columnControls
-                  ? {
-                      resizable: true,
-                      insertColumns: cols.hidden,
-                      onInsert: (key: string) => {
-                        cols.show(key, index + 1);
-                      },
-                      insertLabel: `Insert a column after ${column.label}`,
-                    }
-                  : {})}
-                className="mdt-group/col mdt-whitespace-nowrap"
+        {filters.length > 0 && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <ToolbarButton
+                icon={<Icon name="list-filter" />}
+                count={filterCount || undefined}
+                activeLabel="applied"
               >
-                <span className="mdt-flex mdt-w-full mdt-items-center mdt-gap-2">
-                  {columnControls ? (
-                    <TableColumnMenu
-                      label={column.label}
-                      align="start"
-                      frozen={column.frozen}
-                      canFreeze={cols.canFreeze(column.key)}
-                      onToggleFreeze={() => {
-                        if (column.frozen) cols.unfreeze(column.key);
-                        else cols.freeze(column.key);
-                      }}
-                      {...(column.locked === true
-                        ? {}
-                        : {
-                            onMoveToStart: () => {
-                              cols.moveToStart(column.key);
-                            },
-                            onMoveToEnd: () => {
-                              cols.moveToEnd(column.key);
-                            },
-                            onHide: () => {
-                              cols.hide(column.key);
-                            },
-                          })}
-                    />
-                  ) : (
-                    <span className="mdt-font-medium">{column.label}</span>
-                  )}
-
-                  {/*
-                    A separate control from the name.
-
-                    `TableHead`'s own `sortable` wraps the whole cell in a
-                    button, which cannot then contain the menu trigger or the
-                    drag grip - every drag would sort, and a button inside a
-                    button is invalid markup besides. So the name opens the
-                    menu, the arrow sorts, the grip drags.
-                  */}
-                  <button
-                    type="button"
-                    aria-label={`Sort by ${column.label}`}
-                    onClick={() => {
-                      sort.toggle(column.key);
-                      onSortChange?.(sort.rules);
-                    }}
-                    className={cn(
-                      'mdt-flex mdt-items-center mdt-rounded-sm',
-                      FOCUS_RING,
-                      // Unsorted offers the control on hover; a sorted column
-                      // always shows its badge, because that badge is not an
-                      // offer - it is the answer to "how is this ordered".
-                      sort.directionOf(column.key) === null &&
-                        'mdt-opacity-0 mdt-transition-opacity focus-visible:mdt-opacity-100 group-hover/col:mdt-opacity-100'
-                    )}
-                  >
-                    {sort.directionOf(column.key) === null ? (
-                      <Icon
-                        name="arrow-up-down"
-                        className="mdt-h-3.5 mdt-w-3.5 mdt-opacity-50"
-                        aria-hidden
-                      />
-                    ) : (
-                      <Badge
-                        tone="info"
-                        shape="pill"
-                        size="md"
-                        icon={
-                          <Icon
-                            name={
-                              sort.directionOf(column.key) === 'ascend' ? 'arrow-up' : 'arrow-down'
-                            }
-                            aria-hidden
-                          />
-                        }
-                        className="mdt-tabular-nums"
-                      >
-                        {sort.rules.length > 1 ? sort.orderOf(column.key) : ''}
-                      </Badge>
-                    )}
-                  </button>
-
-                  {columnControls && !column.frozen && (
-                    <button
-                      type="button"
-                      {...reorder.gripProps(column.key)}
-                      className={cn(
-                        'mdt-ml-auto mdt-cursor-grab mdt-touch-none mdt-rounded-sm',
-                        'mdt-text-muted-foreground hover:mdt-text-foreground',
-                        'mdt-opacity-0 mdt-transition-opacity',
-                        'focus-visible:mdt-opacity-100 group-hover/col:mdt-opacity-100',
-                        FOCUS_RING
-                      )}
-                    >
-                      <Icon name="grip-vertical" size="sm" aria-hidden />
-                    </button>
-                  )}
+                Filters
+              </ToolbarButton>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              sideOffset={6}
+              className="mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4"
+              aria-label="Filters"
+            >
+              <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
+                <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
+                  Filters
                 </span>
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          // Dimmed while a refresh is in flight, so the rows read as "these are
-          // about to change" rather than as the answer. `aria-busy` says the
-          // same thing to a screen reader, which cannot see the dimming.
-          aria-busy={loading || undefined}
-          className={cn(loading && !firstLoad && 'mdt-opacity-60 mdt-transition-opacity')}
-        >
-          {firstLoad &&
-            Array.from({ length: skeletonRows }, (_, index) => (
-              <TableRow key={`skeleton-${String(index)}`} interactive={false}>
-                {selectable && (
-                  <TableCell>
-                    <Skeleton className="mdt-h-4 mdt-w-4 mdt-rounded-sm" />
-                  </TableCell>
-                )}
-                {cols.visible.map((column) => (
-                  <TableCell key={column.key}>
-                    {/*
-                      Uneven widths, because a column of identical bars reads as
-                      a loading graphic rather than as the table that is coming.
-                    */}
-                    {/*
-                      A line of text tall, so a row of placeholders is the
-                      height of the row it stands in for. A cell holding a badge
-                      or an avatar is a few pixels taller than a line of text,
-                      which no placeholder can know in advance - this is as
-                      close as a component that has not seen your cells can get.
-                    */}
-                    <Skeleton
-                      className={cn('mdt-h-5', index % 2 === 0 ? 'mdt-w-2/3' : 'mdt-w-1/2')}
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          {visible.map((row) => {
-            const rowId = String(getRowId(row));
-            return (
-              <TableRow key={rowId} selected={selectable && selection.isSelected(rowId)}>
-                {selectable && (
-                  <TableCell>
-                    {/*
-                      The shift key arrives on the click, not the change:
-                      `onCheckedChange` reports the new value and nothing about
-                      the modifiers, and a range is what makes a long selection
-                      bearable.
-                    */}
-                    <Checkbox
-                      checked={selection.isSelected(rowId)}
-                      onClick={(event) => {
-                        selection.toggle(rowId, { extend: event.shiftKey });
-                      }}
-                      aria-label={`Select ${rowId}`}
-                    />
-                  </TableCell>
-                )}
-                {cols.visible.map((column) => (
-                  <TableCell
-                    key={column.key}
-                    columnKey={column.key}
-                    frozen={column.frozen ? column.index : false}
-                    style={reorder.styleFor(column.key)}
-                  >
-                    {renderCell === undefined
-                      ? text(cellValue(row, column.key))
-                      : renderCell(row, column.key)}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
-          })}
-          {visible.length === 0 && !loading && (
-            <TableRow interactive={false}>
-              <TableCell colSpan={cols.visible.length + (selectable ? 1 : 0)} className="mdt-p-0">
-                <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-2 mdt-py-10">
-                  <p className="mdt-text-sm mdt-text-muted-foreground">
-                    {narrowed ? filteredEmptyMessage : emptyMessage}
-                  </p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-          {infinite && hasMore && onLoadMore !== undefined && (
-            <TableRow interactive={false}>
-              <TableCell colSpan={cols.visible.length + (selectable ? 1 : 0)} className="mdt-p-0">
-                {/*
-                  A button, not an empty div. Scrolling is not the only way
-                  through a list - a keyboard user tabs here and a screen reader
-                  user lands on it - and the same element serves the observer.
-                */}
                 <button
                   type="button"
-                  ref={sentinelRef}
-                  disabled={loadingMore}
-                  onClick={onLoadMore}
-                  className={cn(
-                    'mdt-flex mdt-w-full mdt-items-center mdt-justify-center mdt-gap-2 mdt-py-4',
-                    'mdt-text-sm mdt-text-muted-foreground hover:mdt-text-foreground',
-                    FOCUS_RING
-                  )}
+                  className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
+                  onClick={() => {
+                    setTicked({});
+                    resetPaging();
+                  }}
                 >
-                  {loadingMore ? <Spinner size="sm" /> : null}
-                  {loadingMore ? 'Loading more' : 'Load more'}
+                  Clear all
                 </button>
-              </TableCell>
-            </TableRow>
+              </div>
+              {filters.map((g) => (
+                <div key={g.key}>
+                  <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
+                    {g.label}
+                  </div>
+                  {g.options.map((o) => {
+                    const on = ticked[g.key]?.has(o) ?? false;
+                    return (
+                      <label
+                        key={o}
+                        className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
+                      >
+                        <Checkbox
+                          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                          checked={on}
+                          onCheckedChange={(v) => {
+                            setTicked((t) => {
+                              const s = new Set(t[g.key] ?? []);
+                              if (v === true) s.add(o);
+                              else s.delete(o);
+                              return { ...t, [g.key]: s };
+                            });
+                            resetPaging();
+                          }}
+                        />
+                        {o}
+                      </label>
+                    );
+                  })}
+                </div>
+              ))}
+            </PopoverContent>
+          </Popover>
+        )}
+        {quickFilter && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <ToolbarButton
+                icon={quickFilter.icon ?? <Icon name="check-circle" />}
+                dot={quick.size > 0}
+                aria-label={quickFilter.label}
+                activeLabel="applied"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="mdt-w-48">
+              {quickFilter.options.map((o) => (
+                <DropdownMenuCheckboxItem
+                  key={o}
+                  checked={quick.has(o)}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                  onCheckedChange={(v) => {
+                    setQuick((s) => {
+                      const n = new Set(s);
+                      if (v) n.add(o);
+                      else n.delete(o);
+                      return n;
+                    });
+                    resetPaging();
+                  }}
+                >
+                  {o}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        <ToolbarSpacer />
+        <ToolbarSection>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <ToolbarButton
+                icon={<Icon name="arrow-up-down" />}
+                dot={sort.sort !== null}
+                aria-label="Sort"
+                activeLabel="applied"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="mdt-w-48">
+              {sortKeys.map((k) => (
+                <DropdownMenuItem
+                  key={k}
+                  onSelect={() => {
+                    sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
+                  }}
+                >
+                  {labelOf(k)}
+                  {sortDir(k) && (
+                    <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
+                      {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
+                    </span>
+                  )}
+                </DropdownMenuItem>
+              ))}
+              {sort.sort && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <TableColumnsPanel
+            trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
+            {...columnsPanel({
+              selectable,
+              numbers,
+              setNumbers,
+              layout,
+              labelOf,
+              nameLabel: nameColumn.label ?? 'Name',
+              hasActions,
+            })}
+          />
+        </ToolbarSection>
+      </Toolbar>
+
+      <Table
+        ref={cardRef}
+        label={label}
+        divider={divider}
+        docked={docked}
+        style={tableMorphOf(docked).driven ? { height: maxHeight } : undefined}
+      >
+        <TableViewport
+          ref={viewportRef}
+          tableWidth={tableWidth}
+          maxHeight={maxHeight}
+          rowCount={sorted.length}
+          refreshing={refreshing}
+          hasSelection={selection.count > 0}
+          label={label}
+        >
+          <TableColGroup widths={widths} />
+          <TableHeader>
+            <tr>
+              {selectable && (
+                <TableSelectAll
+                  state={pageState}
+                  onToggle={togglePage}
+                  onScope={setScopeAnchor}
+                  frozen={0}
+                />
+              )}
+              {!selectable && numbers && <TableNumberHead frozen={0} />}
+              <TableHead
+                columnKey={NAME_KEY}
+                label={nameColumn.label ?? 'Name'}
+                width={nameWidth}
+                frozen={nameLeft}
+                frozenEdge={!hasActions}
+                sortable={nameColumn.sortable ?? true}
+                sort={sortDir(NAME_KEY)}
+                onSort={() => {
+                  sort.cycle(NAME_KEY);
+                }}
+              />
+              {hasActions && (
+                <TableHead
+                  columnKey="__action"
+                  label="Action"
+                  width={ACTION_WIDTH}
+                  frozen={actionLeft}
+                  frozenEdge
+                  align="center"
+                />
+              )}
+              {visible.map((c) => (
+                <TableHead
+                  key={c.key}
+                  columnKey={c.key}
+                  label={c.label}
+                  width={layout.widthOf(c.key)}
+                  minWidth={c.minWidth ?? TABLE_COLUMN_MIN}
+                  align={c.align ?? 'left'}
+                  sortable={c.sortable ?? false}
+                  sort={sortDir(c.key)}
+                  onSort={() => {
+                    sort.cycle(c.key);
+                  }}
+                  movable
+                  onGripPointerDown={drag.gripPointerDown(c.key, c.label)}
+                  onGripMove={(d) => {
+                    layout.moveBy(c.key, d);
+                  }}
+                  menu={headMenu(c)}
+                  glyph={c.glyph}
+                  filtered={quickFilter?.columnKey === c.key && quick.size > 0}
+                  dragging={drag.drag?.key === c.key}
+                  resizable
+                  onResize={(w) => {
+                    layout.setWidth(c.key, w);
+                  }}
+                  onBoundaryHover={(h) => {
+                    showInsert(c.key, h);
+                  }}
+                />
+              ))}
+              <TableTailCell head />
+            </tr>
+          </TableHeader>
+          {loading ? (
+            <TableSkeleton widths={widths} />
+          ) : (
+            <TableBody>
+              {!blankKind &&
+                pageRows.map((row, i) => {
+                  const id = getRowId(row);
+                  const isInert = inert(row);
+                  const picked = selection.isSelected(id);
+                  return (
+                    <TableRow
+                      key={id}
+                      selected={picked}
+                      inert={isInert}
+                      onOpen={
+                        onRowOpen
+                          ? () => {
+                              onRowOpen(row);
+                            }
+                          : undefined
+                      }
+                      onToggle={
+                        selectable
+                          ? (extend) => {
+                              selection.toggle(id, { extend, within: pageIds });
+                            }
+                          : undefined
+                      }
+                      onArrow={(d) => {
+                        const tr =
+                          viewportRef.current?.querySelector<HTMLTableRowElement>(
+                            `tr.tbl-row:focus`
+                          );
+                        if (tr) focusSibling(tr, d);
+                      }}
+                    >
+                      {selectable && (
+                        <TableSelectionCell
+                          index={rowIndex(i)}
+                          selected={picked}
+                          inert={isInert}
+                          label={String(nameColumn.sortValue?.(row) ?? id)}
+                          onToggle={(extend) => {
+                            selection.toggle(id, { extend, within: pageIds });
+                          }}
+                          frozen={0}
+                        />
+                      )}
+                      {!selectable && numbers && (
+                        <TableNumberCell index={rowIndex(i)} inert={isInert} frozen={0} />
+                      )}
+                      <TableCell frozen={nameLeft} frozenEdge={!hasActions}>
+                        {nameColumn.cell(row)}
+                      </TableCell>
+                      {hasActions && (
+                        <TableCell frozen={actionLeft} frozenEdge align="center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40 dark:data-[state=open]:mdt-bg-neutral-120 dark:data-[state=open]:mdt-text-neutral-40"
+                                aria-label="Row actions"
+                                tabIndex={-1}
+                              >
+                                <Icon name="more-horizontal" size={20} />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="mdt-w-48">
+                              {rowActions(row)}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      )}
+                      {visible.map((c) => (
+                        <TableCell
+                          key={c.key}
+                          align={c.align ?? 'left'}
+                          dragging={drag.drag?.key === c.key}
+                        >
+                          {c.cell(row)}
+                        </TableCell>
+                      ))}
+                      <TableTailCell />
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
           )}
-        </TableBody>
+          {!loading &&
+            !blankKind &&
+            pagingState.mode === 'loadMore' &&
+            pagingState.loaded < sorted.length && (
+              <tbody>
+                <tr>
+                  <td colSpan={widths.length + 1} className="mdt-p-0">
+                    <div ref={sentinelRef} className="mdt-h-px" />
+                  </td>
+                </tr>
+              </tbody>
+            )}
+        </TableViewport>
+        {!loading && blankKind && (
+          <TableBlank
+            kind={blankKind}
+            title={blank?.[blankKind]?.title}
+            body={blank?.[blankKind]?.body}
+            action={blank?.[blankKind]?.action}
+            onAction={
+              blankKind === 'empty' || blank?.[blankKind]?.onAction ? blankAction : undefined
+            }
+          />
+        )}
+        {selectable && (
+          <TableBulkBar count={selection.count} onScope={setScopeAnchor} onClear={selection.clear}>
+            {bulkActions([...selection.selected], selection.clear)}
+          </TableBulkBar>
+        )}
+        {loading ? (
+          <TablePager
+            total={0}
+            page={1}
+            pageSize={pagingState.pageSize}
+            onPage={() => undefined}
+            onPageSize={() => undefined}
+            noun={noun}
+            message={`Loading ${noun}…`}
+          />
+        ) : blankKind ? (
+          <TablePager
+            total={0}
+            page={1}
+            pageSize={pagingState.pageSize}
+            onPage={() => undefined}
+            onPageSize={() => undefined}
+            noun={noun}
+            message={
+              blankKind === 'error'
+                ? `${cap(noun)} not loaded`
+                : blankKind === 'first'
+                  ? `No ${noun}`
+                  : `No ${noun} match`
+            }
+          />
+        ) : pagingState.mode === 'loadMore' ? (
+          <TableLoadMore
+            shown={pagingState.loaded}
+            total={sorted.length}
+            noun={noun}
+            loading={refreshing}
+            onMore={pagingState.loadMore}
+          />
+        ) : (
+          <TablePager
+            total={sorted.length}
+            page={Math.min(pagingState.page, pagingState.pagesFor(sorted.length))}
+            pageSize={pagingState.pageSize}
+            pageSizes={pageSizes}
+            onPage={(p) => {
+              pagingState.setPage(p, sorted.length);
+              if (viewportRef.current) viewportRef.current.scrollTop = 0;
+            }}
+            onPageSize={(s) => {
+              pagingState.setPageSize(s, sorted.length);
+            }}
+            noun={noun}
+          />
+        )}
+        {insert && layout.hidden.length > 0 && (
+          <button
+            ref={insertBtn}
+            type="button"
+            className="mdt-absolute mdt-z-[8] mdt-inline-flex mdt-h-5 mdt-w-5 -mdt-translate-x-1/2 -mdt-translate-y-1/2 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 mdt-shadow-sm hover:mdt-border-neutral-90 hover:mdt-text-neutral-130 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 dark:hover:mdt-text-neutral-10"
+            style={{ left: insert.x, top: insert.y }}
+            aria-label={`Insert a column after ${labelOf(insert.key)}`}
+            onPointerEnter={() => {
+              if (insertTimer.current) clearTimeout(insertTimer.current);
+            }}
+            onPointerLeave={() => {
+              showInsert(insert.key, false);
+            }}
+            onClick={() => {
+              setInsertOpen(true);
+            }}
+          >
+            <Icon name="plus" size={12} />
+          </button>
+        )}
+        {insert && (
+          <TableInsertPanel
+            open={insertOpen}
+            onOpenChange={(o) => {
+              setInsertOpen(o);
+              if (!o) setInsert(null);
+            }}
+            anchor={insertBtn.current}
+            afterLabel={labelOf(insert.key)}
+            hidden={layout.hidden.map((c) => ({ key: c.key, label: c.label }))}
+            onPick={(k) => {
+              layout.insertAfter(k, insert.key);
+              setInsertOpen(false);
+              setInsert(null);
+            }}
+          />
+        )}
       </Table>
 
       {selectable && (
-        <TableBulkBar count={selection.count} onClear={selection.clear}>
-          {bulkActions?.(selection.selected)}
-        </TableBulkBar>
+        <TableScopeMenu
+          open={scopeAnchor !== null}
+          onOpenChange={(o) => {
+            if (!o) setScopeAnchor(null);
+          }}
+          anchor={scopeAnchor}
+          pageCount={pageIds.length}
+          allCount={allIds.length}
+          noun={noun}
+          onApply={(scope, n) => {
+            selection.setAll(
+              scope === 'page' ? pageIds : scope === 'all' ? allIds : allIds.slice(0, n)
+            );
+          }}
+        />
       )}
 
-      {!paged && (
-        <TablePagination
-          page={pagination.page}
-          pageCount={pagination.pageCount}
-          from={pagination.from}
-          to={pagination.to}
-          total={total ?? sorted.length}
-          pageSize={pagination.pageSize}
-          {...(pageSizes ? { pageSizes } : {})}
-          onPageChange={(next) => {
-            pagination.goTo(next);
-            onPageChange?.(next, pagination.pageSize);
-          }}
-          {...(rowsPerPage
-            ? {
-                onPageSizeChange: (size: number) => {
-                  pagination.setPageSize(size);
-                  onPageChange?.(pagination.page, size);
-                },
-              }
-            : {})}
-        />
+      {drag.drag && (
+        <>
+          <div
+            className="mdt-pointer-events-none mdt-fixed mdt-z-[40] mdt-inline-flex mdt-h-10 mdt-w-[200px] mdt-items-center mdt-gap-2.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-pl-3 mdt-pr-4 mdt-text-[11px] mdt-leading-[1.5] mdt-text-neutral-90 mdt-shadow-[0_12px_32px_rgba(29,43,62,0.18)] dark:mdt-border-neutral-110 dark:mdt-text-neutral-40"
+            style={{ left: drag.drag.x - 20, top: drag.drag.y - 20 }}
+            aria-hidden="true"
+          >
+            <Icon
+              name="grip-vertical"
+              size={14}
+              className="mdt-text-neutral-40 dark:mdt-text-neutral-90"
+            />
+            {drag.drag.label}
+          </div>
+          <div
+            className="mdt-pointer-events-none mdt-fixed mdt-z-[39] mdt-w-0.5 mdt-bg-azure-60"
+            style={{ left: drag.drag.lineX, top: drag.drag.lineTop, height: drag.drag.lineHeight }}
+            aria-hidden="true"
+          />
+        </>
       )}
     </div>
   );
 }
 
-DataTable.displayName = 'DataTable';
+function cap(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+export { DataTable };
+export type { KeyboardEvent };

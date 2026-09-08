@@ -1,0 +1,215 @@
+/* Table — the merged console Users table (Pranjal's rulings, 7 September 2026).
+ * State rules live here because they read across elements: a row's hover
+ * changes its number cell, a heading's hover reveals its grip and menu, a
+ * selection anywhere shows every checkbox. Geometry and colour sit in the
+ * Tailwind classes on the components. */
+
+.tbl {
+  --tbl-divider: hsl(var(--mdt-neutral-30));
+  --tbl-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
+  --tbl-hover: hsl(var(--mdt-neutral-10));
+  /* the card-to-page morph: 0 at rest, 1 docked (set by the docked prop) */
+  --tbl-morph: 0;
+  --tbl-radius: 12px;
+  /* the first and last cell inset grows 16 -> 24 as the card gives up the page's margin */
+  --tbl-edge: calc(16px + 8px * var(--tbl-morph));
+  border-radius: calc(var(--tbl-radius) * (1 - var(--tbl-morph)));
+  transition: border-color 0.12s ease-out;
+}
+/* docked: the side edges go (no gradual fade), the rows scroll inside the card, header and pager pinned */
+.tbl[data-docked='true'] {
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.tbl > .tbl-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* a page is scrolling the card to its dock line: until it lands, the rows are clipped, not scrolled */
+.tbl-viewport[data-clip='true'] {
+  overflow-y: clip;
+}
+.tbl-viewport {
+  border-top-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  border-top-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+}
+.tbl-foot {
+  margin-top: auto;
+  flex-shrink: 0;
+  border-bottom-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  border-bottom-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  padding-left: var(--tbl-edge);
+  padding-right: var(--tbl-edge);
+}
+.tbl-table > * > tr > :first-child {
+  padding-left: var(--tbl-edge);
+}
+.tbl-table > * > tr > :last-child {
+  padding-right: var(--tbl-edge);
+}
+/* the 60px selection column keeps its mark centred while the inset grows: the wrappers take the offset */
+.tbl-selall {
+  margin-left: calc(8px * var(--tbl-morph));
+}
+.tbl-sel .tbl-rowsel,
+.tbl-sel .tbl-rownum {
+  width: calc(100% - 8px * var(--tbl-morph));
+  margin-left: calc(8px * var(--tbl-morph));
+}
+.tbl[data-divider='light'] {
+  --tbl-divider: hsl(var(--mdt-neutral-20));
+}
+.dark .tbl {
+  --tbl-divider: hsl(var(--mdt-border) / 0.6);
+  --tbl-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
+  --tbl-hover: hsl(var(--mdt-muted) / 0.5);
+}
+
+/* dividers: on cells, because the table is border-separate; the sticky heading keeps its line as an inset shadow */
+.tbl-cell,
+.tbl-sel {
+  border-bottom: 1px solid var(--tbl-divider);
+}
+.tbl-head {
+  box-shadow: inset 0 -1px 0 var(--tbl-divider);
+}
+.tbl-body > tr:last-child > td {
+  border-bottom-color: transparent;
+}
+
+/* rows: hover and selected share one tint; an invited row does not lift */
+.tbl-row:hover > td,
+.tbl-row[data-state='selected'] > td {
+  background: var(--tbl-hover);
+}
+.tbl-row[data-inert]:hover > td {
+  background: hsl(var(--mdt-background));
+}
+.tbl-row:focus-visible > td {
+  box-shadow:
+    inset 0 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring));
+}
+.tbl-row:focus-visible > td:first-child {
+  box-shadow:
+    inset 2px 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring)),
+    inset 2px -2px 0 hsl(var(--mdt-ring));
+}
+.tbl-row:focus-visible > td:last-child {
+  box-shadow:
+    inset -2px 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring)),
+    inset -2px -2px 0 hsl(var(--mdt-ring));
+}
+
+/* the row number becomes a checkbox on hover, on focus, once picked, and on every row once any row is picked */
+.tbl-rowsel .tbl-cb {
+  display: none;
+}
+.tbl-row:hover .tbl-rowsel .tbl-num,
+.tbl-row:focus-within .tbl-rowsel .tbl-num,
+.tbl-row[data-state='selected'] .tbl-rowsel .tbl-num,
+.tbl-table[data-has-selection='true'] .tbl-row:not([data-inert]) .tbl-rowsel .tbl-num {
+  display: none;
+}
+.tbl-row:hover .tbl-cb,
+.tbl-row:focus-within .tbl-cb,
+.tbl-row[data-state='selected'] .tbl-cb,
+.tbl-table[data-has-selection='true'] .tbl-row:not([data-inert]) .tbl-cb {
+  display: inline-flex;
+}
+.tbl-row[data-inert] .tbl-num {
+  display: inline;
+  opacity: 0.6;
+}
+
+/* headings: 16px inset, grip, 8px, label, 8px, arrow; the "⋯" at the right edge. All of it on hover or focus. */
+.tbl-grip,
+.tbl-more {
+  display: none;
+}
+.tbl-hcell {
+  padding-left: 0;
+  transition: padding-left 0.12s;
+}
+.tbl-head[data-movable='true']:hover,
+.tbl-head[data-movable='true']:focus-within,
+.tbl-head[data-open='true'] {
+  background: var(--tbl-hover);
+}
+.tbl-head[data-movable='true']:hover .tbl-grip,
+.tbl-head[data-movable='true']:focus-within .tbl-grip,
+.tbl-head[data-open='true'] .tbl-grip,
+.tbl-head[data-movable='true']:hover .tbl-more,
+.tbl-head[data-movable='true']:focus-within .tbl-more,
+.tbl-head[data-open='true'] .tbl-more {
+  display: inline-flex;
+}
+.tbl-head[data-movable='true']:hover .tbl-hcell,
+.tbl-head[data-movable='true']:focus-within .tbl-hcell,
+.tbl-head[data-open='true'] .tbl-hcell {
+  padding-left: 22px;
+}
+/* a quick-filter column's glyph becomes the grip, in the same slot */
+.tbl-head[data-movable='true']:hover .tbl-glyph,
+.tbl-head[data-movable='true']:focus-within .tbl-glyph,
+.tbl-head[data-open='true'] .tbl-glyph {
+  display: none;
+}
+.tbl-sortmark {
+  display: none;
+}
+.tbl-head[aria-sort] .tbl-sortmark {
+  display: inline-flex;
+}
+.tbl-head[data-sortable='true']:not([aria-sort]):hover .tbl-sortmark {
+  display: inline-flex;
+  color: hsl(var(--mdt-neutral-50));
+}
+.tbl-head[aria-sort='descending'] .tbl-sortmark svg {
+  transform: rotate(180deg);
+}
+.tbl-head[data-filtered='true'],
+.tbl-head[data-filtered='true']:hover,
+.tbl-head[data-filtered='true']:focus-within {
+  background: var(--tbl-wash);
+}
+.tbl-head[data-filtered='true'] .tbl-glyph {
+  color: hsl(var(--mdt-azure-60));
+}
+.tbl-head[data-dragging='true'],
+.tbl-cell[data-dragging='true'] {
+  opacity: 0.4;
+}
+.tbl-head[data-open='true'] .tbl-more {
+  background: hsl(var(--mdt-neutral-20));
+}
+
+/* the resize handle: a 1×16 nick at rest, darker on hover, azure and 2px while it has focus */
+.tbl-rz:hover ~ .tbl-nick {
+  background: hsl(var(--mdt-neutral-50));
+}
+.tbl-rz:focus-visible {
+  outline: none;
+}
+.tbl-rz:focus-visible ~ .tbl-nick {
+  width: 2px;
+  background: hsl(var(--mdt-ring));
+}
+
+/* the last frozen column draws its boundary while the table is scrolled sideways */
+.tbl-viewport[data-scrolled-x='true'] .tbl-frozen-edge {
+  box-shadow: 1px 0 0 var(--tbl-divider);
+}
+.tbl-table[data-refreshing='true'] > tbody {
+  opacity: 0.6;
+}
+
+/* the owner mark shares the wash recipe: azure at 6% over the page, the console's blue-10 */
+.tbl-owner {
+  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
+}
+.dark .tbl-owner {
+  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
+}

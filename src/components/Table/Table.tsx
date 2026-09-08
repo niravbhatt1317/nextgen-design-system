@@ -1,800 +1,636 @@
 import { cva } from 'class-variance-authority';
-import {
-  createContext,
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+import { createContext, forwardRef, useCallback, useContext, useRef, useState } from 'react';
+import type {
+  KeyboardEvent,
+  MouseEvent,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
 } from 'react';
 import { cn } from '@/utils';
-import { TableColumnBoundary } from './TableColumnBoundary';
-import {
-  FROZEN_BAND,
-  FROZEN_CELL,
-  FROZEN_HEAD,
-  FROZEN_LAST,
-  FROZEN_LAST_EDGE,
-  FROZEN_STICKY_CORNER,
-  STUCK_BOTTOM,
-  STUCK_TOP,
-} from './Table.classes';
-
-import { Badge } from '../Badge';
+import { Checkbox } from '../Checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import type {
-  TableProps,
-  TableHeaderProps,
-  TableBodyProps,
-  TableFooterProps,
-  TableRowProps,
-  TableHeadProps,
+  TableAlign,
   TableCellProps,
-  TableCaptionProps,
-  TableGroupRowProps,
-  TableExpandTriggerProps,
-  TableContextValue,
-  TableSection,
-  TableSortOrder,
-  TableStickyEdge,
+  TableColGroupProps,
+  TableHeadProps,
+  TableNumberCellProps,
+  TableNumberHeadProps,
+  TableProps,
+  TableRowProps,
+  TableSelectAllProps,
+  TableSelectionCellProps,
+  TableViewportProps,
 } from './Table.types';
+import './table.css';
 
-/**
- * Density and striping are set once on `Table` but applied by every cell, so
- * they travel by context rather than by descendant selector.
- *
- * The reason is specificity. A rule like `[&_td]:mdt-p-2` on the table compiles
- * to `.class td`, which outranks a cell's own `.mdt-p-4` - so a per-cell
- * override would silently lose. Context keeps `cn()` merging working normally.
- */
-const TableContext = createContext<TableContextValue>({
-  density: 'compact',
-  striped: false,
-  stickyHeader: false,
-});
+/** The width of the row-number column and of the elastic tail. */
+export const TABLE_GUTTER = 60;
+/** Every content column starts here on the console; a person can drag it from 120 to 720. */
+export const TABLE_COLUMN_WIDTH = 200;
+export const TABLE_COLUMN_MIN = 120;
+export const TABLE_COLUMN_MAX = 720;
 
-/** Which part of the table we are in. Striping is body-only; sticky is header-only. */
-const TableSectionContext = createContext<TableSection>('body');
-
-/**
- * Which edge the current row pins to, if any.
- *
- * A row cannot carry the sticky treatment itself: `position: sticky` on a `<tr>`
- * is unreliable across browsers, and a `box-shadow` on one does not render at
- * all under `border-collapse: collapse`. Both have to sit on the cells, so the
- * row announces its intent here and `TableCell` applies it.
- */
-const TableStickyRowContext = createContext<TableStickyEdge | undefined>(undefined);
-
-/**
- * Where each pinned column sits, measured from the real table.
- *
- * The first pinned column is at zero; the second starts at whatever the first
- * turned out to be. That is a runtime measurement, not a design value - the
- * width depends on content, on `layout`, and on whatever the user dragged it
- * to - so it cannot be a class and has to be measured and applied inline.
- *
- * `count` is here so a cell can tell whether it is the last pinned one, which
- * is the only one that draws the boundary and the shadow band.
- */
-interface TableFrozenValue {
-  offsets: number[];
-  count: number;
-}
-
-const TableFrozenContext = createContext<TableFrozenValue>({ offsets: [], count: 0 });
-
-/**
- * Resolves a `frozen` prop into a position.
- *
- * `frozen` is a boolean or an index because one pinned column - by far the
- * common case - should not have to say `frozen={0}`.
- */
-const useFrozenPlacement = (frozen: boolean | number) => {
-  const { offsets, count } = useContext(TableFrozenContext);
-  const isFrozen = frozen !== false;
-  const index = typeof frozen === 'number' ? frozen : 0;
-  return {
-    isFrozen,
-    index,
-    // With no measurement yet, `count` is 0 and a single pinned column is
-    // still the last one. Without this the boundary flickers in on first paint.
-    isLast: isFrozen && (count === 0 ? index === 0 : index === count - 1),
-    left: isFrozen ? (offsets[index] ?? 0) : undefined,
-  };
+const ALIGN: Record<TableAlign, string> = {
+  left: 'mdt-text-left',
+  center: 'mdt-text-center',
+  right: 'mdt-text-right mdt-tabular-nums',
 };
 
 /**
- * `default` is exactly the spacing this table had before density existed, so an
- * existing table does not move unless it asks to.
- *
- * The `align` map is written out in full in both definitions below rather than
- * shared as a constant, and that repetition is deliberate.
- * `scripts/extract-variants.mjs` reads these definitions **statically** to build
- * `component-catalog.json` - it cannot resolve an identifier, so hoisting the
- * map to `const ALIGN` silently published `align: []` to the catalogue. A model
- * reading the catalogue would have been told this table has no alignment
- * options at all. Machine-readability is the point of this library, so it wins
- * over saving three lines.
+ * Table cell styles: 54px rows, a 16px inset, 12px type. Frozen cells stay put
+ * while the table scrolls sideways.
+ */
+export const tableCellVariants = cva(
+  [
+    'tbl-cell mdt-h-[54px] mdt-px-4 mdt-py-[5px] mdt-align-middle',
+    'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
+    'mdt-bg-background mdt-text-neutral-130 dark:mdt-text-neutral-10',
+  ],
+  {
+    variants: {
+      frozen: { true: 'mdt-sticky mdt-z-[2]', false: '' },
+      align: ALIGN,
+    },
+    defaultVariants: { frozen: false, align: 'left' },
+  }
+);
+
+/**
+ * Heading styles: 40px tall, 11px slate type, sticky to the top of the region.
+ * The grip, the sort arrow and the "⋯" menu are revealed by table.css.
  */
 export const tableHeadVariants = cva(
-  'mdt-relative mdt-border-border mdt-align-middle mdt-font-medium mdt-text-muted-foreground [&:has([role=checkbox])]:mdt-pr-0',
-  {
-    variants: {
-      density: {
-        short: 'mdt-h-8 mdt-px-2',
-        compact: 'mdt-h-10 mdt-px-3',
-        default: 'mdt-h-12 mdt-px-4',
-        relaxed: 'mdt-h-14 mdt-px-6',
-      },
-      align: {
-        left: 'mdt-text-left',
-        center: 'mdt-text-center',
-        right: 'mdt-text-right',
-      },
-    },
-    defaultVariants: { density: 'compact', align: 'left' },
-  }
-);
-
-export const tableCellVariants = cva(
-  'mdt-border-border mdt-align-middle [&:has([role=checkbox])]:mdt-pr-0',
-  {
-    variants: {
-      density: {
-        short: 'mdt-px-2 mdt-py-1',
-        compact: 'mdt-px-3 mdt-py-2',
-        default: 'mdt-p-4',
-        relaxed: 'mdt-px-6 mdt-py-5',
-      },
-      align: {
-        left: 'mdt-text-left',
-        center: 'mdt-text-center',
-        right: 'mdt-text-right',
-      },
-      // Declared after `density` so its left padding wins - CVA applies variants
-      // in declaration order, and `pl-*` has to override the `px-*` above it.
-      //
-      // Tailwind's own steps, evenly spaced 1.5rem apart. No arbitrary values:
-      // spacing has no tokens yet, so the default scale is the correct thing to
-      // use, but a raw `pl-[5.5rem]` would be a violation.
-      indent: {
-        0: '',
-        1: 'mdt-pl-8',
-        2: 'mdt-pl-14',
-        3: 'mdt-pl-20',
-      },
-    },
-    defaultVariants: { density: 'compact', align: 'left', indent: 0 },
-  }
-);
-
-export const tableRowVariants = cva('mdt-transition-colors [&>*]:mdt-border-b', {
-  variants: {
-    /** Only body rows respond to hover - a header row is not a target. */
-    interactive: { true: 'hover:mdt-bg-muted/50', false: '' },
-    striped: { true: 'odd:mdt-bg-muted/50', false: '' },
-    selected: { true: 'mdt-bg-muted', false: '' },
-    /** A total or subtotal - reads as a conclusion rather than another record. */
-    summary: { true: 'mdt-bg-muted/50 mdt-font-medium', false: '' },
-  },
-  compoundVariants: [
-    // A selected row must stay readable in a striped table, so the stripe is
-    // not applied to it at all. Suppressing the class beats relying on source
-    // order, which is what `compoundVariants` running last is for.
-    { striped: true, selected: true, class: 'odd:mdt-bg-muted' },
-    // A summary row needs no equivalent: `TableRow` never passes `striped` for
-    // one, because a total carries its own tint and a stripe under it muddies
-    // both. Handling it there keeps this list free of a branch that can never
-    // be reached.
+  [
+    'tbl-head mdt-relative mdt-h-10 mdt-px-4 mdt-py-px mdt-align-middle',
+    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-text-neutral-40',
+    'mdt-select-none mdt-whitespace-nowrap mdt-bg-background',
+    'mdt-sticky mdt-top-0 mdt-z-[3]',
   ],
-  defaultVariants: {
-    interactive: false,
-    striped: false,
-    selected: false,
-    summary: false,
+  {
+    variants: {
+      frozen: { true: 'mdt-z-[4]', false: '' },
+      align: ALIGN,
+    },
+    defaultVariants: { frozen: false, align: 'left' },
+  }
+);
+
+/** Row styles. Hover, selected and focus are drawn by table.css across the row's cells. */
+export const tableRowVariants = cva(['tbl-row mdt-outline-none'], {
+  variants: {
+    inert: { true: 'mdt-cursor-default', false: 'mdt-cursor-pointer' },
   },
+  defaultVariants: { inert: false },
 });
 
 /**
- * The group header row that spans the whole table.
- *
- * Grouped rows were the commonest structure across the reference tables - Jira,
- * Height, ClickUp, GitHub Projects, Attio and bank statements all use them.
+ * How far the card has become the page: 0 at rest, 1 docked. `driven` means a
+ * page is scrolling this card to its dock line, so the card takes the page's
+ * height and its rows are clipped, not scrolled, until the dock.
  */
-export const tableGroupRowVariants = cva(
-  'mdt-bg-muted/50 mdt-font-medium mdt-text-foreground [&>*]:mdt-border-b'
-);
+export interface TableMorph {
+  morph: number;
+  driven: boolean;
+}
+const TableMorphContext = createContext<TableMorph>({ morph: 0, driven: false });
+export const useTableMorph = (): TableMorph => useContext(TableMorphContext);
 
-/** The icon that says "sortable" and the two that say which way. */
-const SORT_ICON: Record<
-  'none' | 'ascend' | 'descend',
-  'arrow-up-down' | 'arrow-up' | 'arrow-down'
-> = {
-  none: 'arrow-up-down',
-  ascend: 'arrow-up',
-  descend: 'arrow-down',
-};
-
-const ARIA_SORT: Record<'none' | 'ascend' | 'descend', 'none' | 'ascending' | 'descending'> = {
-  none: 'none',
-  ascend: 'ascending',
-  descend: 'descending',
-};
-
-const sortKey = (order: TableSortOrder): 'none' | 'ascend' | 'descend' => order ?? 'none';
+/** `docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card. */
+export function tableMorphOf(docked: boolean | number | undefined): TableMorph {
+  if (docked === true) return { morph: 1, driven: true };
+  if (docked === false || docked === undefined) return { morph: 0, driven: false };
+  return { morph: Math.min(1, Math.max(0, docked)), driven: true };
+}
 
 /**
- * Table component - Root table element.
+ * Table - the card that holds a list: rows, a bulk bar and a pager.
  *
  * @example
  * ```tsx
- * <Table density="condensed" striped stickyHeader>
- *   <TableHeader>
- *     <TableRow>
- *       <TableHead sortable sortOrder="ascend" onSort={sortByName}>Name</TableHead>
- *       <TableHead align="right">Amount</TableHead>
- *     </TableRow>
- *   </TableHeader>
- *   <TableBody>
- *     <TableRow selected>
- *       <TableCell>Ada Lovelace</TableCell>
- *       <TableCell align="right">1,204.00</TableCell>
- *     </TableRow>
- *   </TableBody>
+ * <Table label="Users">
+ *   <TableViewport tableWidth={1637} maxHeight={600}>
+ *     <TableColGroup widths={[60, 200, 100, 217, 200]} />
+ *     <TableHeader>…</TableHeader>
+ *     <TableBody>…</TableBody>
+ *   </TableViewport>
+ *   <TablePager … />
  * </Table>
  * ```
  */
-const Table = forwardRef<HTMLTableElement, TableProps>(
-  (
-    {
-      className,
-      children,
-      density = 'compact',
-      striped = false,
-      stickyHeader = false,
-      maxHeight,
-      layout = 'auto',
-      containerClassName,
-      ...props
-    },
-    ref
-  ) => {
-    const context = useMemo<TableContextValue>(
-      () => ({ density, striped, stickyHeader }),
-      [density, striped, stickyHeader]
-    );
-
-    // A pinned row should only cast a shadow while something is actually
-    // scrolled underneath it. A total sitting at the true end of the data is
-    // not floating over anything, and a shadow there is a lie about depth.
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const [scrolled, setScrolled] = useState({ top: false, bottom: false, x: false });
-    // Cumulative left offsets for the pinned columns, measured off the header.
-    const [frozen, setFrozen] = useState<TableFrozenValue>({ offsets: [], count: 0 });
-
-    const measure = useCallback(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const atTop = el.scrollTop <= 0;
-      // One pixel of slack: fractional scroll heights on high-density displays
-      // otherwise leave `bottom` permanently true.
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      // Horizontal is one flag, not two: a frozen column only ever pins to the
-      // left, so all it needs to know is whether anything has slid under it.
-      const scrolledX = el.scrollLeft > 0;
-      setScrolled((prev) =>
-        prev.top === !atTop && prev.bottom === !atBottom && prev.x === scrolledX
-          ? prev
-          : { top: !atTop, bottom: !atBottom, x: scrolledX }
-      );
-
-      // Measure off the header row rather than the body: it is the row that is
-      // always present, and its cells are the ones the widths come from.
-      const cells = el.querySelectorAll<HTMLElement>('thead tr:first-child > [data-frozen-index]');
-      const widths: number[] = [];
-      cells.forEach((cell) => {
-        const index = Number(cell.dataset.frozenIndex);
-        if (Number.isNaN(index)) return;
-        widths[index] = cell.getBoundingClientRect().width;
-      });
-      const offsets: number[] = [];
-      let running = 0;
-      for (let i = 0; i < widths.length; i += 1) {
-        offsets[i] = running;
-        running += widths[i] ?? 0;
-      }
-      setFrozen((prev) =>
-        prev.count === offsets.length && prev.offsets.every((value, i) => value === offsets[i])
-          ? prev
-          : { offsets, count: offsets.length }
-      );
-    }, []);
-
-    useEffect(() => {
-      const el = scrollRef.current;
-      if (!el) return undefined;
-      measure();
-      el.addEventListener('scroll', measure, { passive: true });
-      const observer = new ResizeObserver(measure);
-      observer.observe(el);
-      return () => {
-        el.removeEventListener('scroll', measure);
-        observer.disconnect();
-      };
-    }, [measure, children]);
-
-    return (
-      <TableContext.Provider value={context}>
-        <TableFrozenContext.Provider value={frozen}>
-          <div
-            ref={scrollRef}
-            // `group` is what lets a sticky cell react to the scroll state without
-            // a descendant selector, which would outrank the cell's own classes.
-            className={cn(
-              'mdt-group mdt-relative mdt-w-full mdt-overflow-auto',
-              containerClassName
-            )}
-            // Lets a drag inside the table find what to scroll.
-            data-table-scroller=""
-            data-scrolled-top={scrolled.top ? 'true' : 'false'}
-            data-scrolled-bottom={scrolled.bottom ? 'true' : 'false'}
-            data-scrolled-x={scrolled.x ? 'true' : 'false'}
-            // Whether the pinned corner should draw its own header wash. Two
-            // `group-data-*` variants cannot be chained - Tailwind nests them into
-            // a selector that never matches - so the condition is computed once
-            // here instead.
-            data-corner-wash={scrolled.top && !scrolled.x ? 'true' : 'false'}
-            style={maxHeight === undefined ? undefined : { maxHeight }}
-          >
-            {/*
-            Table is a compound component - headers are provided via TableHeader/TableHead children.
-            Accessibility: Users must include <TableHeader> with <TableHead> cells for proper a11y.
-          */}
-            <table
-              ref={ref}
-              className={cn(
-                // `border-separate` rather than the usual `collapse`, and this is
-                // load-bearing: browsers do not paint `box-shadow` on a table cell
-                // under the collapsed border model. A sticky header's shadow was
-                // being reported by getComputedStyle and rendered by nothing.
-                //
-                // The cost is that borders on a `<tr>` stop rendering entirely, so
-                // every row divider below sits on the cells instead.
-                'mdt-w-full mdt-caption-bottom mdt-border-separate mdt-border-spacing-0 mdt-text-sm',
-                layout === 'fixed' && 'mdt-table-fixed',
-                className
-              )}
-              {...props}
-            >
-              {children}
-            </table>
-          </div>
-        </TableFrozenContext.Provider>
-      </TableContext.Provider>
-    );
-  }
-);
+const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
+  { className, label, divider = 'default', docked, style, children, ...props },
+  ref
+) {
+  const state = tableMorphOf(docked);
+  const { morph } = state;
+  return (
+    <TableMorphContext.Provider value={state}>
+      <div
+        ref={ref}
+        role="region"
+        aria-label={label}
+        data-divider={divider}
+        data-docked={morph >= 1}
+        className={cn(
+          'tbl mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
+          'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
+          className
+        )}
+        style={{ ...style, '--tbl-morph': morph } as React.CSSProperties}
+        {...props}
+      >
+        {children}
+      </div>
+    </TableMorphContext.Provider>
+  );
+});
 Table.displayName = 'Table';
 
-/**
- * TableHeader component - Contains table header rows.
- *
- * @example
- * ```tsx
- * <TableHeader>
- *   <TableRow>
- *     <TableHead>Name</TableHead>
- *   </TableRow>
- * </TableHeader>
- * ```
- */
-const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
-  ({ className, ...props }, ref) => (
-    <TableSectionContext.Provider value="header">
-      <thead ref={ref} className={cn('[&_tr>*]:mdt-border-b', className)} {...props} />
-    </TableSectionContext.Provider>
-  )
+/** The scrolling region and the `<table>` inside it. Headings stick to its top. */
+const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function TableViewport(
+  {
+    className,
+    maxHeight = 600,
+    tableWidth,
+    rowCount,
+    refreshing = false,
+    hasSelection = false,
+    label,
+    children,
+    ...props
+  },
+  ref
+) {
+  const [scrolledX, setScrolledX] = useState(false);
+  const { morph, driven } = useTableMorph();
+  const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrolledX(e.currentTarget.scrollLeft > 0);
+  }, []);
+  return (
+    <div
+      ref={ref}
+      data-scrolled-x={scrolledX}
+      data-clip={driven && morph < 1}
+      onScroll={onScroll}
+      className={cn('tbl-viewport mdt-relative mdt-overflow-auto', className)}
+      style={driven ? undefined : { maxHeight }}
+      {...props}
+    >
+      <table
+        className="tbl-table mdt-table-fixed mdt-border-separate mdt-border-spacing-0 mdt-text-xs mdt-leading-[1.45]"
+        style={{ width: tableWidth }}
+        aria-label={label}
+        aria-rowcount={rowCount}
+        data-has-selection={hasSelection}
+        data-refreshing={refreshing}
+      >
+        {children}
+      </table>
+    </div>
+  );
+});
+TableViewport.displayName = 'TableViewport';
+
+/** One `<col>` per visible column plus the 60px elastic tail. */
+function TableColGroup({ widths }: TableColGroupProps) {
+  return (
+    <colgroup>
+      {widths.map((w, i) => (
+        // eslint-disable-next-line react/no-array-index-key -- a col has no identity but its position
+        <col key={i} style={{ width: w }} />
+      ))}
+      <col style={{ width: TABLE_GUTTER }} />
+    </colgroup>
+  );
+}
+
+const TableHeader = forwardRef<HTMLTableSectionElement, React.ComponentPropsWithoutRef<'thead'>>(
+  function TableHeader({ className, ...props }, ref) {
+    return <thead ref={ref} className={cn('tbl-header', className)} {...props} />;
+  }
 );
 TableHeader.displayName = 'TableHeader';
 
-/**
- * TableBody component - Contains table data rows.
- *
- * @example
- * ```tsx
- * <TableBody>
- *   <TableRow>
- *     <TableCell>Data</TableCell>
- *   </TableRow>
- * </TableBody>
- * ```
- */
-const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
-  ({ className, ...props }, ref) => (
-    <TableSectionContext.Provider value="body">
-      <tbody ref={ref} className={cn('[&_tr:last-child>*]:mdt-border-b-0', className)} {...props} />
-    </TableSectionContext.Provider>
-  )
+const TableBody = forwardRef<HTMLTableSectionElement, React.ComponentPropsWithoutRef<'tbody'>>(
+  function TableBody({ className, ...props }, ref) {
+    return <tbody ref={ref} className={cn('tbl-body', className)} {...props} />;
+  }
 );
 TableBody.displayName = 'TableBody';
 
-/**
- * TableFooter component - Contains table footer rows, usually a total.
- *
- * @example
- * ```tsx
- * <TableFooter>
- *   <TableRow>
- *     <TableCell colSpan={3}>Total: $1,234.00</TableCell>
- *   </TableRow>
- * </TableFooter>
- * ```
- */
-const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>(
-  ({ className, ...props }, ref) => (
-    <TableSectionContext.Provider value="footer">
-      <tfoot
-        ref={ref}
-        className={cn(
-          'mdt-bg-muted/50 mdt-font-medium [&>tr]:last:[&>*]:mdt-border-b-0 [&_tr>*]:mdt-border-t',
-          className
-        )}
-        {...props}
-      />
-    </TableSectionContext.Provider>
-  )
-);
-TableFooter.displayName = 'TableFooter';
+const INTERACTIVE =
+  'button, a, input, select, textarea, [role="menu"], [role="dialog"], [data-no-open]';
 
 /**
- * TableRow component - A table row.
- *
- * @example
- * ```tsx
- * <TableRow selected>
- *   <TableCell>Cell</TableCell>
- * </TableRow>
- * ```
+ * A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the
+ * next row. A click on the row body opens it; clicks on controls inside do not.
  */
-const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
-  ({ className, selected = false, summary = false, sticky, interactive, ...props }, ref) => {
-    const { striped } = useContext(TableContext);
-    const section = useContext(TableSectionContext);
-    // A summary row is a conclusion, not a record - it should not offer hover
-    // feedback as though it were selectable.
-    // `interactive` overrides the default when the caller has an opinion; a
-    // summary row is a conclusion rather than a record, so it never offers it.
-    const isBody = interactive ?? (section === 'body' && !summary);
-
-    return (
-      <TableStickyRowContext.Provider value={sticky}>
-        <tr
-          ref={ref}
-          data-state={selected ? 'selected' : undefined}
-          className={cn(
-            tableRowVariants({
-              summary,
-              interactive: isBody,
-              striped: striped && isBody,
-              selected,
-            }),
-            className
-          )}
-          {...props}
-        />
-      </TableStickyRowContext.Provider>
-    );
-  }
-);
-TableRow.displayName = 'TableRow';
-
-/**
- * TableGroupRow component - a heading row that spans the whole table.
- *
- * Grouping was the commonest structure across the reference tables. Pass
- * `onToggle` to make the group collapsible; leave it off and no control is
- * rendered at all, rather than a dead one.
- *
- * @example
- * ```tsx
- * <TableGroupRow colSpan={4} count={12} expanded={open} onToggle={toggle}>
- *   Mobile App
- * </TableGroupRow>
- * ```
- */
-const TableGroupRow = forwardRef<HTMLTableRowElement, TableGroupRowProps>(
-  (
-    { className, colSpan, count, expanded = true, onToggle, toggleLabel, children, ...props },
-    ref
-  ) => {
-    const { density } = useContext(TableContext);
-
-    const label = (
-      <>
-        <span>{children}</span>
-        {count !== undefined && (
-          <span className="mdt-font-normal mdt-text-muted-foreground">{count}</span>
-        )}
-      </>
-    );
-
-    return (
-      <tr ref={ref} className={cn(tableGroupRowVariants(), className)} {...props}>
-        <td colSpan={colSpan} className={cn(tableCellVariants({ density }))}>
-          {onToggle ? (
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-expanded={expanded}
-              aria-label={toggleLabel ?? (typeof children === 'string' ? children : 'Toggle group')}
-              className={cn(
-                'mdt-inline-flex mdt-items-center mdt-gap-2 mdt-font-medium',
-                'hover:mdt-text-foreground focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
-              )}
-            >
-              {/* Same disclosure glyphs Sidebar uses for the same job. */}
-              <Icon name={expanded ? 'chevron-down' : 'chevron-right'} size="sm" aria-hidden />
-              {label}
-            </button>
-          ) : (
-            <span className="mdt-inline-flex mdt-items-center mdt-gap-2">{label}</span>
-          )}
-        </td>
-      </tr>
-    );
-  }
-);
-TableGroupRow.displayName = 'TableGroupRow';
-
-/**
- * TableExpandTrigger component - the disclosure control for a row that reveals
- * child rows beneath it.
- *
- * Deliberately a separate control you place in a cell rather than a prop on
- * `TableRow`. Where the chevron belongs differs from table to table, and the
- * component has no business owning your tree state.
- *
- * @example
- * ```tsx
- * <TableCell>
- *   <TableExpandTrigger expanded={open} onToggle={toggle} label="Show entries" />
- * </TableCell>
- * ```
- */
-const TableExpandTrigger = forwardRef<HTMLButtonElement, TableExpandTriggerProps>(
-  ({ className, expanded, onToggle, label = 'Toggle row', ...props }, ref) => (
-    <button
+const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(function TableRow(
+  {
+    className,
+    selected = false,
+    inert = false,
+    onOpen,
+    onToggle,
+    onArrow,
+    onClick,
+    onKeyDown,
+    children,
+    ...props
+  },
+  ref
+) {
+  const handleClick = (e: MouseEvent<HTMLTableRowElement>) => {
+    onClick?.(e);
+    if (e.defaultPrevented) return;
+    if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
+    if (!inert) onOpen?.();
+  };
+  const handleKey = (e: KeyboardEvent<HTMLTableRowElement>) => {
+    onKeyDown?.(e);
+    if (e.defaultPrevented || e.target !== e.currentTarget) return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (!inert) onToggle?.(e.shiftKey);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!inert) onOpen?.();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      onArrow?.(e.key === 'ArrowDown' ? 1 : -1);
+    }
+  };
+  return (
+    <tr
       ref={ref}
-      type="button"
-      onClick={onToggle}
-      aria-expanded={expanded}
-      aria-label={label}
-      className={cn(
-        'mdt-inline-flex mdt-items-center mdt-justify-center mdt-rounded-sm',
-        'mdt-text-muted-foreground hover:mdt-text-foreground',
-        'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
-        className
-      )}
+      tabIndex={0}
+      data-state={selected ? 'selected' : undefined}
+      data-inert={inert ? '' : undefined}
+      aria-selected={inert ? undefined : selected}
+      className={cn(tableRowVariants({ inert }), className)}
+      onClick={handleClick}
+      onKeyDown={handleKey}
       {...props}
     >
-      <Icon name={expanded ? 'chevron-down' : 'chevron-right'} size="sm" aria-hidden />
-    </button>
-  )
-);
-TableExpandTrigger.displayName = 'TableExpandTrigger';
+      {children}
+    </tr>
+  );
+});
+TableRow.displayName = 'TableRow';
 
-/**
- * TableHead component - A table header cell, optionally a sort control.
- *
- * @example
- * ```tsx
- * <TableHead>Name</TableHead>
- * <TableHead align="right">Amount</TableHead>
- * <TableHead sortable sortOrder="ascend" onSort={handleSort}>Created</TableHead>
- * ```
- */
-const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  (
-    {
-      className,
-      align = 'left',
-      sortable = false,
-      sortOrder = null,
-      sortIndex,
-      onSort,
-      frozen = false,
-      columnKey,
-      resizable = false,
-      width,
-      onResize,
-      minWidth = 64,
-      maxWidth = 720,
-      resizeLabel,
-      insertColumns,
-      insertSuggested,
-      onInsert,
-      insertLabel,
-      children,
-      style,
-      ...props
-    },
-    ref
-  ) => {
-    const { density, stickyHeader } = useContext(TableContext);
-    const pinned = useFrozenPlacement(frozen);
-    const key = sortKey(sortOrder);
-
-    return (
-      <th
-        ref={ref}
-        aria-sort={sortable ? ARIA_SORT[key] : undefined}
-        // The measurement finds pinned columns by this attribute.
-        data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
-        data-column-key={columnKey}
-        style={{
-          ...style,
-          ...(width === undefined ? null : { width }),
-          ...(pinned.left === undefined ? null : { left: pinned.left }),
-        }}
-        className={cn(
-          tableHeadVariants({ density, align }),
-          // `relative` is in the base class now rather than here: the resize
-          // handle, the insertion point and anything else absolute inside a
-          // header all need a positioned ancestor, and a caller adding
-          // `mdt-relative` themselves would silently beat the `sticky` a frozen
-          // column depends on - `className` merges last, and last wins.
-          // The background is required, not decoration: without it the body
-          // scrolls visibly underneath the header instead of behind it.
-          // Never both: layering them would emit two z-index utilities that
-          // `cn()` cannot merge.
-          pinned.isFrozen && stickyHeader && FROZEN_STICKY_CORNER,
-          !pinned.isFrozen && stickyHeader && STUCK_TOP,
-          pinned.isFrozen && !stickyHeader && FROZEN_HEAD,
-          // Only the last pinned column carries the boundary...
-          pinned.isLast && FROZEN_LAST_EDGE,
-          // ...and the band, except on the corner, which resolves the crossing
-          // of two gradients by leaving one out rather than blending them.
-          pinned.isLast && !stickyHeader && FROZEN_BAND,
-          className
-        )}
-        {...props}
-      >
-        {sortable ? (
-          <button
-            type="button"
-            onClick={onSort}
-            className={cn(
-              'mdt-inline-flex mdt-items-center mdt-gap-1 mdt-font-medium',
-              'hover:mdt-text-foreground focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
-              // Keep the control flush with the cell's own alignment.
-              align === 'right' && 'mdt-flex-row-reverse'
-            )}
-          >
-            {children}
-            {/*
-              With more than one column sorting, the arrow and its rank travel
-              together as one chip.
-              An arrow on three columns says all three are sorted and nothing
-              about their precedence, and people reasonably assume the leftmost
-              column decides - it does not, the stack does. Loose next to each
-              other the two read as separate facts; in a chip they read as one.
-              Medium, not small: a small badge is text or dot only, and this chip carries the arrow.
-            */}
-            {sortIndex === undefined ? (
-              <Icon
-                name={SORT_ICON[key]}
-                size="sm"
-                className={cn(key === 'none' && 'mdt-opacity-50')}
-                aria-hidden
-              />
-            ) : (
-              <Badge
-                tone="info"
-                shape="pill"
-                size="md"
-                icon={<Icon name={SORT_ICON[key]} aria-hidden />}
-                className="mdt-tabular-nums"
-              >
-                {sortIndex}
-              </Badge>
-            )}
-          </button>
-        ) : (
-          children
-        )}
-        {(resizable || onInsert !== undefined) && (
-          <TableColumnBoundary
-            resizable={resizable}
-            {...(width === undefined ? {} : { width })}
-            {...(onResize === undefined ? {} : { onResize })}
-            minWidth={minWidth}
-            maxWidth={maxWidth}
-            resizeLabel={
-              resizeLabel ?? (typeof children === 'string' ? `Resize ${children}` : 'Resize column')
-            }
-            {...(insertColumns === undefined ? {} : { columns: insertColumns })}
-            {...(insertSuggested === undefined ? {} : { suggested: insertSuggested })}
-            {...(onInsert === undefined ? {} : { onInsert })}
-            insertLabel={
-              insertLabel ??
-              (typeof children === 'string'
-                ? `Insert a column after ${children}`
-                : 'Insert a column here')
-            }
-          />
-        )}
-      </th>
-    );
-  }
-);
-TableHead.displayName = 'TableHead';
-
-/**
- * TableCell component - A table data cell.
- *
- * @example
- * ```tsx
- * <TableCell>Ada Lovelace</TableCell>
- * <TableCell align="right">1,204.00</TableCell>
- * ```
- */
-const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, align = 'left', indent = 0, frozen = false, columnKey, style, ...props }, ref) => {
-    const { density } = useContext(TableContext);
-    const sticky = useContext(TableStickyRowContext);
-    const pinned = useFrozenPlacement(frozen);
-    return (
-      <td
-        ref={ref}
-        data-frozen-index={pinned.isFrozen ? pinned.index : undefined}
-        data-column-key={columnKey}
-        style={pinned.left === undefined ? style : { ...style, left: pinned.left }}
-        className={cn(
-          tableCellVariants({ density, align, indent }),
-          sticky === 'top' && STUCK_TOP,
-          sticky === 'bottom' && STUCK_BOTTOM,
-          pinned.isFrozen && FROZEN_CELL,
-          pinned.isLast && FROZEN_LAST,
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
+const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(function TableCell(
+  {
+    className,
+    frozen,
+    frozenEdge = false,
+    align = 'left',
+    dragging = false,
+    style,
+    children,
+    ...props
+  },
+  ref
+) {
+  return (
+    <td
+      ref={ref}
+      data-dragging={dragging || undefined}
+      className={cn(
+        tableCellVariants({ frozen: frozen !== undefined, align }),
+        frozenEdge && 'tbl-frozen-edge',
+        className
+      )}
+      style={frozen !== undefined ? { ...style, left: frozen } : style}
+      {...props}
+    >
+      {children}
+    </td>
+  );
+});
 TableCell.displayName = 'TableCell';
 
 /**
- * TableCaption component - A table caption/title.
- *
- * @example
- * ```tsx
- * <TableCaption>A list of your recent invoices.</TableCaption>
- * ```
+ * A heading. Sortable ones sort on click. Movable ones show a grip and a "⋯"
+ * menu on hover; resizable ones carry a handle on their right boundary that
+ * drags, or moves 16px per arrow key.
  */
-const TableCaption = forwardRef<HTMLTableCaptionElement, TableCaptionProps>(
-  ({ className, ...props }, ref) => (
-    <caption
-      ref={ref}
-      className={cn('mdt-mt-4 mdt-text-sm mdt-text-muted-foreground', className)}
-      {...props}
-    />
-  )
-);
-TableCaption.displayName = 'TableCaption';
+const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function TableHead(
+  {
+    className,
+    columnKey,
+    label,
+    width,
+    minWidth = TABLE_COLUMN_MIN,
+    frozen,
+    frozenEdge = false,
+    align = 'left',
+    sortable = false,
+    sort = null,
+    onSort,
+    movable = false,
+    onGripPointerDown,
+    onGripMove,
+    menu,
+    glyph,
+    filtered = false,
+    dragging = false,
+    resizable = false,
+    onResize,
+    onBoundaryHover,
+    style,
+    children,
+    ...props
+  },
+  ref
+) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const startX = useRef(0);
+  const startW = useRef(width);
+  const moved = useRef(false);
 
+  const sortKey = (e: KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSort?.();
+    }
+  };
+  const gripKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      onGripMove?.(e.key === 'ArrowLeft' ? -1 : 1);
+    }
+  };
+  const rzDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startX.current = e.clientX;
+    startW.current = width;
+    moved.current = false;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const rzMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 1) moved.current = true;
+    onResize?.(clampWidth(startW.current + dx, minWidth), false);
+  };
+  const rzUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId))
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    if (moved.current) onResize?.(width, true);
+  };
+  const rzKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const step = e.key === 'ArrowRight' ? 16 : e.key === 'ArrowLeft' ? -16 : 0;
+    if (step) onResize?.(clampWidth(width + step, minWidth), true);
+    else if (e.key === 'Home') onResize?.(minWidth, true);
+    else if (e.key === 'End') onResize?.(TABLE_COLUMN_MAX, true);
+    else return;
+    e.preventDefault();
+  };
+
+  return (
+    <th
+      ref={ref}
+      scope="col"
+      data-key={columnKey}
+      data-movable={movable}
+      data-sortable={sortable}
+      data-filtered={filtered || undefined}
+      data-dragging={dragging || undefined}
+      data-open={menuOpen || undefined}
+      aria-sort={sort ? (sort === 'asc' ? 'ascending' : 'descending') : undefined}
+      className={cn(
+        tableHeadVariants({ frozen: frozen !== undefined, align }),
+        frozenEdge && 'tbl-frozen-edge',
+        className
+      )}
+      style={{ ...style, width, left: frozen }}
+      {...props}
+    >
+      {movable && (
+        <button
+          type="button"
+          className="tbl-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90"
+          aria-label={`Move column ${label}. Arrow keys move it one place`}
+          onPointerDown={onGripPointerDown}
+          onKeyDown={gripKey}
+        >
+          <Icon name="grip-vertical" size={14} />
+        </button>
+      )}
+      <span
+        className={cn(
+          'tbl-hcell mdt-inline-flex mdt-max-w-full mdt-items-center',
+          sortable && 'mdt-cursor-pointer'
+        )}
+        {...(sortable
+          ? {
+              role: 'button',
+              tabIndex: 0,
+              'aria-label': `Sort by ${label}`,
+              onClick: onSort,
+              onKeyDown: sortKey,
+            }
+          : {})}
+      >
+        {glyph && (
+          <span className="tbl-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 dark:mdt-text-neutral-40 [&_svg]:mdt-size-3.5">
+            {glyph}
+          </span>
+        )}
+        <span className="mdt-overflow-hidden mdt-text-ellipsis">{children ?? label}</span>
+        {sortable && (
+          <span
+            className="tbl-sortmark mdt-ml-2 mdt-text-azure-60 [&_svg]:mdt-size-3"
+            aria-hidden="true"
+          >
+            <Icon name="arrow-up" size={12} />
+          </span>
+        )}
+      </span>
+      {movable && menu && (
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="tbl-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              aria-label={`Options for ${label}`}
+            >
+              <Icon name="more-horizontal" size={14} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="mdt-w-48">
+            {menu}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      {resizable && (
+        <div
+          className="tbl-rz mdt-absolute -mdt-right-[5px] mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-[10px] mdt-cursor-col-resize"
+          role="slider"
+          tabIndex={0}
+          aria-orientation="vertical"
+          aria-label={`Resize ${label}`}
+          aria-valuenow={width}
+          aria-valuemin={minWidth}
+          aria-valuemax={TABLE_COLUMN_MAX}
+          onPointerDown={rzDown}
+          onPointerMove={rzMove}
+          onPointerUp={rzUp}
+          onKeyDown={rzKey}
+          onPointerEnter={() => onBoundaryHover?.(true)}
+          onPointerLeave={() => onBoundaryHover?.(false)}
+        />
+      )}
+      <span
+        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+        aria-hidden="true"
+      />
+    </th>
+  );
+});
+TableHead.displayName = 'TableHead';
+
+function clampWidth(w: number, min: number): number {
+  return Math.max(min, Math.min(TABLE_COLUMN_MAX, Math.round(w)));
+}
+
+/** The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked. */
+function TableSelectionCell({
+  index,
+  selected,
+  inert = false,
+  label,
+  onToggle,
+  frozen = 0,
+}: TableSelectionCellProps) {
+  return (
+    <td
+      className={cn(
+        tableCellVariants({ frozen: true, align: 'center' }),
+        'tbl-sel mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen }}
+    >
+      <span className="tbl-rowsel mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
+        <span className="tbl-num mdt-font-medium mdt-text-muted-foreground" aria-hidden={!inert}>
+          {index}
+        </span>
+        {!inert && (
+          <Checkbox
+            className="tbl-cb data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+            checked={selected}
+            tabIndex={-1}
+            aria-label={`Select ${label}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle(e.shiftKey);
+            }}
+          />
+        )}
+      </span>
+    </td>
+  );
+}
+
+/** A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel. */
+function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellProps) {
+  return (
+    <td
+      className={cn(
+        tableCellVariants({ frozen: true, align: 'center' }),
+        'tbl-sel mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen }}
+    >
+      <span className="tbl-rownum mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
+        <span
+          className={cn(
+            'tbl-num mdt-font-medium mdt-text-muted-foreground',
+            inert && 'mdt-opacity-60'
+          )}
+        >
+          {index}
+        </span>
+      </span>
+    </td>
+  );
+}
+
+/** The blank heading over the row numbers; named for screen readers. */
+function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
+  return (
+    <th
+      scope="col"
+      aria-label="Row number"
+      className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
+      style={{ left: frozen, width: TABLE_GUTTER }}
+    />
+  );
+}
+
+/** The header's checkbox and the chevron that opens the scope menu. */
+function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAllProps) {
+  return (
+    <th
+      scope="col"
+      className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
+      style={{ left: frozen, width: TABLE_GUTTER }}
+    >
+      <span className="tbl-selall mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center">
+        <Checkbox
+          className="data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+          checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
+          onCheckedChange={onToggle}
+          aria-label="Select all on this page"
+        />
+        <button
+          type="button"
+          className="tbl-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40"
+          aria-label="Choose what to select"
+          aria-haspopup="dialog"
+          onClick={(e) => {
+            onScope(e.currentTarget);
+          }}
+        >
+          <Icon name="chevron-down" size={12} />
+        </button>
+      </span>
+    </th>
+  );
+}
+
+/** The blank 60px tail that soaks up leftover width. */
+function TableTailCell({ head = false }: { head?: boolean }) {
+  return head ? (
+    <th
+      scope="col"
+      className={cn(tableHeadVariants({}), '!mdt-px-0')}
+      style={{ width: TABLE_GUTTER }}
+      aria-hidden="true"
+    />
+  ) : (
+    <td className={cn(tableCellVariants({}), '!mdt-px-0')} aria-hidden="true" />
+  );
+}
+
+export type { ReactNode };
 export {
   Table,
+  TableMorphContext,
+  TableViewport,
+  TableColGroup,
   TableHeader,
   TableBody,
-  TableFooter,
   TableRow,
-  TableGroupRow,
-  TableExpandTrigger,
-  TableHead,
   TableCell,
-  TableCaption,
+  TableHead,
+  TableSelectionCell,
+  TableSelectAll,
+  TableNumberCell,
+  TableNumberHead,
+  TableTailCell,
 };
