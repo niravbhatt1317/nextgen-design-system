@@ -41,7 +41,8 @@ describe('KpiCard', () => {
       />
     );
     const chip = screen.getByLabelText('up 4.5%');
-    expect(chip).toHaveTextContent('↗ 4.5%');
+    expect(chip).toHaveTextContent('4.5%');
+    expect(chip.querySelector('svg')).not.toBeNull();
   });
 
   it('with a chart it has no floor, starts at 270 and pins the chart to the right', () => {

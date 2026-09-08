@@ -55,7 +55,13 @@ function KpiBody({
   clickable,
 }: KpiMetricProps & { clickable: boolean }) {
   const tone = delta?.tone ?? 'flat';
-  const arrow = delta?.direction === 'up' ? '↗ ' : delta?.direction === 'down' ? '↘ ' : '';
+  // A drawn arrow, not the ↗ character: on Windows that character renders as an emoji.
+  const arrow =
+    delta?.direction === 'up' ? (
+      <Icon name="arrow-up-right" size={10} aria-hidden />
+    ) : delta?.direction === 'down' ? (
+      <Icon name="arrow-down-right" size={10} aria-hidden />
+    ) : null;
   const spoken =
     delta &&
     (delta.direction === 'up'
@@ -83,8 +89,10 @@ function KpiBody({
         </span>
         {delta && (
           <Badge size="sm" shape="square" tone={TONE[tone]} aria-label={spoken}>
-            {arrow}
-            {delta.label}
+            <span className="mdt-inline-flex mdt-items-center mdt-gap-[3px]">
+              {arrow}
+              {delta.label}
+            </span>
           </Badge>
         )}
       </div>
@@ -121,7 +129,7 @@ function KpiSegment({ metric, grouped }: { metric: KpiMetricProps; grouped: bool
     ? { flex: `1 1 ${String(basisOf(metric))}px`, minWidth: `${String(floorOf(metric))}px` }
     : undefined;
   const base = cn(
-    'kpi-seg mdt-relative mdt-flex mdt-min-h-[100px] mdt-min-w-0 mdt-flex-col mdt-px-4 mdt-py-3 mdt-text-left',
+    'kpi-seg mdt-relative mdt-flex mdt-min-h-[98px] mdt-min-w-0 mdt-flex-col mdt-px-4 mdt-py-3 mdt-text-left',
     !grouped && 'mdt-flex-1'
   );
   if (clickable) {
