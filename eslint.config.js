@@ -187,6 +187,7 @@ export default tseslint.config(
       '**/TagPillOld/**',
       '**/ToolbarOld/**',
       '**/TableOld/**',
+      '**/TooltipOld/**',
       // DataTable still renders the deprecated strip and chips until the table port (2026-09-04)
       'src/components/index.ts',
     ],

@@ -800,7 +800,7 @@ export type {
 export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
 export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
 
-// Tooltip
+// Tooltip — the merged console bubble on the library engine (2026-09-07)
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
 export type {
   TooltipProps,
@@ -809,6 +809,16 @@ export type {
   TooltipContentRef,
   TooltipProviderProps,
 } from './Tooltip';
+
+// TooltipOld — the previous Tooltip, DEPRECATED 2026-09-07, kept for side-by-side review until 1.0.0
+export { TooltipOld, TooltipTriggerOld, TooltipContentOld, TooltipProviderOld } from './TooltipOld';
+export type {
+  TooltipOldProps,
+  TooltipTriggerOldProps,
+  TooltipContentOldProps,
+  TooltipContentOldRef,
+  TooltipProviderOldProps,
+} from './TooltipOld';
 
 // Upload
 export {

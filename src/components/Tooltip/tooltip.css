@@ -1,0 +1,16 @@
+/* Tooltip — the merged console's bubble on the library's engine (Pranjal's rulings, 7 September 2026).
+ * The list's bullets and thin scrollbar live here; geometry and colour sit in the Tailwind classes. */
+
+.tt-li::before {
+  content: '•';
+  margin-right: 6px;
+  opacity: 0.55;
+}
+.tt-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.45) transparent;
+  overscroll-behavior: contain;
+}
+.dark .tt-list {
+  scrollbar-color: rgb(29 43 62 / 0.45) transparent;
+}

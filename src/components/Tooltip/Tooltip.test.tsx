@@ -1,325 +1,140 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
+import type { Ref } from 'react';
 import { describe, it, expect } from 'vitest';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
+import type { TooltipContentProps, TooltipContentRef } from './Tooltip.types';
+
+function Bubble(
+  props: TooltipContentProps & {
+    delay?: number;
+    instant?: boolean;
+    open?: boolean;
+    contentRef?: Ref<TooltipContentRef>;
+  }
+) {
+  const { delay = 0, instant, open, contentRef, ...content } = props;
+  return (
+    <TooltipProvider delayDuration={delay}>
+      <Tooltip
+        {...(instant !== undefined ? { instant } : {})}
+        {...(open !== undefined ? { open } : {})}
+      >
+        <TooltipTrigger>Hover me</TooltipTrigger>
+        <TooltipContent ref={contentRef} {...content} />
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+/** The visible bubble; Radix keeps a second, hidden copy for screen readers. */
+const bubble = () => document.querySelector<HTMLElement>('.tt');
+
+async function open() {
+  await userEvent.hover(screen.getByText('Hover me'));
+  await waitFor(() => {
+    expect(bubble()).not.toBeNull();
+  });
+  return bubble() as HTMLElement;
+}
 
 describe('Tooltip', () => {
-  describe('Rendering', () => {
-    it('renders trigger element', () => {
-      render(
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent>Tooltip content</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-      expect(screen.getByText('Hover me')).toBeInTheDocument();
-    });
+  it('renders the trigger and no bubble until hovered', () => {
+    render(<Bubble>Tooltip content</Bubble>);
+    expect(screen.getByText('Hover me')).toBeInTheDocument();
+    expect(bubble()).toBeNull();
+  });
 
-    it('does not show content initially', () => {
-      render(
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent>Tooltip content</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-      const trigger = screen.getByText('Hover me');
-      expect(trigger).toBeInTheDocument();
-    });
+  it('opens on hover with the console fill, the library padding and a 280px cap, centred', async () => {
+    render(<Bubble>Tooltip content</Bubble>);
+    const el = await open();
+    expect(el).toHaveClass(
+      'mdt-bg-neutral-130',
+      'dark:mdt-bg-neutral-10',
+      'mdt-text-white',
+      'mdt-px-3',
+      'mdt-py-1.5',
+      'mdt-text-center'
+    );
+    expect(el.style.maxWidth).toBe('280px');
+    expect(el.querySelector('svg')).toHaveClass('mdt-fill-neutral-130');
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Tooltip content');
+  });
 
-    it('shows content on hover', async () => {
-      const user = userEvent.setup();
+  it('takes a wider cap and can drop the arrow', async () => {
+    render(
+      <Bubble maxWidth={360} showArrow={false}>
+        Wide
+      </Bubble>
+    );
+    const el = await open();
+    expect(el.style.maxWidth).toBe('360px');
+    expect(el.querySelector('svg')).toBeNull();
+  });
 
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent>Tooltip content visible</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
+  it('shows a quieter hint line and reads from the left', async () => {
+    render(<Bubble hint="Click to copy the mail">sarah@company.com</Bubble>);
+    const el = await open();
+    expect(el).toHaveClass('mdt-text-left');
+    const hint = el.querySelector('.tt-hint');
+    expect(hint).toHaveTextContent('Click to copy the mail');
+    expect(hint).toHaveClass('mdt-text-[10px]', 'mdt-opacity-[0.62]');
+  });
 
-      const trigger = screen.getByText('Hover me');
-      await user.hover(trigger);
+  it('lists items as bullet lines in a list that scrolls past seven', async () => {
+    const items = [
+      'Platform',
+      'Security',
+      'Finance',
+      'Design',
+      'Web',
+      'Support',
+      'Data',
+      'Sales',
+      'Ops',
+    ];
+    render(<Bubble items={items} />);
+    const el = await open();
+    const list = el.querySelector('.tt-list') as HTMLElement;
+    expect(list).toHaveClass('mdt-max-h-[133px]', 'mdt-overflow-y-auto');
+    expect(list.querySelectorAll('li')).toHaveLength(9);
+    expect(list.querySelector('li')).toHaveTextContent('Platform');
+  });
 
-      await waitFor(() => {
-        const contentElements = screen.queryAllByText('Tooltip content visible');
-        expect(contentElements.length).toBeGreaterThan(0);
-      });
+  it('waits for the provider delay by default and opens at once when instant', async () => {
+    const { unmount } = render(<Bubble delay={5000}>Slow</Bubble>);
+    await userEvent.hover(screen.getByText('Hover me'));
+    await new Promise((r) => setTimeout(r, 250));
+    expect(bubble()).toBeNull();
+    unmount();
+    render(
+      <Bubble delay={5000} instant>
+        Fast
+      </Bubble>
+    );
+    await open();
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Fast');
+  });
+
+  it('opens on keyboard focus', async () => {
+    render(<Bubble>Focused</Bubble>);
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(bubble()).not.toBeNull();
     });
   });
 
-  describe('TooltipProvider', () => {
-    it('accepts delayDuration prop', () => {
-      render(
-        <TooltipProvider delayDuration={500}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent>Content</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-      expect(screen.getByText('Hover me')).toBeInTheDocument();
+  it('respects a controlled open state and forwards the ref', async () => {
+    const ref = createRef<TooltipContentRef>();
+    render(
+      <Bubble open contentRef={ref}>
+        Held open
+      </Bubble>
+    );
+    await waitFor(() => {
+      expect(bubble()).not.toBeNull();
     });
-
-    it('uses default delayDuration of 200ms', () => {
-      render(
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent>Content</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-      expect(screen.getByText('Hover me')).toBeInTheDocument();
-    });
-  });
-
-  describe('TooltipContent', () => {
-    it('renders with custom className', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent className="custom-class">Content unique text</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByText('Hover me');
-      await user.hover(trigger);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Content unique text').length).toBeGreaterThan(0);
-      });
-    });
-
-    it('applies custom side prop', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent side="bottom">Bottom content xyz</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByText('Hover me');
-      await user.hover(trigger);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Bottom content xyz').length).toBeGreaterThan(0);
-      });
-    });
-
-    it('applies custom align prop', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent align="start">Aligned content abc</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByText('Hover me');
-      await user.hover(trigger);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Aligned content abc').length).toBeGreaterThan(0);
-      });
-    });
-
-    it('hides arrow when showArrow is false', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover me</TooltipTrigger>
-            <TooltipContent showArrow={false}>Content without arrow def</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByText('Hover me');
-      await user.hover(trigger);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Content without arrow def').length).toBeGreaterThan(0);
-      });
-    });
-  });
-
-  describe('Controlled state', () => {
-    it('respects controlled open state', async () => {
-      render(
-        <TooltipProvider>
-          <Tooltip open={true}>
-            <TooltipTrigger>Trigger</TooltipTrigger>
-            <TooltipContent>Always visible ghi</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Always visible ghi').length).toBeGreaterThan(0);
-      });
-    });
-
-    it('respects controlled closed state', () => {
-      render(
-        <TooltipProvider>
-          <Tooltip open={false}>
-            <TooltipTrigger>Trigger</TooltipTrigger>
-            <TooltipContent>Never visible jkl</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      expect(screen.queryByText('Never visible jkl')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('trigger is focusable', () => {
-      render(
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button type="button">Hover me button</button>
-            </TooltipTrigger>
-            <TooltipContent>Content</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByRole('button', { name: 'Hover me button' });
-      trigger.focus();
-      expect(trigger).toHaveFocus();
-    });
-
-    it('shows content on focus', async () => {
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button type="button">Focus me button</button>
-            </TooltipTrigger>
-            <TooltipContent>Tooltip on focus mno</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByRole('button');
-      trigger.focus();
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Tooltip on focus mno').length).toBeGreaterThan(0);
-      });
-    });
-  });
-
-  describe('Multiple tooltips', () => {
-    it('can render multiple tooltips independently', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Trigger 1</TooltipTrigger>
-            <TooltipContent>Content 1 pqr</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger>Trigger 2</TooltipTrigger>
-            <TooltipContent>Content 2 stu</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger1 = screen.getByText('Trigger 1');
-      await user.hover(trigger1);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Content 1 pqr').length).toBeGreaterThan(0);
-        expect(screen.queryByText('Content 2 stu')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Styling', () => {
-    it('has correct base classes', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>Hover</TooltipTrigger>
-            <TooltipContent>Styled content vwx</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const trigger = screen.getByText('Hover');
-      await user.hover(trigger);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Styled content vwx').length).toBeGreaterThan(0);
-      });
-    });
-  });
-
-  describe('asChild prop', () => {
-    it('merges props when using asChild on trigger', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button type="button">Custom button xyz</button>
-            </TooltipTrigger>
-            <TooltipContent>Content yzab</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      const button = screen.getByRole('button', { name: 'Custom button xyz' });
-      expect(button).toHaveAttribute('type', 'button');
-
-      await user.hover(button);
-
-      await waitFor(() => {
-        expect(screen.queryAllByText('Content yzab').length).toBeGreaterThan(0);
-      });
-    });
-  });
-
-  describe('Ref forwarding', () => {
-    it('forwards ref to content', async () => {
-      const ref = { current: null as HTMLDivElement | null };
-
-      render(
-        <TooltipProvider delayDuration={0}>
-          <Tooltip defaultOpen>
-            <TooltipTrigger>Trigger</TooltipTrigger>
-            <TooltipContent ref={ref}>Content bcde</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-
-      await waitFor(() => {
-        expect(ref.current).toBeInstanceOf(HTMLDivElement);
-      });
-    });
+    expect(ref.current).toBe(bubble());
   });
 });
