@@ -70,19 +70,6 @@ export type {
 export { Button, ButtonVariants } from './Button';
 export type { ButtonProps, ButtonVariantsType } from './Button';
 
-// PageFrame - the default page layout of the merged console (2026-09-10): a rail
-// beside ONE scroll container holding four bands in a fixed order. The sticky
-// ladder is derived from the band heights, and the surface takes its inset from
-// whichever band is above it.
-export { PageFrame, PageHeader, PageHero, PageBand, PageSurface } from './PageFrame';
-export type {
-  PageFrameProps,
-  PageHeaderProps,
-  PageHeroProps,
-  PageBandProps,
-  PageSurfaceProps,
-  PageBandVariant,
-} from './PageFrame';
 // ButtonGroup
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
 export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
@@ -812,6 +799,28 @@ export type {
 // switches). DEPRECATED 2026-09-04: use Toolbar.
 export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
 export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
+
+// KpiCard — the merged console KPI tile: one metric or a group, and the strip that holds them (2026-09-07)
+export {
+  KpiCard,
+  KpiStrip,
+  KpiGauge,
+  KpiBars,
+  formatKpiValue,
+  KPI_FLOOR,
+  KPI_CHART_WIDTH,
+} from './KpiCard';
+export type {
+  KpiCardProps,
+  KpiSingleCardProps,
+  KpiGroupCardProps,
+  KpiMetricProps,
+  KpiTrend,
+  KpiTrendTone,
+  KpiStripProps,
+  KpiGaugeProps,
+  KpiBarsProps,
+} from './KpiCard';
 
 // Tooltip — the merged console bubble on the library engine (2026-09-07)
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';

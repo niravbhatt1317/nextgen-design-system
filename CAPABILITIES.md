@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-990 capabilities: 243 components, 28 hooks, 18 utilities, 701 stories
+1011 capabilities: 247 components, 28 hooks, 19 utilities, 717 stories
 
 ## Components
 
@@ -114,6 +114,10 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `InputGroupTextarea` | InputGroup | InputGroupTextarea - Textarea with support for addons |
 | `Item` | Item | Item component - a flexible list item for menus, dropdowns, and lists. |
 | `Kbd` | Kbd | Kbd - a keyboard shortcut, drawn as keys. |
+| `KpiBars` | KpiCard | Recent readings as bars, with a base line and a threshold line in the danger colour. |
+| `KpiCard` | KpiCard | KpiCard - one metric on one card, or a group of related metrics sharing a card. |
+| `KpiGauge` | KpiCard | A half ring: a share of a limit, the percent inside, a caption under it. |
+| `KpiStrip` | KpiCard | KpiStrip - the row that holds KpiCards. |
 | `Label` | Label | No forwarded ref on purpose. |
 | `LeftNav` | LeftNav | _undocumented_ |
 | `LeftNavBody` | LeftNavOld | The part that scrolls, and the only part that changes with the level. |
@@ -310,6 +314,7 @@ story that already exists. They are in `capability-catalog.json` in full.
 | `describeAccept` | Upload | `accept` in words, for a message a person has to read. |
 | `describeKeys` | Kbd | What the whole combination is called - "Command + Shift + E". |
 | `formatFileSize` | Upload | 1 KB is 1024 bytes here, matching what an operating system reports. |
+| `formatKpiValue` | KpiCard | One decimal with k or M, the console's rounding: 7640 → "7.6k", 8200 → "8.2k", 10001 → "10k", 256 → "256", 1204 → "1.2k". |
 | `initialsForName` | Avatar | "Sarah Johnson" -> "SJ", "monitoring" -> "mo". |
 | `isModifier` | Kbd | Whether a key is a modifier rather than the key being modified. |
 | `matchesAccept` | Upload | Does this file match the `accept` string? The same three forms the file input itself understands: an extension (`.pdf`), a whole family (`image/*`), or an exact type (`application/pdf`). |
