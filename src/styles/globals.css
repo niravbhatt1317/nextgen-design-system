@@ -127,6 +127,86 @@
     --mdt-purple-90: 270 63% 40%; /* #442299 */
     --mdt-purple-100: 270 50% 25%; /* #221166 */
 
+    /* ── Five families the palette did not have (added 2026-09-10) ──
+     * Category colours: hues that carry NO meaning, so a source chip or an
+     * avatar never reads as success, warning or danger. Until now they were
+     * written by hand into the chip code because there was nothing here to
+     * reach for - indigo for LDAP, teal for SCIM, magenta for a third. The
+     * anchor shades below are EXACTLY the values those chips already paint,
+     * so nothing on screen moves; the rest of each ladder is new.
+     *
+     * Purely additive. Not one of the existing shades is touched, and the
+     * 24 places where the console and this file disagree about a shared name
+     * are still open - see Foundation/Colors.
+     *
+     * Each family publishes a TEXT shade: the lightest step that still reads
+     * at 4.5:1 on its own -10 tint. It is not the same number for every
+     * colour, because bright hues cannot carry text at a middle shade. */
+    /* Indigo - Category - the LDAP source chip; text at -70 */
+    --mdt-indigo-05: 231.4 63.64% 97.84%; /* #f6f7fd */
+    --mdt-indigo-10: 234.5 73.33% 97.06%; /* #f2f3fd */
+    --mdt-indigo-20: 235.9 64.44% 91.18%; /* #dadcf7 */
+    --mdt-indigo-30: 233.5 56.1% 83.92%; /* #bfc4ed */
+    --mdt-indigo-40: 233.4 50% 74.9%; /* #9fa6df */
+    --mdt-indigo-50: 233.8 48.6% 64.9%; /* #7a83d1 */
+    --mdt-indigo-60: 233.8 49.79% 53.92%; /* #4f5bc4 */
+    --mdt-indigo-70: 233.7 50.22% 44.9%; /* #3945ac */
+    --mdt-indigo-80: 233.9 47.83% 36.08%; /* #303988 */
+    --mdt-indigo-90: 233.5 45.45% 28.04%; /* #272e68 */
+    --mdt-indigo-100: 234 43.48% 18.04%; /* #1a1e42 */
+
+    /* Teal - Category - the SCIM source chip; text at -80 */
+    --mdt-teal-05: 180 40% 98.04%; /* #f8fcfc */
+    --mdt-teal-10: 171.4 46.67% 97.06%; /* #f4fbfa */
+    --mdt-teal-20: 174.5 44% 95.1%; /* #edf8f7 */
+    --mdt-teal-30: 174.7 44.74% 85.1%; /* #c8eae7 */
+    --mdt-teal-40: 174.1 45.86% 73.92%; /* #9edbd5 */
+    --mdt-teal-50: 173.8 51.96% 60%; /* #64cec3 */
+    --mdt-teal-60: 173.7 59.17% 47.06%; /* #31bfb0 */
+    --mdt-teal-70: 173.7 59.77% 34.12%; /* #238b80 */
+    --mdt-teal-80: 174.1 59.48% 30%; /* #1f7a71 */
+    --mdt-teal-90: 174.2 57.48% 24.9%; /* #1b645d */
+    --mdt-teal-100: 174 54.35% 18.04%; /* #154742 */
+
+    /* Magenta - Category; text at -80 */
+    --mdt-magenta-05: 330 80% 98.04%; /* #fef6fa */
+    --mdt-magenta-10: 331.1 87.1% 93.92%; /* #fde2ef */
+    --mdt-magenta-20: 330 80.65% 87.84%; /* #f9c7e0 */
+    --mdt-magenta-30: 328 77.32% 80.98%; /* #f4a9d1 */
+    --mdt-magenta-40: 326.7 70.63% 71.96%; /* #ea85bd */
+    --mdt-magenta-50: 325.2 71.86% 60.98%; /* #e354a7 */
+    --mdt-magenta-60: 323.9 75.2% 50.98%; /* #e02495 */
+    --mdt-magenta-70: 322.1 70.59% 40%; /* #ae1e79 */
+    --mdt-magenta-80: 321.7 69.05% 32.94%; /* #8e1a64 */
+    --mdt-magenta-90: 321.6 65.15% 25.88%; /* #6d174e */
+    --mdt-magenta-100: 321.7 63.04% 18.04%; /* #4b1136 */
+
+    /* Cyan - Category; text at -80 */
+    --mdt-cyan-05: 195 80% 98.04%; /* #f6fcfe */
+    --mdt-cyan-10: 195.7 74.19% 93.92%; /* #e4f5fb */
+    --mdt-cyan-20: 195 72.73% 87.06%; /* #c6eaf6 */
+    --mdt-cyan-30: 195.2 70.94% 77.06%; /* #9bd9ee */
+    --mdt-cyan-40: 194.9 69.94% 66.08%; /* #6cc7e5 */
+    --mdt-cyan-50: 195 76.67% 52.94%; /* #2bb5e3 */
+    --mdt-cyan-60: 195.2 85.29% 40%; /* #0f91bd */
+    --mdt-cyan-70: 194.7 84.97% 33.92%; /* #0d7ca0 */
+    --mdt-cyan-80: 195.2 82.43% 29.02%; /* #0d6887 */
+    --mdt-cyan-90: 195 78.69% 23.92%; /* #0d556d */
+    --mdt-cyan-100: 194.8 75.82% 17.84%; /* #0b3f50 */
+
+    /* Lime - Category; text at -80 */
+    --mdt-lime-05: 90 60% 98.04%; /* #fafdf7 */
+    --mdt-lime-10: 88.2 54.84% 93.92%; /* #f0f8e7 */
+    --mdt-lime-20: 86.8 52.78% 85.88%; /* #ddeec8 */
+    --mdt-lime-30: 88.1 52.46% 76.08%; /* #c4e2a2 */
+    --mdt-lime-40: 87.7 50.84% 64.9%; /* #a9d378 */
+    --mdt-lime-50: 87.9 56% 50.98%; /* #87c83c */
+    --mdt-lime-60: 88 61.86% 38.04%; /* #659d25 */
+    --mdt-lime-70: 87.7 61.9% 32.94%; /* #588820 */
+    --mdt-lime-80: 88.2 59.44% 28.04%; /* #4a721d */
+    --mdt-lime-90: 87.4 57.38% 23.92%; /* #40601a */
+    --mdt-lime-100: 87.6 54.35% 18.04%; /* #304715 */
+
     /* ── Console foundation colours (added 2026-09-03, Pranjal's call) ──
      * The merged console's muted text grey, quiet heading grey, interactive
      * blue and success green, added as NEW steps with their values untouched
