@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -14,6 +15,7 @@ import {
   TableNumberHead,
   TableTailCell,
   TableViewport,
+  useTableMorph,
 } from './Table';
 import { TableBulkAction, TableBulkBar } from './TableBulkBar';
 import { TableLoadMore, TablePager } from './TablePager';
@@ -341,5 +343,88 @@ describe('TableBlank and TableSkeleton', () => {
     );
     expect(screen.getByRole('table').querySelectorAll('tbody tr')).toHaveLength(5);
     expect(screen.getByRole('table').querySelector('tbody')).toHaveAttribute('aria-hidden', 'true');
+  });
+});
+
+describe('Table expand — the table drives its own morph', () => {
+  it('starts as an ordinary card, not docked', () => {
+    render(
+      <Table label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('reports itself as driven, so the viewport clips instead of scrolling', () => {
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().driven);
+      return null;
+    };
+    render(
+      <Table label="Users" expand>
+        <Probe />
+      </Table>
+    );
+    expect(seen.at(-1)).toBe(true);
+  });
+
+  it('ignores docked while expand is on — the table decides, not the page', () => {
+    const seen: number[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().morph);
+      return null;
+    };
+    render(
+      <Table label="Users" expand docked>
+        <Probe />
+      </Table>
+    );
+    /* docked would say 1; the table's own reading says 0 until it scrolls */
+    expect(seen.at(-1)).toBe(0);
+  });
+
+  it('leaves docked alone when expand is off — the old contract is untouched', () => {
+    render(
+      <Table label="Users" docked>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'true');
+  });
+
+  it('accepts a dock line for pages that are not a PageFrame', () => {
+    render(
+      <Table label="Users" expand dockOffset={90}>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toBeInTheDocument();
+  });
+
+  it('still forwards a ref while driving itself', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Table ref={ref} label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveAttribute('aria-label', 'Users');
+  });
+
+  it('cleans up the height it set when it is switched off', () => {
+    const { rerender } = render(
+      <Table label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    rerender(
+      <Table label="Users">
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
   });
 });

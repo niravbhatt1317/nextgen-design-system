@@ -69,6 +69,23 @@ export interface TableProps extends ComponentPropsWithoutRef<'div'> {
    * The page also sets the card's height once docked (`style.height`).
    */
   docked?: boolean | number | undefined;
+  /**
+   * Let the table drive its own morph from the page scroll.
+   *
+   * With this on the table takes the full height under the page’s dock line
+   * WHATEVER it holds, so it expands on scroll even holding a single row, and
+   * its pager stays on screen instead of floating up under a short list.
+   * (Pranjal’s rule, 2026-09-10.)
+   *
+   * It needs a scrolling ancestor and a dock line to aim at. Inside a
+   * `PageFrame` both are already there. `docked` is ignored while this is on.
+   */
+  expand?: boolean | undefined;
+  /**
+   * Where the page pins this card, in px. Only needed outside a `PageFrame`;
+   * normally the table reads it from the frame’s own published offset.
+   */
+  dockOffset?: number | undefined;
   children: ReactNode;
 }
 

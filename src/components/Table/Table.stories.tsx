@@ -585,3 +585,54 @@ export const DocksOnScroll: Story = {
     );
   },
 };
+
+/**
+ * **Scroll this one.** The table is switched to `expand`, so it drives itself:
+ * it takes the whole height under the dock line, widens to the page as it
+ * reaches it, then hands the scroll to its own rows.
+ *
+ * It holds **one row**. That is the point — expansion is a property of the
+ * table, not of how much happens to be in it, so a filtered-down list does not
+ * suddenly behave like a different component, and the pager does not float up
+ * under a short list. (Pranjal's rule, 2026-09-10.)
+ */
+export const ExpandsWithASingleRow: Story = {
+  render: () => (
+    <div
+      style={{
+        height: 460,
+        overflowY: 'auto',
+        border: '1px solid hsl(var(--mdt-neutral-20))',
+        // the two band heights a PageFrame publishes; the table reads them
+        ['--mdt-band-b1-h' as string]: '60px',
+        ['--mdt-band-b2t-h' as string]: '60px',
+      }}
+    >
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 36,
+          height: 60,
+          background: 'hsl(var(--mdt-background))',
+          borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
+        }}
+      />
+      <div style={{ height: 140, padding: 16 }}>A hero band, which scrolls away.</div>
+      <div
+        style={{
+          position: 'sticky',
+          top: 58,
+          zIndex: 35,
+          height: 60,
+          background: 'hsl(var(--mdt-background))',
+        }}
+      />
+      <div style={{ padding: '6px 24px 20px' }}>
+        <Table label="One row, expanding" expand>
+          <div style={{ padding: 16 }}>A single row.</div>
+        </Table>
+      </div>
+    </div>
+  ),
+};
