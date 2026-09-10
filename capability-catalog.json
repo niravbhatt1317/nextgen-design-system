@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1009,
+  "capabilityCount": 1021,
   "counts": {
-    "story": 719,
-    "component": 243,
+    "story": 726,
+    "component": 248,
     "utility": 19,
     "hook": 28
   },
@@ -3887,6 +3887,16 @@
       "propDocs": ""
     },
     {
+      "name": "HeadingOnly",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / HeadingOnly",
+      "doc": "Layout/PageFrame HeadingOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Headings",
       "kind": "story",
       "file": "src/components/Table/Table.stories.tsx",
@@ -5719,6 +5729,46 @@
       "propDocs": ""
     },
     {
+      "name": "PageBand",
+      "kind": "component",
+      "file": "src/components/PageFrame/PageFrame.tsx",
+      "area": "PageFrame",
+      "summary": "B2t / B3 — the band under the hero.",
+      "doc": "B2t / B3 — the band under the hero. A page renders exactly ONE of these, never both as sibling bands: the tab band when the page has tabs, the toolbar band when it does not. A page whose surface is a table always carries a toolbar somewhere — the band when it is tab-less, the first row of the surface when it has tabs. The variant is not only a look: the surface below reads it and sets its own inset from it.",
+      "props": ["variant", "children", "end", "className"],
+      "propDocs": "The right-hand group — count, meta, view actions."
+    },
+    {
+      "name": "PageFrame",
+      "kind": "component",
+      "file": "src/components/PageFrame/PageFrame.tsx",
+      "area": "PageFrame",
+      "summary": "PageFrame — the content column, and the only scroll container on the page.",
+      "doc": "PageFrame — the content column, and the only scroll container on the page. The rail beside it never scrolls; the page body never scrolls the whole app. Everything pinned is a `position: sticky` child of THIS element, never a nested scroller of its own. It publishes the sticky ladder as custom properties, so a table inside it docks at `--mdt-thead-top` without being told what the bands are. ```tsx <PageFrame> <PageHeader><Breadcrumb /></PageHeader> <PageHero title=\"Users\" actions={<Button>Invite</Button>}> <KpiStrip /> </PageHero> <PageBand variant=\"toolbar\"><Input placeholder=\"Search\" /></PageBand> <PageSurface><Table /></PageSurface> </PageFrame> ```",
+      "props": ["children", "className"],
+      "propDocs": ""
+    },
+    {
+      "name": "PageHeader",
+      "kind": "component",
+      "file": "src/components/PageFrame/PageFrame.tsx",
+      "area": "PageFrame",
+      "summary": "B1 — the header band.",
+      "doc": "B1 — the header band. 60 tall, pinned at the top, and always rendered: it is the page's fixed anchor even at a depth where the breadcrumb itself is omitted. It carries the breadcrumb and nothing global — global controls live in the navigation rail. It is the one band that keeps a hairline; the bands below it have none.",
+      "props": ["children", "leading", "dockActions", "className"],
+      "propDocs": "The breadcrumb. Omit at depth &lt; 2 — the band still renders. Sits hard against the rail edge, left of the breadcrumb. Render the hero's action cluster here once the hero has scrolled away. On by default; pass `false` for a page whose actions should leave with it."
+    },
+    {
+      "name": "PageHero",
+      "kind": "component",
+      "file": "src/components/PageFrame/PageFrame.tsx",
+      "area": "PageFrame",
+      "summary": "B2 — the hero band.",
+      "doc": "B2 — the hero band. The page's one H1, its optional badge and supporting line, and an action cluster of one to three buttons ordered least to most emphatic. Banners and the KPI strip go in as children, in that order. It is never pinned. Once you are reading the surface, the surface is what should own the screen — but the action cluster is handed to the header band on the way out, so the page's main verbs never leave view.",
+      "props": ["title", "badge", "subtitle", "actions", "icon", "children", "className"],
+      "propDocs": "The page's one H1. One to three buttons, least to most emphatic, primary last. Page banners and the KPI strip, in that order."
+    },
+    {
       "name": "pageListOld",
       "kind": "utility",
       "file": "src/components/TableOld/pageList.ts",
@@ -5757,6 +5807,16 @@
       "doc": "Components/Skeleton PageLoadingList",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "PageSurface",
+      "kind": "component",
+      "file": "src/components/PageFrame/PageFrame.tsx",
+      "area": "PageFrame",
+      "summary": "B4 — the surface section.",
+      "doc": "B4 — the surface section. A natural-height stack riding the page scroll, not a scroller of its own. Its inset comes from whichever band is rendered above it, through a CSS sibling rule rather than a prop, so the two cannot drift: 6 above and 20 below under a toolbar band, 16 on both sides under a tab band.",
+      "props": ["children", "under", "className"],
+      "propDocs": "Normally left alone: the surface takes its inset from whichever band is actually rendered above it, through a CSS sibling rule, so the two cannot drift apart. Set it only when the band lives outside this frame."
     },
     {
       "name": "Pagination",
@@ -6517,6 +6577,16 @@
       "doc": "ScrollBar - The scrollbar element. Can be used for both vertical and horizontal scrolling.",
       "props": ["orientation"],
       "propDocs": "Scrollbar orientation"
+    },
+    {
+      "name": "ScrollBehaviour",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / ScrollBehaviour",
+      "doc": "Layout/PageFrame ScrollBehaviour",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "Scrolls",
@@ -7669,6 +7739,16 @@
       "propDocs": ""
     },
     {
+      "name": "TabBarAndToolbarTogether",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / TabBarAndToolbarTogether",
+      "doc": "Layout/PageFrame TabBarAndToolbarTogether",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Table",
       "kind": "component",
       "file": "src/components/Table/Table.tsx",
@@ -8487,6 +8567,16 @@
       "area": "Card",
       "summary": "Story: Components/Card / TheHeaderLine",
       "doc": "Components/Card TheHeaderLine",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TheWholeStack",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / TheWholeStack",
+      "doc": "Layout/PageFrame TheWholeStack",
       "props": [],
       "propDocs": ""
     },
@@ -9579,6 +9669,26 @@
       "propDocs": ""
     },
     {
+      "name": "WithATabBar",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / WithATabBar",
+      "doc": "Layout/PageFrame WithATabBar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithAToolbarBand",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / WithAToolbarBand",
+      "doc": "Layout/PageFrame WithAToolbarBand",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithAvatar",
       "kind": "story",
       "file": "src/components/HoverCard/HoverCard.stories.tsx",
@@ -10215,6 +10325,16 @@
       "area": "Item",
       "summary": "Story: Components/Item / WithoutIcon",
       "doc": "Components/Item WithoutIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithoutKpiCards",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "PageFrame",
+      "summary": "Story: Layout/PageFrame / WithoutKpiCards",
+      "doc": "Layout/PageFrame WithoutKpiCards",
       "props": [],
       "propDocs": ""
     },

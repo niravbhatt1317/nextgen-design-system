@@ -71,6 +71,20 @@ export type {
 export { Button, buttonVariants } from './Button';
 export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
 
+// PageFrame - the default page layout of the merged console (2026-09-10): a rail
+// beside ONE scroll container holding four bands in a fixed order. The sticky
+// ladder is derived from the band heights, and the surface takes its inset from
+// whichever band is above it.
+export { PageFrame, PageHeader, PageHero, PageBand, PageSurface } from './PageFrame';
+export type {
+  PageFrameProps,
+  PageHeaderProps,
+  PageHeroProps,
+  PageBandProps,
+  PageSurfaceProps,
+  PageBandVariant,
+} from './PageFrame';
+
 // ButtonOld — the previous Button, DEPRECATED 2026-09-10, kept until 1.0.0 for the
 // success and AI families, pill and circle shapes, elevation, ripple, badges and shortcut chips.
 export { ButtonOld, ButtonOldVariants } from './ButtonOld';
