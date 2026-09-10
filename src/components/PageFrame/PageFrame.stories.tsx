@@ -202,7 +202,7 @@ const TableBlank = ({ rows = 8 }: { rows?: number }): ReactNode => (
 );
 
 const meta = {
-  title: 'Layout/PageFrame',
+  title: 'Foundation/Page structure',
   component: PageFrame,
   parameters: {
     layout: 'fullscreen',
