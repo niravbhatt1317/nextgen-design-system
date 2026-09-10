@@ -1,0 +1,78 @@
+/* PageFrame — the band model of the merged console.
+ *
+ * The sticky ladder is DERIVED, never typed twice. Every offset below comes
+ * out of the two band heights, so a change to a height cannot leave an offset
+ * behind: a table inside the frame reads `--mdt-thead-top` and docks in the
+ * right place without knowing what the bands are.
+ */
+.mdt-page-frame {
+  --mdt-band-b1-h: 60px;
+  --mdt-band-b2t-h: 60px;
+  /* -2: the tab/toolbar band tucks 2px UNDER the header band, which outranks
+   * it on z. A butt joint at exactly the header height leaks a sub-pixel seam
+   * of scrolling content at fractional screen positions. */
+  --mdt-band-top: calc(var(--mdt-band-b1-h) - 2px);
+  --mdt-thead-top: calc(var(--mdt-band-b1-h) + var(--mdt-band-b2t-h) - 2px);
+}
+
+.mdt-page-header {
+  height: var(--mdt-band-b1-h);
+  top: 0;
+}
+
+.mdt-page-band {
+  height: var(--mdt-band-b2t-h);
+  top: var(--mdt-band-top);
+}
+
+/* The surface's inset is decided by the band that is actually above it.
+ *
+ * A tab band ends in the active tab's 2px underline. At 6px of air that line
+ * and the table's own top edge read as ONE line and the tabs look welded to
+ * the surface, so a tab body is inset 16 top AND bottom — its toolbar row and
+ * its table together — which also closes the section off as its own block.
+ * (Pranjal, 2026-09-10.)
+ *
+ * Under a toolbar band the old figures stand: 6 above, because the toolbar
+ * carries 14 of its own air and 6 + 14 gives an even 20 on both sides of it.
+ */
+.mdt-page-surface {
+  padding-top: 6px;
+  padding-bottom: 20px;
+}
+
+.mdt-page-band[data-band='tabs'] ~ .mdt-page-surface,
+.mdt-page-surface[data-under='tabs'] {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.mdt-page-band[data-band='toolbar'] ~ .mdt-page-surface,
+.mdt-page-surface[data-under='toolbar'] {
+  padding-top: 6px;
+  padding-bottom: 20px;
+}
+
+/* The docked copy of the hero's actions. It stays rendered throughout so the
+ * hero's own copy is never the only reachable one; `visibility` is what keeps
+ * the hidden copy out of the tab order. */
+.mdt-page-docked {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.mdt-page-frame[data-hero-away='true'] .mdt-page-docked {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdt-page-docked {
+    transition: none;
+  }
+}
