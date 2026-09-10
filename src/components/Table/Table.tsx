@@ -141,19 +141,28 @@ const MORPH_RANGE = 140;
 /** Below this there is not enough room to be worth filling. */
 const MIN_FILL = 160;
 
+/** At rest, filling nothing — what a table with nowhere to grow reports. */
+const INERT: TableMorph = { morph: 0, driven: false };
+
 /**
  * Drives the morph from the page scroll, and sizes the card while it is at it.
  *
  * The sizing is the part that matters: the card takes the whole height under
  * the dock line whatever it holds, which is what makes one row behave like a
  * thousand and what keeps the pager on screen.
+ *
+ * It reports `driven` only once it has actually taken a height, which matters
+ * now that it runs by default: a table in a drawer, a modal or a card has no
+ * page to fill, and a table that claims to be driven gives up its own max
+ * height. No scrolling ancestor, or too little room to be worth filling, and
+ * this stays inert and the table behaves exactly as it did before.
  */
 function useSelfDrivenMorph(
   cardRef: MutableRefObject<HTMLDivElement | null>,
   enabled: boolean,
   dockOffset: number | undefined
-): number {
-  const [morph, setMorph] = useState(0);
+): TableMorph {
+  const [state, setState] = useState<TableMorph>(INERT);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -166,12 +175,14 @@ function useSelfDrivenMorph(
     if (found === null) return undefined;
     const page = found;
     const dock = dockOffset ?? dockLineOf(card);
+    let filling = false;
 
     const fill = (): void => {
       card.style.height = '';
       card.style.marginBottom = '';
       const room = page.clientHeight - dock;
-      if (room < MIN_FILL) return;
+      filling = room >= MIN_FILL;
+      if (!filling) return;
       card.style.height = `${String(room)}px`;
       /* Cancel the surface's trailing padding so the page's own scroll end IS
        * the dock line; without it the page runs past and the pinned header
@@ -186,8 +197,12 @@ function useSelfDrivenMorph(
     const read = (): void => {
       raf = 0;
       const top = card.getBoundingClientRect().top - page.getBoundingClientRect().top;
-      const next = Math.min(1, Math.max(0, (dock + MORPH_RANGE - top) / MORPH_RANGE));
-      setMorph((prev) => (Math.abs(prev - next) < 0.001 ? prev : next));
+      const next = filling ? Math.min(1, Math.max(0, (dock + MORPH_RANGE - top) / MORPH_RANGE)) : 0;
+      setState((prev) =>
+        prev.driven === filling && Math.abs(prev.morph - next) < 0.001
+          ? prev
+          : { morph: next, driven: filling }
+      );
     };
     const onScroll = (): void => {
       if (raf === 0) raf = requestAnimationFrame(read);
@@ -212,10 +227,11 @@ function useSelfDrivenMorph(
       if (raf !== 0) cancelAnimationFrame(raf);
       card.style.height = '';
       card.style.marginBottom = '';
+      setState(INERT);
     };
   }, [cardRef, enabled, dockOffset]);
 
-  return morph;
+  return state;
 }
 
 /**
@@ -238,10 +254,13 @@ const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
   ref
 ) {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const self = expand === true;
-  const autoMorph = useSelfDrivenMorph(cardRef, self, dockOffset);
-  /* `expand` means the table decides; `docked` is the page deciding for it. */
-  const state = self ? { morph: autoMorph, driven: true } : tableMorphOf(docked);
+  /* Expanding is the default (Pranjal, 2026-09-10). A page that drives the
+   * morph itself with `docked` keeps that job; `expand={false}` opts out. */
+  const self = expand ?? docked === undefined;
+  /* Inert until it has actually found a page to fill, so a table with nowhere
+   * to grow stays an ordinary card and keeps its own max height. */
+  const auto = useSelfDrivenMorph(cardRef, self, dockOffset);
+  const state = self ? auto : tableMorphOf(docked);
   const { morph } = state;
   const setCard = useCallback(
     (node: HTMLDivElement | null) => {

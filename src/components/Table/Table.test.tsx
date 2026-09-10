@@ -356,7 +356,16 @@ describe('Table expand — the table drives its own morph', () => {
     expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
   });
 
-  it('reports itself as driven, so the viewport clips instead of scrolling', () => {
+  it('is on without being asked for — a plain table expands', () => {
+    render(
+      <Table label="Users">
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('with no page to fill it stays inert, so the viewport keeps its max height', () => {
     const seen: boolean[] = [];
     const Probe = (): null => {
       seen.push(useTableMorph().driven);
@@ -367,7 +376,9 @@ describe('Table expand — the table drives its own morph', () => {
         <Probe />
       </Table>
     );
-    expect(seen.at(-1)).toBe(true);
+    /* Nothing here scrolls, so there is nothing to fill and nothing to drive.
+     * A table in a drawer, a modal or a card lands exactly here. */
+    expect(seen.at(-1)).toBe(false);
   });
 
   it('ignores docked while expand is on — the table decides, not the page', () => {
@@ -385,13 +396,24 @@ describe('Table expand — the table drives its own morph', () => {
     expect(seen.at(-1)).toBe(0);
   });
 
-  it('leaves docked alone when expand is off — the old contract is untouched', () => {
+  it('leaves docked alone — a page driving the morph itself keeps that job', () => {
     render(
       <Table label="Users" docked>
         <div>rows</div>
       </Table>
     );
     expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'true');
+  });
+
+  it('opts out on expand={false}, docked and all', () => {
+    render(
+      <Table label="Users" expand={false} docked={0.5}>
+        <div>rows</div>
+      </Table>
+    );
+    const card = screen.getByRole('region', { name: 'Users' });
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('0.5');
   });
 
   it('accepts a dock line for pages that are not a PageFrame', () => {
@@ -421,7 +443,7 @@ describe('Table expand — the table drives its own morph', () => {
       </Table>
     );
     rerender(
-      <Table label="Users">
+      <Table label="Users" expand={false}>
         <div>rows</div>
       </Table>
     );
