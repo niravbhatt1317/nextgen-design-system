@@ -266,14 +266,18 @@ const PagerBlank = (): ReactNode => (
 );
 
 /**
- * The REAL Table, with `expand` switched on.
+ * The REAL Table, asking for nothing.
+ *
+ * Note what is NOT written below: `expand`. It is the default, so a table
+ * dropped into a frame fills the height under the pin line without anyone
+ * remembering to switch it on.
  *
  * The frame's part in this is only publishing the dock line; the table reads it
  * and does the rest itself. These stories used to carry their own copy of that
  * behaviour, which is exactly the duplication the `expand` setting removed.
  */
 const ExpandingTable = ({ rows = 16 }: { rows?: number }): ReactNode => (
-  <Table label="Users" expand>
+  <Table label="Users">
     <TableViewport tableWidth={880} label="Users" rowCount={rows}>
       <thead>
         <tr>
@@ -357,10 +361,11 @@ const meta = {
           '**sides**, because a tab band ends in the active tab’s 2px underline and at 6px of air that',
           'line and the table’s top edge read as one, welding the tabs to the surface.',
           '',
-          '**With the table\u2019s `expand` switched on it takes the full height under the pin line — ' +
-            'whatever it holds.** One rule, two consequences: it expands on scroll **even holding a single ' +
+          '**A table takes the full height under the pin line — whatever it holds — and it does ' +
+            'that by default.** One rule, two consequences: it expands on scroll **even holding a single ' +
             'row**, and its paging is **always visible at the bottom of the page** rather than floating up ' +
-            'under a short list. That behaviour belongs to the Table; the frame only publishes the pin line.',
+            'under a short list. That behaviour belongs to the Table; the frame only publishes the pin ' +
+            'line. Nothing on these pages asks for it — `expand={false}` is how you would refuse it.',
           '',
           'Content in these stories is drawn as flat blanks on purpose — not the `Skeleton` component,',
           'which pulses because it means "this is still loading". Nothing here is loading.',
@@ -674,8 +679,8 @@ export const AnEmptySurface: Story = {
  * side borders and flattens its corners — it stops being an object on the page
  * and becomes the page.
  *
- * This is the real `Table` with `expand` on. The frame's only part is
- * publishing the pin line, which the table reads for itself.
+ * This is the real `Table`, asking for nothing — expanding is its default. The
+ * frame's only part is publishing the pin line, which the table reads for itself.
  */
 export const TheCardBecomesThePage: Story = {
   render: () => (
