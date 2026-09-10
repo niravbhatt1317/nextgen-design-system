@@ -44,6 +44,7 @@ const meta: Meta<typeof Button> = {
     docs: {
       description: {
         component:
+          '**Behaviour reference — Claude artifacts:** [Button Variants](https://claude.ai/code/artifact/2418ec74-6852-43bf-9001-d028a8fccddf), every look, state and size on one live page, and [Button Spec](https://claude.ai/code/artifact/9e5401f0-4c01-49c5-8b1e-6072cd630e8c), the measurements drawn out. Open them to see how this component is meant to behave — they are what it was designed and approved from.\n\n' +
           'The merged console button. Seven looks, three heights of 28, 32 and 36, one text size of 13/20 and one glyph size of 16 at a 1.5 stroke. ' +
           'The height is not set directly: it comes from the 20px line the label sits on, so 6 above and 6 below make 32. ' +
           'Padding is decided by what meets each edge — 16 against a word, 12 against a glyph — which is why a button with a leading glyph is 12 on the left and 16 on the right. ' +

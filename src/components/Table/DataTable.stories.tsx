@@ -242,6 +242,8 @@ const meta: Meta<typeof UsersTable> = {
     docs: {
       description: {
         component: [
+          '**Behaviour reference — Claude artifact:** [Users Table Workbench](https://claude.ai/code/artifact/5a4568b4-1ca7-4b54-ba2c-436e9cce3f14), a working table you can sort, pick, drag and page through. Open it to see how each part is meant to behave — it is what this component was designed and approved from.',
+          '',
           'The merged console Users table, ported on 7 September 2026. `DataTable` assembles the pieces: the `Toolbar` strip with search, Filters, a quick filter, Sort and Columns; the card with its frozen row-number, Name and Action columns; a bulk bar; a pager or a "Load more" footer; and the blank states.',
           '',
           '| Part | Rule |',

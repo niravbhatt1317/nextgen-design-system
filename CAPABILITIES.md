@@ -18,7 +18,7 @@ bury the handful of hooks that are the whole point of this file. They are still
 searchable, which is what matters: `npm run find -- selectable rows` finds the
 story that already exists. They are in `capability-catalog.json` in full.
 
-1022 capabilities: 248 components, 28 hooks, 19 utilities, 727 stories
+1028 capabilities: 248 components, 28 hooks, 19 utilities, 733 stories
 
 ## Components
 
