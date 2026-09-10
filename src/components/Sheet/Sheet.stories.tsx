@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from './Sheet';
-import { Button } from '../Button';
+import { ButtonOld as Button } from '../ButtonOld';
 import { Input } from '../Input';
 import { Checkbox } from '../Checkbox';
 import { Select } from '../Select';

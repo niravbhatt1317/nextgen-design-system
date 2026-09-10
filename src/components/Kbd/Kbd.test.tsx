@@ -1,6 +1,6 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Button } from '../Button';
+import { ButtonOld as Button } from '../ButtonOld';
 import { Kbd } from './Kbd';
 import { describeKeys, isModifier, resolveKey } from './keys';
 import { usePlatform } from './usePlatform';

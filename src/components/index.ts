@@ -66,9 +66,15 @@ export type {
   BannerActionPlacement,
 } from './Banner';
 
-// Button
-export { Button, ButtonVariants } from './Button';
-export type { ButtonProps, ButtonVariantsType } from './Button';
+// Button — the merged console button (2026-09-10): seven variants, three heights,
+// one text size, and padding decided by what meets each edge.
+export { Button, buttonVariants } from './Button';
+export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
+
+// ButtonOld — the previous Button, DEPRECATED 2026-09-10, kept until 1.0.0 for the
+// success and AI families, pill and circle shapes, elevation, ripple, badges and shortcut chips.
+export { ButtonOld, ButtonOldVariants } from './ButtonOld';
+export type { ButtonOldProps, ButtonOldVariantsType } from './ButtonOld';
 
 // ButtonGroup
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';

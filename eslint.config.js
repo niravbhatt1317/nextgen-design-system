@@ -186,8 +186,17 @@ export default tseslint.config(
       '**/BadgeOld/**',
       '**/TagPillOld/**',
       '**/ToolbarOld/**',
+      '**/ButtonOld/**',
       '**/TableOld/**',
       '**/TooltipOld/**',
+      // These stories demonstrate what ButtonOld still carries and the new Button
+      // deliberately does not: the AI family, shortcut chips inside a button, and a
+      // corner badge. They are meant to reach for the deprecated one (2026-09-10).
+      'src/components/AiMark/AiMark.stories.tsx',
+      'src/components/Dialog/Dialog.stories.tsx',
+      'src/components/Kbd/Kbd.stories.tsx',
+      'src/components/Kbd/Kbd.test.tsx',
+      'src/components/Sheet/Sheet.stories.tsx',
       // DataTable still renders the deprecated strip and chips until the table port (2026-09-04)
       'src/components/index.ts',
     ],

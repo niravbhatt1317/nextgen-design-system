@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1011,
+  "capabilityCount": 1021,
   "counts": {
-    "story": 717,
-    "component": 247,
+    "story": 726,
+    "component": 248,
     "utility": 19,
     "hook": 28
   },
@@ -26,6 +26,16 @@
       "area": "Banner",
       "summary": "Story: Components/Banner / ActionPlacement",
       "doc": "Components/Banner ActionPlacement",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Active",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: Components/Button / Active",
+      "doc": "Components/Button Active",
       "props": [],
       "propDocs": ""
     },
@@ -72,10 +82,10 @@
     {
       "name": "AiFamily",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / AiFamily",
-      "doc": "Components/Button AiFamily",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / AiFamily",
+      "doc": "Deprecated/Button Old AiFamily",
       "props": [],
       "propDocs": ""
     },
@@ -237,6 +247,16 @@
     {
       "name": "AllVariants",
       "kind": "story",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / AllVariants",
+      "doc": "Deprecated/Button Old AllVariants",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AllVariants",
+      "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
       "summary": "Story: Components/Combobox / AllVariants",
@@ -327,10 +347,20 @@
     {
       "name": "AskAI",
       "kind": "story",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / AskAI",
+      "doc": "Deprecated/Button Old AskAI",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AsLink",
+      "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
       "area": "Button",
-      "summary": "Story: Components/Button / AskAI",
-      "doc": "Components/Button AskAI",
+      "summary": "Story: Components/Button / AsLink",
+      "doc": "Components/Button AsLink",
       "props": [],
       "propDocs": ""
     },
@@ -473,10 +503,10 @@
     {
       "name": "BetaExample",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / BetaExample",
-      "doc": "Components/Button BetaExample",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / BetaExample",
+      "doc": "Deprecated/Button Old BetaExample",
       "props": [],
       "propDocs": ""
     },
@@ -575,10 +605,26 @@
       "kind": "component",
       "file": "src/components/Button/Button.tsx",
       "area": "Button",
-      "summary": "Button component with extensive features and variants.",
-      "doc": "Button component with extensive features and variants. ```tsx // Basic usage <Button variant=\"primary\">Click me</Button> // With loading state <Button loading loadingText=\"Saving...\">Save</Button> // With icons <Button leftIcon={<PlusIcon />}>Add Item</Button> // Icon only <Button iconOnly shape=\"circle\"><TrashIcon /></Button> // With badge <Button badge={3}>Notifications</Button> // As link <Button href=\"/dashboard\" target=\"_blank\">Dashboard</Button> // With tooltip <Button tooltipContent=\"Click to save\">Save</Button> ```",
-      "props": [],
-      "propDocs": ""
+      "summary": "Button — the merged console's button.",
+      "doc": "Button — the merged console's button. Seven looks, three heights, one text size and one glyph size. Everything a reader can see is settled by the variant and the content: the height comes from the 20px line the label sits on, and the padding comes from whether a word or a glyph meets each edge. <Button leftIcon={<Icon name=\"plus\" />}>Invite users</Button> <Button variant=\"outline\" size=\"sm\">Cancel</Button> <Button iconOnly variant=\"ghost\" ariaLabel=\"Row actions\" leftIcon={<Icon name=\"more-vertical\" />} />",
+      "props": [
+        "variant",
+        "size",
+        "children",
+        "leftIcon",
+        "rightIcon",
+        "iconOnly",
+        "loading",
+        "loadingText",
+        "fullWidth",
+        "active",
+        "href",
+        "target",
+        "ariaLabel",
+        "className",
+        "style"
+      ],
+      "propDocs": "The button's look. Defaults to `primary`. Height: `sm` 28, `md` 32, `lg` 36. Defaults to `md`. The label. Omit it only with `iconOnly`. A glyph before the label. Rendered at 16 with a 1.5 stroke. A glyph after the label. Rendered at 16 with a 1.5 stroke. A square the height of its size, holding one glyph and no label. `ariaLabel` becomes required in practice: nothing else names the button. Busy. Wears the disabled face with a spinner on it, because in both cases there is nothing for the reader to do. The spinner is what says wait rather than no. Swap the label while `loading` — \"Saving…\" in place of \"Save\". Stretch to the width of the parent. Held on, the way a toolbar control looks once its filter is applied. Draws the pressed fill and reports `aria-pressed`. Render an anchor instead of a button. Where the anchor opens. `_blank` also gets `rel=\"noopener noreferrer\"`. The accessible name. Required when `iconOnly` leaves no label to read."
     },
     {
       "name": "ButtonAddons",
@@ -623,6 +669,16 @@
       "area": "Spinner",
       "summary": "Story: Components/Spinner / ButtonLoadingState",
       "doc": "Components/Spinner ButtonLoadingState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ButtonOld",
+      "kind": "component",
+      "file": "src/components/ButtonOld/ButtonOld.tsx",
+      "area": "ButtonOld",
+      "summary": "ButtonOld component with extensive features and variants.",
+      "doc": "ButtonOld component with extensive features and variants. ```tsx // Basic usage <ButtonOld variant=\"primary\">Click me</ButtonOld> // With loading state <ButtonOld loading loadingText=\"Saving...\">Save</ButtonOld> // With icons <ButtonOld leftIcon={<PlusIcon />}>Add Item</ButtonOld> // Icon only <ButtonOld iconOnly shape=\"circle\"><TrashIcon /></ButtonOld> // With badge <ButtonOld badge={3}>Notifications</ButtonOld> // As link <ButtonOld href=\"/dashboard\" target=\"_blank\">Dashboard</ButtonOld> // With tooltip <ButtonOld tooltipContent=\"Click to save\">Save</ButtonOld> ```",
       "props": [],
       "propDocs": ""
     },
@@ -1971,20 +2027,20 @@
     {
       "name": "Default",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Default",
-      "doc": "Components/Button Default",
+      "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
+      "area": "ButtonGroup",
+      "summary": "Story: Components/ButtonGroup / Default",
+      "doc": "Components/ButtonGroup Default",
       "props": [],
       "propDocs": ""
     },
     {
       "name": "Default",
       "kind": "story",
-      "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
-      "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Default",
-      "doc": "Components/ButtonGroup Default",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Default",
+      "doc": "Deprecated/Button Old Default",
       "props": [],
       "propDocs": ""
     },
@@ -2521,10 +2577,10 @@
     {
       "name": "DeprecatedExample",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / DeprecatedExample",
-      "doc": "Components/Button DeprecatedExample",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / DeprecatedExample",
+      "doc": "Deprecated/Button Old DeprecatedExample",
       "props": [],
       "propDocs": ""
     },
@@ -2564,10 +2620,10 @@
     {
       "name": "Destructive",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Destructive",
-      "doc": "Components/Button Destructive",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Destructive",
+      "doc": "Deprecated/Button Old Destructive",
       "props": [],
       "propDocs": ""
     },
@@ -2594,10 +2650,10 @@
     {
       "name": "DestructiveFamily",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / DestructiveFamily",
-      "doc": "Components/Button DestructiveFamily",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / DestructiveFamily",
+      "doc": "Deprecated/Button Old DestructiveFamily",
       "props": [],
       "propDocs": ""
     },
@@ -2801,10 +2857,10 @@
     {
       "name": "Disabled",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Disabled",
-      "doc": "Components/Button Disabled",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Disabled",
+      "doc": "Deprecated/Button Old Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -3317,10 +3373,10 @@
     {
       "name": "ExperimentalExample",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / ExperimentalExample",
-      "doc": "Components/Button ExperimentalExample",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / ExperimentalExample",
+      "doc": "Deprecated/Button Old ExperimentalExample",
       "props": [],
       "propDocs": ""
     },
@@ -3391,6 +3447,16 @@
       "area": "Flex",
       "summary": "Flex component for creating flexbox layouts.",
       "doc": "Flex component for creating flexbox layouts. A flexible layout primitive that provides a declarative API for building flex-based layouts with support for direction, wrapping, gaps, and alignment. ```tsx // Basic horizontal flex <Flex gap=\"md\"> <div>Item 1</div> <div>Item 2</div> <div>Item 3</div> </Flex> ``` ```tsx // Vertical flex with center alignment <Flex direction=\"col\" align=\"center\" gap=\"lg\"> <Button>Button 1</Button> <Button>Button 2</Button> </Flex> ``` ```tsx // Flex with space between and center alignment <Flex justify=\"between\" align=\"center\"> <div>Left content</div> <div>Right content</div> </Flex> ``` ```tsx // Polymorphic usage as nav <Flex as=\"nav\" gap=\"md\" align=\"center\"> <a href=\"/\">Home</a> <a href=\"/about\">About</a> </Flex> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Focus",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: Components/Button / Focus",
+      "doc": "Components/Button Focus",
       "props": [],
       "propDocs": ""
     },
@@ -3702,6 +3768,16 @@
     {
       "name": "FullWidth",
       "kind": "story",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / FullWidth",
+      "doc": "Deprecated/Button Old FullWidth",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "FullWidth",
+      "kind": "story",
       "file": "src/components/Stack/Stack.stories.tsx",
       "area": "Stack",
       "summary": "Story: Layout/Stack / FullWidth",
@@ -3772,10 +3848,10 @@
     {
       "name": "Ghost",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Ghost",
-      "doc": "Components/Button Ghost",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Ghost",
+      "doc": "Deprecated/Button Old Ghost",
       "props": [],
       "propDocs": ""
     },
@@ -4056,10 +4132,10 @@
     {
       "name": "IconButton",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / IconButton",
-      "doc": "Components/Button IconButton",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / IconButton",
+      "doc": "Deprecated/Button Old IconButton",
       "props": [],
       "propDocs": ""
     },
@@ -4444,10 +4520,10 @@
     {
       "name": "InteractionTest",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / InteractionTest",
-      "doc": "Components/Button InteractionTest",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / InteractionTest",
+      "doc": "Deprecated/Button Old InteractionTest",
       "props": [],
       "propDocs": ""
     },
@@ -4484,10 +4560,10 @@
     {
       "name": "InteractionTestDisabled",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / InteractionTestDisabled",
-      "doc": "Components/Button InteractionTestDisabled",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / InteractionTestDisabled",
+      "doc": "Deprecated/Button Old InteractionTestDisabled",
       "props": [],
       "propDocs": ""
     },
@@ -4524,10 +4600,10 @@
     {
       "name": "InteractionTestLoading",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / InteractionTestLoading",
-      "doc": "Components/Button InteractionTestLoading",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / InteractionTestLoading",
+      "doc": "Deprecated/Button Old InteractionTestLoading",
       "props": [],
       "propDocs": ""
     },
@@ -5062,10 +5138,10 @@
     {
       "name": "Link",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Link",
-      "doc": "Components/Button Link",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Link",
+      "doc": "Deprecated/Button Old Link",
       "props": [],
       "propDocs": ""
     },
@@ -5112,10 +5188,10 @@
     {
       "name": "Loading",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Loading",
-      "doc": "Components/Button Loading",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Loading",
+      "doc": "Deprecated/Button Old Loading",
       "props": [],
       "propDocs": ""
     },
@@ -5152,10 +5228,10 @@
     {
       "name": "LoadingEveryVariant",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / LoadingEveryVariant",
-      "doc": "Components/Button LoadingEveryVariant",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / LoadingEveryVariant",
+      "doc": "Deprecated/Button Old LoadingEveryVariant",
       "props": [],
       "propDocs": ""
     },
@@ -5750,10 +5826,10 @@
     {
       "name": "Outline",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Outline",
-      "doc": "Components/Button Outline",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Outline",
+      "doc": "Deprecated/Button Old Outline",
       "props": [],
       "propDocs": ""
     },
@@ -6139,6 +6215,16 @@
     {
       "name": "Playground",
       "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: Components/Button / Playground",
+      "doc": "Components/Button Playground",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
       "file": "src/components/LeftNav/LeftNav.stories.tsx",
       "area": "LeftNav",
       "summary": "Story: Components/LeftNav / Playground",
@@ -6226,20 +6312,20 @@
     {
       "name": "Primary",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Primary",
-      "doc": "Components/Button Primary",
+      "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
+      "area": "ButtonGroup",
+      "summary": "Story: Components/ButtonGroup / Primary",
+      "doc": "Components/ButtonGroup Primary",
       "props": [],
       "propDocs": ""
     },
     {
       "name": "Primary",
       "kind": "story",
-      "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
-      "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Primary",
-      "doc": "Components/ButtonGroup Primary",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Primary",
+      "doc": "Deprecated/Button Old Primary",
       "props": [],
       "propDocs": ""
     },
@@ -6744,10 +6830,10 @@
     {
       "name": "Secondary",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Secondary",
-      "doc": "Components/Button Secondary",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Secondary",
+      "doc": "Deprecated/Button Old Secondary",
       "props": [],
       "propDocs": ""
     },
@@ -7420,6 +7506,16 @@
     {
       "name": "Sizes",
       "kind": "story",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Sizes",
+      "doc": "Deprecated/Button Old Sizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sizes",
+      "kind": "story",
       "file": "src/components/Dialog/Dialog.stories.tsx",
       "area": "Dialog",
       "summary": "Story: Components/Dialog / Sizes",
@@ -7849,10 +7945,10 @@
     {
       "name": "Success",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / Success",
-      "doc": "Components/Button Success",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / Success",
+      "doc": "Deprecated/Button Old Success",
       "props": [],
       "propDocs": ""
     },
@@ -7869,10 +7965,10 @@
     {
       "name": "SuccessFamily",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / SuccessFamily",
-      "doc": "Components/Button SuccessFamily",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / SuccessFamily",
+      "doc": "Deprecated/Button Old SuccessFamily",
       "props": [],
       "propDocs": ""
     },
@@ -9973,6 +10069,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithAndWithoutIcons",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: Components/Button / WithAndWithoutIcons",
+      "doc": "Components/Button WithAndWithoutIcons",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithArrow",
       "kind": "story",
       "file": "src/components/HoverCard/HoverCard.stories.tsx",
@@ -10545,10 +10651,10 @@
     {
       "name": "WithLeftIcon",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / WithLeftIcon",
-      "doc": "Components/Button WithLeftIcon",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / WithLeftIcon",
+      "doc": "Deprecated/Button Old WithLeftIcon",
       "props": [],
       "propDocs": ""
     },
@@ -10715,10 +10821,10 @@
     {
       "name": "WithRightIcon",
       "kind": "story",
-      "file": "src/components/Button/Button.stories.tsx",
-      "area": "Button",
-      "summary": "Story: Components/Button / WithRightIcon",
-      "doc": "Components/Button WithRightIcon",
+      "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
+      "area": "Button Old",
+      "summary": "Story: Deprecated/Button Old / WithRightIcon",
+      "doc": "Deprecated/Button Old WithRightIcon",
       "props": [],
       "propDocs": ""
     },
@@ -10859,6 +10965,16 @@
       "area": "KPI Card",
       "summary": "Story: Components/KPI Card / WithTrendChip",
       "doc": "Components/KPI Card WithTrendChip",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WorkingAndDisabled",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: Components/Button / WorkingAndDisabled",
+      "doc": "Components/Button WorkingAndDisabled",
       "props": [],
       "propDocs": ""
     },
