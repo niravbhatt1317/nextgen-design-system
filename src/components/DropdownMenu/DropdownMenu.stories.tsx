@@ -231,7 +231,7 @@ export const WithIcons: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Open menu">
+        <Button variant="outline" iconOnly aria-label="Open menu">
           <Icon name="more-horizontal" size="sm" />
         </Button>
       </DropdownMenuTrigger>

@@ -279,7 +279,7 @@ export const InForm: Story = {
           </label>
           <TooltipOld>
             <TooltipTriggerOld asChild>
-              <Button variant="ghost" size="icon" aria-label="Username help">
+              <Button variant="ghost" iconOnly aria-label="Username help">
                 <Icon name="info" size="sm" color="muted" />
               </Button>
             </TooltipTriggerOld>
@@ -298,7 +298,7 @@ export const InForm: Story = {
           </label>
           <TooltipOld>
             <TooltipTriggerOld asChild>
-              <Button variant="ghost" size="icon" aria-label="Email help">
+              <Button variant="ghost" iconOnly aria-label="Email help">
                 <Icon name="info" size="sm" color="muted" />
               </Button>
             </TooltipTriggerOld>
@@ -317,7 +317,7 @@ export const InForm: Story = {
           </label>
           <TooltipOld>
             <TooltipTriggerOld asChild>
-              <Button variant="ghost" size="icon" aria-label="Password help">
+              <Button variant="ghost" iconOnly aria-label="Password help">
                 <Icon name="info" size="sm" color="muted" />
               </Button>
             </TooltipTriggerOld>
@@ -365,7 +365,7 @@ export const MultipleTooltips: Story = {
     <div className="mdt-inline-flex mdt-gap-1 mdt-rounded-md mdt-border mdt-border-border mdt-p-1">
       <TooltipOld>
         <TooltipTriggerOld asChild>
-          <Button variant="ghost" size="icon" aria-label="Bold">
+          <Button variant="ghost" iconOnly aria-label="Bold">
             <Icon name="bold" size="sm" />
           </Button>
         </TooltipTriggerOld>
@@ -377,7 +377,7 @@ export const MultipleTooltips: Story = {
 
       <TooltipOld>
         <TooltipTriggerOld asChild>
-          <Button variant="ghost" size="icon" aria-label="Italic">
+          <Button variant="ghost" iconOnly aria-label="Italic">
             <Icon name="italic" size="sm" />
           </Button>
         </TooltipTriggerOld>
@@ -389,7 +389,7 @@ export const MultipleTooltips: Story = {
 
       <TooltipOld>
         <TooltipTriggerOld asChild>
-          <Button variant="ghost" size="icon" aria-label="Underline">
+          <Button variant="ghost" iconOnly aria-label="Underline">
             <Icon name="underline" size="sm" />
           </Button>
         </TooltipTriggerOld>
@@ -403,7 +403,7 @@ export const MultipleTooltips: Story = {
 
       <TooltipOld>
         <TooltipTriggerOld asChild>
-          <Button variant="ghost" size="icon" aria-label="Insert link">
+          <Button variant="ghost" iconOnly aria-label="Insert link">
             <Icon name="link" size="sm" />
           </Button>
         </TooltipTriggerOld>

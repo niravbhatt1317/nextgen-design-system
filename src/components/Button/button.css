@@ -1,0 +1,51 @@
+/* Button — the few things a utility class cannot say.
+ *
+ * Every glyph inside a button draws at 1.5, one step lighter than the icon set
+ * ships at, because a 16 glyph beside 13px text reads heavy at 2.
+ */
+.mdt-btn svg {
+  stroke-width: 1.5;
+}
+
+/* The spinner. `loading` wears the disabled face, so this turns at full opacity
+ * inside a button already dimmed to half — the motion is the only thing that
+ * separates busy from unavailable. */
+.mdt-btn-spin {
+  animation: mdt-btn-spin 0.7s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes mdt-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Someone who has asked for less movement still needs to know the button is
+ * working, so the spinner slows rather than stops. */
+@media (prefers-reduced-motion: reduce) {
+  .mdt-btn-spin {
+    animation-duration: 2.4s;
+  }
+  .mdt-btn {
+    transition: none;
+  }
+}
+
+/* The outbound marker on a link. It holds its place at all times and only
+ * shows on hover, so a sentence containing a link never reflows when the
+ * pointer arrives. */
+.mdt-btn-out {
+  opacity: 0;
+  transition: opacity 0.13s ease;
+}
+
+.mdt-btn:hover .mdt-btn-out {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdt-btn-out {
+    transition: none;
+  }
+}

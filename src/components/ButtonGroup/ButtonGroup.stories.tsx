@@ -121,13 +121,13 @@ export const IconButtons: Story = {
   args: {
     children: (
       <>
-        <Button variant="outline" size="icon" aria-label="Settings">
+        <Button variant="outline" iconOnly aria-label="Settings">
           <Icon name="settings" aria-hidden />
         </Button>
-        <Button variant="outline" size="icon" aria-label="Download">
+        <Button variant="outline" iconOnly aria-label="Download">
           <Icon name="download" aria-hidden />
         </Button>
-        <Button variant="outline" size="icon" aria-label="Share">
+        <Button variant="outline" iconOnly aria-label="Share">
           <Icon name="share-2" aria-hidden />
         </Button>
       </>
@@ -177,10 +177,10 @@ export const Sizes: Story = {
   render: () => (
     <div className="mdt-flex mdt-flex-col mdt-gap-4">
       <ButtonGroup>
-        <Button variant="outline" size="xs">
+        <Button variant="outline" size="sm">
           Extra Small
         </Button>
-        <Button variant="outline" size="xs">
+        <Button variant="outline" size="sm">
           Button
         </Button>
       </ButtonGroup>
@@ -209,10 +209,10 @@ export const Sizes: Story = {
         </Button>
       </ButtonGroup>
       <ButtonGroup>
-        <Button variant="outline" size="xl">
+        <Button variant="outline" size="lg">
           Extra Large
         </Button>
-        <Button variant="outline" size="xl">
+        <Button variant="outline" size="lg">
           Button
         </Button>
       </ButtonGroup>

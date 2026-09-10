@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
-import { Button } from '../Button';
+import { ButtonOld as Button } from '../ButtonOld';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button } from '../Button';
+import { ButtonOld as Button } from '../ButtonOld';
 import { Badge } from '../Badge';
 import { Callout } from '../Callout';
 import { Tabs, TabsList, TabsTrigger } from '../Tabs';
