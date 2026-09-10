@@ -1,5 +1,79 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- 624296d: Button is the merged console's button (10 September 2026). Seven looks — primary, secondary, outline, ghost, destructive, destructiveGhost and link — at three heights of 28, 32 and 36, with 32 the default.
+
+  One text size everywhere, 13/20 at weight 500, and one glyph size everywhere, 16 drawn at a 1.5 stroke. The height is not set directly: it falls out of the 20px line the label sits on, so 6 above and 6 below make 32, 4 and 4 make 28, 8 and 8 make 36. Padding is decided by what meets each edge rather than by the size — 16 against a word, 12 against a glyph — so a button with a leading glyph is 12 on the left and 16 on the right, and the two figures swap when the glyph trails. Icon-only is a square the height of its size. Corner 8 throughout.
+
+  `secondary` is now a quiet fill with no border, which is what separates it from `outline`; together with `primary` that gives three volumes a reader can rank without reading the labels. Hover and press move along the neutral ramp instead of fading the fill, because fading blends a colour toward the page behind it and costs a white label its contrast.
+
+  `loading` wears the disabled face with a spinner on it: in both cases there is nothing for the reader to do, and the turning glyph is what says wait rather than no. It works on an icon-only square too. Keyboard focus lights the button's own edge and lifts its fill, with nothing drawn outside the box, so the mark can never touch a neighbour and the layout never moves. A `link` carries an outbound marker that holds its place at all times and only shows on hover, so a sentence containing one never reflows.
+
+  The previous Button is `ButtonOld`, deprecated, kept until 1.0.0 for everything left out on purpose: the success and AI families, the soft and outlined destructive steps, the extra-small and extra-large heights, the pill, circle and square shapes, elevation, uppercase, ripple, corner badges, shortcut chips and the built-in tooltip. Stories that demonstrate those now import `ButtonOld`.
+
+- 5fce5b1: KpiCard and KpiStrip: the merged console's KPI tile (7 September 2026). One metric on one card (label, rounded number, quiet line, an optional trend chip as a Badge, a chart area pinned right with KpiGauge and KpiBars first), or a group of two to n metrics sharing one card split by inset hairlines. Clickable is a switch per card or segment, off by default, with the console's hover cue. A plain card has a 174px floor and no ceiling; a chart card no floor and 270 natural. KpiStrip is the row: cards grow evenly until the row is full, then it scrolls sideways instead of squeezing, bleeding through the page inset so a cut card is cut at the page edge. Nothing deprecated: the library had no KPI piece; Card and IconTile are untouched.
+- 6065087: PageFrame: the default page layout of the merged console
+
+  The layer above the components — where things go, rather than what they look
+  like. A navigation rail that never moves sits beside ONE scroll container, and
+  that container holds four bands in a fixed order:
+  - `PageHeader` (B1) — 60 tall, pinned at 0, always rendered because it is the
+    page's fixed anchor. Carries the breadcrumb, never a global control. The one
+    band that keeps a hairline.
+  - `PageHero` (B2) — the page's single H1 with its badge, supporting line and an
+    action cluster of one to three buttons; banners and the KPI strip go in as
+    children. Never pinned.
+  - `PageBand` (B2t/B3) — 60 tall, pinned at 58. `variant="tabs"` or
+    `variant="toolbar"`, and a page renders exactly one of them, never both.
+  - `PageSurface` (B4) — a natural-height stack riding the page scroll, never a
+    scroller of its own.
+
+  Two things are derived rather than typed, so they cannot drift:
+  - `--mdt-thead-top` is calculated from the two band heights, so a table inside
+    the frame docks at the right offset without knowing what the bands are.
+  - The surface's inset comes from the band actually rendered above it, through a
+    CSS sibling rule. Under a toolbar band it is 6 above and 20 below; under a tab
+    band it is 16 on both sides, because a tab band ends in the active tab's 2px
+    underline and at 6px of air that line and the table's own top edge read as a
+    single line.
+
+  The hero hands its action cluster to the header band once it scrolls out of
+  view, so the page's main verbs never leave the screen; the hero's own copy stays
+  rendered and reachable throughout.
+
+- 8ecb987: Colours: five new families, and a Foundation page that reads itself
+
+  **Five families the palette did not have** — indigo, teal, magenta, cyan and
+  lime, 55 shades. Category colours: hues that carry no meaning, so a source chip
+  or an avatar never reads as success, warning or danger. Until now they were
+  written by hand into chip code because there was nothing here to reach for. The
+  anchor shades are exactly the values those chips already painted, so nothing on
+  screen moves.
+
+  This is **purely additive**. Not one of the existing 87 shades is touched.
+
+  **Foundation/Colors is rebuilt.** Every swatch is now read live from the running
+  stylesheet, so the page cannot drift from the tokens it describes. The page it
+  replaces typed out more than a thousand lines of hex by hand and had already
+  drifted — several of its values no longer matched what the token resolved to.
+
+  Four short pages instead of one long one:
+  - **Palette** — twelve families, 141 shades, click a swatch to copy its token.
+  - **What each shade is for** — a stated job per rung, so picking a shade is a
+    decision rather than a guess at brightness.
+  - **Text on a tint** — each family's published text shade, with its contrast
+    measured as the page renders. Red reaches 4.5:1 at -70, most families need
+    -80, and yellow and purple have to go to -90.
+  - **Where the console and the library disagree** — the 24 token names that paint
+    one colour here and another in the console. Still open, and Nirav's call.
+
+  The previous page is kept at **Deprecated/Colors Old** until 1.0.0.
+
+- 23077ed: Tooltip is the merged console's hover bubble on the library's engine (7 September 2026): the console fill and text (neutral-130 with white; neutral-10 with neutral-130 in dark), the library's 6/12 padding, 12/16 type, 10 × 5 arrow, four sides with edge flipping, keyboard focus and screen-reader wiring. A 100ms wait by default, `instant` for chips and counters. Two content pieces from the console: `hint`, a quieter 10px second line, and `items`, a bullet list that scrolls past seven lines. Plain text wraps at `maxWidth` 280 and reads centred. No tones, no sizes. The previous Tooltip is `TooltipOld`, deprecated, kept for side-by-side review until 1.0.0. The Table's ContactChips carry the hint bubble and say "Copied!" after a click; TagList's "+N" lists the rest.
+
 ## 0.4.0
 
 ### Minor Changes
