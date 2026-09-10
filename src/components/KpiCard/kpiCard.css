@@ -1,0 +1,147 @@
+/* KPI Card — the merged console tile on the library tokens (Pranjal's rulings, 7 September 2026).
+ * State rules live here because they read across elements: a hovered segment reveals its gear and
+ * draws an inset fill; a segment beside another draws the hairline; the strip sizes its children. */
+
+/* the hairline between segments: 12px clear of the top and bottom edges, never touching the card edge */
+.kpi-seg + .kpi-seg::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: hsl(var(--mdt-neutral-30));
+}
+.dark .kpi-seg + .kpi-seg::before {
+  background: hsl(var(--mdt-neutral-110));
+}
+
+/* a clickable segment: the cue on hover and keyboard focus */
+.kpi-btn {
+  isolation: isolate;
+  transition: transform 120ms ease-out;
+}
+.kpi-btn::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: -1;
+  border-radius: 6px;
+  background: transparent;
+  transition: background 100ms ease-out;
+}
+.kpi-btn:hover,
+.kpi-btn:focus-visible {
+  transform: scale(0.97);
+  outline: none;
+}
+.kpi-btn:hover::after,
+.kpi-btn:focus-visible::after {
+  background: hsl(var(--mdt-neutral-10));
+}
+.dark .kpi-btn:hover::after,
+.dark .kpi-btn:focus-visible::after {
+  background: hsl(var(--mdt-neutral-130));
+}
+.kpi-btn:focus-visible {
+  box-shadow: inset 0 0 0 2px hsl(var(--mdt-ring));
+  border-radius: 10px;
+}
+.kpi-btn:hover .kpi-label,
+.kpi-btn:focus-visible .kpi-label {
+  color: hsl(var(--mdt-neutral-130));
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.dark .kpi-btn:hover .kpi-label,
+.dark .kpi-btn:focus-visible .kpi-label {
+  color: hsl(var(--mdt-neutral-10));
+}
+/* the gear appears beside the label, hugging it; display-switched so it never takes room at rest */
+.kpi-btn:hover .kpi-gear,
+.kpi-btn:focus-visible .kpi-gear {
+  display: inline-flex;
+}
+.kpi-btn:hover .kpi-top:has(.kpi-gear),
+.kpi-btn:focus-visible .kpi-top:has(.kpi-gear) {
+  justify-content: flex-start;
+  gap: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kpi-btn,
+  .kpi-btn::after {
+    transition: none;
+  }
+  .kpi-btn:hover,
+  .kpi-btn:focus-visible {
+    transform: none;
+  }
+}
+
+/* the strip: cards keep their floor, grow one share per segment, and the row scrolls past the fit */
+.kpi-strip {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--mdt-neutral-40)) transparent;
+}
+.kpi-strip > .kpi-card {
+  flex: var(--kpi-grow, 1) 0 var(--kpi-basis, 174px);
+  width: auto;
+}
+.kpi-strip-snap {
+  scroll-snap-type: x mandatory;
+}
+.kpi-strip-snap > .kpi-card {
+  scroll-snap-align: start;
+}
+.kpi-strip:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: 2px;
+}
+
+/* charts: the neutral ladder, the threshold in the danger colour */
+.kpi-gauge-track {
+  stroke: hsl(var(--mdt-neutral-30));
+}
+.kpi-gauge-fill {
+  stroke: hsl(var(--mdt-neutral-110));
+}
+.kpi-gauge-number {
+  fill: hsl(var(--mdt-neutral-130));
+}
+.kpi-gauge-caption,
+.kpi-bars-base-label {
+  fill: hsl(var(--mdt-neutral-90));
+}
+.kpi-bars-bar {
+  fill: hsl(var(--mdt-neutral-30));
+}
+.kpi-bars-base {
+  stroke: hsl(var(--mdt-neutral-50));
+}
+.kpi-bars-threshold {
+  stroke: hsl(var(--mdt-red-60));
+}
+.kpi-bars-threshold-label {
+  fill: hsl(var(--mdt-red-60));
+}
+.dark .kpi-gauge-track,
+.dark .kpi-bars-bar {
+  stroke: hsl(var(--mdt-neutral-110));
+  fill: hsl(var(--mdt-neutral-110));
+}
+.dark .kpi-gauge-track {
+  fill: none;
+}
+.dark .kpi-gauge-fill {
+  stroke: hsl(var(--mdt-neutral-40));
+}
+.dark .kpi-gauge-number {
+  fill: hsl(var(--mdt-neutral-10));
+}
+.dark .kpi-gauge-caption,
+.dark .kpi-bars-base-label {
+  fill: hsl(var(--mdt-neutral-40));
+}
+.dark .kpi-bars-base {
+  stroke: hsl(var(--mdt-neutral-70));
+}

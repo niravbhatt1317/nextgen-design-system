@@ -66,9 +66,15 @@ export type {
   BannerActionPlacement,
 } from './Banner';
 
-// Button
-export { Button, ButtonVariants } from './Button';
-export type { ButtonProps, ButtonVariantsType } from './Button';
+// Button — the merged console button (2026-09-10): seven variants, three heights,
+// one text size, and padding decided by what meets each edge.
+export { Button, buttonVariants } from './Button';
+export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
+
+// ButtonOld — the previous Button, DEPRECATED 2026-09-10, kept until 1.0.0 for the
+// success and AI families, pill and circle shapes, elevation, ripple, badges and shortcut chips.
+export { ButtonOld, ButtonOldVariants } from './ButtonOld';
+export type { ButtonOldProps, ButtonOldVariantsType } from './ButtonOld';
 
 // ButtonGroup
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
@@ -800,7 +806,29 @@ export type {
 export { ToolbarOld, ToolbarOldSection, ToolbarOldSpacer, toolbarOldVariants } from './ToolbarOld';
 export type { ToolbarOldProps, ToolbarOldVariants } from './ToolbarOld';
 
-// Tooltip
+// KpiCard — the merged console KPI tile: one metric or a group, and the strip that holds them (2026-09-07)
+export {
+  KpiCard,
+  KpiStrip,
+  KpiGauge,
+  KpiBars,
+  formatKpiValue,
+  KPI_FLOOR,
+  KPI_CHART_WIDTH,
+} from './KpiCard';
+export type {
+  KpiCardProps,
+  KpiSingleCardProps,
+  KpiGroupCardProps,
+  KpiMetricProps,
+  KpiTrend,
+  KpiTrendTone,
+  KpiStripProps,
+  KpiGaugeProps,
+  KpiBarsProps,
+} from './KpiCard';
+
+// Tooltip — the merged console bubble on the library engine (2026-09-07)
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip';
 export type {
   TooltipProps,
@@ -809,6 +837,16 @@ export type {
   TooltipContentRef,
   TooltipProviderProps,
 } from './Tooltip';
+
+// TooltipOld — the previous Tooltip, DEPRECATED 2026-09-07, kept for side-by-side review until 1.0.0
+export { TooltipOld, TooltipTriggerOld, TooltipContentOld, TooltipProviderOld } from './TooltipOld';
+export type {
+  TooltipOldProps,
+  TooltipTriggerOldProps,
+  TooltipContentOldProps,
+  TooltipContentOldRef,
+  TooltipProviderOldProps,
+} from './TooltipOld';
 
 // Upload
 export {

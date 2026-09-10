@@ -1,8 +1,10 @@
+import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 import type { IconName } from '../Icon';
 import './table.css';
 
@@ -66,30 +68,82 @@ export interface ContactChipsProps {
   onCopy?: (value: string, kind: 'email' | 'phone') => void;
 }
 
-/** The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing. */
-function ContactChips({ email, phone, onCopy }: ContactChipsProps) {
-  if (!email && !phone) return <TableEmptyValue />;
-  const chip = (kind: 'email' | 'phone', value: string, icon: IconName) => (
-    <button
-      type="button"
-      key={kind}
-      className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-neutral-90 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 [&+&]:-mdt-ml-1.5"
-      title={`Copy ${kind}`}
-      aria-label={`Copy ${kind}: ${value}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        void navigator.clipboard.writeText(value);
-        onCopy?.(value, kind);
+const CHIP =
+  'mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-azure-60 hover:mdt-text-azure-60 data-[state=delayed-open]:mdt-border-azure-60 data-[state=delayed-open]:mdt-text-azure-60 data-[state=instant-open]:mdt-border-azure-60 data-[state=instant-open]:mdt-text-azure-60 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 [&+&]:-mdt-ml-1.5';
+
+/**
+ * One chip: the value in an instant bubble with the click-to-copy hint; after a
+ * click the bubble says "Copied!" until the pointer leaves. The engine closes a
+ * bubble on pointer-down and on click; while the pointer is still on the chip
+ * those closes are ignored, so the bubble is held open through the click.
+ */
+function ContactChip({
+  kind,
+  value,
+  icon,
+  onCopy,
+}: {
+  kind: 'email' | 'phone';
+  value: string;
+  icon: IconName;
+  onCopy?: ((value: string, kind: 'email' | 'phone') => void) | undefined;
+}) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const hovering = useRef(false);
+  return (
+    <Tooltip
+      instant
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && hovering.current) return;
+        setOpen(next);
+        if (!next) setCopied(false);
       }}
     >
-      <Icon name={icon} size={14} />
-    </button>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className={CHIP}
+          aria-label={`Copy ${kind}: ${value}`}
+          onPointerEnter={() => {
+            hovering.current = true;
+          }}
+          onPointerLeave={() => {
+            hovering.current = false;
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            void navigator.clipboard.writeText(value);
+            setCopied(true);
+            setOpen(true);
+            onCopy?.(value, kind);
+          }}
+        >
+          <Icon name={icon} size={14} />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent
+        {...(copied
+          ? {}
+          : { hint: `Click the icon to copy the ${kind === 'email' ? 'mail' : 'number'}` })}
+      >
+        {copied ? 'Copied!' : value}
+      </TooltipContent>
+    </Tooltip>
   );
+}
+
+/** The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing. Each chip carries its value in a bubble. */
+function ContactChips({ email, phone, onCopy }: ContactChipsProps) {
+  if (!email && !phone) return <TableEmptyValue />;
   return (
-    <span className="mdt-inline-flex">
-      {email ? chip('email', email, 'mail') : null}
-      {phone ? chip('phone', phone, 'phone') : null}
-    </span>
+    <TooltipProvider>
+      <span className="mdt-inline-flex">
+        {email ? <ContactChip kind="email" value={email} icon="mail" onCopy={onCopy} /> : null}
+        {phone ? <ContactChip kind="phone" value={phone} icon="phone" onCopy={onCopy} /> : null}
+      </span>
+    </TooltipProvider>
   );
 }
 
@@ -99,7 +153,7 @@ export interface TagListProps {
   max?: number;
 }
 
-/** Teams, roles and the like: neutral square Badges, and a slate "+N" that lists the rest on hover. */
+/** Teams, roles and the like: neutral square Badges, and a slate "+N" whose bubble lists the rest. */
 function TagList({ items, max = 2 }: TagListProps) {
   if (items.length === 0) return <TableEmptyValue />;
   const shown = items.slice(0, max);
@@ -112,15 +166,22 @@ function TagList({ items, max = 2 }: TagListProps) {
         </Badge>
       ))}
       {rest.length > 0 && (
-        <Badge
-          size="sm"
-          shape="square"
-          tone="slate"
-          title={rest.join(', ')}
-          aria-label={`${String(rest.length)} more: ${rest.join(', ')}`}
-        >
-          +{rest.length}
-        </Badge>
+        <TooltipProvider>
+          <Tooltip instant>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="mdt-inline-flex mdt-cursor-default mdt-rounded mdt-border-0 mdt-bg-transparent mdt-p-0"
+                aria-label={`${String(rest.length)} more: ${rest.join(', ')}`}
+              >
+                <Badge size="sm" shape="square" tone="slate" aria-hidden="true">
+                  +{rest.length}
+                </Badge>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent items={rest} />
+          </Tooltip>
+        </TooltipProvider>
       )}
     </span>
   );

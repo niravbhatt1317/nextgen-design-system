@@ -2,95 +2,83 @@ import type { ComponentPropsWithoutRef, ElementRef, ReactNode } from 'react';
 import type * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
 /**
- * Props for the TooltipProvider component
+ * Props for TooltipProvider. One per app, or one around a component that
+ * brings its own bubbles (the Table's contact chips do).
  */
 export interface TooltipProviderProps {
-  /**
-   * Content wrapped by the provider
-   */
   children: ReactNode;
-
   /**
-   * The duration from when the mouse enters a tooltip trigger until the tooltip opens.
-   * @default 200
+   * How long the pointer rests on a trigger before the bubble opens.
+   * @default 100
    */
   delayDuration?: number;
-
   /**
-   * Prevents the tooltip from opening when in keyboard navigation mode.
-   * @default false
+   * Moving to a neighbouring trigger within this many ms opens it at once.
+   * @default 300
    */
   skipDelayDuration?: number;
-
   /**
-   * Disables the hover card
+   * Close as soon as the pointer leaves the trigger, instead of letting it
+   * travel into the bubble (a scrolling list needs the travel).
    * @default false
    */
   disableHoverableContent?: boolean;
 }
 
-/**
- * Props for the Tooltip root component
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TooltipProps extends ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> {}
+/** Props for the Tooltip root, which holds the open state. */
+export interface TooltipProps extends ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> {
+  /**
+   * No wait at all. For chips and counters that reveal a value.
+   * @default false
+   */
+  instant?: boolean | undefined;
+}
 
-/**
- * Props for the TooltipTrigger component
- */
+/** Props for the element that opens the bubble. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TooltipTriggerProps extends ComponentPropsWithoutRef<
   typeof TooltipPrimitive.Trigger
 > {}
 
-/**
- * Props for the TooltipContent component
- */
+/** Props for the bubble itself. */
 export interface TooltipContentProps extends Omit<
   ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
   'content'
 > {
-  /**
-   * The content to display in the tooltip
-   */
-  children: ReactNode;
-
-  /**
-   * Custom className for the tooltip content
-   */
+  /** The text. Leave it out when `items` is given. */
+  children?: ReactNode;
   className?: string;
-
   /**
-   * The preferred side of the trigger to render against when open.
+   * Which side of the trigger. Near a screen edge it flips by itself.
    * @default 'top'
    */
   side?: 'top' | 'right' | 'bottom' | 'left';
-
   /**
-   * The distance in pixels from the trigger.
+   * Distance from the trigger in px, before the arrow.
    * @default 4
    */
   sideOffset?: number;
-
   /**
-   * The preferred alignment against the trigger.
+   * Where along the trigger the bubble sits.
    * @default 'center'
    */
   align?: 'start' | 'center' | 'end';
-
   /**
-   * Whether to show the arrow pointing to the trigger.
+   * The 10 × 5 arrow in the fill colour.
    * @default true
    */
   showArrow?: boolean;
-
-  /**
-   * Custom className for the arrow element.
-   */
   arrowClassName?: string;
+  /** A quieter second line under the text: what a click will do. 10px at 62%. */
+  hint?: ReactNode | undefined;
+  /** A list of values instead of text: bullet lines, scrolling past seven. */
+  items?: string[] | undefined;
+  /**
+   * The widest the bubble grows before plain text wraps and reads centred.
+   * @default 280
+   */
+  maxWidth?: number | undefined;
 }
 
-/**
- * Ref type for TooltipContent
- */
+/** Ref type for TooltipContent. */
 export type TooltipContentRef = ElementRef<typeof TooltipPrimitive.Content>;

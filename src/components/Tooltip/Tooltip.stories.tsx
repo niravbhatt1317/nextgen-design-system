@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button } from '../Button';
-import { Icon } from '../Icon';
-import { Input } from '../Input';
+import { ContactChips, TagList } from '../Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
 const meta: Meta<typeof Tooltip> = {
@@ -13,8 +12,11 @@ const meta: Meta<typeof Tooltip> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it. Built on top of Radix UI Tooltip.',
+        component: [
+          'A small dark bubble that names or explains the thing under the pointer. It opens on hover and on keyboard focus, sits on any side of its trigger, turns away from the screen edge, and follows the page as it scrolls. One look, two themes, no tones.',
+          "The merged console's bubble on the library's engine (7 September 2026): the console fill and text; the library's spacing, arrow, sides and delay handling. Two content pieces come from the console: `hint`, a quieter second line, and `items`, a list that scrolls past seven entries. Plain text wraps at 280px and reads centred.",
+          'Dark mode comes from the theme toggle in the toolbar: the fill and text swap through the tokens, nothing else changes.',
+        ].join('\n\n'),
       },
     },
     controls: {
@@ -22,28 +24,20 @@ const meta: Meta<typeof Tooltip> = {
     },
   },
   argTypes: {
+    instant: {
+      control: 'boolean',
+      description: 'No wait at all. For chips and counters that reveal a value.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
     open: {
       control: 'boolean',
-      description: 'The controlled open state of the tooltip',
-      table: {
-        type: { summary: 'boolean' },
-      },
+      description: 'Drive the open state yourself',
+      table: { type: { summary: 'boolean' } },
     },
     defaultOpen: {
       control: 'boolean',
-      description: 'The open state of the tooltip when it is initially rendered',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
-      },
-    },
-    delayDuration: {
-      control: { type: 'number', min: 0, max: 2000, step: 100 },
-      description: 'The duration from when the mouse enters until the tooltip opens (ms)',
-      table: {
-        type: { summary: 'number' },
-        defaultValue: { summary: '200' },
-      },
+      description: 'Open when first rendered',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
   },
   decorators: [
@@ -60,447 +54,185 @@ const meta: Meta<typeof Tooltip> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Default tooltip example - hover over the button to see the tooltip.
- */
+const TEAMS = [
+  'Platform',
+  'Security',
+  'Finance',
+  'Design',
+  'Web',
+  'Support',
+  'Data',
+  'Sales',
+  'Ops',
+  'Product',
+];
+
+/** Opens 100ms after the pointer arrives, or at once on keyboard focus: Tab to the button. Neighbouring triggers open without the wait. Escape closes it. */
 export const Default: Story = {
-  args: {
-    defaultOpen: false,
-  },
-  render: (args: { defaultOpen?: boolean }) => (
+  args: { defaultOpen: false, instant: false },
+  render: (args) => (
     <Tooltip {...args}>
       <TooltipTrigger asChild>
         <Button variant="outline">Hover me</Button>
       </TooltipTrigger>
-      <TooltipContent>
-        <p>This is a helpful tooltip</p>
-      </TooltipContent>
+      <TooltipContent>This is a helpful tooltip</TooltipContent>
     </Tooltip>
   ),
 };
 
-/**
- * Tooltips on all sides - top, right, bottom, and left.
- */
-export const AllSides: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-gap-4">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Top</Button>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <p>Tooltip on top</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Right</Button>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          <p>Tooltip on right</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Bottom</Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p>Tooltip on bottom</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Left</Button>
-        </TooltipTrigger>
-        <TooltipContent side="left">
-          <p>Tooltip on left</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-  ),
-};
-
-/**
- * Tooltip with arrow pointing to the trigger element.
- */
-export const WithArrow: Story = {
-  render: () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline">Hover for arrow</Button>
-      </TooltipTrigger>
-      <TooltipContent showArrow>
-        <p>Tooltip with arrow</p>
-      </TooltipContent>
-    </Tooltip>
-  ),
-};
-
-/**
- * Tooltip without arrow.
- */
+/** The same bubble with the arrow off. Sits 4px from the trigger instead of 9. */
 export const WithoutArrow: Story = {
   render: () => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">No arrow</Button>
       </TooltipTrigger>
-      <TooltipContent showArrow={false}>
-        <p>Tooltip without arrow</p>
-      </TooltipContent>
+      <TooltipContent showArrow={false}>Same bubble, arrow off</TooltipContent>
     </Tooltip>
   ),
 };
 
-/**
- * Different alignment options - start, center, and end.
- */
+/** Top by default. Any side on request; near a screen edge it flips to the opposite side by itself. */
+export const Sides: Story = {
+  render: () => (
+    <div className="mdt-grid mdt-grid-cols-3 mdt-gap-4">
+      <div />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Top</Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Tooltip on top</TooltipContent>
+      </Tooltip>
+      <div />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Left</Button>
+        </TooltipTrigger>
+        <TooltipContent side="left">Tooltip on left</TooltipContent>
+      </Tooltip>
+      <div />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Right</Button>
+        </TooltipTrigger>
+        <TooltipContent side="right">Tooltip on right</TooltipContent>
+      </Tooltip>
+      <div />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Bottom</Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Tooltip on bottom</TooltipContent>
+      </Tooltip>
+      <div />
+    </div>
+  ),
+};
+
+/** Alignment slides the bubble to the start or end of a wide trigger. */
 export const Alignment: Story = {
   render: () => (
-    <div className="mdt-flex mdt-gap-4">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Start</Button>
-        </TooltipTrigger>
-        <TooltipContent align="start">
-          <p>Aligned to start</p>
-        </TooltipContent>
-      </Tooltip>
+    <div className="mdt-flex mdt-flex-col mdt-gap-6">
+      {(['start', 'center', 'end'] as const).map((align) => (
+        <Tooltip key={align}>
+          <TooltipTrigger asChild>
+            <Button variant="outline" className="mdt-w-[280px]">
+              align=&quot;{align}&quot;
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent align={align}>Aligned to the {align}</TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  ),
+};
 
-      <Tooltip>
+/** A quieter second line under the value: what happens if you click. The Table's contact chips carry it, open at once, and say "Copied!" after a click until the pointer leaves. */
+export const WithHint: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-items-center mdt-gap-12">
+      <ContactChips email="michael.smith@company.com" phone="+1 415 555 0100" />
+      <Tooltip instant>
         <TooltipTrigger asChild>
-          <Button variant="outline">Center</Button>
+          <Button variant="outline">Copy link</Button>
         </TooltipTrigger>
-        <TooltipContent align="center">
-          <p>Aligned to center</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">End</Button>
-        </TooltipTrigger>
-        <TooltipContent align="end">
-          <p>Aligned to end</p>
-        </TooltipContent>
+        <TooltipContent hint="Click to copy the link">company.com/invite/8f3k2</TooltipContent>
       </Tooltip>
     </div>
   ),
 };
 
-/**
- * Custom delay duration before tooltip appears.
- */
-export const WithDelay: Story = {
+/** Plain text wraps at 280px and reads centred. Short copy stays on one line. */
+export const LongCopy: Story = {
   render: () => (
-    <TooltipProvider delayDuration={1000}>
-      <div className="mdt-flex mdt-gap-4">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline">Instant (0ms)</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>No delay</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip delayDuration={500}>
-          <TooltipTrigger asChild>
-            <Button variant="outline">Medium (500ms)</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>500ms delay</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip delayDuration={1000}>
-          <TooltipTrigger asChild>
-            <Button variant="outline">Long (1000ms)</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>1000ms delay</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-    </TooltipProvider>
-  ),
-};
-
-/**
- * Rich content tooltip with formatted text and styling.
- */
-export const RichContent: Story = {
-  render: () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline">Rich content</Button>
-      </TooltipTrigger>
-      <TooltipContent className="mdt-max-w-xs">
-        <div className="mdt-flex mdt-flex-col mdt-gap-2">
-          <p className="mdt-font-semibold">Advanced Features</p>
-          <ul className="mdt-list-inside mdt-list-disc mdt-space-y-1 mdt-text-xs">
-            <li>Keyboard navigation support</li>
-            <li>Automatic positioning</li>
-            <li>Collision detection</li>
-            <li>Fully accessible</li>
-          </ul>
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  ),
-};
-
-/**
- * Tooltips with info icons in a form context.
- */
-export const InForm: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-w-80 mdt-flex-col mdt-gap-4">
-      <div className="mdt-flex mdt-flex-col mdt-gap-2">
-        <div className="mdt-flex mdt-items-center mdt-gap-2">
-          <label htmlFor="username" className="mdt-text-sm mdt-font-medium">
-            Username
-          </label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Username help">
-                <Icon name="info" size="sm" color="muted" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Your username must be unique and between 3-20 characters</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <Input id="username" placeholder="Enter username" aria-label="Username input" />
-      </div>
-
-      <div className="mdt-flex mdt-flex-col mdt-gap-2">
-        <div className="mdt-flex mdt-items-center mdt-gap-2">
-          <label htmlFor="email" className="mdt-text-sm mdt-font-medium">
-            Email
-          </label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Email help">
-                <Icon name="info" size="sm" color="muted" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>We&apos;ll never share your email with anyone else</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <Input id="email" type="email" placeholder="Enter email" aria-label="Email input" />
-      </div>
-
-      <div className="mdt-flex mdt-flex-col mdt-gap-2">
-        <div className="mdt-flex mdt-items-center mdt-gap-2">
-          <label htmlFor="password" className="mdt-text-sm mdt-font-medium">
-            Password
-          </label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Password help">
-                <Icon name="info" size="sm" color="muted" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Must be at least 8 characters with uppercase, lowercase, and numbers</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Enter password"
-          aria-label="Password input"
-        />
-      </div>
-    </div>
-  ),
-};
-
-/**
- * Tooltip on a disabled button - requires wrapper element.
- */
-export const WithDisabledTrigger: Story = {
-  render: () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span role="button" tabIndex={0} className="mdt-inline-block">
-          <Button disabled style={{ pointerEvents: 'none' }}>
-            Disabled Button
-          </Button>
-        </span>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>This action is currently unavailable</p>
-      </TooltipContent>
-    </Tooltip>
-  ),
-};
-
-/**
- * Multiple tooltips in a toolbar.
- */
-export const MultipleTooltips: Story = {
-  render: () => (
-    <div className="mdt-inline-flex mdt-gap-1 mdt-rounded-md mdt-border mdt-border-border mdt-p-1">
+    <div className="mdt-flex mdt-items-center mdt-gap-12">
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Bold">
-            <Icon name="bold" size="sm" />
-          </Button>
+          <Button variant="outline">Scheduled suspension</Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Bold</p>
-          <span className="mdt-text-[10px] mdt-opacity-60">Ctrl+B</span>
+          This account is scheduled for suspension on 14 October 2026 because the last owner left
+          the organisation.
         </TooltipContent>
       </Tooltip>
-
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Italic">
-            <Icon name="italic" size="sm" />
-          </Button>
+          <Button variant="outline">Short</Button>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>Italic</p>
-          <span className="mdt-text-[10px] mdt-opacity-60">Ctrl+I</span>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Underline">
-            <Icon name="underline" size="sm" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Underline</p>
-          <span className="mdt-text-[10px] mdt-opacity-60">Ctrl+U</span>
-        </TooltipContent>
-      </Tooltip>
-
-      <div className="mdt-mx-1 mdt-w-px mdt-bg-border" />
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Insert link">
-            <Icon name="link" size="sm" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Insert Link</p>
-          <span className="mdt-text-[10px] mdt-opacity-60">Ctrl+K</span>
-        </TooltipContent>
+        <TooltipContent>Short copy stays on one line</TooltipContent>
       </Tooltip>
     </div>
   ),
 };
 
-/**
- * Controlled tooltip - open state is managed externally.
- */
+/** The "+N" in a Teams or Roles cell lists the rest. Bullet lines 3px apart; past seven the list scrolls inside the bubble, and the pointer may travel into it. */
+export const List: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-items-center mdt-gap-12">
+      <TagList items={TEAMS.slice(0, 5)} />
+      <TagList items={TEAMS} max={1} />
+    </div>
+  ),
+};
+
+/** Side by side: the default 100ms wait, and `instant`. */
+export const Instant: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-items-center mdt-gap-6">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">100ms</Button>
+        </TooltipTrigger>
+        <TooltipContent>Opens after the wait</TooltipContent>
+      </Tooltip>
+      <Tooltip instant>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Instant</Button>
+        </TooltipTrigger>
+        <TooltipContent>Opens at once</TooltipContent>
+      </Tooltip>
+    </div>
+  ),
+};
+
+/** Drive it yourself: the button toggles the bubble, the pointer no longer does. */
 export const Controlled: Story = {
-  render: function ControlledComponent() {
-    const [open, setOpen] = useState(false);
-
+  render: function ControlledStory() {
+    const [open, setOpen] = useState(true);
     return (
-      <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-4">
-        <Tooltip open={open} onOpenChange={setOpen}>
-          <TooltipTrigger asChild>
-            <Button variant="outline">Controlled tooltip</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>This tooltip&apos;s state is controlled externally</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <div className="mdt-flex mdt-gap-2">
+      <Tooltip open={open} onOpenChange={setOpen}>
+        <TooltipTrigger asChild>
           <Button
-            variant="secondary"
-            size="sm"
+            variant="outline"
             onClick={() => {
-              setOpen(true);
+              setOpen((o) => !o);
             }}
           >
-            Open
+            {open ? 'Close it' : 'Open it'}
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setOpen(false);
-            }}
-          >
-            Close
-          </Button>
-        </div>
-
-        <p className="mdt-text-sm mdt-text-muted-foreground">
-          Tooltip is {open ? 'open' : 'closed'}
-        </p>
-      </div>
+        </TooltipTrigger>
+        <TooltipContent>Held open by the page</TooltipContent>
+      </Tooltip>
     );
   },
-};
-
-/**
- * Custom styling example with different colors and sizes.
- */
-export const CustomStyling: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-gap-4">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Success</Button>
-        </TooltipTrigger>
-        <TooltipContent
-          className="mdt-bg-success mdt-text-success-foreground"
-          arrowClassName="mdt-fill-success"
-        >
-          <p>Success message</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Warning</Button>
-        </TooltipTrigger>
-        <TooltipContent
-          className="mdt-bg-warning mdt-text-warning-foreground"
-          arrowClassName="mdt-fill-warning"
-        >
-          <p>Warning message</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Error</Button>
-        </TooltipTrigger>
-        <TooltipContent
-          className="mdt-bg-destructive mdt-text-destructive-foreground"
-          arrowClassName="mdt-fill-destructive"
-        >
-          <p>Error message</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Large</Button>
-        </TooltipTrigger>
-        <TooltipContent className="mdt-px-4 mdt-py-3 mdt-text-sm">
-          <p>Large tooltip with more padding</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-  ),
 };
