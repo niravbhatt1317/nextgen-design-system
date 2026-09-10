@@ -587,14 +587,19 @@ export const DocksOnScroll: Story = {
 };
 
 /**
- * **Scroll this one.** The table is switched to `expand`, so it drives itself:
- * it takes the whole height under the dock line, widens to the page as it
- * reaches it, then hands the scroll to its own rows.
+ * **Scroll this one.** The table drives itself: it takes the whole height under
+ * the dock line, widens to the page as it reaches it, then hands the scroll to
+ * its own rows.
  *
  * It holds **one row**. That is the point — expansion is a property of the
  * table, not of how much happens to be in it, so a filtered-down list does not
  * suddenly behave like a different component, and the pager does not float up
  * under a short list. (Pranjal's rule, 2026-09-10.)
+ *
+ * **This is the default.** `expand` is written out below only to say so out
+ * loud; leave it off and you get the same table. A table with no page to fill —
+ * in a drawer, a modal or a card — quietly stays an ordinary card instead, so
+ * the default costs nothing where it does not apply. `expand={false}` opts out.
  */
 export const ExpandsWithASingleRow: Story = {
   render: () => (
