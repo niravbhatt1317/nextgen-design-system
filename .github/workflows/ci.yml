@@ -99,6 +99,13 @@ jobs:
         run: npm run check:tokens
         continue-on-error: true
 
+      # Unlike the token check above, this one FAILS the build. There are no
+      # known violations to grandfather - every component is reachable today -
+      # so blocking costs nothing, and the thing it catches is invisible
+      # otherwise: the build succeeds and the import returns undefined.
+      - name: Every component is importable
+        run: npm run check:exports
+
       - name: Lint
         run: npm run lint
 
