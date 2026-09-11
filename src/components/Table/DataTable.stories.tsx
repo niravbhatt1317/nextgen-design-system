@@ -10,7 +10,10 @@ import { SAMPLE_ROLES, SAMPLE_TEAMS, sampleUsers } from './sampleUsers';
 import type { SampleUser } from './sampleUsers';
 import type { TableColumnDef } from './Table.types';
 
-const USERS = sampleUsers(10001);
+/* Twenty-six, not ten thousand (Pranjal, 2026-09-11: "26 entries is more than
+ * enough"). One more than a page, so the pager has a second page to go to and
+ * Load more has one more to load — which is all the stories need to show. */
+const USERS = sampleUsers(26);
 
 /** The console's own Status glyph: an eight-spoke loader, 14px. */
 const StatusGlyph = () => (
@@ -254,7 +257,7 @@ const meta: Meta<typeof UsersTable> = {
           '| Insert | With columns hidden, hovering a boundary shows a "+" that puts one back right there. |',
           '| Quick filter | Washes its heading blue-10 and turns the column glyph azure; the glyph becomes the grip on hover. No chips, ever. |',
           '| Pills | Every one is `Badge` at size sm. Pill for status, square for source, teams, roles and "+N". |',
-          '| Pager | Typed page box, first and last, rows per page; thousands get a comma. Or a "Load more" footer. |',
+          '| Pager | Typed page box, first and last, rows per page. Or a "Load more" footer. |',
         ].join('\n'),
       },
     },
@@ -264,7 +267,7 @@ export default meta;
 
 type Story = StoryObj<typeof UsersTable>;
 
-/** 10,001 made-up people with every control live. Column order, hidden columns and widths are remembered in this browser. */
+/** 26 made-up people — one more than a page — with every control live. Column order, hidden columns and widths are remembered in this browser. */
 export const Users: Story = {};
 
 /** The other footer: a count and a "Load more" button that also fires as you scroll near the bottom. */

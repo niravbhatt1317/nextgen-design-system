@@ -33,6 +33,20 @@
   border-top-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
   border-top-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
 }
+/* NO SCROLLBAR (Pranjal, 2026-09-11: "there's no need to show scrollable bar").
+   The console table has hidden its bars since 27 August — the page scroller
+   hides its own, and a bar inside the card read as a second scroller. Scrolling
+   itself still works: wheel, trackpad, drag, keys. The frozen edge's shadow is
+   what says "there is more to the right", not a bar. */
+.tbl-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tbl-viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
 .tbl-foot {
   margin-top: auto;
   flex-shrink: 0;

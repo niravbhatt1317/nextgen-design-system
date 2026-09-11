@@ -662,10 +662,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           onPointerLeave={() => onBoundaryHover?.(false)}
         />
       )}
-      <span
-        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
-        aria-hidden="true"
-      />
+      <TableNick />
     </th>
   );
 });
@@ -745,6 +742,22 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
  * forgot to label — and left the numbers underneath with no name, so nobody
  * could say which column they meant. (Pranjal, 2026-09-11.)
  */
+/**
+ * THE NICK: the 16px mark at a heading's right edge (Pranjal, 2026-09-11:
+ * "we just need that nick"). It is drawn on EVERY heading, identically,
+ * whether or not that boundary can be dragged — "it might work for some, might
+ * not, but it will look the same." The resize handle is a separate, invisible
+ * thing that sits over it only where resizing is allowed.
+ */
+function TableNick() {
+  return (
+    <span
+      className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+      aria-hidden="true"
+    />
+  );
+}
+
 function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
   return (
     <th
@@ -754,6 +767,7 @@ function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
       style={{ left: frozen, width: TABLE_GUTTER }}
     >
       <span aria-hidden="true">#</span>
+      <TableNick />
     </th>
   );
 }
@@ -785,6 +799,7 @@ function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAll
           <Icon name="chevron-down" size={12} />
         </button>
       </span>
+      <TableNick />
     </th>
   );
 }
