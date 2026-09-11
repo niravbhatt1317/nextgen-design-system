@@ -212,9 +212,19 @@
   background: hsl(var(--mdt-ring));
 }
 
-/* the last frozen column draws its boundary while the table is scrolled sideways */
+/* The last frozen column draws its boundary while the table is scrolled
+   sideways. THE CATCH (Pranjal, 2026-09-11: "when we scroll the line under the
+   action column header disappears"): box-shadow is ONE property and does not
+   stack across rules — the later rule wins outright. So this used to replace
+   the heading's own `inset 0 -1px 0` underline, and the line under Action
+   vanished the moment the table moved sideways. A heading restates both. */
 .tbl-viewport[data-scrolled-x='true'] .tbl-frozen-edge {
   box-shadow: 1px 0 0 var(--tbl-divider);
+}
+.tbl-viewport[data-scrolled-x='true'] th.tbl-frozen-edge {
+  box-shadow:
+    1px 0 0 var(--tbl-divider),
+    inset 0 -1px 0 var(--tbl-divider);
 }
 .tbl-table[data-refreshing='true'] > tbody {
   opacity: 0.6;
