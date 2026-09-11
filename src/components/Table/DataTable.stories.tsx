@@ -293,3 +293,15 @@ export const LighterDividers: Story = { args: { divider: 'light' } };
 
 /** The card as the page: square corners, no side edges, a 24px inset on the end cells, the header and pager pinned while the rows scroll inside. `maxHeight` is the card's height here. The page decides when this happens; see Pieces → Docks On Scroll. */
 export const Docked: Story = { args: { docked: true, maxHeight: 520 } };
+
+/**
+ * **The table on its own.** `toolbar={false}` leaves off the strip above it.
+ *
+ * Use it where the PAGE already carries a toolbar — a screen with a tab strip
+ * puts its controls up there, and a second strip would draw search, Filters,
+ * Sort and Columns twice. The page then supplies its own `Toolbar`, a separate
+ * component that stays connected to this one: it owns the controls, this owns
+ * the rows. Everything inside the card — the frozen columns, the grips, the
+ * heading menus, the pager — is unchanged.
+ */
+export const WithoutToolbar: Story = { args: { toolbar: false } };

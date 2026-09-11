@@ -155,6 +155,7 @@ function DataTable<Row>({
   divider = 'default',
   maxHeight = 600,
   docked,
+  toolbar = true,
   className,
 }: DataTableProps<Row>) {
   // ── state ──
@@ -406,169 +407,175 @@ function DataTable<Row>({
 
   return (
     <div className={cn('mdt-flex mdt-flex-col mdt-gap-[22px]', className)}>
-      <Toolbar label={`${label} controls`}>
-        {search && (
-          <Input
-            size="sm"
-            className="mdt-w-[300px]"
-            placeholder={search.placeholder ?? 'Search'}
-            aria-label={`Search ${noun}`}
-            value={query}
-            onChange={(e) => {
-              onQuery(e.target.value);
-            }}
-            startAdornment={<Icon name="search" size={14} />}
-          />
-        )}
-        {filters.length > 0 && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <ToolbarButton
-                icon={<Icon name="list-filter" />}
-                count={filterCount || undefined}
-                activeLabel="applied"
-              >
-                Filters
-              </ToolbarButton>
-            </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              sideOffset={6}
-              className="mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4"
-              aria-label="Filters"
-            >
-              <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
-                <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
+      {/* THE TOOLBAR CAN BE LEFT OFF (Pranjal, 2026-09-11). On a screen with a
+          tab strip the page carries its own toolbar up there, and a second strip
+          here would draw search, Filters, Sort and Columns twice. Everything
+          inside the card is untouched either way. */}
+      {toolbar && (
+        <Toolbar label={`${label} controls`}>
+          {search && (
+            <Input
+              size="sm"
+              className="mdt-w-[300px]"
+              placeholder={search.placeholder ?? 'Search'}
+              aria-label={`Search ${noun}`}
+              value={query}
+              onChange={(e) => {
+                onQuery(e.target.value);
+              }}
+              startAdornment={<Icon name="search" size={14} />}
+            />
+          )}
+          {filters.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <ToolbarButton
+                  icon={<Icon name="list-filter" />}
+                  count={filterCount || undefined}
+                  activeLabel="applied"
+                >
                   Filters
-                </span>
-                <button
-                  type="button"
-                  className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
-                  onClick={() => {
-                    setTicked({});
-                    resetPaging();
-                  }}
-                >
-                  Clear all
-                </button>
-              </div>
-              {filters.map((g) => (
-                <div key={g.key}>
-                  <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
-                    {g.label}
-                  </div>
-                  {g.options.map((o) => {
-                    const on = ticked[g.key]?.has(o) ?? false;
-                    return (
-                      <label
-                        key={o}
-                        className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
-                      >
-                        <Checkbox
-                          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
-                          checked={on}
-                          onCheckedChange={(v) => {
-                            setTicked((t) => {
-                              const s = new Set(t[g.key] ?? []);
-                              if (v === true) s.add(o);
-                              else s.delete(o);
-                              return { ...t, [g.key]: s };
-                            });
-                            resetPaging();
-                          }}
-                        />
-                        {o}
-                      </label>
-                    );
-                  })}
+                </ToolbarButton>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                sideOffset={6}
+                className="mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4"
+                aria-label="Filters"
+              >
+                <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
+                  <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
+                    Filters
+                  </span>
+                  <button
+                    type="button"
+                    className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
+                    onClick={() => {
+                      setTicked({});
+                      resetPaging();
+                    }}
+                  >
+                    Clear all
+                  </button>
                 </div>
-              ))}
-            </PopoverContent>
-          </Popover>
-        )}
-        {quickFilter && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToolbarButton
-                icon={quickFilter.icon ?? <Icon name="check-circle" />}
-                dot={quick.size > 0}
-                aria-label={quickFilter.label}
-                activeLabel="applied"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="mdt-w-48">
-              {quickFilter.options.map((o) => (
-                <DropdownMenuCheckboxItem
-                  key={o}
-                  checked={quick.has(o)}
-                  onSelect={(e) => {
-                    e.preventDefault();
-                  }}
-                  onCheckedChange={(v) => {
-                    setQuick((s) => {
-                      const n = new Set(s);
-                      if (v) n.add(o);
-                      else n.delete(o);
-                      return n;
-                    });
-                    resetPaging();
-                  }}
-                >
-                  {o}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        <ToolbarSpacer />
-        <ToolbarSection>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToolbarButton
-                icon={<Icon name="arrow-up-down" />}
-                dot={sort.sort !== null}
-                aria-label="Sort"
-                activeLabel="applied"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="mdt-w-48">
-              {sortKeys.map((k) => (
-                <DropdownMenuItem
-                  key={k}
-                  onSelect={() => {
-                    sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
-                  }}
-                >
-                  {labelOf(k)}
-                  {sortDir(k) && (
-                    <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
-                      {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-              ))}
-              {sort.sort && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <TableColumnsPanel
-            trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
-            {...columnsPanel({
-              selectable,
-              numbers,
-              setNumbers,
-              layout,
-              labelOf,
-              nameLabel: nameColumn.label ?? 'Name',
-              hasActions,
-            })}
-          />
-        </ToolbarSection>
-      </Toolbar>
+                {filters.map((g) => (
+                  <div key={g.key}>
+                    <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
+                      {g.label}
+                    </div>
+                    {g.options.map((o) => {
+                      const on = ticked[g.key]?.has(o) ?? false;
+                      return (
+                        <label
+                          key={o}
+                          className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
+                        >
+                          <Checkbox
+                            className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                            checked={on}
+                            onCheckedChange={(v) => {
+                              setTicked((t) => {
+                                const s = new Set(t[g.key] ?? []);
+                                if (v === true) s.add(o);
+                                else s.delete(o);
+                                return { ...t, [g.key]: s };
+                              });
+                              resetPaging();
+                            }}
+                          />
+                          {o}
+                        </label>
+                      );
+                    })}
+                  </div>
+                ))}
+              </PopoverContent>
+            </Popover>
+          )}
+          {quickFilter && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ToolbarButton
+                  icon={quickFilter.icon ?? <Icon name="check-circle" />}
+                  dot={quick.size > 0}
+                  aria-label={quickFilter.label}
+                  activeLabel="applied"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="mdt-w-48">
+                {quickFilter.options.map((o) => (
+                  <DropdownMenuCheckboxItem
+                    key={o}
+                    checked={quick.has(o)}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                    onCheckedChange={(v) => {
+                      setQuick((s) => {
+                        const n = new Set(s);
+                        if (v) n.add(o);
+                        else n.delete(o);
+                        return n;
+                      });
+                      resetPaging();
+                    }}
+                  >
+                    {o}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <ToolbarSpacer />
+          <ToolbarSection>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ToolbarButton
+                  icon={<Icon name="arrow-up-down" />}
+                  dot={sort.sort !== null}
+                  aria-label="Sort"
+                  activeLabel="applied"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="mdt-w-48">
+                {sortKeys.map((k) => (
+                  <DropdownMenuItem
+                    key={k}
+                    onSelect={() => {
+                      sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
+                    }}
+                  >
+                    {labelOf(k)}
+                    {sortDir(k) && (
+                      <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
+                        {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+                {sort.sort && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <TableColumnsPanel
+              trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
+              {...columnsPanel({
+                selectable,
+                numbers,
+                setNumbers,
+                layout,
+                labelOf,
+                nameLabel: nameColumn.label ?? 'Name',
+                hasActions,
+              })}
+            />
+          </ToolbarSection>
+        </Toolbar>
+      )}
 
       <Table
         ref={cardRef}

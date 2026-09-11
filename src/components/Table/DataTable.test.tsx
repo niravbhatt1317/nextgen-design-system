@@ -200,4 +200,14 @@ describe('DataTable', { timeout: 20000 }, () => {
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
     expect(screen.getByText('Showing 50 of 60 users')).toBeInTheDocument();
   });
+
+  /* Pranjal, 2026-09-11: on a screen that already has a toolbar, a second
+   * strip would draw search, Filters, Sort and Columns twice. */
+  it('leaves the toolbar off but keeps everything inside the card', () => {
+    render(<Users toolbar={false} />);
+    expect(screen.queryByPlaceholderText('Search')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Filters' })).not.toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /Email/ })).toBeInTheDocument();
+  });
 });

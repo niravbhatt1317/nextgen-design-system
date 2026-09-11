@@ -91,5 +91,16 @@ export interface DataTableProps<Row> {
    * page scrolls it to its dock line. See Table's `docked`.
    */
   docked?: boolean | number | undefined;
+  /**
+   * The strip above the table: search, Filters, the quick filter, Sort and
+   * Columns. ON by default.
+   *
+   * Pass `false` where the PAGE carries its own toolbar — a screen with a tab
+   * strip puts its controls up there, and a second strip would draw the same
+   * controls twice (Pranjal, 2026-09-11). The page then supplies its own
+   * `Toolbar`, a separate component, and the two stay connected through the
+   * props below.
+   */
+  toolbar?: boolean | undefined;
   className?: string | undefined;
 }
