@@ -1,0 +1,127 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Table columns" />
+
+# Table columns
+
+Five rules decide what a table's columns do. They were settled on the Users
+screen and lived only in that file, so every table built afterwards started
+without them — and the difference only showed when somebody put two screens
+side by side. They are written here so that stops happening.
+
+Each one is a rule about **placement and behaviour**, not about styling. The
+Table already gives you the right row height, insets and type; these five are
+the decisions it cannot make for you.
+
+---
+
+## 1. Every table opens with a lead column, and it has two faces
+
+A **60px leading column**, pinned at the left edge. What it shows depends on
+one fact about the table:
+
+- **The table acts on many rows at once** → a **checkbox**. The heading carries
+  the select-all box; each row shows its number at rest and its checkbox on
+  hover, and a picked row keeps the checkbox once you move away.
+- **It does not** → a **row number**, under a **`#`** heading. Nothing to tick,
+  so nothing pretends to be tickable.
+
+The two never sit side by side; it is one slot with two occupants. `DataTable`
+picks the face from whether you give it `bulkActions`. Hand-built tables use
+`TableLeadHead` / `TableLeadCell` and pass `selectable` — see
+Table → Pieces → The lead column.
+
+**Why it is not optional.** Without it, nobody can say "row 14" to anybody, and
+a table that later grows selection has to re-flow every column to make room.
+The `#` heading used to be blank, which read as a column somebody forgot to
+label (Pranjal, 2026-09-11).
+
+---
+
+## 2. Action sits second, right after the name
+
+Not last. **100px**, which deliberately overrides the 200px floor every other
+content column has, and the row's menu sits **centred** in its cell.
+
+What you do to a row is a property of the row, not its final fact. A table that
+scrolls sideways puts a trailing action menu off-screen, and a menu you have to
+scroll to reach is a menu nobody uses.
+
+The 100px is so the frozen group stays lean — see rule 3.
+
+---
+
+## 3. The leading group is frozen
+
+Frozen **up to and including Action**: lead column, name, action.
+
+Those three hold at the left edge while everything else scrolls sideways, so
+you always know which row you are reading and can always act on it.
+`DataTable` does this itself; a hand-built table passes `frozen` (the left
+offset) to each of the three and `frozenEdge` to the last.
+
+The frozen edge's shadow appears **only while the table is actually scrolled
+sideways**. At rest there is no shadow, because at rest nothing is being held
+back — and there is no scrollbar either: the shadow is the whole cue that there
+is more to the right.
+
+---
+
+## 4. Columns are draggable, except the ones that are not
+
+Every content column moves: drag the grip that appears on its heading, or use
+the heading's menu to send it to either end. The order sticks, per browser.
+
+Two groups never move:
+
+- **The frozen group** — lead, name, action. Their whole job is to be in a
+  known place.
+- **The elastic tail** — the blank last column that soaks up leftover width so
+  the table always fills its card. It has no grip and no entry in the Columns
+  panel.
+
+---
+
+## 5. Every heading carries the nick
+
+A **16px mark** at the right edge of every heading — the lead column's
+included — sitting the same on every one of them, whether or not that boundary
+can be dragged to resize.
+
+It is a mark, not a line: it does not run the full height of the heading, and
+it says nothing about what the boundary can do. The resize handle is a
+separate, invisible thing that sits over it only where resizing is allowed.
+*"It might work for some, might not, but it will look the same"* (Pranjal,
+2026-09-11).
+
+---
+
+## The order is a rule, not an array position
+
+The five rules together mean a column's position is **decided**, not typed. A
+page hands `DataTable` its content columns and nothing else; the component
+places the lead column, Name, Action and the tail itself, so a column added
+later cannot land in the wrong place by being written on the wrong line.
+
+Which lays a table out like this, every time:
+
+| Position | Column                  | Moves?                | Width          |
+| -------- | ----------------------- | --------------------- | -------------- |
+| 1        | Lead: `#` or checkbox   | No — frozen           | 60             |
+| 2        | Name                    | No — frozen           | 200            |
+| 3        | Action                  | No — frozen           | 100            |
+| 4 … n    | Everything else         | **Yes, dragged**      | 200 floor      |
+| last     | Elastic tail            | No                    | 60, grows      |
+
+---
+
+## Where these came from
+
+The first four were ruled on by Pranjal during the Users work in August 2026,
+and recorded here on 2026-09-11 after the Service accounts screen was built
+without any of them and the gap had to be found by eye. The lead column's two
+faces, the centred action, the missing scrollbar and the nick were ruled the
+same day.
+
+If you are building a new table and one of these does not fit your screen, that
+is worth a conversation — it is not worth quietly leaving out.
