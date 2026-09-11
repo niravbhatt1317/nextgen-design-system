@@ -412,7 +412,12 @@ function DataTable<Row>({
           here would draw search, Filters, Sort and Columns twice. Everything
           inside the card is untouched either way. */}
       {toolbar && (
-        <Toolbar label={`${label} controls`}>
+        /* INSET TO THE TABLE'S EDGE, not the strip's own (Pranjal, 2026-09-11:
+           "toolbar spacing doesn't align with that of table"). A standalone
+           Toolbar keeps the 24px inset ruled on 4 September; this one belongs
+           to the table under it, so its controls start where the table's first
+           column starts — the table's 16px edge. */
+        <Toolbar label={`${label} controls`} className="mdt-px-4">
           {search && (
             <Input
               size="sm"
