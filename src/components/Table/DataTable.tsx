@@ -128,6 +128,26 @@ function saveNumbers(storageKey: string | undefined, on: boolean): void {
  *
  * Every pill inside is the library Badge; every control is a ToolbarButton.
  */
+/**
+ * Whether the pager strip earns its place. A strip reading "1–12 of 12" over a
+ * page nobody can leave is furniture: 'auto' draws it only once there IS a
+ * second page; 'always' holds it for a list about to grow, so the footer does
+ * not pop in and out as rows come and go; 'never' drops it for a list that
+ * shows all it has.
+ */
+function pagerWanted(mode: 'auto' | 'always' | 'never', total: number, pageSize: number): boolean {
+  if (mode === 'never') return false;
+  if (mode === 'always') return true;
+  return total > pageSize;
+}
+
+/** The same rule for the Load more footer: only while there is more to load. */
+function loadMoreWanted(mode: 'auto' | 'always' | 'never', shown: number, total: number): boolean {
+  if (mode === 'never') return false;
+  if (mode === 'always') return true;
+  return shown < total;
+}
+
 function DataTable<Row>({
   label,
   noun = 'rows',
@@ -156,6 +176,7 @@ function DataTable<Row>({
   maxHeight = 600,
   docked,
   toolbar = true,
+  pager = 'auto',
   className,
 }: DataTableProps<Row>) {
   // ── state ──
@@ -783,56 +804,43 @@ function DataTable<Row>({
             {bulkActions([...selection.selected], selection.clear)}
           </TableBulkBar>
         )}
-        {loading ? (
-          <TablePager
-            total={0}
-            page={1}
-            pageSize={pagingState.pageSize}
-            onPage={() => undefined}
-            onPageSize={() => undefined}
-            noun={noun}
-            message={`Loading ${noun}…`}
-          />
-        ) : blankKind ? (
-          <TablePager
-            total={0}
-            page={1}
-            pageSize={pagingState.pageSize}
-            onPage={() => undefined}
-            onPageSize={() => undefined}
-            noun={noun}
-            message={
-              blankKind === 'error'
-                ? `${cap(noun)} not loaded`
-                : blankKind === 'first'
-                  ? `No ${noun}`
-                  : `No ${noun} match`
-            }
-          />
-        ) : pagingState.mode === 'loadMore' ? (
-          <TableLoadMore
-            shown={pagingState.loaded}
-            total={sorted.length}
-            noun={noun}
-            loading={refreshing}
-            onMore={pagingState.loadMore}
-          />
-        ) : (
-          <TablePager
-            total={sorted.length}
-            page={Math.min(pagingState.page, pagingState.pagesFor(sorted.length))}
-            pageSize={pagingState.pageSize}
-            pageSizes={pageSizes}
-            onPage={(p) => {
-              pagingState.setPage(p, sorted.length);
-              if (viewportRef.current) viewportRef.current.scrollTop = 0;
-            }}
-            onPageSize={(s) => {
-              pagingState.setPageSize(s, sorted.length);
-            }}
-            noun={noun}
-          />
-        )}
+        {/* THE FOOTER EARNS ITS PLACE (Pranjal, 2026-09-11: "what's the need of
+            pagination in blank states?" and "26 entries will create a second
+            page. Then only pagination should be visible."). Nothing to page —
+            loading, a blank state, a single page, everything already loaded —
+            means no strip at all: six disabled controls under an empty table
+            are furniture, and the blank state carries its own message. */}
+        {!loading &&
+          !blankKind &&
+          pagingState.mode === 'loadMore' &&
+          loadMoreWanted(pager, pagingState.loaded, sorted.length) && (
+            <TableLoadMore
+              shown={pagingState.loaded}
+              total={sorted.length}
+              noun={noun}
+              loading={refreshing}
+              onMore={pagingState.loadMore}
+            />
+          )}
+        {!loading &&
+          !blankKind &&
+          pagingState.mode !== 'loadMore' &&
+          pagerWanted(pager, sorted.length, pagingState.pageSize) && (
+            <TablePager
+              total={sorted.length}
+              page={Math.min(pagingState.page, pagingState.pagesFor(sorted.length))}
+              pageSize={pagingState.pageSize}
+              pageSizes={pageSizes}
+              onPage={(p) => {
+                pagingState.setPage(p, sorted.length);
+                if (viewportRef.current) viewportRef.current.scrollTop = 0;
+              }}
+              onPageSize={(s) => {
+                pagingState.setPageSize(s, sorted.length);
+              }}
+              noun={noun}
+            />
+          )}
         {insert && layout.hidden.length > 0 && (
           <button
             ref={insertBtn}
@@ -913,10 +921,6 @@ function DataTable<Row>({
       )}
     </div>
   );
-}
-
-function cap(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export { DataTable };

@@ -102,5 +102,17 @@ export interface DataTableProps<Row> {
    * props below.
    */
   toolbar?: boolean | undefined;
+  /**
+   * When the pager strip appears.
+   *
+   * `'auto'` — the default — only once there IS a second page: 25 rows at 25 a
+   * page have none, 26 have one. Never while loading or in a blank state —
+   * nothing to page, and the blank state carries its own message. For a
+   * "Load more" table, only while there is more to load.
+   *
+   * `'always'` keeps it whatever the count, for a list about to grow.
+   * `'never'` drops it, for a list that shows everything it has.
+   */
+  pager?: 'auto' | 'always' | 'never' | undefined;
   className?: string | undefined;
 }

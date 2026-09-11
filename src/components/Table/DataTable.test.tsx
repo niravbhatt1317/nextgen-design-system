@@ -143,7 +143,8 @@ describe('DataTable', { timeout: 20000 }, () => {
   it('shows nothing-found with a Clear filters button that brings the rows back', async () => {
     render(<Users initialQuery="zzqx" />);
     expect(within(screen.getByRole('status')).getByText('No users match')).toBeInTheDocument();
-    expect(screen.getByText('No users match', { selector: '.tbl-count' })).toBeInTheDocument();
+    /* the blank state says it; the footer no longer repeats it under six dead controls */
+    expect(document.querySelector('.tbl-foot')).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
     expect(screen.getByText('1–25 of 60 users')).toBeInTheDocument();
   });
@@ -152,7 +153,7 @@ describe('DataTable', { timeout: 20000 }, () => {
     const { rerender } = render(<Users rows={[]} />);
     expect(screen.getByText('No users yet')).toBeInTheDocument();
     rerender(<Users loading />);
-    expect(screen.getByText('Loading users…')).toBeInTheDocument();
+    expect(document.querySelector('.tbl-foot')).toBeNull();
     expect(screen.getByRole('table', { name: 'Users' }).querySelectorAll('tbody tr')).toHaveLength(
       5
     );
@@ -209,5 +210,33 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.queryByRole('button', { name: 'Filters' })).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /Email/ })).toBeInTheDocument();
+  });
+
+  /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
+   * pagination should be visible." */
+  it('shows no pager while everything fits on one page', () => {
+    render(<Users rows={USERS.slice(0, 20)} />);
+    expect(document.querySelector('.tbl-foot')).toBeNull();
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+  });
+
+  it('brings the pager back at the row that makes a second page', () => {
+    render(<Users rows={USERS.slice(0, 26)} />);
+    expect(screen.getByText(/1–25 of 26 users/)).toBeInTheDocument();
+  });
+
+  it('keeps the pager whatever the count when asked, and drops it when told', () => {
+    const { unmount } = render(<Users rows={USERS.slice(0, 8)} pager="always" />);
+    expect(screen.getByText(/rows\/page/)).toBeInTheDocument();
+    unmount();
+    render(<Users rows={USERS.slice(0, 40)} pager="never" />);
+    expect(document.querySelector('.tbl-foot')).toBeNull();
+  });
+
+  it('drops the Load more footer once everything is loaded', async () => {
+    render(<Users rows={USERS.slice(0, 30)} paging="loadMore" />);
+    expect(screen.getByText('Showing 25 of 30 users')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
+    expect(document.querySelector('.tbl-foot')).toBeNull();
   });
 });

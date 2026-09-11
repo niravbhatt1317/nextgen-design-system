@@ -305,3 +305,24 @@ export const Docked: Story = { args: { docked: true, maxHeight: 520 } };
  * heading menus, the pager — is unchanged.
  */
 export const WithoutToolbar: Story = { args: { toolbar: false } };
+
+/**
+ * **A list that fits on one page has no pager.** Twenty rows at twenty-five a
+ * page: there is no second page to go to, so the strip is not drawn. The
+ * default story above, with twenty-six, is the smallest list that gets one.
+ */
+export const NoPagerNeeded: Story = { args: { rows: USERS.slice(0, 20) } };
+
+/**
+ * **Kept whatever the count.** `pager="always"` holds the strip for a list that
+ * is about to grow, so the footer does not pop in and out as rows come and go.
+ */
+export const PagerAlways: Story = { args: { rows: USERS.slice(0, 8), pager: 'always' } };
+
+/**
+ * **Neither strip.** No toolbar, no pager, a short list — the card alone, which
+ * is what a table inside a panel or a tab body looks like.
+ */
+export const CardOnly: Story = {
+  args: { toolbar: false, pager: 'never', rows: USERS.slice(0, 6) },
+};

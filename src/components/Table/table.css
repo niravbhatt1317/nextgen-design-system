@@ -47,6 +47,15 @@
   width: 0;
   height: 0;
 }
+/* With no footer under it, the viewport takes the card's bottom corners itself.
+   The card does not clip its children, so otherwise the last row — its frozen
+   cells painted solid — ends square over the card's rounded edge. The footer
+   used to hide this; now that it only appears when there is something to page
+   (Pranjal, 2026-09-11), the viewport is often the last thing in the card. */
+.tbl-viewport:not(:has(~ .tbl-foot)) {
+  border-bottom-left-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+  border-bottom-right-radius: calc((var(--tbl-radius) - 1px) * (1 - var(--tbl-morph)));
+}
 .tbl-foot {
   margin-top: auto;
   flex-shrink: 0;
