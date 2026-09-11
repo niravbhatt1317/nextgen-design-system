@@ -427,7 +427,7 @@ function DataTable<Row>({
     sort.sort?.key === key ? sort.sort.direction : null;
 
   return (
-    <div className={cn('mdt-flex mdt-flex-col mdt-gap-[22px]', className)}>
+    <div className={cn('mdt-flex mdt-flex-col mdt-gap-4', className)}>
       {/* THE TOOLBAR CAN BE LEFT OFF (Pranjal, 2026-09-11). On a screen with a
           tab strip the page carries its own toolbar up there, and a second strip
           here would draw search, Filters, Sort and Columns twice. Everything
@@ -436,9 +436,14 @@ function DataTable<Row>({
         /* INSET TO THE TABLE'S EDGE, not the strip's own (Pranjal, 2026-09-11:
            "toolbar spacing doesn't align with that of table"). A standalone
            Toolbar keeps the 24px inset ruled on 4 September; this one belongs
-           to the table under it, so its controls start where the table's first
-           column starts — the table's 16px edge. */
-        <Toolbar label={`${label} controls`} className="mdt-px-4">
+           to the table under it, so its controls sit flush with the card's own
+           edges: the search box starts where the card's border starts, the last
+           button ends where it ends. And it is only as tall as its controls —
+           the 60px is the PAGE band's height, not this strip's — so the gap
+           to the card is the plain 16px he asked for, not 14px of empty strip
+           plus a gap. A table without its own toolbar leaves all of this to
+           the page's structure. */
+        <Toolbar label={`${label} controls`} className="mdt-h-auto mdt-px-0">
           {search && (
             <Input
               size="sm"

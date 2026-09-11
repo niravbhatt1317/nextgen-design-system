@@ -100,6 +100,9 @@ export interface DataTableProps<Row> {
    * controls twice (Pranjal, 2026-09-11). The page then supplies its own
    * `Toolbar`, a separate component, and the two stay connected through the
    * props below.
+   *
+   * With its own toolbar the table keeps 16px between the strip and the card.
+   * Without one, the page's structure decides the space above the table.
    */
   toolbar?: boolean | undefined;
   /**
