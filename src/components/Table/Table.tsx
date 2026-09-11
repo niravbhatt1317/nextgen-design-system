@@ -1,5 +1,14 @@
 import { cva } from 'class-variance-authority';
-import { createContext, forwardRef, useCallback, useContext, useRef, useState } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type { MutableRefObject } from 'react';
 import type {
   KeyboardEvent,
   MouseEvent,
@@ -104,6 +113,127 @@ export function tableMorphOf(docked: boolean | number | undefined): TableMorph {
   return { morph: Math.min(1, Math.max(0, docked)), driven: true };
 }
 
+const pxOf = (value: string): number => {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : 0;
+};
+
+/**
+ * Where the page pins this card.
+ *
+ * Prefer the page's own published offset; fall back to the band heights it is
+ * derived from, so a change to a band height cannot leave the table docking in
+ * the wrong place. A `calc()` value cannot be parsed, which is exactly when the
+ * band heights are the better answer.
+ */
+function dockLineOf(card: HTMLElement): number {
+  const cs = getComputedStyle(card);
+  const published = cs.getPropertyValue('--mdt-thead-top').trim();
+  if (published !== '' && !published.includes('calc')) return pxOf(published);
+  const b1 = pxOf(cs.getPropertyValue('--mdt-band-b1-h'));
+  const b2 = pxOf(cs.getPropertyValue('--mdt-band-b2t-h'));
+  if (b1 > 0) return b1 + (b2 > 0 ? b2 - 2 : 0);
+  return 0;
+}
+
+/** The distance over which the card finishes becoming the page. */
+const MORPH_RANGE = 140;
+/** Below this there is not enough room to be worth filling. */
+const MIN_FILL = 160;
+
+/** At rest, filling nothing — what a table with nowhere to grow reports. */
+const INERT: TableMorph = { morph: 0, driven: false };
+
+/**
+ * Drives the morph from the page scroll, and sizes the card while it is at it.
+ *
+ * The sizing is the part that matters: the card takes the whole height under
+ * the dock line whatever it holds, which is what makes one row behave like a
+ * thousand and what keeps the pager on screen.
+ *
+ * It reports `driven` only once it has actually taken a height, which matters
+ * now that it runs by default: a table in a drawer, a modal or a card has no
+ * page to fill, and a table that claims to be driven gives up its own max
+ * height. No scrolling ancestor, or too little room to be worth filling, and
+ * this stays inert and the table behaves exactly as it did before.
+ */
+function useSelfDrivenMorph(
+  cardRef: MutableRefObject<HTMLDivElement | null>,
+  enabled: boolean,
+  dockOffset: number | undefined
+): TableMorph {
+  const [state, setState] = useState<TableMorph>(INERT);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!enabled || card === null) return undefined;
+
+    let found: HTMLElement | null = card.parentElement;
+    while (found !== null && !/(auto|scroll)/.test(getComputedStyle(found).overflowY)) {
+      found = found.parentElement;
+    }
+    if (found === null) return undefined;
+    const page = found;
+    const dock = dockOffset ?? dockLineOf(card);
+    let filling = false;
+
+    const fill = (): void => {
+      card.style.height = '';
+      card.style.marginBottom = '';
+      const room = page.clientHeight - dock;
+      filling = room >= MIN_FILL;
+      if (!filling) return;
+      card.style.height = `${String(room)}px`;
+      /* Cancel the surface's trailing padding so the page's own scroll end IS
+       * the dock line; without it the page runs past and the pinned header
+       * ends up half-hidden under the band above. */
+      const topInPage =
+        card.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop;
+      const over = page.scrollHeight - page.clientHeight - (topInPage - dock);
+      if (over > 0 && over <= 96) card.style.marginBottom = `${String(-over)}px`;
+    };
+
+    let raf = 0;
+    const read = (): void => {
+      raf = 0;
+      const top = card.getBoundingClientRect().top - page.getBoundingClientRect().top;
+      const next = filling ? Math.min(1, Math.max(0, (dock + MORPH_RANGE - top) / MORPH_RANGE)) : 0;
+      setState((prev) =>
+        prev.driven === filling && Math.abs(prev.morph - next) < 0.001
+          ? prev
+          : { morph: next, driven: filling }
+      );
+    };
+    const onScroll = (): void => {
+      if (raf === 0) raf = requestAnimationFrame(read);
+    };
+
+    fill();
+    read();
+    page.addEventListener('scroll', onScroll, { passive: true });
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        fill();
+        read();
+      });
+      observer.observe(page);
+    }
+
+    return () => {
+      page.removeEventListener('scroll', onScroll);
+      if (observer !== null) observer.disconnect();
+      if (raf !== 0) cancelAnimationFrame(raf);
+      card.style.height = '';
+      card.style.marginBottom = '';
+      setState(INERT);
+    };
+  }, [cardRef, enabled, dockOffset]);
+
+  return state;
+}
+
 /**
  * Table - the card that holds a list: rows, a bulk bar and a pager.
  *
@@ -120,15 +250,30 @@ export function tableMorphOf(docked: boolean | number | undefined): TableMorph {
  * ```
  */
 const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
-  { className, label, divider = 'default', docked, style, children, ...props },
+  { className, label, divider = 'default', docked, expand, dockOffset, style, children, ...props },
   ref
 ) {
-  const state = tableMorphOf(docked);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  /* Expanding is the default (Pranjal, 2026-09-10). A page that drives the
+   * morph itself with `docked` keeps that job; `expand={false}` opts out. */
+  const self = expand ?? docked === undefined;
+  /* Inert until it has actually found a page to fill, so a table with nowhere
+   * to grow stays an ordinary card and keeps its own max height. */
+  const auto = useSelfDrivenMorph(cardRef, self, dockOffset);
+  const state = self ? auto : tableMorphOf(docked);
   const { morph } = state;
+  const setCard = useCallback(
+    (node: HTMLDivElement | null) => {
+      cardRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref !== null) ref.current = node;
+    },
+    [ref]
+  );
   return (
     <TableMorphContext.Provider value={state}>
       <div
-        ref={ref}
+        ref={setCard}
         role="region"
         aria-label={label}
         data-divider={divider}
