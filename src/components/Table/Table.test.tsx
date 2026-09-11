@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -14,6 +15,7 @@ import {
   TableNumberHead,
   TableTailCell,
   TableViewport,
+  useTableMorph,
 } from './Table';
 import { TableBulkAction, TableBulkBar } from './TableBulkBar';
 import { TableLoadMore, TablePager } from './TablePager';
@@ -341,5 +343,186 @@ describe('TableBlank and TableSkeleton', () => {
     );
     expect(screen.getByRole('table').querySelectorAll('tbody tr')).toHaveLength(5);
     expect(screen.getByRole('table').querySelector('tbody')).toHaveAttribute('aria-hidden', 'true');
+  });
+});
+
+describe('Table expand — the table drives its own morph', () => {
+  it('starts as an ordinary card, not docked', () => {
+    render(
+      <Table label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('is on without being asked for — a plain table expands', () => {
+    render(
+      <Table label="Users">
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('with no page to fill it stays inert, so the viewport keeps its max height', () => {
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().driven);
+      return null;
+    };
+    render(
+      <Table label="Users" expand>
+        <Probe />
+      </Table>
+    );
+    /* Nothing here scrolls, so there is nothing to fill and nothing to drive.
+     * A table in a drawer, a modal or a card lands exactly here. */
+    expect(seen.at(-1)).toBe(false);
+  });
+
+  it('ignores docked while expand is on — the table decides, not the page', () => {
+    const seen: number[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().morph);
+      return null;
+    };
+    render(
+      <Table label="Users" expand docked>
+        <Probe />
+      </Table>
+    );
+    /* docked would say 1; the table's own reading says 0 until it scrolls */
+    expect(seen.at(-1)).toBe(0);
+  });
+
+  it('leaves docked alone — a page driving the morph itself keeps that job', () => {
+    render(
+      <Table label="Users" docked>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'true');
+  });
+
+  it('opts out on expand={false}, docked and all', () => {
+    render(
+      <Table label="Users" expand={false} docked={0.5}>
+        <div>rows</div>
+      </Table>
+    );
+    const card = screen.getByRole('region', { name: 'Users' });
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-morph')).toBe('0.5');
+  });
+
+  it('accepts a dock line for pages that are not a PageFrame', () => {
+    render(
+      <Table label="Users" expand dockOffset={90}>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toBeInTheDocument();
+  });
+
+  it('still forwards a ref while driving itself', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Table ref={ref} label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveAttribute('aria-label', 'Users');
+  });
+
+  it('cleans up the height it set when it is switched off', () => {
+    const { rerender } = render(
+      <Table label="Users" expand>
+        <div>rows</div>
+      </Table>
+    );
+    rerender(
+      <Table label="Users" expand={false}>
+        <div>rows</div>
+      </Table>
+    );
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+  });
+
+  /* A page, faked: a scrolling box the table can measure. jsdom lays nothing
+   * out, so the box's visible height is set by hand. */
+  const pageOf = (visibleHeight: number): HTMLDivElement => {
+    const box = document.createElement('div');
+    box.style.overflowY = 'auto';
+    Object.defineProperty(box, 'clientHeight', { value: visibleHeight, configurable: true });
+    document.body.appendChild(box);
+    return box;
+  };
+
+  it('fills a real page — a scrolling box no taller than the window', () => {
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().driven);
+      return null;
+    };
+    const page = pageOf(600);
+    render(
+      <Table label="Users">
+        <Probe />
+      </Table>,
+      { container: page }
+    );
+    expect(seen.at(-1)).toBe(true);
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).not.toBe('');
+    page.remove();
+  });
+
+  it('skips a scrolling box taller than the window — that is content, not a page', () => {
+    /* The gallery's docs page wraps every story in exactly this: overflow auto,
+     * no height, so it is as tall as whatever it holds. Filling it ratcheted
+     * every table to 8,000px (Pranjal, 2026-09-11). */
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().driven);
+      return null;
+    };
+    const notAPage = pageOf(window.innerHeight + 1);
+    render(
+      <Table label="Users">
+        <Probe />
+      </Table>,
+      { container: notAPage }
+    );
+    expect(seen.at(-1)).toBe(false);
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+    notAPage.remove();
+  });
+
+  it('gives up on a box that is small at mount but grows the moment the table fills it', () => {
+    /* The docs page, exactly: the wrapper is short when the first table
+     * mounts, then swells as the table takes a height. A mount-time check
+     * waved this through. */
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().driven);
+      return null;
+    };
+    const box = document.createElement('div');
+    box.style.overflowY = 'auto';
+    Object.defineProperty(box, 'clientHeight', {
+      configurable: true,
+      get: () => (box.querySelector<HTMLElement>('.tbl')?.style.height ? 5000 : 600),
+    });
+    document.body.appendChild(box);
+    render(
+      <Table label="Users">
+        <Probe />
+      </Table>,
+      { container: box }
+    );
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+    expect(seen.at(-1)).toBe(false);
+    box.remove();
   });
 });
