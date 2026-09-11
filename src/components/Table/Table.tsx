@@ -629,8 +629,17 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           onPointerLeave={() => onBoundaryHover?.(false)}
         />
       )}
+      {/*
+        THE SEPARATOR, which is not the resize handle (Pranjal, 2026-09-11).
+
+        These were one thing: a 16px nick that only read as a divider on the
+        columns you could drag, so a column you could not resize had no line at
+        all and the boundary looked arbitrary. They are separate now — this is
+        drawn on every heading, full height, and never takes a pointer; the
+        handle above sits on top of it only where resizing is allowed.
+      */}
       <span
-        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+        className="tbl-sep mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-0 mdt-h-full mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
         aria-hidden="true"
       />
     </th>
@@ -705,7 +714,13 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
   );
 }
 
-/** The blank heading over the row numbers; named for screen readers. */
+/**
+ * The heading over the row numbers.
+ *
+ * It shows a hash. It used to show NOTHING, which read as a column somebody
+ * forgot to label — and left the numbers underneath with no name, so nobody
+ * could say which column they meant. (Pranjal, 2026-09-11.)
+ */
 function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
   return (
     <th
@@ -713,7 +728,9 @@ function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
       aria-label="Row number"
       className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
       style={{ left: frozen, width: TABLE_GUTTER }}
-    />
+    >
+      <span aria-hidden="true">#</span>
+    </th>
   );
 }
 
@@ -748,6 +765,72 @@ function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAll
   );
 }
 
+/**
+ * THE LEAD COLUMN — one 60px slot with two occupants (Pranjal, 2026-09-11).
+ *
+ * A table that can act on many rows at once puts a checkbox here. A table that
+ * cannot puts the row number, under a hash. Same slot, same width, same
+ * alignment, so a page that later grows bulk actions changes nothing about its
+ * columns and a page that loses them leaves no hole.
+ *
+ * The PAGE does not choose which. It says whether it has bulk actions and this
+ * draws the right one — which is the whole reason it is one component and not
+ * two the caller has to pick between and keep in step.
+ */
+function TableLeadHead({
+  selectable = false,
+  state = 'none',
+  onToggle,
+  onScope,
+  frozen = 0,
+}: {
+  /** Does this table act on many rows at once? */
+  selectable?: boolean | undefined;
+  state?: TableSelectAllProps['state'] | undefined;
+  onToggle?: (() => void) | undefined;
+  onScope?: ((anchor: HTMLElement) => void) | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined || onScope === undefined) {
+    return <TableNumberHead frozen={frozen} />;
+  }
+  return <TableSelectAll state={state} onToggle={onToggle} onScope={onScope} frozen={frozen} />;
+}
+
+/** The lead cell: a checkbox where the table selects, the row number where it does not. */
+function TableLeadCell({
+  index,
+  label,
+  selectable = false,
+  selected = false,
+  onToggle,
+  inert = false,
+  frozen = 0,
+}: {
+  index: number;
+  /** Spoken name for the checkbox: "Select Sarah Johnson". Only read when selectable. */
+  label?: string | undefined;
+  selectable?: boolean | undefined;
+  selected?: boolean | undefined;
+  onToggle?: ((extend: boolean) => void) | undefined;
+  inert?: boolean | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined) {
+    return <TableNumberCell index={index} inert={inert} frozen={frozen} />;
+  }
+  return (
+    <TableSelectionCell
+      index={index}
+      label={label ?? `Select row ${String(index)}`}
+      selected={selected}
+      onToggle={onToggle}
+      inert={inert}
+      frozen={frozen}
+    />
+  );
+}
+
 /** The blank 60px tail that soaks up leftover width. */
 function TableTailCell({ head = false }: { head?: boolean }) {
   return head ? (
@@ -774,6 +857,8 @@ export {
   TableCell,
   TableHead,
   TableSelectionCell,
+  TableLeadHead,
+  TableLeadCell,
   TableSelectAll,
   TableNumberCell,
   TableNumberHead,

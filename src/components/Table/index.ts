@@ -8,6 +8,8 @@ export {
   TableCell,
   TableHead,
   TableSelectionCell,
+  TableLeadHead,
+  TableLeadCell,
   TableSelectAll,
   TableNumberCell,
   TableNumberHead,

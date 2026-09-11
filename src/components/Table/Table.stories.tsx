@@ -12,6 +12,8 @@ import {
   TableColGroup,
   TableHead,
   TableHeader,
+  TableLeadCell,
+  TableLeadHead,
   TableRow,
   TableSelectAll,
   TableSelectionCell,
@@ -640,4 +642,77 @@ export const ExpandsWithASingleRow: Story = {
       </div>
     </div>
   ),
+};
+
+/**
+ * **The lead column is one slot with two occupants.**
+ *
+ * A table that can act on many rows at once puts a checkbox here. A table that
+ * cannot puts the row number, under a **hash** — not a blank heading, which
+ * read as a column somebody forgot to label and left the numbers underneath
+ * with no name.
+ *
+ * Same slot, same 60px, same alignment. A page that later grows bulk actions
+ * changes nothing about its columns, and a page that loses them leaves no hole.
+ *
+ * **The page does not choose which.** It says whether it has bulk actions and
+ * `TableLeadHead` / `TableLeadCell` draw the right one. That is the whole
+ * reason this is one component rather than two the caller has to keep in step.
+ *
+ * (Pranjal, 2026-09-11.)
+ */
+export const TheLeadColumn: Story = {
+  render: function LeadColumn() {
+    const [picked, setPicked] = useState<number[]>([2]);
+    const people = ['Sarah Johnson', 'Michael Smith', 'Emily Davis'];
+    const both: { selectable: boolean; caption: string }[] = [
+      { selectable: false, caption: 'No bulk actions — a hash, and the row number' },
+      { selectable: true, caption: 'With bulk actions — a checkbox in the same slot' },
+    ];
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        {both.map((v) => (
+          <div key={v.caption} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 12, color: 'hsl(var(--mdt-neutral-90))' }}>{v.caption}</div>
+            <Table label={v.caption}>
+              <TableViewport tableWidth={620} label={v.caption}>
+                <TableColGroup widths={[60, 240, 200]} />
+                <TableHeader>
+                  <TableRow inert>
+                    <TableLeadHead
+                      selectable={v.selectable}
+                      state={picked.length === 0 ? 'none' : picked.length === 3 ? 'all' : 'some'}
+                      onToggle={() => {
+                        setPicked((p) => (p.length === 0 ? [0, 1, 2] : []));
+                      }}
+                      onScope={() => undefined}
+                    />
+                    <TableHead columnKey="name" label="Name" width={240} />
+                    <TableHead columnKey="role" label="Role" width={200} />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {people.map((name, i) => (
+                    <TableRow key={name} selected={v.selectable && picked.includes(i)}>
+                      <TableLeadCell
+                        index={i + 1}
+                        label={`Select ${name}`}
+                        selectable={v.selectable}
+                        selected={picked.includes(i)}
+                        onToggle={() => {
+                          setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
+                        }}
+                      />
+                      <TableCell>{name}</TableCell>
+                      <TableCell>Operator</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </TableViewport>
+            </Table>
+          </div>
+        ))}
+      </div>
+    );
+  },
 };
