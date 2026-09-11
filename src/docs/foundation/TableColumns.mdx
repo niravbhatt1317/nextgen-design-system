@@ -1,0 +1,115 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Table columns" />
+
+# Table columns
+
+Four rules decide what a table's columns do. They were settled on the Users
+screen and lived only in that file, so every table built afterwards started
+without them — and the difference only showed when somebody put two screens
+side by side. They are written here so that stops happening.
+
+Each one is a rule about **placement and behaviour**, not about styling. The
+Table component already gives you the right row height, insets and type; these
+four are the decisions it cannot make for you.
+
+---
+
+## 1. Every table opens with a serial column
+
+A **60px leading column** carrying the row's number.
+
+Where a table has selection, the checkbox swaps into **the same optical spot** —
+the number and the tick never sit beside each other, and a picked row keeps its
+checkbox visible once you move the pointer away. Where a table has no bulk
+actions, it stays the number.
+
+```tsx
+{ key: 'sel', type: 'checkbox', label: '', render: (row, i) => i + 1 }
+```
+
+**Why it is not optional.** Without it, nobody can say "row 14" to anybody, and
+a table that later grows selection has to re-flow every column to make room.
+
+---
+
+## 2. Action sits second, right after the name
+
+Not last. **100px**, which deliberately overrides the 200px floor every other
+content column has.
+
+What you do to a row is a property of the row, not its final fact. A table that
+scrolls sideways puts a trailing action menu off-screen, and a menu you have to
+scroll to reach is a menu nobody uses.
+
+The 100px is so the frozen group stays lean — see rule 3.
+
+---
+
+## 3. The leading group is frozen
+
+Frozen **up to and including Action**: serial, name, action.
+
+Those three hold at the left edge while everything else scrolls sideways, so
+you always know which row you are reading and can always act on it.
+
+```tsx
+<DataTable freezeUpTo="action" … />
+```
+
+The boundary line appears **only while the table is actually scrolled
+sideways**, and only on the cells — never on the pager. At rest there is no
+line, because at rest nothing is being held back.
+
+---
+
+## 4. Columns are draggable, except the ones that are not
+
+The manageable columns reorder by dragging inside the **Columns** popover, and
+the order sticks.
+
+Two groups never move:
+
+- **The frozen group** — serial, name, action. Their whole job is to be in a
+  known place.
+- **The elastic tail** — the blank last column that soaks up leftover width so
+  the table always fills its card. It has no handle and no entry in the
+  column manager.
+
+---
+
+## The order is a rule, not an array position
+
+The four rules together mean a column's position is **decided**, not typed. Put
+the order in one helper so a column added later cannot land in the wrong place
+by being written on the wrong line:
+
+```tsx
+function orderColumns(defs, order) {
+  const cols = defs.filter(Boolean);
+  const pick = (k) => cols.filter((c) => c.key === k);
+  const managed = order.map((k) => cols.find((c) => c.key === k)).filter(Boolean);
+  return [...pick('sel'), ...pick('name'), ...pick('action'), ...managed, ...pick('tail')];
+}
+```
+
+Which lays a table out like this, every time:
+
+| Position | Column | Moves? | Width |
+| --- | --- | --- | --- |
+| 1 | Serial or checkbox | No — frozen | 60 |
+| 2 | Name | No — frozen | 200 |
+| 3 | Action | No — frozen | 100 |
+| 4 … n | Everything else | **Yes, dragged** | 200 floor |
+| last | Elastic tail | No | 60, grows |
+
+---
+
+## Where these came from
+
+All four were ruled on by Pranjal during the Users work in August 2026, and
+recorded here on 2026-09-11 after the Service accounts screen was built without
+any of them and the gap had to be found by eye.
+
+If you are building a new table and one of these does not fit your screen, that
+is worth a conversation — it is not worth quietly leaving out.

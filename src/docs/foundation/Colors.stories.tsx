@@ -347,6 +347,8 @@ const meta = {
     docs: {
       description: {
         component: [
+          '**Reference — Claude artifact:** [NextGen Colour Palette](https://claude.ai/code/artifact/db469b11-8470-4b45-9128-94b056cc168d), where the five added families, the job of every shade and the text shade per colour were settled. Open it for the reasoning behind the palette on this page.',
+          '',
           'Twelve families, 141 shades. **Every swatch is read live from the running stylesheet**,',
           'so this page cannot drift from the tokens it describes — which is how the page it',
           'replaces went wrong. Click any swatch to copy its token name.',

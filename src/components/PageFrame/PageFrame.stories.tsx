@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ReactNode } from 'react';
+import { Table, TableViewport } from '../Table';
 import { Button } from '../Button';
 import { PageBand, PageFrame, PageHeader, PageHero, PageSurface } from './PageFrame';
 
@@ -201,6 +202,129 @@ const TableBlank = ({ rows = 8 }: { rows?: number }): ReactNode => (
   </div>
 );
 
+/** A page banner: a standing condition on the whole page, above the numbers. */
+const BannerBlank = (): ReactNode => (
+  <div className="mdt-flex mdt-flex-none mdt-items-center mdt-gap-2.5 mdt-rounded-lg mdt-border mdt-border-orange-30 mdt-bg-orange-10 mdt-px-3.5 mdt-py-2.5">
+    <span className="mdt-size-1.5 mdt-flex-none mdt-rounded-full mdt-bg-orange-60" />
+    <Blank w={318} />
+  </div>
+);
+
+/** Applied filter chips, riding in the toolbar band right of the dropdowns. */
+const ChipBlanks = (): ReactNode => (
+  <>
+    {[
+      [34, 30],
+      [28, 40],
+    ].map(([a, b]) => (
+      <span
+        key={String(a)}
+        className="mdt-flex mdt-h-7 mdt-flex-none mdt-items-center mdt-gap-1.5 mdt-rounded-lg mdt-border mdt-border-blue-30 mdt-bg-blue-10 mdt-pl-3 mdt-pr-1.5"
+      >
+        <Blank w={a ?? 30} h={7} />
+        <Blank w={b ?? 30} h={7} />
+        <span className="mdt-grid mdt-size-4 mdt-place-items-center">
+          <Blank w={8} h={8} />
+        </span>
+      </span>
+    ))}
+    <Blank w={46} h={7} />
+  </>
+);
+
+/** The empty state fills the surface and nothing more. */
+const EmptyBlank = (): ReactNode => (
+  <div className="mdt-flex mdt-flex-none mdt-flex-col mdt-items-center mdt-gap-3 mdt-rounded-[10px] mdt-border mdt-border-border mdt-px-5 mdt-py-14">
+    <span className="mdt-size-11 mdt-rounded-[10px] mdt-border-2 mdt-border-dashed mdt-border-border" />
+    <Blank w={168} h={10} />
+    <Blank w={232} />
+  </div>
+);
+
+/** Paging, inside the table's own footer, pinned to the bottom of the view. */
+const PagerBlank = (): ReactNode => (
+  <div className="mdt-sticky mdt-bottom-0 mdt-z-[19] mdt-flex mdt-flex-none mdt-items-center mdt-gap-3 mdt-border-t mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2">
+    <Blank w={72} h={7} />
+    <span className="mdt-flex-1" />
+    <Blank w={28} h={7} />
+    {[6, 7, 7, 7, 6].map((w, i) => (
+      <span
+        key={`pg${String(i)}`}
+        className={
+          i === 1
+            ? 'mdt-grid mdt-size-7 mdt-place-items-center mdt-rounded-md mdt-bg-foreground'
+            : 'mdt-grid mdt-size-7 mdt-place-items-center mdt-rounded-md mdt-border mdt-border-border'
+        }
+      >
+        <span
+          className={i === 1 ? 'mdt-block mdt-bg-background' : 'mdt-block mdt-bg-muted'}
+          style={{ width: w, height: 8, borderRadius: 4 }}
+        />
+      </span>
+    ))}
+  </div>
+);
+
+/**
+ * The REAL Table, asking for nothing.
+ *
+ * Note what is NOT written below: `expand`. It is the default, so a table
+ * dropped into a frame fills the height under the pin line without anyone
+ * remembering to switch it on.
+ *
+ * The frame's part in this is only publishing the dock line; the table reads it
+ * and does the rest itself. These stories used to carry their own copy of that
+ * behaviour, which is exactly the duplication the `expand` setting removed.
+ */
+const ExpandingTable = ({ rows = 16 }: { rows?: number }): ReactNode => (
+  <Table label="Users">
+    <TableViewport tableWidth={880} label="Users" rowCount={rows}>
+      <thead>
+        <tr>
+          {[44, 38, 40, 58].map((w) => (
+            <th
+              key={w}
+              className="mdt-sticky mdt-top-0 mdt-z-[30] mdt-h-10 mdt-border-b mdt-border-neutral-20 mdt-bg-neutral-10 mdt-px-4 mdt-text-left dark:mdt-bg-neutral-140"
+            >
+              <Blank w={w} h={7} />
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: rows }, (_, i) => {
+          const widths = [
+            [104, 58, 88, 74],
+            [86, 52, 46, 92],
+            [118, 60, 38, 48],
+            [94, 54, 72, 64],
+          ][i % 4] ?? [100, 56, 60, 70];
+          return (
+            <tr key={`r${String(i)}`} className="mdt-h-[54px] mdt-border-b mdt-border-neutral-20">
+              <td className="mdt-px-4">
+                <span className="mdt-flex mdt-items-center mdt-gap-2.5">
+                  <Blank w={26} h={26} round />
+                  <Blank w={widths[0] ?? 100} h={9} />
+                </span>
+              </td>
+              <td className="mdt-px-4">
+                <Blank w={widths[1] ?? 56} h={20} round />
+              </td>
+              <td className="mdt-px-4">
+                <Blank w={widths[2] ?? 60} />
+              </td>
+              <td className="mdt-px-4">
+                <Blank w={widths[3] ?? 70} />
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </TableViewport>
+    <PagerBlank />
+  </Table>
+);
+
 const meta = {
   title: 'Foundation/Page structure',
   component: PageFrame,
@@ -209,6 +333,8 @@ const meta = {
     docs: {
       description: {
         component: [
+          '**Behaviour reference — Claude artifact:** [Console Page Frame](https://claude.ai/code/artifact/9d95439c-c22c-4137-a46b-d7b7276cfc15), a frame you can actually scroll, with a card for every arrangement and every scroll behaviour. Open it to see how the page is meant to behave — it is what this component was designed and approved from.',
+          '',
           'The default page layout of the merged console, and the layer above the components:',
           'where things go, rather than what they look like.',
           '',
@@ -234,6 +360,12 @@ const meta = {
           'air, so 6 + 14 reads as an even 20 on both sides of it. Under a tab band: **16 on both**',
           '**sides**, because a tab band ends in the active tab’s 2px underline and at 6px of air that',
           'line and the table’s top edge read as one, welding the tabs to the surface.',
+          '',
+          '**A table takes the full height under the pin line — whatever it holds — and it does ' +
+            'that by default.** One rule, two consequences: it expands on scroll **even holding a single ' +
+            'row**, and its paging is **always visible at the bottom of the page** rather than floating up ' +
+            'under a short list. That behaviour belongs to the Table; the frame only publishes the pin ' +
+            'line. Nothing on these pages asks for it — `expand={false}` is how you would refuse it.',
           '',
           'Content in these stories is drawn as flat blanks on purpose — not the `Skeleton` component,',
           'which pulses because it means "this is still loading". Nothing here is loading.',
@@ -450,6 +582,180 @@ export const ScrollBehaviour: Story = {
         </PageBand>
         <PageSurface>
           <TableBlank rows={16} />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * A standing condition on the whole page, above the numbers — a paused sync, a
+ * fired alert. Two at most.
+ *
+ * An explanation of how the surface works is a different thing and goes at the
+ * top of the body, so it never pushes the numbers below the fold.
+ */
+export const WithAPageBanner: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" actions={<Actions />}>
+          <BannerBlank />
+          <KpiStripBlank />
+        </PageHero>
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+        </PageBand>
+        <PageSurface>
+          <TableBlank rows={8} />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * Applied filters ride in the toolbar band, right of the dropdowns, each one
+ * removable, with a Clear all closing out the set.
+ *
+ * Never a second row, never a sidebar. The rarely-used filters live behind a
+ * More filters button that opens a drawer and shows its applied count.
+ */
+export const WithFilterChips: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" actions={<Actions />} />
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+          <ChipBlanks />
+        </PageBand>
+        <PageSurface>
+          <TableBlank rows={8} />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * The empty state fills the surface and nothing more.
+ *
+ * The heading, the numbers and the toolbar all stay where they were. An empty
+ * state that swallows the whole page is a defect — it takes away the very
+ * controls that would get someone out of it.
+ */
+export const AnEmptySurface: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" actions={<Actions />}>
+          <KpiStripBlank />
+        </PageHero>
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+          <ChipBlanks />
+        </PageBand>
+        <PageSurface>
+          <EmptyBlank />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * **Scroll this one.** At rest the table is a rounded card at the page's inset.
+ * As it approaches the pin line it takes back the 24 on each side, drops its
+ * side borders and flattens its corners — it stops being an object on the page
+ * and becomes the page.
+ *
+ * This is the real `Table`, asking for nothing — expanding is its default. The
+ * frame's only part is publishing the pin line, which the table reads for itself.
+ */
+export const TheCardBecomesThePage: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" subtitle={<Blank w={432} />} actions={<Actions />}>
+          <KpiStripBlank />
+        </PageHero>
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+        </PageBand>
+        <PageSurface>
+          <ExpandingTable rows={14} />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * **Scroll to the bottom.** Once the table is fully docked the page stops and
+ * the rows take over the scroll inside it.
+ *
+ * The header, the toolbar and the paging are all frozen in place, so a long
+ * read never loses its column names. Release it and the table re-forms as a
+ * card showing its top, never mid-list.
+ */
+export const TheRowsTakeOverTheScroll: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" actions={<Actions />}>
+          <KpiStripBlank />
+        </PageHero>
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+        </PageBand>
+        <PageSurface>
+          <ExpandingTable rows={26} />
+        </PageSurface>
+      </PageFrame>
+    </Shell>
+  ),
+};
+
+/**
+ * **One row, and it still expands.** The table holds a single entry and behaves
+ * exactly like the long one — full height under the pin line, widening as it
+ * docks, paging pinned to the bottom of the view.
+ *
+ * Expansion is a property of the table, not of how much happens to be in it, so
+ * a filtered-down list does not suddenly behave like a different component.
+ */
+export const EvenOneRowExpands: Story = {
+  render: () => (
+    <Shell>
+      <PageFrame>
+        <PageHeader leading={<Blank w={28} h={28} />}>
+          <Crumbs />
+        </PageHeader>
+        <PageHero title="Users" actions={<Actions />}>
+          <KpiStripBlank />
+        </PageHero>
+        <PageBand variant="toolbar" end={<Blank w={52} h={7} />}>
+          <ToolbarBlanks />
+          <ChipBlanks />
+        </PageBand>
+        <PageSurface>
+          <ExpandingTable rows={1} />
         </PageSurface>
       </PageFrame>
     </Shell>
