@@ -548,7 +548,15 @@ function DataTable<Row>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <ToolbarButton
-              icon={quickFilter.icon ?? <Icon name="check-circle" />}
+              icon={
+                quickFilter.icon ??
+                /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
+                       icon we used in users is different here"): one icon for the
+                       filter, in the strip and in the heading it filters. */
+                allColumns.find((c) => c.key === quickFilter.columnKey)?.glyph ?? (
+                  <Icon name="check-circle" />
+                )
+              }
               dot={quick.size > 0}
               aria-label={quickFilter.label}
               activeLabel="applied"
@@ -572,7 +580,7 @@ function DataTable<Row>({
                   resetPaging();
                 }}
               >
-                {o}
+                {quickFilter.renderOption ? quickFilter.renderOption(o) : o}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>

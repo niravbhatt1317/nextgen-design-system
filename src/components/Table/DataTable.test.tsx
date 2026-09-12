@@ -282,6 +282,33 @@ describe('DataTable', { timeout: 20000 }, () => {
     }
   });
 
+  /* Pranjal, 2026-09-12: "the status icon we used in users is different here" -
+   * one icon for a filter: the square wears the glyph of the column it filters. */
+  it("puts the filtered column's glyph on the quick-filter square", () => {
+    render(<Users />);
+    const square = screen.getByRole('button', { name: 'Filter by status' });
+    expect(square.querySelector('[data-testid="glyph"]')).not.toBeNull();
+  });
+
+  /* Pranjal, 2026-09-12: "we showed the badges inside the filter for clear
+   * distinguish visibility" - the menu can draw each value as the column's pill. */
+  it('draws each quick-filter value the way the page asks, a pill here', async () => {
+    render(
+      <Users
+        quickFilter={{
+          columnKey: 'status',
+          label: 'Filter by status',
+          options: ['Active', 'Inactive'],
+          value: (u) => u.status,
+          renderOption: (v) => <Badge size="sm">{v}</Badge>,
+        }}
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    const item = await screen.findByRole('menuitemcheckbox', { name: 'Active' });
+    expect(item.querySelector('[data-tone]')).not.toBeNull();
+  });
+
   /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
    * pagination should be visible." */
   it('shows no pager while everything fits on one page', () => {

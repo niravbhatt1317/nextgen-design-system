@@ -10,8 +10,15 @@ export interface DataTableQuickFilter<Row> {
   options: string[];
   /** The row's value for this filter. */
   value: (row: Row) => string;
-  /** The square's 14px icon. */
+  /** The square's 14px icon. Left unset, the square wears the column's own glyph. */
   icon?: ReactNode | undefined;
+  /**
+   * How one value is drawn in the menu. Left unset, the plain word. Users
+   * draws each status as its own pill, so the menu reads like the column
+   * (Pranjal, 2026-09-12: "we showed the badges inside the filter for clear
+   * distinguish visibility").
+   */
+  renderOption?: ((value: string) => ReactNode) | undefined;
 }
 
 /** One group in the Filters panel: a label and the values a person can tick. */

@@ -16,27 +16,9 @@ import type { TableColumnDef } from './Table.types';
  * Load more has one more to load — which is all the stories need to show. */
 const USERS = sampleUsers(26);
 
-/** The console's own Status glyph: an eight-spoke loader, 14px. */
-const StatusGlyph = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <line x1="12" y1="2" x2="12" y2="6" />
-    <line x1="12" y1="18" x2="12" y2="22" />
-    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
-    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
-    <line x1="2" y1="12" x2="6" y2="12" />
-    <line x1="18" y1="12" x2="22" y2="12" />
-    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
-    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
-  </svg>
-);
+/** The Status mark: the eight-spoke loader, the library's own icon. One icon for the
+ * column heading and the quick-filter square alike (Pranjal, 2026-09-12). */
+const StatusGlyph = () => <Icon name="loader" />;
 
 const TONE = { Active: 'success', Inactive: 'slate', Invited: 'warning' } as const;
 const SOURCE_PALETTE = {
@@ -165,6 +147,12 @@ function UsersTable(
           label: 'Filter by status',
           options: ['Active', 'Inactive', 'Invited'],
           value: (u) => u.status,
+          /* the menu reads like the column: each status as its own pill */
+          renderOption: (v) => (
+            <Badge size="sm" tone={TONE[v as SampleUser['status']]} dot>
+              {v}
+            </Badge>
+          ),
         }}
         filters={[
           {
