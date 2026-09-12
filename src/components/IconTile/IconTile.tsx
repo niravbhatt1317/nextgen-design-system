@@ -29,11 +29,15 @@ export const iconTileVariants = cva(
         purple:
           'mdt-bg-purple-10 mdt-text-purple-90 dark:mdt-bg-purple-100 dark:mdt-text-purple-30',
       },
+      /* THE TILE SIZES ITS ICON (Pranjal, 2026-09-12: "icon size is too big" - a
+       * 20px glyph in a 24px tile). The glyph is a little over half the tile at
+       * every size: 14 in 24, 16 in 32, 20 in 40 (the size he called right in the
+       * Users drawer), 24 in 48. Set here, so no page has to know the ratio. */
       size: {
-        sm: 'mdt-h-6 mdt-w-6',
-        md: 'mdt-h-8 mdt-w-8',
-        lg: 'mdt-h-10 mdt-w-10',
-        xl: 'mdt-h-12 mdt-w-12',
+        sm: 'mdt-h-6 mdt-w-6 [&_svg]:mdt-size-3.5',
+        md: 'mdt-h-8 mdt-w-8 [&_svg]:mdt-size-4',
+        lg: 'mdt-h-10 mdt-w-10 [&_svg]:mdt-size-5',
+        xl: 'mdt-h-12 mdt-w-12 [&_svg]:mdt-size-6',
       },
       shape: {
         square: 'mdt-rounded-md',

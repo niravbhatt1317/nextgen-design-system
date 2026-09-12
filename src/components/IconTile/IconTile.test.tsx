@@ -91,4 +91,17 @@ describe('IconTile', () => {
     render(<IconTile icon={icon} ref={ref} />);
     expect(ref.current).toBeInstanceOf(HTMLSpanElement);
   });
+
+  /* Pranjal, 2026-09-12: "icon size is too big" - the tile sizes its own glyph */
+  it.each([
+    ['sm', '[&_svg]:mdt-size-3.5'],
+    ['md', '[&_svg]:mdt-size-4'],
+    ['lg', '[&_svg]:mdt-size-5'],
+    ['xl', '[&_svg]:mdt-size-6'],
+  ])('sizes the glyph to a little over half the %s tile', (size, cls) => {
+    const { container } = render(
+      <IconTile icon={<svg data-testid="g" />} size={size as 'sm' | 'md' | 'lg' | 'xl'} />
+    );
+    expect(container.firstElementChild?.className).toContain(cls);
+  });
 });
