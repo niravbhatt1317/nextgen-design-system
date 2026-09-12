@@ -482,7 +482,7 @@ function DataTable<Row>({
         <Popover>
           <PopoverTrigger asChild>
             <ToolbarButton
-              icon={<Icon name="list-filter" />}
+              icon={<Icon name="funnel" />}
               count={filterCount || undefined}
               activeLabel="applied"
             >
@@ -566,6 +566,12 @@ function DataTable<Row>({
             {quickFilter.options.map((o) => (
               <DropdownMenuCheckboxItem
                 key={o}
+                /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
+                       here"), as the Filters panel's rows do and as Users' quick filter
+                       always has: a person sees at a glance which values are on and
+                       that several can be. The menu's own tick, which only appears
+                       once checked, is hidden in favour of the box. */
+                className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
                 checked={quick.has(o)}
                 onSelect={(e) => {
                   e.preventDefault();
@@ -580,6 +586,12 @@ function DataTable<Row>({
                   resetPaging();
                 }}
               >
+                <Checkbox
+                  className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                  checked={quick.has(o)}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
                 {quickFilter.renderOption ? quickFilter.renderOption(o) : o}
               </DropdownMenuCheckboxItem>
             ))}

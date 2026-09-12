@@ -22,6 +22,12 @@ export const toolbarVariants = cva(
     'mdt-flex mdt-w-full mdt-items-center mdt-gap-2.5',
     'mdt-h-[60px] mdt-px-6',
     'mdt-bg-background',
+    /* A SEARCH BOX IN THE STRIP WEARS THE STRIP'S BORDER (Pranjal, 2026-09-12:
+       "change the search input box border color with filter cta border color").
+       The Input's own border is one step darker than a ToolbarButton's; side by
+       side the two read as two different controls. Set here, on the strip, so
+       every strip - the table's own or the page's - keeps the pair matched. */
+    '[&_input]:mdt-border-neutral-30 dark:[&_input]:mdt-border-neutral-110',
   ],
   {
     variants: {
@@ -44,7 +50,7 @@ export const toolbarVariants = cva(
  * ```tsx
  * <Toolbar label="User controls">
  *   <Input size="sm" placeholder="Search by name or email" startAdornment={<Icon name="search" size={14} />} />
- *   <ToolbarButton icon={<Icon name="list-filter" />} count={2} onClick={openDrawer}>Filters</ToolbarButton>
+ *   <ToolbarButton icon={<Icon name="funnel" />} count={2} onClick={openDrawer}>Filters</ToolbarButton>
  *   <ToolbarButton icon={<Icon name="check-circle" />} dot aria-label="Status" />
  *   <ToolbarSpacer />
  *   <ToolbarSection>

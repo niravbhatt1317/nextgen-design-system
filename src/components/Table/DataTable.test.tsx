@@ -309,6 +309,21 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(item.querySelector('[data-tone]')).not.toBeNull();
   });
 
+  /* Pranjal, 2026-09-12: "i need checkboxes here" - every quick-filter row shows
+   * a box, on or off, like the Filters panel and like Users. */
+  it('shows a checkbox on every quick-filter row, reflecting the tick', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    const active = await screen.findByRole('menuitemcheckbox', { name: 'Active' });
+    const box = active.querySelector('button[data-state]');
+    expect(box).not.toBeNull();
+    expect(box).toHaveAttribute('data-state', 'unchecked');
+    await userEvent.click(active);
+    expect(
+      screen.getByRole('menuitemcheckbox', { name: 'Active' }).querySelector('button[data-state]')
+    ).toHaveAttribute('data-state', 'checked');
+  });
+
   /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
    * pagination should be visible." */
   it('shows no pager while everything fits on one page', () => {

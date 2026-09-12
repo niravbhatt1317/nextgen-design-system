@@ -48,7 +48,7 @@ export const Default: Story = {
   render: () => (
     <Toolbar label="User controls">
       <Search />
-      <ToolbarButton icon={<Icon name="list-filter" />}>Filters</ToolbarButton>
+      <ToolbarButton icon={<Icon name="funnel" />}>Filters</ToolbarButton>
       <ToolbarButton icon={<Icon name="check-circle" />} aria-label="Status" />
       <ToolbarSpacer />
       <ToolbarSection>
@@ -67,7 +67,7 @@ export const WithThingsApplied: Story = {
       <Toolbar label="User controls">
         <Search />
         <ToolbarButton
-          icon={<Icon name="list-filter" />}
+          icon={<Icon name="funnel" />}
           count={2}
           open={open}
           onClick={() => {
@@ -92,7 +92,7 @@ export const WithBorder: Story = {
   render: () => (
     <Toolbar label="User controls" border>
       <Search />
-      <ToolbarButton icon={<Icon name="list-filter" />}>Filters</ToolbarButton>
+      <ToolbarButton icon={<Icon name="funnel" />}>Filters</ToolbarButton>
       <ToolbarSpacer />
       <ToolbarSection>
         <ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" />
@@ -106,7 +106,7 @@ export const WithBorder: Story = {
 export const ControlsOnly: Story = {
   render: () => (
     <Toolbar label="Role controls">
-      <ToolbarButton icon={<Icon name="list-filter" />}>Filters</ToolbarButton>
+      <ToolbarButton icon={<Icon name="funnel" />}>Filters</ToolbarButton>
       <ToolbarSpacer />
       <ToolbarSection>
         <ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" />

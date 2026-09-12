@@ -8887,7 +8887,7 @@
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
       "summary": "Toolbar - the strip above a list: search, filters, then sort and columns on the right.",
-      "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
+      "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"funnel\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
       "props": ["children", "label"],
       "propDocs": "The controls. Put the right-hand run in a ToolbarSection after a ToolbarSpacer. The strip's spoken name. @default 'Toolbar'"
     },
