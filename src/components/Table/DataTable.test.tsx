@@ -240,6 +240,48 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.getByText(USERS[0].name)).toBeInTheDocument();
   });
 
+  /* Pranjal, 2026-09-12: "not following the minimum width of column rule" - a
+   * width the page DECLARES is held to the minimum, like one a person drags to. */
+  it('holds a declared width to the column minimum', () => {
+    render(
+      <Users columns={[{ key: 'status', label: 'Status', width: 110, cell: (u) => u.status }]} />
+    );
+    const cols = [...document.querySelectorAll('colgroup col')].map(
+      (c) => (c as HTMLElement).style.width
+    );
+    /* row number 60, Name 200, Action 100, then Status - never 110 */
+    expect(cols[3]).toBe('120px');
+  });
+
+  /* Pranjal, 2026-09-12: "if there's space left then columns should automatically
+   * stretch equally to fill the full width of the table". */
+  it('shares spare width equally among the content columns, and only them', () => {
+    const wide = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
+    /* the card is 1600 wide; the columns cover 60 + 200 + 100 + 3 × 200 + the 60 tail = 1020 */
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        return (this as HTMLElement).classList.contains('tbl-viewport') ? 1600 : 0;
+      },
+    });
+    try {
+      render(<Users />);
+      const cols = [...document.querySelectorAll('colgroup col')].map((c) =>
+        parseFloat((c as HTMLElement).style.width)
+      );
+      expect(cols.slice(0, 3)).toEqual([60, 200, 100]);
+      const content = cols.slice(3, -1);
+      expect(content).toHaveLength(3);
+      /* 1600 - 1020 = 580 spare, 193.33 each */
+      for (const w of content) expect(w).toBeCloseTo(200 + 580 / 3, 1);
+      expect(cols.at(-1)).toBe(60);
+      expect(cols.reduce((a, b) => a + b, 0)).toBeCloseTo(1600, 1);
+    } finally {
+      if (wide) Object.defineProperty(HTMLElement.prototype, 'clientWidth', wide);
+      else delete (HTMLElement.prototype as unknown as Record<string, unknown>)['clientWidth'];
+    }
+  });
+
   /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
    * pagination should be visible." */
   it('shows no pager while everything fits on one page', () => {

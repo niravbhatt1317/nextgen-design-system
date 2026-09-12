@@ -193,6 +193,29 @@ function DataTable<Row>({
     saveNumbers(storageKey, numbers);
   }, [storageKey, numbers]);
   const viewportRef = useRef<HTMLDivElement>(null);
+
+  /* THE COLUMNS FILL THE CARD (Pranjal, 2026-09-12: "if there's space left then
+   * columns should automatically stretch equally to fill the full width of the
+   * table"). The card's inner width is watched; whatever the columns do not
+   * cover is shared equally among the CONTENT columns - the lead, Name and
+   * Action keep their ruled widths - so a wide screen shows wider columns, not
+   * a blank run past the last one. Narrower than the columns, and the table
+   * scrolls sideways as before. */
+  const [viewportWidth, setViewportWidth] = useState(0);
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (el === null) return undefined;
+    const measure = (): void => {
+      setViewportWidth(el.clientWidth);
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+    };
+  }, []);
   const cardRef = useRef<HTMLDivElement>(null);
   const [scopeAnchor, setScopeAnchor] = useState<HTMLElement | null>(null);
   const [insert, setInsert] = useState<{ key: string; x: number; y: number } | null>(null);
@@ -260,7 +283,7 @@ function DataTable<Row>({
   const nameWidth = nameColumn.width ?? TABLE_COLUMN_WIDTH;
   const hasActions = rowActions !== undefined;
   const visible = layout.visible;
-  const widths = useMemo(
+  const baseWidths = useMemo(
     () => [
       ...(leading ? [TABLE_GUTTER] : []),
       nameWidth,
@@ -269,6 +292,16 @@ function DataTable<Row>({
     ],
     [leading, nameWidth, hasActions, visible, layout]
   );
+  /* the first content column's position: after the lead, Name and Action */
+  const contentStart = (leading ? 1 : 0) + 1 + (hasActions ? 1 : 0);
+  const widths = useMemo(() => {
+    const covered = baseWidths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
+    const content = baseWidths.length - contentStart;
+    const spare = viewportWidth - covered;
+    if (spare <= 0 || content <= 0) return baseWidths;
+    const share = spare / content;
+    return baseWidths.map((w, i) => (i >= contentStart ? w + share : w));
+  }, [baseWidths, contentStart, viewportWidth]);
   const tableWidth = widths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
   const nameLeft = leading ? TABLE_GUTTER : 0;
   const actionLeft = nameLeft + nameWidth;

@@ -478,6 +478,67 @@ describe('Table expand — the table drives its own morph', () => {
     page.remove();
   });
 
+  it('rests at 0 however close to the dock line it starts, and reaches 1 exactly there', async () => {
+    /* Pranjal, 2026-09-12, on the Service accounts page. A card 81px from the
+     * dock line, measured against a flat 140, RESTED 42% morphed: corners half
+     * flattened before anyone scrolled. The morph runs over the travel the
+     * card actually has. */
+    const seen: number[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorph().morph);
+      return null;
+    };
+    /* 700 tall: shorter than jsdom's 768px window, so it counts as a page and fills */
+    const page = pageOf(700);
+    Object.defineProperty(page, 'scrollTop', { value: 0, writable: true, configurable: true });
+    /* the page sits at 0; the card starts 199px down it; the dock line is 118 */
+    page.getBoundingClientRect = () => ({
+      top: 0,
+      left: 0,
+      right: 1440,
+      bottom: 700,
+      width: 1440,
+      height: 700,
+      x: 0,
+      y: 0,
+      toJSON: () => '',
+    });
+    let cardTop = 199;
+    const { container } = render(
+      <Table label="Service accounts" dockOffset={118}>
+        <Probe />
+      </Table>,
+      { container: page }
+    );
+    const card = container.querySelector<HTMLElement>('.tbl');
+    if (card === null) throw new Error('no card');
+    card.getBoundingClientRect = () => ({
+      top: cardTop,
+      left: 280,
+      right: 1416,
+      bottom: cardTop + 782,
+      width: 1136,
+      height: 782,
+      x: 280,
+      y: cardTop,
+      toJSON: () => '',
+    });
+    const scrollTo = async (y: number): Promise<void> => {
+      (page as unknown as { scrollTop: number }).scrollTop = y;
+      cardTop = 199 - y;
+      page.dispatchEvent(new Event('scroll'));
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await new Promise((r) => setTimeout(r, 0));
+    };
+    await scrollTo(0);
+    expect(seen.at(-1)).toBe(0);
+    await scrollTo(40);
+    expect(seen.at(-1)).toBeCloseTo(40 / 81, 2);
+    await scrollTo(81);
+    expect(seen.at(-1)).toBe(1);
+    page.remove();
+  });
+
   it('skips a scrolling box taller than the window — that is content, not a page', () => {
     /* The gallery's docs page wraps every story in exactly this: overflow auto,
      * no height, so it is as tall as whatever it holds. Filling it ratcheted

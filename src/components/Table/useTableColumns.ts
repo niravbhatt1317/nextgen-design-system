@@ -38,6 +38,9 @@ export interface UseTableColumns<Row> {
 }
 
 const DEFAULT_WIDTH = 200;
+/** The same floor and ceiling the heading's resize handle uses. */
+const MIN_WIDTH = 120;
+const MAX_WIDTH = 720;
 
 function load(storageKey: string | undefined): TableColumnsLayout | null {
   if (!storageKey) return null;
@@ -100,14 +103,22 @@ export function useTableColumns<Row>({
   }, []);
 
   const widthOf = useCallback(
-    (key: string) => layout.widths[key] ?? byKey.get(key)?.width ?? DEFAULT_WIDTH,
+    (key: string) => {
+      /* The minimum holds for a width the page DECLARES too, not only for one a
+       * person drags to (Pranjal, 2026-09-12: "not following the minimum width
+       * of column rule"). A console column definition of 110 used to slip under. */
+      const c = byKey.get(key);
+      const min = c?.minWidth ?? MIN_WIDTH;
+      const w = layout.widths[key] ?? c?.width ?? DEFAULT_WIDTH;
+      return Math.max(min, Math.min(MAX_WIDTH, w));
+    },
     [layout.widths, byKey]
   );
 
   const setWidth = useCallback(
     (key: string, width: number) => {
-      const min = byKey.get(key)?.minWidth ?? 120;
-      const clamped = Math.max(min, Math.min(720, Math.round(width)));
+      const min = byKey.get(key)?.minWidth ?? MIN_WIDTH;
+      const clamped = Math.max(min, Math.min(MAX_WIDTH, Math.round(width)));
       update((l) => ({ ...l, widths: { ...l.widths, [key]: clamped } }));
     },
     [byKey, update]

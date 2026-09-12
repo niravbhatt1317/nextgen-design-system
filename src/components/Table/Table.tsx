@@ -136,7 +136,8 @@ function dockLineOf(card: HTMLElement): number {
   return 0;
 }
 
-/** The distance over which the card finishes becoming the page. */
+/** The most the card ever needs to travel to finish becoming the page; a card
+ * that starts closer to the dock line morphs over the distance it has. */
 const MORPH_RANGE = 140;
 /** Below this there is not enough room to be worth filling. */
 const MIN_FILL = 160;
@@ -230,7 +231,17 @@ function useSelfDrivenMorph(
     const read = (): void => {
       raf = 0;
       const top = card.getBoundingClientRect().top - page.getBoundingClientRect().top;
-      const next = filling ? Math.min(1, Math.max(0, (dock + MORPH_RANGE - top) / MORPH_RANGE)) : 0;
+      /* THE MORPH RUNS OVER THE TRAVEL THE CARD ACTUALLY HAS, never a flat 140
+       * (Pranjal, 2026-09-12, on the Service accounts page: "do you think its
+       * working fine?"). A page with a KPI strip above the table gives the card
+       * ~200px of travel, so it rested at 0 - a full 12px radius. A page without
+       * one gives it 81px, and against a fixed 140 that card RESTED 42% morphed:
+       * corners half flattened before anyone scrolled. Travel is measured from
+       * the card's place in the CONTENT (`top + scrollTop`), which does not move
+       * as the page scrolls, so every card rests at 0 and reaches 1 exactly at
+       * the dock line. 140 stays as the ceiling for cards that start far down. */
+      const travel = Math.max(1, Math.min(MORPH_RANGE, top + page.scrollTop - dock));
+      const next = filling ? Math.min(1, Math.max(0, (dock + travel - top) / travel)) : 0;
       setState((prev) =>
         prev.driven === filling && Math.abs(prev.morph - next) < 0.001
           ? prev
