@@ -103,8 +103,14 @@ export interface DataTableProps<Row> {
    *
    * With its own toolbar the table keeps 16px between the strip and the card.
    * Without one, the page's structure decides the space above the table.
+   *
+   * Pass the page's own `Toolbar` ELEMENT (Pranjal, 2026-09-12) and the table
+   * draws the same controls inside it instead: the page keeps its 60px strip
+   * as structure, the table keeps search, Filters, the quick filter, Sort and
+   * Columns working. Use a callback ref or state for the element, so the
+   * table sees it once it exists; until then it draws no strip.
    */
-  toolbar?: boolean | undefined;
+  toolbar?: boolean | HTMLElement | null | undefined;
   /**
    * When the pager strip appears.
    *

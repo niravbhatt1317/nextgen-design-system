@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
+import { Toolbar } from '../Toolbar';
 import { DataTable } from './DataTable';
 import { TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 import { ContactChips, PersonCell, TagList } from './TableCells';
@@ -325,4 +326,28 @@ export const PagerAlways: Story = { args: { rows: USERS.slice(0, 8), pager: 'alw
  */
 export const CardOnly: Story = {
   args: { toolbar: false, pager: 'never', rows: USERS.slice(0, 6) },
+};
+
+/**
+ * **The page owns the strip.** A screen with no tab bar keeps the 60px
+ * `Toolbar` band as page structure and hands the table the ELEMENT; the table
+ * draws its own search, Filters, quick filter, Sort and Columns inside it
+ * (Pranjal, 2026-09-12). Every control works as it does in the table's own
+ * strip, and there is no second copy for the page to keep in step.
+ */
+export const WithThePagesToolbar: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: function WithThePagesToolbarStory() {
+    const [strip, setStrip] = useState<HTMLDivElement | null>(null);
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-bg-background">
+        <Toolbar ref={setStrip} label="User controls">
+          {null}
+        </Toolbar>
+        <div className="mdt-px-6 mdt-pb-5 mdt-pt-1.5">
+          <UsersTable toolbar={strip ?? false} />
+        </div>
+      </div>
+    );
+  },
 };

@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { DataTable } from './DataTable';
@@ -210,6 +211,33 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.queryByRole('button', { name: 'Filters' })).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /Email/ })).toBeInTheDocument();
+  });
+
+  /* Pranjal, 2026-09-12: a page with no tab bar keeps the 60px Toolbar band as
+   * page structure and hands the table the element; the table draws its own
+   * controls inside it, so nothing is copied and everything keeps working. */
+  it('draws its controls into a strip the page owns, and they still work', async () => {
+    function Page() {
+      const [strip, setStrip] = useState<HTMLDivElement | null>(null);
+      return (
+        <>
+          <div ref={setStrip} role="toolbar" aria-label="The page strip" />
+          <Users toolbar={strip ?? false} />
+        </>
+      );
+    }
+    render(<Page />);
+    const strip = screen.getByRole('toolbar', { name: 'The page strip' });
+    /* the controls are inside the page strip, and the table drew no strip of its own */
+    const search = within(strip).getByPlaceholderText('Search');
+    expect(within(strip).getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+    expect(within(strip).getByRole('button', { name: 'Sort' })).toBeInTheDocument();
+    expect(screen.queryByRole('toolbar', { name: 'Users controls' })).not.toBeInTheDocument();
+    /* and they drive the table */
+    const before = screen.getAllByRole('row').length;
+    await userEvent.type(search, USERS[0].name);
+    expect(screen.getAllByRole('row').length).toBeLessThan(before);
+    expect(screen.getByText(USERS[0].name)).toBeInTheDocument();
   });
 
   /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
