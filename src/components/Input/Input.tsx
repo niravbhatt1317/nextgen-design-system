@@ -10,7 +10,10 @@ import type { InputProps } from './Input.types';
 export const InputVariants = cva(
   // Base styles applied to all inputs
   [
-    'mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-input',
+    /* the same edge as the outline Button and the Toolbar's controls
+     * (neutral-30) - the toolbar used to force this on any input inside it,
+     * and an Input anywhere else came out darker (--mdt-input, neutral-40) */
+    'mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-neutral-30 dark:mdt-border-neutral-110',
     'mdt-bg-background mdt-text-foreground',
     'mdt-transition-colors',
     'file:mdt-border-0 file:mdt-bg-transparent file:mdt-text-sm file:mdt-font-medium',
