@@ -32,25 +32,33 @@ export const iconTileVariants = cva(
       /* THE TILE SIZES ITS ICON (Pranjal, 2026-09-12: "icon size is too big" - a
        * 20px glyph in a 24px tile). The glyph is a little over half the tile at
        * every size: 14 in 24, 16 in 32, 20 in 40 (the size he called right in the
-       * Users drawer), 24 in 48. Set here, so no page has to know the ratio. */
+       * Users drawer), 24 in 48. Set here, so no page has to know the ratio.
+       *
+       * 2XL IS THE IDENTITY MARK (Pranjal, 2026-09-12): the tile at the top of an
+       * object drawer sits where Users puts a 56px avatar, so it is 56 too - the
+       * band keeps the same height whichever mark it carries. The glyph stays 24
+       * (a bot at 24 in 56 reads as a mark, not a button), and a square 2xl tile
+       * rounds to 12, the radius the console's own identity tiles used. */
       size: {
         sm: 'mdt-h-6 mdt-w-6 [&_svg]:mdt-size-3.5',
         md: 'mdt-h-8 mdt-w-8 [&_svg]:mdt-size-4',
         lg: 'mdt-h-10 mdt-w-10 [&_svg]:mdt-size-5',
         xl: 'mdt-h-12 mdt-w-12 [&_svg]:mdt-size-6',
+        '2xl': 'mdt-h-14 mdt-w-14 [&_svg]:mdt-size-6',
       },
       shape: {
         square: 'mdt-rounded-md',
         circle: 'mdt-rounded-full',
       },
     },
+    compoundVariants: [{ size: '2xl', shape: 'square', class: 'mdt-rounded-xl' }],
     defaultVariants: { tone: 'slate', size: 'md', shape: 'square' },
   }
 );
 
 export type IconTileVariantsType = VariantProps<typeof iconTileVariants>;
 export type IconTileTone = 'slate' | 'blue' | 'green' | 'amber' | 'rose' | 'purple';
-export type IconTileSize = 'sm' | 'md' | 'lg' | 'xl';
+export type IconTileSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type IconTileShape = 'square' | 'circle';
 
 export interface IconTileProps extends Omit<
@@ -61,7 +69,7 @@ export interface IconTileProps extends Omit<
   icon: ReactNode;
   /** @default 'slate' */
   tone?: IconTileTone;
-  /** @default 'md' */
+  /** @default 'md' - `2xl` (56) is the identity mark at the top of an object drawer. */
   size?: IconTileSize;
   /** @default 'square' */
   shape?: IconTileShape;

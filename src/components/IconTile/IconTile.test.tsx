@@ -38,6 +38,7 @@ describe('IconTile', () => {
       ['md', 'mdt-h-8'],
       ['lg', 'mdt-h-10'],
       ['xl', 'mdt-h-12'],
+      ['2xl', 'mdt-h-14'],
     ];
 
     it.each(cases)('applies the %s size', (size, expected) => {
@@ -98,10 +99,23 @@ describe('IconTile', () => {
     ['md', '[&_svg]:mdt-size-4'],
     ['lg', '[&_svg]:mdt-size-5'],
     ['xl', '[&_svg]:mdt-size-6'],
+    ['2xl', '[&_svg]:mdt-size-6'],
   ])('sizes the glyph to a little over half the %s tile', (size, cls) => {
     const { container } = render(
-      <IconTile icon={<svg data-testid="g" />} size={size as 'sm' | 'md' | 'lg' | 'xl'} />
+      <IconTile icon={<svg data-testid="g" />} size={size as IconTileSize} />
     );
     expect(container.firstElementChild?.className).toContain(cls);
+  });
+
+  /* Pranjal, 2026-09-12: the 56 mark at the top of an object drawer rounds to 12 */
+  it('rounds the square 2xl tile to 12, the identity-mark radius', () => {
+    const { container } = render(<IconTile icon={icon} size="2xl" />);
+    expect(container.firstChild).toHaveClass('mdt-rounded-xl');
+    expect(container.firstChild).not.toHaveClass('mdt-rounded-md');
+  });
+
+  it('keeps the circle round at 2xl', () => {
+    const { container } = render(<IconTile icon={icon} size="2xl" shape="circle" />);
+    expect(container.firstChild).toHaveClass('mdt-rounded-full');
   });
 });
