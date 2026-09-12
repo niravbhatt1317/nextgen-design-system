@@ -182,7 +182,21 @@ function DataTable<Row>({
 }: DataTableProps<Row>) {
   // ── state ──
   const [query, setQuery] = useState(initialQuery);
-  const [quick, setQuick] = useState<Set<string>>(() => new Set());
+  /* one Set of ticked values per quick filter, keyed by the column it filters */
+  const [quick, setQuick] = useState<Record<string, Set<string>>>({});
+  const quickFilters = useMemo(
+    () => (Array.isArray(quickFilter) ? quickFilter : quickFilter ? [quickFilter] : []),
+    [quickFilter]
+  );
+  const quickCount = useMemo(() => Object.values(quick).reduce((t, s) => t + s.size, 0), [quick]);
+  const tickQuick = (key: string, value: string, on: boolean) => {
+    setQuick((all) => {
+      const next = new Set(all[key] ?? []);
+      if (on) next.add(value);
+      else next.delete(value);
+      return { ...all, [key]: next };
+    });
+  };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   const sort = useTableSort();
   const pagingState = useTablePaging({ pageSize, mode: paging });
@@ -249,14 +263,20 @@ function DataTable<Row>({
     const q = query.trim().toLowerCase();
     return rows.filter((row) => {
       if (q && search && !search.match(row, q)) return false;
-      if (quickFilter && quick.size > 0 && !quick.has(quickFilter.value(row))) return false;
+      for (const qf of quickFilters) {
+        const s = quick[qf.columnKey];
+        if (!s || s.size === 0) continue;
+        const v = qf.value(row);
+        const values = Array.isArray(v) ? v : [v];
+        if (!values.some((x) => s.has(x))) return false;
+      }
       for (const g of filters) {
         const s = ticked[g.key];
         if (s && s.size > 0 && !g.match(row, s)) return false;
       }
       return true;
     });
-  }, [rows, query, search, quickFilter, quick, filters, ticked]);
+  }, [rows, query, search, quickFilters, quick, filters, ticked]);
   const sorted = useMemo(() => sort.apply(filtered, allColumns), [sort, filtered, allColumns]);
   const pageRows = useMemo(() => pagingState.slice(sorted), [pagingState, sorted]);
   const inert = useCallback((row: Row) => isRowInert?.(row) ?? false, [isRowInert]);
@@ -271,7 +291,7 @@ function DataTable<Row>({
   const selectable = bulkActions !== undefined;
   /** The first column: checkboxes when there is selection, plain numbers otherwise (unless hidden). */
   const leading = selectable || numbers;
-  const hasFiltering = query.trim() !== '' || quick.size > 0 || filterCount > 0;
+  const hasFiltering = query.trim() !== '' || quickCount > 0 || filterCount > 0;
 
   const resetPaging = pagingState.reset;
   const onQuery = (v: string) => {
@@ -376,7 +396,7 @@ function DataTable<Row>({
         : null;
   const clearAll = () => {
     setQuery('');
-    setQuick(new Set());
+    setQuick({});
     setTicked({});
     resetPaging();
   };
@@ -544,60 +564,60 @@ function DataTable<Row>({
           </PopoverContent>
         </Popover>
       )}
-      {quickFilter && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <ToolbarButton
-              icon={
-                quickFilter.icon ??
-                /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
+      {/* ONE SQUARE PER QUICK FILTER, in the order the page gives them (Pranjal,
+          2026-09-12: Status and Organisation side by side on Service accounts). */}
+      {quickFilters.map((qf) => {
+        const set = quick[qf.columnKey] ?? new Set<string>();
+        return (
+          <DropdownMenu key={qf.columnKey}>
+            <DropdownMenuTrigger asChild>
+              <ToolbarButton
+                icon={
+                  qf.icon ??
+                  /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
                        icon we used in users is different here"): one icon for the
                        filter, in the strip and in the heading it filters. */
-                allColumns.find((c) => c.key === quickFilter.columnKey)?.glyph ?? (
-                  <Icon name="check-circle" />
-                )
-              }
-              dot={quick.size > 0}
-              aria-label={quickFilter.label}
-              activeLabel="applied"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="mdt-w-48">
-            {quickFilter.options.map((o) => (
-              <DropdownMenuCheckboxItem
-                key={o}
-                /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
+                  allColumns.find((c) => c.key === qf.columnKey)?.glyph ?? (
+                    <Icon name="check-circle" />
+                  )
+                }
+                dot={set.size > 0}
+                aria-label={qf.label}
+                activeLabel="applied"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="mdt-w-48">
+              {qf.options.map((o) => (
+                <DropdownMenuCheckboxItem
+                  key={o}
+                  /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
                        here"), as the Filters panel's rows do and as Users' quick filter
                        always has: a person sees at a glance which values are on and
                        that several can be. The menu's own tick, which only appears
                        once checked, is hidden in favour of the box. */
-                className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
-                checked={quick.has(o)}
-                onSelect={(e) => {
-                  e.preventDefault();
-                }}
-                onCheckedChange={(v) => {
-                  setQuick((s) => {
-                    const n = new Set(s);
-                    if (v) n.add(o);
-                    else n.delete(o);
-                    return n;
-                  });
-                  resetPaging();
-                }}
-              >
-                <Checkbox
-                  className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
-                  checked={quick.has(o)}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                />
-                {quickFilter.renderOption ? quickFilter.renderOption(o) : o}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+                  className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
+                  checked={set.has(o)}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                  onCheckedChange={(v) => {
+                    tickQuick(qf.columnKey, o, v);
+                    resetPaging();
+                  }}
+                >
+                  <Checkbox
+                    className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                    checked={set.has(o)}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                  {qf.renderOption ? qf.renderOption(o) : o}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      })}
       <ToolbarSpacer />
       <ToolbarSection>
         <DropdownMenu>
@@ -749,7 +769,9 @@ function DataTable<Row>({
                   }}
                   menu={headMenu(c)}
                   glyph={c.glyph}
-                  filtered={quickFilter?.columnKey === c.key && quick.size > 0}
+                  filtered={quickFilters.some(
+                    (qf) => qf.columnKey === c.key && (quick[qf.columnKey]?.size ?? 0) > 0
+                  )}
                   dragging={drag.drag?.key === c.key}
                   resizable
                   onResize={(w) => {

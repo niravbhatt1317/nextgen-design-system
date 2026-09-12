@@ -8,8 +8,12 @@ export interface DataTableQuickFilter<Row> {
   /** Spoken name of the square: "Filter by status". */
   label: string;
   options: string[];
-  /** The row's value for this filter. */
-  value: (row: Row) => string;
+  /**
+   * The row's value for this filter — one string, or several when a row can
+   * match more than one (a service account's home organisation and every
+   * organisation in its reach). A row passes when any of them is ticked.
+   */
+  value: (row: Row) => string | string[];
   /** The square's 14px icon. Left unset, the square wears the column's own glyph. */
   icon?: ReactNode | undefined;
   /**
@@ -69,7 +73,13 @@ export interface DataTableProps<Row> {
     | undefined;
   /** What the search box holds to begin with. */
   initialQuery?: string | undefined;
-  quickFilter?: DataTableQuickFilter<Row> | undefined;
+  /**
+   * One quick filter, or several — each is its own square in the strip with
+   * its own menu, and the row must satisfy every one that has a tick
+   * (Pranjal, 2026-09-12: Service accounts filters by Status AND by
+   * Organisation, side by side, as version 3 did).
+   */
+  quickFilter?: DataTableQuickFilter<Row> | DataTableQuickFilter<Row>[] | undefined;
   filters?: DataTableFilterGroup<Row>[] | undefined;
   /** Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. */
   sortFields?: string[] | undefined;

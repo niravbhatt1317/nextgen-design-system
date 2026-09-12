@@ -309,6 +309,49 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(item.querySelector('[data-tone]')).not.toBeNull();
   });
 
+  /* Pranjal, 2026-09-12: "Can you add that organisation quick filter as well" -
+   * the strip carries as many quick filters as the page gives it, each its own
+   * square; a row may answer a filter with several values and passes on any. */
+  describe('several quick filters', () => {
+    const two = [
+      {
+        columnKey: 'status',
+        label: 'Filter by status',
+        options: ['Active', 'Inactive', 'Invited'],
+        value: (r: SampleUser) => r.status,
+      },
+      {
+        columnKey: 'role',
+        label: 'Filter by role',
+        options: ['Admin', 'Member', 'Everyone'],
+        value: (r: SampleUser) => [r.role, 'Everyone'],
+      },
+    ];
+    it('draws one square per quick filter', () => {
+      render(<Users quickFilter={two} />);
+      expect(screen.getByLabelText('Filter by status')).toBeInTheDocument();
+      expect(screen.getByLabelText('Filter by role')).toBeInTheDocument();
+    });
+    it('passes a row when any of its several values is ticked, and unticking brings the rows back', async () => {
+      const user = userEvent.setup();
+      render(<Users quickFilter={two} />);
+      const all = screen.getAllByRole('row').length;
+      await user.click(screen.getByLabelText('Filter by role'));
+      await user.click(await screen.findByRole('menuitemcheckbox', { name: /Everyone/ }));
+      await user.keyboard('{Escape}');
+      /* every row carries 'Everyone' as its second value, so none drop out */
+      expect(screen.getAllByRole('row').length).toBe(all);
+      await user.click(screen.getByLabelText('Filter by status'));
+      await user.click(await screen.findByRole('menuitemcheckbox', { name: /Inactive/ }));
+      await user.keyboard('{Escape}');
+      expect(screen.getAllByRole('row').length).toBeLessThan(all);
+      await user.click(screen.getByLabelText('Filter by status'));
+      await user.click(await screen.findByRole('menuitemcheckbox', { name: /Inactive/ }));
+      await user.keyboard('{Escape}');
+      expect(screen.getAllByRole('row').length).toBe(all);
+    });
+  });
+
   /* Pranjal, 2026-09-12: "i need checkboxes here" - every quick-filter row shows
    * a box, on or off, like the Filters panel and like Users. */
   it('shows a checkbox on every quick-filter row, reflecting the tick', async () => {
