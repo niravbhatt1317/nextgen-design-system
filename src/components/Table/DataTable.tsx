@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Checkbox } from '../Checkbox';
 import { Toolbar, ToolbarButton, ToolbarSection, ToolbarSpacer } from '../Toolbar';
 import {
+  TABLE_COLUMN_MAX,
   TABLE_COLUMN_MIN,
   TABLE_COLUMN_WIDTH,
   TABLE_GUTTER,
@@ -51,6 +52,8 @@ import type { TableColumnDef, TableSortDirection } from './Table.types';
 
 const ACTION_WIDTH = 100;
 const NAME_KEY = '__name';
+/** The Name column's floor when the page declares none: room for a tile and a name. */
+const NAME_MIN = 160;
 const ROWNUM_KEY = '__rownum';
 
 /** Whether the row numbers are shown, remembered next to the column layout. */
@@ -300,7 +303,20 @@ function DataTable<Row>({
   };
 
   // ── widths and offsets ──
-  const nameWidth = nameColumn.width ?? TABLE_COLUMN_WIDTH;
+  /* THE NAME COLUMN RESIZES like any content column (Pranjal, 2026-09-13:
+   * "only checkbox and action columns are the one which cannot be resized").
+   * Its width lives in the same remembered layout under NAME_KEY, floored at
+   * NAME_MIN (nameColumn.minWidth overrides) and capped with the others. */
+  const nameMin = nameColumn.minWidth ?? NAME_MIN;
+  const nameWidth = Math.max(
+    nameMin,
+    Math.min(
+      TABLE_COLUMN_MAX,
+      layout.hasWidth(NAME_KEY)
+        ? layout.widthOf(NAME_KEY)
+        : (nameColumn.width ?? TABLE_COLUMN_WIDTH)
+    )
+  );
   const hasActions = rowActions !== undefined;
   const visible = layout.visible;
   const baseWidths = useMemo(
@@ -737,6 +753,11 @@ function DataTable<Row>({
                 sort={sortDir(NAME_KEY)}
                 onSort={() => {
                   sort.cycle(NAME_KEY);
+                }}
+                minWidth={nameMin}
+                resizable
+                onResize={(w) => {
+                  layout.setWidth(NAME_KEY, Math.max(nameMin, w));
                 }}
               />
               {hasActions && (

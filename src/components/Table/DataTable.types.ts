@@ -45,6 +45,8 @@ export interface DataTableBlankCopy {
 export interface DataTableNameColumn<Row> {
   label?: string | undefined;
   width?: number | undefined;
+  /** The narrowest a person may drag it; 160 when not given. */
+  minWidth?: number | undefined;
   sortable?: boolean | undefined;
   cell: (row: Row) => ReactNode;
   sortValue?: ((row: Row) => string | number) | undefined;

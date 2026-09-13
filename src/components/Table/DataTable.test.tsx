@@ -394,4 +394,25 @@ describe('DataTable', { timeout: 20000 }, () => {
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
     expect(document.querySelector('.tbl-foot')).toBeNull();
   });
+
+  it('lets the Name column resize; the lead and Action stay fixed', () => {
+    render(<Users />);
+    /* the handle is a slider named for its heading (Pranjal, 2026-09-13: "only
+     * checkbox and action columns are the one which cannot be resized") */
+    expect(screen.getByRole('slider', { name: 'Resize Name' })).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'Resize Action' })).toBeNull();
+    /* Name plus every content column, nothing for the checkbox lead */
+    expect(screen.getAllByRole('slider', { name: /^Resize / })).toHaveLength(COLS.length + 1);
+  });
+
+  it('keeps a dragged Name width in the remembered layout', async () => {
+    localStorage.clear();
+    render(<Users storageKey="t.name-width" />);
+    const handle = screen.getByRole('slider', { name: 'Resize Name' });
+    handle.focus();
+    await userEvent.keyboard('{End}');
+    const stored = JSON.parse(localStorage.getItem('t.name-width') || '{}');
+    expect(stored.widths && stored.widths.__name).toBe(720);
+    localStorage.clear();
+  });
 });
