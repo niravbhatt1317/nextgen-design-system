@@ -657,7 +657,11 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
       )}
       {resizable && (
         <div
-          className="tbl-rz mdt-absolute -mdt-right-[5px] mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-[10px] mdt-cursor-col-resize"
+          /* INSIDE its own heading (2026-09-13): every heading is sticky with a
+           * z-index, so a handle that straddled the boundary had its far half
+           * painted over by the next heading and only a sliver could be grabbed.
+           * Twelve pixels ending at the boundary line, all of them the heading's. */
+          className="tbl-rz mdt-absolute mdt-right-0 mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-3 mdt-cursor-col-resize"
           role="slider"
           tabIndex={0}
           aria-orientation="vertical"
