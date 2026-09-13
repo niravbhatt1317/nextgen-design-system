@@ -383,14 +383,14 @@ const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function Ta
 TableViewport.displayName = 'TableViewport';
 
 /** One `<col>` per visible column plus the 60px elastic tail. */
-function TableColGroup({ widths }: TableColGroupProps) {
+function TableColGroup({ widths, tail = TABLE_GUTTER }: TableColGroupProps) {
   return (
     <colgroup>
       {widths.map((w, i) => (
         // eslint-disable-next-line react/no-array-index-key -- a col has no identity but its position
         <col key={i} style={{ width: w }} />
       ))}
-      <col style={{ width: TABLE_GUTTER }} />
+      <col style={{ width: tail }} />
     </colgroup>
   );
 }

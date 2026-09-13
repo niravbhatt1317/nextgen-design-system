@@ -330,15 +330,44 @@ function DataTable<Row>({
   );
   /* the first content column's position: after the lead, Name and Action */
   const contentStart = (leading ? 1 : 0) + 1 + (hasActions ? 1 : 0);
+  /* WIDENING ONE COLUMN NEVER NARROWS ANOTHER (Pranjal, 2026-09-13: "when I
+   * increase the size of one column the size of other column reduces that
+   * should not happen at all … It can stretch through to fill the table").
+   * At rest — no width remembered — the content columns share the card's
+   * spare equally. The first drag freezes every column where it stands (see
+   * resizeTo), and from then on nothing is shared: the elastic tail takes the
+   * spare, and when the columns outgrow the card the table scrolls sideways.
+   * Reset columns forgets the widths and the sharing returns. */
+  const frozen = layout.hasAnyWidth;
   const widths = useMemo(() => {
+    if (frozen) return baseWidths;
     const covered = baseWidths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
     const content = baseWidths.length - contentStart;
     const spare = viewportWidth - covered;
     if (spare <= 0 || content <= 0) return baseWidths;
     const share = spare / content;
     return baseWidths.map((w, i) => (i >= contentStart ? w + share : w));
-  }, [baseWidths, contentStart, viewportWidth]);
-  const tableWidth = widths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
+  }, [baseWidths, contentStart, viewportWidth, frozen]);
+  const columnsWidth = widths.reduce((a, b) => a + b, 0);
+  const tailWidth = frozen ? Math.max(TABLE_GUTTER, viewportWidth - columnsWidth) : TABLE_GUTTER;
+  const tableWidth = columnsWidth + tailWidth;
+  /* a drag: the first one freezes every column at its rendered width, so the
+   * others do not move; then the dragged key takes its new width */
+  const frozenRef = useRef(frozen);
+  frozenRef.current = frozen;
+  const resizeTo = (key: string, w: number) => {
+    if (!frozenRef.current) {
+      frozenRef.current = true;
+      const all: Record<string, number> = { [NAME_KEY]: nameWidth };
+      visible.forEach((c, i) => {
+        all[c.key] = widths[contentStart + i] ?? layout.widthOf(c.key);
+      });
+      all[key] = w;
+      layout.setWidths(all);
+      return;
+    }
+    layout.setWidth(key, w);
+  };
   const nameLeft = leading ? TABLE_GUTTER : 0;
   const actionLeft = nameLeft + nameWidth;
 
@@ -731,7 +760,7 @@ function DataTable<Row>({
           hasSelection={selection.count > 0}
           label={label}
         >
-          <TableColGroup widths={widths} />
+          <TableColGroup widths={widths} tail={tailWidth} />
           <TableHeader>
             <tr>
               {selectable && (
@@ -757,7 +786,7 @@ function DataTable<Row>({
                 minWidth={nameMin}
                 resizable
                 onResize={(w) => {
-                  layout.setWidth(NAME_KEY, Math.max(nameMin, w));
+                  resizeTo(NAME_KEY, Math.max(nameMin, w));
                 }}
               />
               {hasActions && (
@@ -770,12 +799,12 @@ function DataTable<Row>({
                   align="center"
                 />
               )}
-              {visible.map((c) => (
+              {visible.map((c, i) => (
                 <TableHead
                   key={c.key}
                   columnKey={c.key}
                   label={c.label}
-                  width={layout.widthOf(c.key)}
+                  width={widths[contentStart + i] ?? layout.widthOf(c.key)}
                   minWidth={c.minWidth ?? TABLE_COLUMN_MIN}
                   align={c.align ?? 'left'}
                   sortable={c.sortable ?? false}
@@ -796,7 +825,7 @@ function DataTable<Row>({
                   dragging={drag.drag?.key === c.key}
                   resizable
                   onResize={(w) => {
-                    layout.setWidth(c.key, w);
+                    resizeTo(c.key, w);
                   }}
                   onBoundaryHover={(h) => {
                     showInsert(c.key, h);

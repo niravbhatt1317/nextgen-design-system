@@ -415,4 +415,25 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(stored.widths && stored.widths.__name).toBe(720);
     localStorage.clear();
   });
+
+  it('widening one column never narrows another: the first drag freezes every column where it stands', async () => {
+    localStorage.clear();
+    render(<Users storageKey="t.freeze" />);
+    const colWidths = () =>
+      [...document.querySelectorAll('colgroup col')].map((c) => (c as HTMLElement).style.width);
+    const before = colWidths();
+    const handle = screen.getByRole('slider', { name: 'Resize Role' });
+    handle.focus();
+    await userEvent.keyboard('{End}');
+    const after = colWidths();
+    /* lead · Name · Action · Email · Status · Role · tail */
+    expect(after[5]).toBe('720px');
+    expect(after[3]).toBe(before[3]);
+    expect(after[4]).toBe(before[4]);
+    const stored = JSON.parse(localStorage.getItem('t.freeze') || '{}');
+    expect(stored.widths.email).toBe(200);
+    expect(stored.widths.status).toBe(200);
+    expect(stored.widths.role).toBe(720);
+    localStorage.clear();
+  });
 });

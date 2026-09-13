@@ -19,7 +19,13 @@ export interface UseTableColumns<Row> {
   /** Every column key in display order, hidden ones included. */
   order: string[];
   widthOf: (key: string) => number;
+  /** Whether a width has been remembered for this key (dragged or restored). */
+  hasWidth: (key: string) => boolean;
+  /** Whether any width is remembered at all — once true, columns no longer share the card. */
+  hasAnyWidth: boolean;
   setWidth: (key: string, width: number) => void;
+  /** Several widths at once (the first drag freezes every column where it stands). */
+  setWidths: (widths: Record<string, number>) => void;
   hide: (key: string) => void;
   show: (key: string) => void;
   hideAll: () => void;
@@ -113,6 +119,22 @@ export function useTableColumns<Row>({
       return Math.max(min, Math.min(MAX_WIDTH, w));
     },
     [layout.widths, byKey]
+  );
+
+  const hasWidth = useCallback((key: string) => layout.widths[key] !== undefined, [layout.widths]);
+  const hasAnyWidth = Object.keys(layout.widths).length > 0;
+  const setWidths = useCallback(
+    (widths: Record<string, number>) => {
+      update((l) => {
+        const next = { ...l.widths };
+        for (const [key, width] of Object.entries(widths)) {
+          const min = byKey.get(key)?.minWidth ?? MIN_WIDTH;
+          next[key] = Math.max(min, Math.min(MAX_WIDTH, Math.round(width)));
+        }
+        return { ...l, widths: next };
+      });
+    },
+    [byKey, update]
   );
 
   const setWidth = useCallback(
@@ -227,7 +249,10 @@ export function useTableColumns<Row>({
     hidden,
     order: layout.order,
     widthOf,
+    hasWidth,
+    hasAnyWidth,
     setWidth,
+    setWidths,
     hide,
     show,
     hideAll,
