@@ -41,6 +41,22 @@ const DELIBERATELY_UNEXPORTED = {
   //                worked example of what an entry should say.',
 };
 
+/**
+ * Names a component publishes that are meant NOT to reach the package root.
+ *
+ * Keyed `Component: name`. Same rule as the directory list above - say why,
+ * and say when to revisit.
+ *
+ * @type {Record<string, string>}
+ */
+const DELIBERATELY_UNEXPORTED_NAMES = {
+  'Sidebar: DataDrivenSidebar':
+    'Sidebar is deprecated in favour of LeftNav, so this would widen the public ' +
+    'API of a family products are being moved off. It has been unreachable since ' +
+    'it was written; this records that rather than changing it. Revisit when ' +
+    'Sidebar is removed - it goes with it, or moves to LeftNav first.',
+};
+
 const barrel = readFileSync(BARREL, 'utf8');
 
 /** Does the root barrel re-export anything at all from this directory? */
@@ -53,6 +69,21 @@ const components = readdirSync(ROOT, { withFileTypes: true })
   // something else exports. Only a public face makes it a candidate.
   .filter((dir) => existsSync(`${ROOT}/${dir}/index.ts`));
 
+/**
+ * Every name a component's own `index.ts` publishes.
+ *
+ * Deliberately crude: the names in a `export { … }` block, one per line, which
+ * is how every barrel in this repo is written. A name it misses is a name this
+ * check does not police - that is the trade for not parsing TypeScript here.
+ */
+const namesExportedBy = (dir) => {
+  const src = readFileSync(`${ROOT}/${dir}/index.ts`, 'utf8');
+  // Skip `export type { … }`: a type that never reaches the root is a smaller
+  // problem, and `isolatedModules` makes them easy to get wrong here.
+  const valueBlocks = src.replace(/export\s+type\s*\{[^}]*\}/g, '');
+  return [...valueBlocks.matchAll(/^\s{2}([A-Za-z_][A-Za-z0-9_]*)\s*,?\s*$/gm)].map((m) => m[1]);
+};
+
 const unreachable = components.filter((dir) => !isExported(dir));
 const undeclared = unreachable.filter((dir) => !(dir in DELIBERATELY_UNEXPORTED));
 const declared = unreachable.filter((dir) => dir in DELIBERATELY_UNEXPORTED);
@@ -62,6 +93,34 @@ if (declared.length > 0) {
     `${String(declared.length)} component(s) deliberately not exported:\n` +
       declared.map((d) => `  ${d} - ${DELIBERATELY_UNEXPORTED[d]}\n`).join('')
   );
+}
+
+/*
+ * A directory can be reachable and still leak. PageFrame shipped in 0.5.0 with
+ * no export at all, which the check above now catches; TableLeadHead and
+ * TableLeadCell shipped in 0.6.0's changelog exported from Table/index.ts and
+ * never forwarded from the root, which it did not. Same failure, one level
+ * down: the build succeeds, the import returns undefined, and the changelog
+ * announces a component nobody can use.
+ */
+const orphans = components
+  .filter((dir) => isExported(dir))
+  .flatMap((dir) =>
+    namesExportedBy(dir)
+      .filter((name) => !new RegExp(`\\b${name}\\b`).test(barrel))
+      .map((name) => `${dir}: ${name}`)
+  )
+  .filter((o) => !(o in DELIBERATELY_UNEXPORTED_NAMES));
+
+if (orphans.length > 0) {
+  process.stderr.write(
+    `\n${String(orphans.length)} name(s) are exported by a component but never reach the root:\n\n` +
+      orphans.map((o) => `  ${o}\n`).join('') +
+      `\nEach is in its own component's index.ts, so it looks exported - but\n` +
+      `${BARREL} names its re-exports one by one, and these are not among them.\n` +
+      `\nAdd them to that file's block for the component.\n\n`
+  );
+  process.exit(1);
 }
 
 if (undeclared.length === 0) {

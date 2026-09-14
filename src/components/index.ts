@@ -637,6 +637,8 @@ export {
   TableSelectionCell,
   TableNumberCell,
   TableNumberHead,
+  TableLeadHead,
+  TableLeadCell,
   TableSelectAll,
   TableTailCell,
   tableCellVariants,
