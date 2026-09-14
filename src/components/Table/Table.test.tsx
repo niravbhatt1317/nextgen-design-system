@@ -1,5 +1,5 @@
 import { createRef } from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   Table,
@@ -448,5 +448,268 @@ describe('Table expand — the table drives its own morph', () => {
       </Table>
     );
     expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+  });
+});
+
+describe('Table expand — with a page under it', () => {
+  /* jsdom has no layout, so every measurement the table takes has to be told to
+   * it. These fakes are the whole reason this block is separate from the one
+   * above: there, nothing scrolls and the table never gets past looking for a
+   * page, which leaves the filling and the morph untested. */
+
+  const rectAt = (top: number): DOMRect => ({
+    top,
+    bottom: top,
+    left: 0,
+    right: 0,
+    width: 0,
+    height: 0,
+    x: 0,
+    y: top,
+    toJSON: () => ({}),
+  });
+
+  const measure = (el: HTMLElement, clientHeight: number, scrollHeight: number): void => {
+    Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+    Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
+    Object.defineProperty(el, 'scrollTop', { value: 0, configurable: true, writable: true });
+    el.getBoundingClientRect = () => rectAt(0);
+  };
+
+  let frames: FrameRequestCallback[] = [];
+
+  beforeEach(() => {
+    frames = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      frames.push(cb);
+      /* The table treats 0 as "no frame pending", so a handle must not be 0. */
+      return frames.length;
+    });
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** Runs whatever the table asked for a frame for, the way a browser would. */
+  const runFrames = (): void => {
+    const due = frames;
+    frames = [];
+    act(() => {
+      due.forEach((cb) => {
+        cb(0);
+      });
+    });
+  };
+
+  let morph = 0;
+  let driven = false;
+
+  function Probe(): null {
+    const state = useTableMorph();
+    morph = state.morph;
+    driven = state.driven;
+    return null;
+  }
+
+  interface Layout {
+    /** How tall the scrolling page is. */
+    page: number;
+    /** How far the page can scroll. Defaults to exactly its own height. */
+    scroll?: number;
+    /** Where the card sits inside it. */
+    cardTop: number;
+    /** Passed straight to the table, for the pages that are not a PageFrame. */
+    dockOffset?: number;
+    /** Custom properties on the card, standing in for the ones a page publishes. */
+    vars?: Record<string, string>;
+  }
+
+  /**
+   * Mounts a table inside a page it can fill.
+   *
+   * It mounts switched off, takes its measurements, then switches on: the
+   * effect only reads the page once, so the numbers have to be in place before
+   * it runs, and the elements do not exist until the first render.
+   */
+  const mountInPage = (layout: Layout) => {
+    const ui = (expand: boolean): JSX.Element => (
+      <div data-testid="page" style={{ overflowY: 'auto' }}>
+        <Table label="Users" expand={expand} dockOffset={layout.dockOffset} style={layout.vars}>
+          <Probe />
+        </Table>
+      </div>
+    );
+    const view = render(ui(false));
+    const page = screen.getByTestId('page');
+    const card = screen.getByRole('region', { name: 'Users' });
+    measure(page, layout.page, layout.scroll ?? layout.page);
+    card.getBoundingClientRect = () => rectAt(layout.cardTop);
+    view.rerender(ui(true));
+    return { ...view, page, card };
+  };
+
+  it('takes the whole height under the dock line', () => {
+    const { card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    expect(driven).toBe(true);
+  });
+
+  it('reports the morph it reads, not the one it was handed', () => {
+    mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    /* 170 sits half way through the 140px the morph runs over from 100. */
+    expect(morph).toBeCloseTo(0.5, 3);
+  });
+
+  it('stays an ordinary card when there is too little room to be worth filling', () => {
+    const { card } = mountInPage({ page: 200, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('');
+    expect(driven).toBe(false);
+    expect(morph).toBe(0);
+  });
+
+  it('cancels the surface trailing padding so the page stops on the dock line', () => {
+    const { card } = mountInPage({ page: 600, scroll: 720, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('-50px');
+  });
+
+  it('leaves the margin alone when the page does not overrun', () => {
+    const { card } = mountInPage({ page: 600, scroll: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('leaves the margin alone when the overrun is too big to be padding', () => {
+    const { card } = mountInPage({ page: 600, scroll: 900, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('morphs as the page scrolls', () => {
+    const { page, card } = mountInPage({ page: 600, cardTop: 240, dockOffset: 100 });
+    expect(morph).toBe(0);
+    card.getBoundingClientRect = () => rectAt(100);
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    runFrames();
+    expect(morph).toBe(1);
+  });
+
+  it('asks for one frame however many scroll events arrive', () => {
+    const { page } = mountInPage({ page: 600, cardTop: 240, dockOffset: 100 });
+    const before = frames.length;
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+      page.dispatchEvent(new Event('scroll'));
+      page.dispatchEvent(new Event('scroll'));
+    });
+    expect(frames.length - before).toBe(1);
+  });
+
+  it('holds its state when a scroll changes nothing', () => {
+    const { page } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    const settled = morph;
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    runFrames();
+    expect(morph).toBe(settled);
+  });
+
+  it('reads the dock line the page publishes', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: { '--mdt-thead-top': '108px' },
+    });
+    expect(card.style.height).toBe('492px');
+  });
+
+  it('falls back to the band heights when the published line is a calc()', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: {
+        '--mdt-thead-top': 'calc(56px + 54px)',
+        '--mdt-band-b1-h': '56px',
+        '--mdt-band-b2t-h': '54px',
+      },
+    });
+    /* 56 + (54 - 2), the same answer the calc() would have given. */
+    expect(card.style.height).toBe('492px');
+  });
+
+  it('takes the first band alone when there is no second one', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: { '--mdt-band-b1-h': '56px' },
+    });
+    expect(card.style.height).toBe('544px');
+  });
+
+  it('docks at the top when the page publishes nothing at all', () => {
+    const { card } = mountInPage({ page: 600, cardTop: 170 });
+    expect(card.style.height).toBe('600px');
+  });
+
+  it('re-fills when the page changes size', () => {
+    const observers: ResizeObserverCallback[] = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: ResizeObserverCallback) {
+          observers.push(cb);
+        }
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+      }
+    );
+    const { page, card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    Object.defineProperty(page, 'clientHeight', { value: 400, configurable: true });
+    act(() => {
+      observers.forEach((cb) => {
+        cb([], new ResizeObserver(() => undefined));
+      });
+    });
+    expect(card.style.height).toBe('300px');
+    vi.unstubAllGlobals();
+  });
+
+  it('works where ResizeObserver does not exist', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const { card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    vi.unstubAllGlobals();
+  });
+
+  it('drops the height, the frame and the listener on the way out', () => {
+    const { page, card, unmount } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    unmount();
+    expect(window.cancelAnimationFrame).toHaveBeenCalled();
+    expect(card.style.height).toBe('');
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('hands the card to a callback ref as well as keeping it', () => {
+    const seen: (HTMLDivElement | null)[] = [];
+    render(
+      <div style={{ overflowY: 'auto' }}>
+        <Table
+          label="Users"
+          ref={(node) => {
+            seen.push(node);
+          }}
+        >
+          <div>rows</div>
+        </Table>
+      </div>
+    );
+    expect(seen[0]).toBeInstanceOf(HTMLDivElement);
   });
 });
