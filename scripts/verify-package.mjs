@@ -10,8 +10,8 @@
  * artifact that works are two different claims, and only one of them was being
  * checked.
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
@@ -48,6 +48,44 @@ if (existsSync(css)) {
   if (!text.includes('.mdt-')) problems.push('dist/styles.css has no prefixed utilities in it');
 }
 
+/*
+ * The package has to be loadable by Node, not only by a bundler.
+ *
+ * Seven components `import './x.css'` beside themselves, and Rollup preserves
+ * those imports into `dist/`. A published package carrying them cannot be
+ * loaded at all - `require('@mtdt/nextgen-design-system')` dies on
+ * `Unexpected token '.'`, which is CSS being parsed as JavaScript, and every
+ * consumer rendering on the server hits it. 0.5.1 shipped that way.
+ *
+ * `build-package.mjs` folds that CSS into `dist/styles.css` and cuts the
+ * imports. This is the check that it actually did.
+ */
+const strays = [];
+const findCssImports = (dir) => {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      findCssImports(full);
+      continue;
+    }
+    if (!/\.(js|cjs|mjs)$/.test(entry.name)) continue;
+    if (/['"][^'"]+\.css['"]/.test(readFileSync(full, 'utf8'))) strays.push(full);
+  }
+};
+const distDir = resolve(root, 'dist');
+if (existsSync(distDir)) findCssImports(distDir);
+if (strays.length > 0) {
+  problems.push(
+    `${String(strays.length)} file(s) in dist/ still import a .css file, so the package ` +
+      `cannot be loaded by Node: ${strays.slice(0, 3).join(', ')}${strays.length > 3 ? ', …' : ''}`
+  );
+}
+
+// And the CSS those imports used to deliver has to be somewhere, or the fold
+// removed the imports and lost the rules with them.
+if (existsSync(css) && !readFileSync(css, 'utf8').includes('bdg-'))
+  problems.push('dist/styles.css has no component rules in it - the fold dropped them');
+
 if (problems.length > 0) {
   process.stderr.write(`\nThe package does not contain what it promises:\n`);
   for (const problem of problems) process.stderr.write(`  - ${problem}\n`);
@@ -56,4 +94,5 @@ if (problems.length > 0) {
 }
 
 process.stdout.write(`  ${String(promised.size)} promised paths, all present\n`);
-process.stdout.write(`  dist/styles.css carries tokens and prefixed utilities\n`);
+process.stdout.write(`  dist/styles.css carries tokens, utilities and component rules\n`);
+process.stdout.write(`  no dist file imports a .css, so the package loads in Node\n`);

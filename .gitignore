@@ -122,3 +122,8 @@ junit.xml
 
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
+
+# Packed tarballs. `npm pack` writes one here and the release workflow
+# uploads it; a stale one committed alongside means the artifact carries two
+# and somebody installs the wrong version.
+*.tgz
