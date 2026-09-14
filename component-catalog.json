@@ -1,8 +1,8 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 46,
-  "variantGroupCount": 164,
-  "variantValueCount": 508,
+  "componentCount": 47,
+  "variantGroupCount": 166,
+  "variantValueCount": 519,
   "components": [
     {
       "component": "Avatar",
@@ -11,29 +11,10 @@
         {
           "name": "avatarVariants",
           "variants": {
-            "tone": [
-              "slate",
-              "blue",
-              "green",
-              "amber",
-              "rose",
-              "purple"
-            ],
-            "size": [
-              "xs",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
-            "shape": [
-              "circle",
-              "rounded"
-            ],
-            "ring": [
-              "true",
-              "false"
-            ]
+            "tone": ["slate", "blue", "green", "amber", "rose", "purple"],
+            "size": ["xs", "sm", "md", "lg", "xl"],
+            "shape": ["circle", "rounded"],
+            "ring": ["true", "false"]
           },
           "defaults": {
             "tone": "slate",
@@ -51,34 +32,11 @@
         {
           "name": "badgeVariants",
           "variants": {
-            "tone": [
-              "neutral",
-              "slate",
-              "success",
-              "warning",
-              "danger",
-              "info",
-              "ai",
-              "inverse"
-            ],
-            "emphasis": [
-              "fill",
-              "outline",
-              "solid"
-            ],
-            "shape": [
-              "pill",
-              "square"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "iconOnly": [
-              "true",
-              "false"
-            ]
+            "tone": ["neutral", "slate", "success", "warning", "danger", "info", "ai", "inverse"],
+            "emphasis": ["fill", "outline", "solid"],
+            "shape": ["pill", "square"],
+            "size": ["sm", "md", "lg"],
+            "iconOnly": ["true", "false"]
           },
           "defaults": {
             "tone": "neutral",
@@ -97,32 +55,11 @@
         {
           "name": "badgeOldVariants",
           "variants": {
-            "tone": [
-              "neutral",
-              "info",
-              "success",
-              "warning",
-              "danger",
-              "ai"
-            ],
-            "emphasis": [
-              "subtle",
-              "outline",
-              "solid"
-            ],
-            "shape": [
-              "pill",
-              "square"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "iconOnly": [
-              "true",
-              "false"
-            ]
+            "tone": ["neutral", "info", "success", "warning", "danger", "ai"],
+            "emphasis": ["subtle", "outline", "solid"],
+            "shape": ["pill", "square"],
+            "size": ["sm", "md", "lg"],
+            "iconOnly": ["true", "false"]
           },
           "defaults": {
             "tone": "neutral",
@@ -141,22 +78,9 @@
         {
           "name": "bannerVariants",
           "variants": {
-            "tone": [
-              "info",
-              "warning",
-              "danger",
-              "success",
-              "ai",
-              "neutral"
-            ],
-            "placement": [
-              "inline",
-              "page"
-            ],
-            "stacked": [
-              "true",
-              "false"
-            ]
+            "tone": ["info", "warning", "danger", "success", "ai", "neutral"],
+            "placement": ["inline", "page"],
+            "stacked": ["true", "false"]
           },
           "defaults": {
             "tone": "neutral",
@@ -171,7 +95,53 @@
       "file": "src/components/Button/Button.tsx",
       "definitions": [
         {
-          "name": "ButtonVariants",
+          "name": "buttonVariants",
+          "variants": {
+            "variant": [
+              "primary",
+              "secondary",
+              "outline",
+              "ghost",
+              "destructive",
+              "destructiveGhost",
+              "link"
+            ],
+            "size": ["sm", "md", "lg"]
+          },
+          "defaults": {
+            "variant": "primary",
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "ButtonGroup",
+      "file": "src/components/ButtonGroup/ButtonGroup.tsx",
+      "definitions": [
+        {
+          "name": "buttonGroupVariants",
+          "variants": {
+            "orientation": ["horizontal", "vertical"],
+            "variant": ["default", "attached"],
+            "size": ["xs", "sm", "md", "lg", "xl"],
+            "fullWidth": ["true", "false"]
+          },
+          "defaults": {
+            "orientation": "horizontal",
+            "variant": "attached",
+            "size": "md",
+            "fullWidth": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "ButtonOld",
+      "file": "src/components/ButtonOld/ButtonOld.tsx",
+      "definitions": [
+        {
+          "name": "ButtonOldVariants",
           "variants": {
             "variant": [
               "primary",
@@ -189,34 +159,11 @@
               "successGhost",
               "ai"
             ],
-            "size": [
-              "xs",
-              "sm",
-              "md",
-              "lg",
-              "xl",
-              "icon"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ],
-            "shape": [
-              "square",
-              "rounded",
-              "pill",
-              "circle"
-            ],
-            "elevation": [
-              "0",
-              "1",
-              "2",
-              "3"
-            ],
-            "active": [
-              "true",
-              "false"
-            ]
+            "size": ["xs", "sm", "md", "lg", "xl", "icon"],
+            "fullWidth": ["true", "false"],
+            "shape": ["square", "rounded", "pill", "circle"],
+            "elevation": ["0", "1", "2", "3"],
+            "active": ["true", "false"]
           },
           "defaults": {
             "variant": "primary",
@@ -230,42 +177,6 @@
       ]
     },
     {
-      "component": "ButtonGroup",
-      "file": "src/components/ButtonGroup/ButtonGroup.tsx",
-      "definitions": [
-        {
-          "name": "buttonGroupVariants",
-          "variants": {
-            "orientation": [
-              "horizontal",
-              "vertical"
-            ],
-            "variant": [
-              "default",
-              "attached"
-            ],
-            "size": [
-              "xs",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ]
-          },
-          "defaults": {
-            "orientation": "horizontal",
-            "variant": "attached",
-            "size": "md",
-            "fullWidth": "false"
-          }
-        }
-      ]
-    },
-    {
       "component": "Callout",
       "file": "src/components/Callout/Callout.tsx",
       "definitions": [
@@ -273,14 +184,8 @@
           "name": "calloutVariants",
           "variants": {
             "tone": [],
-            "size": [
-              "sm",
-              "md"
-            ],
-            "variant": [
-              "tinted",
-              "outline"
-            ]
+            "size": ["sm", "md"],
+            "variant": ["tinted", "outline"]
           },
           "defaults": {
             "tone": "neutral",
@@ -297,17 +202,8 @@
         {
           "name": "cardVariants",
           "variants": {
-            "surface": [
-              "filled",
-              "secondary",
-              "outline",
-              "elevated"
-            ],
-            "padding": [
-              "normal",
-              "compact",
-              "none"
-            ]
+            "surface": ["filled", "secondary", "outline", "elevated"],
+            "padding": ["normal", "compact", "none"]
           },
           "defaults": {
             "surface": "filled",
@@ -323,12 +219,7 @@
         {
           "name": "checkboxVariants",
           "variants": {
-            "variant": [
-              "default",
-              "card",
-              "chip",
-              "card-with-checkbox"
-            ]
+            "variant": ["default", "card", "chip", "card-with-checkbox"]
           },
           "defaults": {
             "variant": "default"
@@ -343,23 +234,10 @@
         {
           "name": "codeWellVariants",
           "variants": {
-            "truncate": [
-              "true",
-              "false"
-            ],
-            "surface": [
-              "light",
-              "dark"
-            ],
-            "padded": [
-              "true",
-              "false"
-            ],
-            "controls": [
-              "none",
-              "one",
-              "two"
-            ]
+            "truncate": ["true", "false"],
+            "surface": ["light", "dark"],
+            "padded": ["true", "false"],
+            "controls": ["none", "one", "two"]
           },
           "defaults": {
             "surface": "light",
@@ -377,19 +255,9 @@
         {
           "name": "comboboxTriggerVariants",
           "variants": {
-            "variant": [
-              "default",
-              "outline"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "hasError": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "outline"],
+            "size": ["sm", "md", "lg"],
+            "hasError": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -406,32 +274,10 @@
         {
           "name": "containerVariants",
           "variants": {
-            "maxWidth": [
-              "sm",
-              "md",
-              "lg",
-              "xl",
-              "2xl",
-              "full"
-            ],
-            "padding": [
-              "none",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
-            "paddingY": [
-              "none",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
-            "centered": [
-              "true",
-              "false"
-            ]
+            "maxWidth": ["sm", "md", "lg", "xl", "2xl", "full"],
+            "padding": ["none", "sm", "md", "lg", "xl"],
+            "paddingY": ["none", "sm", "md", "lg", "xl"],
+            "centered": ["true", "false"]
           },
           "defaults": {
             "maxWidth": "lg",
@@ -449,18 +295,8 @@
         {
           "name": "dialogContentVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg",
-              "xl",
-              "full"
-            ],
-            "density": [
-              "compact",
-              "comfortable",
-              "spacious"
-            ]
+            "size": ["sm", "md", "lg", "xl", "full"],
+            "density": ["compact", "comfortable", "spacious"]
           },
           "defaults": {
             "size": "md",
@@ -476,32 +312,10 @@
         {
           "name": "flexVariants",
           "variants": {
-            "direction": [
-              "row",
-              "row-reverse",
-              "col",
-              "col-reverse"
-            ],
-            "wrap": [
-              "wrap",
-              "nowrap",
-              "wrap-reverse"
-            ],
-            "justify": [
-              "start",
-              "end",
-              "center",
-              "between",
-              "around",
-              "evenly"
-            ],
-            "align": [
-              "start",
-              "end",
-              "center",
-              "baseline",
-              "stretch"
-            ],
+            "direction": ["row", "row-reverse", "col", "col-reverse"],
+            "wrap": ["wrap", "nowrap", "wrap-reverse"],
+            "justify": ["start", "end", "center", "between", "around", "evenly"],
+            "align": ["start", "end", "center", "baseline", "stretch"],
             "gap": [],
             "gapX": [],
             "gapY": []
@@ -539,12 +353,7 @@
         {
           "name": "formLabelVariants",
           "variants": {
-            "weight": [
-              "normal",
-              "medium",
-              "semibold",
-              "bold"
-            ],
+            "weight": ["normal", "medium", "semibold", "bold"],
             "color": [
               "default",
               "muted",
@@ -588,63 +397,16 @@
         {
           "name": "gridVariants",
           "variants": {
-            "columns": [
-              "1",
-              "2",
-              "3",
-              "4",
-              "5",
-              "6",
-              "7",
-              "8",
-              "9",
-              "10",
-              "11",
-              "12",
-              "auto"
-            ],
-            "rows": [
-              "1",
-              "2",
-              "3",
-              "4",
-              "5",
-              "6",
-              "auto"
-            ],
+            "columns": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "auto"],
+            "rows": ["1", "2", "3", "4", "5", "6", "auto"],
             "gap": [],
             "gapX": [],
             "gapY": [],
-            "justify": [
-              "start",
-              "end",
-              "center",
-              "stretch"
-            ],
+            "justify": ["start", "end", "center", "stretch"],
             "align": [],
-            "justifyContent": [
-              "start",
-              "end",
-              "center",
-              "between",
-              "around",
-              "evenly"
-            ],
-            "alignContent": [
-              "start",
-              "end",
-              "center",
-              "between",
-              "around",
-              "evenly"
-            ],
-            "autoFlow": [
-              "row",
-              "col",
-              "dense",
-              "rowDense",
-              "colDense"
-            ]
+            "justifyContent": ["start", "end", "center", "between", "around", "evenly"],
+            "alignContent": ["start", "end", "center", "between", "around", "evenly"],
+            "autoFlow": ["row", "col", "dense", "rowDense", "colDense"]
           },
           "defaults": {
             "gap": "md"
@@ -659,13 +421,7 @@
         {
           "name": "iconVariants",
           "variants": {
-            "size": [
-              "xs",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
+            "size": ["xs", "sm", "md", "lg", "xl"],
             "color": [
               "current",
               "primary",
@@ -692,24 +448,9 @@
         {
           "name": "iconTileVariants",
           "variants": {
-            "tone": [
-              "slate",
-              "blue",
-              "green",
-              "amber",
-              "rose",
-              "purple"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ],
-            "shape": [
-              "square",
-              "circle"
-            ]
+            "tone": ["slate", "blue", "green", "amber", "rose", "purple"],
+            "size": ["sm", "md", "lg", "xl", "2xl"],
+            "shape": ["square", "circle"]
           },
           "defaults": {
             "tone": "slate",
@@ -726,15 +467,8 @@
         {
           "name": "InputVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "hasError": [
-              "true",
-              "false"
-            ]
+            "size": ["sm", "md", "lg"],
+            "hasError": ["true", "false"]
           },
           "defaults": {
             "size": "md",
@@ -750,21 +484,9 @@
         {
           "name": "itemVariants",
           "variants": {
-            "variant": [
-              "default",
-              "ghost",
-              "active",
-              "destructive"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "clickable": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "ghost", "active", "destructive"],
+            "size": ["sm", "md", "lg"],
+            "clickable": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -781,19 +503,9 @@
         {
           "name": "capVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "variant": [
-              "outline",
-              "filled"
-            ],
-            "tone": [
-              "default",
-              "inverted"
-            ]
+            "size": ["sm", "md", "lg"],
+            "variant": ["outline", "filled"],
+            "tone": ["default", "inverted"]
           },
           "defaults": {
             "size": "md",
@@ -810,10 +522,7 @@
         {
           "name": "labelVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md"
-            ]
+            "size": ["sm", "md"]
           },
           "defaults": {
             "size": "sm"
@@ -828,14 +537,8 @@
         {
           "name": "leftNavItemVariants",
           "variants": {
-            "active": [
-              "true",
-              "false"
-            ],
-            "disabled": [
-              "true",
-              "false"
-            ]
+            "active": ["true", "false"],
+            "disabled": ["true", "false"]
           },
           "defaults": {
             "active": "false",
@@ -851,16 +554,8 @@
         {
           "name": "paginationLinkVariants",
           "variants": {
-            "variant": [
-              "default",
-              "outline",
-              "active"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ]
+            "variant": ["default", "outline", "active"],
+            "size": ["sm", "md", "lg"]
           },
           "defaults": {
             "variant": "default",
@@ -876,11 +571,7 @@
         {
           "name": "progressVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ]
+            "size": ["sm", "md", "lg"]
           },
           "defaults": {
             "size": "md"
@@ -895,14 +586,8 @@
         {
           "name": "radioGroupVariants",
           "variants": {
-            "variant": [
-              "default",
-              "segmented"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "segmented"],
+            "fullWidth": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -912,12 +597,7 @@
         {
           "name": "radioGroupItemVariants",
           "variants": {
-            "variant": [
-              "default",
-              "card",
-              "card-with-radio",
-              "segmented"
-            ]
+            "variant": ["default", "card", "card-with-radio", "segmented"]
           },
           "defaults": {
             "variant": "default"
@@ -932,19 +612,9 @@
         {
           "name": "selectTriggerVariants",
           "variants": {
-            "variant": [
-              "default",
-              "borderless"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "hasError": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "borderless"],
+            "size": ["sm", "md", "lg"],
+            "hasError": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -961,27 +631,10 @@
         {
           "name": "separatorVariants",
           "variants": {
-            "orientation": [
-              "horizontal",
-              "vertical"
-            ],
-            "variant": [
-              "solid",
-              "dashed",
-              "dotted"
-            ],
-            "thickness": [
-              "thin",
-              "medium",
-              "thick"
-            ],
-            "spacing": [
-              "none",
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ]
+            "orientation": ["horizontal", "vertical"],
+            "variant": ["solid", "dashed", "dotted"],
+            "thickness": ["thin", "medium", "thick"],
+            "spacing": ["none", "sm", "md", "lg", "xl"]
           },
           "defaults": {
             "orientation": "horizontal",
@@ -999,12 +652,7 @@
         {
           "name": "sheetVariants",
           "variants": {
-            "side": [
-              "top",
-              "bottom",
-              "left",
-              "right"
-            ]
+            "side": ["top", "bottom", "left", "right"]
           },
           "defaults": {
             "side": "right"
@@ -1019,11 +667,7 @@
         {
           "name": "sidebarVariants",
           "variants": {
-            "variant": [
-              "default",
-              "compact",
-              "wide"
-            ]
+            "variant": ["default", "compact", "wide"]
           },
           "defaults": {
             "variant": "default"
@@ -1038,11 +682,7 @@
         {
           "name": "skeletonVariants",
           "variants": {
-            "variant": [
-              "default",
-              "lighter",
-              "darker"
-            ]
+            "variant": ["default", "lighter", "darker"]
           },
           "defaults": {
             "variant": "default"
@@ -1057,19 +697,8 @@
         {
           "name": "spinnerVariants",
           "variants": {
-            "variant": [
-              "default",
-              "primary",
-              "secondary",
-              "success",
-              "destructive"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg",
-              "xl"
-            ]
+            "variant": ["default", "primary", "secondary", "success", "destructive"],
+            "size": ["sm", "md", "lg", "xl"]
           },
           "defaults": {
             "variant": "default",
@@ -1085,47 +714,13 @@
         {
           "name": "stackVariants",
           "variants": {
-            "direction": [
-              "vertical",
-              "horizontal"
-            ],
-            "gap": [
-              "none",
-              "xs",
-              "sm",
-              "md",
-              "lg",
-              "xl",
-              "2xl",
-              "3xl"
-            ],
-            "justify": [
-              "start",
-              "center",
-              "end",
-              "between",
-              "around",
-              "evenly"
-            ],
-            "align": [
-              "start",
-              "center",
-              "end",
-              "stretch",
-              "baseline"
-            ],
-            "wrap": [
-              "true",
-              "false"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ],
-            "divider": [
-              "true",
-              "false"
-            ]
+            "direction": ["vertical", "horizontal"],
+            "gap": ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"],
+            "justify": ["start", "center", "end", "between", "around", "evenly"],
+            "align": ["start", "center", "end", "stretch", "baseline"],
+            "wrap": ["true", "false"],
+            "fullWidth": ["true", "false"],
+            "divider": ["true", "false"]
           },
           "defaults": {
             "direction": "vertical",
@@ -1146,11 +741,7 @@
         {
           "name": "stepperVariants",
           "variants": {
-            "layout": [
-              "stacked",
-              "inline",
-              "underline"
-            ]
+            "layout": ["stacked", "inline", "underline"]
           },
           "defaults": {
             "layout": "stacked"
@@ -1165,11 +756,7 @@
         {
           "name": "motadataSwitchRootVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ]
+            "size": ["sm", "md", "lg"]
           },
           "defaults": {
             "size": "md"
@@ -1178,11 +765,7 @@
         {
           "name": "motadataSwitchThumbVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ]
+            "size": ["sm", "md", "lg"]
           },
           "defaults": {
             "size": "md"
@@ -1197,10 +780,7 @@
         {
           "name": "tableCellVariants",
           "variants": {
-            "frozen": [
-              "true",
-              "false"
-            ],
+            "frozen": ["true", "false"],
             "align": []
           },
           "defaults": {
@@ -1211,10 +791,7 @@
         {
           "name": "tableHeadVariants",
           "variants": {
-            "frozen": [
-              "true",
-              "false"
-            ],
+            "frozen": ["true", "false"],
             "align": []
           },
           "defaults": {
@@ -1225,10 +802,7 @@
         {
           "name": "tableRowVariants",
           "variants": {
-            "inert": [
-              "true",
-              "false"
-            ]
+            "inert": ["true", "false"]
           },
           "defaults": {
             "inert": "false"
@@ -1243,17 +817,8 @@
         {
           "name": "tableHeadOldVariants",
           "variants": {
-            "density": [
-              "short",
-              "compact",
-              "default",
-              "relaxed"
-            ],
-            "align": [
-              "left",
-              "center",
-              "right"
-            ]
+            "density": ["short", "compact", "default", "relaxed"],
+            "align": ["left", "center", "right"]
           },
           "defaults": {
             "density": "compact",
@@ -1263,23 +828,9 @@
         {
           "name": "tableCellOldVariants",
           "variants": {
-            "density": [
-              "short",
-              "compact",
-              "default",
-              "relaxed"
-            ],
-            "align": [
-              "left",
-              "center",
-              "right"
-            ],
-            "indent": [
-              "0",
-              "1",
-              "2",
-              "3"
-            ]
+            "density": ["short", "compact", "default", "relaxed"],
+            "align": ["left", "center", "right"],
+            "indent": ["0", "1", "2", "3"]
           },
           "defaults": {
             "density": "compact",
@@ -1290,22 +841,10 @@
         {
           "name": "tableRowOldVariants",
           "variants": {
-            "interactive": [
-              "true",
-              "false"
-            ],
-            "striped": [
-              "true",
-              "false"
-            ],
-            "selected": [
-              "true",
-              "false"
-            ],
-            "summary": [
-              "true",
-              "false"
-            ]
+            "interactive": ["true", "false"],
+            "striped": ["true", "false"],
+            "selected": ["true", "false"],
+            "summary": ["true", "false"]
           },
           "defaults": {
             "interactive": "false",
@@ -1323,34 +862,13 @@
         {
           "name": "tagPillVariants",
           "variants": {
-            "emphasis": [
-              "fill",
-              "outline"
-            ],
-            "shape": [
-              "pill",
-              "square"
-            ],
-            "hasAvatar": [
-              "true",
-              "false"
-            ],
-            "removable": [
-              "true",
-              "false"
-            ],
-            "interactive": [
-              "true",
-              "false"
-            ],
-            "disabled": [
-              "true",
-              "false"
-            ],
-            "truncate": [
-              "true",
-              "false"
-            ]
+            "emphasis": ["fill", "outline"],
+            "shape": ["pill", "square"],
+            "hasAvatar": ["true", "false"],
+            "removable": ["true", "false"],
+            "interactive": ["true", "false"],
+            "disabled": ["true", "false"],
+            "truncate": ["true", "false"]
           },
           "defaults": {
             "shape": "pill",
@@ -1371,30 +889,12 @@
         {
           "name": "tagPillOldVariants",
           "variants": {
-            "shape": [
-              "pill",
-              "square"
-            ],
-            "hasAvatar": [
-              "true",
-              "false"
-            ],
-            "removable": [
-              "true",
-              "false"
-            ],
-            "interactive": [
-              "true",
-              "false"
-            ],
-            "disabled": [
-              "true",
-              "false"
-            ],
-            "truncate": [
-              "true",
-              "false"
-            ]
+            "shape": ["pill", "square"],
+            "hasAvatar": ["true", "false"],
+            "removable": ["true", "false"],
+            "interactive": ["true", "false"],
+            "disabled": ["true", "false"],
+            "truncate": ["true", "false"]
           },
           "defaults": {
             "shape": "pill",
@@ -1414,24 +914,10 @@
         {
           "name": "textareaVariants",
           "variants": {
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "variant": [
-              "default",
-              "filled"
-            ],
-            "hasError": [
-              "true",
-              "false"
-            ],
-            "resize": [
-              "none",
-              "vertical",
-              "both"
-            ]
+            "size": ["sm", "md", "lg"],
+            "variant": ["default", "filled"],
+            "hasError": ["true", "false"],
+            "resize": ["none", "vertical", "both"]
           },
           "defaults": {
             "size": "md",
@@ -1450,10 +936,7 @@
           "name": "toastVariants",
           "variants": {
             "tone": [],
-            "size": [
-              "sm",
-              "md"
-            ]
+            "size": ["sm", "md"]
           },
           "defaults": {
             "tone": "neutral",
@@ -1469,15 +952,8 @@
         {
           "name": "toggleVariants",
           "variants": {
-            "variant": [
-              "default",
-              "outline"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ]
+            "variant": ["default", "outline"],
+            "size": ["sm", "md", "lg"]
           },
           "defaults": {
             "variant": "default",
@@ -1493,23 +969,10 @@
         {
           "name": "toggleGroupVariants",
           "variants": {
-            "variant": [
-              "default",
-              "outline"
-            ],
-            "orientation": [
-              "horizontal",
-              "vertical"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "outline"],
+            "orientation": ["horizontal", "vertical"],
+            "size": ["sm", "md", "lg"],
+            "fullWidth": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -1521,19 +984,9 @@
         {
           "name": "toggleGroupItemVariants",
           "variants": {
-            "variant": [
-              "default",
-              "outline"
-            ],
-            "size": [
-              "sm",
-              "md",
-              "lg"
-            ],
-            "fullWidth": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "outline"],
+            "size": ["sm", "md", "lg"],
+            "fullWidth": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -1550,10 +1003,7 @@
         {
           "name": "toolbarVariants",
           "variants": {
-            "border": [
-              "true",
-              "false"
-            ]
+            "border": ["true", "false"]
           },
           "defaults": {
             "border": "false"
@@ -1562,18 +1012,9 @@
         {
           "name": "toolbarButtonVariants",
           "variants": {
-            "shape": [
-              "label",
-              "square"
-            ],
-            "open": [
-              "true",
-              "false"
-            ],
-            "active": [
-              "true",
-              "false"
-            ]
+            "shape": ["label", "square"],
+            "open": ["true", "false"],
+            "active": ["true", "false"]
           },
           "defaults": {
             "shape": "label",
@@ -1590,31 +1031,12 @@
         {
           "name": "toolbarOldVariants",
           "variants": {
-            "variant": [
-              "default",
-              "compact",
-              "spacious"
-            ],
-            "border": [
-              "true",
-              "false"
-            ],
-            "noPaddingLeft": [
-              "true",
-              "false"
-            ],
-            "noPaddingRight": [
-              "true",
-              "false"
-            ],
-            "noPaddingTop": [
-              "true",
-              "false"
-            ],
-            "noPaddingBottom": [
-              "true",
-              "false"
-            ]
+            "variant": ["default", "compact", "spacious"],
+            "border": ["true", "false"],
+            "noPaddingLeft": ["true", "false"],
+            "noPaddingRight": ["true", "false"],
+            "noPaddingTop": ["true", "false"],
+            "noPaddingBottom": ["true", "false"]
           },
           "defaults": {
             "variant": "default",
@@ -1634,12 +1056,7 @@
         {
           "name": "uploadVariants",
           "variants": {
-            "state": [
-              "rest",
-              "over",
-              "error",
-              "disabled"
-            ]
+            "state": ["rest", "over", "error", "disabled"]
           },
           "defaults": {
             "state": "rest"
