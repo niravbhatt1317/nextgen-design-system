@@ -65,7 +65,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 );
 
 export const Default: Story = {
-  args: { children: 'Filters', icon: <Icon name="list-filter" />, count: 0 },
+  args: { children: 'Filters', icon: <Icon name="funnel" />, count: 0 },
 };
 
 /** Rest, open, active. Hover the rest ones to see the ground lift and the edge turn slate. */
@@ -73,13 +73,13 @@ export const States: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <Row label="rest · hover me">
-        <ToolbarButton icon={<Icon name="list-filter" />}>Filters</ToolbarButton>
+        <ToolbarButton icon={<Icon name="funnel" />}>Filters</ToolbarButton>
         <ToolbarButton icon={<Icon name="check-circle" />} aria-label="Status" />
         <ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" />
         <ToolbarButton icon={<Icon name="columns" />} aria-label="Columns" />
       </Row>
       <Row label="open">
-        <ToolbarButton icon={<Icon name="list-filter" />} open>
+        <ToolbarButton icon={<Icon name="funnel" />} open>
           Filters
         </ToolbarButton>
         <ToolbarButton icon={<Icon name="check-circle" />} open aria-label="Status" />
@@ -87,7 +87,7 @@ export const States: Story = {
         <ToolbarButton icon={<Icon name="columns" />} open aria-label="Columns" />
       </Row>
       <Row label="active">
-        <ToolbarButton icon={<Icon name="list-filter" />} count={2}>
+        <ToolbarButton icon={<Icon name="funnel" />} count={2}>
           Filters
         </ToolbarButton>
         <ToolbarButton icon={<Icon name="check-circle" />} dot aria-label="Status" />
@@ -99,18 +99,18 @@ export const States: Story = {
         </span>
       </Row>
       <Row label="count caps at 9+">
-        <ToolbarButton icon={<Icon name="list-filter" />} count={1}>
+        <ToolbarButton icon={<Icon name="funnel" />} count={1}>
           Filters
         </ToolbarButton>
-        <ToolbarButton icon={<Icon name="list-filter" />} count={9}>
+        <ToolbarButton icon={<Icon name="funnel" />} count={9}>
           Filters
         </ToolbarButton>
-        <ToolbarButton icon={<Icon name="list-filter" />} count={14}>
+        <ToolbarButton icon={<Icon name="funnel" />} count={14}>
           Filters
         </ToolbarButton>
       </Row>
       <Row label="disabled">
-        <ToolbarButton icon={<Icon name="list-filter" />} disabled>
+        <ToolbarButton icon={<Icon name="funnel" />} disabled>
           Filters
         </ToolbarButton>
         <ToolbarButton icon={<Icon name="arrow-up-down" />} disabled aria-label="Sort" />
@@ -163,7 +163,7 @@ export const InTheBand: Story = {
           className="mdt-w-[300px]"
         />
         <ToolbarButton
-          icon={<Icon name="list-filter" />}
+          icon={<Icon name="funnel" />}
           count={2}
           open={open}
           onClick={() => {
@@ -187,7 +187,7 @@ export const InTheBand: Story = {
 export const Playground: Story = {
   args: {
     children: 'Filters',
-    icon: <Icon name="list-filter" />,
+    icon: <Icon name="funnel" />,
     count: 2,
     open: false,
     dot: false,

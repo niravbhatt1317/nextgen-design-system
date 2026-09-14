@@ -111,6 +111,8 @@ export interface TableViewportProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 export interface TableColGroupProps {
+  /** The elastic tail's width; the gutter unless the table has spare to fill. */
+  tail?: number | undefined;
   /** Widths in px, one per column, in display order. The 60px tail is added. */
   widths: number[];
 }

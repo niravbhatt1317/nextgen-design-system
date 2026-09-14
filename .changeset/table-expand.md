@@ -1,5 +1,5 @@
 ---
-'@mdt/design-system': minor
+'@mtdt/nextgen-design-system': minor
 ---
 
 Table: `expand` — the table drives its own morph **by default**, and one row behaves like a thousand
@@ -32,6 +32,13 @@ The default is safe wherever a table lands because it only engages once it has
 actually found a page to fill — a scrolling ancestor, and room under the dock
 line worth taking. A table in a drawer, a modal or a card finds neither, stays
 an ordinary card and keeps its own `maxHeight`, exactly as before.
+
+A scrolling box that is **taller than the window** does not count as a page
+either. That is a box growing with its content, not a viewport — the gallery's
+own docs page wraps every story in one — and filling it ratchets: the table
+stretches to the box, the box grows to the table, again and again, until every
+table on the page is 8,000px tall. The table skips such a box and keeps looking
+upward, and a page with no real scroller above the table stays an ordinary card.
 
 `docked` also keeps its exact contract: pass one and the page keeps the job of
 driving the morph, because `expand` stands down unless it is passed explicitly

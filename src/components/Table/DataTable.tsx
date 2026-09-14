@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/utils';
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Checkbox } from '../Checkbox';
 import { Toolbar, ToolbarButton, ToolbarSection, ToolbarSpacer } from '../Toolbar';
 import {
+  TABLE_COLUMN_MAX,
   TABLE_COLUMN_MIN,
   TABLE_COLUMN_WIDTH,
   TABLE_GUTTER,
@@ -50,6 +52,8 @@ import type { TableColumnDef, TableSortDirection } from './Table.types';
 
 const ACTION_WIDTH = 100;
 const NAME_KEY = '__name';
+/** The Name column's floor when the page declares none: room for a tile and a name. */
+const NAME_MIN = 160;
 const ROWNUM_KEY = '__rownum';
 
 /** Whether the row numbers are shown, remembered next to the column layout. */
@@ -128,6 +132,26 @@ function saveNumbers(storageKey: string | undefined, on: boolean): void {
  *
  * Every pill inside is the library Badge; every control is a ToolbarButton.
  */
+/**
+ * Whether the pager strip earns its place. A strip reading "1–12 of 12" over a
+ * page nobody can leave is furniture: 'auto' draws it only once there IS a
+ * second page; 'always' holds it for a list about to grow, so the footer does
+ * not pop in and out as rows come and go; 'never' drops it for a list that
+ * shows all it has.
+ */
+function pagerWanted(mode: 'auto' | 'always' | 'never', total: number, pageSize: number): boolean {
+  if (mode === 'never') return false;
+  if (mode === 'always') return true;
+  return total > pageSize;
+}
+
+/** The same rule for the Load more footer: only while there is more to load. */
+function loadMoreWanted(mode: 'auto' | 'always' | 'never', shown: number, total: number): boolean {
+  if (mode === 'never') return false;
+  if (mode === 'always') return true;
+  return shown < total;
+}
+
 function DataTable<Row>({
   label,
   noun = 'rows',
@@ -155,11 +179,27 @@ function DataTable<Row>({
   divider = 'default',
   maxHeight = 600,
   docked,
+  toolbar = true,
+  pager = 'auto',
   className,
 }: DataTableProps<Row>) {
   // ── state ──
   const [query, setQuery] = useState(initialQuery);
-  const [quick, setQuick] = useState<Set<string>>(() => new Set());
+  /* one Set of ticked values per quick filter, keyed by the column it filters */
+  const [quick, setQuick] = useState<Record<string, Set<string>>>({});
+  const quickFilters = useMemo(
+    () => (Array.isArray(quickFilter) ? quickFilter : quickFilter ? [quickFilter] : []),
+    [quickFilter]
+  );
+  const quickCount = useMemo(() => Object.values(quick).reduce((t, s) => t + s.size, 0), [quick]);
+  const tickQuick = (key: string, value: string, on: boolean) => {
+    setQuick((all) => {
+      const next = new Set(all[key] ?? []);
+      if (on) next.add(value);
+      else next.delete(value);
+      return { ...all, [key]: next };
+    });
+  };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   const sort = useTableSort();
   const pagingState = useTablePaging({ pageSize, mode: paging });
@@ -170,6 +210,29 @@ function DataTable<Row>({
     saveNumbers(storageKey, numbers);
   }, [storageKey, numbers]);
   const viewportRef = useRef<HTMLDivElement>(null);
+
+  /* THE COLUMNS FILL THE CARD (Pranjal, 2026-09-12: "if there's space left then
+   * columns should automatically stretch equally to fill the full width of the
+   * table"). The card's inner width is watched; whatever the columns do not
+   * cover is shared equally among the CONTENT columns - the lead, Name and
+   * Action keep their ruled widths - so a wide screen shows wider columns, not
+   * a blank run past the last one. Narrower than the columns, and the table
+   * scrolls sideways as before. */
+  const [viewportWidth, setViewportWidth] = useState(0);
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (el === null) return undefined;
+    const measure = (): void => {
+      setViewportWidth(el.clientWidth);
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+    };
+  }, []);
   const cardRef = useRef<HTMLDivElement>(null);
   const [scopeAnchor, setScopeAnchor] = useState<HTMLElement | null>(null);
   const [insert, setInsert] = useState<{ key: string; x: number; y: number } | null>(null);
@@ -203,14 +266,20 @@ function DataTable<Row>({
     const q = query.trim().toLowerCase();
     return rows.filter((row) => {
       if (q && search && !search.match(row, q)) return false;
-      if (quickFilter && quick.size > 0 && !quick.has(quickFilter.value(row))) return false;
+      for (const qf of quickFilters) {
+        const s = quick[qf.columnKey];
+        if (!s || s.size === 0) continue;
+        const v = qf.value(row);
+        const values = Array.isArray(v) ? v : [v];
+        if (!values.some((x) => s.has(x))) return false;
+      }
       for (const g of filters) {
         const s = ticked[g.key];
         if (s && s.size > 0 && !g.match(row, s)) return false;
       }
       return true;
     });
-  }, [rows, query, search, quickFilter, quick, filters, ticked]);
+  }, [rows, query, search, quickFilters, quick, filters, ticked]);
   const sorted = useMemo(() => sort.apply(filtered, allColumns), [sort, filtered, allColumns]);
   const pageRows = useMemo(() => pagingState.slice(sorted), [pagingState, sorted]);
   const inert = useCallback((row: Row) => isRowInert?.(row) ?? false, [isRowInert]);
@@ -225,7 +294,7 @@ function DataTable<Row>({
   const selectable = bulkActions !== undefined;
   /** The first column: checkboxes when there is selection, plain numbers otherwise (unless hidden). */
   const leading = selectable || numbers;
-  const hasFiltering = query.trim() !== '' || quick.size > 0 || filterCount > 0;
+  const hasFiltering = query.trim() !== '' || quickCount > 0 || filterCount > 0;
 
   const resetPaging = pagingState.reset;
   const onQuery = (v: string) => {
@@ -234,10 +303,23 @@ function DataTable<Row>({
   };
 
   // ── widths and offsets ──
-  const nameWidth = nameColumn.width ?? TABLE_COLUMN_WIDTH;
+  /* THE NAME COLUMN RESIZES like any content column (Pranjal, 2026-09-13:
+   * "only checkbox and action columns are the one which cannot be resized").
+   * Its width lives in the same remembered layout under NAME_KEY, floored at
+   * NAME_MIN (nameColumn.minWidth overrides) and capped with the others. */
+  const nameMin = nameColumn.minWidth ?? NAME_MIN;
+  const nameWidth = Math.max(
+    nameMin,
+    Math.min(
+      TABLE_COLUMN_MAX,
+      layout.hasWidth(NAME_KEY)
+        ? layout.widthOf(NAME_KEY)
+        : (nameColumn.width ?? TABLE_COLUMN_WIDTH)
+    )
+  );
   const hasActions = rowActions !== undefined;
   const visible = layout.visible;
-  const widths = useMemo(
+  const baseWidths = useMemo(
     () => [
       ...(leading ? [TABLE_GUTTER] : []),
       nameWidth,
@@ -246,7 +328,46 @@ function DataTable<Row>({
     ],
     [leading, nameWidth, hasActions, visible, layout]
   );
-  const tableWidth = widths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
+  /* the first content column's position: after the lead, Name and Action */
+  const contentStart = (leading ? 1 : 0) + 1 + (hasActions ? 1 : 0);
+  /* WIDENING ONE COLUMN NEVER NARROWS ANOTHER (Pranjal, 2026-09-13: "when I
+   * increase the size of one column the size of other column reduces that
+   * should not happen at all … It can stretch through to fill the table").
+   * At rest — no width remembered — the content columns share the card's
+   * spare equally. The first drag freezes every column where it stands (see
+   * resizeTo), and from then on nothing is shared: the elastic tail takes the
+   * spare, and when the columns outgrow the card the table scrolls sideways.
+   * Reset columns forgets the widths and the sharing returns. */
+  const frozen = layout.hasAnyWidth;
+  const widths = useMemo(() => {
+    if (frozen) return baseWidths;
+    const covered = baseWidths.reduce((a, b) => a + b, 0) + TABLE_GUTTER;
+    const content = baseWidths.length - contentStart;
+    const spare = viewportWidth - covered;
+    if (spare <= 0 || content <= 0) return baseWidths;
+    const share = spare / content;
+    return baseWidths.map((w, i) => (i >= contentStart ? w + share : w));
+  }, [baseWidths, contentStart, viewportWidth, frozen]);
+  const columnsWidth = widths.reduce((a, b) => a + b, 0);
+  const tailWidth = frozen ? Math.max(TABLE_GUTTER, viewportWidth - columnsWidth) : TABLE_GUTTER;
+  const tableWidth = columnsWidth + tailWidth;
+  /* a drag: the first one freezes every column at its rendered width, so the
+   * others do not move; then the dragged key takes its new width */
+  const frozenRef = useRef(frozen);
+  frozenRef.current = frozen;
+  const resizeTo = (key: string, w: number) => {
+    if (!frozenRef.current) {
+      frozenRef.current = true;
+      const all: Record<string, number> = { [NAME_KEY]: nameWidth };
+      visible.forEach((c, i) => {
+        all[c.key] = widths[contentStart + i] ?? layout.widthOf(c.key);
+      });
+      all[key] = w;
+      layout.setWidths(all);
+      return;
+    }
+    layout.setWidth(key, w);
+  };
   const nameLeft = leading ? TABLE_GUTTER : 0;
   const actionLeft = nameLeft + nameWidth;
 
@@ -320,7 +441,7 @@ function DataTable<Row>({
         : null;
   const clearAll = () => {
     setQuery('');
-    setQuick(new Set());
+    setQuick({});
     setTicked({});
     resetPaging();
   };
@@ -404,171 +525,224 @@ function DataTable<Row>({
   const sortDir = (key: string): TableSortDirection | null =>
     sort.sort?.key === key ? sort.sort.direction : null;
 
-  return (
-    <div className={cn('mdt-flex mdt-flex-col mdt-gap-[22px]', className)}>
-      <Toolbar label={`${label} controls`}>
-        {search && (
-          <Input
-            size="sm"
-            className="mdt-w-[300px]"
-            placeholder={search.placeholder ?? 'Search'}
-            aria-label={`Search ${noun}`}
-            value={query}
-            onChange={(e) => {
-              onQuery(e.target.value);
-            }}
-            startAdornment={<Icon name="search" size={14} />}
-          />
-        )}
-        {filters.length > 0 && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <ToolbarButton
-                icon={<Icon name="list-filter" />}
-                count={filterCount || undefined}
-                activeLabel="applied"
-              >
-                Filters
-              </ToolbarButton>
-            </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              sideOffset={6}
-              className="mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4"
-              aria-label="Filters"
+  /* The strip's controls: search, Filters, the quick filter, then Sort and
+   * Columns on the right. Drawn either in the table's own strip or, when the
+   * page hands its own Toolbar element in, inside that. */
+  const stripControls = (
+    <>
+      {search && (
+        <Input
+          size="sm"
+          className="mdt-w-[300px]"
+          placeholder={search.placeholder ?? 'Search'}
+          aria-label={`Search ${noun}`}
+          value={query}
+          onChange={(e) => {
+            onQuery(e.target.value);
+          }}
+          startAdornment={<Icon name="search" size={14} />}
+        />
+      )}
+      {filters.length > 0 && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <ToolbarButton
+              icon={<Icon name="funnel" />}
+              count={filterCount || undefined}
+              activeLabel="applied"
             >
-              <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
-                <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
-                  Filters
-                </span>
-                <button
-                  type="button"
-                  className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
-                  onClick={() => {
-                    setTicked({});
-                    resetPaging();
-                  }}
-                >
-                  Clear all
-                </button>
-              </div>
-              {filters.map((g) => (
-                <div key={g.key}>
-                  <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
-                    {g.label}
-                  </div>
-                  {g.options.map((o) => {
-                    const on = ticked[g.key]?.has(o) ?? false;
-                    return (
-                      <label
-                        key={o}
-                        className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
-                      >
-                        <Checkbox
-                          className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
-                          checked={on}
-                          onCheckedChange={(v) => {
-                            setTicked((t) => {
-                              const s = new Set(t[g.key] ?? []);
-                              if (v === true) s.add(o);
-                              else s.delete(o);
-                              return { ...t, [g.key]: s };
-                            });
-                            resetPaging();
-                          }}
-                        />
-                        {o}
-                      </label>
-                    );
-                  })}
+              Filters
+            </ToolbarButton>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={6}
+            className="mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4"
+            aria-label="Filters"
+          >
+            <div className="mdt-mb-1 mdt-flex mdt-items-center mdt-justify-between">
+              <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
+                Filters
+              </span>
+              <button
+                type="button"
+                className="-mdt-mr-1.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-40 dark:hover:mdt-bg-neutral-130"
+                onClick={() => {
+                  setTicked({});
+                  resetPaging();
+                }}
+              >
+                Clear all
+              </button>
+            </div>
+            {filters.map((g) => (
+              <div key={g.key}>
+                <div className="mdt-mb-0.5 mdt-mt-2.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40">
+                  {g.label}
                 </div>
-              ))}
-            </PopoverContent>
-          </Popover>
-        )}
-        {quickFilter && (
-          <DropdownMenu>
+                {g.options.map((o) => {
+                  const on = ticked[g.key]?.has(o) ?? false;
+                  return (
+                    <label
+                      key={o}
+                      className="mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-px-1 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 dark:mdt-text-neutral-10 dark:hover:mdt-bg-neutral-130"
+                    >
+                      <Checkbox
+                        className="mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                        checked={on}
+                        onCheckedChange={(v) => {
+                          setTicked((t) => {
+                            const s = new Set(t[g.key] ?? []);
+                            if (v === true) s.add(o);
+                            else s.delete(o);
+                            return { ...t, [g.key]: s };
+                          });
+                          resetPaging();
+                        }}
+                      />
+                      {o}
+                    </label>
+                  );
+                })}
+              </div>
+            ))}
+          </PopoverContent>
+        </Popover>
+      )}
+      {/* ONE SQUARE PER QUICK FILTER, in the order the page gives them (Pranjal,
+          2026-09-12: Status and Organisation side by side on Service accounts). */}
+      {quickFilters.map((qf) => {
+        const set = quick[qf.columnKey] ?? new Set<string>();
+        return (
+          <DropdownMenu key={qf.columnKey}>
             <DropdownMenuTrigger asChild>
               <ToolbarButton
-                icon={quickFilter.icon ?? <Icon name="check-circle" />}
-                dot={quick.size > 0}
-                aria-label={quickFilter.label}
+                icon={
+                  qf.icon ??
+                  /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
+                       icon we used in users is different here"): one icon for the
+                       filter, in the strip and in the heading it filters. */
+                  allColumns.find((c) => c.key === qf.columnKey)?.glyph ?? (
+                    <Icon name="check-circle" />
+                  )
+                }
+                dot={set.size > 0}
+                aria-label={qf.label}
                 activeLabel="applied"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="mdt-w-48">
-              {quickFilter.options.map((o) => (
+              {qf.options.map((o) => (
                 <DropdownMenuCheckboxItem
                   key={o}
-                  checked={quick.has(o)}
+                  /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
+                       here"), as the Filters panel's rows do and as Users' quick filter
+                       always has: a person sees at a glance which values are on and
+                       that several can be. The menu's own tick, which only appears
+                       once checked, is hidden in favour of the box. */
+                  className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
+                  checked={set.has(o)}
                   onSelect={(e) => {
                     e.preventDefault();
                   }}
                   onCheckedChange={(v) => {
-                    setQuick((s) => {
-                      const n = new Set(s);
-                      if (v) n.add(o);
-                      else n.delete(o);
-                      return n;
-                    });
+                    tickQuick(qf.columnKey, o, v);
                     resetPaging();
                   }}
                 >
-                  {o}
+                  <Checkbox
+                    className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                    checked={set.has(o)}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                  {qf.renderOption ? qf.renderOption(o) : o}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
-        <ToolbarSpacer />
-        <ToolbarSection>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToolbarButton
-                icon={<Icon name="arrow-up-down" />}
-                dot={sort.sort !== null}
-                aria-label="Sort"
-                activeLabel="applied"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="mdt-w-48">
-              {sortKeys.map((k) => (
-                <DropdownMenuItem
-                  key={k}
-                  onSelect={() => {
-                    sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
-                  }}
-                >
-                  {labelOf(k)}
-                  {sortDir(k) && (
-                    <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
-                      {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-              ))}
-              {sort.sort && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <TableColumnsPanel
-            trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
-            {...columnsPanel({
-              selectable,
-              numbers,
-              setNumbers,
-              layout,
-              labelOf,
-              nameLabel: nameColumn.label ?? 'Name',
-              hasActions,
-            })}
-          />
-        </ToolbarSection>
-      </Toolbar>
+        );
+      })}
+      <ToolbarSpacer />
+      <ToolbarSection>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <ToolbarButton
+              icon={<Icon name="arrow-up-down" />}
+              dot={sort.sort !== null}
+              aria-label="Sort"
+              activeLabel="applied"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="mdt-w-48">
+            {sortKeys.map((k) => (
+              <DropdownMenuItem
+                key={k}
+                onSelect={() => {
+                  sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
+                }}
+              >
+                {labelOf(k)}
+                {sortDir(k) && (
+                  <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
+                    {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
+                  </span>
+                )}
+              </DropdownMenuItem>
+            ))}
+            {sort.sort && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <TableColumnsPanel
+          trigger={<ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />}
+          {...columnsPanel({
+            selectable,
+            numbers,
+            setNumbers,
+            layout,
+            labelOf,
+            nameLabel: nameColumn.label ?? 'Name',
+            hasActions,
+          })}
+        />
+      </ToolbarSection>
+    </>
+  );
+
+  return (
+    <div className={cn('mdt-flex mdt-flex-col mdt-gap-4', className)}>
+      {/* THE TOOLBAR CAN BE LEFT OFF (Pranjal, 2026-09-11). On a screen with a
+          tab strip the page carries its own toolbar up there, and a second strip
+          here would draw search, Filters, Sort and Columns twice. Everything
+          inside the card is untouched either way. */}
+      {toolbar === true && (
+        /* INSET TO THE TABLE'S EDGE, not the strip's own (Pranjal, 2026-09-11:
+           "toolbar spacing doesn't align with that of table"). A standalone
+           Toolbar keeps the 24px inset ruled on 4 September; this one belongs
+           to the table under it, so its controls sit flush with the card's own
+           edges: the search box starts where the card's border starts, the last
+           button ends where it ends. And it is only as tall as its controls —
+           the 60px is the PAGE band's height, not this strip's — so the gap
+           to the card is the plain 16px he asked for, not 14px of empty strip
+           plus a gap. A table without its own toolbar leaves all of this to
+           the page's structure. */
+        <Toolbar label={`${label} controls`} className="mdt-h-auto mdt-px-0">
+          {stripControls}
+        </Toolbar>
+      )}
+      {/* OR DRAWN INTO THE PAGE'S OWN STRIP (Pranjal, 2026-09-12: "the table you
+          pick from library would not come with toolbar, because there is no tab
+          bar we will use the individual toolbar component"). A page without a
+          tab strip keeps the 60px Toolbar band as page structure and hands the
+          element in; the table places the same controls inside it, so search,
+          Filters, the quick filter, Sort and Columns keep working, and stay one
+          thing rather than a copy the page has to keep in step. */}
+      {toolbar !== true && toolbar ? createPortal(stripControls, toolbar) : null}
 
       <Table
         ref={cardRef}
@@ -586,7 +760,7 @@ function DataTable<Row>({
           hasSelection={selection.count > 0}
           label={label}
         >
-          <TableColGroup widths={widths} />
+          <TableColGroup widths={widths} tail={tailWidth} />
           <TableHeader>
             <tr>
               {selectable && (
@@ -609,6 +783,11 @@ function DataTable<Row>({
                 onSort={() => {
                   sort.cycle(NAME_KEY);
                 }}
+                minWidth={nameMin}
+                resizable
+                onResize={(w) => {
+                  resizeTo(NAME_KEY, Math.max(nameMin, w));
+                }}
               />
               {hasActions && (
                 <TableHead
@@ -620,12 +799,12 @@ function DataTable<Row>({
                   align="center"
                 />
               )}
-              {visible.map((c) => (
+              {visible.map((c, i) => (
                 <TableHead
                   key={c.key}
                   columnKey={c.key}
                   label={c.label}
-                  width={layout.widthOf(c.key)}
+                  width={widths[contentStart + i] ?? layout.widthOf(c.key)}
                   minWidth={c.minWidth ?? TABLE_COLUMN_MIN}
                   align={c.align ?? 'left'}
                   sortable={c.sortable ?? false}
@@ -640,11 +819,13 @@ function DataTable<Row>({
                   }}
                   menu={headMenu(c)}
                   glyph={c.glyph}
-                  filtered={quickFilter?.columnKey === c.key && quick.size > 0}
+                  filtered={quickFilters.some(
+                    (qf) => qf.columnKey === c.key && (quick[qf.columnKey]?.size ?? 0) > 0
+                  )}
                   dragging={drag.drag?.key === c.key}
                   resizable
                   onResize={(w) => {
-                    layout.setWidth(c.key, w);
+                    resizeTo(c.key, w);
                   }}
                   onBoundaryHover={(h) => {
                     showInsert(c.key, h);
@@ -771,56 +952,43 @@ function DataTable<Row>({
             {bulkActions([...selection.selected], selection.clear)}
           </TableBulkBar>
         )}
-        {loading ? (
-          <TablePager
-            total={0}
-            page={1}
-            pageSize={pagingState.pageSize}
-            onPage={() => undefined}
-            onPageSize={() => undefined}
-            noun={noun}
-            message={`Loading ${noun}…`}
-          />
-        ) : blankKind ? (
-          <TablePager
-            total={0}
-            page={1}
-            pageSize={pagingState.pageSize}
-            onPage={() => undefined}
-            onPageSize={() => undefined}
-            noun={noun}
-            message={
-              blankKind === 'error'
-                ? `${cap(noun)} not loaded`
-                : blankKind === 'first'
-                  ? `No ${noun}`
-                  : `No ${noun} match`
-            }
-          />
-        ) : pagingState.mode === 'loadMore' ? (
-          <TableLoadMore
-            shown={pagingState.loaded}
-            total={sorted.length}
-            noun={noun}
-            loading={refreshing}
-            onMore={pagingState.loadMore}
-          />
-        ) : (
-          <TablePager
-            total={sorted.length}
-            page={Math.min(pagingState.page, pagingState.pagesFor(sorted.length))}
-            pageSize={pagingState.pageSize}
-            pageSizes={pageSizes}
-            onPage={(p) => {
-              pagingState.setPage(p, sorted.length);
-              if (viewportRef.current) viewportRef.current.scrollTop = 0;
-            }}
-            onPageSize={(s) => {
-              pagingState.setPageSize(s, sorted.length);
-            }}
-            noun={noun}
-          />
-        )}
+        {/* THE FOOTER EARNS ITS PLACE (Pranjal, 2026-09-11: "what's the need of
+            pagination in blank states?" and "26 entries will create a second
+            page. Then only pagination should be visible."). Nothing to page —
+            loading, a blank state, a single page, everything already loaded —
+            means no strip at all: six disabled controls under an empty table
+            are furniture, and the blank state carries its own message. */}
+        {!loading &&
+          !blankKind &&
+          pagingState.mode === 'loadMore' &&
+          loadMoreWanted(pager, pagingState.loaded, sorted.length) && (
+            <TableLoadMore
+              shown={pagingState.loaded}
+              total={sorted.length}
+              noun={noun}
+              loading={refreshing}
+              onMore={pagingState.loadMore}
+            />
+          )}
+        {!loading &&
+          !blankKind &&
+          pagingState.mode !== 'loadMore' &&
+          pagerWanted(pager, sorted.length, pagingState.pageSize) && (
+            <TablePager
+              total={sorted.length}
+              page={Math.min(pagingState.page, pagingState.pagesFor(sorted.length))}
+              pageSize={pagingState.pageSize}
+              pageSizes={pageSizes}
+              onPage={(p) => {
+                pagingState.setPage(p, sorted.length);
+                if (viewportRef.current) viewportRef.current.scrollTop = 0;
+              }}
+              onPageSize={(s) => {
+                pagingState.setPageSize(s, sorted.length);
+              }}
+              noun={noun}
+            />
+          )}
         {insert && layout.hidden.length > 0 && (
           <button
             ref={insertBtn}
@@ -901,10 +1069,6 @@ function DataTable<Row>({
       )}
     </div>
   );
-}
-
-function cap(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export { DataTable };

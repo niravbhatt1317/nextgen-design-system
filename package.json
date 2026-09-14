@@ -1,6 +1,6 @@
 {
   "name": "@mtdt/nextgen-design-system",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "The NextGen design system: accessible React components for building SaaS platforms, designed to be readable by machines as well as people.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -70,6 +70,7 @@
     "test:e2e:update-snapshots": "playwright test --update-snapshots",
     "catalog": "node scripts/extract-capabilities.mjs --write",
     "find": "node scripts/extract-capabilities.mjs --find",
+    "check:exports": "node scripts/check-exports.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:tokens:strict": "node scripts/check-tokens.mjs --strict",
     "check:tokens:report": "node scripts/check-tokens.mjs --markdown",
