@@ -862,7 +862,7 @@ function TableLeadCell({
   frozen = 0,
 }: {
   index: number;
-  /** Spoken name for the checkbox: "Select Sarah Johnson". Only read when selectable. */
+  /** Who the checkbox is for: "Sarah Johnson" is spoken as "Select Sarah Johnson". Only read when selectable. */
   label?: string | undefined;
   selectable?: boolean | undefined;
   selected?: boolean | undefined;
@@ -876,7 +876,7 @@ function TableLeadCell({
   return (
     <TableSelectionCell
       index={index}
-      label={label ?? `Select row ${String(index)}`}
+      label={label ?? `row ${String(index)}`}
       selected={selected}
       onToggle={onToggle}
       inert={inert}

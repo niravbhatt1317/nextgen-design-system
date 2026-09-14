@@ -639,7 +639,7 @@ export const TheLeadColumn: Story = {
                     <TableRow key={name} selected={v.selectable && picked.includes(i)}>
                       <TableLeadCell
                         index={i + 1}
-                        label={`Select ${name}`}
+                        label={name}
                         selectable={v.selectable}
                         selected={picked.includes(i)}
                         onToggle={() => {
