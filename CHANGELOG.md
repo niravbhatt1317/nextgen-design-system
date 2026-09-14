@@ -2,6 +2,12 @@
 
 ## 0.6.0
 
+### Packaging
+
+- The package can be loaded by Node. Both entry points carried `import './x.css'` statements that Rollup preserved from source, so `require('@mtdt/nextgen-design-system')` failed with `SyntaxError: Unexpected token '.'` — CSS being parsed as JavaScript — and anything rendering on the server hit it. 0.5.1 and every release before it shipped that way.
+
+  The seven per-component stylesheets are now folded into `dist/styles.css` instead, appended after the utilities so the cascade is unchanged. **If you import the package but have never imported `@mtdt/nextgen-design-system/styles.css`, do — component rules now arrive only through that file.** It is the import the README, `AGENTS.md` and the migration prompt have always specified.
+
 ### Minor Changes
 
 - bb99ce1: IconTile: a `2xl` size (56, glyph 24, radius 12 when square) - the identity mark at the top of an object drawer, the height of the 56 avatar Users puts there.

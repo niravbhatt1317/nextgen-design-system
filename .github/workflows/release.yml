@@ -64,14 +64,24 @@ jobs:
       - name: Check the package contains what it promises
         run: node scripts/verify-package.mjs
 
+      # Into an empty directory, not the repo root. A stale
+      # `mtdt-nextgen-design-system-0.1.0.tgz` was committed at the root for
+      # months, and `path: '*.tgz'` swept it into every release artifact - so
+      # the artifact held two tarballs, six versions apart, and nothing said
+      # which was which.
       - name: Pack
-        run: npm pack --pack-destination .
+        # `--pack-destination` does not create the directory - npm exits
+        # ENOENT if it is missing, which it always is on a fresh runner.
+        run: mkdir -p pack && npm pack --pack-destination ./pack
 
       - uses: actions/upload-artifact@v4
         with:
           name: package-tarball
-          path: '*.tgz'
+          path: pack/*.tgz
           retention-days: 14
+          # The artifact is the thing a person installs before publishing. If it
+          # is empty the dry run proved nothing, and that should be loud.
+          if-no-files-found: error
 
       # No token. npm verifies the OIDC identity GitHub mints for this workflow
       # against the trusted publisher configured on the package, so there is no
