@@ -684,6 +684,7 @@ import { ListIcon } from './list';
 import { ListChecksIcon } from './list-checks';
 import { ListEndIcon } from './list-end';
 import { ListFilterIcon } from './list-filter';
+import { FunnelIcon } from './funnel';
 import { ListMinusIcon } from './list-minus';
 import { ListMusicIcon } from './list-music';
 import { ListOrderedIcon } from './list-ordered';
@@ -1902,6 +1903,7 @@ export const iconRegistry = {
   'list-checks': ListChecksIcon,
   'list-end': ListEndIcon,
   'list-filter': ListFilterIcon,
+  funnel: FunnelIcon,
   'list-minus': ListMinusIcon,
   'list-music': ListMusicIcon,
   'list-ordered': ListOrderedIcon,

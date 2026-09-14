@@ -8,10 +8,21 @@ export interface DataTableQuickFilter<Row> {
   /** Spoken name of the square: "Filter by status". */
   label: string;
   options: string[];
-  /** The row's value for this filter. */
-  value: (row: Row) => string;
-  /** The square's 14px icon. */
+  /**
+   * The row's value for this filter — one string, or several when a row can
+   * match more than one (a service account's home organisation and every
+   * organisation in its reach). A row passes when any of them is ticked.
+   */
+  value: (row: Row) => string | string[];
+  /** The square's 14px icon. Left unset, the square wears the column's own glyph. */
   icon?: ReactNode | undefined;
+  /**
+   * How one value is drawn in the menu. Left unset, the plain word. Users
+   * draws each status as its own pill, so the menu reads like the column
+   * (Pranjal, 2026-09-12: "we showed the badges inside the filter for clear
+   * distinguish visibility").
+   */
+  renderOption?: ((value: string) => ReactNode) | undefined;
 }
 
 /** One group in the Filters panel: a label and the values a person can tick. */
@@ -34,6 +45,8 @@ export interface DataTableBlankCopy {
 export interface DataTableNameColumn<Row> {
   label?: string | undefined;
   width?: number | undefined;
+  /** The narrowest a person may drag it; 160 when not given. */
+  minWidth?: number | undefined;
   sortable?: boolean | undefined;
   cell: (row: Row) => ReactNode;
   sortValue?: ((row: Row) => string | number) | undefined;
@@ -62,7 +75,13 @@ export interface DataTableProps<Row> {
     | undefined;
   /** What the search box holds to begin with. */
   initialQuery?: string | undefined;
-  quickFilter?: DataTableQuickFilter<Row> | undefined;
+  /**
+   * One quick filter, or several — each is its own square in the strip with
+   * its own menu, and the row must satisfy every one that has a tick
+   * (Pranjal, 2026-09-12: Service accounts filters by Status AND by
+   * Organisation, side by side, as version 3 did).
+   */
+  quickFilter?: DataTableQuickFilter<Row> | DataTableQuickFilter<Row>[] | undefined;
   filters?: DataTableFilterGroup<Row>[] | undefined;
   /** Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. */
   sortFields?: string[] | undefined;
@@ -91,5 +110,37 @@ export interface DataTableProps<Row> {
    * page scrolls it to its dock line. See Table's `docked`.
    */
   docked?: boolean | number | undefined;
+  /**
+   * The strip above the table: search, Filters, the quick filter, Sort and
+   * Columns. ON by default.
+   *
+   * Pass `false` where the PAGE carries its own toolbar — a screen with a tab
+   * strip puts its controls up there, and a second strip would draw the same
+   * controls twice (Pranjal, 2026-09-11). The page then supplies its own
+   * `Toolbar`, a separate component, and the two stay connected through the
+   * props below.
+   *
+   * With its own toolbar the table keeps 16px between the strip and the card.
+   * Without one, the page's structure decides the space above the table.
+   *
+   * Pass the page's own `Toolbar` ELEMENT (Pranjal, 2026-09-12) and the table
+   * draws the same controls inside it instead: the page keeps its 60px strip
+   * as structure, the table keeps search, Filters, the quick filter, Sort and
+   * Columns working. Use a callback ref or state for the element, so the
+   * table sees it once it exists; until then it draws no strip.
+   */
+  toolbar?: boolean | HTMLElement | null | undefined;
+  /**
+   * When the pager strip appears.
+   *
+   * `'auto'` — the default — only once there IS a second page: 25 rows at 25 a
+   * page have none, 26 have one. Never while loading or in a blank state —
+   * nothing to page, and the blank state carries its own message. For a
+   * "Load more" table, only while there is more to load.
+   *
+   * `'always'` keeps it whatever the count, for a list about to grow.
+   * `'never'` drops it, for a list that shows everything it has.
+   */
+  pager?: 'auto' | 'always' | 'never' | undefined;
   className?: string | undefined;
 }

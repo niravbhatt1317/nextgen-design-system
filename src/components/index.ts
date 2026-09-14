@@ -874,3 +874,19 @@ export type {
   UploadSenderContext,
   UploadVariantsType,
 } from './Upload';
+
+// PageFrame — the content column, and the ONLY scroll container on a page. The
+// rail beside it never scrolls; everything pinned is a sticky child of the frame
+// rather than a nested scroller. It publishes the sticky ladder as custom
+// properties, so a table docks at `--mdt-thead-top` without being told what the
+// bands above it are. Shipped in 0.5.0 but never exported, so nothing could
+// import it (2026-09-11).
+export { PageFrame, PageHeader, PageHero, PageBand, PageSurface } from './PageFrame';
+export type {
+  PageFrameProps,
+  PageHeaderProps,
+  PageHeroProps,
+  PageBandProps,
+  PageSurfaceProps,
+  PageBandVariant,
+} from './PageFrame';

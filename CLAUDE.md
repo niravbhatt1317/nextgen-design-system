@@ -885,6 +885,7 @@ Your role: implement solutions, run tests/builds/lint, create code changes.
 | `CAPABILITIES.md`                        | Generated: every component, hook and utility - **search this first** |
 | `capability-catalog.json`                | The same list, machine-readable                                      |
 | `scripts/check-tokens.mjs`               | Finds values that should be tokens                                   |
+| `scripts/check-exports.mjs`              | Finds components that exist but cannot be imported                   |
 | `scripts/extract-variants.mjs`           | Builds `component-catalog.json` from the CVA definitions             |
 | `scripts/extract-capabilities.mjs`       | Builds the capability catalogue, and answers `npm run find`          |
 | `scripts/generate-icons.mjs`             | Rebuilds the icon set from Lucide - **see the icon rule below**      |
@@ -894,6 +895,7 @@ Your role: implement solutions, run tests/builds/lint, create code changes.
 ```bash
 npm run find -- <words>       # what do we already have for this? SEARCH BEFORE BUILDING
 npm run catalog               # rebuild CAPABILITIES.md and capability-catalog.json
+npm run check:exports         # every component reachable from the package root? FAILS if not
 npm run check:tokens          # report hardcoded values (does not fail)
 npm run check:tokens:strict   # same, but exits non-zero on violations
 npm run check:tokens:report   # also writes TOKEN-REPORT.md
