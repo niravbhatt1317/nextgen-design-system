@@ -136,7 +136,8 @@ function dockLineOf(card: HTMLElement): number {
   return 0;
 }
 
-/** The distance over which the card finishes becoming the page. */
+/** The most the card ever needs to travel to finish becoming the page; a card
+ * that starts closer to the dock line morphs over the distance it has. */
 const MORPH_RANGE = 140;
 /** Below this there is not enough room to be worth filling. */
 const MIN_FILL = 160;
@@ -168,8 +169,18 @@ function useSelfDrivenMorph(
     const card = cardRef.current;
     if (!enabled || card === null) return undefined;
 
+    /* THE PAGE is the nearest scrolling ancestor — unless that ancestor is
+     * taller than the window, in which case it is not a viewport at all but a
+     * box that grows with whatever is inside it. Storybook wraps every story
+     * on its docs page in exactly such a box: overflow auto, no height. Filling
+     * THAT ratchets — the table stretches to the box, the box grows to the
+     * table, the observer fires, again — and every table on the page ended up
+     * 8,000px tall (Pranjal, 2026-09-11). A box that can show more than the
+     * window can is skipped, and the walk carries on upward. */
+    const isViewport = (el: HTMLElement): boolean =>
+      /(auto|scroll)/.test(getComputedStyle(el).overflowY) && el.clientHeight <= window.innerHeight;
     let found: HTMLElement | null = card.parentElement;
-    while (found !== null && !/(auto|scroll)/.test(getComputedStyle(found).overflowY)) {
+    while (found !== null && !isViewport(found)) {
       found = found.parentElement;
     }
     if (found === null) return undefined;
@@ -177,13 +188,36 @@ function useSelfDrivenMorph(
     const dock = dockOffset ?? dockLineOf(card);
     let filling = false;
 
+    /* Learned, not assumed: a "page" that turns out to grow with its content
+     * is not a page. Once that is seen, filling stops for good. */
+    let contentSized = false;
+    const tooTall = (): boolean => page.clientHeight > window.innerHeight;
     const fill = (): void => {
+      if (contentSized) return;
       card.style.height = '';
       card.style.marginBottom = '';
+      /* Checked EVERY time, not only at mount: on the gallery's docs page the
+       * wrapper is small when the first table mounts and grows as the others
+       * arrive, so a mount-time check waved it through and every table on the
+       * page ended up 6,000px tall (Pranjal, 2026-09-11). */
+      if (tooTall()) {
+        contentSized = true;
+        filling = false;
+        return;
+      }
       const room = page.clientHeight - dock;
       filling = room >= MIN_FILL;
       if (!filling) return;
       card.style.height = `${String(room)}px`;
+      /* And once more after taking the height: if that made the page taller
+       * than the window, the page was sized by its content — the table just
+       * stretched its own container. Undo, and never try again. */
+      if (tooTall()) {
+        card.style.height = '';
+        contentSized = true;
+        filling = false;
+        return;
+      }
       /* Cancel the surface's trailing padding so the page's own scroll end IS
        * the dock line; without it the page runs past and the pinned header
        * ends up half-hidden under the band above. */
@@ -197,7 +231,17 @@ function useSelfDrivenMorph(
     const read = (): void => {
       raf = 0;
       const top = card.getBoundingClientRect().top - page.getBoundingClientRect().top;
-      const next = filling ? Math.min(1, Math.max(0, (dock + MORPH_RANGE - top) / MORPH_RANGE)) : 0;
+      /* THE MORPH RUNS OVER THE TRAVEL THE CARD ACTUALLY HAS, never a flat 140
+       * (Pranjal, 2026-09-12, on the Service accounts page: "do you think its
+       * working fine?"). A page with a KPI strip above the table gives the card
+       * ~200px of travel, so it rested at 0 - a full 12px radius. A page without
+       * one gives it 81px, and against a fixed 140 that card RESTED 42% morphed:
+       * corners half flattened before anyone scrolled. Travel is measured from
+       * the card's place in the CONTENT (`top + scrollTop`), which does not move
+       * as the page scrolls, so every card rests at 0 and reaches 1 exactly at
+       * the dock line. 140 stays as the ceiling for cards that start far down. */
+      const travel = Math.max(1, Math.min(MORPH_RANGE, top + page.scrollTop - dock));
+      const next = filling ? Math.min(1, Math.max(0, (dock + travel - top) / travel)) : 0;
       setState((prev) =>
         prev.driven === filling && Math.abs(prev.morph - next) < 0.001
           ? prev
@@ -339,14 +383,14 @@ const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function Ta
 TableViewport.displayName = 'TableViewport';
 
 /** One `<col>` per visible column plus the 60px elastic tail. */
-function TableColGroup({ widths }: TableColGroupProps) {
+function TableColGroup({ widths, tail = TABLE_GUTTER }: TableColGroupProps) {
   return (
     <colgroup>
       {widths.map((w, i) => (
         // eslint-disable-next-line react/no-array-index-key -- a col has no identity but its position
         <col key={i} style={{ width: w }} />
       ))}
-      <col style={{ width: TABLE_GUTTER }} />
+      <col style={{ width: tail }} />
     </colgroup>
   );
 }
@@ -613,7 +657,11 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
       )}
       {resizable && (
         <div
-          className="tbl-rz mdt-absolute -mdt-right-[5px] mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-[10px] mdt-cursor-col-resize"
+          /* INSIDE its own heading (2026-09-13): every heading is sticky with a
+           * z-index, so a handle that straddled the boundary had its far half
+           * painted over by the next heading and only a sliver could be grabbed.
+           * Twelve pixels ending at the boundary line, all of them the heading's. */
+          className="tbl-rz mdt-absolute mdt-right-0 mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-3 mdt-cursor-col-resize"
           role="slider"
           tabIndex={0}
           aria-orientation="vertical"
@@ -629,10 +677,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           onPointerLeave={() => onBoundaryHover?.(false)}
         />
       )}
-      <span
-        className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
-        aria-hidden="true"
-      />
+      <TableNick />
     </th>
   );
 });
@@ -705,7 +750,29 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
   );
 }
 
-/** The blank heading over the row numbers; named for screen readers. */
+/**
+ * The heading over the row numbers.
+ *
+ * It shows a hash. It used to show NOTHING, which read as a column somebody
+ * forgot to label — and left the numbers underneath with no name, so nobody
+ * could say which column they meant. (Pranjal, 2026-09-11.)
+ */
+/**
+ * THE NICK: the 16px mark at a heading's right edge (Pranjal, 2026-09-11:
+ * "we just need that nick"). It is drawn on EVERY heading, identically,
+ * whether or not that boundary can be dragged — "it might work for some, might
+ * not, but it will look the same." The resize handle is a separate, invisible
+ * thing that sits over it only where resizing is allowed.
+ */
+function TableNick() {
+  return (
+    <span
+      className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+      aria-hidden="true"
+    />
+  );
+}
+
 function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
   return (
     <th
@@ -713,7 +780,10 @@ function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
       aria-label="Row number"
       className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
       style={{ left: frozen, width: TABLE_GUTTER }}
-    />
+    >
+      <span aria-hidden="true">#</span>
+      <TableNick />
+    </th>
   );
 }
 
@@ -744,7 +814,74 @@ function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAll
           <Icon name="chevron-down" size={12} />
         </button>
       </span>
+      <TableNick />
     </th>
+  );
+}
+
+/**
+ * THE LEAD COLUMN — one 60px slot with two occupants (Pranjal, 2026-09-11).
+ *
+ * A table that can act on many rows at once puts a checkbox here. A table that
+ * cannot puts the row number, under a hash. Same slot, same width, same
+ * alignment, so a page that later grows bulk actions changes nothing about its
+ * columns and a page that loses them leaves no hole.
+ *
+ * The PAGE does not choose which. It says whether it has bulk actions and this
+ * draws the right one — which is the whole reason it is one component and not
+ * two the caller has to pick between and keep in step.
+ */
+function TableLeadHead({
+  selectable = false,
+  state = 'none',
+  onToggle,
+  onScope,
+  frozen = 0,
+}: {
+  /** Does this table act on many rows at once? */
+  selectable?: boolean | undefined;
+  state?: TableSelectAllProps['state'] | undefined;
+  onToggle?: (() => void) | undefined;
+  onScope?: ((anchor: HTMLElement) => void) | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined || onScope === undefined) {
+    return <TableNumberHead frozen={frozen} />;
+  }
+  return <TableSelectAll state={state} onToggle={onToggle} onScope={onScope} frozen={frozen} />;
+}
+
+/** The lead cell: a checkbox where the table selects, the row number where it does not. */
+function TableLeadCell({
+  index,
+  label,
+  selectable = false,
+  selected = false,
+  onToggle,
+  inert = false,
+  frozen = 0,
+}: {
+  index: number;
+  /** Who the checkbox is for: "Sarah Johnson" is spoken as "Select Sarah Johnson". Only read when selectable. */
+  label?: string | undefined;
+  selectable?: boolean | undefined;
+  selected?: boolean | undefined;
+  onToggle?: ((extend: boolean) => void) | undefined;
+  inert?: boolean | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined) {
+    return <TableNumberCell index={index} inert={inert} frozen={frozen} />;
+  }
+  return (
+    <TableSelectionCell
+      index={index}
+      label={label ?? `row ${String(index)}`}
+      selected={selected}
+      onToggle={onToggle}
+      inert={inert}
+      frozen={frozen}
+    />
   );
 }
 
@@ -774,6 +911,8 @@ export {
   TableCell,
   TableHead,
   TableSelectionCell,
+  TableLeadHead,
+  TableLeadCell,
   TableSelectAll,
   TableNumberCell,
   TableNumberHead,

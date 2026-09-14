@@ -96,4 +96,14 @@ describe('the strip assembled', () => {
     expect(strip).toContainElement(screen.getByText('Search'));
     expect(strip).toContainElement(screen.getByText('Columns'));
   });
+
+  /* Pranjal, 2026-09-12: the search box and the Filters button wear one border */
+  it('gives an input inside it the same border as a ToolbarButton', () => {
+    render(
+      <Toolbar label="Controls">
+        <input aria-label="Search" />
+      </Toolbar>
+    );
+    expect(screen.getByRole('toolbar').className).toContain('[&_input]:mdt-border-neutral-30');
+  });
 });

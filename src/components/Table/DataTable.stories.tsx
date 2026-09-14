@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
+import { Toolbar } from '../Toolbar';
 import { DataTable } from './DataTable';
 import { TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 import { ContactChips, PersonCell, TagList } from './TableCells';
@@ -10,29 +11,14 @@ import { SAMPLE_ROLES, SAMPLE_TEAMS, sampleUsers } from './sampleUsers';
 import type { SampleUser } from './sampleUsers';
 import type { TableColumnDef } from './Table.types';
 
-const USERS = sampleUsers(10001);
+/* Twenty-six, not ten thousand (Pranjal, 2026-09-11: "26 entries is more than
+ * enough"). One more than a page, so the pager has a second page to go to and
+ * Load more has one more to load — which is all the stories need to show. */
+const USERS = sampleUsers(26);
 
-/** The console's own Status glyph: an eight-spoke loader, 14px. */
-const StatusGlyph = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <line x1="12" y1="2" x2="12" y2="6" />
-    <line x1="12" y1="18" x2="12" y2="22" />
-    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
-    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
-    <line x1="2" y1="12" x2="6" y2="12" />
-    <line x1="18" y1="12" x2="22" y2="12" />
-    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
-    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
-  </svg>
-);
+/** The Status mark: the eight-spoke loader, the library's own icon. One icon for the
+ * column heading and the quick-filter square alike (Pranjal, 2026-09-12). */
+const StatusGlyph = () => <Icon name="loader" />;
 
 const TONE = { Active: 'success', Inactive: 'slate', Invited: 'warning' } as const;
 const SOURCE_PALETTE = {
@@ -161,6 +147,12 @@ function UsersTable(
           label: 'Filter by status',
           options: ['Active', 'Inactive', 'Invited'],
           value: (u) => u.status,
+          /* the menu reads like the column: each status as its own pill */
+          renderOption: (v) => (
+            <Badge size="sm" tone={TONE[v as SampleUser['status']]} dot>
+              {v}
+            </Badge>
+          ),
         }}
         filters={[
           {
@@ -254,7 +246,7 @@ const meta: Meta<typeof UsersTable> = {
           '| Insert | With columns hidden, hovering a boundary shows a "+" that puts one back right there. |',
           '| Quick filter | Washes its heading blue-10 and turns the column glyph azure; the glyph becomes the grip on hover. No chips, ever. |',
           '| Pills | Every one is `Badge` at size sm. Pill for status, square for source, teams, roles and "+N". |',
-          '| Pager | Typed page box, first and last, rows per page; thousands get a comma. Or a "Load more" footer. |',
+          '| Pager | Typed page box, first and last, rows per page. Or a "Load more" footer. |',
         ].join('\n'),
       },
     },
@@ -264,7 +256,7 @@ export default meta;
 
 type Story = StoryObj<typeof UsersTable>;
 
-/** 10,001 made-up people with every control live. Column order, hidden columns and widths are remembered in this browser. */
+/** 26 made-up people — one more than a page — with every control live. Column order, hidden columns and widths are remembered in this browser. */
 export const Users: Story = {};
 
 /** The other footer: a count and a "Load more" button that also fires as you scroll near the bottom. */
@@ -290,3 +282,60 @@ export const LighterDividers: Story = { args: { divider: 'light' } };
 
 /** The card as the page: square corners, no side edges, a 24px inset on the end cells, the header and pager pinned while the rows scroll inside. `maxHeight` is the card's height here. The page decides when this happens; see Pieces → Docks On Scroll. */
 export const Docked: Story = { args: { docked: true, maxHeight: 520 } };
+
+/**
+ * **The table on its own.** `toolbar={false}` leaves off the strip above it.
+ *
+ * Use it where the PAGE already carries a toolbar — a screen with a tab strip
+ * puts its controls up there, and a second strip would draw search, Filters,
+ * Sort and Columns twice. The page then supplies its own `Toolbar`, a separate
+ * component that stays connected to this one: it owns the controls, this owns
+ * the rows. Everything inside the card — the frozen columns, the grips, the
+ * heading menus, the pager — is unchanged.
+ */
+export const WithoutToolbar: Story = { args: { toolbar: false } };
+
+/**
+ * **A list that fits on one page has no pager.** Twenty rows at twenty-five a
+ * page: there is no second page to go to, so the strip is not drawn. The
+ * default story above, with twenty-six, is the smallest list that gets one.
+ */
+export const NoPagerNeeded: Story = { args: { rows: USERS.slice(0, 20) } };
+
+/**
+ * **Kept whatever the count.** `pager="always"` holds the strip for a list that
+ * is about to grow, so the footer does not pop in and out as rows come and go.
+ */
+export const PagerAlways: Story = { args: { rows: USERS.slice(0, 8), pager: 'always' } };
+
+/**
+ * **Neither strip.** No toolbar, no pager, a short list — the card alone, which
+ * is what a table inside a panel or a tab body looks like.
+ */
+export const CardOnly: Story = {
+  args: { toolbar: false, pager: 'never', rows: USERS.slice(0, 6) },
+};
+
+/**
+ * **The page owns the strip.** A screen with no tab bar keeps the 60px
+ * `Toolbar` band as page structure and hands the table the ELEMENT; the table
+ * draws its own search, Filters, quick filter, Sort and Columns inside it
+ * (Pranjal, 2026-09-12). Every control works as it does in the table's own
+ * strip, and there is no second copy for the page to keep in step.
+ */
+export const WithThePagesToolbar: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: function WithThePagesToolbarStory() {
+    const [strip, setStrip] = useState<HTMLDivElement | null>(null);
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-bg-background">
+        <Toolbar ref={setStrip} label="User controls">
+          {null}
+        </Toolbar>
+        <div className="mdt-px-6 mdt-pb-5 mdt-pt-1.5">
+          <UsersTable toolbar={strip ?? false} />
+        </div>
+      </div>
+    );
+  },
+};

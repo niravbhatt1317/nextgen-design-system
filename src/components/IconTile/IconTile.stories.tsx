@@ -95,6 +95,7 @@ export const Sizes: Story = {
           <IconTile icon={<Icon name="server" size="sm" />} tone="blue" size="md" />
           <IconTile icon={<Icon name="server" size="md" />} tone="blue" size="lg" />
           <IconTile icon={<Icon name="server" size="lg" />} tone="blue" size="xl" />
+          <IconTile icon={<Icon name="server" size="lg" />} tone="blue" size="2xl" />
         </Row>
       </div>
       <div>

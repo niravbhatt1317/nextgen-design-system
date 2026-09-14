@@ -1,10 +1,10 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1022,
+  "capabilityCount": 1030,
   "counts": {
-    "story": 727,
-    "component": 248,
+    "story": 733,
+    "component": 250,
     "utility": 19,
     "hook": 28
   },
@@ -793,6 +793,16 @@
       "area": "Card",
       "summary": "Full-bleed.",
       "doc": "Full-bleed. Ignores the inset and runs edge to edge, so it is always first.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CardOnly",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / CardOnly",
+      "doc": "Components/Table CardOnly",
       "props": [],
       "propDocs": ""
     },
@@ -1840,8 +1850,8 @@
       "kind": "component",
       "file": "src/components/Table/DataTable.tsx",
       "area": "Table",
-      "summary": "DataTable - the merged console Users table, assembled: the Toolbar strip with search, Filters, a quick filter, Sort and Columns; the table with its frozen row-number, Name and Action columns; a bulk bar; a pager or a \"Load more\" footer; and the loading, empty, first-run and error states.",
-      "doc": "DataTable - the merged console Users table, assembled: the Toolbar strip with search, Filters, a quick filter, Sort and Columns; the table with its frozen row-number, Name and Action columns; a bulk bar; a pager or a \"Load more\" footer; and the loading, empty, first-run and error states. Every pill inside is the library Badge; every control is a ToolbarButton.",
+      "summary": "",
+      "doc": "",
       "props": [
         "label",
         "noun",
@@ -1869,9 +1879,11 @@
         "divider",
         "maxHeight",
         "docked",
+        "toolbar",
+        "pager",
         "className"
       ],
-      "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection: its rows then carry plain numbers that never become checkboxes, and \"Row number\" can be hidden from the Columns panel. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. How tall the rows may grow before they scroll. Once `docked`, the card's own height. The card becomes the page: `true` docked, a number the in-between while the page scrolls it to its dock line. See Table's `docked`"
+      "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. One quick filter, or several — each is its own square in the strip with its own menu, and the row must satisfy every one that has a tick (Pranjal, 2026-09-12: Service accounts filters by Status AND by Organisation, side by side, as version 3 did). Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkAction elements. Leave unset for a table without selection: its rows then carry plain numbers that never become checkboxes, and \"Row number\" can be hidden from the Columns panel. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter neu"
     },
     {
       "name": "DataTableOld",
@@ -5549,6 +5561,16 @@
       "propDocs": ""
     },
     {
+      "name": "NoPagerNeeded",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / NoPagerNeeded",
+      "doc": "Components/Table NoPagerNeeded",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NotCentered",
       "kind": "story",
       "file": "src/components/Container/Container.stories.tsx",
@@ -5815,6 +5837,16 @@
       "area": "Skeleton",
       "summary": "Story: Components/Skeleton / PageLoadingList",
       "doc": "Components/Skeleton PageLoadingList",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "PagerAlways",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / PagerAlways",
+      "doc": "Components/Table PagerAlways",
       "props": [],
       "propDocs": ""
     },
@@ -7766,7 +7798,7 @@
       "summary": "Table - the card that holds a list: rows, a bulk bar and a pager.",
       "doc": "Table - the card that holds a list: rows, a bulk bar and a pager. ```tsx <Table label=\"Users\"> <TableViewport tableWidth={1637} maxHeight={600}> <TableColGroup widths={[60, 200, 100, 217, 200]} /> <TableHeader>…</TableHeader> <TableBody>…</TableBody> </TableViewport> <TablePager … /> </Table> ```",
       "props": ["label", "divider", "docked", "expand", "dockOffset", "children"],
-      "propDocs": "Spoken name of the table. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. The card becomes the page. `true` squares the corners, drops the side edges, grows the first and last cell inset from 16 to 24 and lets the rows scroll inside the card, with the header and pager pinned. A number from 0 to 1 is the in-between while the page scrolls the card up to its dock line; the page decides when, the table only decides how it looks. The page also sets the card's height once docked (`style.height`). Let the table drive its own morph from the page scroll. With this on the table takes the full height under the page’s dock line WHATEVER it holds, so it expands on scroll even holding a single row, and its pager stays on screen instead of floating up under a short list. (Pranjal’s rule, 2026-09-10.) It needs a scrolling ancestor and a dock line to aim at. Inside a `PageFrame` both are already there. `docked` is ignored while this is on. Where the page pins this card, in px. Only needed outside a `PageFrame`; normally the table reads it from the frame’s own published offset."
+      "propDocs": "Spoken name of the table. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. The card becomes the page. `true` squares the corners, drops the side edges, grows the first and last cell inset from 16 to 24 and lets the rows scroll inside the card, with the header and pager pinned. A number from 0 to 1 is the in-between while the page scrolls the card up to its dock line; the page decides when, the table only decides how it looks. The page also sets the card's height once docked (`style.height`). Let the table drive its own morph from the page scroll. **On by default.** The table takes the full height under the page’s dock line WHATEVER it holds, so it expands on scroll even holding a single row, and its pager stays on screen instead of floating up under a short list. (Pranjal’s rule, and his default since 2026-09-10.) It needs a scrolling ancestor and a dock line to aim at. Inside a `PageFrame` both are already there. With neither — a table in a drawer, a modal or a card — nothing happens: it stays an ordinary card and keeps its own max height, so the default is safe wherever the table lands. Give the table a `docked` value instead and the page keep"
     },
     {
       "name": "Table",
@@ -7905,8 +7937,8 @@
       "area": "Table",
       "summary": "One `<col>` per visible column plus the 60px elastic tail.",
       "doc": "One `<col>` per visible column plus the 60px elastic tail.",
-      "props": ["widths"],
-      "propDocs": "Widths in px, one per column, in display order. The 60px tail is added."
+      "props": ["tail", "widths"],
+      "propDocs": "The elastic tail's width; the gutter unless the table has spare to fill. Widths in px, one per column, in display order. The 60px tail is added."
     },
     {
       "name": "TableColumnBoundaryOld",
@@ -8123,6 +8155,26 @@
       "propDocs": ""
     },
     {
+      "name": "TableLeadCell",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "The lead cell: a checkbox where the table selects, the row number where it does not.",
+      "doc": "The lead cell: a checkbox where the table selects, the row number where it does not.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TableLeadHead",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "THE LEAD COLUMN — one 60px slot with two occupants (Pranjal, 2026-09-11).",
+      "doc": "THE LEAD COLUMN — one 60px slot with two occupants (Pranjal, 2026-09-11). A table that can act on many rows at once puts a checkbox here. A table that cannot puts the row number, under a hash. Same slot, same width, same alignment, so a page that later grows bulk actions changes nothing about its columns and a page that loses them leaves no hole. The PAGE does not choose which. It says whether it has bulk actions and this draws the right one — which is the whole reason it is one component and not two the caller has to pick between and keep in step.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TableLoadMore",
       "kind": "component",
       "file": "src/components/Table/TablePager.tsx",
@@ -8167,8 +8219,8 @@
       "kind": "component",
       "file": "src/components/Table/Table.tsx",
       "area": "Table",
-      "summary": "The blank heading over the row numbers; named for screen readers.",
-      "doc": "The blank heading over the row numbers; named for screen readers.",
+      "summary": "",
+      "doc": "",
       "props": ["frozen"],
       "propDocs": ""
     },
@@ -8581,6 +8633,16 @@
       "propDocs": ""
     },
     {
+      "name": "TheLeadColumn",
+      "kind": "story",
+      "file": "src/components/Table/Table.stories.tsx",
+      "area": "Pieces",
+      "summary": "Story: Components/Table/Pieces / TheLeadColumn",
+      "doc": "Components/Table/Pieces TheLeadColumn",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TheWholeStack",
       "kind": "story",
       "file": "src/components/PageFrame/PageFrame.stories.tsx",
@@ -8825,7 +8887,7 @@
       "file": "src/components/Toolbar/Toolbar.tsx",
       "area": "Toolbar",
       "summary": "Toolbar - the strip above a list: search, filters, then sort and columns on the right.",
-      "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"list-filter\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
+      "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"funnel\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
       "props": ["children", "label"],
       "propDocs": "The controls. Put the right-hand run in a ToolbarSection after a ToolbarSpacer. The strip's spoken name. @default 'Toolbar'"
     },
@@ -10359,6 +10421,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithoutToolbar",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / WithoutToolbar",
+      "doc": "Components/Table WithoutToolbar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithPagination",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -10525,6 +10597,16 @@
       "area": "ToggleGroup",
       "summary": "Story: Components/ToggleGroup / WithTextLabels",
       "doc": "Components/ToggleGroup WithTextLabels",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithThePagesToolbar",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: Components/Table / WithThePagesToolbar",
+      "doc": "Components/Table WithThePagesToolbar",
       "props": [],
       "propDocs": ""
     },
