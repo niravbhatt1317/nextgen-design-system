@@ -1,9 +1,9 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1030,
+  "capabilityCount": 1036,
   "counts": {
-    "story": 733,
+    "story": 739,
     "component": 250,
     "utility": 19,
     "hook": 28
@@ -306,6 +306,16 @@
       "area": "ScrollArea",
       "summary": "Story: Components/ScrollArea / AlwaysVisible",
       "doc": "Components/ScrollArea AlwaysVisible",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AnEmptySurface",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / AnEmptySurface",
+      "doc": "Foundation/Page structure AnEmptySurface",
       "props": [],
       "propDocs": ""
     },
@@ -3265,6 +3275,16 @@
       "area": "Table Old Cell Recipes",
       "summary": "Story: Deprecated/Table Old Cell Recipes / EmptyValueRecipe",
       "doc": "Deprecated/Table Old Cell Recipes EmptyValueRecipe",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "EvenOneRowExpands",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / EvenOneRowExpands",
+      "doc": "Foundation/Page structure EvenOneRowExpands",
       "props": [],
       "propDocs": ""
     },
@@ -8623,6 +8643,16 @@
       "propDocs": ""
     },
     {
+      "name": "TheCardBecomesThePage",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / TheCardBecomesThePage",
+      "doc": "Foundation/Page structure TheCardBecomesThePage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TheHeaderLine",
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
@@ -8639,6 +8669,16 @@
       "area": "Pieces",
       "summary": "Story: Components/Table/Pieces / TheLeadColumn",
       "doc": "Components/Table/Pieces TheLeadColumn",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TheRowsTakeOverTheScroll",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / TheRowsTakeOverTheScroll",
+      "doc": "Foundation/Page structure TheRowsTakeOverTheScroll",
       "props": [],
       "propDocs": ""
     },
@@ -9721,6 +9761,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithAPageBanner",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / WithAPageBanner",
+      "doc": "Foundation/Page structure WithAPageBanner",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithArrow",
       "kind": "story",
       "file": "src/components/HoverCard/HoverCard.stories.tsx",
@@ -10067,6 +10117,16 @@
       "area": "Textarea",
       "summary": "Story: Components/Textarea / WithError",
       "doc": "Components/Textarea WithError",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithFilterChips",
+      "kind": "story",
+      "file": "src/components/PageFrame/PageFrame.stories.tsx",
+      "area": "Page structure",
+      "summary": "Story: Foundation/Page structure / WithFilterChips",
+      "doc": "Foundation/Page structure WithFilterChips",
       "props": [],
       "propDocs": ""
     },
