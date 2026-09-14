@@ -1,5 +1,100 @@
 # Changelog
 
+## 0.6.0
+
+### Minor Changes
+
+- bb99ce1: IconTile: a `2xl` size (56, glyph 24, radius 12 when square) - the identity mark at the top of an object drawer, the height of the 56 avatar Users puts there.
+- 4a13a21: Table: `expand` — the table drives its own morph **by default**, and one row behaves like a thousand
+
+  Until now the Table only _rendered_ a morph value someone else computed. Its own
+  documentation said so: "the page decides when, the table only decides how it
+  looks. The page also sets the card's height once docked." That left Pranjal's
+  rule living in whoever called the table rather than in the table.
+
+  `expand` moves it inside, and it is **on unless you turn it off** — a rule that
+  has to be remembered at every call site is a rule that gets forgotten at one of
+  them. Every table:
+  - takes the full height under the page's dock line **whatever it holds**
+  - widens to the page as it reaches that line, and hands the scroll to its rows
+  - keeps its pager on screen instead of letting it float up under a short list
+
+  One rule, two consequences, and neither can now be got wrong by a caller: a
+  table expands on scroll **even holding a single row**, and a filtered-down list
+  does not suddenly behave like a different component.
+
+  The dock line is read from the page rather than typed: the frame's own published
+  offset where that is a plain value, otherwise the band heights it is derived
+  from — so changing a band height cannot leave the table docking in the wrong
+  place. `dockOffset` is there for pages that are not a `PageFrame`.
+
+  ### What the default does not touch
+
+  The default is safe wherever a table lands because it only engages once it has
+  actually found a page to fill — a scrolling ancestor, and room under the dock
+  line worth taking. A table in a drawer, a modal or a card finds neither, stays
+  an ordinary card and keeps its own `maxHeight`, exactly as before.
+
+  A scrolling box that is **taller than the window** does not count as a page
+  either. That is a box growing with its content, not a viewport — the gallery's
+  own docs page wraps every story in one — and filling it ratchets: the table
+  stretches to the box, the box grows to the table, again and again, until every
+  table on the page is 8,000px tall. The table skips such a box and keeps looking
+  upward, and a page with no real scroller above the table stays an ordinary card.
+
+  `docked` also keeps its exact contract: pass one and the page keeps the job of
+  driving the morph, because `expand` stands down unless it is passed explicitly
+  alongside. `expand={false}` opts out of everything.
+
+  ### What it does change
+
+  Any table sitting directly in a scrolling page now fills the height under its
+  dock line instead of ending where its rows end. That is the point of the change,
+  and it is visible on every list at once — including lists nobody had got round
+  to switching on.
+
+- bb99ce1: Table: the lead column is one thing with two faces — a checkbox where the table has bulk actions, a row number under a `#` where it does not.
+  - `TableLeadHead` / `TableLeadCell` are new. Pass `selectable` and they draw the right face; a page declares whether it acts on many rows and the component does the rest.
+  - The heading over the row numbers now shows `#`. It used to be blank by design, which read as a column somebody forgot to label.
+  - Story: Table → Pieces → The lead column, both faces side by side.
+
+- bb99ce1: DataTable: one icon for a quick filter, and pills in its menu.
+  - The quick-filter square wears the glyph of the column it filters unless given its own icon, so the strip and the heading always show one mark.
+  - `quickFilter.renderOption` draws each value in the menu the way the page asks — Users draws each status as its own Badge, so the menu reads like the column.
+  - The Users story's Status mark is the library's own eight-spoke `loader` icon, on the heading and the square alike.
+
+- bb99ce1: Table: the pager strip only appears when there is something to page.
+
+  `pager="auto"` (the default) draws it once there IS a second page — 25 rows at 25 a page have none, 26 have one — and never while loading or in a blank state, where six disabled controls under an empty table were furniture and the blank state already carries the message. A "Load more" footer likewise goes once everything is loaded. `pager="always"` keeps the strip for a list about to grow; `pager="never"` drops it for a list that shows all it has.
+
+- bb99ce1: DataTable: `quickFilter` takes one quick filter or several — each gets its own square and menu in the strip, and a row must satisfy every one that has a tick. A filter's `value` may return several strings; the row passes when any of them is ticked (a service account's home organisation and its reach).
+- bb99ce1: Toolbar and DataTable: three details of the strip, by ruling.
+  - **Every quick-filter row carries a checkbox**, on or off, like the Filters panel's rows: a person sees at a glance which values are on and that several can be. The menu's own tick, which only appeared once checked, gives way to the box.
+  - **The Filters button wears Tabler's funnel.** A new `funnel` icon joins the set — Tabler's `filter`, inlined — and every Filters button in the library draws it in place of the three lines.
+  - **A search box inside a Toolbar wears the strip's border**, the same neutral-30 as a ToolbarButton, so the pair reads as one family of controls.
+
+- bb99ce1: DataTable: `toolbar` can take the page's own Toolbar element.
+
+  A page with no tab strip keeps the 60px `Toolbar` band as page structure. Hand its element to the table (`toolbar={stripEl}`) and the table draws its own search, Filters, quick filter, Sort and Columns inside it instead of in a strip of its own — every control keeps working, and the page has no copy to keep in step. `true` still draws the table's own strip; `false` still draws none. Use a callback ref or state for the element so the table sees it once it exists.
+
+- bb99ce1: Table: `toolbar={false}` — the table without its own strip above it.
+
+  On a screen with a tab strip the page carries its own toolbar up there, and a second strip on the table would draw search, Filters, Sort and Columns twice. Pass `toolbar={false}` and the page supplies its own `Toolbar` instead; everything inside the card — frozen columns, grips, heading menus, pager — is unchanged. On by default.
+
+- bb99ce1: Table: three rules the card and its columns now keep.
+  - **The reshaping runs over the travel the card actually has.** It was measured against a flat 140px, so a card starting 81px above its dock line rested 42% reshaped, corners half flattened before anyone scrolled. Every card now rests at 0 and reaches 1 exactly at the dock line, however far from it it starts.
+  - **A declared column width is held to the minimum (120)**, the same floor the resize handle keeps. A page can no longer declare 110 and get it.
+  - **Spare width is shared equally among the content columns**, so a wide card shows wider columns rather than a blank run past the last one. The lead, Name and Action columns keep their ruled widths; a card narrower than its columns still scrolls sideways.
+
+### Patch Changes
+
+- bb99ce1: IconTile: the tile sizes its own glyph — 14 in the 24px tile, 16 in 32, 20 in 40, 24 in 48. A page no longer has to know the ratio, and an icon that arrives at its default 20px no longer overflows the small tile.
+- bb99ce1: Input: the border is neutral-30 (neutral-110 in dark), the same edge as the outline Button and the Toolbar's controls. The Toolbar had been forcing that colour onto any input inside it; an Input anywhere else - a search above a table in a drawer - came out darker (the --mdt-input token, neutral-40).
+- bb99ce1: DataTable: the Name column resizes like any content column - drag or arrow keys on its heading, a floor of 160 (nameColumn.minWidth overrides it), the shared 720 ceiling, and the width is remembered under the table's storageKey with the other widths. The lead column (checkbox or row number) and Action stay fixed. useTableColumns gains hasWidth(key).
+- bb99ce1: DataTable: the column resize handle sits fully inside its own heading (12px ending at the boundary line). It used to straddle the boundary, and because every heading is sticky with a z-index the next heading painted over its far half - only about three pixels could be grabbed with the mouse.
+- bb99ce1: Table: the table's own toolbar sits flush with the card's edges — the search box starts where the card starts, the last button ends where it ends — is only as tall as its controls, and keeps 16px to the card. A standalone `Toolbar` keeps its 60px band and 24px inset; a table without its own toolbar leaves the spacing to the page's structure.
+- bb99ce1: DataTable: widening one column never narrows another. At rest the content columns share the card's spare width; the first drag freezes every column at its rendered width, after which the elastic tail takes the spare and the table scrolls sideways when the columns outgrow the card. Reset columns brings the sharing back. useTableColumns gains hasAnyWidth and setWidths; TableColGroup takes a tail width.
+
 ## 0.5.1
 
 ### Patch Changes
