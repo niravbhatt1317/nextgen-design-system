@@ -38,9 +38,35 @@ const startingTheme = getInitialTheme();
 // `satisfies` keeps the type checking and the parser strips it before reading.
 export default {
   parameters: {
-    // Alphabetical, so a new component turns up where its name says it should.
     options: {
-      storySort: { method: 'alphabetical', locales: 'en-US' },
+      // `order` names the top-level groups; `method` sorts everything it does
+      // not name, so a new component still turns up where its name says it
+      // should. The array has to be a literal here for the same reason this
+      // whole object is - the parser reads it as text and cannot follow a
+      // variable.
+      //
+      // Foundation leads because it is what the system is made of: the tokens,
+      // the colour families, the page structure. A designer opening this for
+      // the first time landed in Accordion, which tells them nothing about how
+      // anything here is built.
+      //
+      // The rest is a gradient from "use this" to "do not", which is the only
+      // question a reader actually has:
+      //
+      //   Components       use this
+      //   On the way out   do not START anything new with this - and unlike
+      //                    Deprecated, there is nowhere else to go yet, which
+      //                    is exactly why it is a separate group and not a
+      //                    footnote on each component
+      //   Deprecated       do not use this, use the named replacement
+      //
+      // A group with no stories in it does not appear, so naming one here
+      // before anything moves costs nothing.
+      storySort: {
+        order: ['Foundation', 'Components', 'Layout', 'On the way out', 'Deprecated'],
+        method: 'alphabetical',
+        locales: 'en-US',
+      },
     },
     controls: {
       matchers: {
