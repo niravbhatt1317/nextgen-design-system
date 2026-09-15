@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Item } from './Item';
 
 const meta: Meta<typeof Item> = {
-  title: 'Components/Item',
+  title: 'Deprecated/Item',
   component: Item,
   tags: ['autodocs'],
   parameters: {

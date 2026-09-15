@@ -42,6 +42,14 @@ export const itemVariants = cva(
 );
 
 /**
+
+ * @deprecated Since 0.7.0. No replacement — compose the row you need.
+ *
+ * Nothing in this library has ever used it, and the rows that do exist — the
+ * dropdown's, the command palette's, the table's — each build their own. A
+ * general-purpose row that no specific row is built from is a fifth way to do
+ * the thing, not the one way.
+ *
  * Item component - a flexible list item for menus, dropdowns, and lists.
  *
  * @example

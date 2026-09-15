@@ -5,6 +5,13 @@ import { cn } from '@/utils';
 import type { OTPInputProps } from './OTPInput.types';
 
 /**
+
+ * @deprecated Since 0.7.0. No replacement in this library.
+ *
+ * A one-time-password field nothing here uses. It is a product concern rather
+ * than a design-system one — the rules about length, resend and expiry belong
+ * to whoever owns the sign-in flow.
+ *
  * OTPInput - One-Time Password input component
  *
  * A fully accessible OTP input component with the following features:
