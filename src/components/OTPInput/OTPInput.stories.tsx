@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { OTPInput } from './OTPInput';
 
 const meta: Meta<typeof OTPInput> = {
-  title: 'Components/OTPInput',
+  title: 'Deprecated/OTPInput',
   component: OTPInput,
   tags: ['autodocs'],
   parameters: {

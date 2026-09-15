@@ -20,7 +20,7 @@ import { AiMark } from './AiMark';
  * which is what made it a pattern worth saving rather than two one-off fills.
  */
 const meta: Meta<typeof AiMark> = {
-  title: 'Components/AiMark',
+  title: 'Deprecated/AiMark',
   component: AiMark,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

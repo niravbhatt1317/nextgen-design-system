@@ -9,7 +9,8 @@
 // every single pull request. Alphabetical insertion puts two new components
 // hundreds of lines apart, and git merges them without a word.
 
-// AiMark
+// AiMark - the gradient AI mark. DEPRECATED 2026-09-15: no replacement yet;
+// Toast still draws it for its `ai` tone and has to move off it first.
 export { AiMark } from './AiMark';
 export type { AiMarkProps, AiMarkVariant, AiMarkAppearance, AiMarkSize } from './AiMark';
 
@@ -80,7 +81,8 @@ export type { ButtonOldProps, ButtonOldVariantsType } from './ButtonOld';
 export { ButtonGroup, buttonGroupVariants } from './ButtonGroup';
 export type { ButtonGroupProps, ButtonGroupVariants } from './ButtonGroup';
 
-// Callout
+// Callout - the tinted inline message. DEPRECATED 2026-09-15: use Banner, which
+// is the same surface with six tones instead of three.
 export { Callout, calloutVariants } from './Callout';
 export type { CalloutProps, CalloutTone, CalloutSize, CalloutVariant } from './Callout';
 
@@ -305,7 +307,8 @@ export type {
   InputGroupTextareaProps,
 } from './InputGroup';
 
-// Item
+// Item - a general-purpose row. DEPRECATED 2026-09-15: no replacement; every row
+// that exists here builds its own.
 export { Item, itemVariants } from './Item';
 export type { ItemProps, ItemVariants } from './Item';
 
@@ -326,7 +329,8 @@ export type {
 export { Label, labelVariants } from './Label';
 export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
 
-// OTPInput
+// OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
+// the length, resend and expiry rules belong to the sign-in flow, not here.
 export { OTPInput } from './OTPInput';
 export type { OTPInputProps } from './OTPInput';
 

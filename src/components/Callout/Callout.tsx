@@ -76,6 +76,15 @@ const TITLE_SIZE: Record<CalloutSize, string> = {
 };
 
 /**
+
+ * @deprecated Since 0.7.0. Use `Banner` instead.
+ *
+ * `Banner` is this surface with more of it: six tones against this one's three,
+ * and the same `title`, `icon`, `actions` and `onDismiss`. Two components drew
+ * the same tinted message from the same tone table, which is the second way to
+ * do a thing this library treats as a defect. Kept until 1.0.0 so callers can
+ * move without a breaking release.
+ *
  * Callout - a tinted block that says something about the content around it.
  *
  * **It is already there when you arrive.** That is the whole difference from

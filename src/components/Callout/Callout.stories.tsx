@@ -17,7 +17,7 @@ import { Callout } from './Callout';
  * so a seventh tone is one edit rather than two that drift.
  */
 const meta: Meta<typeof Callout> = {
-  title: 'Components/Callout',
+  title: 'Deprecated/Callout',
   component: Callout,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },

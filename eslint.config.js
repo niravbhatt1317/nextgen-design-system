@@ -199,6 +199,18 @@ export default tseslint.config(
       'src/components/Sheet/Sheet.stories.tsx',
       // DataTable still renders the deprecated strip and chips until the table port (2026-09-04)
       'src/components/index.ts',
+      // Deprecated 2026-09-15. Each still has to name itself in its own file, its
+      // barrel and its stories.
+      '**/AiMark/**',
+      '**/Callout/**',
+      '**/Item/**',
+      '**/OTPInput/**',
+      // NOT a "must reference it" case, and the only one here that is debt rather
+      // than bookkeeping: `Toast` draws `AiMark` for its `ai` tone, so a live
+      // component depends on one that is on its way out. This is the entry to
+      // delete once Toast has something else to draw - which is also the thing
+      // that unblocks removing AiMark at all.
+      'src/components/Toast/ToastBody.tsx',
     ],
     rules: {
       '@typescript-eslint/no-deprecated': 'off',

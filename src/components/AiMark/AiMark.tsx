@@ -70,6 +70,15 @@ const SIZES: Record<AiMarkSize, string> = {
 };
 
 /**
+
+ * @deprecated Since 0.7.0. No replacement yet.
+ *
+ * **`Toast` still draws this for its `ai` tone**, so it cannot simply go: that
+ * has to move first, and nothing has been chosen for it to move to. This records
+ * the intent and the debt in one place rather than letting the component look
+ * current while it is on its way out. For the AI treatment in new work, the
+ * `Button` `ai` variant and the `ai` tone on `Banner` both supply their own mark.
+ *
  * AiMark - the gradient mark that means "this is AI".
  *
  * **A mark, not an icon, which is why it is not in the icon set.** Every
