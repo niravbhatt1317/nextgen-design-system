@@ -199,7 +199,8 @@ const SheetContent = forwardRef<
                * pointer with the glyph in the primary colour; a primary ring with the field's halo on keyboard focus
                * only - the content auto-focuses this button on open, and a plain :focus ring lit up every time */
               'mdt-absolute mdt-right-2.5 mdt-top-2.5 mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
-              'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-text-neutral-90 mdt-transition-colors',
+              /* corners 6: the console's 28-high controls all sit at 6 (rounded-md is 8 here) */
+              'mdt-rounded-[6px] mdt-border-0 mdt-bg-transparent mdt-text-neutral-90 mdt-transition-colors',
               'hover:mdt-bg-neutral-20 hover:mdt-text-primary',
               'focus-visible:mdt-shadow-[0_0_0_1px_hsl(var(--mdt-primary)),0_0_0_4px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
               'disabled:mdt-pointer-events-none disabled:mdt-text-neutral-40'
