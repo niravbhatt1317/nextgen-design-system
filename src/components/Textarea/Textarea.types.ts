@@ -25,6 +25,12 @@ export interface TextareaProps
    */
   helperText?: string;
   /**
+   * A held field (Pranjal, 2026-09-17): disabled, with a lock inside at the right - 14 like the search glyph, 12 from
+   * the edge, in the disabled text colour - and the value truncating before it. For a value something else owns (a
+   * directory, a fixed identity); the label above stays plain.
+   */
+  locked?: boolean;
+  /**
    * Wrapper className for the container div
    */
   wrapperClassName?: string;

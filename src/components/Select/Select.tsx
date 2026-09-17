@@ -271,6 +271,7 @@ function renderSingleSelectMode(props: {
   prefixIcon?: ReactNode;
   placeholder?: string;
   _clearable: boolean;
+  locked: boolean;
   position: 'item-aligned' | 'popper';
   placement: 'bottom' | 'overlay';
   maxHeight: number;
@@ -306,6 +307,7 @@ function renderSingleSelectMode(props: {
     prefixIcon,
     placeholder,
     _clearable,
+    locked,
     position,
     placement,
     maxHeight,
@@ -361,8 +363,8 @@ function renderSingleSelectMode(props: {
               {prefixIcon}
             </span>
           )}
-          <SelectPrimitive.Value placeholder={placeholder} />
-          {renderSingleSelectIcons({ _clearable, singleValue, handleValueChange, variant })}
+          <SelectPrimitive.Value placeholder={placeholder} className="mdt-truncate" />
+          {renderSingleSelectIcons({ _clearable, singleValue, handleValueChange, variant, locked })}
         </SelectPrimitive.Trigger>
 
         <SelectPrimitive.Portal>
@@ -458,8 +460,18 @@ function renderSingleSelectIcons(props: {
   singleValue: string | null | undefined;
   handleValueChange: (value: string | null) => void;
   variant: SelectTriggerVariant;
+  locked: boolean;
 }) {
-  const { _clearable, singleValue, handleValueChange, variant } = props;
+  const { _clearable, singleValue, handleValueChange, variant, locked } = props;
+
+  /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron - a held field cannot open */
+  if (locked) {
+    return (
+      <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-neutral-70">
+        <Icon name="lock" size={14} aria-hidden />
+      </span>
+    );
+  }
 
   return (
     <span className="mdt-group/icon mdt-relative mdt-flex mdt-shrink-0 mdt-items-center">
@@ -550,7 +562,8 @@ function renderPill(
           e.stopPropagation();
           handlePillRemove(option.value.toString());
         }}
-        className="mdt-hover:bg-accent mdt-hover:text-accent-foreground mdt-ml-0.5 mdt-cursor-pointer mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0"
+        /* a disabled or held trigger offers no removal (the field mock, 2026-09-17) */
+        className="mdt-hover:bg-accent mdt-hover:text-accent-foreground mdt-ml-0.5 mdt-cursor-pointer mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 group-disabled:mdt-hidden"
       >
         <Icon name="x" size={12} aria-hidden />
       </button>
@@ -692,6 +705,7 @@ function renderDefaultMultiSelectTrigger(props: {
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
   placeholder: string;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): ReactNode {
   const {
@@ -715,10 +729,11 @@ function renderDefaultMultiSelectTrigger(props: {
     _renderPillHoverCard,
     placeholder,
     _clearable,
+    locked,
     handleClearAll,
   } = props;
 
-  const showClearButton = _clearable && selectedOptions.length > 0;
+  const showClearButton = _clearable && selectedOptions.length > 0 && !locked;
 
   return (
     <button
@@ -760,15 +775,20 @@ function renderDefaultMultiSelectTrigger(props: {
           <Icon name="x" size={16} aria-hidden />
         </button>
       )}
-      <Icon
-        name="chevron-down"
-        size={16}
-        className={cn(
-          SHRINK_TRANSITION_OPACITY,
-          variant === 'borderless' ? OPACITY_HIDDEN_ON_HOVER : 'mdt-opacity-50'
-        )}
-        aria-hidden
-      />
+      {locked ? (
+        /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron */
+        <Icon name="lock" size={14} className="mdt-shrink-0 mdt-text-neutral-70" aria-hidden />
+      ) : (
+        <Icon
+          name="chevron-down"
+          size={16}
+          className={cn(
+            SHRINK_TRANSITION_OPACITY,
+            variant === 'borderless' ? OPACITY_HIDDEN_ON_HOVER : 'mdt-opacity-50'
+          )}
+          aria-hidden
+        />
+      )}
     </button>
   );
 }
@@ -1527,6 +1547,7 @@ function buildSingleSelectProps(params: {
   prefixIcon: ReactNode | undefined;
   placeholder: string | undefined;
   _clearable: boolean;
+  locked: boolean;
   position: 'item-aligned' | 'popper';
   placement: 'bottom' | 'overlay';
   maxHeight: number;
@@ -1550,6 +1571,7 @@ function buildSingleSelectProps(params: {
     errorId: params.errorId,
     helperId: params.helperId,
     _clearable: params._clearable,
+    locked: params.locked,
     position: params.position,
     placement: params.placement,
     maxHeight: params.maxHeight,
@@ -1611,6 +1633,7 @@ function buildMultiSelectTriggerProps(params: {
   _pillHoverCard: boolean;
   _renderPillHoverCard: ((props: { option: SelectOption }) => ReactNode) | undefined;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): Parameters<typeof createMultiSelectTrigger>[0] {
   const result: Parameters<typeof createMultiSelectTrigger>[0] = {
@@ -1630,6 +1653,7 @@ function buildMultiSelectTriggerProps(params: {
     handlePillRemove: params.handlePillRemove,
     _pillHoverCard: params._pillHoverCard,
     _clearable: params._clearable,
+    locked: params.locked,
     handleClearAll: params.handleClearAll,
   };
 
@@ -1931,6 +1955,7 @@ function createMultiSelectTrigger(props: {
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): ReactNode {
   const {
@@ -1956,6 +1981,7 @@ function createMultiSelectTrigger(props: {
     _pillHoverCard,
     _renderPillHoverCard,
     _clearable,
+    locked,
     handleClearAll,
   } = props;
 
@@ -1990,6 +2016,7 @@ function createMultiSelectTrigger(props: {
     ...(_renderPillHoverCard && { _renderPillHoverCard }),
     placeholder,
     _clearable,
+    locked,
     handleClearAll,
   });
 }
@@ -2035,7 +2062,9 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       size = 'md',
       variant = 'default',
       placement = 'bottom',
-      disabled = false,
+      disabled: disabledProp = false,
+      /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock in place of the chevron */
+      locked = false,
       required = false,
       error,
       label,
@@ -2105,6 +2134,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
     }: SelectProps<T>,
     ref: React.Ref<HTMLButtonElement>
   ) => {
+    const disabled = disabledProp || locked;
     // Generate IDs
     const generatedId = useId();
     const selectId = propId ?? generatedId;
@@ -2212,6 +2242,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
         prefixIcon,
         placeholder,
         _clearable,
+        locked,
         position,
         placement,
         maxHeight,
@@ -2263,6 +2294,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       _pillHoverCard,
       _renderPillHoverCard,
       _clearable,
+      locked,
       handleClearAll,
     });
     const triggerElement = createMultiSelectTrigger(triggerProps);

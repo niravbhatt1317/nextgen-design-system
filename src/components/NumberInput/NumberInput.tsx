@@ -1,6 +1,7 @@
 import { forwardRef, useId, useRef } from 'react';
 import type { ChangeEvent, InputHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/utils';
+import { Icon } from '../Icon';
 import { InputVariants } from '../Input/Input';
 
 /**
@@ -32,6 +33,8 @@ export interface NumberInputProps extends Omit<
   size?: 'sm' | 'md' | 'lg' | undefined;
   /** Class name for the outer wrapper */
   wrapperClassName?: string | undefined;
+  /** A held field (Pranjal, 2026-09-17): disabled, the lock inside in place of the stepper */
+  locked?: boolean | undefined;
 }
 
 const Chevron = ({ up }: { up: boolean }) => (
@@ -63,6 +66,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       min,
       max,
       disabled,
+      locked,
       className,
       wrapperClassName,
       id: idProp,
@@ -70,6 +74,8 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref
   ) => {
+    const held = Boolean(locked);
+    const off = Boolean(disabled) || held;
     const generatedId = useId();
     const id = idProp ?? generatedId;
     const errorId = `${id}-error`;
@@ -84,7 +90,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     const stepBy = (direction: 1 | -1) => {
-      if (disabled) return;
+      if (off) return;
       const current = Number(inner.current?.value ?? value ?? 0) || 0;
       let next = current + direction * step;
       if (typeof min === 'number') next = Math.max(min, next);
@@ -111,43 +117,51 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             min={min}
             max={max}
             step={step}
-            disabled={disabled}
+            disabled={off}
             onChange={(e: ChangeEvent<HTMLInputElement>) => onChange?.(e.target.value)}
             className={cn(
               InputVariants({ size, hasError }),
               'mdt-pr-[30px] mdt-tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:mdt-appearance-none [&::-webkit-outer-spin-button]:mdt-appearance-none',
+              /* held: the lock takes the stepper's place - 34 at the right, the value ends in an ellipsis */
+              held && 'mdt-text-ellipsis mdt-pr-[34px]',
               className
             )}
             aria-invalid={hasError}
             aria-describedby={error ? errorId : helperText ? helperId : undefined}
             {...props}
           />
-          <span className="mdt-absolute mdt-right-1 mdt-top-1/2 mdt-flex -mdt-translate-y-1/2 mdt-flex-col mdt-gap-px">
-            <button
-              type="button"
-              tabIndex={-1}
-              aria-label="Increase"
-              disabled={disabled}
-              className={stepButton}
-              onClick={() => {
-                stepBy(1);
-              }}
-            >
-              <Chevron up />
-            </button>
-            <button
-              type="button"
-              tabIndex={-1}
-              aria-label="Decrease"
-              disabled={disabled}
-              className={stepButton}
-              onClick={() => {
-                stepBy(-1);
-              }}
-            >
-              <Chevron up={false} />
-            </button>
-          </span>
+          {held ? (
+            <span className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-neutral-70">
+              <Icon name="lock" size={14} aria-hidden />
+            </span>
+          ) : (
+            <span className="mdt-absolute mdt-right-1 mdt-top-1/2 mdt-flex -mdt-translate-y-1/2 mdt-flex-col mdt-gap-px">
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label="Increase"
+                disabled={off}
+                className={stepButton}
+                onClick={() => {
+                  stepBy(1);
+                }}
+              >
+                <Chevron up />
+              </button>
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label="Decrease"
+                disabled={off}
+                className={stepButton}
+                onClick={() => {
+                  stepBy(-1);
+                }}
+              >
+                <Chevron up={false} />
+              </button>
+            </span>
+          )}
         </div>
         {error && (
           <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">

@@ -11,8 +11,11 @@ import { Input } from './Input';
  * mock "Input fields"). 32 high, corners 8, the text 13 in neutral-90, the
  * placeholder in neutral-70, a neutral-30 border. Under the pointer the border
  * turns to the primary colour; focused, the same border with a soft 3-px halo
- * of it. Disabled sits on neutral-10 in the placeholder colour. An error keeps
- * the danger border and turns the halo red. Hover and focus are live here -
+ * of it. Disabled sits on neutral-10 in the placeholder colour. Held is a
+ * disabled field something else owns: the lock inside at the right, 14 like
+ * the search glyph, 12 from the edge, the value truncating before it, the lock
+ * in place of the chevron or the stepper. An error keeps the danger border and
+ * turns the halo red. Hover and focus are live here -
  * move the pointer over a field, click into it.
  */
 const meta = {
@@ -22,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'One field, six kinds, four resting states. Hover and focus are live: move the pointer over a field and click into it. The search keeps 12 to its glyph, 6 to the text, 12 at the right. The number field draws its own stepper. The multi-select shows the first pick as a pill and folds the rest into a +N badge; a long first pick truncates.',
+          'One field, six kinds, five resting states. Hover and focus are live: move the pointer over a field and click into it. Held is a disabled field something else owns - the lock sits inside at the right (14, 12 from the edge) and the value truncates before it. The search keeps 12 to its glyph, 6 to the text, 12 at the right. The number field draws its own stepper. The multi-select shows the first pick as a pill and folds the rest into a +N badge; a long first pick truncates.',
       },
     },
   },
@@ -45,7 +48,7 @@ const PEOPLE = [
   'Enterprise Sales Operations Leadership Team',
 ].map((name) => ({ value: name, label: name }));
 
-const COLUMNS = ['Default', 'Filled', 'Disabled', 'Error'] as const;
+const COLUMNS = ['Default', 'Filled', 'Disabled', 'Held', 'Error'] as const;
 
 function Row({ kind, cells }: { kind: string; cells: React.ReactNode[] }) {
   return (
@@ -82,7 +85,7 @@ function Matrix() {
   const single = (v: string | string[] | null) => (Array.isArray(v) ? (v[0] ?? null) : v);
   const many = (v: string | string[] | null) => (Array.isArray(v) ? v : v === null ? [] : [v]);
   return (
-    <div className="mdt-grid mdt-grid-cols-[120px_repeat(4,220px)] mdt-gap-x-6 mdt-gap-y-7">
+    <div className="mdt-grid mdt-grid-cols-[120px_repeat(5,220px)] mdt-gap-x-6 mdt-gap-y-7">
       <div />
       {COLUMNS.map((c) => (
         <div
@@ -105,6 +108,13 @@ function Matrix() {
             }}
           />,
           <Input key="c" label="Email" value="emily.davis@company.com" disabled readOnly />,
+          <Input
+            key="h"
+            label="Email"
+            value="alexandra.konstantinopoulos-whitfield@company.com"
+            locked
+            readOnly
+          />,
           <Input
             key="d"
             label="Team name"
@@ -150,6 +160,13 @@ function Matrix() {
             disabled
             aria-label="Search grants"
           />,
+          <Input
+            key="h"
+            placeholder="Search grants"
+            startAdornment={<Icon name="search" size={14} />}
+            locked
+            aria-label="Search grants"
+          />,
           <div key="d" className="mdt-pt-2 mdt-text-xs mdt-text-neutral-70">
             — a search has no error
           </div>,
@@ -161,6 +178,7 @@ function Matrix() {
           <NumberInput key="a" label="Maximum uses" placeholder="0" min={0} />,
           <NumberInput key="b" label="Maximum uses" value={count} onChange={setCount} min={0} />,
           <NumberInput key="c" label="Maximum uses" value="10" disabled />,
+          <NumberInput key="h" label="Maximum uses" value="10" locked />,
           <NumberInput key="d" label="Maximum uses" value="0" error="Must be at least 1" min={1} />,
         ]}
       />
@@ -193,6 +211,14 @@ function Matrix() {
             disabled
           />,
           <Select
+            key="h"
+            mode="single"
+            label="Link expires after"
+            options={DAYS}
+            value="14"
+            locked
+          />,
+          <Select
             key="d"
             mode="single"
             label="Link expires after"
@@ -223,6 +249,13 @@ function Matrix() {
             label="Description"
             value="Technical support team for internal systems and devices"
             disabled
+            readOnly
+          />,
+          <Textarea
+            key="h"
+            label="Description"
+            value="Technical support team for internal systems and devices"
+            locked
             readOnly
           />,
           <Textarea key="d" label="Description" error="A description is required" />,
@@ -278,6 +311,15 @@ function Matrix() {
             value={['Natasha Manglore', 'Sarah Johnson', 'Michael Smith']}
             showPills
             disabled
+          />,
+          <Select
+            key="h"
+            mode="multiple"
+            label="Owner"
+            options={PEOPLE}
+            value={['Natasha Manglore', 'Sarah Johnson', 'Michael Smith']}
+            showPills
+            locked
           />,
           <Select
             key="d"

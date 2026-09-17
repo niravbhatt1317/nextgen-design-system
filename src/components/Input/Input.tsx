@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef, useId } from 'react';
 import { cn } from '@/utils';
+import { Icon } from '../Icon';
 import type { InputProps } from './Input.types';
 
 /**
@@ -75,6 +76,9 @@ export const InputVariants = cva(
  *   startAdornment={<IconSearch />}
  *   placeholder="Search..."
  * />
+ *
+ * // A held field: disabled, the lock inside at the right
+ * <Input label="Email" value="emily.davis@company.com" locked readOnly />
  * ```
  */
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -88,6 +92,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       helperText,
       startAdornment,
       endAdornment,
+      locked,
+      disabled,
       id: propId,
       ...props
     },
@@ -98,6 +104,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const errorId = `${id}-error`;
     const helperId = `${id}-helper`;
     const hasError = Boolean(error);
+    /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock inside at the right, the value truncating before it */
+    const held = Boolean(locked);
 
     // Determine aria-describedby value
     let describedBy: string | undefined;
@@ -128,16 +136,25 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               /* 12 to the glyph, 6 to the text, 12 at the right (Pranjal, 2026-09-17) */
               startAdornment && 'mdt-pl-8',
               endAdornment && 'mdt-pr-8',
+              /* held: the text stops 34 short of the edge (12 + the 14 lock + 8) and ends in an ellipsis */
+              held && 'mdt-text-ellipsis mdt-pr-[34px]',
               className
             )}
             aria-invalid={hasError}
             aria-describedby={describedBy}
+            disabled={held || disabled}
             {...props}
           />
-          {endAdornment && (
-            <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-muted-foreground">
-              {endAdornment}
+          {held ? (
+            <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-neutral-70">
+              <Icon name="lock" size={14} aria-hidden />
             </div>
+          ) : (
+            endAdornment && (
+              <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-muted-foreground">
+                {endAdornment}
+              </div>
+            )
           )}
         </div>
         {error && (

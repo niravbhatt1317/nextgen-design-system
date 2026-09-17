@@ -123,6 +123,8 @@ export interface SelectProps<T = any> {
   placement?: SelectPlacement;
   /** Whether select is disabled */
   disabled?: boolean;
+  /** A held field (Pranjal, 2026-09-17): disabled, with the lock in place of the chevron - a value something else owns */
+  locked?: boolean;
   /** Whether select is required */
   required?: boolean;
   /** Error message */

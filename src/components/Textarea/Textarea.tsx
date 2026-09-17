@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef, useId } from 'react';
 import { cn } from '@/utils';
+import { Icon } from '../Icon';
 import type { TextareaProps } from './Textarea.types';
 
 /**
@@ -98,6 +99,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       error,
       label,
       helperText,
+      locked,
+      disabled,
       id: propId,
       ...props
     },
@@ -108,6 +111,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errorId = `${id}-error`;
     const helperId = `${id}-helper`;
     const hasError = Boolean(error);
+    /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock inside at the top right, the text stopping short of it */
+    const held = Boolean(locked);
 
     // Determine aria-describedby value
     let describedBy: string | undefined;
@@ -124,14 +129,26 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             {label}
           </label>
         )}
-        <textarea
-          id={id}
-          ref={ref}
-          className={cn(textareaVariants({ size, variant, hasError, resize }), className)}
-          aria-invalid={hasError}
-          aria-describedby={describedBy}
-          {...props}
-        />
+        <div className="mdt-relative mdt-flex">
+          <textarea
+            id={id}
+            ref={ref}
+            className={cn(
+              textareaVariants({ size, variant, hasError, resize }),
+              held && 'mdt-pr-[34px]',
+              className
+            )}
+            aria-invalid={hasError}
+            aria-describedby={describedBy}
+            disabled={held || disabled}
+            {...props}
+          />
+          {held && (
+            <div className="mdt-absolute mdt-right-3 mdt-top-[9px] mdt-flex mdt-items-center mdt-text-neutral-70">
+              <Icon name="lock" size={14} aria-hidden />
+            </div>
+          )}
+        </div>
         {error && (
           <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
             {error}
