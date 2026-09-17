@@ -195,12 +195,14 @@ const SheetContent = forwardRef<
         {showCloseButton && (
           <DialogPrimitive.Close
             className={cn(
-              'mdt-absolute mdt-right-4 mdt-top-4 mdt-rounded-sm mdt-opacity-70',
-              'mdt-ring-offset-background mdt-transition-opacity',
-              'hover:mdt-opacity-100',
-              'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-              'disabled:mdt-pointer-events-none',
-              'data-[state=open]:mdt-bg-secondary'
+              /* THE CLOSE (Pranjal, 2026-09-17): a 28 box with corners 6; the glyph in neutral-90; neutral-20 under the
+               * pointer with the glyph in the primary colour; a primary ring with the field's halo on keyboard focus
+               * only - the content auto-focuses this button on open, and a plain :focus ring lit up every time */
+              'mdt-absolute mdt-right-2.5 mdt-top-2.5 mdt-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center',
+              'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-text-neutral-90 mdt-transition-colors',
+              'hover:mdt-bg-neutral-20 hover:mdt-text-primary',
+              'focus-visible:mdt-shadow-[0_0_0_1px_hsl(var(--mdt-primary)),0_0_0_4px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
+              'disabled:mdt-pointer-events-none disabled:mdt-text-neutral-40'
             )}
           >
             <Icon name="x" size="sm" aria-hidden />
