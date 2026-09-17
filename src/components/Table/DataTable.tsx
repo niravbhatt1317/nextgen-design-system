@@ -197,6 +197,9 @@ function DataTable<Row>({
   const [query, setQuery] = useState(initialQuery);
   /* one Set of ticked values per quick filter, keyed by the column it filters */
   const [quick, setQuick] = useState<Record<string, Set<string>>>({});
+  /* what is typed in a quick filter's search box, per filter; cleared when its menu closes */
+  const [quickQuery, setQuickQuery] = useState<Record<string, string>>({});
+  const quickSearchRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const quickFilters = useMemo(
     () => (Array.isArray(quickFilter) ? quickFilter : quickFilter ? [quickFilter] : []),
     [quickFilter]
@@ -624,7 +627,16 @@ function DataTable<Row>({
       {quickFilters.map((qf) => {
         const set = quick[qf.columnKey] ?? new Set<string>();
         return (
-          <DropdownMenu key={qf.columnKey}>
+          <DropdownMenu
+            key={qf.columnKey}
+            onOpenChange={(o) => {
+              if (!o) setQuickQuery((m) => ({ ...m, [qf.columnKey]: '' }));
+              /* the search box takes focus once the menu has placed its own (Radix focuses the content on mount) */ else if (
+                qf.searchable
+              )
+                window.setTimeout(() => quickSearchRefs.current[qf.columnKey]?.focus(), 0);
+            }}
+          >
             <DropdownMenuTrigger asChild>
               <ToolbarButton
                 icon={
@@ -641,34 +653,86 @@ function DataTable<Row>({
                 activeLabel="applied"
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="mdt-w-48">
-              {qf.options.map((o) => (
-                <DropdownMenuCheckboxItem
-                  key={o}
-                  /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
-                       here"), as the Filters panel's rows do and as Users' quick filter
-                       always has: a person sees at a glance which values are on and
-                       that several can be. The menu's own tick, which only appears
-                       once checked, is hidden in favour of the box. */
-                  className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
-                  checked={set.has(o)}
-                  onSelect={(e) => {
-                    e.preventDefault();
-                  }}
-                  onCheckedChange={(v) => {
-                    tickQuick(qf.columnKey, o, v);
-                    resetPaging();
+            {/* THE MENU IS AS WIDE AS ITS LONGEST NAME, up to 380 (Pranjal, 2026-09-17:
+                "increase the width of the drop down. And truncate it after 40-50
+                characters. But till then width should be flexible"): past 380 a name
+                ends in an ellipsis and carries its full text as a title. A menu with a
+                search box starts at 240 so the box has room; one without keeps 192. */}
+            <DropdownMenuContent
+              align="start"
+              className={cn(
+                'mdt-w-max mdt-max-w-[380px]',
+                qf.searchable ? 'mdt-min-w-[240px]' : 'mdt-min-w-48'
+              )}
+            >
+              {qf.searchable && (
+                /* the search box (Pranjal, 2026-09-17: "it will contain search box as
+                   well"): keys stay in the box - the menu's own type-ahead and arrow
+                   handling would otherwise swallow them */
+                <div
+                  className="mdt-p-1 mdt-pb-2"
+                  onKeyDown={(e) => {
+                    e.stopPropagation();
                   }}
                 >
-                  <Checkbox
-                    className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
-                    checked={set.has(o)}
-                    tabIndex={-1}
-                    aria-hidden="true"
+                  <Input
+                    ref={(el) => {
+                      quickSearchRefs.current[qf.columnKey] = el;
+                    }}
+                    size="sm"
+                    className="mdt-rounded-lg"
+                    value={quickQuery[qf.columnKey] ?? ''}
+                    onChange={(e) => {
+                      setQuickQuery((m) => ({ ...m, [qf.columnKey]: e.target.value }));
+                    }}
+                    placeholder="Search"
+                    aria-label={`Search ${qf.label.replace(/^Filter by /i, '')}`}
+                    startAdornment={<Icon name="search" size={14} />}
                   />
-                  {qf.renderOption ? qf.renderOption(o) : o}
-                </DropdownMenuCheckboxItem>
-              ))}
+                </div>
+              )}
+              {(() => {
+                const needle = (quickQuery[qf.columnKey] ?? '').trim().toLowerCase();
+                const shown = needle
+                  ? qf.options.filter((o) => o.toLowerCase().includes(needle))
+                  : qf.options;
+                if (shown.length === 0) {
+                  return (
+                    <div className="mdt-px-2.5 mdt-py-2 mdt-text-[13px] mdt-text-neutral-60">
+                      No matches
+                    </div>
+                  );
+                }
+                return shown.map((o) => (
+                  <DropdownMenuCheckboxItem
+                    key={o}
+                    /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
+                         here"), as the Filters panel's rows do and as Users' quick filter
+                         always has: a person sees at a glance which values are on and
+                         that several can be. The menu's own tick, which only appears
+                         once checked, is hidden in favour of the box. */
+                    className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
+                    checked={set.has(o)}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                    onCheckedChange={(v) => {
+                      tickQuick(qf.columnKey, o, v);
+                      resetPaging();
+                    }}
+                  >
+                    <Checkbox
+                      className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                      checked={set.has(o)}
+                      tabIndex={-1}
+                      aria-hidden="true"
+                    />
+                    <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate" title={o}>
+                      {qf.renderOption ? qf.renderOption(o) : o}
+                    </span>
+                  </DropdownMenuCheckboxItem>
+                ));
+              })()}
             </DropdownMenuContent>
           </DropdownMenu>
         );
