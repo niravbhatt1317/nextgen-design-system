@@ -202,19 +202,24 @@ function CustomRenderItemWrapper({
  */
 export const selectTriggerVariants = cva(
   [
+    /* THE FIELD (Pranjal, 2026-09-17): the trigger is the Input's box - corners 8, neutral-90 text, the primary border
+     * under the pointer and, open or focused, with the 3-px halo; disabled on neutral-10 */
     'mdt-flex mdt-w-full mdt-items-center mdt-justify-between',
-    'mdt-rounded-md',
-    'mdt-bg-background mdt-text-foreground',
-    'mdt-transition-colors',
-    'focus-visible:mdt-outline-none',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50',
-    'data-[placeholder]:mdt-text-muted-foreground',
+    'mdt-rounded-lg',
+    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-transition-[border-color,box-shadow]',
+    'focus-visible:mdt-border-primary focus-visible:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
+    'data-[state=open]:mdt-border-primary data-[state=open]:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'aria-expanded:mdt-border-primary aria-expanded:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70',
+    'data-[placeholder]:mdt-text-neutral-70',
   ],
   {
     variants: {
       variant: {
-        default: 'mdt-border mdt-border-input',
-        borderless: 'mdt-border mdt-border-transparent hover:mdt-border-input',
+        default:
+          'mdt-border mdt-border-neutral-30 hover:mdt-border-primary disabled:hover:mdt-border-neutral-30',
+        borderless: 'mdt-border mdt-border-transparent hover:mdt-border-neutral-30',
       },
       size: {
         sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-xs',
@@ -222,13 +227,13 @@ export const selectTriggerVariants = cva(
         lg: 'mdt-h-10 mdt-gap-2 mdt-px-4 mdt-text-base',
       },
       hasError: {
-        true: 'mdt-border-destructive',
+        true: 'mdt-border-destructive hover:mdt-border-destructive',
         false: '',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'md',
+      size: 'sm',
       hasError: false,
     },
   }
@@ -529,7 +534,7 @@ function renderPill(
   const pillContent = (
     <span
       key={option.value}
-      className="mdt-select-pill mdt-inline-flex mdt-min-w-0 mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-secondary mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-font-medium"
+      className="mdt-select-pill mdt-inline-flex mdt-h-[22px] mdt-min-w-0 mdt-max-w-[calc(100%-64px)] mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-neutral-20 mdt-py-0 mdt-pl-2 mdt-pr-1 mdt-text-xs mdt-font-medium mdt-text-neutral-90"
     >
       {option.avatar && (
         <img src={option.avatar} alt={option.label} className="mdt-h-4 mdt-w-4 mdt-rounded-full" />
@@ -599,7 +604,7 @@ function renderSelectedValueDisplay(props: {
             renderPill(option, handlePillRemove, _pillHoverCard, _renderPillHoverCard)
           )}
         {selectedOptions.length > _maxPills && (
-          <span className="mdt-select-overflow mdt-text-xs mdt-text-muted-foreground">
+          <span className="mdt-select-overflow mdt-inline-flex mdt-h-[22px] mdt-shrink-0 mdt-items-center mdt-rounded-md mdt-bg-neutral-20 mdt-px-1.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90">
             {_overflowLabel(selectedOptions.length - _maxPills)}
           </span>
         )}
@@ -791,13 +796,14 @@ function renderMultiSelectSearchInput(props: {
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={_autoFocus}
         className={cn(
-          'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-md',
-          'mdt-border mdt-border-input mdt-bg-background',
-          'mdt-px-3 mdt-py-1 mdt-text-sm',
-          'placeholder:mdt-text-muted-foreground',
-          'focus:mdt-outline-none focus:mdt-ring-2',
-          'focus:mdt-ring-ring focus:mdt-ring-offset-2',
-          'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50'
+          'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
+          'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
+          'mdt-px-3 mdt-py-1 mdt-text-xs',
+          'placeholder:mdt-text-neutral-70',
+          'hover:mdt-border-primary',
+          'focus:mdt-border-primary focus:mdt-outline-none ' +
+            'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+          'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10'
         )}
       />
     </div>
@@ -2055,8 +2061,9 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
       // Pills props
       showPills: _showPills = false,
-      maxPills: _maxPills = 3,
-      overflowLabel: _overflowLabel = (hidden: number) => '+' + String(hidden) + ' more',
+      /* ONE pick shows, the rest fold into a "+N" badge (Pranjal, 2026-09-17) */
+      maxPills: _maxPills = 1,
+      overflowLabel: _overflowLabel = (hidden: number) => '+' + String(hidden),
       pillHoverCard: _pillHoverCard = false,
       renderPillHoverCard: _renderPillHoverCard,
       onRemovePill: _onRemovePill,

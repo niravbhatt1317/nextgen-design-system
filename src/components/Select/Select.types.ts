@@ -167,9 +167,9 @@ export interface SelectProps<T = any> {
   // === Multi-Select Pills Props ===
   /** Show selected items as pills */
   showPills?: boolean;
-  /** Maximum pills to show before overflow */
+  /** Maximum pills to show before overflow. Default 1: the first pick shows, the rest fold into the overflow badge. */
   maxPills?: number;
-  /** How the picks past `maxPills` read. Default: "+N more". */
+  /** How the picks past `maxPills` read. Default: "+N". */
   overflowLabel?: ((hidden: number) => string) | undefined;
   /** Enable hover card on pills */
   pillHoverCard?: boolean;

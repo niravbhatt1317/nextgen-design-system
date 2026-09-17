@@ -10,12 +10,15 @@ import type { TextareaProps } from './Textarea.types';
 export const textareaVariants = cva(
   // Base styles applied to all textareas
   [
-    'mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-input',
-    'mdt-bg-background mdt-text-foreground',
-    'mdt-transition-colors',
-    'placeholder:mdt-text-muted-foreground',
-    'focus-visible:mdt-outline-none',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50',
+    /* THE FIELD (Pranjal, 2026-09-17) - the same box as the Input, grown */
+    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
+    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-transition-[border-color,box-shadow]',
+    'placeholder:mdt-text-neutral-70',
+    'hover:mdt-border-primary',
+    'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
+      'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70 disabled:hover:mdt-border-neutral-30',
   ],
   {
     variants: {
@@ -38,7 +41,9 @@ export const textareaVariants = cva(
        * Whether the textarea is in an error state
        */
       hasError: {
-        true: 'mdt-border-destructive',
+        true:
+          'mdt-border-destructive hover:mdt-border-destructive focus:mdt-border-destructive ' +
+          'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-destructive)/0.14)]',
         false: '',
       },
       /**
@@ -51,7 +56,7 @@ export const textareaVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'md',
+      size: 'sm',
       variant: 'default',
       hasError: false,
       resize: 'vertical',

@@ -13,13 +13,18 @@ export const InputVariants = cva(
     /* the same edge as the outline Button and the Toolbar's controls
      * (neutral-30) - the toolbar used to force this on any input inside it,
      * and an Input anywhere else came out darker (--mdt-input, neutral-40) */
-    'mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-neutral-30 dark:mdt-border-neutral-110',
-    'mdt-bg-background mdt-text-foreground',
-    'mdt-transition-colors',
+    /* THE FIELD (Pranjal, 2026-09-17): corners 8, the typed value in neutral-90, the placeholder in neutral-70; under
+     * the pointer the border is the primary colour; focused, the same border with a 3-px halo of it; disabled sits on
+     * neutral-10 in the placeholder colour, not dimmed. */
+    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30 dark:mdt-border-neutral-110',
+    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-transition-[border-color,box-shadow]',
     'file:mdt-border-0 file:mdt-bg-transparent file:mdt-text-sm file:mdt-font-medium',
-    'placeholder:mdt-text-muted-foreground',
-    'focus-visible:mdt-outline-none',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50',
+    'placeholder:mdt-text-neutral-70',
+    'hover:mdt-border-primary',
+    'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
+      'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70 disabled:hover:mdt-border-neutral-30',
   ],
   {
     variants: {
@@ -35,12 +40,15 @@ export const InputVariants = cva(
        * Whether the input is in an error state
        */
       hasError: {
-        true: 'mdt-border-destructive',
+        true:
+          'mdt-border-destructive hover:mdt-border-destructive focus:mdt-border-destructive ' +
+          'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-destructive)/0.14)]',
         false: '',
       },
     },
     defaultVariants: {
-      size: 'md',
+      /* 32 high is the field (Pranjal, 2026-09-17); md and lg stay for the places that ask */
+      size: 'sm',
       hasError: false,
     },
   }
@@ -101,7 +109,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+          <label htmlFor={id} className="mdt-text-xs mdt-text-neutral-90">
             {label}
           </label>
         )}
@@ -116,8 +124,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={cn(
               InputVariants({ size, hasError }),
-              startAdornment && 'mdt-pl-10',
-              endAdornment && 'mdt-pr-10',
+              /* 12 to the glyph, 6 to the text, 12 at the right (Pranjal, 2026-09-17) */
+              startAdornment && 'mdt-pl-8',
+              endAdornment && 'mdt-pr-8',
               className
             )}
             aria-invalid={hasError}

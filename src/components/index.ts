@@ -286,6 +286,8 @@ export type {
 // Input
 export { Input, InputVariants } from './Input';
 export type { InputProps, InputVariantsType } from './Input';
+export { NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
 
 // InputGroup
 export {
