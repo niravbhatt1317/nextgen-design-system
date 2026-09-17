@@ -222,7 +222,7 @@ export const selectTriggerVariants = cva(
         borderless: 'mdt-border mdt-border-transparent hover:mdt-border-neutral-30',
       },
       size: {
-        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-xs',
+        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-[13px]',
         md: 'mdt-h-9 mdt-gap-2 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-gap-2 mdt-px-4 mdt-text-base',
       },
@@ -331,7 +331,7 @@ function renderSingleSelectMode(props: {
   return (
     <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
       {label && (
-        <label htmlFor={selectId} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+        <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
           {label}
           {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
         </label>
@@ -798,7 +798,7 @@ function renderMultiSelectSearchInput(props: {
         className={cn(
           'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
           'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
-          'mdt-px-3 mdt-py-1 mdt-text-xs',
+          'mdt-px-3 mdt-py-1 mdt-text-[13px]',
           'placeholder:mdt-text-neutral-70',
           'hover:mdt-border-primary',
           'focus:mdt-border-primary focus:mdt-outline-none ' +
@@ -899,7 +899,7 @@ function renderSelectLabel(props: {
   if (!label) return null;
 
   return (
-    <label htmlFor={selectId} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+    <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
       {label}
       {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
     </label>

@@ -32,7 +32,8 @@ export const InputVariants = cva(
        * Size variant of the input
        */
       size: {
-        sm: 'mdt-h-8 mdt-px-3 mdt-text-xs',
+        /* the field's text is 13 (Pranjal, 2026-09-17) - text-xs is 12 */
+        sm: 'mdt-h-8 mdt-px-3 mdt-text-[13px]',
         md: 'mdt-h-9 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-px-4 mdt-text-base',
       },
@@ -109,7 +110,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="mdt-text-xs mdt-text-neutral-90">
+          <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
             {label}
           </label>
         )}
