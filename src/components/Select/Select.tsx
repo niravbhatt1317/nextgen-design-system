@@ -529,7 +529,7 @@ function renderPill(
   const pillContent = (
     <span
       key={option.value}
-      className="mdt-inline-flex mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-secondary mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-font-medium"
+      className="mdt-select-pill mdt-inline-flex mdt-min-w-0 mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-secondary mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-font-medium"
     >
       {option.avatar && (
         <img src={option.avatar} alt={option.label} className="mdt-h-4 mdt-w-4 mdt-rounded-full" />
@@ -537,7 +537,7 @@ function renderPill(
       {option.icon && (
         <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-items-center">{option.icon}</span>
       )}
-      <span>{option.label}</span>
+      <span className="mdt-truncate">{option.label}</span>
       <button
         type="button"
         aria-label={`Remove ${option.label}`}
@@ -572,6 +572,7 @@ function renderSelectedValueDisplay(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard: ((props: { option: SelectOption }) => ReactNode) | undefined;
@@ -581,6 +582,7 @@ function renderSelectedValueDisplay(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -597,8 +599,8 @@ function renderSelectedValueDisplay(props: {
             renderPill(option, handlePillRemove, _pillHoverCard, _renderPillHoverCard)
           )}
         {selectedOptions.length > _maxPills && (
-          <span className="mdt-text-xs mdt-text-muted-foreground">
-            +{selectedOptions.length - _maxPills} more
+          <span className="mdt-select-overflow mdt-text-xs mdt-text-muted-foreground">
+            {_overflowLabel(selectedOptions.length - _maxPills)}
           </span>
         )}
       </>
@@ -622,6 +624,7 @@ function renderMultiSelectTriggerContent(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
@@ -632,6 +635,7 @@ function renderMultiSelectTriggerContent(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -649,6 +653,7 @@ function renderMultiSelectTriggerContent(props: {
         _showPills,
         selectedOptions,
         _maxPills,
+        _overflowLabel,
         handlePillRemove,
         _pillHoverCard,
         _renderPillHoverCard,
@@ -676,6 +681,7 @@ function renderDefaultMultiSelectTrigger(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
@@ -698,6 +704,7 @@ function renderDefaultMultiSelectTrigger(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -729,6 +736,7 @@ function renderDefaultMultiSelectTrigger(props: {
         _showPills,
         selectedOptions,
         _maxPills,
+        _overflowLabel,
         handlePillRemove,
         _pillHoverCard,
         ...(_renderPillHoverCard && { _renderPillHoverCard }),
@@ -1592,6 +1600,7 @@ function buildMultiSelectTriggerProps(params: {
   prefixIcon: ReactNode | undefined;
   _showPills: boolean;
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard: ((props: { option: SelectOption }) => ReactNode) | undefined;
@@ -1611,6 +1620,7 @@ function buildMultiSelectTriggerProps(params: {
     hasError: params.hasError,
     _showPills: params._showPills,
     _maxPills: params._maxPills,
+    _overflowLabel: params._overflowLabel,
     handlePillRemove: params.handlePillRemove,
     _pillHoverCard: params._pillHoverCard,
     _clearable: params._clearable,
@@ -1910,6 +1920,7 @@ function createMultiSelectTrigger(props: {
   prefixIcon?: ReactNode;
   _showPills: boolean;
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
@@ -1934,6 +1945,7 @@ function createMultiSelectTrigger(props: {
     prefixIcon,
     _showPills,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -1966,6 +1978,7 @@ function createMultiSelectTrigger(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     ...(_renderPillHoverCard && { _renderPillHoverCard }),
@@ -2043,6 +2056,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       // Pills props
       showPills: _showPills = false,
       maxPills: _maxPills = 3,
+      overflowLabel: _overflowLabel = (hidden: number) => '+' + String(hidden) + ' more',
       pillHoverCard: _pillHoverCard = false,
       renderPillHoverCard: _renderPillHoverCard,
       onRemovePill: _onRemovePill,
@@ -2237,6 +2251,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       prefixIcon,
       _showPills,
       _maxPills,
+      _overflowLabel,
       handlePillRemove,
       _pillHoverCard,
       _renderPillHoverCard,

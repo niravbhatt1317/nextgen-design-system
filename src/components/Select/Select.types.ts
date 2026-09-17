@@ -169,6 +169,8 @@ export interface SelectProps<T = any> {
   showPills?: boolean;
   /** Maximum pills to show before overflow */
   maxPills?: number;
+  /** How the picks past `maxPills` read. Default: "+N more". */
+  overflowLabel?: ((hidden: number) => string) | undefined;
   /** Enable hover card on pills */
   pillHoverCard?: boolean;
   /** Custom pill hover card renderer */
