@@ -26,7 +26,8 @@ export interface TableColumnsPanelProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const PANEL = 'mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4';
+/* 264 wide and 10 corners - the Users table's Columns panel (Pranjal, 2026-09-17: "same for column management") */
+const PANEL = 'mdt-w-[264px] mdt-rounded-[10px] mdt-px-3.5 mdt-pb-2.5 mdt-pt-4';
 const ROW =
   'mdt-flex mdt-min-h-[34px] mdt-w-full mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130';
 const SECTION =

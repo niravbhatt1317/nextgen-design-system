@@ -7,6 +7,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
@@ -91,7 +92,10 @@ function columnsPanel<Row>(opts: {
     label: 'Row number',
     hidden: !numbers,
   };
-  const lockedNames = [nameLabel, ...(hasActions ? ['Action'] : [])];
+  /* Name stays listed and locked, as the Users panel lists it; the Action column is not listed - it cannot be hidden
+   * and Users never shows it (Pranjal, 2026-09-17: "same for column management") */
+  const lockedNames = [nameLabel];
+  void hasActions;
   return {
     columns: selectable ? own : [rowNumber, ...own],
     locked: selectable ? ['Row number', ...lockedNames] : lockedNames,
@@ -674,28 +678,41 @@ function DataTable<Row>({
               activeLabel="applied"
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="mdt-w-48">
+          {/* THE USERS TABLE'S SORT MENU, to the number (Pranjal, 2026-09-17: "keep the sorting design element same as
+           * users … other modules sort should look the same"): 220 wide, a SORT BY heading at 11/600 in the muted grey,
+           * one row per field with the active one in the reading ink carrying ↑ or ↓, the rest in neutral-90, a
+           * hairline, and Clear sort always there in the muted grey - live only while a sort is on. */}
+          <DropdownMenuContent align="end" className="mdt-w-[220px]">
+            <DropdownMenuLabel className="mdt-px-2.5 mdt-pb-1 mdt-pt-1.5 mdt-text-[11px] mdt-font-semibold mdt-uppercase mdt-tracking-[0.04em] mdt-text-neutral-50">
+              Sort by
+            </DropdownMenuLabel>
             {sortKeys.map((k) => (
               <DropdownMenuItem
                 key={k}
+                className={sortDir(k) ? undefined : 'mdt-text-neutral-90'}
                 onSelect={() => {
                   sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
                 }}
               >
                 {labelOf(k)}
                 {sortDir(k) && (
-                  <span className="mdt-ml-auto mdt-text-xs mdt-text-muted-foreground">
-                    {sortDir(k) === 'asc' ? 'A to Z' : 'Z to A'}
+                  <span
+                    className="mdt-ml-auto mdt-text-sm"
+                    aria-label={sortDir(k) === 'asc' ? 'ascending' : 'descending'}
+                  >
+                    {sortDir(k) === 'asc' ? '\u2191' : '\u2193'}
                   </span>
                 )}
               </DropdownMenuItem>
             ))}
-            {sort.sort && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={sort.clear}>Clear sort</DropdownMenuItem>
-              </>
-            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="mdt-text-neutral-50"
+              disabled={!sort.sort}
+              onSelect={sort.clear}
+            >
+              Clear sort
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <TableColumnsPanel
