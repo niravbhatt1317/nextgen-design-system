@@ -91,6 +91,7 @@ function columnsPanel<Row>(opts: {
     key: ROWNUM_KEY,
     label: 'Row number',
     hidden: !numbers,
+    fixed: true, // the serial column keeps its place: it neither drags nor takes a drop
   };
   /* Name stays listed and locked, as the Users panel lists it; the Action column is not listed - it cannot be hidden
    * and Users never shows it (Pranjal, 2026-09-17: "same for column management") */
@@ -115,6 +116,11 @@ function columnsPanel<Row>(opts: {
     onReset: () => {
       layout.reset();
       setNumbers(true);
+    },
+    /* a row dragged in the panel moves the column, as dragging the heading does (Pranjal, 2026-09-17) */
+    onMoveBefore: (key: string, beforeKey: string) => {
+      if (key === ROWNUM_KEY || beforeKey === ROWNUM_KEY) return;
+      layout.moveBefore(key, beforeKey);
     },
   };
 }
