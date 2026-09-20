@@ -390,6 +390,29 @@ export type {
 export { SecretDots, BULLET_COUNT } from './SecretDots';
 export type { SecretDotsProps, SecretDotsSize } from './SecretDots';
 
+// AdvancedFilter
+export {
+  AdvancedFilter,
+  OPERATORS as ADVANCED_FILTER_OPERATORS,
+  EMPTY_FILTER,
+  isGroup as isFilterGroup,
+  isComplete as isFilterComplete,
+  liveItems as liveFilterItems,
+  countConditions,
+  matchRow as matchFilterRow,
+  applyAdvanced,
+} from './AdvancedFilter';
+export type {
+  AdvancedFilterProps,
+  FilterKey,
+  FilterKeyType,
+  FilterJoin,
+  FilterRow,
+  FilterGroup,
+  FilterItem,
+  FilterValue,
+} from './AdvancedFilter';
+
 // Select
 export { Select, selectTriggerVariants } from './Select';
 export type {
