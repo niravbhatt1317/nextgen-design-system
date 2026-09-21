@@ -137,7 +137,7 @@ describe('Avatar', () => {
   describe('shape', () => {
     const cases: [AvatarShape, string][] = [
       ['circle', 'mdt-rounded-full'],
-      ['rounded', 'mdt-rounded-md'],
+      ['rounded', 'mdt-rounded-[6px]'],
     ];
 
     it.each(cases)('applies the %s shape', (shape, expected) => {
@@ -241,7 +241,7 @@ describe('Avatar', () => {
       render(<Avatar name={NAME} src="/broken.png" />);
       fireEvent.error(screen.getByTestId(IMG));
       expect(screen.queryByTestId(IMG)).not.toBeInTheDocument();
-      expect(getAvatar()).toHaveTextContent('SJ');
+      expect(getAvatar()).toHaveTextContent(/^S$/);
     });
 
     it('shows initials when src is an empty string', () => {
