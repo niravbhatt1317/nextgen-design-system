@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Avatar } from './Avatar';
 import { AvatarStack } from './AvatarStack';
+import { Icon } from '@/components/Icon';
 
 const meta: Meta<typeof Avatar> = {
   title: 'Components/Avatar',
@@ -11,21 +12,23 @@ const meta: Meta<typeof Avatar> = {
     docs: {
       description: {
         component: [
-          'A person or thing, as a photo or their initials.',
+          'A person or a thing, as a photo, **one letter**, or an icon.',
           '',
           '| Prop | Values |',
           '| --- | --- |',
-          '| `shape` | circle · rounded |',
-          '| `size` | xs · sm · md · lg · xl |',
+          '| `shape` | circle · rounded — left unset it follows the content: a letter or a photo is a circle, an icon a rounded square |',
+          '| `size` | xs 20 · sm 24 · md 32 · lg 40 · xl 56 |',
           '| `tone` | slate · blue · green · amber · rose · purple |',
+          '| `icon` | a thing rather than a person — the glyph sizes itself: 12 · 14 · 16 · 20 · 24 |',
           '',
-          'Both shapes come from the source systems: Org Mgmt and Agent Fleet render',
-          'circles, IAM renders rounded squares.',
+          'Ruled on the avatar mock (Pranjal, 2026-09-20 → 21): **one letter at every size**; the type a',
+          'step smaller than the scale (11 · 11 · 12 · 16 · 18); **a person is a circle, a thing is a',
+          "square**; the square's corners are 6, and 12 at xl; a photo falls back to the letter.",
           '',
           '**Leave `tone` unset and the colour is derived from the name**, so one person is',
-          "always one colour. IAM's audit records the failure this avoids — its palette is",
-          'assigned per row rather than per identity, so the same person appears in two',
-          'different colours on two different screens.',
+          'always one colour — and never slate, which keeps to the +N chip, to a thing, and to an',
+          "avatar with no name. IAM's audit records the failure this avoids: a palette assigned per",
+          'row rather than per identity, so the same person appears in two colours on two screens.',
         ].join('\n'),
       },
     },
@@ -53,13 +56,13 @@ export const Default: Story = {
   args: { name: 'Sarah Johnson' },
 };
 
-/** Circles and rounded squares. Both are in use across the source systems. */
+/** A person is a circle, a thing is a rounded square. Either can be forced. */
 export const Shapes: Story = {
   parameters: { controls: { disable: true }, layout: 'padded' },
   render: () => (
     <Group>
       <div>
-        <Label>circle — Org Mgmt and Agent Fleet</Label>
+        <Label>circle — a person</Label>
         <Row>
           {PEOPLE.slice(0, 4).map((n) => (
             <Avatar key={n} name={n} shape="circle" />
@@ -67,7 +70,7 @@ export const Shapes: Story = {
         </Row>
       </div>
       <div>
-        <Label>rounded — IAM</Label>
+        <Label>rounded — a thing, or a person when forced</Label>
         <Row>
           {PEOPLE.slice(0, 4).map((n) => (
             <Avatar key={n} name={n} shape="rounded" />
@@ -162,6 +165,48 @@ export const WithPhoto: Story = {
         <Label>Broken image — falls back to initials rather than an empty box</Label>
         <Row>
           <Avatar name="Sarah Johnson" size="lg" src="https://example.invalid/missing.png" />
+        </Row>
+      </div>
+    </Group>
+  ),
+};
+
+/** A thing rather than a person: a team, a role, a service account, an organization. The square is the default; the glyph sizes itself to the tile. */
+export const WithIcon: Story = {
+  name: 'With an icon',
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: () => (
+    <Group>
+      <div>
+        <Label>The things the console marks — team · role · service account · organization</Label>
+        <Row>
+          <Avatar name="Design team" icon={<Icon name="users" />} tone="blue" />
+          <Avatar name="Administrator role" icon={<Icon name="shield" />} tone="blue" />
+          <Avatar name="Backup runner" icon={<Icon name="bot" />} tone="blue" />
+          <Avatar name="Acme Corp" icon={<Icon name="building" />} tone="blue" />
+        </Row>
+      </div>
+      <div>
+        <Label>
+          At every size — the glyph follows: 12 · 14 · 16 · 20 · 24; the corners 6, and 12 at xl
+        </Label>
+        <Row>
+          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
+            <Avatar key={s} name="Design team" icon={<Icon name="users" />} tone="blue" size={s} />
+          ))}
+        </Row>
+      </div>
+      <div>
+        <Label>Forced into a circle, and a person beside it for scale</Label>
+        <Row>
+          <Avatar name="Design team" icon={<Icon name="users" />} tone="blue" shape="circle" />
+          <Avatar name="Sarah Johnson" />
+        </Row>
+      </div>
+      <div>
+        <Label>No name at all — a glyph on slate</Label>
+        <Row>
+          <Avatar icon={<Icon name="user" />} />
         </Row>
       </div>
     </Group>

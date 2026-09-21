@@ -16,10 +16,8 @@ export type AvatarTone = 'slate' | 'blue' | 'green' | 'amber' | 'rose' | 'purple
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
- * Circle or rounded square.
- *
- * Both exist in the source systems: Org Mgmt and Agent Fleet render circles,
- * IAM renders rounded squares. Neither is wrong, so both are supported.
+ * Circle or rounded square: a person is a circle, a thing is a square (Pranjal,
+ * 2026-09-20, on the avatar mock). The square's corners are 6, and 12 at xl.
  */
 export type AvatarShape = 'circle' | 'rounded';
 
@@ -31,15 +29,23 @@ export interface AvatarOwnProps {
   name?: string;
 
   /**
-   * Overrides the initials derived from `name`.
+   * Overrides the letter derived from `name`.
    *
-   * Trimmed to fit the size: two characters at `md` and above, one at `sm` and
-   * `xs`, where two letters crowd into a smudge.
+   * ONE letter at every size (Pranjal, 2026-09-20); anything longer is cut to
+   * its first character.
    */
   initials?: string;
 
-  /** Photo. Falls back to initials if it fails to load. */
+  /** Photo. Falls back to the letter if it fails to load. */
   src?: string;
+
+  /**
+   * A thing rather than a person: a team, a role, a service account, an
+   * organization. The glyph takes the letter's place and sizes itself to the
+   * tile - 12 in 20, 14 in 24, 16 in 32, 20 in 40, 24 in 56. With an icon the
+   * shape defaults to the rounded square; pass `shape` to say otherwise.
+   */
+  icon?: ReactNode;
 
   /**
    * Colour. Left unset, it is derived from `name`, so the same person always
@@ -54,7 +60,10 @@ export interface AvatarOwnProps {
   /** @default 'md' */
   size?: AvatarSize;
 
-  /** @default 'circle' */
+  /**
+   * Circle for a person, rounded square for a thing. Left unset it follows the
+   * content: an `icon` makes it `rounded`, a letter or a photo `circle`.
+   */
   shape?: AvatarShape;
 
   /**
