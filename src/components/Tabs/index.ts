@@ -6,6 +6,7 @@ export type {
   TabsTriggerProps,
   TabsContentProps,
   TabsAddProps,
+  TabsType,
   TabsVariant,
 } from './Tabs.types';
 export type { EditableTab, UseEditableTabs, UseEditableTabsOptions } from './useEditableTabs';
