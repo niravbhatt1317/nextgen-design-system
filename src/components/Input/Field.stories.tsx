@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { DateInput } from '../DateInput';
 import { Icon } from '../Icon';
 import { NumberInput } from '../NumberInput';
 import { Select } from '../Select';
@@ -7,16 +8,18 @@ import { Textarea } from '../Textarea';
 import { Input } from './Input';
 
 /**
- * THE FIELD - one field, six kinds, its states (Pranjal, 2026-09-17, from the
- * mock "Input fields"). 32 high, corners 8, the text 13 in neutral-90, the
- * placeholder in neutral-70, a neutral-30 border. Under the pointer the border
- * turns to the primary colour; focused, the same border with a soft 3-px halo
- * of it. Disabled sits on neutral-10 in the placeholder colour. Held is a
- * disabled field something else owns: the lock inside at the right, 14 like
- * the search glyph, 12 from the edge, the value truncating before it, the lock
- * in place of the chevron or the stepper. An error keeps the danger border and
- * turns the halo red. Hover and focus are live here -
- * move the pointer over a field, click into it.
+ * THE FIELD - one field, seven kinds, its states (Pranjal, 2026-09-17, from the
+ * mock "Input fields"; the date field joined 2026-09-22). 32 high, corners 8,
+ * the text 13 in neutral-90, the placeholder in neutral-70, a neutral-30
+ * border. Under the pointer the border turns to the primary colour; focused,
+ * the same border with a soft 3-px halo of it. Disabled sits on neutral-10 in
+ * the placeholder colour. Held is a disabled field something else owns: the
+ * lock inside at the right, 14 like the search glyph, 12 from the edge, the
+ * value truncating before it, the lock in place of the chevron, the stepper or
+ * the calendar glyph. An error keeps the danger border and turns the halo red.
+ * The date field is the same box as a button, the 16 calendar glyph at the
+ * right, 12 from the edge; it opens the calendar below and shows "22 Oct 2026".
+ * Hover and focus are live here - move the pointer over a field, click into it.
  */
 const meta = {
   title: 'Foundation/Field',
@@ -25,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'One field, six kinds, five resting states. Hover and focus are live: move the pointer over a field and click into it. Held is a disabled field something else owns - the lock sits inside at the right (14, 12 from the edge) and the value truncates before it. The search keeps 12 to its glyph, 6 to the text, 12 at the right. The number field draws its own stepper. The multi-select shows the first pick as a pill and folds the rest into a +N badge; a long first pick truncates.',
+          'One field, seven kinds, five resting states. Hover and focus are live: move the pointer over a field and click into it. Held is a disabled field something else owns - the lock sits inside at the right (14, 12 from the edge) and the value truncates before it. The search keeps 12 to its glyph, 6 to the text, 12 at the right. The number field draws its own stepper. The multi-select shows the first pick as a pill and folds the rest into a +N badge; a long first pick truncates. The date field is the same box as a button with the 16 calendar glyph at the right, 12 from the edge; it opens the calendar below, keeps the halo while open, and shows the day as "22 Oct 2026" - held, the lock takes the glyph\'s place.',
       },
     },
   },
@@ -71,6 +74,7 @@ function Matrix() {
   const [count, setCount] = useState('10');
   const [days, setDays] = useState<string | null>('14');
   const [notes, setNotes] = useState('Covers the overnight queue and the weekend hand-over.');
+  const [when, setWhen] = useState('2026-10-22');
   const [owners, setOwners] = useState<string[]>([
     'Natasha Manglore',
     'Sarah Johnson',
@@ -330,6 +334,16 @@ function Matrix() {
             showPills
             error="Pick at least one role"
           />,
+        ]}
+      />
+      <Row
+        kind="Date"
+        cells={[
+          <DateInput key="a" label="Expires on" placeholder="Pick a date" />,
+          <DateInput key="b" label="Expires on" value={when} onChange={setWhen} />,
+          <DateInput key="c" label="Expires on" value="2026-10-22" disabled />,
+          <DateInput key="h" label="Expires on" value="2026-10-22" locked />,
+          <DateInput key="d" label="Expires on" value="2026-01-05" error="That day has passed" />,
         ]}
       />
     </div>
