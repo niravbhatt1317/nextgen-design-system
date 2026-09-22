@@ -160,7 +160,7 @@ export const States: Story = {
       <span className={CAPTION}>Hover · drawn</span>
       <MotadataSwitch
         aria-label="Off, hovered"
-        className="data-[state=unchecked]:mdt-bg-neutral-50"
+        className="data-[state=unchecked]:mdt-bg-[#B9C3D4]"
       />
       <MotadataSwitch
         defaultChecked

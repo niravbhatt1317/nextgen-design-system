@@ -121,7 +121,7 @@ describe('MotadataSwitch', () => {
     it('takes the off track one step darker on hover', () => {
       render(<MotadataSwitch aria-label="Toggle setting" />);
       expect(screen.getByRole('switch')).toHaveClass(
-        'hover:data-[state=unchecked]:mdt-bg-neutral-50'
+        'hover:data-[state=unchecked]:mdt-bg-[#B9C3D4]'
       );
     });
 
@@ -136,7 +136,7 @@ describe('MotadataSwitch', () => {
       for (const size of ['sm', 'md', 'lg'] as const) {
         const { unmount } = render(<MotadataSwitch size={size} aria-label="Toggle setting" />);
         expect(screen.getByRole('switch')).toHaveClass(
-          'hover:data-[state=unchecked]:mdt-bg-neutral-50',
+          'hover:data-[state=unchecked]:mdt-bg-[#B9C3D4]',
           'hover:data-[state=checked]:mdt-bg-primary/90'
         );
         unmount();
