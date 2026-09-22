@@ -28,6 +28,11 @@ export const motadataSwitchRootVariants = cva(
     'disabled:mdt-opacity-50',
     'data-[state=checked]:mdt-bg-primary',
     'data-[state=unchecked]:mdt-bg-input',
+    // Hover: the track goes a step darker so the pointer gets an answer (Pranjal,
+    // 2026-09-22, mocks/foundation/switch.html). Off climbs one step up the
+    // neutral ramp; on eases the primary ink to 90%.
+    'hover:data-[state=unchecked]:mdt-bg-neutral-50',
+    'hover:data-[state=checked]:mdt-bg-primary/90',
   ],
   {
     variants: {

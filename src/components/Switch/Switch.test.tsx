@@ -3,6 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { MotadataSwitch } from './Switch';
 
+/** The thumb is the one element inside the track. */
+const thumbOf = (track: HTMLElement): HTMLElement => {
+  const thumb = track.querySelector('span');
+  if (!thumb) throw new Error('no thumb inside the switch');
+  return thumb;
+};
+
 describe('MotadataSwitch', () => {
   describe('Rendering', () => {
     it('renders correctly', () => {
@@ -38,28 +45,108 @@ describe('MotadataSwitch', () => {
       expect(switchElement).toHaveClass('mdt-rounded-full');
       expect(switchElement).toHaveClass('mdt-cursor-pointer');
     });
+
+    it('is a pill: the track and the thumb are both fully rounded', () => {
+      render(<MotadataSwitch aria-label="Toggle setting" />);
+      const switchElement = screen.getByRole('switch');
+      expect(switchElement).toHaveClass(
+        'mdt-rounded-full',
+        'mdt-border-2',
+        'mdt-border-transparent'
+      );
+      expect(thumbOf(switchElement)).toHaveClass('mdt-rounded-full', 'mdt-bg-background');
+    });
   });
 
   describe('Sizes', () => {
-    it('renders with small size', () => {
+    it('renders with small size: a 20 x 36 track and a 16 thumb that travels 16', () => {
       render(<MotadataSwitch size="sm" aria-label="Toggle setting" />);
       const switchElement = screen.getByRole('switch');
-      expect(switchElement).toHaveClass('mdt-h-5');
-      expect(switchElement).toHaveClass('mdt-w-9');
+      expect(switchElement).toHaveClass('mdt-h-5', 'mdt-w-9');
+      expect(thumbOf(switchElement)).toHaveClass(
+        'mdt-h-4',
+        'mdt-w-4',
+        'data-[state=checked]:mdt-translate-x-4'
+      );
     });
 
-    it('renders with medium size (default)', () => {
+    it('renders with medium size (default): a 24 x 44 track and a 20 thumb that travels 20', () => {
       render(<MotadataSwitch aria-label="Toggle setting" />);
       const switchElement = screen.getByRole('switch');
-      expect(switchElement).toHaveClass('mdt-h-6');
-      expect(switchElement).toHaveClass('mdt-w-11');
+      expect(switchElement).toHaveClass('mdt-h-6', 'mdt-w-11');
+      expect(thumbOf(switchElement)).toHaveClass(
+        'mdt-h-5',
+        'mdt-w-5',
+        'data-[state=checked]:mdt-translate-x-5'
+      );
     });
 
-    it('renders with large size', () => {
+    it('md given by name draws the same classes as the default', () => {
+      render(<MotadataSwitch size="md" aria-label="Toggle setting" />);
+      const switchElement = screen.getByRole('switch');
+      expect(switchElement).toHaveClass('mdt-h-6', 'mdt-w-11');
+      expect(thumbOf(switchElement)).toHaveClass('mdt-h-5', 'mdt-w-5');
+    });
+
+    it('renders with large size: a 28 x 56 track and a 24 thumb that travels 28', () => {
       render(<MotadataSwitch size="lg" aria-label="Toggle setting" />);
       const switchElement = screen.getByRole('switch');
-      expect(switchElement).toHaveClass('mdt-h-7');
-      expect(switchElement).toHaveClass('mdt-w-14');
+      expect(switchElement).toHaveClass('mdt-h-7', 'mdt-w-14');
+      expect(thumbOf(switchElement)).toHaveClass(
+        'mdt-h-6',
+        'mdt-w-6',
+        'data-[state=checked]:mdt-translate-x-7'
+      );
+    });
+
+    it('keeps the pill at every size', () => {
+      for (const size of ['sm', 'md', 'lg'] as const) {
+        const { unmount } = render(<MotadataSwitch size={size} aria-label="Toggle setting" />);
+        const switchElement = screen.getByRole('switch');
+        expect(switchElement).toHaveClass('mdt-rounded-full');
+        expect(thumbOf(switchElement)).toHaveClass('mdt-rounded-full');
+        unmount();
+      }
+    });
+  });
+
+  describe('Colours and hover', () => {
+    it('is the input grey off and the primary ink on', () => {
+      render(<MotadataSwitch aria-label="Toggle setting" />);
+      const switchElement = screen.getByRole('switch');
+      expect(switchElement).toHaveClass('data-[state=unchecked]:mdt-bg-input');
+      expect(switchElement).toHaveClass('data-[state=checked]:mdt-bg-primary');
+    });
+
+    it('takes the off track one step darker on hover', () => {
+      render(<MotadataSwitch aria-label="Toggle setting" />);
+      expect(screen.getByRole('switch')).toHaveClass(
+        'hover:data-[state=unchecked]:mdt-bg-neutral-50'
+      );
+    });
+
+    it('eases the on track to 90% on hover', () => {
+      render(<MotadataSwitch defaultChecked aria-label="Toggle setting" />);
+      expect(screen.getByRole('switch')).toHaveClass(
+        'hover:data-[state=checked]:mdt-bg-primary/90'
+      );
+    });
+
+    it('carries both hover answers whatever the size', () => {
+      for (const size of ['sm', 'md', 'lg'] as const) {
+        const { unmount } = render(<MotadataSwitch size={size} aria-label="Toggle setting" />);
+        expect(screen.getByRole('switch')).toHaveClass(
+          'hover:data-[state=unchecked]:mdt-bg-neutral-50',
+          'hover:data-[state=checked]:mdt-bg-primary/90'
+        );
+        unmount();
+      }
+    });
+
+    it('draws the colour change and the travel as transitions', () => {
+      render(<MotadataSwitch aria-label="Toggle setting" />);
+      expect(screen.getByRole('switch')).toHaveClass('mdt-transition-colors');
+      expect(thumbOf(screen.getByRole('switch'))).toHaveClass('mdt-transition-transform');
     });
   });
 
@@ -210,6 +297,15 @@ describe('MotadataSwitch', () => {
       render(<MotadataSwitch aria-label="Toggle setting" />);
       const switchElement = screen.getByRole('switch');
       expect(switchElement).toBeInTheDocument();
+      expect(switchElement).toHaveAttribute('role', 'switch');
+    });
+
+    it('sets role="switch" at every size', () => {
+      for (const size of ['sm', 'md', 'lg'] as const) {
+        const { unmount } = render(<MotadataSwitch size={size} aria-label="Toggle setting" />);
+        expect(screen.getByRole('switch')).toHaveAttribute('role', 'switch');
+        unmount();
+      }
     });
 
     it('has proper ARIA checked state', () => {
