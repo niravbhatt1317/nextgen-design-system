@@ -20,7 +20,7 @@ import type { DateInputProps } from './DateInput.types';
  * browser's "Sept". No time: expiry is day-only (Pranjal, 2026-09-22).
  */
 const meta: Meta<typeof DateInput> = {
-  title: 'Components/DateInput',
+  title: 'New Components/DateInput',
   component: DateInput,
   tags: ['autodocs'],
   parameters: {

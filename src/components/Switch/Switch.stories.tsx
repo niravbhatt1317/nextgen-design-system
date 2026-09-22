@@ -16,7 +16,7 @@ import {
 import { MotadataSwitch } from './Switch';
 
 const meta: Meta<typeof MotadataSwitch> = {
-  title: 'Components/Switch',
+  title: 'New Components/Switch',
   component: MotadataSwitch,
   tags: ['autodocs'],
   parameters: {

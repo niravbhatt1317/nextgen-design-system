@@ -40,7 +40,22 @@ export default {
   parameters: {
     // Alphabetical, so a new component turns up where its name says it should.
     options: {
-      storySort: { method: 'alphabetical', locales: 'en-US' },
+      storySort: {
+        method: 'alphabetical',
+        locales: 'en-US',
+        // The sidebar's order is his (Pranjal, 2026-09-22): Foundation and Layout on top, then New Components
+        // (the parts we worked on), Components, Deprecated 2, Deprecated; the two guides close the list.
+        order: [
+          'Foundation',
+          'Layout',
+          'New Components',
+          'Components',
+          'Deprecated 2',
+          'Deprecated',
+          'Introduction',
+          'Getting Started',
+        ],
+      },
     },
     controls: {
       matchers: {

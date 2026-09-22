@@ -4,7 +4,7 @@ import { FormLabel } from '../Form';
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof RadioGroup> = {
-  title: 'Components/Radio',
+  title: 'New Components/Radio',
   component: RadioGroup,
   tags: ['autodocs'],
   parameters: {

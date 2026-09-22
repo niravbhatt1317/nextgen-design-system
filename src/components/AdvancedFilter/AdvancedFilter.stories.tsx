@@ -12,7 +12,7 @@ import { Icon } from '@/components/Icon';
  * first; this is the same panel as a library part.
  */
 const meta: Meta<typeof AdvancedFilter> = {
-  title: 'Components/AdvancedFilter',
+  title: 'New Components/AdvancedFilter',
   component: AdvancedFilter,
   tags: ['autodocs'],
   parameters: {

@@ -6,7 +6,7 @@ import { KpiBars, KpiGauge } from './KpiCharts';
 
 // The card's props are a union (one metric, or `items`); the controls table follows the single-metric shape.
 const meta: Meta<KpiMetricProps> = {
-  title: 'Components/KPI Card',
+  title: 'New Components/KPI Card',
   component: KpiCard as React.ComponentType<KpiMetricProps>,
   tags: ['autodocs'],
   parameters: {

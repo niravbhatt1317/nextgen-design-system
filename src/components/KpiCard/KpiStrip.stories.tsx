@@ -4,7 +4,7 @@ import { KpiGauge } from './KpiCharts';
 import { KpiStrip } from './KpiStrip';
 
 const meta: Meta<typeof KpiStrip> = {
-  title: 'Components/KPI Card/Strip',
+  title: 'New Components/KPI Card/Strip',
   component: KpiStrip,
   tags: ['autodocs'],
   parameters: {

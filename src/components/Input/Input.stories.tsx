@@ -7,7 +7,7 @@ import { Input } from './Input';
  * It supports labels, error states, helper text, and adornments.
  */
 const meta: Meta<typeof Input> = {
-  title: 'Components/Input',
+  title: 'New Components/Input',
   component: Input,
   tags: ['autodocs'],
   parameters: {

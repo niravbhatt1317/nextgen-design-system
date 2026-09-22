@@ -20,7 +20,7 @@ import { formatDay } from './date';
  * a `withTime` option is left for later.
  */
 const meta: Meta<typeof DatePicker> = {
-  title: 'Components/DatePicker',
+  title: 'New Components/DatePicker',
   component: DatePicker,
   tags: ['autodocs'],
   parameters: {

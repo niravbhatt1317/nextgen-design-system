@@ -7,7 +7,7 @@ import { Badge } from '../Badge';
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof Tabs> = {
-  title: 'Components/Tabs',
+  title: 'New Components/Tabs',
   component: Tabs,
   tags: ['autodocs'],
   parameters: {

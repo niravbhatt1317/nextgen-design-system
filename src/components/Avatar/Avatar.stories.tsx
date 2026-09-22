@@ -4,7 +4,7 @@ import { AvatarStack } from './AvatarStack';
 import { Icon } from '@/components/Icon';
 
 const meta: Meta<typeof Avatar> = {
-  title: 'Components/Avatar',
+  title: 'New Components/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   parameters: {
