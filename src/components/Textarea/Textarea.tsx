@@ -15,11 +15,11 @@ export const textareaVariants = cva(
     'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
     'mdt-bg-background mdt-text-neutral-90',
     'mdt-transition-[border-color,box-shadow]',
-    'placeholder:mdt-text-neutral-70',
+    'placeholder:mdt-text-faint',
     'hover:mdt-border-primary',
     'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
       'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70 disabled:hover:mdt-border-neutral-30',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint disabled:hover:mdt-border-neutral-30',
   ],
   {
     variants: {
@@ -144,13 +144,19 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             {...props}
           />
           {held && (
-            <div className="mdt-absolute mdt-right-3 mdt-top-[9px] mdt-flex mdt-items-center mdt-text-neutral-70">
+            <div className="mdt-absolute mdt-right-3 mdt-top-[9px] mdt-flex mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />
             </div>
           )}
         </div>
         {error && (
-          <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+          <p
+            id={errorId}
+            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            role="alert"
+          >
+            {/* the alert mark, 12, before the message (K-Field-10) */}
+            <Icon name="alert-circle" size={12} aria-hidden />
             {error}
           </p>
         )}

@@ -1,21 +1,31 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import type { ReactNode } from 'react';
+import { within } from 'storybook/test';
+import { DateInput } from '../DateInput';
+import { Icon } from '../Icon';
+import { NumberInput } from '../NumberInput';
+import { Select } from '../Select';
 import { Input } from './Input';
 
-/**
- * The Input component is used for text input fields.
- * It supports labels, error states, helper text, and adornments.
+/*
+ * THE FIELD, frame by frame from the artifact he ruled on (Pranjal, 2026-09-17,
+ * mocks/foundation/inputs.html; DESIGN-LANGUAGE.md K-Field-01 to K-Field-19).
+ * Every number here is the mock's number. The Foundation/Field story keeps the
+ * seven-kinds matrix; this page is the Input itself.
  */
+
+const RULE =
+  'One field everywhere (K-Field-01 to K-Field-19; Pranjal, 2026-09-17). 32 high, corners 8, the text 13/400, 12 at the sides: the placeholder in the faint ink #8FA0BD, the typed value in neutral-90 #516281, a 1px neutral-30 border. Under the pointer the border turns to the primary colour #070F1D; focused, the same border with a 3px halo of it at 8%. Disabled sits on the neutral-10 ground #F7FAFC in the placeholder colour, not dimmed, with a not-allowed cursor. A held field is disabled with a 14 lock inside at the right, 12 from the edge, in the disabled text colour, and the value stops 34 short of the edge (12 + 14 + 8) in an ellipsis. Error is the danger border #DB132A in every state, the halo turning red (14%) on focus, and the message under the field at 12 in the danger colour with the alert mark. The default size, sm, IS this field; md 36 / 14 and lg 40 / 16 stay for the places that ask.';
+
 const meta: Meta<typeof Input> = {
   title: 'New Components/Input',
   component: Input,
   tags: ['autodocs'],
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
-        component:
-          'A text input component with support for labels, validation states, and adornments.',
+        component: RULE,
       },
     },
     controls: {
@@ -23,34 +33,20 @@ const meta: Meta<typeof Input> = {
     },
   },
   argTypes: {
-    // === Core Props ===
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
-      description: 'Size variant of the input',
+      description:
+        'sm is THE field (32 high, text 13, 12 at the sides) and the default; md (36 / 14) and lg (40 / 16) stay for the places that ask',
       table: {
         type: { summary: '"sm" | "md" | "lg"' },
-        defaultValue: { summary: 'md' },
+        defaultValue: { summary: 'sm' },
       },
     },
     type: {
       control: 'select',
-      options: [
-        'text',
-        'email',
-        'password',
-        'number',
-        'tel',
-        'url',
-        'search',
-        'date',
-        'time',
-        'datetime-local',
-        'month',
-        'week',
-        'color',
-      ],
-      description: 'HTML input type attribute',
+      options: ['text', 'email', 'password', 'search', 'tel', 'url'],
+      description: 'The HTML input type; a number, a dropdown and a date are their own components',
       table: {
         type: { summary: 'string' },
         defaultValue: { summary: 'text' },
@@ -58,805 +54,364 @@ const meta: Meta<typeof Input> = {
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text displayed when input is empty',
-      table: {
-        type: { summary: 'string' },
-      },
+      description: 'Shown while the field is empty, in the faint ink #8FA0BD (K-Field-03)',
+      table: { type: { summary: 'string' } },
     },
     value: {
       control: 'text',
-      description: 'Controlled value of the input',
-      table: {
-        type: { summary: 'string' },
-      },
+      description: 'The typed value, in neutral-90 #516281 (K-Field-04)',
+      table: { type: { summary: 'string' } },
     },
     defaultValue: {
       control: 'text',
-      description: 'Default value for uncontrolled input',
-      table: {
-        type: { summary: 'string' },
-      },
+      description: 'The starting value of an uncontrolled field',
+      table: { type: { summary: 'string' } },
     },
-    className: {
-      control: 'text',
-      description: 'Custom CSS classes for the input element',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    wrapperClassName: {
-      control: 'text',
-      description: 'Custom CSS classes for the wrapper container',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-
-    // === Label & Messages ===
     label: {
       control: 'text',
-      description: 'Label text displayed above the input',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    error: {
-      control: 'text',
-      description: 'Error message displayed below the input (shows red styling)',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    helperText: {
-      control: 'text',
-      description: 'Helper text displayed below the input (hidden when error is present)',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-
-    // === Adornments ===
-    startAdornment: {
-      control: false,
-      description: 'Icon, text, or element displayed at the start of the input (left side)',
-      table: {
-        type: { summary: 'ReactNode' },
-      },
-    },
-    endAdornment: {
-      control: false,
-      description:
-        'Icon, text, or element displayed at the end of the input (right side). Commonly used for clear buttons, password visibility toggles, or units',
-      table: {
-        type: { summary: 'ReactNode' },
-      },
-    },
-
-    // === States ===
-    disabled: {
-      control: 'boolean',
-      description: 'Disables the input and prevents user interaction',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
-      },
-    },
-    readOnly: {
-      control: 'boolean',
-      description: 'Makes the input read-only (can be focused but not edited)',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
-      },
+      description: 'Above the field: 13 in neutral-90, 6 under it (K-Field-05)',
+      table: { type: { summary: 'string' } },
     },
     required: {
       control: 'boolean',
-      description: 'Marks the input as required (for form validation)',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
-      },
+      description: 'Adds the asterisk in the danger red after the label (K-Field-05)',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
-
-    // === Input Attributes ===
-    name: {
+    error: {
       control: 'text',
-      description: 'Name attribute for form submission',
-      table: {
-        type: { summary: 'string' },
-      },
+      description:
+        'The danger border in every state, the red halo on focus, and this message at 12 under the field with the alert mark (K-Field-10)',
+      table: { type: { summary: 'string' } },
     },
-    id: {
+    helperText: {
       control: 'text',
-      description: 'Unique identifier for the input element',
-      table: {
-        type: { summary: 'string' },
-      },
+      description: 'Under the field at 12 in the muted colour; hidden while there is an error',
+      table: { type: { summary: 'string' } },
     },
-    autoComplete: {
-      control: 'text',
-      description: 'HTML autocomplete attribute for browser autofill',
-      table: {
-        type: { summary: 'string' },
-      },
+    startAdornment: {
+      control: false,
+      description:
+        'A glyph at the left: 14, at 12 from the edge, 6 to the text so the text starts at 32 (K-Field-15)',
+      table: { type: { summary: 'ReactNode' } },
     },
-    autoFocus: {
-      control: 'boolean',
-      description: 'Automatically focus the input when component mounts',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
-      },
+    endAdornment: {
+      control: false,
+      description: 'A glyph at the right: 14, at 12 from the edge, the text stopping 32 short',
+      table: { type: { summary: 'ReactNode' } },
     },
-    maxLength: {
-      control: 'number',
-      description: 'Maximum number of characters allowed',
-      table: {
-        type: { summary: 'number' },
-      },
-    },
-    minLength: {
-      control: 'number',
-      description: 'Minimum number of characters required',
-      table: {
-        type: { summary: 'number' },
-      },
-    },
-    pattern: {
-      control: 'text',
-      description: 'Regular expression pattern for validation',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    min: {
-      control: 'text',
-      description: 'Minimum value (for number, date, time inputs)',
-      table: {
-        type: { summary: 'string | number' },
-      },
-    },
-    max: {
-      control: 'text',
-      description: 'Maximum value (for number, date, time inputs)',
-      table: {
-        type: { summary: 'string | number' },
-      },
-    },
-    step: {
-      control: 'text',
-      description: 'Stepping interval (for number, date, time inputs)',
-      table: {
-        type: { summary: 'string | number' },
-      },
-    },
-
-    // === Event Handlers ===
-    onChange: {
-      action: 'changed',
-      description: 'Callback fired when the input value changes',
-      table: {
-        type: { summary: '(event: ChangeEvent<HTMLInputElement>) => void' },
-      },
-    },
-    onFocus: {
-      action: 'focused',
-      description: 'Callback fired when the input receives focus',
-      table: {
-        type: { summary: '(event: FocusEvent<HTMLInputElement>) => void' },
-      },
-    },
-    onBlur: {
-      action: 'blurred',
-      description: 'Callback fired when the input loses focus',
-      table: {
-        type: { summary: '(event: FocusEvent<HTMLInputElement>) => void' },
-      },
-    },
-    onKeyDown: {
-      action: 'keydown',
-      description: 'Callback fired when a key is pressed down',
-      table: {
-        type: { summary: '(event: KeyboardEvent<HTMLInputElement>) => void' },
-      },
-    },
-    onKeyUp: {
-      action: 'keyup',
-      description: 'Callback fired when a key is released',
-      table: {
-        type: { summary: '(event: KeyboardEvent<HTMLInputElement>) => void' },
-      },
-    },
-
-    // === ARIA Attributes ===
-    'aria-label': {
-      control: 'text',
-      description: 'Accessible label for screen readers (use when label prop is not provided)',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    'aria-describedby': {
-      control: 'text',
-      description: 'ID of element that describes the input',
-      table: {
-        type: { summary: 'string' },
-      },
-    },
-    'aria-invalid': {
+    disabled: {
       control: 'boolean',
       description:
-        'Indicates whether the input value is invalid (automatically set when error prop is present)',
-      table: {
-        type: { summary: 'boolean' },
-      },
+        'Off for a moment: the neutral-10 ground, the placeholder colour for the text, opacity 1, a not-allowed cursor, no lock (K-Field-09, K-Field-13)',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    locked: {
+      control: 'boolean',
+      description:
+        'Held: disabled with the 14 lock inside at the right, 12 from the edge; the value stops 34 short (K-Field-11)',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    readOnly: {
+      control: 'boolean',
+      description: 'Focusable but not editable',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    className: {
+      control: 'text',
+      description: 'Classes for the field itself',
+      table: { type: { summary: 'string' } },
+    },
+    wrapperClassName: {
+      control: 'text',
+      description: 'Classes for the wrapper (the label, the field and the message)',
+      table: { type: { summary: 'string' } },
+    },
+    onChange: {
+      action: 'changed',
+      table: { type: { summary: '(event: ChangeEvent<HTMLInputElement>) => void' } },
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ width: '320px' }}>
-        <Story />
-      </div>
-    ),
-  ],
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/* The mock's matrix cell: a 220 column with 16 in, so the field is 188 wide; the
+ * head 11/600 upper-case in neutral-90, as the mock's column heads. */
+function Cell({ head, note, children }: { head: string; note?: string; children: ReactNode }) {
+  return (
+    <div className="mdt-flex mdt-w-[188px] mdt-shrink-0 mdt-flex-col mdt-gap-2">
+      <div className="mdt-text-[11px] mdt-font-semibold mdt-uppercase mdt-tracking-wide mdt-text-neutral-90">
+        {head}
+        {note && (
+          <span className="mdt-ml-1.5 mdt-font-normal mdt-normal-case mdt-tracking-normal mdt-text-faint">
+            {note}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Frame({ children }: { children: ReactNode }) {
+  return (
+    <div className="mdt-flex mdt-flex-wrap mdt-items-start mdt-gap-x-8 mdt-gap-y-6">{children}</div>
+  );
+}
+
+const DAYS = [
+  { value: '7', label: '7 days' },
+  { value: '14', label: '14 days' },
+  { value: '30', label: '30 days' },
+  { value: '90', label: '90 days' },
+];
+
+const searchGlyph = <Icon name="search" size={14} aria-hidden />;
+
 /**
- * The default input.
+ * The mock's first frame, the text kind in its states. 32 high, corners 8, the
+ * text 13 in neutral-90 #516281, the placeholder in the faint ink #8FA0BD, a
+ * 1px neutral-30 border, 12 at the sides. Hover: the border turns to the
+ * primary colour #070F1D (move the pointer over the second field). Focused: the
+ * same border with the 3px halo of it at 8% (the third field takes focus on
+ * load). Disabled: the neutral-10 ground #F7FAFC, the text in the placeholder
+ * colour, opacity 1, a not-allowed cursor. Held: disabled with the 14 lock at
+ * 12 from the right and the value stopping 34 short. Error: the #DB132A border,
+ * the red halo on focus, the message at 12 with the alert mark.
  */
-export const Default: Story = {
-  args: {
-    placeholder: 'Enter text...',
-    'aria-label': 'Text input',
+export const TheField: Story = {
+  name: 'The field',
+  render: () => (
+    <Frame>
+      <Cell head="Default">
+        <Input aria-label="Default" placeholder="Enter team name" />
+      </Cell>
+      <Cell head="Hover" note="move the pointer over it">
+        <Input aria-label="Hover" placeholder="Enter team name" />
+      </Cell>
+      <Cell head="Focused" note="takes focus on load">
+        <Input aria-label="Focused" defaultValue="Night Sh" />
+      </Cell>
+      <Cell head="Filled">
+        <Input aria-label="Filled" defaultValue="Night Shift" />
+      </Cell>
+      <Cell head="Disabled">
+        <Input aria-label="Disabled" placeholder="Enter team name" disabled />
+      </Cell>
+      <Cell head="Held">
+        <Input aria-label="Held" defaultValue="emily.davis@company.com" locked readOnly />
+      </Cell>
+      <Cell head="Error">
+        <Input
+          aria-label="Error"
+          defaultValue="IT Support"
+          error="A team with this name already exists"
+        />
+      </Cell>
+    </Frame>
+  ),
+  play: ({ canvasElement }) => {
+    /* the Focused cell shows the focus look as the mock draws it: the primary border and the halo */
+    within(canvasElement).getByLabelText('Focused').focus();
   },
 };
 
 /**
- * Input with a label.
+ * The mock's kinds, each at rest: text; search with the 14 glyph at 12 and the
+ * text at 32; number with its own stepper (two 18 x 11 buttons stacked 4 from
+ * the right, 9 chevrons); dropdown, which is the Select's trigger (the 16
+ * chevron at 10 from the right); date, which is the DateInput (the 16 calendar
+ * glyph at 12 from the right). One box, five doors. OPEN: the Select's own
+ * default size is still md (36 high, text 14) although K-Field-17 rules the
+ * trigger at sm; the dropdown here is set to sm by hand until that is settled.
+ */
+export const Kinds: Story = {
+  render: () => (
+    <Frame>
+      <Cell head="Text">
+        <Input label="Team name" placeholder="Enter team name" />
+      </Cell>
+      <Cell head="Search">
+        <Input
+          aria-label="Search grants"
+          placeholder="Search grants"
+          startAdornment={searchGlyph}
+        />
+      </Cell>
+      <Cell head="Number">
+        <NumberInput label="Maximum uses" placeholder="0" min={0} />
+      </Cell>
+      <Cell head="Dropdown">
+        <Select
+          mode="single"
+          size="sm"
+          label="Link expires after"
+          placeholder="Select days…"
+          options={DAYS}
+        />
+      </Cell>
+      <Cell head="Date">
+        <DateInput label="Expires on" placeholder="Select a date" />
+      </Cell>
+    </Frame>
+  ),
+};
+
+/**
+ * The label is 13/400 in neutral-90 #516281 with 6 under it; a required field
+ * carries the asterisk in the danger red #DB132A after the label (K-Field-05).
+ * Helper text sits under the field at 12 in the muted colour and gives way to
+ * an error message.
  */
 export const WithLabel: Story = {
-  args: {
-    label: 'Email',
-    placeholder: 'Enter your email',
-    type: 'email',
-  },
+  name: 'With label',
+  render: () => (
+    <Frame>
+      <Cell head="Label">
+        <Input label="Team name" placeholder="Enter team name" />
+      </Cell>
+      <Cell head="Required">
+        <Input label="Team name" placeholder="Enter team name" required />
+      </Cell>
+      <Cell head="Helper">
+        <Input label="Email" placeholder="you@company.com" helperText="Work addresses only" />
+      </Cell>
+    </Frame>
+  ),
 };
 
 /**
- * Input with helper text.
+ * Error is the danger border #DB132A in every state - at rest, under the
+ * pointer and focused - and on focus the 3px halo turns red, destructive at
+ * 14%. The message sits under the field at 12 in the danger colour with the
+ * 12 alert mark, 6 before the text, as role="alert" (K-Field-10). Click into
+ * the second field for the red halo.
  */
-export const WithHelperText: Story = {
-  args: {
-    label: 'Password',
-    type: 'password',
-    placeholder: 'Enter password',
-    helperText: 'Password must be at least 8 characters',
-  },
+export const Error: Story = {
+  render: () => (
+    <Frame>
+      <Cell head="At rest">
+        <Input
+          label="Team name"
+          defaultValue="IT Support"
+          error="A team with this name already exists"
+        />
+      </Cell>
+      <Cell head="Focused" note="click into it">
+        <Input
+          label="Team name"
+          defaultValue="IT Support"
+          error="A team with this name already exists"
+        />
+      </Cell>
+      <Cell head="Empty">
+        <Input label="Team name" placeholder="Enter team name" error="A team name is required" />
+      </Cell>
+    </Frame>
+  ),
 };
 
 /**
- * Input in error state with error message.
+ * A held field is a disabled field something else owns - a directory, a fixed
+ * identity. The 14 lock sits inside at the right, 12 from the edge, in the
+ * disabled text colour; the value stops 34 short of the edge (12 + the 14 lock
+ * + 8) and ends in an ellipsis, never running under the lock; the label stays
+ * plain (K-Field-11). A field merely off for a moment is the plain grey field
+ * with no lock (K-Field-13).
  */
-export const WithError: Story = {
-  args: {
-    label: 'Email',
-    type: 'email',
-    placeholder: 'Enter your email',
-    error: 'Please enter a valid email address',
-    defaultValue: 'invalid-email',
-  },
+export const Held: Story = {
+  render: () => (
+    <Frame>
+      <Cell head="Held">
+        <Input label="Email" defaultValue="emily.davis@company.com" locked readOnly />
+      </Cell>
+      <Cell head="A long value truncates">
+        <Input
+          label="Email"
+          defaultValue="alexandra.konstantinopoulos@company.com"
+          locked
+          readOnly
+        />
+      </Cell>
+      <Cell head="Off for a moment" note="no lock">
+        <Input label="Email" defaultValue="emily.davis@company.com" disabled readOnly />
+      </Cell>
+    </Frame>
+  ),
 };
 
 /**
- * Different size variants.
+ * A start glyph is 14, at 12 from the left, 6 to the text, so the text starts
+ * at 32; an end glyph is the same from the right, the text stopping 32 short
+ * (K-Field-15). The glyph is in the faint ink at rest and neutral-90 under the
+ * pointer or while focused. Once a search has text, the clear cross sits at
+ * the right where the end glyph goes.
+ */
+export const Adornments: Story = {
+  render: () => (
+    <Frame>
+      <Cell head="Start glyph">
+        <Input
+          aria-label="Search grants"
+          placeholder="Search grants"
+          startAdornment={searchGlyph}
+        />
+      </Cell>
+      <Cell head="Typed, with the clear">
+        <Input
+          aria-label="Search grants"
+          defaultValue="helpdesk"
+          startAdornment={searchGlyph}
+          endAdornment={<Icon name="x" size={14} aria-label="Clear search" />}
+        />
+      </Cell>
+      <Cell head="End glyph">
+        <Input
+          aria-label="Email"
+          placeholder="you@company.com"
+          endAdornment={<Icon name="mail" size={14} aria-hidden />}
+        />
+      </Cell>
+    </Frame>
+  ),
+};
+
+/**
+ * sm - 32 high, text 13, 12 at the sides - IS the field and the default
+ * (K-Field-01). md (36 high, text 14) and lg (40 high, text 16, 16 at the
+ * sides) stay for the places that ask for them; nothing new is built on them.
  */
 export const Sizes: Story = {
   render: () => (
-    <div className="mdt-flex mdt-flex-col mdt-gap-4">
-      <Input size="sm" placeholder="Small input" aria-label="Small input" />
-      <Input size="md" placeholder="Medium input (default)" aria-label="Medium input" />
-      <Input size="lg" placeholder="Large input" aria-label="Large input" />
-    </div>
+    <Frame>
+      <Cell head="sm · 32" note="the default">
+        <Input aria-label="Small" placeholder="32 high, text 13" />
+      </Cell>
+      <Cell head="md · 36" note="for the places that ask">
+        <Input aria-label="Medium" size="md" placeholder="36 high, text 14" />
+      </Cell>
+      <Cell head="lg · 40" note="for the places that ask">
+        <Input aria-label="Large" size="lg" placeholder="40 high, text 16" />
+      </Cell>
+    </Frame>
   ),
 };
 
 /**
- * Input with start adornment (icon).
+ * Every prop on the controls. The field starts as the rule leaves it: sm, a
+ * placeholder, nothing else.
  */
-export const WithStartAdornment: Story = {
+export const Playground: Story = {
   args: {
-    placeholder: 'Search...',
-    'aria-label': 'Search input',
-    startAdornment: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
+    placeholder: 'Enter team name',
+    'aria-label': 'Team name',
+  },
+  decorators: [
+    (StoryFn) => (
+      <div className="mdt-w-[320px]">
+        <StoryFn />
+      </div>
     ),
-  },
-};
-
-/**
- * Input with end adornment (icon).
- */
-export const WithEndAdornment: Story = {
-  args: {
-    label: 'Password',
-    type: 'password',
-    placeholder: 'Enter password',
-    endAdornment: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="mdt-cursor-pointer"
-      >
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    ),
-  },
-};
-
-/**
- * Input with both adornments.
- */
-export const WithBothAdornments: Story = {
-  args: {
-    placeholder: 'Amount',
-    startAdornment: <span className="mdt-text-sm">$</span>,
-    endAdornment: <span className="mdt-text-sm">USD</span>,
-    type: 'number',
-  },
-};
-
-/**
- * Disabled input.
- */
-export const Disabled: Story = {
-  args: {
-    label: 'Email',
-    disabled: true,
-    placeholder: 'Disabled input',
-    defaultValue: 'disabled@example.com',
-  },
-};
-
-/**
- * Read-only input.
- */
-export const ReadOnly: Story = {
-  args: {
-    label: 'Account ID',
-    readOnly: true,
-    defaultValue: 'ACC-123456',
-    helperText: 'This field cannot be edited',
-  },
-};
-
-/**
- * Required input.
- */
-export const Required: Story = {
-  args: {
-    label: 'Username',
-    required: true,
-    placeholder: 'Required field',
-  },
-};
-
-/**
- * Various input types.
- */
-export const InputTypes: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-flex-col mdt-gap-4">
-      <Input label="Text" type="text" placeholder="Text input" />
-      <Input label="Email" type="email" placeholder="Email input" />
-      <Input label="Password" type="password" placeholder="Password input" />
-      <Input label="Number" type="number" placeholder="Number input" />
-      <Input label="Tel" type="tel" placeholder="Phone input" />
-      <Input label="URL" type="url" placeholder="URL input" />
-      <Input label="Search" type="search" placeholder="Search input" />
-    </div>
-  ),
-};
-
-/**
- * Form example with multiple inputs.
- */
-export const FormExample: Story = {
-  render: () => (
-    <form className="mdt-flex mdt-flex-col mdt-gap-4">
-      <Input label="Full Name" placeholder="John Doe" required />
-      <Input label="Email" type="email" placeholder="john@example.com" required />
-      <Input
-        label="Phone"
-        type="tel"
-        placeholder="+1 (555) 123-4567"
-        helperText="Include country code"
-      />
-      <Input label="Website" type="url" placeholder="https://example.com" />
-    </form>
-  ),
-};
-
-/**
- * Interaction test - Typing text into input.
- * This story demonstrates how to test user typing interactions in Storybook.
- */
-export const InteractionTestTyping: Story = {
-  args: {
-    label: 'Username',
-    placeholder: 'Enter your username',
-    onChange: fn(),
-  },
-  play: async ({ args, canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: /username/i });
-
-    // Test: Input is visible and empty
-    await expect(input).toBeInTheDocument();
-    await expect(input).toHaveValue('');
-
-    // Test: Type into the input
-    await userEvent.type(input, 'john_doe');
-
-    // Test: Verify value was typed
-    await expect(input).toHaveValue('john_doe');
-
-    // Test: Verify onChange was called
-    await expect(args.onChange).toHaveBeenCalled();
-  },
-};
-
-/**
- * Interaction test - Disabled input should not accept input.
- */
-export const InteractionTestDisabled: Story = {
-  args: {
-    label: 'Email',
-    placeholder: 'Disabled input',
-    disabled: true,
-    onChange: fn(),
-  },
-  play: async ({ args, canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: /email/i });
-
-    // Test: Input is disabled
-    await expect(input).toBeDisabled();
-
-    // Test: Try to type (should not work)
-    await userEvent.type(input, 'test@example.com');
-
-    // Test: Verify no value was entered
-    await expect(input).toHaveValue('');
-
-    // Test: Verify onChange was NOT called
-    await expect(args.onChange).not.toHaveBeenCalled();
-  },
-};
-
-/**
- * Interaction test - Clear input and verify onChange.
- */
-export const InteractionTestClear: Story = {
-  args: {
-    label: 'Search',
-    placeholder: 'Type to search',
-    defaultValue: 'initial value',
-    onChange: fn(),
-  },
-  play: async ({ args, canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: /search/i });
-
-    // Test: Input has initial value
-    await expect(input).toHaveValue('initial value');
-
-    // Test: Clear the input
-    await userEvent.clear(input);
-
-    // Test: Verify input is empty
-    await expect(input).toHaveValue('');
-
-    // Test: Type new value
-    await userEvent.type(input, 'new search term');
-
-    // Test: Verify new value
-    await expect(input).toHaveValue('new search term');
-
-    // Test: Verify onChange was called multiple times
-    await expect(args.onChange).toHaveBeenCalled();
-  },
-};
-
-/**
- * Industry-standard adornment examples.
- * These examples demonstrate common patterns used in production applications.
- */
-export const AdornmentExamples: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-flex-col mdt-gap-6">
-      {/* Search with magnifying glass icon */}
-      <Input
-        label="Search"
-        placeholder="Search users..."
-        startAdornment={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-        }
-      />
-
-      {/* Email with icon */}
-      <Input
-        label="Email"
-        type="email"
-        placeholder="you@example.com"
-        startAdornment={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
-        }
-      />
-
-      {/* Currency input with text adornments */}
-      <Input
-        label="Price"
-        type="number"
-        placeholder="0.00"
-        startAdornment={<span className="mdt-text-sm mdt-font-medium">$</span>}
-        endAdornment={<span className="mdt-text-xs mdt-text-muted-foreground">USD</span>}
-      />
-
-      {/* Percentage input */}
-      <Input
-        label="Discount"
-        type="number"
-        placeholder="0"
-        endAdornment={<span className="mdt-text-sm mdt-font-medium">%</span>}
-      />
-
-      {/* Unit measurement */}
-      <Input
-        label="Weight"
-        type="number"
-        placeholder="0"
-        endAdornment={<span className="mdt-text-xs mdt-text-muted-foreground">kg</span>}
-      />
-
-      {/* Password with visibility toggle */}
-      <Input
-        label="Password"
-        type="password"
-        placeholder="Enter your password"
-        endAdornment={
-          <button
-            type="button"
-            aria-label="Toggle password visibility"
-            className="mdt-cursor-pointer mdt-border-0 mdt-bg-transparent mdt-p-0 hover:mdt-text-foreground"
-            onClick={() => {
-              // eslint-disable-next-line no-console
-              console.log('Toggle password visibility');
-            }}
-          >
-            <svg
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-        }
-      />
-
-      {/* Clear button */}
-      <Input
-        label="Username"
-        placeholder="Enter username"
-        defaultValue="john_doe"
-        endAdornment={
-          <button
-            type="button"
-            aria-label="Clear input"
-            className="mdt-cursor-pointer mdt-border-0 mdt-bg-transparent mdt-p-0 hover:mdt-text-foreground"
-            onClick={() => {
-              // eslint-disable-next-line no-console
-              console.log('Clear input');
-            }}
-          >
-            <svg
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="m15 9-6 6" />
-              <path d="m9 9 6 6" />
-            </svg>
-          </button>
-        }
-      />
-
-      {/* Loading/spinner indicator */}
-      <Input
-        label="API Key"
-        placeholder="Validating..."
-        disabled
-        endAdornment={
-          <svg
-            className="mdt-animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-          </svg>
-        }
-      />
-
-      {/* Phone with country code */}
-      <Input
-        label="Phone Number"
-        type="tel"
-        placeholder="123-456-7890"
-        startAdornment={<span className="mdt-text-sm mdt-font-medium">+1</span>}
-      />
-
-      {/* URL with protocol */}
-      <Input
-        label="Website"
-        type="url"
-        placeholder="example.com"
-        startAdornment={<span className="mdt-text-xs mdt-text-muted-foreground">https://</span>}
-      />
-
-      {/* User handle */}
-      <Input
-        label="Twitter Handle"
-        placeholder="username"
-        startAdornment={<span className="mdt-text-sm mdt-font-medium">@</span>}
-      />
-
-      {/* File size limit */}
-      <Input
-        label="Max Upload Size"
-        type="number"
-        placeholder="100"
-        endAdornment={<span className="mdt-text-xs mdt-text-muted-foreground">MB</span>}
-      />
-
-      {/* Temperature */}
-      <Input
-        label="Temperature"
-        type="number"
-        placeholder="0"
-        endAdornment={<span className="mdt-text-sm mdt-font-medium">°C</span>}
-      />
-
-      {/* Validation success indicator */}
-      <Input
-        label="Email (Validated)"
-        type="email"
-        defaultValue="user@example.com"
-        endAdornment={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mdt-text-green-600"
-          >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <path d="m9 11 3 3L22 4" />
-          </svg>
-        }
-      />
-
-      {/* Copy button */}
-      <Input
-        label="Share Link"
-        readOnly
-        defaultValue="https://app.example.com/share/abc123"
-        endAdornment={
-          <button
-            type="button"
-            aria-label="Copy to clipboard"
-            className="mdt-cursor-pointer mdt-border-0 mdt-bg-transparent mdt-p-0 hover:mdt-text-foreground"
-            onClick={() => {
-              // eslint-disable-next-line no-console
-              console.log('Copy to clipboard');
-            }}
-          >
-            <svg
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          </button>
-        }
-      />
-    </div>
-  ),
+  ],
 };

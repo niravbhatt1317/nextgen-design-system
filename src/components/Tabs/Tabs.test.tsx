@@ -70,13 +70,13 @@ describe('Tabs — the two types (K-Tabs-01)', () => {
 });
 
 describe('the label (K-Tabs-02 to 05, 07)', () => {
-  it('is 13/500 on an 18 line, neutral-70 at rest', () => {
+  it('is 13/500 on an 18 line, the faint ink at rest', () => {
     render(three());
     expect(tab('Grants')).toHaveClass(
       'mdt-text-[13px]',
       'mdt-font-medium',
       'mdt-leading-[18px]',
-      'mdt-text-neutral-70'
+      'mdt-text-faint'
     );
   });
 
@@ -240,7 +240,7 @@ describe('the icon and the count (K-Tabs-13, 14, 20)', () => {
 
   it('mutes the count on neutral-20, a step darker on the filled track', () => {
     const { unmount } = render(three(undefined, { count: 3 }));
-    expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-20', 'mdt-text-neutral-70');
+    expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-20', 'mdt-text-faint');
     unmount();
     render(three('filled', { count: 3 }));
     expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-30');

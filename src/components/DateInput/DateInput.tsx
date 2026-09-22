@@ -12,7 +12,7 @@ import type { DateInputProps } from './DateInput.types';
  *
  * It is a button wearing the Input's box, so every ruled state comes from the
  * one place: 32 high, corners 8, 13 text in neutral-90, the placeholder in
- * neutral-70, a neutral-30 edge; the primary border under the pointer; the
+ * the faint ink (#8FA0BD), a neutral-30 edge; the primary border under the pointer; the
  * primary border with the 3-px 8% halo when focused or open; disabled on the
  * neutral-10 ground in the placeholder colour; error in the danger border with
  * the red halo and the message under. The calendar glyph is 16 at the RIGHT,
@@ -113,13 +113,17 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
                 )}
                 {...rest}
               >
-                <span className={cn('mdt-truncate', !filled && 'mdt-text-neutral-70')}>
+                <span className={cn('mdt-truncate', !filled && 'mdt-text-faint')}>
                   {filled ? shown : placeholder}
                 </span>
               </button>
             </PopoverTrigger>
             <span
-              className="mdt-pointer-events-none mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-neutral-70"
+              /* the lock in the disabled text colour (K-Field-11); the calendar glyph as it was */
+              className={cn(
+                'mdt-pointer-events-none mdt-absolute mdt-right-3 mdt-flex mdt-items-center',
+                held ? 'mdt-text-faint' : 'mdt-text-neutral-70'
+              )}
               aria-hidden
             >
               {held ? (
@@ -152,7 +156,13 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
           </PopoverContent>
         </Popover>
         {error && (
-          <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+          <p
+            id={errorId}
+            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            role="alert"
+          >
+            {/* the alert mark, 12, before the message (K-Field-10) */}
+            <Icon name="alert-circle" size={12} aria-hidden />
             {error}
           </p>
         )}

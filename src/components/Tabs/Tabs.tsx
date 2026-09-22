@@ -20,7 +20,7 @@ import type {
  * before is TabsOld2, under Deprecated 2.
  *
  * UNDERLINE - the default, every drawer band and page band: the label 13/500 in
- * neutral-70, the active one 600 in the primary colour; a 2px primary line ON
+ * the faint ink (#8FA0BD), the active one 600 in the primary colour; a 2px primary line ON
  * the strip's hairline spanning the label plus 12 at both sides; the tabs flush,
  * so labels read 24 apart; 9 above the label, 11 below; the strip starts on the
  * content edge so the active line lines up with the text under it.
@@ -54,13 +54,13 @@ const LIST_TYPE: Record<TabsType, string> = {
 };
 
 /* THE LABEL, both types (K-Tabs-02 to K-Tabs-05): 13/500 on an 18 line in
- * neutral-70; hover neutral-90; the active one in the primary colour, and it
+ * the faint ink (#8FA0BD, K-Tabs-03); hover neutral-90; the active one in the primary colour, and it
  * stays primary under the pointer; disabled neutral-40 with a not-allowed cursor
  * (not pointer-events-none, or the cursor never shows). 6 between the icon, the
  * label and the count (K-Tabs-13). Colour moves in 120ms (K-Tabs-23). */
 const TRIGGER_BASE = cn(
   'mdt-inline-flex mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-whitespace-nowrap',
-  'mdt-text-[13px] mdt-font-medium mdt-leading-[18px] mdt-text-neutral-70',
+  'mdt-text-[13px] mdt-font-medium mdt-leading-[18px] mdt-text-faint',
   'mdt-transition-colors mdt-duration-[120ms] mdt-ease-[ease]',
   'hover:mdt-text-neutral-90',
   'data-[state=active]:mdt-text-primary data-[state=active]:hover:mdt-text-primary',
@@ -98,7 +98,7 @@ const TRIGGER_TYPE: Record<TabsType, string> = {
 const COUNT_BASE = cn(
   'mdt-inline-flex mdt-h-[18px] mdt-min-w-[18px] mdt-shrink-0 mdt-items-center mdt-justify-center',
   'mdt-rounded-[9px] mdt-px-[5px] mdt-text-[11px] mdt-font-semibold mdt-leading-none',
-  'mdt-text-neutral-70',
+  'mdt-text-faint',
   '[[data-state=active]_&]:mdt-bg-neutral-90 [[data-state=active]_&]:mdt-text-white',
   '[:disabled_&]:mdt-text-neutral-40'
 );

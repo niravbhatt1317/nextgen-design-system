@@ -272,7 +272,7 @@ describe('Textarea', () => {
       render(<Textarea disabled label="Disabled" />);
       const textarea = screen.getByLabelText('Disabled');
       expect(textarea).toHaveClass('disabled:mdt-bg-neutral-10');
-      expect(textarea).toHaveClass('disabled:mdt-text-neutral-70');
+      expect(textarea).toHaveClass('disabled:mdt-text-faint');
       expect(textarea).not.toHaveClass('disabled:mdt-opacity-50');
     });
 

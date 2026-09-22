@@ -189,4 +189,41 @@ describe('Input', () => {
       expect(screen.getByRole('spinbutton')).toHaveAttribute('type', 'number');
     });
   });
+
+  describe('The field as ruled (K-Field-03, 05, 09, 10, 11)', () => {
+    it('draws the placeholder in the faint ink, not the neutral ramp', () => {
+      render(<Input placeholder="Enter team name" />);
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('placeholder:mdt-text-faint');
+      expect(input).not.toHaveClass('placeholder:mdt-text-neutral-70');
+    });
+
+    it('sits on neutral-10 in the faint ink when disabled, not dimmed', () => {
+      render(<Input disabled />);
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('disabled:mdt-bg-neutral-10', 'disabled:mdt-text-faint');
+      expect(input).not.toHaveClass('disabled:mdt-opacity-50');
+    });
+
+    it('adds the asterisk in the danger red after a required label', () => {
+      render(<Input label="Team name" required />);
+      expect(screen.getByText('*')).toHaveClass('mdt-text-destructive');
+      expect(screen.getByLabelText(/Team name/)).toBeRequired();
+    });
+
+    it('carries the alert mark before the error message', () => {
+      render(<Input error="A team with this name already exists" />);
+      const alert = screen.getByRole('alert');
+      expect(alert.querySelector('svg')).not.toBeNull();
+      expect(alert).toHaveClass('mdt-text-xs', 'mdt-text-destructive');
+    });
+
+    it('holds a locked field: disabled, the lock inside, the value stopping 34 short', () => {
+      render(<Input label="Email" value="emily.davis@company.com" locked readOnly />);
+      const input = screen.getByLabelText('Email');
+      expect(input).toBeDisabled();
+      expect(input).toHaveClass('mdt-pr-[34px]', 'mdt-text-ellipsis');
+      expect(input.parentElement?.querySelector('svg')).not.toBeNull();
+    });
+  });
 });

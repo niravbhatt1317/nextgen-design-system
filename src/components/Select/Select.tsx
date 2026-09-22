@@ -211,8 +211,8 @@ export const selectTriggerVariants = cva(
     'focus-visible:mdt-border-primary focus-visible:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
     'data-[state=open]:mdt-border-primary data-[state=open]:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
     'aria-expanded:mdt-border-primary aria-expanded:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70',
-    'data-[placeholder]:mdt-text-neutral-70',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint',
+    'data-[placeholder]:mdt-text-faint',
   ],
   {
     variants: {
@@ -439,7 +439,13 @@ function renderSingleSelectMode(props: {
       </SelectPrimitive.Root>
 
       {error && (
-        <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+        <p
+          id={errorId}
+          className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+          role="alert"
+        >
+          {/* the alert mark, 12, before the message (K-Field-10) */}
+          <Icon name="alert-circle" size={12} aria-hidden />
           {error}
         </p>
       )}
@@ -467,7 +473,7 @@ function renderSingleSelectIcons(props: {
   /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron - a held field cannot open */
   if (locked) {
     return (
-      <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-neutral-70">
+      <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-faint">
         <Icon name="lock" size={14} aria-hidden />
       </span>
     );
@@ -777,7 +783,7 @@ function renderDefaultMultiSelectTrigger(props: {
       )}
       {locked ? (
         /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron */
-        <Icon name="lock" size={14} className="mdt-shrink-0 mdt-text-neutral-70" aria-hidden />
+        <Icon name="lock" size={14} className="mdt-shrink-0 mdt-text-faint" aria-hidden />
       ) : (
         <Icon
           name="chevron-down"
@@ -819,7 +825,7 @@ function renderMultiSelectSearchInput(props: {
           'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
           'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
           'mdt-px-3 mdt-py-1 mdt-text-[13px]',
-          'placeholder:mdt-text-neutral-70',
+          'placeholder:mdt-text-faint',
           'hover:mdt-border-primary',
           'focus:mdt-border-primary focus:mdt-outline-none ' +
             'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
@@ -889,7 +895,13 @@ function renderHelperOrError(props: {
 
   if (error) {
     return (
-      <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+      <p
+        id={errorId}
+        className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+        role="alert"
+      >
+        {/* the alert mark, 12, before the message (K-Field-10) */}
+        <Icon name="alert-circle" size={12} aria-hidden />
         {error}
       </p>
     );
@@ -2059,7 +2071,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
       // UI props
       placeholder = 'Select...',
-      size = 'md',
+      size = 'sm', // the field's default is sm 32 (K-Field-01 / K-Field-17, 2026-09-17; was md)
       variant = 'default',
       placement = 'bottom',
       disabled: disabledProp = false,

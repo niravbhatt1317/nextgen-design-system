@@ -99,7 +99,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     const stepButton =
-      'mdt-flex mdt-h-[11px] mdt-w-[18px] mdt-cursor-pointer mdt-items-center mdt-justify-center mdt-rounded-[3px] mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-70 hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 disabled:mdt-pointer-events-none disabled:mdt-text-neutral-40';
+      'mdt-flex mdt-h-[11px] mdt-w-[18px] mdt-cursor-pointer mdt-items-center mdt-justify-center mdt-rounded-[3px] mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 disabled:mdt-pointer-events-none disabled:mdt-text-neutral-40';
 
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
@@ -131,7 +131,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             {...props}
           />
           {held ? (
-            <span className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-neutral-70">
+            <span className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />
             </span>
           ) : (
@@ -164,7 +164,13 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           )}
         </div>
         {error && (
-          <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+          <p
+            id={errorId}
+            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            role="alert"
+          >
+            {/* the alert mark, 12, before the message (K-Field-10) */}
+            <Icon name="alert-circle" size={12} aria-hidden />
             {error}
           </p>
         )}

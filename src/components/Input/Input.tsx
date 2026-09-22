@@ -14,18 +14,18 @@ export const InputVariants = cva(
     /* the same edge as the outline Button and the Toolbar's controls
      * (neutral-30) - the toolbar used to force this on any input inside it,
      * and an Input anywhere else came out darker (--mdt-input, neutral-40) */
-    /* THE FIELD (Pranjal, 2026-09-17): corners 8, the typed value in neutral-90, the placeholder in neutral-70; under
+    /* THE FIELD (Pranjal, 2026-09-17): corners 8, the typed value in neutral-90, the placeholder in the faint ink (#8FA0BD); under
      * the pointer the border is the primary colour; focused, the same border with a 3-px halo of it; disabled sits on
      * neutral-10 in the placeholder colour, not dimmed. */
     'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30 dark:mdt-border-neutral-110',
     'mdt-bg-background mdt-text-neutral-90',
     'mdt-transition-[border-color,box-shadow]',
     'file:mdt-border-0 file:mdt-bg-transparent file:mdt-text-sm file:mdt-font-medium',
-    'placeholder:mdt-text-neutral-70',
+    'placeholder:mdt-text-faint',
     'hover:mdt-border-primary',
     'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
       'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-neutral-70 disabled:hover:mdt-border-neutral-30',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint disabled:hover:mdt-border-neutral-30',
   ],
   {
     variants: {
@@ -94,6 +94,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       endAdornment,
       locked,
       disabled,
+      required,
       id: propId,
       ...props
     },
@@ -120,11 +121,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
             {label}
+            {/* the asterisk in the danger red (K-Field-05), as the Select draws it */}
+            {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
           </label>
         )}
-        <div className="mdt-relative mdt-flex mdt-items-center">
+        <div className="mdt-group mdt-relative mdt-flex mdt-items-center">
+          {/* a glyph is 14 at 12 from the edge, in the faint ink at rest and neutral-90 under the pointer or while
+           * focused (the mock's search row); the text starts 32 in */}
           {startAdornment && (
-            <div className="mdt-absolute mdt-left-3 mdt-flex mdt-items-center mdt-text-muted-foreground">
+            <div className="mdt-absolute mdt-left-3 mdt-flex mdt-items-center mdt-text-faint group-focus-within:mdt-text-neutral-90 group-hover:mdt-text-neutral-90">
               {startAdornment}
             </div>
           )}
@@ -143,22 +148,29 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={hasError}
             aria-describedby={describedBy}
             disabled={held || disabled}
+            required={required}
             {...props}
           />
           {held ? (
-            <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-neutral-70">
+            <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />
             </div>
           ) : (
             endAdornment && (
-              <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-muted-foreground">
+              <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint group-focus-within:mdt-text-neutral-90 group-hover:mdt-text-neutral-90">
                 {endAdornment}
               </div>
             )
           )}
         </div>
         {error && (
-          <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+          <p
+            id={errorId}
+            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            role="alert"
+          >
+            {/* the alert mark, 12, before the message (K-Field-10) */}
+            <Icon name="alert-circle" size={12} aria-hidden />
             {error}
           </p>
         )}

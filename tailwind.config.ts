@@ -59,6 +59,11 @@ const config: Config = {
           foreground: 'hsl(var(--mdt-muted-foreground) / <alpha-value>)',
           'foreground-subtle': 'hsl(var(--mdt-muted-foreground-subtle) / <alpha-value>)',
         },
+        // The faint ink - placeholders, resting tab labels, the meta line, a
+        // disabled field's text and its lock. The console's neutral-70
+        // (#8FA0BD), which the library's neutral ramp does not hold; see
+        // globals.css.
+        faint: 'hsl(var(--mdt-faint) / <alpha-value>)',
         accent: {
           DEFAULT: 'hsl(var(--mdt-accent) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-accent-foreground) / <alpha-value>)',
