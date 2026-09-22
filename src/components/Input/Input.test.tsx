@@ -38,14 +38,29 @@ describe('Input', () => {
   });
 
   describe('Sizes', () => {
-    it('applies md size by default', () => {
+    // Renamed 2026-09-22: "applies md size by default" no longer holds. By ruling
+    // (Pranjal, 2026-09-17) the field is 32 high with 13-px text, so sm is the
+    // default; md and lg stay for the places that ask for them.
+    it('applies sm size by default (32 high, text 13)', () => {
       render(<Input />);
-      expect(screen.getByRole('textbox')).toHaveClass('mdt-h-9');
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('mdt-h-8');
+      expect(input).toHaveClass('mdt-text-[13px]');
+      expect(input).not.toHaveClass('mdt-h-9');
     });
 
     it('applies sm size', () => {
       render(<Input size="sm" />);
-      expect(screen.getByRole('textbox')).toHaveClass('mdt-h-8');
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('mdt-h-8');
+      expect(input).toHaveClass('mdt-text-[13px]');
+    });
+
+    it('applies md size when asked', () => {
+      render(<Input size="md" />);
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('mdt-h-9');
+      expect(input).toHaveClass('mdt-text-sm');
     });
 
     it('applies lg size', () => {

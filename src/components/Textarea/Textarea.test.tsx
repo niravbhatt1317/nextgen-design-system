@@ -46,7 +46,10 @@ describe('Textarea', () => {
 
     it('renders with custom wrapperClassName', () => {
       render(<Textarea wrapperClassName="custom-wrapper" label="Field" />);
-      const wrapper = screen.getByLabelText('Field').parentElement;
+      // Since 2026-09-17 the textarea sits inside a positioning box (it holds
+      // the lock of a held field), so the outer wrapper is two levels up.
+      const wrapper = screen.getByLabelText('Field').parentElement?.parentElement;
+      expect(wrapper).toHaveClass('mdt-flex-col');
       expect(wrapper).toHaveClass('custom-wrapper');
     });
   });
@@ -56,7 +59,8 @@ describe('Textarea', () => {
       render(<Textarea size="sm" label="Small" />);
       const textarea = screen.getByLabelText('Small');
       expect(textarea).toHaveClass('mdt-min-h-[80px]');
-      expect(textarea).toHaveClass('mdt-text-xs');
+      // the field's text is 13 (Pranjal, 2026-09-17) - text-xs is 12
+      expect(textarea).toHaveClass('mdt-text-[13px]');
     });
 
     it('renders medium size (default)', () => {
@@ -261,10 +265,15 @@ describe('Textarea', () => {
   });
 
   describe('Disabled state styling', () => {
-    it('has disabled opacity', () => {
+    // Renamed 2026-09-22: "has disabled opacity" no longer holds. By ruling
+    // (Pranjal, 2026-09-17) a disabled field sits on neutral-10 in the
+    // placeholder colour and is not dimmed.
+    it('sits on neutral-10 in the placeholder colour when disabled, not dimmed', () => {
       render(<Textarea disabled label="Disabled" />);
       const textarea = screen.getByLabelText('Disabled');
-      expect(textarea).toHaveClass('disabled:mdt-opacity-50');
+      expect(textarea).toHaveClass('disabled:mdt-bg-neutral-10');
+      expect(textarea).toHaveClass('disabled:mdt-text-neutral-70');
+      expect(textarea).not.toHaveClass('disabled:mdt-opacity-50');
     });
 
     it('has disabled cursor', () => {
