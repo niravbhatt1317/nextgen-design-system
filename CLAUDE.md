@@ -1,3 +1,5 @@
+**READ FIRST: the design rulebook lives in the product repo** - `Functional/next-gen-ui/DESIGN-LANGUAGE.md` on Azure DevOps (Motadata/NextGen/platform-documentation). Every number a part in this library carries is a rule there, with its status and who decided it; the parts keep their numbers in their own comments and stories, the book is where they are ruled. A rule changes only when the person running the session says so, recorded there with the date and their words. Console pages ride this library through a packed copy in the console's `vendor/`; a capability the library lacks is built here first, with a story, then the console rides it.
+
 **On session start:** If `HANDOFF.md` exists in this directory, read it before anything else for the latest state of the work.
 
 # CLAUDE.md - AI Assistant Instructions
