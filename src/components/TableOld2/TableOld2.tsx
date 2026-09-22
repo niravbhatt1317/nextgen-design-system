@@ -1,0 +1,932 @@
+import { cva } from 'class-variance-authority';
+import {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type { MutableRefObject } from 'react';
+import type {
+  KeyboardEvent,
+  MouseEvent,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+} from 'react';
+import { cn } from '@/utils';
+import { Checkbox } from '../Checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../DropdownMenu';
+import { Icon } from '../Icon';
+import type {
+  TableAlignOld2,
+  TableCellOld2Props,
+  TableColGroupOld2Props,
+  TableHeadOld2Props,
+  TableNumberCellOld2Props,
+  TableNumberHeadOld2Props,
+  TableOld2Props,
+  TableRowOld2Props,
+  TableSelectAllOld2Props,
+  TableSelectionCellOld2Props,
+  TableViewportOld2Props,
+} from './TableOld2.types';
+import './tableOld2.css';
+
+/** The width of the row-number column and of the elastic tail. */
+export const TABLE_GUTTER_OLD2 = 60;
+/** Every content column starts here on the console; a person can drag it from 120 to 720. */
+export const TABLE_COLUMN_WIDTH_OLD2 = 200;
+export const TABLE_COLUMN_MIN_OLD2 = 120;
+export const TABLE_COLUMN_MAX_OLD2 = 720;
+
+const ALIGN: Record<TableAlignOld2, string> = {
+  left: 'mdt-text-left',
+  center: 'mdt-text-center',
+  right: 'mdt-text-right mdt-tabular-nums',
+};
+
+/**
+ * TableOld2 cell styles: 54px rows, a 16px inset, 12px type. Frozen cells stay put
+ * while the table scrolls sideways.
+ */
+export const tableCellOld2Variants = cva(
+  [
+    'tbl-old2-cell mdt-h-[54px] mdt-px-4 mdt-py-[5px] mdt-align-middle',
+    'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
+    'mdt-bg-background mdt-text-neutral-130 dark:mdt-text-neutral-10',
+  ],
+  {
+    variants: {
+      frozen: { true: 'mdt-sticky mdt-z-[2]', false: '' },
+      align: ALIGN,
+    },
+    defaultVariants: { frozen: false, align: 'left' },
+  }
+);
+
+/**
+ * Heading styles: 40px tall, 11px slate type, sticky to the top of the region.
+ * The grip, the sort arrow and the "⋯" menu are revealed by table.css.
+ */
+export const tableHeadOld2Variants = cva(
+  [
+    'tbl-old2-head mdt-relative mdt-h-10 mdt-px-4 mdt-py-px mdt-align-middle',
+    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-text-neutral-40',
+    'mdt-select-none mdt-whitespace-nowrap mdt-bg-background',
+    'mdt-sticky mdt-top-0 mdt-z-[3]',
+  ],
+  {
+    variants: {
+      frozen: { true: 'mdt-z-[4]', false: '' },
+      align: ALIGN,
+    },
+    defaultVariants: { frozen: false, align: 'left' },
+  }
+);
+
+/** Row styles. Hover, selected and focus are drawn by table.css across the row's cells. */
+export const tableRowOld2Variants = cva(['tbl-old2-row mdt-outline-none'], {
+  variants: {
+    inert: { true: 'mdt-cursor-default', false: 'mdt-cursor-pointer' },
+  },
+  defaultVariants: { inert: false },
+});
+
+/**
+ * How far the card has become the page: 0 at rest, 1 docked. `driven` means a
+ * page is scrolling this card to its dock line, so the card takes the page's
+ * height and its rows are clipped, not scrolled, until the dock.
+ */
+export interface TableMorphOld2 {
+  morph: number;
+  driven: boolean;
+}
+const TableMorphContextOld2 = createContext<TableMorphOld2>({ morph: 0, driven: false });
+export const useTableMorphOld2 = (): TableMorphOld2 => useContext(TableMorphContextOld2);
+
+/** `docked` read: `true` is 1, a number is clamped to 0..1, `false` or unset is an ordinary card. */
+export function tableMorphOfOld2(docked: boolean | number | undefined): TableMorphOld2 {
+  if (docked === true) return { morph: 1, driven: true };
+  if (docked === false || docked === undefined) return { morph: 0, driven: false };
+  return { morph: Math.min(1, Math.max(0, docked)), driven: true };
+}
+
+const pxOf = (value: string): number => {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : 0;
+};
+
+/**
+ * Where the page pins this card.
+ *
+ * Prefer the page's own published offset; fall back to the band heights it is
+ * derived from, so a change to a band height cannot leave the table docking in
+ * the wrong place. A `calc()` value cannot be parsed, which is exactly when the
+ * band heights are the better answer.
+ */
+function dockLineOf(card: HTMLElement): number {
+  const cs = getComputedStyle(card);
+  const published = cs.getPropertyValue('--mdt-thead-top').trim();
+  if (published !== '' && !published.includes('calc')) return pxOf(published);
+  const b1 = pxOf(cs.getPropertyValue('--mdt-band-b1-h'));
+  const b2 = pxOf(cs.getPropertyValue('--mdt-band-b2t-h'));
+  if (b1 > 0) return b1 + (b2 > 0 ? b2 - 2 : 0);
+  return 0;
+}
+
+/** The most the card ever needs to travel to finish becoming the page; a card
+ * that starts closer to the dock line morphs over the distance it has. */
+const MORPH_RANGE = 140;
+/** Below this there is not enough room to be worth filling. */
+const MIN_FILL = 160;
+
+/** At rest, filling nothing — what a table with nowhere to grow reports. */
+const INERT: TableMorphOld2 = { morph: 0, driven: false };
+
+/**
+ * Drives the morph from the page scroll, and sizes the card while it is at it.
+ *
+ * The sizing is the part that matters: the card takes the whole height under
+ * the dock line whatever it holds, which is what makes one row behave like a
+ * thousand and what keeps the pager on screen.
+ *
+ * It reports `driven` only once it has actually taken a height, which matters
+ * now that it runs by default: a table in a drawer, a modal or a card has no
+ * page to fill, and a table that claims to be driven gives up its own max
+ * height. No scrolling ancestor, or too little room to be worth filling, and
+ * this stays inert and the table behaves exactly as it did before.
+ */
+function useSelfDrivenMorph(
+  cardRef: MutableRefObject<HTMLDivElement | null>,
+  enabled: boolean,
+  dockOffset: number | undefined
+): TableMorphOld2 {
+  const [state, setState] = useState<TableMorphOld2>(INERT);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!enabled || card === null) return undefined;
+
+    /* THE PAGE is the nearest scrolling ancestor — unless that ancestor is
+     * taller than the window, in which case it is not a viewport at all but a
+     * box that grows with whatever is inside it. Storybook wraps every story
+     * on its docs page in exactly such a box: overflow auto, no height. Filling
+     * THAT ratchets — the table stretches to the box, the box grows to the
+     * table, the observer fires, again — and every table on the page ended up
+     * 8,000px tall (Pranjal, 2026-09-11). A box that can show more than the
+     * window can is skipped, and the walk carries on upward. */
+    const isViewport = (el: HTMLElement): boolean =>
+      /(auto|scroll)/.test(getComputedStyle(el).overflowY) && el.clientHeight <= window.innerHeight;
+    let found: HTMLElement | null = card.parentElement;
+    while (found !== null && !isViewport(found)) {
+      found = found.parentElement;
+    }
+    if (found === null) return undefined;
+    const page = found;
+    const dock = dockOffset ?? dockLineOf(card);
+    let filling = false;
+
+    /* Learned, not assumed: a "page" that turns out to grow with its content
+     * is not a page. Once that is seen, filling stops for good. */
+    let contentSized = false;
+    const tooTall = (): boolean => page.clientHeight > window.innerHeight;
+    const fill = (): void => {
+      if (contentSized) return;
+      card.style.height = '';
+      card.style.marginBottom = '';
+      /* Checked EVERY time, not only at mount: on the gallery's docs page the
+       * wrapper is small when the first table mounts and grows as the others
+       * arrive, so a mount-time check waved it through and every table on the
+       * page ended up 6,000px tall (Pranjal, 2026-09-11). */
+      if (tooTall()) {
+        contentSized = true;
+        filling = false;
+        return;
+      }
+      const room = page.clientHeight - dock;
+      filling = room >= MIN_FILL;
+      if (!filling) return;
+      card.style.height = `${String(room)}px`;
+      /* And once more after taking the height: if that made the page taller
+       * than the window, the page was sized by its content — the table just
+       * stretched its own container. Undo, and never try again. */
+      if (tooTall()) {
+        card.style.height = '';
+        contentSized = true;
+        filling = false;
+        return;
+      }
+      /* Cancel the surface's trailing padding so the page's own scroll end IS
+       * the dock line; without it the page runs past and the pinned header
+       * ends up half-hidden under the band above. */
+      const topInPage =
+        card.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop;
+      const over = page.scrollHeight - page.clientHeight - (topInPage - dock);
+      if (over > 0 && over <= 96) card.style.marginBottom = `${String(-over)}px`;
+    };
+
+    let raf = 0;
+    const read = (): void => {
+      raf = 0;
+      const top = card.getBoundingClientRect().top - page.getBoundingClientRect().top;
+      /* THE MORPH RUNS OVER THE TRAVEL THE CARD ACTUALLY HAS, never a flat 140
+       * (Pranjal, 2026-09-12, on the Service accounts page: "do you think its
+       * working fine?"). A page with a KPI strip above the table gives the card
+       * ~200px of travel, so it rested at 0 - a full 12px radius. A page without
+       * one gives it 81px, and against a fixed 140 that card RESTED 42% morphed:
+       * corners half flattened before anyone scrolled. Travel is measured from
+       * the card's place in the CONTENT (`top + scrollTop`), which does not move
+       * as the page scrolls, so every card rests at 0 and reaches 1 exactly at
+       * the dock line. 140 stays as the ceiling for cards that start far down. */
+      const travel = Math.max(1, Math.min(MORPH_RANGE, top + page.scrollTop - dock));
+      const next = filling ? Math.min(1, Math.max(0, (dock + travel - top) / travel)) : 0;
+      setState((prev) =>
+        prev.driven === filling && Math.abs(prev.morph - next) < 0.001
+          ? prev
+          : { morph: next, driven: filling }
+      );
+    };
+    const onScroll = (): void => {
+      if (raf === 0) raf = requestAnimationFrame(read);
+    };
+
+    fill();
+    read();
+    page.addEventListener('scroll', onScroll, { passive: true });
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        fill();
+        read();
+      });
+      observer.observe(page);
+    }
+
+    return () => {
+      page.removeEventListener('scroll', onScroll);
+      if (observer !== null) observer.disconnect();
+      if (raf !== 0) cancelAnimationFrame(raf);
+      card.style.height = '';
+      card.style.marginBottom = '';
+      setState(INERT);
+    };
+  }, [cardRef, enabled, dockOffset]);
+
+  return state;
+}
+
+/**
+ * TableOld2 - the card that holds a list: rows, a bulk bar and a pager.
+ *
+ * @example
+ * ```tsx
+ * <TableOld2 label="Users">
+ *   <TableViewportOld2 tableWidth={1637} maxHeight={600}>
+ *     <TableColGroupOld2 widths={[60, 200, 100, 217, 200]} />
+ *     <TableHeaderOld2>…</TableHeaderOld2>
+ *     <TableBodyOld2>…</TableBodyOld2>
+ *   </TableViewportOld2>
+ *   <TablePagerOld2 … />
+ * </TableOld2>
+ * ```
+ */
+const TableOld2 = forwardRef<HTMLDivElement, TableOld2Props>(function TableOld2(
+  { className, label, divider = 'default', docked, expand, dockOffset, style, children, ...props },
+  ref
+) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  /* Expanding is the default (Pranjal, 2026-09-10). A page that drives the
+   * morph itself with `docked` keeps that job; `expand={false}` opts out. */
+  const self = expand ?? docked === undefined;
+  /* Inert until it has actually found a page to fill, so a table with nowhere
+   * to grow stays an ordinary card and keeps its own max height. */
+  const auto = useSelfDrivenMorph(cardRef, self, dockOffset);
+  const state = self ? auto : tableMorphOfOld2(docked);
+  const { morph } = state;
+  const setCard = useCallback(
+    (node: HTMLDivElement | null) => {
+      cardRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref !== null) ref.current = node;
+    },
+    [ref]
+  );
+  return (
+    <TableMorphContextOld2.Provider value={state}>
+      <div
+        ref={setCard}
+        role="region"
+        aria-label={label}
+        data-divider={divider}
+        data-docked={morph >= 1}
+        className={cn(
+          'tbl-old2 mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
+          'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
+          className
+        )}
+        style={{ ...style, '--tbl-old2-morph': morph } as React.CSSProperties}
+        {...props}
+      >
+        {children}
+      </div>
+    </TableMorphContextOld2.Provider>
+  );
+});
+TableOld2.displayName = 'TableOld2';
+
+/** The scrolling region and the `<table>` inside it. Headings stick to its top. */
+const TableViewportOld2 = forwardRef<HTMLDivElement, TableViewportOld2Props>(
+  function TableViewportOld2(
+    {
+      className,
+      maxHeight = 600,
+      tableWidth,
+      rowCount,
+      refreshing = false,
+      hasSelection = false,
+      label,
+      children,
+      ...props
+    },
+    ref
+  ) {
+    const [scrolledX, setScrolledX] = useState(false);
+    const { morph, driven } = useTableMorphOld2();
+    const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      setScrolledX(e.currentTarget.scrollLeft > 0);
+    }, []);
+    return (
+      <div
+        ref={ref}
+        data-scrolled-x={scrolledX}
+        data-clip={driven && morph < 1}
+        onScroll={onScroll}
+        className={cn('tbl-old2-viewport mdt-relative mdt-overflow-auto', className)}
+        style={driven ? undefined : { maxHeight }}
+        {...props}
+      >
+        <table
+          className="tbl-old2-table mdt-table-fixed mdt-border-separate mdt-border-spacing-0 mdt-text-xs mdt-leading-[1.45]"
+          style={{ width: tableWidth }}
+          aria-label={label}
+          aria-rowcount={rowCount}
+          data-has-selection={hasSelection}
+          data-refreshing={refreshing}
+        >
+          {children}
+        </table>
+      </div>
+    );
+  }
+);
+TableViewportOld2.displayName = 'TableViewportOld2';
+
+/** One `<col>` per visible column plus the 60px elastic tail. */
+function TableColGroupOld2({ widths, tail = TABLE_GUTTER_OLD2 }: TableColGroupOld2Props) {
+  return (
+    <colgroup>
+      {widths.map((w, i) => (
+        // eslint-disable-next-line react/no-array-index-key -- a col has no identity but its position
+        <col key={i} style={{ width: w }} />
+      ))}
+      <col style={{ width: tail }} />
+    </colgroup>
+  );
+}
+
+const TableHeaderOld2 = forwardRef<
+  HTMLTableSectionElement,
+  React.ComponentPropsWithoutRef<'thead'>
+>(function TableHeaderOld2({ className, ...props }, ref) {
+  return <thead ref={ref} className={cn('tbl-old2-header', className)} {...props} />;
+});
+TableHeaderOld2.displayName = 'TableHeaderOld2';
+
+const TableBodyOld2 = forwardRef<HTMLTableSectionElement, React.ComponentPropsWithoutRef<'tbody'>>(
+  function TableBodyOld2({ className, ...props }, ref) {
+    return <tbody ref={ref} className={cn('tbl-old2-body', className)} {...props} />;
+  }
+);
+TableBodyOld2.displayName = 'TableBodyOld2';
+
+const INTERACTIVE =
+  'button, a, input, select, textarea, [role="menu"], [role="dialog"], [data-no-open]';
+
+/**
+ * A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the
+ * next row. A click on the row body opens it; clicks on controls inside do not.
+ */
+const TableRowOld2 = forwardRef<HTMLTableRowElement, TableRowOld2Props>(function TableRowOld2(
+  {
+    className,
+    selected = false,
+    inert = false,
+    onOpen,
+    onToggle,
+    onArrow,
+    onClick,
+    onKeyDown,
+    children,
+    ...props
+  },
+  ref
+) {
+  const handleClick = (e: MouseEvent<HTMLTableRowElement>) => {
+    onClick?.(e);
+    if (e.defaultPrevented) return;
+    if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
+    if (!inert) onOpen?.();
+  };
+  const handleKey = (e: KeyboardEvent<HTMLTableRowElement>) => {
+    onKeyDown?.(e);
+    if (e.defaultPrevented || e.target !== e.currentTarget) return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (!inert) onToggle?.(e.shiftKey);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!inert) onOpen?.();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      onArrow?.(e.key === 'ArrowDown' ? 1 : -1);
+    }
+  };
+  return (
+    <tr
+      ref={ref}
+      tabIndex={0}
+      data-state={selected ? 'selected' : undefined}
+      data-inert={inert ? '' : undefined}
+      aria-selected={inert ? undefined : selected}
+      className={cn(tableRowOld2Variants({ inert }), className)}
+      onClick={handleClick}
+      onKeyDown={handleKey}
+      {...props}
+    >
+      {children}
+    </tr>
+  );
+});
+TableRowOld2.displayName = 'TableRowOld2';
+
+const TableCellOld2 = forwardRef<HTMLTableCellElement, TableCellOld2Props>(function TableCellOld2(
+  {
+    className,
+    frozen,
+    frozenEdge = false,
+    align = 'left',
+    dragging = false,
+    style,
+    children,
+    ...props
+  },
+  ref
+) {
+  return (
+    <td
+      ref={ref}
+      data-dragging={dragging || undefined}
+      className={cn(
+        tableCellOld2Variants({ frozen: frozen !== undefined, align }),
+        frozenEdge && 'tbl-old2-frozen-edge',
+        className
+      )}
+      style={frozen !== undefined ? { ...style, left: frozen } : style}
+      {...props}
+    >
+      {children}
+    </td>
+  );
+});
+TableCellOld2.displayName = 'TableCellOld2';
+
+/**
+ * A heading. Sortable ones sort on click. Movable ones show a grip and a "⋯"
+ * menu on hover; resizable ones carry a handle on their right boundary that
+ * drags, or moves 16px per arrow key.
+ */
+const TableHeadOld2 = forwardRef<HTMLTableCellElement, TableHeadOld2Props>(function TableHeadOld2(
+  {
+    className,
+    columnKey,
+    label,
+    width,
+    minWidth = TABLE_COLUMN_MIN_OLD2,
+    frozen,
+    frozenEdge = false,
+    align = 'left',
+    sortable = false,
+    sort = null,
+    onSort,
+    movable = false,
+    onGripPointerDown,
+    onGripMove,
+    menu,
+    glyph,
+    filtered = false,
+    dragging = false,
+    resizable = false,
+    onResize,
+    onBoundaryHover,
+    style,
+    children,
+    ...props
+  },
+  ref
+) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const startX = useRef(0);
+  const startW = useRef(width);
+  const moved = useRef(false);
+
+  const sortKey = (e: KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSort?.();
+    }
+  };
+  const gripKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      onGripMove?.(e.key === 'ArrowLeft' ? -1 : 1);
+    }
+  };
+  const rzDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startX.current = e.clientX;
+    startW.current = width;
+    moved.current = false;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const rzMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 1) moved.current = true;
+    onResize?.(clampWidth(startW.current + dx, minWidth), false);
+  };
+  const rzUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId))
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    if (moved.current) onResize?.(width, true);
+  };
+  const rzKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const step = e.key === 'ArrowRight' ? 16 : e.key === 'ArrowLeft' ? -16 : 0;
+    if (step) onResize?.(clampWidth(width + step, minWidth), true);
+    else if (e.key === 'Home') onResize?.(minWidth, true);
+    else if (e.key === 'End') onResize?.(TABLE_COLUMN_MAX_OLD2, true);
+    else return;
+    e.preventDefault();
+  };
+
+  return (
+    <th
+      ref={ref}
+      scope="col"
+      data-key={columnKey}
+      data-movable={movable}
+      data-sortable={sortable}
+      data-filtered={filtered || undefined}
+      data-dragging={dragging || undefined}
+      data-open={menuOpen || undefined}
+      aria-sort={sort ? (sort === 'asc' ? 'ascending' : 'descending') : undefined}
+      className={cn(
+        tableHeadOld2Variants({ frozen: frozen !== undefined, align }),
+        frozenEdge && 'tbl-old2-frozen-edge',
+        className
+      )}
+      style={{ ...style, width, left: frozen }}
+      {...props}
+    >
+      {movable && (
+        <button
+          type="button"
+          className="tbl-old2-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90"
+          aria-label={`Move column ${label}. Arrow keys move it one place`}
+          onPointerDown={onGripPointerDown}
+          onKeyDown={gripKey}
+        >
+          <Icon name="grip-vertical" size={14} />
+        </button>
+      )}
+      <span
+        className={cn(
+          'tbl-old2-hcell mdt-inline-flex mdt-max-w-full mdt-items-center',
+          sortable && 'mdt-cursor-pointer'
+        )}
+        {...(sortable
+          ? {
+              role: 'button',
+              tabIndex: 0,
+              'aria-label': `Sort by ${label}`,
+              onClick: onSort,
+              onKeyDown: sortKey,
+            }
+          : {})}
+      >
+        {glyph && (
+          <span className="tbl-old2-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 dark:mdt-text-neutral-40 [&_svg]:mdt-size-3.5">
+            {glyph}
+          </span>
+        )}
+        <span className="mdt-overflow-hidden mdt-text-ellipsis">{children ?? label}</span>
+        {sortable && (
+          <span
+            className="tbl-old2-sortmark mdt-ml-2 mdt-text-azure-60 [&_svg]:mdt-size-3"
+            aria-hidden="true"
+          >
+            <Icon name="arrow-up" size={12} />
+          </span>
+        )}
+      </span>
+      {movable && menu && (
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="tbl-old2-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              aria-label={`Options for ${label}`}
+            >
+              <Icon name="more-horizontal" size={14} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="mdt-w-48">
+            {menu}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      {resizable && (
+        <div
+          /* INSIDE its own heading (2026-09-13): every heading is sticky with a
+           * z-index, so a handle that straddled the boundary had its far half
+           * painted over by the next heading and only a sliver could be grabbed.
+           * Twelve pixels ending at the boundary line, all of them the heading's. */
+          className="tbl-old2-rz mdt-absolute mdt-right-0 mdt-top-0 mdt-z-[5] mdt-h-10 mdt-w-3 mdt-cursor-col-resize"
+          role="slider"
+          tabIndex={0}
+          aria-orientation="vertical"
+          aria-label={`Resize ${label}`}
+          aria-valuenow={width}
+          aria-valuemin={minWidth}
+          aria-valuemax={TABLE_COLUMN_MAX_OLD2}
+          onPointerDown={rzDown}
+          onPointerMove={rzMove}
+          onPointerUp={rzUp}
+          onKeyDown={rzKey}
+          onPointerEnter={() => onBoundaryHover?.(true)}
+          onPointerLeave={() => onBoundaryHover?.(false)}
+        />
+      )}
+      <TableNick />
+    </th>
+  );
+});
+TableHeadOld2.displayName = 'TableHeadOld2';
+
+function clampWidth(w: number, min: number): number {
+  return Math.max(min, Math.min(TABLE_COLUMN_MAX_OLD2, Math.round(w)));
+}
+
+/** The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked. */
+function TableSelectionCellOld2({
+  index,
+  selected,
+  inert = false,
+  label,
+  onToggle,
+  frozen = 0,
+}: TableSelectionCellOld2Props) {
+  return (
+    <td
+      className={cn(
+        tableCellOld2Variants({ frozen: true, align: 'center' }),
+        'tbl-old2-sel mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen }}
+    >
+      <span className="tbl-old2-rowsel mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
+        <span
+          className="tbl-old2-num mdt-font-medium mdt-text-muted-foreground"
+          aria-hidden={!inert}
+        >
+          {index}
+        </span>
+        {!inert && (
+          <Checkbox
+            className="tbl-old2-cb data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+            checked={selected}
+            tabIndex={-1}
+            aria-label={`Select ${label}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle(e.shiftKey);
+            }}
+          />
+        )}
+      </span>
+    </td>
+  );
+}
+
+/** A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel. */
+function TableNumberCellOld2({ index, inert = false, frozen = 0 }: TableNumberCellOld2Props) {
+  return (
+    <td
+      className={cn(
+        tableCellOld2Variants({ frozen: true, align: 'center' }),
+        'tbl-old2-sel mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen }}
+    >
+      <span className="tbl-old2-rownum mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
+        <span
+          className={cn(
+            'tbl-old2-num mdt-font-medium mdt-text-muted-foreground',
+            inert && 'mdt-opacity-60'
+          )}
+        >
+          {index}
+        </span>
+      </span>
+    </td>
+  );
+}
+
+/**
+ * The heading over the row numbers.
+ *
+ * It shows a hash. It used to show NOTHING, which read as a column somebody
+ * forgot to label — and left the numbers underneath with no name, so nobody
+ * could say which column they meant. (Pranjal, 2026-09-11.)
+ */
+/**
+ * THE NICK: the 16px mark at a heading's right edge (Pranjal, 2026-09-11:
+ * "we just need that nick"). It is drawn on EVERY heading, identically,
+ * whether or not that boundary can be dragged — "it might work for some, might
+ * not, but it will look the same." The resize handle is a separate, invisible
+ * thing that sits over it only where resizing is allowed.
+ */
+function TableNick() {
+  return (
+    <span
+      className="tbl-old2-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+      aria-hidden="true"
+    />
+  );
+}
+
+function TableNumberHeadOld2({ frozen = 0 }: TableNumberHeadOld2Props) {
+  return (
+    <th
+      scope="col"
+      aria-label="Row number"
+      className={cn(
+        tableHeadOld2Variants({ frozen: true, align: 'center' }),
+        'mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen, width: TABLE_GUTTER_OLD2 }}
+    >
+      <span aria-hidden="true">#</span>
+      <TableNick />
+    </th>
+  );
+}
+
+/** The header's checkbox and the chevron that opens the scope menu. */
+function TableSelectAllOld2({ state, onToggle, onScope, frozen = 0 }: TableSelectAllOld2Props) {
+  return (
+    <th
+      scope="col"
+      className={cn(
+        tableHeadOld2Variants({ frozen: true, align: 'center' }),
+        'mdt-w-[60px] !mdt-px-0'
+      )}
+      style={{ left: frozen, width: TABLE_GUTTER_OLD2 }}
+    >
+      <span className="tbl-old2-selall mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center">
+        <Checkbox
+          className="data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+          checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
+          onCheckedChange={onToggle}
+          aria-label="Select all on this page"
+        />
+        <button
+          type="button"
+          className="tbl-old2-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40"
+          aria-label="Choose what to select"
+          aria-haspopup="dialog"
+          onClick={(e) => {
+            onScope(e.currentTarget);
+          }}
+        >
+          <Icon name="chevron-down" size={12} />
+        </button>
+      </span>
+      <TableNick />
+    </th>
+  );
+}
+
+/**
+ * THE LEAD COLUMN — one 60px slot with two occupants (Pranjal, 2026-09-11).
+ *
+ * A table that can act on many rows at once puts a checkbox here. A table that
+ * cannot puts the row number, under a hash. Same slot, same width, same
+ * alignment, so a page that later grows bulk actions changes nothing about its
+ * columns and a page that loses them leaves no hole.
+ *
+ * The PAGE does not choose which. It says whether it has bulk actions and this
+ * draws the right one — which is the whole reason it is one component and not
+ * two the caller has to pick between and keep in step.
+ */
+function TableLeadHeadOld2({
+  selectable = false,
+  state = 'none',
+  onToggle,
+  onScope,
+  frozen = 0,
+}: {
+  /** Does this table act on many rows at once? */
+  selectable?: boolean | undefined;
+  state?: TableSelectAllOld2Props['state'] | undefined;
+  onToggle?: (() => void) | undefined;
+  onScope?: ((anchor: HTMLElement) => void) | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined || onScope === undefined) {
+    return <TableNumberHeadOld2 frozen={frozen} />;
+  }
+  return <TableSelectAllOld2 state={state} onToggle={onToggle} onScope={onScope} frozen={frozen} />;
+}
+
+/** The lead cell: a checkbox where the table selects, the row number where it does not. */
+function TableLeadCellOld2({
+  index,
+  label,
+  selectable = false,
+  selected = false,
+  onToggle,
+  inert = false,
+  frozen = 0,
+}: {
+  index: number;
+  /** Who the checkbox is for: "Sarah Johnson" is spoken as "Select Sarah Johnson". Only read when selectable. */
+  label?: string | undefined;
+  selectable?: boolean | undefined;
+  selected?: boolean | undefined;
+  onToggle?: ((extend: boolean) => void) | undefined;
+  inert?: boolean | undefined;
+  frozen?: number | undefined;
+}) {
+  if (!selectable || onToggle === undefined) {
+    return <TableNumberCellOld2 index={index} inert={inert} frozen={frozen} />;
+  }
+  return (
+    <TableSelectionCellOld2
+      index={index}
+      label={label ?? `row ${String(index)}`}
+      selected={selected}
+      onToggle={onToggle}
+      inert={inert}
+      frozen={frozen}
+    />
+  );
+}
+
+/** The blank 60px tail that soaks up leftover width. */
+function TableTailCellOld2({ head = false }: { head?: boolean }) {
+  return head ? (
+    <th
+      scope="col"
+      className={cn(tableHeadOld2Variants({}), '!mdt-px-0')}
+      style={{ width: TABLE_GUTTER_OLD2 }}
+      aria-hidden="true"
+    />
+  ) : (
+    <td className={cn(tableCellOld2Variants({}), '!mdt-px-0')} aria-hidden="true" />
+  );
+}
+
+export type { ReactNode };
+export {
+  TableOld2,
+  TableMorphContextOld2,
+  TableViewportOld2,
+  TableColGroupOld2,
+  TableHeaderOld2,
+  TableBodyOld2,
+  TableRowOld2,
+  TableCellOld2,
+  TableHeadOld2,
+  TableSelectionCellOld2,
+  TableLeadHeadOld2,
+  TableLeadCellOld2,
+  TableSelectAllOld2,
+  TableNumberCellOld2,
+  TableNumberHeadOld2,
+  TableTailCellOld2,
+};
