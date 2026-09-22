@@ -39,19 +39,24 @@ const RadioGroupContext = createContext<RadioGroupContextValue>({
  * shape.** A tinted tray with pills floating inside it is `ToggleGroup`, which
  * is a different control for a different job.
  *
- * `overflow-hidden` is what lets the end segments take the strip's corners
- * without each carrying a radius of its own, and it is why focus is drawn
- * *inside* the segment rather than around it.
+ * The strip does **not** clip. The chosen segment paints its own edge over the
+ * strip's line (see the item), and a clipped strip would cut that edge off at
+ * the top and bottom. So the two end segments carry the strip's corners
+ * themselves - the inner radius, one pixel less than the strip's own - and
+ * focus is still drawn *inside* the segment, because butted segments leave no
+ * room for a ring around one.
  */
 export const radioGroupVariants = cva('', {
   variants: {
     variant: {
       default: 'mdt-grid mdt-gap-2',
       segmented: [
-        'mdt-inline-flex mdt-max-w-full mdt-overflow-hidden',
+        'mdt-inline-flex mdt-max-w-full',
         'mdt-rounded-md mdt-border mdt-border-input mdt-bg-background',
         // the shared line: every segment but the first draws its own left edge
         '[&>*:not(:first-child)]:mdt-border-l [&>*:not(:first-child)]:mdt-border-input',
+        // the ends take the strip's corners: 6px outside, so 5px inside
+        '[&>*:first-child]:mdt-rounded-l-[5px] [&>*:last-child]:mdt-rounded-r-[5px]',
       ],
     },
     fullWidth: { true: '', false: '' },
@@ -147,19 +152,46 @@ export const radioGroupItemVariants = cva([], {
       ],
       // ── one segment of the strip ──
       //
-      // No circle. The chosen one is marked by a tint and a heavier word, which
-      // is quiet enough to sit at the same volume as the rest of the form -
-      // three of these on one screen do not start shouting at each other.
+      // No circle. The chosen one is marked by a tint, a heavier word and a
+      // one-pixel primary edge all the way round - the tint alone was quiet
+      // enough to sit at the same volume as the rest of the form, and the edge
+      // is what makes it read as *chosen* rather than merely hovered (Pranjal,
+      // 2026-09-22: "highlight the selected state borders as well not just
+      // fill").
       //
-      // The ring is drawn INSIDE the segment. The strip clips its own overflow,
-      // so a ring with an offset would be cut off exactly where it matters.
+      // The edge has to paint OVER lines that belong to other elements: the
+      // strip's own border above and below, and the right neighbour's dividing
+      // line. The segment's own border cannot reach those, so the edge is a
+      // border on an `::after` box one pixel bigger than the segment's inside
+      // on every side: that puts it on the strip's line above and below, on
+      // the neighbour's dividing line to the right, and on the segment's own
+      // dividing line to the left (every segment but the first draws that line
+      // itself; for the first, that column is the strip's line). The chosen
+      // segment is lifted above its siblings so the edge lands on top.
+      //
+      // A border, not a shadow, on purpose: a strip that fills its column puts
+      // segment edges on half pixels, and a box-shadow there paints at half
+      // strength - the right edge came out grey while the left was black.
+      // Borders snap to whole pixels, which is also how the dividers are drawn.
+      //
+      // The focus ring is drawn INSIDE the segment: the segments are butted,
+      // so there is no room outside for a ring. It is on the segment itself,
+      // the edge on the pseudo-element, so both show at once.
       segmented: [
-        'mdt-inline-flex mdt-items-center mdt-justify-center mdt-gap-2',
+        'mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center mdt-gap-2',
         'mdt-whitespace-nowrap mdt-font-medium mdt-text-muted-foreground',
         'mdt-cursor-pointer mdt-transition-colors',
         'hover:mdt-bg-secondary hover:mdt-text-foreground',
         'data-[state=checked]:mdt-bg-secondary',
         'data-[state=checked]:mdt-font-semibold data-[state=checked]:mdt-text-foreground',
+        'data-[state=checked]:mdt-z-10',
+        // ── the edge ──
+        "after:mdt-pointer-events-none after:mdt-absolute after:-mdt-inset-px after:mdt-border after:mdt-border-primary after:mdt-content-['']",
+        // fades in with the tint rather than snapping ahead of it
+        'after:mdt-opacity-0 after:mdt-transition-opacity data-[state=checked]:after:mdt-opacity-100',
+        // at the two ends it reaches the strip's outer corner, so it takes the
+        // strip's own radius (the segment underneath has the inner one)
+        'first:after:mdt-rounded-l-md last:after:mdt-rounded-r-md',
         'focus:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-inset focus-visible:mdt-ring-ring',
         'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50 disabled:hover:mdt-bg-transparent',
         '[&_svg]:mdt-size-4 [&_svg]:mdt-shrink-0',
