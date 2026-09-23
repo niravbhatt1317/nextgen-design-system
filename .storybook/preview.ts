@@ -39,31 +39,31 @@ const startingTheme = getInitialTheme();
 export default {
   parameters: {
     options: {
+      // The sidebar's order is Pranjal's (2026-09-22): Foundation and Layout on
+      // top, then New Components - the parts reworked for the console - then
+      // Components, Deprecated 2, Deprecated; the two guides close the list.
+      //
       // `order` names the top-level groups; `method` sorts everything it does
       // not name, so a new component still turns up where its name says it
       // should. The array has to be a literal here for the same reason this
-      // whole object is - the parser reads it as text and cannot follow a
+      // whole object is: the parser reads it as text and cannot follow a
       // variable.
       //
-      // Foundation leads because it is what the system is made of: the tokens,
-      // the colour families, the page structure. A designer opening this for
-      // the first time landed in Accordion, which tells them nothing about how
+      // Foundation leads because it is what the system is made of - the tokens,
+      // the colour families, the page structure. A designer opening this for the
+      // first time landed in Accordion, which tells them nothing about how
       // anything here is built.
-      //
-      // The rest is a gradient from "use this" to "do not", which is the only
-      // question a reader actually has:
-      //
-      //   Components       use this
-      //   On the way out   do not START anything new with this - and unlike
-      //                    Deprecated, there is nowhere else to go yet, which
-      //                    is exactly why it is a separate group and not a
-      //                    footnote on each component
-      //   Deprecated       do not use this, use the named replacement
-      //
-      // A group with no stories in it does not appear, so naming one here
-      // before anything moves costs nothing.
       storySort: {
-        order: ['Foundation', 'Components', 'Layout', 'On the way out', 'Deprecated'],
+        order: [
+          'Foundation',
+          'Layout',
+          'New Components',
+          'Components',
+          'Deprecated 2',
+          'Deprecated',
+          'Introduction',
+          'Getting Started',
+        ],
         method: 'alphabetical',
         locales: 'en-US',
       },
