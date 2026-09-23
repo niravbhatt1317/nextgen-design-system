@@ -1,0 +1,251 @@
+/* TableOld2 — the merged console Users table (Pranjal's rulings, 7 September 2026).
+ * State rules live here because they read across elements: a row's hover
+ * changes its number cell, a heading's hover reveals its grip and menu, a
+ * selection anywhere shows every checkbox. Geometry and colour sit in the
+ * Tailwind classes on the components. */
+
+.tbl-old2 {
+  --tbl-old2-divider: hsl(var(--mdt-neutral-30));
+  --tbl-old2-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
+  --tbl-old2-hover: hsl(var(--mdt-neutral-10));
+  /* the card-to-page morph: 0 at rest, 1 docked (set by the docked prop) */
+  --tbl-old2-morph: 0;
+  --tbl-old2-radius: 12px;
+  /* the first and last cell inset grows 16 -> 24 as the card gives up the page's margin */
+  --tbl-old2-edge: calc(16px + 8px * var(--tbl-old2-morph));
+  border-radius: calc(var(--tbl-old2-radius) * (1 - var(--tbl-old2-morph)));
+  transition: border-color 0.12s ease-out;
+}
+/* docked: the side edges go (no gradual fade), the rows scroll inside the card, header and pager pinned */
+.tbl-old2[data-docked='true'] {
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.tbl-old2 > .tbl-old2-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* a page is scrolling the card to its dock line: until it lands, the rows are clipped, not scrolled */
+.tbl-old2-viewport[data-clip='true'] {
+  overflow-y: clip;
+}
+.tbl-old2-viewport {
+  border-top-left-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+  border-top-right-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+}
+/* NO SCROLLBAR (Pranjal, 2026-09-11: "there's no need to show scrollable bar").
+   The console table has hidden its bars since 27 August — the page scroller
+   hides its own, and a bar inside the card read as a second scroller. Scrolling
+   itself still works: wheel, trackpad, drag, keys. The frozen edge's shadow is
+   what says "there is more to the right", not a bar. */
+.tbl-old2-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tbl-old2-viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+/* With no footer under it, the viewport takes the card's bottom corners itself.
+   The card does not clip its children, so otherwise the last row — its frozen
+   cells painted solid — ends square over the card's rounded edge. The footer
+   used to hide this; now that it only appears when there is something to page
+   (Pranjal, 2026-09-11), the viewport is often the last thing in the card. */
+.tbl-old2-viewport:not(:has(~ .tbl-old2-foot)) {
+  border-bottom-left-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+  border-bottom-right-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+}
+.tbl-old2-foot {
+  margin-top: auto;
+  flex-shrink: 0;
+  border-bottom-left-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+  border-bottom-right-radius: calc((var(--tbl-old2-radius) - 1px) * (1 - var(--tbl-old2-morph)));
+  padding-left: var(--tbl-old2-edge);
+  padding-right: var(--tbl-old2-edge);
+}
+.tbl-old2-table > * > tr > :first-child {
+  padding-left: var(--tbl-old2-edge);
+}
+.tbl-old2-table > * > tr > :last-child {
+  padding-right: var(--tbl-old2-edge);
+}
+/* the 60px selection column keeps its mark centred while the inset grows: the wrappers take the offset */
+.tbl-old2-selall {
+  margin-left: calc(8px * var(--tbl-old2-morph));
+}
+.tbl-old2-sel .tbl-old2-rowsel,
+.tbl-old2-sel .tbl-old2-rownum {
+  width: calc(100% - 8px * var(--tbl-old2-morph));
+  margin-left: calc(8px * var(--tbl-old2-morph));
+}
+.tbl-old2[data-divider='light'] {
+  --tbl-old2-divider: hsl(var(--mdt-neutral-20));
+}
+.dark .tbl-old2 {
+  --tbl-old2-divider: hsl(var(--mdt-border) / 0.6);
+  --tbl-old2-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
+  --tbl-old2-hover: hsl(var(--mdt-muted) / 0.5);
+}
+
+/* dividers: on cells, because the table is border-separate; the sticky heading keeps its line as an inset shadow */
+.tbl-old2-cell,
+.tbl-old2-sel {
+  border-bottom: 1px solid var(--tbl-old2-divider);
+}
+.tbl-old2-head {
+  box-shadow: inset 0 -1px 0 var(--tbl-old2-divider);
+}
+.tbl-old2-body > tr:last-child > td {
+  border-bottom-color: transparent;
+}
+
+/* rows: hover and selected share one tint; an invited row does not lift */
+.tbl-old2-row:hover > td,
+.tbl-old2-row[data-state='selected'] > td {
+  background: var(--tbl-old2-hover);
+}
+.tbl-old2-row[data-inert]:hover > td {
+  background: hsl(var(--mdt-background));
+}
+.tbl-old2-row:focus-visible > td {
+  box-shadow:
+    inset 0 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring));
+}
+.tbl-old2-row:focus-visible > td:first-child {
+  box-shadow:
+    inset 2px 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring)),
+    inset 2px -2px 0 hsl(var(--mdt-ring));
+}
+.tbl-old2-row:focus-visible > td:last-child {
+  box-shadow:
+    inset -2px 2px 0 hsl(var(--mdt-ring)),
+    inset 0 -2px 0 hsl(var(--mdt-ring)),
+    inset -2px -2px 0 hsl(var(--mdt-ring));
+}
+
+/* the row number becomes a checkbox on hover, on focus, once picked, and on every row once any row is picked */
+.tbl-old2-rowsel .tbl-old2-cb {
+  display: none;
+}
+.tbl-old2-row:hover .tbl-old2-rowsel .tbl-old2-num,
+.tbl-old2-row:focus-within .tbl-old2-rowsel .tbl-old2-num,
+.tbl-old2-row[data-state='selected'] .tbl-old2-rowsel .tbl-old2-num,
+.tbl-old2-table[data-has-selection='true']
+  .tbl-old2-row:not([data-inert])
+  .tbl-old2-rowsel
+  .tbl-old2-num {
+  display: none;
+}
+.tbl-old2-row:hover .tbl-old2-cb,
+.tbl-old2-row:focus-within .tbl-old2-cb,
+.tbl-old2-row[data-state='selected'] .tbl-old2-cb,
+.tbl-old2-table[data-has-selection='true'] .tbl-old2-row:not([data-inert]) .tbl-old2-cb {
+  display: inline-flex;
+}
+.tbl-old2-row[data-inert] .tbl-old2-num {
+  display: inline;
+  opacity: 0.6;
+}
+
+/* headings: 16px inset, grip, 8px, label, 8px, arrow; the "⋯" at the right edge. All of it on hover or focus. */
+.tbl-old2-grip,
+.tbl-old2-more {
+  display: none;
+}
+.tbl-old2-hcell {
+  padding-left: 0;
+  transition: padding-left 0.12s;
+}
+.tbl-old2-head[data-movable='true']:hover,
+.tbl-old2-head[data-movable='true']:focus-within,
+.tbl-old2-head[data-open='true'] {
+  background: var(--tbl-old2-hover);
+}
+.tbl-old2-head[data-movable='true']:hover .tbl-old2-grip,
+.tbl-old2-head[data-movable='true']:focus-within .tbl-old2-grip,
+.tbl-old2-head[data-open='true'] .tbl-old2-grip,
+.tbl-old2-head[data-movable='true']:hover .tbl-old2-more,
+.tbl-old2-head[data-movable='true']:focus-within .tbl-old2-more,
+.tbl-old2-head[data-open='true'] .tbl-old2-more {
+  display: inline-flex;
+}
+.tbl-old2-head[data-movable='true']:hover .tbl-old2-hcell,
+.tbl-old2-head[data-movable='true']:focus-within .tbl-old2-hcell,
+.tbl-old2-head[data-open='true'] .tbl-old2-hcell {
+  padding-left: 22px;
+}
+/* a quick-filter column's glyph becomes the grip, in the same slot */
+.tbl-old2-head[data-movable='true']:hover .tbl-old2-glyph,
+.tbl-old2-head[data-movable='true']:focus-within .tbl-old2-glyph,
+.tbl-old2-head[data-open='true'] .tbl-old2-glyph {
+  display: none;
+}
+.tbl-old2-sortmark {
+  display: none;
+}
+.tbl-old2-head[aria-sort] .tbl-old2-sortmark {
+  display: inline-flex;
+}
+.tbl-old2-head[data-sortable='true']:not([aria-sort]):hover .tbl-old2-sortmark {
+  display: inline-flex;
+  color: hsl(var(--mdt-neutral-50));
+}
+.tbl-old2-head[aria-sort='descending'] .tbl-old2-sortmark svg {
+  transform: rotate(180deg);
+}
+.tbl-old2-head[data-filtered='true'],
+.tbl-old2-head[data-filtered='true']:hover,
+.tbl-old2-head[data-filtered='true']:focus-within {
+  background: var(--tbl-old2-wash);
+}
+.tbl-old2-head[data-filtered='true'] .tbl-old2-glyph {
+  color: hsl(var(--mdt-azure-60));
+}
+.tbl-old2-head[data-dragging='true'],
+.tbl-old2-cell[data-dragging='true'] {
+  opacity: 0.4;
+}
+.tbl-old2-head[data-open='true'] .tbl-old2-more {
+  background: hsl(var(--mdt-neutral-20));
+}
+
+/* the resize handle: a 1×16 nick at rest, darker on hover, azure and 2px while it has focus */
+.tbl-old2-rz:hover ~ .tbl-old2-nick {
+  background: hsl(var(--mdt-neutral-50));
+}
+.tbl-old2-rz:focus-visible {
+  outline: none;
+}
+.tbl-old2-rz:focus-visible ~ .tbl-old2-nick {
+  width: 2px;
+  background: hsl(var(--mdt-ring));
+}
+
+/* The last frozen column draws its boundary while the table is scrolled
+   sideways. THE CATCH (Pranjal, 2026-09-11: "when we scroll the line under the
+   action column header disappears"): box-shadow is ONE property and does not
+   stack across rules — the later rule wins outright. So this used to replace
+   the heading's own `inset 0 -1px 0` underline, and the line under Action
+   vanished the moment the table moved sideways. A heading restates both. */
+.tbl-old2-viewport[data-scrolled-x='true'] .tbl-old2-frozen-edge {
+  box-shadow: 1px 0 0 var(--tbl-old2-divider);
+}
+.tbl-old2-viewport[data-scrolled-x='true'] th.tbl-old2-frozen-edge {
+  box-shadow:
+    1px 0 0 var(--tbl-old2-divider),
+    inset 0 -1px 0 var(--tbl-old2-divider);
+}
+.tbl-old2-table[data-refreshing='true'] > tbody {
+  opacity: 0.6;
+}
+
+/* the owner mark shares the wash recipe: azure at 6% over the page, the console's blue-10 */
+.tbl-old2-owner {
+  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
+}
+.dark .tbl-old2-owner {
+  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
+}
