@@ -103,8 +103,19 @@ if (declared.length > 0) {
  * down: the build succeeds, the import returns undefined, and the changelog
  * announces a component nobody can use.
  */
+/**
+ * Does the barrel re-export this directory wholesale?
+ *
+ * `export * from './TableOld2'` makes every name in that barrel reachable
+ * without naming any of them, so the per-name check below cannot see them and
+ * would report every one as an orphan. A star export is a deliberate choice -
+ * TableOld2 takes it because all 21 of its names already carry the suffix, so
+ * there is nothing to clash with - and it is as reachable as a named one.
+ */
+const isStarExported = (dir) => new RegExp(`export \\* from '\\./${dir}'`).test(barrel);
+
 const orphans = components
-  .filter((dir) => isExported(dir))
+  .filter((dir) => isExported(dir) && !isStarExported(dir))
   .flatMap((dir) =>
     namesExportedBy(dir)
       .filter((name) => !new RegExp(`\\b${name}\\b`).test(barrel))

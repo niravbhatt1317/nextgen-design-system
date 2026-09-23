@@ -1,0 +1,951 @@
+import { createRef } from 'react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {
+  TableOld2,
+  TableBodyOld2,
+  TableCellOld2,
+  TableColGroupOld2,
+  TableHeadOld2,
+  TableHeaderOld2,
+  TableRowOld2,
+  TableSelectAllOld2,
+  TableSelectionCellOld2,
+  TableLeadHeadOld2,
+  TableLeadCellOld2,
+  TableNumberCellOld2,
+  TableNumberHeadOld2,
+  TableTailCellOld2,
+  TableViewportOld2,
+  useTableMorphOld2,
+} from './TableOld2';
+import { TableBulkActionOld2, TableBulkBarOld2 } from './TableBulkBarOld2';
+import { TableLoadMoreOld2, TablePagerOld2 } from './TablePagerOld2';
+import { TableBlankOld2, TableSkeletonOld2 } from './TableStates';
+
+function Grid({
+  hasSelection = false,
+  selected = false,
+  inert = false,
+  onOpen = () => undefined,
+  onToggle = () => undefined,
+}) {
+  return (
+    <TableOld2 label="People">
+      <TableViewportOld2 tableWidth={537} hasSelection={hasSelection} label="People grid">
+        <TableColGroupOld2 widths={[60, 200, 217]} />
+        <TableHeaderOld2>
+          <tr>
+            <TableSelectAllOld2 state="none" onToggle={() => undefined} onScope={() => undefined} />
+            <TableHeadOld2
+              columnKey="name"
+              label="Name"
+              width={200}
+              frozen={60}
+              sortable
+              sort="asc"
+              onSort={() => undefined}
+            />
+            <TableHeadOld2
+              columnKey="email"
+              label="Email"
+              width={217}
+              movable
+              resizable
+              menu={<span>items</span>}
+            />
+            <TableTailCellOld2 head />
+          </tr>
+        </TableHeaderOld2>
+        <TableBodyOld2>
+          <TableRowOld2 selected={selected} inert={inert} onOpen={onOpen} onToggle={onToggle}>
+            <TableSelectionCellOld2
+              index={1}
+              selected={selected}
+              inert={inert}
+              label="Sarah Johnson"
+              onToggle={onToggle}
+            />
+            <TableCellOld2 frozen={60}>Sarah Johnson</TableCellOld2>
+            <TableCellOld2>sarah@company.com</TableCellOld2>
+            <TableTailCellOld2 />
+          </TableRowOld2>
+        </TableBodyOld2>
+      </TableViewportOld2>
+    </TableOld2>
+  );
+}
+
+describe('TableOld2', () => {
+  it('is a named region holding a named grid with the console geometry', () => {
+    render(<Grid />);
+    const card = screen.getByRole('region', { name: 'People' });
+    expect(card).toHaveClass('tbl-old2', 'mdt-border-neutral-20');
+    expect(card.style.getPropertyValue('--tbl-old2-morph')).toBe('0');
+    const th = screen.getByRole('columnheader', { name: /Name/ });
+    expect(th).toHaveClass('mdt-h-10', 'mdt-text-[11px]', 'mdt-text-neutral-90', 'mdt-sticky');
+    const cell = screen.getByText('sarah@company.com').closest('td');
+    expect(cell).toHaveClass('mdt-h-[54px]', 'mdt-px-4');
+  });
+
+  it('speaks the sort and offers the heading as a sort button', () => {
+    render(<Grid />);
+    expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute(
+      'aria-sort',
+      'ascending'
+    );
+    expect(screen.getByRole('button', { name: 'Sort by Name' })).toBeInTheDocument();
+  });
+
+  it('gives a movable heading a grip, a menu and a resize handle with its width spoken', () => {
+    render(<Grid />);
+    expect(screen.getByLabelText(/Move column Email/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Options for Email')).toHaveAttribute('aria-haspopup', 'menu');
+    const handle = screen.getByRole('slider', { name: 'Resize Email' });
+    expect(handle).toHaveAttribute('aria-valuenow', '217');
+    expect(handle).toHaveAttribute('aria-valuemin', '120');
+    expect(handle).toHaveAttribute('aria-valuemax', '720');
+  });
+
+  it('resizes by keyboard in 16px steps and jumps with Home and End', async () => {
+    const onResize = vi.fn();
+    render(
+      <TableOld2 label="t">
+        <TableViewportOld2 tableWidth={300}>
+          <TableHeaderOld2>
+            <tr>
+              <TableHeadOld2
+                columnKey="email"
+                label="Email"
+                width={200}
+                resizable
+                onResize={onResize}
+              />
+            </tr>
+          </TableHeaderOld2>
+        </TableViewportOld2>
+      </TableOld2>
+    );
+    const handle = screen.getByRole('slider', { name: 'Resize Email' });
+    handle.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(onResize).toHaveBeenLastCalledWith(216, true);
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(onResize).toHaveBeenLastCalledWith(184, true);
+    await userEvent.keyboard('{Home}');
+    expect(onResize).toHaveBeenLastCalledWith(120, true);
+    await userEvent.keyboard('{End}');
+    expect(onResize).toHaveBeenLastCalledWith(720, true);
+  });
+
+  it('marks the row picked, and the grid as holding a selection', () => {
+    render(<Grid selected hasSelection />);
+    const row = screen.getByRole('row', { selected: true });
+    expect(row).toHaveAttribute('data-state', 'selected');
+    expect(screen.getByRole('table')).toHaveAttribute('data-has-selection', 'true');
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Sarah Johnson', hidden: true })
+    ).toBeInTheDocument();
+  });
+
+  it('gives an invited row a number and no checkbox, and never opens it', async () => {
+    const onOpen = vi.fn();
+    render(<Grid inert onOpen={onOpen} />);
+    expect(screen.queryByLabelText('Select Sarah Johnson')).not.toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('sarah@company.com'));
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it('opens on Enter or a body click, picks on Space, and Shift extends', async () => {
+    const onOpen = vi.fn();
+    const onToggle = vi.fn();
+    render(<Grid onOpen={onOpen} onToggle={onToggle} />);
+    const row = screen.getAllByRole('row')[1] as HTMLElement;
+    row.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(' ');
+    expect(onToggle).toHaveBeenLastCalledWith(false);
+    await userEvent.keyboard('{Shift>} {/Shift}');
+    expect(onToggle).toHaveBeenLastCalledWith(true);
+    await userEvent.click(screen.getByText('sarah@company.com'));
+    expect(onOpen).toHaveBeenCalledTimes(2);
+  });
+
+  it('names the header checkbox and its scope chevron', () => {
+    render(<Grid />);
+    expect(screen.getByRole('checkbox', { name: 'Select all on this page' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Choose what to select' })).toHaveAttribute(
+      'aria-haspopup',
+      'dialog'
+    );
+  });
+
+  it('keeps the header checkbox on the column axis: the chevron hangs off it, not beside it', () => {
+    render(<Grid />);
+    const chevron = screen.getByRole('button', { name: 'Choose what to select' });
+    expect(chevron.className).toContain('mdt-absolute');
+    expect(chevron.parentElement?.className).toContain('mdt-relative');
+  });
+
+  it('draws the checkbox border only while unchecked, so a picked box is one solid fill', () => {
+    render(<Grid selected hasSelection />);
+    const box = screen.getByRole('checkbox', { name: 'Select Sarah Johnson', hidden: true });
+    expect(box).toHaveAttribute('data-state', 'checked');
+    expect(box.className).toContain('data-[state=unchecked]:mdt-border-neutral-40');
+    expect(box.className.split(' ')).not.toContain('mdt-border-neutral-40');
+    const all = screen.getByRole('checkbox', { name: 'Select all on this page' });
+    expect(all.className.split(' ')).not.toContain('mdt-border-neutral-40');
+  });
+});
+
+describe('TableNumberCellOld2', () => {
+  it('is a plain number under a named blank heading, with no checkbox to swap to', () => {
+    render(
+      <TableOld2 label="People">
+        <TableViewportOld2 tableWidth={260}>
+          <TableColGroupOld2 widths={[60, 200]} />
+          <TableHeaderOld2>
+            <tr>
+              <TableNumberHeadOld2 />
+              <TableHeadOld2 columnKey="name" label="Name" width={200} />
+            </tr>
+          </TableHeaderOld2>
+          <TableBodyOld2>
+            <TableRowOld2 inert>
+              <TableNumberCellOld2 index={7} inert />
+              <TableCellOld2>Priya Natarajan</TableCellOld2>
+            </TableRowOld2>
+          </TableBodyOld2>
+        </TableViewportOld2>
+      </TableOld2>
+    );
+    expect(screen.getByRole('columnheader', { name: 'Row number' })).toBeInTheDocument();
+    expect(screen.getByText('7')).toHaveClass('tbl-old2-num', 'mdt-opacity-60');
+    expect(screen.queryByRole('checkbox', { hidden: true })).not.toBeInTheDocument();
+    expect(document.querySelector('.tbl-old2-rowsel')).toBeNull();
+  });
+});
+
+describe('TableOld2 docking', () => {
+  const Card = ({ docked }: { docked?: boolean | number }) => (
+    <TableOld2 label="People" docked={docked} style={{ height: 600 }}>
+      <TableViewportOld2 tableWidth={537} maxHeight={480}>
+        <tbody />
+      </TableViewportOld2>
+    </TableOld2>
+  );
+  const parts = () => {
+    const card = screen.getByRole('region', { name: 'People' });
+    const viewport = card.querySelector('.tbl-old2-viewport') as HTMLElement;
+    return { card, viewport };
+  };
+
+  it('at rest is a rounded card whose rows scroll within the max height', () => {
+    render(<Card />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-old2-morph')).toBe('0');
+    expect(viewport.style.maxHeight).toBe('480px');
+    expect(viewport).toHaveAttribute('data-clip', 'false');
+  });
+
+  it('docked, it squares off, drops the max height and takes the height the page gives it', () => {
+    render(<Card docked />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'true');
+    expect(card.style.getPropertyValue('--tbl-old2-morph')).toBe('1');
+    expect(card.style.height).toBe('600px');
+    expect(viewport.style.maxHeight).toBe('');
+    expect(viewport).toHaveAttribute('data-clip', 'false');
+  });
+
+  it('half way, the morph is the number given and the rows are still clipped to the page scroll', () => {
+    render(<Card docked={0.5} />);
+    const { card, viewport } = parts();
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-old2-morph')).toBe('0.5');
+    expect(viewport).toHaveAttribute('data-clip', 'true');
+  });
+});
+
+describe('TableBulkBarOld2', () => {
+  it('renders nothing at zero and a spoken count otherwise', () => {
+    const { rerender } = render(<TableBulkBarOld2 count={0} onClear={() => undefined} />);
+    expect(screen.queryByRole('region', { name: 'Selection' })).not.toBeInTheDocument();
+    rerender(
+      <TableBulkBarOld2 count={1234} onClear={() => undefined}>
+        <TableBulkActionOld2>Activate</TableBulkActionOld2>
+      </TableBulkBarOld2>
+    );
+    expect(screen.getByRole('button', { name: /1,234 selected/ })).toHaveAttribute(
+      'aria-live',
+      'polite'
+    );
+    expect(screen.getByRole('button', { name: 'Activate' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clear selection' })).toBeInTheDocument();
+  });
+});
+
+describe('TablePagerOld2', () => {
+  it('writes thousands with a comma and goes to a typed page on Enter', async () => {
+    const onPage = vi.fn();
+    render(
+      <TablePagerOld2
+        total={10001}
+        page={1}
+        pageSize={25}
+        onPage={onPage}
+        onPageSize={() => undefined}
+        noun="users"
+      />
+    );
+    expect(screen.getByText('1–25 of 10,001 users')).toBeInTheDocument();
+    expect(screen.getByText('of 401')).toBeInTheDocument();
+    const box = screen.getByRole('textbox', { name: 'Page number' });
+    await userEvent.clear(box);
+    await userEvent.type(box, '3{Enter}');
+    expect(onPage).toHaveBeenLastCalledWith(3);
+    await userEvent.click(screen.getByRole('button', { name: 'Last page' }));
+    expect(onPage).toHaveBeenLastCalledWith(401);
+    expect(screen.getByRole('button', { name: 'First page' })).toBeDisabled();
+  });
+
+  it('offers a Load more footer that hides its button once everything is shown', () => {
+    const { rerender } = render(
+      <TableLoadMoreOld2 shown={25} total={100} noun="users" onMore={() => undefined} />
+    );
+    expect(screen.getByText('Showing 25 of 100 users')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Load more' })).toBeInTheDocument();
+    rerender(<TableLoadMoreOld2 shown={100} total={100} noun="users" onMore={() => undefined} />);
+    expect(screen.queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument();
+  });
+});
+
+describe('TableBlankOld2 and TableSkeletonOld2', () => {
+  it('has the three states with their Users wording and a primary button only for a new tenant', () => {
+    const { rerender } = render(<TableBlankOld2 kind="first" onAction={() => undefined} />);
+    expect(screen.getByText('No users yet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Invite users' })).toHaveClass('mdt-bg-neutral-150');
+    rerender(<TableBlankOld2 kind="empty" onAction={() => undefined} />);
+    expect(screen.getByRole('button', { name: 'Clear filters' })).not.toHaveClass(
+      'mdt-bg-neutral-150'
+    );
+    rerender(<TableBlankOld2 kind="error" onAction={() => undefined} />);
+    expect(screen.getByText('Couldn’t load users')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
+  it('draws five hidden skeleton rows by default', () => {
+    render(
+      <table>
+        <TableSkeletonOld2 widths={[60, 200, 200]} />
+      </table>
+    );
+    expect(screen.getByRole('table').querySelectorAll('tbody tr')).toHaveLength(5);
+    expect(screen.getByRole('table').querySelector('tbody')).toHaveAttribute('aria-hidden', 'true');
+  });
+});
+
+describe('TableOld2 expand — the table drives its own morph', () => {
+  it('starts as an ordinary card, not docked', () => {
+    render(
+      <TableOld2 label="Users" expand>
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('is on without being asked for — a plain table expands', () => {
+    render(
+      <TableOld2 label="Users">
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'false');
+  });
+
+  it('with no page to fill it stays inert, so the viewport keeps its max height', () => {
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().driven);
+      return null;
+    };
+    render(
+      <TableOld2 label="Users" expand>
+        <Probe />
+      </TableOld2>
+    );
+    /* Nothing here scrolls, so there is nothing to fill and nothing to drive.
+     * A table in a drawer, a modal or a card lands exactly here. */
+    expect(seen.at(-1)).toBe(false);
+  });
+
+  it('ignores docked while expand is on — the table decides, not the page', () => {
+    const seen: number[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().morph);
+      return null;
+    };
+    render(
+      <TableOld2 label="Users" expand docked>
+        <Probe />
+      </TableOld2>
+    );
+    /* docked would say 1; the table's own reading says 0 until it scrolls */
+    expect(seen.at(-1)).toBe(0);
+  });
+
+  it('leaves docked alone — a page driving the morph itself keeps that job', () => {
+    render(
+      <TableOld2 label="Users" docked>
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toHaveAttribute('data-docked', 'true');
+  });
+
+  it('opts out on expand={false}, docked and all', () => {
+    render(
+      <TableOld2 label="Users" expand={false} docked={0.5}>
+        <div>rows</div>
+      </TableOld2>
+    );
+    const card = screen.getByRole('region', { name: 'Users' });
+    expect(card).toHaveAttribute('data-docked', 'false');
+    expect(card.style.getPropertyValue('--tbl-old2-morph')).toBe('0.5');
+  });
+
+  it('accepts a dock line for pages that are not a PageFrame', () => {
+    render(
+      <TableOld2 label="Users" expand dockOffset={90}>
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(screen.getByRole('region', { name: 'Users' })).toBeInTheDocument();
+  });
+
+  it('still forwards a ref while driving itself', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <TableOld2 ref={ref} label="Users" expand>
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveAttribute('aria-label', 'Users');
+  });
+
+  it('cleans up the height it set when it is switched off', () => {
+    const { rerender } = render(
+      <TableOld2 label="Users" expand>
+        <div>rows</div>
+      </TableOld2>
+    );
+    rerender(
+      <TableOld2 label="Users" expand={false}>
+        <div>rows</div>
+      </TableOld2>
+    );
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+  });
+
+  /* A page, faked: a scrolling box the table can measure. jsdom lays nothing
+   * out, so the box's visible height is set by hand. */
+  const pageOf = (visibleHeight: number): HTMLDivElement => {
+    const box = document.createElement('div');
+    box.style.overflowY = 'auto';
+    Object.defineProperty(box, 'clientHeight', { value: visibleHeight, configurable: true });
+    document.body.appendChild(box);
+    return box;
+  };
+
+  it('fills a real page — a scrolling box no taller than the window', () => {
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().driven);
+      return null;
+    };
+    const page = pageOf(600);
+    render(
+      <TableOld2 label="Users">
+        <Probe />
+      </TableOld2>,
+      { container: page }
+    );
+    expect(seen.at(-1)).toBe(true);
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).not.toBe('');
+    page.remove();
+  });
+
+  it('rests at 0 however close to the dock line it starts, and reaches 1 exactly there', async () => {
+    /* Pranjal, 2026-09-12, on the Service accounts page. A card 81px from the
+     * dock line, measured against a flat 140, RESTED 42% morphed: corners half
+     * flattened before anyone scrolled. The morph runs over the travel the
+     * card actually has. */
+    const seen: number[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().morph);
+      return null;
+    };
+    /* 700 tall: shorter than jsdom's 768px window, so it counts as a page and fills */
+    const page = pageOf(700);
+    Object.defineProperty(page, 'scrollTop', { value: 0, writable: true, configurable: true });
+    /* the page sits at 0; the card starts 199px down it; the dock line is 118 */
+    page.getBoundingClientRect = () => ({
+      top: 0,
+      left: 0,
+      right: 1440,
+      bottom: 700,
+      width: 1440,
+      height: 700,
+      x: 0,
+      y: 0,
+      toJSON: () => '',
+    });
+    let cardTop = 199;
+    const { container } = render(
+      <TableOld2 label="Service accounts" dockOffset={118}>
+        <Probe />
+      </TableOld2>,
+      { container: page }
+    );
+    const card = container.querySelector<HTMLElement>('.tbl-old2');
+    if (card === null) throw new Error('no card');
+    card.getBoundingClientRect = () => ({
+      top: cardTop,
+      left: 280,
+      right: 1416,
+      bottom: cardTop + 782,
+      width: 1136,
+      height: 782,
+      x: 280,
+      y: cardTop,
+      toJSON: () => '',
+    });
+    const scrollTo = async (y: number): Promise<void> => {
+      (page as unknown as { scrollTop: number }).scrollTop = y;
+      cardTop = 199 - y;
+      page.dispatchEvent(new Event('scroll'));
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await new Promise((r) => setTimeout(r, 0));
+    };
+    await scrollTo(0);
+    expect(seen.at(-1)).toBe(0);
+    await scrollTo(40);
+    expect(seen.at(-1)).toBeCloseTo(40 / 81, 2);
+    await scrollTo(81);
+    expect(seen.at(-1)).toBe(1);
+    page.remove();
+  });
+
+  it('skips a scrolling box taller than the window — that is content, not a page', () => {
+    /* The gallery's docs page wraps every story in exactly this: overflow auto,
+     * no height, so it is as tall as whatever it holds. Filling it ratcheted
+     * every table to 8,000px (Pranjal, 2026-09-11). */
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().driven);
+      return null;
+    };
+    const notAPage = pageOf(window.innerHeight + 1);
+    render(
+      <TableOld2 label="Users">
+        <Probe />
+      </TableOld2>,
+      { container: notAPage }
+    );
+    expect(seen.at(-1)).toBe(false);
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+    notAPage.remove();
+  });
+
+  it('gives up on a box that is small at mount but grows the moment the table fills it', () => {
+    /* The docs page, exactly: the wrapper is short when the first table
+     * mounts, then swells as the table takes a height. A mount-time check
+     * waved this through. */
+    const seen: boolean[] = [];
+    const Probe = (): null => {
+      seen.push(useTableMorphOld2().driven);
+      return null;
+    };
+    const box = document.createElement('div');
+    box.style.overflowY = 'auto';
+    Object.defineProperty(box, 'clientHeight', {
+      configurable: true,
+      get: () => (box.querySelector<HTMLElement>('.tbl-old2')?.style.height ? 5000 : 600),
+    });
+    document.body.appendChild(box);
+    render(
+      <TableOld2 label="Users">
+        <Probe />
+      </TableOld2>,
+      { container: box }
+    );
+    expect(screen.getByRole('region', { name: 'Users' }).style.height).toBe('');
+    expect(seen.at(-1)).toBe(false);
+    box.remove();
+  });
+});
+
+describe('TableOld2 expand — with a page under it', () => {
+  /* jsdom has no layout, so every measurement the table takes has to be told to
+   * it. These fakes are the whole reason this block is separate from the one
+   * above: there, nothing scrolls and the table never gets past looking for a
+   * page, which leaves the filling and the morph untested. */
+
+  const rectAt = (top: number): DOMRect => ({
+    top,
+    bottom: top,
+    left: 0,
+    right: 0,
+    width: 0,
+    height: 0,
+    x: 0,
+    y: top,
+    toJSON: () => ({}),
+  });
+
+  const measure = (el: HTMLElement, clientHeight: number, scrollHeight: number): void => {
+    Object.defineProperty(el, 'clientHeight', { value: clientHeight, configurable: true });
+    Object.defineProperty(el, 'scrollHeight', { value: scrollHeight, configurable: true });
+    Object.defineProperty(el, 'scrollTop', { value: 0, configurable: true, writable: true });
+    el.getBoundingClientRect = () => rectAt(0);
+  };
+
+  let frames: FrameRequestCallback[] = [];
+
+  beforeEach(() => {
+    frames = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      frames.push(cb);
+      /* The table treats 0 as "no frame pending", so a handle must not be 0. */
+      return frames.length;
+    });
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** Runs whatever the table asked for a frame for, the way a browser would. */
+  const runFrames = (): void => {
+    const due = frames;
+    frames = [];
+    act(() => {
+      due.forEach((cb) => {
+        cb(0);
+      });
+    });
+  };
+
+  let morph = 0;
+  let driven = false;
+
+  function Probe(): null {
+    const state = useTableMorphOld2();
+    morph = state.morph;
+    driven = state.driven;
+    return null;
+  }
+
+  interface Layout {
+    /** How tall the scrolling page is. */
+    page: number;
+    /** How far the page can scroll. Defaults to exactly its own height. */
+    scroll?: number;
+    /** Where the card sits inside it. */
+    cardTop: number;
+    /** Passed straight to the table, for the pages that are not a PageFrame. */
+    dockOffset?: number;
+    /** Custom properties on the card, standing in for the ones a page publishes. */
+    vars?: Record<string, string>;
+  }
+
+  /**
+   * Mounts a table inside a page it can fill.
+   *
+   * It mounts switched off, takes its measurements, then switches on: the
+   * effect only reads the page once, so the numbers have to be in place before
+   * it runs, and the elements do not exist until the first render.
+   */
+  const mountInPage = (layout: Layout) => {
+    const ui = (expand: boolean): JSX.Element => (
+      <div data-testid="page" style={{ overflowY: 'auto' }}>
+        <TableOld2 label="Users" expand={expand} dockOffset={layout.dockOffset} style={layout.vars}>
+          <Probe />
+        </TableOld2>
+      </div>
+    );
+    const view = render(ui(false));
+    const page = screen.getByTestId('page');
+    const card = screen.getByRole('region', { name: 'Users' });
+    measure(page, layout.page, layout.scroll ?? layout.page);
+    card.getBoundingClientRect = () => rectAt(layout.cardTop);
+    view.rerender(ui(true));
+    return { ...view, page, card };
+  };
+
+  it('takes the whole height under the dock line', () => {
+    const { card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    expect(driven).toBe(true);
+  });
+
+  it('rests at 0 whatever travel it has, rather than part-morphed before a scroll', () => {
+    mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    /* 70px of travel against the old flat 140 put this card at rest 50% morphed
+     * — corners half flattened before anyone touched the page. The morph now
+     * runs over the travel the card actually has, so every card rests at 0. */
+    expect(morph).toBe(0);
+  });
+
+  it('stays an ordinary card when there is too little room to be worth filling', () => {
+    const { card } = mountInPage({ page: 200, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('');
+    expect(driven).toBe(false);
+    expect(morph).toBe(0);
+  });
+
+  it('cancels the surface trailing padding so the page stops on the dock line', () => {
+    const { card } = mountInPage({ page: 600, scroll: 720, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('-50px');
+  });
+
+  it('leaves the margin alone when the page does not overrun', () => {
+    const { card } = mountInPage({ page: 600, scroll: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('leaves the margin alone when the overrun is too big to be padding', () => {
+    const { card } = mountInPage({ page: 600, scroll: 900, cardTop: 170, dockOffset: 100 });
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('morphs as the page scrolls', () => {
+    const { page, card } = mountInPage({ page: 600, cardTop: 240, dockOffset: 100 });
+    expect(morph).toBe(0);
+    card.getBoundingClientRect = () => rectAt(100);
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    runFrames();
+    expect(morph).toBe(1);
+  });
+
+  it('asks for one frame however many scroll events arrive', () => {
+    const { page } = mountInPage({ page: 600, cardTop: 240, dockOffset: 100 });
+    const before = frames.length;
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+      page.dispatchEvent(new Event('scroll'));
+      page.dispatchEvent(new Event('scroll'));
+    });
+    expect(frames.length - before).toBe(1);
+  });
+
+  it('holds its state when a scroll changes nothing', () => {
+    const { page } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    const settled = morph;
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    runFrames();
+    expect(morph).toBe(settled);
+  });
+
+  it('reads the dock line the page publishes', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: { '--mdt-thead-top': '108px' },
+    });
+    expect(card.style.height).toBe('492px');
+  });
+
+  it('falls back to the band heights when the published line is a calc()', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: {
+        '--mdt-thead-top': 'calc(56px + 54px)',
+        '--mdt-band-b1-h': '56px',
+        '--mdt-band-b2t-h': '54px',
+      },
+    });
+    /* 56 + (54 - 2), the same answer the calc() would have given. */
+    expect(card.style.height).toBe('492px');
+  });
+
+  it('takes the first band alone when there is no second one', () => {
+    const { card } = mountInPage({
+      page: 600,
+      cardTop: 170,
+      vars: { '--mdt-band-b1-h': '56px' },
+    });
+    expect(card.style.height).toBe('544px');
+  });
+
+  it('docks at the top when the page publishes nothing at all', () => {
+    const { card } = mountInPage({ page: 600, cardTop: 170 });
+    expect(card.style.height).toBe('600px');
+  });
+
+  it('re-fills when the page changes size', () => {
+    const observers: ResizeObserverCallback[] = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: ResizeObserverCallback) {
+          observers.push(cb);
+        }
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+      }
+    );
+    const { page, card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    Object.defineProperty(page, 'clientHeight', { value: 400, configurable: true });
+    act(() => {
+      observers.forEach((cb) => {
+        cb([], new ResizeObserver(() => undefined));
+      });
+    });
+    expect(card.style.height).toBe('300px');
+    vi.unstubAllGlobals();
+  });
+
+  it('works where ResizeObserver does not exist', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const { card } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    expect(card.style.height).toBe('500px');
+    vi.unstubAllGlobals();
+  });
+
+  it('drops the height, the frame and the listener on the way out', () => {
+    const { page, card, unmount } = mountInPage({ page: 600, cardTop: 170, dockOffset: 100 });
+    act(() => {
+      page.dispatchEvent(new Event('scroll'));
+    });
+    unmount();
+    expect(window.cancelAnimationFrame).toHaveBeenCalled();
+    expect(card.style.height).toBe('');
+    expect(card.style.marginBottom).toBe('');
+  });
+
+  it('hands the card to a callback ref as well as keeping it', () => {
+    const seen: (HTMLDivElement | null)[] = [];
+    render(
+      <div style={{ overflowY: 'auto' }}>
+        <TableOld2
+          label="Users"
+          ref={(node) => {
+            seen.push(node);
+          }}
+        >
+          <div>rows</div>
+        </TableOld2>
+      </div>
+    );
+    expect(seen[0]).toBeInstanceOf(HTMLDivElement);
+  });
+});
+describe('The lead column — one slot with two occupants', () => {
+  /* The page says whether it has bulk actions; the lead column draws the right
+   * occupant. So every test here asks what got drawn, never which was asked
+   * for. */
+  const Lead = ({
+    head,
+    cell,
+  }: {
+    head: Parameters<typeof TableLeadHeadOld2>[0];
+    cell: Parameters<typeof TableLeadCellOld2>[0];
+  }) => (
+    <TableOld2 label="Operators">
+      <TableViewportOld2 tableWidth={260}>
+        <TableColGroupOld2 widths={[60, 200]} />
+        <TableHeaderOld2>
+          <tr>
+            <TableLeadHeadOld2 {...head} />
+            <TableHeadOld2 columnKey="name" label="Name" width={200} />
+          </tr>
+        </TableHeaderOld2>
+        <TableBodyOld2>
+          <TableRowOld2>
+            <TableLeadCellOld2 {...cell} />
+            <TableCellOld2>Anita Raghavan</TableCellOld2>
+          </TableRowOld2>
+        </TableBodyOld2>
+      </TableViewportOld2>
+    </TableOld2>
+  );
+
+  const hash = () => screen.queryByRole('columnheader', { name: 'Row number' });
+  const selectAll = () => screen.queryByRole('checkbox', { name: 'Select all on this page' });
+
+  it('puts the row number there when the table cannot act on many rows', () => {
+    render(<Lead head={{}} cell={{ index: 3 }} />);
+    expect(hash()).toBeInTheDocument();
+    expect(selectAll()).not.toBeInTheDocument();
+    expect(screen.getByText('3')).toHaveClass('tbl-old2-num');
+  });
+
+  it('puts a checkbox in the same slot when it can', () => {
+    render(
+      <Lead
+        head={{
+          selectable: true,
+          state: 'some',
+          onToggle: () => undefined,
+          onScope: () => undefined,
+          frozen: 12,
+        }}
+        cell={{
+          index: 3,
+          label: 'Anita Raghavan',
+          selectable: true,
+          selected: true,
+          onToggle: () => undefined,
+          inert: false,
+          frozen: 12,
+        }}
+      />
+    );
+    expect(selectAll()).toBeInTheDocument();
+    expect(hash()).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Select Anita Raghavan')).toBeChecked();
+  });
+
+  it('names the row checkbox after its row when the page does not', () => {
+    render(
+      <Lead
+        head={{ selectable: true, onToggle: () => undefined, onScope: () => undefined }}
+        cell={{ index: 4, selectable: true, onToggle: () => undefined }}
+      />
+    );
+    expect(screen.getByLabelText('Select row 4')).toBeInTheDocument();
+  });
+
+  it('stays on the row number when a handler is missing, rather than drawing a dead checkbox', () => {
+    /* selectable says what the page wants; without the handlers it cannot have
+     * it, and a checkbox that does nothing is worse than the number. */
+    render(
+      <Lead
+        head={{ selectable: true, onScope: () => undefined }}
+        cell={{ index: 5, selectable: true }}
+      />
+    );
+    expect(hash()).toBeInTheDocument();
+    expect(screen.getByText('5')).toHaveClass('tbl-old2-num');
+  });
+
+  it('needs the scope menu too, not just the toggle', () => {
+    render(<Lead head={{ selectable: true, onToggle: () => undefined }} cell={{ index: 6 }} />);
+    expect(hash()).toBeInTheDocument();
+    expect(selectAll()).not.toBeInTheDocument();
+  });
+});

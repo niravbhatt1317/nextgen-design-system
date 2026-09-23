@@ -199,6 +199,12 @@ export default tseslint.config(
       'src/components/Sheet/Sheet.stories.tsx',
       // DataTable still renders the deprecated strip and chips until the table port (2026-09-04)
       'src/components/index.ts',
+      // Deprecated 2026-09-23 - the Deprecated 2 families. Each names itself in
+      // its own file, its barrel, its stories and its ported test suite, and
+      // nothing outside the families references one: checked, and worth
+      // re-checking if an entry is ever added here for a file that is not an
+      // *Old2 one.
+      '**/*Old2/**',
       // Deprecated 2026-09-15. Each still has to name itself in its own file, its
       // barrel and its stories.
       '**/AiMark/**',

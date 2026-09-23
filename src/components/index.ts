@@ -924,3 +924,86 @@ export type {
   PageSurfaceProps,
   PageBandVariant,
 } from './PageFrame';
+
+// ── Deprecated 2 (2026-09-22) — the versions these parts replaced on this branch; kept for
+// side-by-side review under "Deprecated 2/…" in the gallery; Nirav sets the removal version.
+// InputOld2 — the Input before 2026-09-12. DEPRECATED 2026-09-22: use Input.
+export { InputOld2, inputOld2Variants } from './InputOld2';
+export type { InputOld2Props, InputOld2VariantsType } from './InputOld2';
+// TextareaOld2 — the Textarea before 2026-09-17. DEPRECATED 2026-09-22: use Textarea.
+export { TextareaOld2, textareaOld2Variants } from './TextareaOld2';
+export type { TextareaOld2Props, TextareaOld2Variants } from './TextareaOld2';
+// SelectOld2 — the Select before 2026-09-17. DEPRECATED 2026-09-22: use Select.
+export { SelectOld2, selectOld2TriggerVariants } from './SelectOld2';
+export type {
+  SelectOld2Props,
+  SelectOld2Option,
+  SelectOld2OptionGroup,
+  SelectOld2Mode,
+  SelectOld2Size,
+  SelectOld2TriggerVariant,
+  SelectOld2Placement,
+  SelectOld2TriggerRenderProps,
+  SelectOld2ItemRenderProps,
+  SelectOld2PillHoverCardRenderProps,
+  SelectOld2State,
+  SelectOld2TriggerProps,
+  SelectOld2ContentProps,
+  SelectOld2ItemProps,
+  SelectOld2SearchProps,
+  SelectOld2PillProps,
+  SelectOld2EmptyProps,
+  SelectOld2LoadingProps,
+  SelectOld2GroupProps,
+  SelectOld2LabelProps,
+  SelectOld2SeparatorProps,
+  SelectOld2ValueProps,
+} from './SelectOld2';
+// AvatarOld2 — the Avatar and AvatarStack before 2026-09-21. DEPRECATED 2026-09-22: use Avatar.
+export {
+  AvatarOld2,
+  AvatarStackOld2,
+  avatarOld2Variants,
+  toneForNameOld2,
+  initialsForNameOld2,
+} from './AvatarOld2';
+export type {
+  AvatarOld2Props,
+  AvatarOld2OwnProps,
+  AvatarStackOld2Props,
+  AvatarOld2VariantsType,
+  AvatarOld2Tone,
+  AvatarOld2Size,
+  AvatarOld2Shape,
+} from './AvatarOld2';
+// SwitchOld2 — the MotadataSwitch before 2026-09-22. DEPRECATED 2026-09-22: use MotadataSwitch.
+export {
+  MotadataSwitchOld2,
+  motadataSwitchOld2RootVariants,
+  motadataSwitchOld2ThumbVariants,
+} from './SwitchOld2';
+export type { MotadataSwitchOld2Props, MotadataSwitchOld2Variants } from './SwitchOld2';
+// TableOld2 — the merged console Users table family before 2026-09-11. DEPRECATED 2026-09-22: use Table / DataTable.
+// Every name in that barrel already carries Old2, so the star form is clash-free.
+export * from './TableOld2';
+
+// TabsOld2 — the Tabs before 2026-09-22 (the console's tabs ruling of 2026-09-17 came into the library). DEPRECATED 2026-09-22: use Tabs.
+export {
+  TabsOld2,
+  TabsListOld2,
+  TabsTriggerOld2,
+  TabsContentOld2,
+  TabsAddOld2,
+  useEditableTabsOld2,
+} from './TabsOld2';
+export type {
+  TabsOld2Props,
+  TabsListOld2Props,
+  TabsTriggerOld2Props,
+  TabsContentOld2Props,
+  TabsAddOld2Props,
+  TabsOld2Variant,
+  EditableTabOld2,
+  UseEditableTabsOld2,
+  UseEditableTabsOld2Options,
+} from './TabsOld2';
