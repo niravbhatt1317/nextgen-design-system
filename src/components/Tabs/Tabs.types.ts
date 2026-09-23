@@ -2,9 +2,24 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import type * as TabsPrimitive from '@radix-ui/react-tabs';
 
 /**
- * Variant type for tabs styling
+ * The two types of tab (K-Tabs-01, ruled 2026-09-17).
+ *
+ * - `underline` — the default: every drawer band and page band. A 13/500 label
+ *   over a 2px line that sits on the strip's hairline.
+ * - `filled` — a switch inside a body (a view toggle, a form's mode), where a
+ *   track reads better than a line: a 32 track holding 26 chips.
+ *
+ * A sequence is a Stepper, a view preference a ToggleGroup, "one of these" a
+ * Radio strip; only sections you visit in any order are Tabs (K-Tabs-25).
  */
-export type TabsVariant = 'default' | 'underline' | 'card' | 'pills';
+export type TabsType = 'underline' | 'filled';
+
+/**
+ * The older name for `TabsType`; prefer `TabsType`. The four looks this used to
+ * name (default, underline, card, pills) live on in `TabsOld2`; here it is only
+ * an alias so callers written against `variant` keep compiling.
+ */
+export type TabsVariant = TabsType;
 
 /**
  * Props for the Tabs root component
@@ -23,7 +38,8 @@ export interface TabsProps extends ComponentPropsWithoutRef<typeof TabsPrimitive
   value?: string;
 
   /**
-   * Event handler called when the value changes.
+   * Event handler called when the value changes. Not called for a tab that is
+   * already selected: the active tab ignores a click (K-Tabs-12).
    */
   onValueChange?: (value: string) => void;
 
@@ -40,57 +56,86 @@ export interface TabsProps extends ComponentPropsWithoutRef<typeof TabsPrimitive
   dir?: 'ltr' | 'rtl';
 
   /**
-   * When true, keyboard navigation will loop from last tab to first, and vice versa.
-   * @default true
+   * Whether a tab is selected as soon as it is focused (automatic) or only on
+   * Enter or Space (manual).
+   * @default 'automatic'
    */
   activationMode?: 'automatic' | 'manual';
 }
 
 /**
- * Props for the TabsList component
+ * Props for the TabsList component - the strip (underline) or the track (filled).
  */
 export interface TabsListProps extends ComponentPropsWithoutRef<typeof TabsPrimitive.List> {
   /**
-   * Visual style variant
-   * @default 'default'
+   * Which of the two types the strip draws. Every trigger inside inherits it,
+   * so it is set once here and never repeated on the tabs.
+   * @default 'underline'
    */
-  variant?: TabsVariant;
+  type?: TabsType;
+
+  /** The older name for `type`; prefer `type`. */
+  variant?: TabsType;
 
   /**
-   * Whether the tabs should take full width of container
+   * Stretches each tab to share the width equally.
    * @default false
    */
   fullWidth?: boolean;
 }
 
 /**
- * Props for the TabsTrigger component
+ * Props for the TabsTrigger component - one tab.
+ *
+ * `type` here is the tab's type, not the button's: the trigger is always a
+ * `type="button"`, which Radix sets itself.
  */
-export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
+export interface TabsTriggerProps extends Omit<
+  ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>,
+  'type'
+> {
   /**
    * The value of the tab. Must be unique within the Tabs component.
    */
   value: string;
 
   /**
-   * A glyph before the label.
+   * Overrides the type inherited from the `TabsList`. Normally left unset.
+   */
+  type?: TabsType;
+
+  /** The older name for `type`; prefer `type` on the `TabsList`. */
+  variant?: TabsType;
+
+  /**
+   * A glyph before the label, drawn at 14 with 6 before the label (K-Tabs-13).
    *
-   * A prop rather than something you put in `children` so the spacing is the
-   * same on every tab in the product. Hand-placing it meant each caller picked
-   * their own margin, and they did not agree.
+   * A prop rather than something you put in `children` so the size and the
+   * spacing are decided once here, not by whoever writes the next tab bar.
    */
   icon?: ReactNode;
 
   /**
-   * A count or status after the label - usually a `Badge`.
-   *
-   * Pairs with `icon`: a tab can carry a glyph, a label and a count all at
-   * once, which is the shape most navigation actually needs.
+   * A count after the label: an 18-high pill at 11/600, muted, inverted on the
+   * active tab (K-Tabs-14 - the console's CountBadge as it is). A tab may carry
+   * a count and never a button.
+   */
+  count?: number | string;
+
+  /**
+   * Caps the count. Above it the pill reads `99+`.
+   * @default 99
+   */
+  countMax?: number;
+
+  /**
+   * Anything else after the label - a `Badge` for a status, say. For a number
+   * use `count`, which is already the right pill.
    */
   badge?: ReactNode;
 
   /**
-   * Shows a close control on the tab.
+   * Shows a close control on the tab (K-Tabs-21).
    *
    * For tab bars the person builds themselves - a set of open documents, a
    * saved view per tab - rather than fixed navigation. Fixed sections should
@@ -110,25 +155,20 @@ export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof TabsPr
   closeLabel?: string;
 
   /**
-   * Visual style variant (should match TabsList variant)
-   * @default 'default'
-   */
-  variant?: TabsVariant;
-
-  /**
-   * Whether the tab trigger should take full width
+   * Whether the tab takes an equal share of the strip's width.
    * @default false
    */
   fullWidth?: boolean;
 
   /**
-   * Whether the tab is disabled
+   * A disabled tab reads neutral-40 with a not-allowed cursor (K-Tabs-05) and
+   * is skipped by the arrow keys.
    */
   disabled?: boolean;
 }
 
 /**
- * Props for the add-a-tab control.
+ * Props for the add-a-tab control (K-Tabs-22).
  */
 export interface TabsAddProps extends ComponentPropsWithoutRef<'button'> {
   /**

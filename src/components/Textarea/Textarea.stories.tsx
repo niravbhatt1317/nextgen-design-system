@@ -8,7 +8,7 @@ import { Textarea } from './Textarea';
  * It supports labels, error states, helper text, and character counting.
  */
 const meta: Meta<typeof Textarea> = {
-  title: 'Components/Textarea',
+  title: 'New Components/Textarea',
   component: Textarea,
   tags: ['autodocs'],
   parameters: {

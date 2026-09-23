@@ -174,6 +174,12 @@ export type {
 export { Container, containerVariants } from './Container';
 export type { ContainerProps, ContainerVariants } from './Container';
 
+// DateInput — the date field: the Input's box as a button with the 16 calendar
+// glyph at the right, opening DatePicker below. Day-only, "YYYY-MM-DD"
+// (Pranjal, 2026-09-22).
+export { DateInput } from './DateInput';
+export type { DateInputProps, DateInputSize } from './DateInput';
+
 // DatePicker — the calendar on its own: month grid, min/max bounds, a today
 // mark, Clear and Done. No time picker (Pranjal, 2026-09-22).
 export { DatePicker, formatDay, parseDay, toDay, MONTHS_SHORT } from './DatePicker';
@@ -344,6 +350,12 @@ export type {
 // Label — the uppercase micro-heading, settling three competing letter-spacings
 export { Label, labelVariants } from './Label';
 export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
+
+// NumberInput — the number field with its own stepper, the native spinner
+// hidden. Sits with Input, Textarea and Select on Foundation/Field
+// (Pranjal, 2026-09-22).
+export { NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
 
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
 // the length, resend and expiry rules belong to the sign-in flow, not here.

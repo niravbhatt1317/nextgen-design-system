@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef, useId } from 'react';
 import { cn } from '@/utils';
+import { Icon } from '../Icon';
 import type { TextareaProps } from './Textarea.types';
 
 /**
@@ -10,12 +11,15 @@ import type { TextareaProps } from './Textarea.types';
 export const textareaVariants = cva(
   // Base styles applied to all textareas
   [
-    'mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-input',
-    'mdt-bg-background mdt-text-foreground',
-    'mdt-transition-colors',
-    'placeholder:mdt-text-muted-foreground',
-    'focus-visible:mdt-outline-none',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50',
+    /* THE FIELD (Pranjal, 2026-09-17) - the same box as the Input, grown */
+    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
+    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-transition-[border-color,box-shadow]',
+    'placeholder:mdt-text-faint',
+    'hover:mdt-border-primary',
+    'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
+      'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint disabled:hover:mdt-border-neutral-30',
   ],
   {
     variants: {
@@ -23,7 +27,7 @@ export const textareaVariants = cva(
        * Size variant of the textarea
        */
       size: {
-        sm: 'mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-xs',
+        sm: 'mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-[13px]',
         md: 'mdt-min-h-[100px] mdt-px-3 mdt-py-2 mdt-text-sm',
         lg: 'mdt-min-h-[120px] mdt-px-4 mdt-py-3 mdt-text-base',
       },
@@ -38,7 +42,9 @@ export const textareaVariants = cva(
        * Whether the textarea is in an error state
        */
       hasError: {
-        true: 'mdt-border-destructive',
+        true:
+          'mdt-border-destructive hover:mdt-border-destructive focus:mdt-border-destructive ' +
+          'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-destructive)/0.14)]',
         false: '',
       },
       /**
@@ -51,7 +57,7 @@ export const textareaVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'md',
+      size: 'sm',
       variant: 'default',
       hasError: false,
       resize: 'vertical',
@@ -93,6 +99,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       error,
       label,
       helperText,
+      locked,
+      disabled,
       id: propId,
       ...props
     },
@@ -103,6 +111,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errorId = `${id}-error`;
     const helperId = `${id}-helper`;
     const hasError = Boolean(error);
+    /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock inside at the top right, the text stopping short of it */
+    const held = Boolean(locked);
 
     // Determine aria-describedby value
     let describedBy: string | undefined;
@@ -115,20 +125,38 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+          <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
             {label}
           </label>
         )}
-        <textarea
-          id={id}
-          ref={ref}
-          className={cn(textareaVariants({ size, variant, hasError, resize }), className)}
-          aria-invalid={hasError}
-          aria-describedby={describedBy}
-          {...props}
-        />
+        <div className="mdt-relative mdt-flex">
+          <textarea
+            id={id}
+            ref={ref}
+            className={cn(
+              textareaVariants({ size, variant, hasError, resize }),
+              held && 'mdt-pr-[34px]',
+              className
+            )}
+            aria-invalid={hasError}
+            aria-describedby={describedBy}
+            disabled={held || disabled}
+            {...props}
+          />
+          {held && (
+            <div className="mdt-absolute mdt-right-3 mdt-top-[9px] mdt-flex mdt-items-center mdt-text-faint">
+              <Icon name="lock" size={14} aria-hidden />
+            </div>
+          )}
+        </div>
         {error && (
-          <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+          <p
+            id={errorId}
+            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            role="alert"
+          >
+            {/* the alert mark, 12, before the message (K-Field-10) */}
+            <Icon name="alert-circle" size={12} aria-hidden />
             {error}
           </p>
         )}

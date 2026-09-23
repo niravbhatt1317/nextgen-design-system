@@ -62,6 +62,32 @@ not something to settle in a story. Live example: Storybook → Components → T
 
 ---
 
+## Colour — a neutral step between 40 and 50
+
+The neutral ramp jumps from **neutral-40 `#CBD3E1`** straight to **neutral-50 `#8FA0BD`**. Measured
+in sRGB that is a distance of 63 — by far the widest gap in the ramp — and a control that needs to
+go _one shade darker_ has nowhere to land.
+
+`Switch` hit it first. Its unchecked track rests on `--mdt-input`, which **is** neutral-40, so
+hovering to neutral-40 changes nothing; hovering to neutral-50 overshoots. The mock
+(`mocks/foundation/switch.html`, 2026-09-22) draws `#B9C3D4`, which sits between the two:
+
+| Step       | Hex       | Distance from `#B9C3D4` |
+| ---------- | --------- | ----------------------- |
+| neutral-40 | `#CBD3E1` | 27.4                    |
+| **wanted** | `#B9C3D4` | —                       |
+| neutral-50 | `#8FA0BD` | 59.3                    |
+
+So `Switch.tsx` currently carries the raw hex, and it is the one token-rule violation in that
+component. Mapping it to the nearest step we own would either remove the hover entirely
+(neutral-40) or make it read as a press rather than a hover (neutral-50).
+
+**Whether the ramp gains a step here is a palette decision for the design owner.** Any control that
+wants a hover one shade off a neutral-40 resting state will want the same thing, so this is not
+`Switch`'s problem alone.
+
+---
+
 ## Colour — the quiet-variant pair
 
 Colour used to be the one complete category. It is not, and the gap is worth reading before the

@@ -291,7 +291,11 @@ describe('RadioGroup · segmented', () => {
     const group = strip(container);
     expect(group).toHaveClass('mdt-border');
     expect(group).toHaveClass('mdt-rounded-md');
-    expect(group).toHaveClass('mdt-overflow-hidden');
+    // the strip must not clip, or the chosen segment's edge is cut off at the
+    // top and bottom - so the two ends carry the strip's corners themselves
+    expect(group).not.toHaveClass('mdt-overflow-hidden');
+    expect(group).toHaveClass('[&>*:first-child]:mdt-rounded-l-[5px]');
+    expect(group).toHaveClass('[&>*:last-child]:mdt-rounded-r-[5px]');
     // no tray and no gaps - the joint is the shape
     expect(group).not.toHaveClass('mdt-gap-2');
     expect(group).not.toHaveClass('mdt-p-1');
@@ -312,7 +316,27 @@ describe('RadioGroup · segmented', () => {
     expect(container.querySelector('[data-slot="radio-segment"] .mdt-bg-current')).toBeNull();
   });
 
-  it('draws focus inside the segment, because the strip clips its own edges', () => {
+  it('gives the chosen one a primary edge all round, over the strip and the dividers', () => {
+    const { container } = render3();
+    const chosen = segments(container)[1];
+    // a border (borders snap to whole pixels; a shadow blurs on a half pixel)
+    // on a box one pixel bigger than the segment's inside on every side: the
+    // strip's line above and below, the dividers either side
+    expect(chosen).toHaveClass('after:mdt-absolute');
+    expect(chosen).toHaveClass('after:mdt-border');
+    expect(chosen).toHaveClass('after:mdt-border-primary');
+    expect(chosen).toHaveClass('after:-mdt-inset-px');
+    // only on the chosen one, lifted above its neighbours so it lands on their lines
+    expect(chosen).toHaveClass('after:mdt-opacity-0');
+    expect(chosen).toHaveClass('data-[state=checked]:after:mdt-opacity-100');
+    expect(chosen).toHaveClass('mdt-relative');
+    expect(chosen).toHaveClass('data-[state=checked]:mdt-z-10');
+    // the two ends reach the strip's outer corners, so they take the strip's radius
+    expect(chosen).toHaveClass('first:after:mdt-rounded-l-md');
+    expect(chosen).toHaveClass('last:after:mdt-rounded-r-md');
+  });
+
+  it('draws focus inside the segment, because butted segments leave no room outside', () => {
     const { container } = render3();
     const seg = segments(container)[0];
     expect(seg).toHaveClass('focus-visible:mdt-ring-inset');

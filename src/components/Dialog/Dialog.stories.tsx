@@ -27,7 +27,7 @@ import {
  * Built on Radix UI Dialog for accessibility and keyboard navigation.
  */
 const meta: Meta<typeof Dialog> = {
-  title: 'Components/Dialog',
+  title: 'New Components/Dialog',
   component: Dialog,
   tags: ['autodocs'],
   parameters: {
