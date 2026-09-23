@@ -1,248 +1,212 @@
-# Handoff — 2026-09-15
+# Handoff — 2026-09-23
 
 ## Read first
 
-**0.6.0 is published.** `@mtdt/nextgen-design-system@0.6.0` is live on npm — 5 MB, 2845 files,
-provenance attested, published by OIDC trusted publishing so no token exists anywhere.
-
-**The PR queue is empty, `main` is clean, and nothing is pending.** No open pull requests, no
-queued changesets, working tree clean, local branches pruned to `main` and `islamabad`.
+**The next release is 1.0.0.** Six changesets are queued and **two are `major`** —
+that is a deliberate consequence of the work below, not changeset arithmetic. Nothing
+is published yet; `main` and npm both sit at **0.6.0**.
 
 ```
-0c6733e  fix(package): the package loads in Node, artifact holds one tarball  (#101)
-d660df1  fix(table): export TableLeadHead and TableLeadCell, catch the next one (#100)
-2b3887d  chore(release): 0.6.0                                                (#99)
-7fa9ae3  docs(handoff)                                                        (#98)
-34997ec  docs: the design links, six page-structure entries                   (#90)
-bb99ce1  table, strip, icon tile, input: twenty refinements                   (#94)
-4a13a21  feat(table): expand — the table drives its own morph                  (#89)
+2256b30  feat(deprecated-2): the seven replaced components, tested and tagged   (#112)
+c74c0ce  feat(field, tabs, avatar)!: the rework from #109, on current main      (#111)
+1b545cd  feat(deprecate)!: AiMark, Callout, Item and OTPInput move to Deprecated (#104)
+2336786  docs(storybook): Foundation leads the sidebar                          (#103)
 ```
 
-Then `CLAUDE.md`. Two of its sections did the real work over these two days:
-**⚠️ Class order matters** and **🔒 The token rule**.
+Working tree clean, local branches `main` and `islamabad`. **One PR open: #109.**
 
-**The project lives at `~/Claude-Projects/Next-Gen/AI Ready Design System` on macOS.** `CLAUDE.md`
-still says `G:\Claude Project\...`, which is the Windows machine and wrong. Fix it next time
-anybody edits that file.
+Then `CLAUDE.md` — and note it still says the project lives at `G:\Claude Project\...`,
+which is the old Windows machine. It is `~/Claude-Projects/Next-Gen/AI Ready Design System`.
+
+---
+
+## What breaks in 1.0.0
+
+Four changes, each with a changeset that names it:
+
+|                                                | before                                          | now                                                     |
+| ---------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| `Input` / `Textarea` / `Select` default `size` | `md` (36px)                                     | **`sm` (32px)**                                         |
+| `Avatar` `MAX_INITIALS`                        | `2`                                             | **`1`**                                                 |
+| `Avatar` person tones                          | includes `slate`                                | **`slate` removed** — every name-derived colour changes |
+| `Tabs`                                         | `'default' \| 'underline' \| 'card' \| 'pills'` | **`'underline' \| 'filled'`**                           |
+| `--mdt-destructive` (light)                    | red 65 `#C72323`                                | **red 60 `#DB132A`**                                    |
+
+The `destructive` move is a **fix**: light pointed at red 65 and dark at red 60 from
+the first commit, so the themes never agreed, and red 60 is the ruled value
+(K-Field-10). White on the fill measures **5.07:1**, down from 5.69 but clear of 4.5.
 
 ---
 
 ## What we worked on
 
-Two days, one thread: get three stuck pull requests out, then get a release out. **Every single
-thing that went wrong was invisible to a green test run.**
+Taking #109 apart and landing it. That PR is 161 files, conflicting, has **never had
+CI run on it**, and its four predecessors (#105–#108) all closed without review. It
+was not one change; it was four decisions in a trench coat. Split, each part landed
+green.
 
-Seven pull requests were opened and merged: **#95**, **#96**, **#97** to unblock the backlog,
-**#98** the handoff, **#99** the release, **#100** and **#101** to fix what the release dry run
-found.
+### Landed
 
----
+- **#110** (closed, superseded) → **#111** — `Breadcrumb`, `DatePicker`, Pranjal's
+  sidebar order, the tokens, and the whole field / Tabs / Avatar rework, plus
+  `DateInput` and `NumberInput`.
+- **#112** — the seven `Deprecated 2` families, with their original test suites ported
+  onto them.
 
-## Completed
+### Defects found on the way, each verified rather than assumed
 
-### The backlog: three PRs, all stuck on the same gate
-
-#89, #90 and #94 had been stuck for three days on the **90% global branch-coverage threshold**.
-None was stuck on anything hard. Each was stuck because nobody had written tests for the feature
-it added.
-
-- **#89 — Table `expand`.** 89.46%, every test passing. `useSelfDrivenMorph` and `dockLineOf` had
-  **33 uncovered branches** — every branch past the first `if`. All nine existing tests mounted a
-  table with nothing scrolling above it, so each stopped at `if (found === null) return`. **#95**
-  added 17 tests that give the table a real page to fill. → **90.31%**
-- **#94 — twenty refinements from the IAM console build.** 40 files, 16 changesets. **#96** merged
-  `main` in: five `Table.tsx` conflicts, all resolved to #94's side. → **90.34%**
-- **#90 — collapsed to what its title said.** After #94 landed, its `Table.tsx` contribution was
-  byte-identical to `main`. **#97** dropped all of it, leaving 313 lines of stories.
-
-### The release: three defects caught between cutting it and publishing it
-
-**This is the part worth reading.** All three were found by the dry run, and any of them would have
-been permanent once published — npm cannot take a version back.
-
-| Defect                                                                          | How it would have shipped                                                                                                                               |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TableLeadHead` / `TableLeadCell` **in the changelog, absent from the package** | Exported from `Table/index.ts`, never forwarded from `components/index.ts`. Confirmed against the real tarball: **0 occurrences** in `dist/index.d.ts`. |
-| **The package could not be loaded by Node at all**                              | `require(...)` → `SyntaxError: Unexpected token '.'` — CSS parsed as JavaScript. **0.5.1 and every release before it shipped this way.**                |
-| The release artifact carried **two tarballs**, six versions apart               | A stale `0.1.0.tgz` committed in August, swept up by `path: '*.tgz'`.                                                                                   |
-
-Each now has a check that fails when it returns, and **each was verified by deliberately
-reintroducing the bug**:
-
-- `check:exports` compares the names a component's own `index.ts` publishes against the barrel.
-  Revert the two lines and it exits naming both.
-- `verify-package` fails if any `dist` file imports a `.css`, **and** if `styles.css` comes out
-  without component rules — the fold cutting the imports and losing the rules would otherwise look
-  exactly like success.
-
-### Five more defects, found while merging
-
-|                                                             |                                                                                                                               |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `TableLeadCell` spoke **"Select Select row 4"**             | It hands `label` to `TableSelectionCell`, which already writes `` `Select ${label}` ``. The documented example was wrong too. |
-| The `table-expand` changeset named **`@mdt/design-system`** | Not a package here. `expand` would have reached npm with **no version bump and no changelog entry**.                          |
-| #90's `tbl-sep` killed the resize handle's focus ring       | `.tbl-rz:focus-visible { outline: none }` still applied while the replacement matched nothing. **WCAG 2.4.7.**                |
-| A test asserted `0.5` morph at rest                         | It pinned the exact bug #94 fixes. Rewritten to assert `0`.                                                                   |
-| `component-catalog.json` was stale                          | In neither PR; did not know about IconTile's `2xl`.                                                                           |
+|                                                            |                                                                                                                                                                                        |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`DateInput` was coupled to the rework**                  | Its test asserts `rounded-lg`/`text-[13px]`, which come from the reworked `Input`. Held out of #110; passed untouched in #111.                                                         |
+| **`NumberInput` hand-drew its chevrons** as inline `<svg>` | Against the icon rule. Both glyphs were in the registry; now `<Icon name="chevron-up" />`.                                                                                             |
+| **`NumberInput` had no tests**, as a public export         | 18 written. 96.8% statements, 92.1% branches.                                                                                                                                          |
+| **`--mdt-faint` duplicated `--mdt-neutral-50`**            | Same HSL triple. The note said the ramp does not hold `#8FA0BD` — it does, at neutral-50, whose own comment wrongly read `#8E9FBC`. Now `var(--mdt-neutral-50)`.                       |
+| **`check:exports` was wrong about star exports**           | It reported 21 orphaned `TableOld2` names. `export * from './TableOld2'` genuinely re-exports them. **My bug, from #100**, not his code. Fixed and verified against the built package. |
 
 ---
 
 ## In progress
 
-**Nothing.** No open pull requests, no pending changesets, `main` clean at `0c6733e`, 0.6.0 on npm.
-
-Branches at **90.3%**, typecheck and lint clean, all 63 components reachable, `verify-package`
-green on all three of its guarantees.
+**Nothing mid-flight.** `main` clean at `2256b30`, 3443 tests, branches 90.47%,
+typecheck and lint clean, **74 components reachable**, build and `verify-package`
+green, package loads in Node.
 
 ---
 
 ## Next steps
 
-**1. The token count is 100, up from 14.** The single biggest regression in the repo, and the only
-number moving the wrong way. It arrived with the console merge work; `check:tokens` reports without
-failing, so nothing stopped it.
+**1. Cut 1.0.0 — deliberately.** Six changesets, two major. Follow the order that
+caught three defects last time: **merge, dry run, install the tarball, then publish.**
+That dry run is not optional; see the gotchas.
 
-```
-10  Upload.tsx        9  DataTable.tsx     7  Table.tsx      6  Stepper.tsx
-10  TableStates.tsx   8  TableBulkBar.tsx  6  TablePager.tsx 6  KpiCard.tsx
-```
+**2. The token count is 202**, from 100 at the start of this stretch. Roughly half
+arrived with the `Old2` copies — duplicates of violations that already existed — and
+the rest with the rework's arbitrary values (`mdt-text-[13px]` alone appears 36
+times). `check:tokens` reports without failing, so nothing stopped it. **Grandfather
+the current count and block new ones**, the shape `check:exports` uses.
 
-`CLAUDE.md`'s plan was to switch CI to `check:tokens:strict` once the count reached zero. That is
-receding. **Grandfather the existing 100 and block new ones** — the same shape as `check:exports`,
-which works precisely because its baseline was clean and it blocks from day one.
+**3. `#109` is still open** with what did not come across: `AdvancedFilter` (777
+lines, **no test file**), the `Foundation/Colors` page changes, and assorted story
+edits. The review comment on it lists everything.
 
-**2. Two stories look broken though the component is not.** `Pieces → The Lead Column` and
-`Pieces → Headings` set `tableWidth={620}` inside a full-width card, so row dividers, the header
-underline and the selected-row highlight stop dead mid-card. It contradicts #94's own elastic-tail
-rule, on the two stories a designer is most likely to open. Flagged on #94, not changed.
+**4. A palette decision is parked in `MISSING-TOKENS.md`** under _"Colour — a neutral
+step between 40 and 50"_. The ramp jumps `#CBD3E1 → #8FA0BD`, its widest gap, so a
+control needing a hover one shade off a neutral-40 resting state has nowhere to land.
+`Switch` hit it first and carries a raw `#B9C3D4`. Any other control will hit the
+same wall.
 
-**3. `DataDrivenSidebar`.** 180 lines of real component in the deprecated Sidebar family,
-unreachable from the root since it was written. Recorded in `DELIBERATELY_UNEXPORTED_NAMES` rather
-than decided. If products want it, move it to `LeftNav` — do not publish it from a family people
-are being moved off.
+**5. `TableOld2` is not a faithful snapshot.** It imports the _current_ `Avatar`,
+`Input`, `Toolbar` and `Checkbox`, so it renders the old table wearing this release's
+one-letter avatar and 32px field. Fine as a structural reference, misleading as a
+side-by-side.
 
-**4. The separator.** A working 16px `<TableNick />` is on `main`. If full height is still the
-preference it is one line there plus its two CSS rules — deliberately, not as a merge resolution.
+**6. Fourteen deprecated families now ship** — seven `*Old` and seven `*Old2`. That is
+a lot of surface to carry to 1.0.0 and nobody has scheduled a removal.
 
-**5. Seven deprecated `*Old` families** still ship: `BadgeOld`, `ButtonOld`, `LeftNavOld`,
-`TableOld`, `TagPillOld`, `ToolbarOld`, `TooltipOld`. A major-version decision nobody has scheduled.
-
-**6. Close issues #1, #2, #5** — Stat/KPI tile, Banner and Wizard stepper are all built. Genuinely
-open: **#4** Empty state and **#6** Tag input (both confirmed absent via `npm run find`), **#7**
-`Select.tsx` at 2299 lines against a documented 1000, **#8** hand-drawn `<svg>` in stories (now
-**119**, up from 89), **#9** nothing checks one-glyph-one-meaning, **#10** two broken Skeleton
+**7. Close issues #1, #2, #5** — Stat/KPI tile, Banner, Wizard stepper are all built.
+Still open: **#4** Empty state, **#6** Tag input, **#7** `Select.tsx` over the
+1000-line limit (now doubled by `SelectOld2.tsx` at 2,702), **#8** hand-drawn `<svg>`
+in stories, **#9** nothing checks one-glyph-one-meaning, **#10** two broken Skeleton
 stories.
 
-**7. `CLAUDE.md` permits exactly two inline `<svg>` in shipped code. There are 14** — `Icon` (5)
-and `Spinner` (1) are the documented two; `LeftNav` (2), `KpiCharts` (2), `Button` (2), `Upload`
-(1) and `AiMark` (1) are not. Some are probably fine by intent — a sparkline is not an icon — but
-the rule and the code have drifted and nobody wrote the exception down.
-
-**8. The machine-readable layer is still unpublished.** `capability-catalog.json` now ships in the
-package (it is in the `exports` map), which is a real step — but nothing serves it at a URL and
-there is no `llms.txt`. This is what makes the "AI-ready" claim true. An MCP server sits behind it,
-not before it.
+**8. The machine-readable layer is still unserved.** `capability-catalog.json` ships
+in the package, but nothing serves it at a URL and there is no `llms.txt`. This is
+what makes the "AI-ready" claim true.
 
 ---
 
 ## Decisions made
 
-- **#94 landed before #90**, though #90 was older. #94 was the _later revision_ of every line the
-  two shared — it contained #90's `TableLeadHead`/`TableLeadCell` byte-for-byte plus fixes #90 did
-  not have. The reverse order would have left #94 re-resolving eight `Table.tsx` blocks in the
-  "take theirs" direction, where picking wrong silently reverts console-found fixes.
+- **#109 was split rather than re-cut.** Four attempts had already died as one large
+  PR; a fifth would have too. Each slice landed green on its own.
 
-- **The separator was never really a design disagreement.** Both branches wrote down the same
-  reasoning — the mark is not the resize handle, so draw it on every heading. They differed only in
-  height. `main`'s won because #90's was not wired up: `tbl-sep` appeared exactly once on that
-  branch, as a `className`, with no rule defining it.
+- **`Deprecated 2` keeps its own group**, per Pranjal, and the sidebar took his order:
+  `Foundation · Layout · New Components · Components · Deprecated 2 · Deprecated`.
+  The empty `On the way out` group from #103 was dropped — it was a shelf with
+  nothing on it, and `Deprecated 2` is the same idea with real work behind it.
 
-- **Component CSS is appended to `styles.css`, never prepended.** Prepending would reorder every
-  component rule against the utilities — the hazard `CLAUDE.md`'s class-order note is about, and it
-  would need a full 521-story diff to clear. Appending keeps the cascade consumers already have.
+- **The `Old2` families are excluded from the coverage threshold, not from the
+  suite.** Their original test suites were ported onto them — 424 tests, the level
+  they were tested to as live code — and those tests still run. Only the percentage
+  ignores them, on the same footing as `Sidebar`. **The gate measures code the library
+  is still writing**; 12,000 lines of frozen copies dragged it 90.47% → 89.72% while
+  saying nothing about anything anyone is working on, and new tests for code scheduled
+  for deletion only make the deletion harder. The exclusion goes when the families do.
 
-- **`src/` was not touched by the packaging fix.** The seven `import './x.css'` statements stay
-  where they are: they are right for source, and Storybook, the dev server and the tests all read
-  `src/`. Only the built output changes.
+- **`--mdt-faint` points at the ramp rather than restating a value.** A second name
+  for a colour we own is the "second way to do something" this repo treats as a
+  defect.
 
-- **Merges into someone else's branch go through their own pull request**, never a direct push.
-  The precedent #85–#87 set, and #95–#97 followed.
+- **Component CSS is appended to `styles.css`, never prepended** (from 0.6.0, still
+  true). Prepending would reorder every component rule against the utilities.
 
-- **A merge of `main` into a feature branch is merged with a merge commit, not a squash.** Squashing
-  throws the merge away and every conflict comes straight back.
+- **Merges into someone else's branch go through their own pull request**, and a merge
+  of `main` into a feature branch is merged with a **merge commit, not a squash**.
 
-- **`no changeset` is a label plus a written reason.** The label records _that_ somebody decided;
-  a comment records _why_.
-
-- **Publishing stayed a deliberate, separate act.** `release.yml` is `workflow_dispatch` only and
-  stops before the irreversible step unless `publish` is ticked. Three dry runs preceded the real
-  one, and all three defects above were found in them.
+- **`no changeset` is a label plus a written reason.**
 
 ---
 
 ## Gotchas & notes
 
-- **The dry run is not optional.** It found three defects in one release, two of which had been
-  shipping silently for months. A dry run costs eight minutes; a bad version on npm is permanent.
-  **Download the artifact and actually load it** — `verify-package` checks files exist, which is
-  exactly the check that passed while the package could not be `require`d at all.
+- **The release dry run is not optional.** It found three defects in 0.6.0, two of
+  which had been shipping silently for months. **Download the artifact and actually
+  load it** — `verify-package` checking that files exist is precisely the check that
+  passed while the package could not be `require`d at all.
 
-- **The `Table.test.tsx` merge trap.** Three branches append a `describe` block at the same anchor,
-  so git offers you one side or the other. **Taking either alone silently deletes tests** — and in
-  #94's case the deleted set was the one holding coverage above the gate. Splice, never `--ours` /
-  `--theirs`.
+- **Ported tests need three passes of renaming, not one.** The exported identifiers,
+  then the CSS classes (`TableOld2` namespaces its own to `tbl-old2`), then the names
+  that live in the component file rather than the barrel — `useTableMorph`,
+  `tableMorphOf`, `TableMorphContext` were all missed by a map built from `index.ts`.
 
-- **Never `--delete-branch` a PR that has another stacked on it.** Merging #89 that way deleted
-  `pranjal/table-expand`, which was #90's base, and GitHub **auto-closed #90**. Recovery is a
-  catch-22: GitHub will not reopen a PR whose base is missing, and will not retarget a closed PR.
-  Push the base branch back at its old tip, reopen, retarget to `main`, delete it again. Check
-  `gh pr list` for dependents first.
+- **`@deprecated` only works in the JSDoc block immediately before the declaration.**
+  A second block above it reads perfectly in a diff and does nothing — no
+  strike-through, no lint error. Check the block closes on the line before the
+  declaration.
 
-- **Re-running a failed check does not pick up a label you just added.** A re-run replays the
-  original event payload. The `labeled` event fires its own run — wait for that one. The stale red
-  row stays on the PR and means nothing.
+- **A star export defeats a name-level check.** `export * from './X'` makes every name
+  reachable without listing any, so a check that greps the barrel for names reports
+  them all as orphans. `check-exports.mjs` now knows.
 
-- **`npm pack --pack-destination` does not create the directory.** It exits `ENOENT` if missing,
-  which it always is on a fresh runner. Found by running it, not by reading it.
+- **Never `--delete-branch` a PR that has another stacked on it.** It auto-closes the
+  dependent, and GitHub will neither reopen a PR whose base is missing nor retarget a
+  closed one. Check `gh pr list` first.
 
-- **This machine is memory-bound.** 16 GB, and Storybook + Vite + headless Chromium together will
-  get processes killed mid-run — three died in one session. `npx vitest run --coverage
---maxWorkers=2` completes where `npm run test:coverage` does not. Stop Storybook before the suite.
+- **Re-running a failed check does not pick up a label you just added** — a re-run
+  replays the original event payload. The `labeled` event fires its own run.
 
-- **The npm registry is unreachable from the sandbox** (`npm install` fails on a proxy error, though
-  `npm view` works). To smoke-test a tarball, unpack it with `tar` and `require` the built entry
-  directly, symlinking the repo's own `node_modules` for React.
+- **`gh pr edit` can fail on a GraphQL `projectCards` error** and silently not apply.
+  `gh api -X PATCH .../pulls/N --input file.json` works.
 
-- **The screenshot wait rule in `CLAUDE.md` is for text-heavy stories only.** Waiting for
-  `#storybook-root` to hold >15 characters times out on sparse stories — IconTile, Input — where the
-  story is boxes, not words. Wait for rendered children and a non-zero box instead.
+- **This machine is memory-bound.** 16 GB, and Storybook + Vite + headless Chromium
+  together get processes killed mid-run. Use `npx vitest run --coverage
+--maxWorkers=2`, and stop Storybook before the suite.
 
-- **Row checkboxes need `getByLabelText`, not `getByRole('checkbox', { name })`.** They sit in an
-  `aria-hidden` subtree, so the accessible-name computation returns empty even with `hidden: true`.
-  `Table.test.tsx:154` already does this.
+- **The npm registry is unreachable from the sandbox** (`npm install` fails on a proxy
+  error; `npm view` works). Smoke-test a tarball by unpacking it with `tar` and
+  requiring the built entry, symlinking the repo's `node_modules` for React.
 
-- **`.bdg-label` and friends are hook classes with no rules**, used as `querySelector` targets. A
-  check that every class in the markup exists in the stylesheet will flag them; that is the check
-  being naive, not a defect.
+- **Row checkboxes need `getByLabelText`**, not `getByRole('checkbox', { name })` —
+  they sit in an `aria-hidden` subtree.
 
-- **Commit messages must go through a file.** `git commit -F <file>`.
-- **`exactOptionalPropertyTypes` is on**, and the lint config forbids `as` casts and `!` assertions.
-- **Test files are lint-ignored but typechecked** (`tsconfig.test.json`). `npm run typecheck` does
-  _not_ cover them — run `npx tsc --noEmit -p tsconfig.test.json` separately.
-- **`COMPONENT-GAP.md` is public and names four colleagues** alongside an audit of their work.
-  Flagged many times, still undecided. **Raise it before doing anything with that file.**
+- **Commit messages go through a file** (`git commit -F`).
+- **`exactOptionalPropertyTypes` is on**; the lint config forbids `as` casts and `!`.
+- **Test files are lint-ignored but typechecked** — run `npx tsc --noEmit -p
+tsconfig.test.json` separately; `npm run typecheck` does not cover them.
+- **`COMPONENT-GAP.md` is public and names four colleagues.** Still undecided. Raise
+  it before touching that file.
 
 ---
 
 ## Waiting on the design owner
 
-| Question                                                                                                                                          | Cost to act                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| **The token count is 100 and climbing.** Grandfather them and block new ones, or keep reporting only?                                             | An hour to wire the gate    |
-| **The two stories that read as broken** — widen them so the table fills its card and shows the elastic tail, or leave them at `tableWidth={620}`? | Ten minutes                 |
-| **`DataDrivenSidebar`** — move it to `LeftNav`, export it where it is, or delete it with Sidebar?                                                 | Depends on the answer       |
-| **The full-height separator** — still wanted, now that a working 16px version is on `main`?                                                       | One line plus two CSS rules |
-| **Seven `*Old` families** still ship. Schedule their removal for a major?                                                                         | A release decision          |
-| **Close issues #1, #2, #5?** All three are built.                                                                                                 | Minutes                     |
-| `CLAUDE.md` still points at `G:\Claude Project\...` on a Mac. Correct it?                                                                         | One line                    |
-| `COMPONENT-GAP.md` names four colleagues on a public page — strip, rewrite history, or leave it?                                                  | Minutes either way          |
+| Question                                                                                                    | Cost to act                   |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **Cut 1.0.0?** Six changesets, two major, four real breaking changes.                                       | Half an hour with the dry run |
+| **The token count is 202 and climbing.** Grandfather and block new ones?                                    | An hour to wire the gate      |
+| **A neutral step between 40 and 50** — the ramp's widest gap, and `Switch` carries a raw hex because of it. | A palette decision            |
+| **Fourteen deprecated families** ship. Schedule removal for 1.0.0, or carry them?                           | A release decision            |
+| **`AdvancedFilter`** — 777 lines with no tests, still in #109. Take it, or leave it with Pranjal?           | A day with tests              |
+| **Close issues #1, #2, #5?** All three are built.                                                           | Minutes                       |
+| `CLAUDE.md` still points at `G:\Claude Project\...` on a Mac.                                               | One line                      |
+| `COMPONENT-GAP.md` names four colleagues on a public page.                                                  | Minutes either way            |
