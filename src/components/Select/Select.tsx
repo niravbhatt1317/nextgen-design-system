@@ -202,33 +202,38 @@ function CustomRenderItemWrapper({
  */
 export const selectTriggerVariants = cva(
   [
+    /* THE FIELD (Pranjal, 2026-09-17): the trigger is the Input's box - corners 8, neutral-90 text, the primary border
+     * under the pointer and, open or focused, with the 3-px halo; disabled on neutral-10 */
     'mdt-flex mdt-w-full mdt-items-center mdt-justify-between',
-    'mdt-rounded-md',
-    'mdt-bg-background mdt-text-foreground',
-    'mdt-transition-colors',
-    'focus-visible:mdt-outline-none',
-    'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50',
-    'data-[placeholder]:mdt-text-muted-foreground',
+    'mdt-rounded-lg',
+    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-transition-[border-color,box-shadow]',
+    'focus-visible:mdt-border-primary focus-visible:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
+    'data-[state=open]:mdt-border-primary data-[state=open]:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'aria-expanded:mdt-border-primary aria-expanded:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+    'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint',
+    'data-[placeholder]:mdt-text-faint',
   ],
   {
     variants: {
       variant: {
-        default: 'mdt-border mdt-border-input',
-        borderless: 'mdt-border mdt-border-transparent hover:mdt-border-input',
+        default:
+          'mdt-border mdt-border-neutral-30 hover:mdt-border-primary disabled:hover:mdt-border-neutral-30',
+        borderless: 'mdt-border mdt-border-transparent hover:mdt-border-neutral-30',
       },
       size: {
-        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-xs',
+        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-[13px]',
         md: 'mdt-h-9 mdt-gap-2 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-gap-2 mdt-px-4 mdt-text-base',
       },
       hasError: {
-        true: 'mdt-border-destructive',
+        true: 'mdt-border-destructive hover:mdt-border-destructive',
         false: '',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'md',
+      size: 'sm',
       hasError: false,
     },
   }
@@ -266,6 +271,7 @@ function renderSingleSelectMode(props: {
   prefixIcon?: ReactNode;
   placeholder?: string;
   _clearable: boolean;
+  locked: boolean;
   position: 'item-aligned' | 'popper';
   placement: 'bottom' | 'overlay';
   maxHeight: number;
@@ -301,6 +307,7 @@ function renderSingleSelectMode(props: {
     prefixIcon,
     placeholder,
     _clearable,
+    locked,
     position,
     placement,
     maxHeight,
@@ -326,7 +333,7 @@ function renderSingleSelectMode(props: {
   return (
     <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
       {label && (
-        <label htmlFor={selectId} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+        <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
           {label}
           {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
         </label>
@@ -356,8 +363,8 @@ function renderSingleSelectMode(props: {
               {prefixIcon}
             </span>
           )}
-          <SelectPrimitive.Value placeholder={placeholder} />
-          {renderSingleSelectIcons({ _clearable, singleValue, handleValueChange, variant })}
+          <SelectPrimitive.Value placeholder={placeholder} className="mdt-truncate" />
+          {renderSingleSelectIcons({ _clearable, singleValue, handleValueChange, variant, locked })}
         </SelectPrimitive.Trigger>
 
         <SelectPrimitive.Portal>
@@ -432,7 +439,13 @@ function renderSingleSelectMode(props: {
       </SelectPrimitive.Root>
 
       {error && (
-        <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+        <p
+          id={errorId}
+          className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+          role="alert"
+        >
+          {/* the alert mark, 12, before the message (K-Field-10) */}
+          <Icon name="alert-circle" size={12} aria-hidden />
           {error}
         </p>
       )}
@@ -453,8 +466,18 @@ function renderSingleSelectIcons(props: {
   singleValue: string | null | undefined;
   handleValueChange: (value: string | null) => void;
   variant: SelectTriggerVariant;
+  locked: boolean;
 }) {
-  const { _clearable, singleValue, handleValueChange, variant } = props;
+  const { _clearable, singleValue, handleValueChange, variant, locked } = props;
+
+  /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron - a held field cannot open */
+  if (locked) {
+    return (
+      <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-faint">
+        <Icon name="lock" size={14} aria-hidden />
+      </span>
+    );
+  }
 
   return (
     <span className="mdt-group/icon mdt-relative mdt-flex mdt-shrink-0 mdt-items-center">
@@ -529,7 +552,7 @@ function renderPill(
   const pillContent = (
     <span
       key={option.value}
-      className="mdt-inline-flex mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-secondary mdt-px-2 mdt-py-0.5 mdt-text-xs mdt-font-medium"
+      className="mdt-select-pill mdt-inline-flex mdt-h-[22px] mdt-min-w-0 mdt-max-w-[calc(100%-64px)] mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-neutral-20 mdt-py-0 mdt-pl-2 mdt-pr-1 mdt-text-xs mdt-font-medium mdt-text-neutral-90"
     >
       {option.avatar && (
         <img src={option.avatar} alt={option.label} className="mdt-h-4 mdt-w-4 mdt-rounded-full" />
@@ -537,7 +560,7 @@ function renderPill(
       {option.icon && (
         <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-items-center">{option.icon}</span>
       )}
-      <span>{option.label}</span>
+      <span className="mdt-truncate">{option.label}</span>
       <button
         type="button"
         aria-label={`Remove ${option.label}`}
@@ -545,7 +568,8 @@ function renderPill(
           e.stopPropagation();
           handlePillRemove(option.value.toString());
         }}
-        className="mdt-hover:bg-accent mdt-hover:text-accent-foreground mdt-ml-0.5 mdt-cursor-pointer mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0"
+        /* a disabled or held trigger offers no removal (the field mock, 2026-09-17) */
+        className="mdt-hover:bg-accent mdt-hover:text-accent-foreground mdt-ml-0.5 mdt-cursor-pointer mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 group-disabled:mdt-hidden"
       >
         <Icon name="x" size={12} aria-hidden />
       </button>
@@ -572,6 +596,7 @@ function renderSelectedValueDisplay(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard: ((props: { option: SelectOption }) => ReactNode) | undefined;
@@ -581,6 +606,7 @@ function renderSelectedValueDisplay(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -597,8 +623,8 @@ function renderSelectedValueDisplay(props: {
             renderPill(option, handlePillRemove, _pillHoverCard, _renderPillHoverCard)
           )}
         {selectedOptions.length > _maxPills && (
-          <span className="mdt-text-xs mdt-text-muted-foreground">
-            +{selectedOptions.length - _maxPills} more
+          <span className="mdt-select-overflow mdt-inline-flex mdt-h-[22px] mdt-shrink-0 mdt-items-center mdt-rounded-md mdt-bg-neutral-20 mdt-px-1.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90">
+            {_overflowLabel(selectedOptions.length - _maxPills)}
           </span>
         )}
       </>
@@ -622,6 +648,7 @@ function renderMultiSelectTriggerContent(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
@@ -632,6 +659,7 @@ function renderMultiSelectTriggerContent(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
@@ -649,6 +677,7 @@ function renderMultiSelectTriggerContent(props: {
         _showPills,
         selectedOptions,
         _maxPills,
+        _overflowLabel,
         handlePillRemove,
         _pillHoverCard,
         _renderPillHoverCard,
@@ -676,11 +705,13 @@ function renderDefaultMultiSelectTrigger(props: {
   _showPills: boolean;
   selectedOptions: SelectOption[];
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
   placeholder: string;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): ReactNode {
   const {
@@ -698,15 +729,17 @@ function renderDefaultMultiSelectTrigger(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
     placeholder,
     _clearable,
+    locked,
     handleClearAll,
   } = props;
 
-  const showClearButton = _clearable && selectedOptions.length > 0;
+  const showClearButton = _clearable && selectedOptions.length > 0 && !locked;
 
   return (
     <button
@@ -729,6 +762,7 @@ function renderDefaultMultiSelectTrigger(props: {
         _showPills,
         selectedOptions,
         _maxPills,
+        _overflowLabel,
         handlePillRemove,
         _pillHoverCard,
         ...(_renderPillHoverCard && { _renderPillHoverCard }),
@@ -747,15 +781,20 @@ function renderDefaultMultiSelectTrigger(props: {
           <Icon name="x" size={16} aria-hidden />
         </button>
       )}
-      <Icon
-        name="chevron-down"
-        size={16}
-        className={cn(
-          SHRINK_TRANSITION_OPACITY,
-          variant === 'borderless' ? OPACITY_HIDDEN_ON_HOVER : 'mdt-opacity-50'
-        )}
-        aria-hidden
-      />
+      {locked ? (
+        /* A HELD FIELD (Pranjal, 2026-09-17): the lock in place of the chevron */
+        <Icon name="lock" size={14} className="mdt-shrink-0 mdt-text-faint" aria-hidden />
+      ) : (
+        <Icon
+          name="chevron-down"
+          size={16}
+          className={cn(
+            SHRINK_TRANSITION_OPACITY,
+            variant === 'borderless' ? OPACITY_HIDDEN_ON_HOVER : 'mdt-opacity-50'
+          )}
+          aria-hidden
+        />
+      )}
     </button>
   );
 }
@@ -783,13 +822,14 @@ function renderMultiSelectSearchInput(props: {
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={_autoFocus}
         className={cn(
-          'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-md',
-          'mdt-border mdt-border-input mdt-bg-background',
-          'mdt-px-3 mdt-py-1 mdt-text-sm',
-          'placeholder:mdt-text-muted-foreground',
-          'focus:mdt-outline-none focus:mdt-ring-2',
-          'focus:mdt-ring-ring focus:mdt-ring-offset-2',
-          'disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50'
+          'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
+          'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
+          'mdt-px-3 mdt-py-1 mdt-text-[13px]',
+          'placeholder:mdt-text-faint',
+          'hover:mdt-border-primary',
+          'focus:mdt-border-primary focus:mdt-outline-none ' +
+            'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
+          'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10'
         )}
       />
     </div>
@@ -855,7 +895,13 @@ function renderHelperOrError(props: {
 
   if (error) {
     return (
-      <p id={errorId} className="mdt-text-xs mdt-text-destructive" role="alert">
+      <p
+        id={errorId}
+        className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+        role="alert"
+      >
+        {/* the alert mark, 12, before the message (K-Field-10) */}
+        <Icon name="alert-circle" size={12} aria-hidden />
         {error}
       </p>
     );
@@ -885,7 +931,7 @@ function renderSelectLabel(props: {
   if (!label) return null;
 
   return (
-    <label htmlFor={selectId} className="mdt-text-sm mdt-font-medium mdt-text-foreground">
+    <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
       {label}
       {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
     </label>
@@ -1513,6 +1559,7 @@ function buildSingleSelectProps(params: {
   prefixIcon: ReactNode | undefined;
   placeholder: string | undefined;
   _clearable: boolean;
+  locked: boolean;
   position: 'item-aligned' | 'popper';
   placement: 'bottom' | 'overlay';
   maxHeight: number;
@@ -1536,6 +1583,7 @@ function buildSingleSelectProps(params: {
     errorId: params.errorId,
     helperId: params.helperId,
     _clearable: params._clearable,
+    locked: params.locked,
     position: params.position,
     placement: params.placement,
     maxHeight: params.maxHeight,
@@ -1592,10 +1640,12 @@ function buildMultiSelectTriggerProps(params: {
   prefixIcon: ReactNode | undefined;
   _showPills: boolean;
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard: ((props: { option: SelectOption }) => ReactNode) | undefined;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): Parameters<typeof createMultiSelectTrigger>[0] {
   const result: Parameters<typeof createMultiSelectTrigger>[0] = {
@@ -1611,9 +1661,11 @@ function buildMultiSelectTriggerProps(params: {
     hasError: params.hasError,
     _showPills: params._showPills,
     _maxPills: params._maxPills,
+    _overflowLabel: params._overflowLabel,
     handlePillRemove: params.handlePillRemove,
     _pillHoverCard: params._pillHoverCard,
     _clearable: params._clearable,
+    locked: params.locked,
     handleClearAll: params.handleClearAll,
   };
 
@@ -1910,10 +1962,12 @@ function createMultiSelectTrigger(props: {
   prefixIcon?: ReactNode;
   _showPills: boolean;
   _maxPills: number;
+  _overflowLabel: (hidden: number) => string;
   handlePillRemove: (value: string) => void;
   _pillHoverCard: boolean;
   _renderPillHoverCard?: (props: { option: SelectOption }) => ReactNode;
   _clearable: boolean;
+  locked: boolean;
   handleClearAll: () => void;
 }): ReactNode {
   const {
@@ -1934,10 +1988,12 @@ function createMultiSelectTrigger(props: {
     prefixIcon,
     _showPills,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     _renderPillHoverCard,
     _clearable,
+    locked,
     handleClearAll,
   } = props;
 
@@ -1966,11 +2022,13 @@ function createMultiSelectTrigger(props: {
     _showPills,
     selectedOptions,
     _maxPills,
+    _overflowLabel,
     handlePillRemove,
     _pillHoverCard,
     ...(_renderPillHoverCard && { _renderPillHoverCard }),
     placeholder,
     _clearable,
+    locked,
     handleClearAll,
   });
 }
@@ -2013,10 +2071,12 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
       // UI props
       placeholder = 'Select...',
-      size = 'md',
+      size = 'sm', // the field's default is sm 32 (K-Field-01 / K-Field-17, 2026-09-17; was md)
       variant = 'default',
       placement = 'bottom',
-      disabled = false,
+      disabled: disabledProp = false,
+      /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock in place of the chevron */
+      locked = false,
       required = false,
       error,
       label,
@@ -2042,7 +2102,9 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
       // Pills props
       showPills: _showPills = false,
-      maxPills: _maxPills = 3,
+      /* ONE pick shows, the rest fold into a "+N" badge (Pranjal, 2026-09-17) */
+      maxPills: _maxPills = 1,
+      overflowLabel: _overflowLabel = (hidden: number) => '+' + String(hidden),
       pillHoverCard: _pillHoverCard = false,
       renderPillHoverCard: _renderPillHoverCard,
       onRemovePill: _onRemovePill,
@@ -2084,6 +2146,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
     }: SelectProps<T>,
     ref: React.Ref<HTMLButtonElement>
   ) => {
+    const disabled = disabledProp || locked;
     // Generate IDs
     const generatedId = useId();
     const selectId = propId ?? generatedId;
@@ -2191,6 +2254,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
         prefixIcon,
         placeholder,
         _clearable,
+        locked,
         position,
         placement,
         maxHeight,
@@ -2237,10 +2301,12 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       prefixIcon,
       _showPills,
       _maxPills,
+      _overflowLabel,
       handlePillRemove,
       _pillHoverCard,
       _renderPillHoverCard,
       _clearable,
+      locked,
       handleClearAll,
     });
     const triggerElement = createMultiSelectTrigger(triggerProps);

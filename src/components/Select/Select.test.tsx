@@ -325,10 +325,28 @@ describe('Select', () => {
     });
 
     it('displays pills when showPills is true', () => {
-      render(<Select mode="multiple" options={simpleOptions} value={['1', '2']} showPills />);
+      const { container } = render(
+        <Select mode="multiple" options={simpleOptions} value={['1', '2']} showPills />
+      );
 
+      // Since 2026-09-17 maxPills defaults to 1: the first pick shows as a pill
+      // and the rest fold into the overflow badge - never the "N selected" count.
+      const pills = container.querySelectorAll('.mdt-select-pill');
+      expect(pills).toHaveLength(1);
+      expect(pills[0]).toHaveTextContent('Option 1');
+      expect(container.querySelector('.mdt-select-overflow')).toHaveTextContent('+1');
+      expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    });
+
+    it('displays every pick as a pill when maxPills allows', () => {
+      const { container } = render(
+        <Select mode="multiple" options={simpleOptions} value={['1', '2']} showPills maxPills={2} />
+      );
+
+      expect(container.querySelectorAll('.mdt-select-pill')).toHaveLength(2);
       expect(screen.getByText('Option 1')).toBeInTheDocument();
       expect(screen.getByText('Option 2')).toBeInTheDocument();
+      expect(container.querySelector('.mdt-select-overflow')).not.toBeInTheDocument();
     });
 
     it('displays count when showPills is false', () => {
@@ -444,8 +462,10 @@ describe('Select', () => {
       expect(screen.getByText('2 selected')).toBeInTheDocument();
     });
 
-    it('shows "+N more" when pills exceed maxPills', () => {
-      render(
+    // Renamed 2026-09-22: the overflow badge reads "+N" by default now (2026-09-17);
+    // "+N more" is what a caller gets by passing overflowLabel.
+    it('shows "+N" when pills exceed maxPills', () => {
+      const { container } = render(
         <Select
           mode="multiple"
           options={simpleOptions}
@@ -454,7 +474,23 @@ describe('Select', () => {
           maxPills={2}
         />
       );
-      expect(screen.getByText('+1 more')).toBeInTheDocument();
+      expect(container.querySelectorAll('.mdt-select-pill')).toHaveLength(2);
+      expect(container.querySelector('.mdt-select-overflow')).toHaveTextContent('+1');
+      expect(screen.getByText('+1')).toBeInTheDocument();
+    });
+
+    it('reads the overflow through overflowLabel when one is given', () => {
+      render(
+        <Select
+          mode="multiple"
+          options={simpleOptions}
+          value={['1', '2', '3']}
+          showPills
+          maxPills={1}
+          overflowLabel={(hidden) => `+${hidden} more`}
+        />
+      );
+      expect(screen.getByText('+2 more')).toBeInTheDocument();
     });
 
     it('calls onRemovePill callback when pill is removed', async () => {
@@ -814,10 +850,24 @@ describe('Select', () => {
         { value: '2', label: 'Star Item', icon: <span data-testid="pill-icon">⭐</span> },
       ];
 
-      render(<Select mode="multiple" options={optionsWithExtras} value={['1', '2']} showPills />);
+      // maxPills defaults to 1 since 2026-09-17; ask for both so each pill can
+      // be checked for what it carries.
+      const { container } = render(
+        <Select
+          mode="multiple"
+          options={optionsWithExtras}
+          value={['1', '2']}
+          showPills
+          maxPills={2}
+        />
+      );
 
-      expect(screen.getByText('User 1')).toBeInTheDocument();
-      expect(screen.getByText('Star Item')).toBeInTheDocument();
+      const pills = container.querySelectorAll('.mdt-select-pill');
+      expect(pills).toHaveLength(2);
+      expect(pills[0]).toHaveTextContent('User 1');
+      expect(pills[0]?.querySelector('img')).toHaveAttribute('src', 'https://example.com/a.jpg');
+      expect(pills[1]).toHaveTextContent('Star Item');
+      expect(pills[1]?.querySelector('[data-testid="pill-icon"]')).toBeInTheDocument();
     });
 
     it('removes pill via keyboard (Enter key)', async () => {
@@ -1506,12 +1556,13 @@ describe('Select', () => {
     it('renders pills with hover card when pillHoverCard and renderPillHoverCard provided', async () => {
       const user = userEvent.setup();
 
-      render(
+      const { container } = render(
         <Select
           mode="multiple"
           options={simpleOptions}
           value={['1', '2']}
           showPills
+          maxPills={2}
           pillHoverCard
           renderPillHoverCard={({ option }) => (
             <div data-testid={`hover-content-${option.value}`}>Details for {option.label}</div>
@@ -1519,7 +1570,8 @@ describe('Select', () => {
         />
       );
 
-      // Pills should be rendered
+      // Both pills should be rendered (maxPills defaults to 1 since 2026-09-17)
+      expect(container.querySelectorAll('.mdt-select-pill')).toHaveLength(2);
       expect(screen.getByText('Option 1')).toBeInTheDocument();
       expect(screen.getByText('Option 2')).toBeInTheDocument();
 

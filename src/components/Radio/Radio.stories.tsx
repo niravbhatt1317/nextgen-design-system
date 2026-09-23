@@ -4,7 +4,7 @@ import { FormLabel } from '../Form';
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof RadioGroup> = {
-  title: 'Components/Radio',
+  title: 'New Components/Radio',
   component: RadioGroup,
   tags: ['autodocs'],
   parameters: {
@@ -18,7 +18,7 @@ const meta: Meta<typeof RadioGroup> = {
           '| --- | --- |',
           '| `default` | A circle beside each choice |',
           '| `card` / `card-with-radio` | Each choice is a bordered panel |',
-          '| `segmented` | One joined strip, no circles - the chosen one takes a tint |',
+          '| `segmented` | One joined strip, no circles - the chosen one takes a tint and a primary edge |',
           '',
           '**All of them are the same control underneath**: a value you submit, announced as',
           'a radio group. Use `Tabs` when the point is to change what is on screen, and',
@@ -196,6 +196,11 @@ export const Disabled: Story = {
  * dividing lines, one border goes round the whole thing, and only the two ends
  * are rounded. No tray behind it, no gaps, no padding.
  *
+ * **The chosen segment carries the tint and a primary edge.** The edge is one
+ * pixel, all the way round, painted over the strip's own line and over the
+ * dividers either side of it - so the chosen one reads as chosen, not merely
+ * hovered.
+ *
  * **It is still a radio group.** Tab reaches it, the arrow keys move between
  * segments, and a screen reader announces "Priority, radio group, Medium, 2 of
  * 3". Reach for `Tabs` when the point is to change what is on screen, and
@@ -215,8 +220,9 @@ export const Segmented: Story = {
 };
 
 /**
- * The chosen one is a pale tint and a heavier word - quiet enough that three of
- * these on one screen do not start shouting at each other.
+ * The chosen one is a pale tint, a heavier word and a one-pixel primary edge -
+ * quiet enough that three of these on one screen do not start shouting at each
+ * other.
  */
 export const SegmentedInAForm: Story = {
   render: () => (

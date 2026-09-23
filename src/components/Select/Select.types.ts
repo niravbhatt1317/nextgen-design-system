@@ -123,6 +123,8 @@ export interface SelectProps<T = any> {
   placement?: SelectPlacement;
   /** Whether select is disabled */
   disabled?: boolean;
+  /** A held field (Pranjal, 2026-09-17): disabled, with the lock in place of the chevron - a value something else owns */
+  locked?: boolean;
   /** Whether select is required */
   required?: boolean;
   /** Error message */
@@ -167,8 +169,10 @@ export interface SelectProps<T = any> {
   // === Multi-Select Pills Props ===
   /** Show selected items as pills */
   showPills?: boolean;
-  /** Maximum pills to show before overflow */
+  /** Maximum pills to show before overflow. Default 1: the first pick shows, the rest fold into the overflow badge. */
   maxPills?: number;
+  /** How the picks past `maxPills` read. Default: "+N". */
+  overflowLabel?: ((hidden: number) => string) | undefined;
   /** Enable hover card on pills */
   pillHoverCard?: boolean;
   /** Custom pill hover card renderer */

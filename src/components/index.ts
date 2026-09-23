@@ -67,6 +67,17 @@ export type {
   BannerActionPlacement,
 } from './Banner';
 
+// Breadcrumb — says where you are and offers the way back. Depth, not sequence:
+// a journey with steps still ahead is Stepper; doors in any order are Tabs.
+// Ported from the console (Pranjal, 2026-09-22).
+export { Breadcrumb, breadcrumbVariants } from './Breadcrumb';
+export type {
+  BreadcrumbProps,
+  BreadcrumbOwnProps,
+  BreadcrumbItem,
+  BreadcrumbVariant,
+} from './Breadcrumb';
+
 // Button — the merged console button (2026-09-10): seven variants, three heights,
 // one text size, and padding decided by what meets each edge.
 export { Button, buttonVariants } from './Button';
@@ -162,6 +173,17 @@ export type {
 // Container
 export { Container, containerVariants } from './Container';
 export type { ContainerProps, ContainerVariants } from './Container';
+
+// DateInput — the date field: the Input's box as a button with the 16 calendar
+// glyph at the right, opening DatePicker below. Day-only, "YYYY-MM-DD"
+// (Pranjal, 2026-09-22).
+export { DateInput } from './DateInput';
+export type { DateInputProps, DateInputSize } from './DateInput';
+
+// DatePicker — the calendar on its own: month grid, min/max bounds, a today
+// mark, Clear and Done. No time picker (Pranjal, 2026-09-22).
+export { DatePicker, formatDay, parseDay, toDay, MONTHS_SHORT } from './DatePicker';
+export type { DatePickerProps, Day } from './DatePicker';
 
 // Dialog
 export {
@@ -328,6 +350,12 @@ export type {
 // Label — the uppercase micro-heading, settling three competing letter-spacings
 export { Label, labelVariants } from './Label';
 export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
+
+// NumberInput — the number field with its own stepper, the native spinner
+// hidden. Sits with Input, Textarea and Select on Foundation/Field
+// (Pranjal, 2026-09-22).
+export { NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
 
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
 // the length, resend and expiry rules belong to the sign-in flow, not here.

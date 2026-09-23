@@ -18,9 +18,11 @@
        ============================================ */
     --mdt-neutral-10: 210 50% 98%; /* #F6F9FC - Lightest */
     --mdt-neutral-20: 217 52% 95%; /* #ECF1F9 */
-    --mdt-neutral-30: 220 30% 92%; /* #E3E8F2 */
+    /* Decimals so it lands exactly: 30%/92% rendered #E4E9F1, one unit off the
+       ruled field border (Pranjal, 2026-09-22). */
+    --mdt-neutral-30: 220 34.7% 91.9%; /* #E3E8F2 */
     --mdt-neutral-40: 218 27% 84%; /* #CAD3E2 */
-    --mdt-neutral-50: 218 26% 65%; /* #8E9FBC */
+    --mdt-neutral-50: 218 26% 65%; /* #8FA0BD - the comment read #8E9FBC; 218 26% 65% has always rendered #8FA0BD */
     --mdt-neutral-60: 217 24% 55%; /* #7186A8 */
     --mdt-neutral-70: 216 24% 52%; /* #697FA0 */
     --mdt-neutral-80: 217 22% 45%; /* #5A6D8C */
@@ -42,7 +44,8 @@
     --mdt-red-30: 0 80% 83%; /* #f6b1b1 */
     --mdt-red-40: 0 84% 75%; /* #f58a8a */
     --mdt-red-50: 0 79% 64%; /* #ec5b5b - Primary red */
-    --mdt-red-60: 353 84% 47%; /* #db132a */
+    /* One decimal so the value lands exactly: at 47% it rendered #DD132B. */
+    --mdt-red-60: 353 84% 46.7%; /* #DB132A */
     --mdt-red-65: 0 70% 46%; /* #c72323 */
     --mdt-red-70: 0 82% 37%; /* #ad1111 */
     --mdt-red-80: 0 81% 25%; /* #750c0c */
@@ -270,8 +273,19 @@
     --mdt-accent: var(--mdt-blue-10);
     --mdt-accent-foreground: var(--mdt-blue-50);
 
-    --mdt-destructive: var(--mdt-red-65);
+    /* Red 60 as ruled (K-Field-10), and as the dark block has always had it.
+       The light block pointed at red 65 (#C72323) from the first commit, so
+       every light-mode error border, halo and message read a different red
+       from dark and from the rulebook (Pranjal, 2026-09-22). */
+    --mdt-destructive: var(--mdt-red-60);
     --mdt-destructive-foreground: var(--mdt-white);
+
+    /* The faint ink (Pranjal, 2026-09-17; K-Field-03, K-Tabs-03): placeholders,
+       resting tab labels, the meta line, a disabled field's text and its lock.
+       It is neutral-50, which renders #8FA0BD - the step's own comment said
+       #8E9FBC, which is why this looked like a colour the ramp did not hold.
+       A name for a role, pointing at the ramp; not a second value. */
+    --mdt-faint: var(--mdt-neutral-50);
 
     --mdt-warning: var(--mdt-orange-50);
     --mdt-warning-foreground: var(--mdt-black);
@@ -493,6 +507,7 @@
 
     --mdt-destructive: var(--mdt-red-60);
     --mdt-destructive-foreground: var(--mdt-white);
+    --mdt-faint: var(--mdt-neutral-60); /* 4.9:1 on the dark ground */
 
     --mdt-warning: var(--mdt-orange-60);
     --mdt-warning-foreground: var(--mdt-black);

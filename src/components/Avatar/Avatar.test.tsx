@@ -12,17 +12,17 @@ const getAvatar = () => screen.getByRole('img', { name: NAME });
 
 describe('initialsForName', () => {
   it.each([
-    ['Sarah Johnson', 'SJ'],
-    ['Ravi Kumar Patel', 'RP'],
-    ['monitoring', 'mo'],
-    ['  spaced   out  ', 'so'],
+    ['Sarah Johnson', 'S'],
+    ['Ravi Kumar Patel', 'R'],
+    ['monitoring', 'm'],
+    ['  spaced   out  ', 's'],
     ['', ''],
   ])('turns %o into %o', (input, expected) => {
     expect(initialsForName(input)).toBe(expected);
   });
 
-  it('never returns more than two characters', () => {
-    expect(initialsForName('Extraordinarily Long Name Here')).toHaveLength(2);
+  it('never returns more than one character (Pranjal, 2026-09-20: one letter)', () => {
+    expect(initialsForName('Extraordinarily Long Name Here')).toHaveLength(1);
   });
 });
 
@@ -47,47 +47,65 @@ describe('toneForName', () => {
     expect(tones.size).toBeGreaterThan(1);
   });
 
-  it('only ever returns a tone from the palette', () => {
-    const palette: AvatarTone[] = ['slate', 'blue', 'green', 'amber', 'rose', 'purple'];
+  it('only ever returns a tone from the palette, and never slate for a person', () => {
+    const palette: AvatarTone[] = ['blue', 'green', 'amber', 'rose', 'purple'];
     for (const n of ['a', 'bb', 'ccc', 'Zebra', '12345', 'Sarah Johnson']) {
       expect(palette).toContain(toneForName(n));
+      expect(toneForName(n)).not.toBe('slate');
     }
   });
 });
 
 describe('Avatar', () => {
   describe('rendering', () => {
-    it('shows initials derived from the name', () => {
+    it('shows the one letter derived from the name', () => {
       render(<Avatar name={NAME} />);
-      expect(getAvatar()).toHaveTextContent('SJ');
+      expect(getAvatar()).toHaveTextContent(/^S$/);
     });
 
-    it('lets initials be overridden', () => {
-      render(<Avatar name={NAME} initials="XY" />);
-      expect(getAvatar()).toHaveTextContent('XY');
+    it('lets the letter be overridden', () => {
+      render(<Avatar name={NAME} initials="X" />);
+      expect(getAvatar()).toHaveTextContent(/^X$/);
     });
 
-    it('trims overridden initials to two characters', () => {
+    it('trims an overridden value to one character', () => {
       render(<Avatar name={NAME} initials="ABCDEF" />);
-      expect(getAvatar()).toHaveTextContent('AB');
+      expect(getAvatar()).toHaveTextContent(/^A$/);
+    });
+
+    it('renders an icon in place of the letter, as a rounded square by default', () => {
+      render(<Avatar name="Design team" icon={<svg data-testid="glyph" />} />);
+      const el = screen.getByRole('img', { name: 'Design team' });
+      expect(screen.getByTestId('glyph')).toBeInTheDocument();
+      expect(el).not.toHaveTextContent(/\S/);
+      expect(el.className).toContain('mdt-rounded-[6px]');
+    });
+
+    it('lets an icon be forced into a circle', () => {
+      render(<Avatar name="Design team" icon={<svg data-testid="glyph" />} shape="circle" />);
+      expect(screen.getByRole('img', { name: 'Design team' }).className).toContain(
+        'mdt-rounded-full'
+      );
     });
 
     it.each([
       ['xs', 'S'],
       ['sm', 'S'],
-      ['md', 'SJ'],
-      ['lg', 'SJ'],
-      ['xl', 'SJ'],
-    ] as const)('shows the right number of letters at %s', (size, expected) => {
+      ['md', 'S'],
+      ['lg', 'S'],
+      ['xl', 'S'],
+    ] as const)('shows one letter at %s', (size, expected) => {
       render(<Avatar name={NAME} size={size} />);
       expect(getAvatar()).toHaveTextContent(new RegExp(`^${expected}$`));
     });
 
-    it.each(['xs', 'sm'] as const)('cuts overridden initials to one letter at %s', (size) => {
-      // The size decides how many letters fit, not where the letters came from.
-      render(<Avatar name={NAME} initials="XY" size={size} />);
-      expect(getAvatar()).toHaveTextContent(/^X$/);
-    });
+    it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)(
+      'cuts an overridden value to one letter at %s',
+      (size) => {
+        render(<Avatar name={NAME} initials="XY" size={size} />);
+        expect(getAvatar()).toHaveTextContent(/^X$/);
+      }
+    );
 
     it('carries the name as its accessible label', () => {
       render(<Avatar name={NAME} />);
@@ -96,7 +114,7 @@ describe('Avatar', () => {
 
     it('hides the initials from screen readers, since the label already says the name', () => {
       render(<Avatar name={NAME} />);
-      expect(screen.getByText('SJ')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByText('S')).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('renders with no name at all', () => {
@@ -119,7 +137,7 @@ describe('Avatar', () => {
   describe('shape', () => {
     const cases: [AvatarShape, string][] = [
       ['circle', 'mdt-rounded-full'],
-      ['rounded', 'mdt-rounded-md'],
+      ['rounded', 'mdt-rounded-[6px]'],
     ];
 
     it.each(cases)('applies the %s shape', (shape, expected) => {
@@ -132,9 +150,14 @@ describe('Avatar', () => {
       expect(getAvatar()).toHaveClass('mdt-rounded-full');
     });
 
-    it('softens the corners further at large sizes when rounded', () => {
+    it('softens the corners to 12 at xl when rounded (the drawer identity mark)', () => {
       render(<Avatar name={NAME} shape="rounded" size="xl" />);
-      expect(getAvatar()).toHaveClass('mdt-rounded-lg');
+      expect(getAvatar()).toHaveClass('mdt-rounded-xl');
+    });
+
+    it('keeps corners 6 at lg when rounded', () => {
+      render(<Avatar name={NAME} shape="rounded" size="lg" />);
+      expect(getAvatar()).toHaveClass('mdt-rounded-[6px]');
     });
 
     it('does not soften a circle at large sizes', () => {
@@ -218,7 +241,7 @@ describe('Avatar', () => {
       render(<Avatar name={NAME} src="/broken.png" />);
       fireEvent.error(screen.getByTestId(IMG));
       expect(screen.queryByTestId(IMG)).not.toBeInTheDocument();
-      expect(getAvatar()).toHaveTextContent('SJ');
+      expect(getAvatar()).toHaveTextContent(/^S$/);
     });
 
     it('shows initials when src is an empty string', () => {
@@ -284,7 +307,7 @@ describe('AvatarStack', () => {
   it('applies its shape to every avatar', () => {
     stack({ shape: 'rounded' });
     for (const a of screen.getAllByRole('img')) {
-      expect(a).toHaveClass('mdt-rounded-md');
+      expect(a).toHaveClass('mdt-rounded-[6px]');
     }
   });
 

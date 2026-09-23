@@ -348,12 +348,13 @@ const DialogContent = forwardRef<
                         // Muted, not near-black. The way out of a dialog is not
                         // the thing to look at first, and at full strength the X
                         // competed with the title for that.
-                        'mdt-rounded-sm mdt-text-muted-foreground mdt-transition-colors',
-                        'hover:mdt-text-foreground',
-                        'mdt-ring-offset-background',
-                        'focus:mdt-outline-none focus:mdt-ring-2 focus:mdt-ring-ring focus:mdt-ring-offset-2',
-                        'disabled:mdt-pointer-events-none',
-                        'data-[state=open]:mdt-bg-accent'
+                        /* THE CLOSE (Pranjal, 2026-09-17): the same as the Sheet's - corners 6, neutral-90,
+                         * neutral-20 + primary under the pointer, the primary ring + halo on keyboard focus only */
+                        /* corners 6: the console's 28-high controls all sit at 6 (rounded-md is 8 here) */
+                        'mdt-rounded-[6px] mdt-border-0 mdt-bg-transparent mdt-text-neutral-90 mdt-transition-colors',
+                        'hover:mdt-bg-neutral-20 hover:mdt-text-primary',
+                        'focus-visible:mdt-shadow-[0_0_0_1px_hsl(var(--mdt-primary)),0_0_0_4px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
+                        'disabled:mdt-pointer-events-none disabled:mdt-text-neutral-40'
                       )}
                     >
                       <CloseIcon />

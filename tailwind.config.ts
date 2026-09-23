@@ -54,6 +54,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--mdt-destructive) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-destructive-foreground) / <alpha-value>)',
         },
+        // The faint ink - placeholders, resting tab labels, the meta line, a
+        // disabled field's text and its lock. Points at neutral-50; see
+        // globals.css.
+        faint: 'hsl(var(--mdt-faint) / <alpha-value>)',
         muted: {
           DEFAULT: 'hsl(var(--mdt-muted) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-muted-foreground) / <alpha-value>)',

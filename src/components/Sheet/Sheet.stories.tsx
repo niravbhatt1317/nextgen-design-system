@@ -21,7 +21,7 @@ import type { SheetContentProps } from './Sheet.types';
 type SheetArgTypes = ArgTypes<React.ComponentProps<typeof Sheet> & SheetContentProps>;
 
 const meta: Meta<typeof Sheet> & { argTypes: SheetArgTypes } = {
-  title: 'Components/Sheet',
+  title: 'New Components/Sheet',
   component: Sheet,
   tags: ['autodocs'],
   parameters: {

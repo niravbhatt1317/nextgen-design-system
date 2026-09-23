@@ -9,7 +9,7 @@ import { cn } from '@/utils';
  * It supports search, virtual scrolling, grouping, and custom renderers.
  */
 const meta: Meta<typeof Select> = {
-  title: 'Components/Select',
+  title: 'New Components/Select',
   component: Select,
   tags: ['autodocs'],
   parameters: {

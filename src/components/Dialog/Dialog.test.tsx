@@ -974,10 +974,16 @@ describe('the close button', () => {
     expect(close().className).toContain('mdt-h-7');
   });
 
-  it('is muted rather than near-black', () => {
-    // The way out of a dialog is not the thing to look at first, and at full
-    // strength the X competed with the title for that.
-    expect(close().className).toContain('mdt-text-muted-foreground');
+  // Renamed 2026-09-22: "is muted rather than near-black" no longer holds. By
+  // ruling (Pranjal, 2026-09-17) the close is the Sheet's: corners 6, neutral-90,
+  // neutral-20 + primary under the pointer.
+  it("is the Sheet's close: neutral-90, corners 6, neutral-20 and primary under the pointer", () => {
+    const className = close().className;
+    expect(className).toContain('mdt-text-neutral-90');
+    expect(className).not.toContain('mdt-text-muted-foreground');
+    expect(className).toContain('mdt-rounded-[6px]');
+    expect(className).toContain('hover:mdt-bg-neutral-20');
+    expect(className).toContain('hover:mdt-text-primary');
   });
 });
 
