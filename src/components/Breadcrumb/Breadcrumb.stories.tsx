@@ -14,7 +14,7 @@ const PAGE: BreadcrumbItem[] = [
 const DRAWER: BreadcrumbItem[] = [{ label: 'User management' }, { label: 'Edit details' }];
 
 const meta: Meta<typeof Breadcrumb> = {
-  title: 'Components/Breadcrumb',
+  title: 'New Components/Breadcrumb',
   component: Breadcrumb,
   tags: ['autodocs'],
   parameters: {
