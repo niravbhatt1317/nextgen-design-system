@@ -67,6 +67,17 @@ export type {
   BannerActionPlacement,
 } from './Banner';
 
+// Breadcrumb — says where you are and offers the way back. Depth, not sequence:
+// a journey with steps still ahead is Stepper; doors in any order are Tabs.
+// Ported from the console (Pranjal, 2026-09-22).
+export { Breadcrumb, breadcrumbVariants } from './Breadcrumb';
+export type {
+  BreadcrumbProps,
+  BreadcrumbOwnProps,
+  BreadcrumbItem,
+  BreadcrumbVariant,
+} from './Breadcrumb';
+
 // Button — the merged console button (2026-09-10): seven variants, three heights,
 // one text size, and padding decided by what meets each edge.
 export { Button, buttonVariants } from './Button';
@@ -162,6 +173,11 @@ export type {
 // Container
 export { Container, containerVariants } from './Container';
 export type { ContainerProps, ContainerVariants } from './Container';
+
+// DatePicker — the calendar on its own: month grid, min/max bounds, a today
+// mark, Clear and Done. No time picker (Pranjal, 2026-09-22).
+export { DatePicker, formatDay, parseDay, toDay, MONTHS_SHORT } from './DatePicker';
+export type { DatePickerProps, Day } from './DatePicker';
 
 // Dialog
 export {
