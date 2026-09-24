@@ -1,5 +1,69 @@
 # Changelog
 
+## 1.0.0
+
+### Major Changes
+
+- c74c0ce: **The field, rebuilt against the artifact** (Pranjal, 2026-09-17 and 2026-09-22). `Input`, `Textarea` and `Select` change shape, and two of the changes are breaking.
+
+  **`size` now defaults to `sm` (32px), not `md` (36px).** Every `<Input>`, `<Textarea>` and `<Select>` that does not name a size gets shorter, and its text goes from `text-sm` to 13px. Name `size="md"` to keep the old height.
+
+  Also: corners go `rounded-md` → `rounded-lg`; the border is `neutral-30`; placeholders use the new `faint` ink; a hover border and a focus halo arrive; a disabled field becomes a neutral ground rather than 50% opacity; error messages gain a 12px `alert-circle`; and a required field gets its asterisk.
+
+  **New `locked` prop** on all three — a held field: disabled, with a lock inside where the adornment would sit, and the value truncated rather than wrapped. `Select` also gains `overflowLabel` for folded multi-select pills.
+
+  Two new fields join the family: **`NumberInput`** (its own stepper, the native spinner hidden) and **`DateInput`** (the field's box as a button, opening `DatePicker` below). Both are on the new **Foundation → Field** page alongside the rest.
+
+- c74c0ce: **`Tabs` and `Avatar` on Pranjal's rulings** (2026-09-17). Both are breaking.
+
+  **`Tabs` has two looks, not four.** `TabsVariant = 'default' | 'underline' | 'card' | 'pills'` becomes `TabsType = 'underline' | 'filled'`. **`'default'`, `'card'` and `'pills'` no longer exist** — code passing them stops typechecking. `variant` survives as a deprecated alias of `type`. New: `count` and `countMax` on a trigger, and `ignoreWhenActive`, so clicking the tab you are already on no longer fires `onValueChange`.
+
+  **`Avatar` shows one letter, at every size.** `MAX_INITIALS` goes 2 → 1, so an avatar that read `SJ` now reads `S`. `slate` also leaves the person-tone rotation, which means **every name-derived avatar colour changes**. New `icon` prop for an avatar that carries a glyph rather than a photo or initials.
+
+  Smaller, with them: `Switch` gains a hover on its track; `Radio`'s segmented strip stops clipping and paints the chosen segment's edge; `Dialog` and `Sheet` rebuild their close buttons on a 28px box with a focus-visible halo.
+
+### Minor Changes
+
+- b876fc5: **`AdvancedFilter`** — the "More filters" panel, ported from the console (Pranjal, 2026-09-22).
+
+  A page describes the keys its list can be filtered on; the panel builds rows of **key · operator · value** from them, joined by And or Or, and stacking one level deep into groups with their own join. A key is text, a list of options, or a date, and each offers only the operators it can answer — `contains` for text, `within the last` for a date, neither for a list.
+
+  It comes with the functions that make the value mean something: **`applyAdvanced(rows, value, keys)`** filters a list, **`countConditions(value)`** is the number for the door, and `matchRow`, `liveItems`, `isComplete` and `isGroup` are there for a page that needs to reason about a filter itself. A half-built row is ignored rather than fought, so the list stays usable while someone is still typing.
+
+- c74c0ce: Two new components, ported from the console (Pranjal, 2026-09-22).
+
+  **`Breadcrumb`** — says where you are and offers the way back. Two forms: `page`, a row of chevron-separated crumbs for the header band, and `drawer`, which leads with a back button. Depth, not sequence — a journey with steps still ahead is `Stepper`, and doors you can open in any order are `Tabs`.
+
+  **`DatePicker`** — the calendar on its own: a month grid with `min`/`max` bounds, a today mark, and Clear and Done. Day-only, as `YYYY-MM-DD`; the console's time picker was deliberately left out. `formatDay`, `parseDay`, `toDay` and `MONTHS_SHORT` come with it for callers that need to read or write the day string.
+
+- 1b545cd: Deprecated: `AiMark`, `Callout`, `Item` and `OTPInput`.
+
+  All four still export and behave exactly as before, and are kept until 1.0.0 so callers can move without a breaking release. They move to `Deprecated/` in Storybook and carry an `@deprecated` note saying what to use instead — or saying plainly that nothing replaces them yet, which is the more useful answer when it is the true one.
+  - **`Callout` → use `Banner`.** The same tinted message from the same tone table, with six tones against Callout's three and the same `title`, `icon`, `actions` and `onDismiss`. Two components doing one thing is the second way to do it, which this library treats as a defect.
+  - **`AiMark` → nothing yet.** `Toast` still draws it for its `ai` tone, so it cannot simply go; that has to move first and nothing has been chosen for it to move to. For the AI treatment in new work the `Button` `ai` variant and the `ai` tone on `Banner` both supply their own mark.
+  - **`Item` → nothing; compose the row you need.** Every row that exists here — the dropdown's, the command palette's, the table's — builds its own.
+  - **`OTPInput` → nothing.** Length, resend and expiry are rules the sign-in flow owns, not a component library.
+
+- 2256b30: **Deprecated 2** — the seven components this release replaced, kept under their old behaviour so products can move across at their own pace: `InputOld2`, `TextareaOld2`, `SelectOld2`, `AvatarOld2`, `MotadataSwitchOld2`, `TabsOld2` and the `TableOld2` family.
+
+  Each is the component exactly as it was, and each carries an `@deprecated` tag naming its replacement — so an editor strikes the name through and the linter says what to use instead. They appear under **Deprecated 2** in the gallery. The removal version is the design owner's to set.
+
+  **One caveat worth knowing before you rely on them for comparison:** `TableOld2` imports the _current_ `Avatar`, `Input`, `Toolbar` and `Checkbox`, so it renders the old table's structure wearing this release's one-letter avatar and 32px field. It is a snapshot of the table, not of the page around it.
+
+- c74c0ce: The field's tokens, from Pranjal's 2026-09-22 rulings.
+
+  **`--mdt-destructive` now points at red 60 (`#DB132A`) in light mode, so every error border, halo and message changes colour.** This is visible wherever the library shows an error. The light block had pointed at red 65 (`#C72323`) since the first commit while the dark block already used red 60 — so light and dark have disagreed all along, and red 60 is the one in the rulebook (K-Field-10). White text on the fill measures **5.07:1**, down from 5.69:1 but still clear of the 4.5 minimum.
+
+  **`--mdt-faint` is new** — the faint ink for placeholders, resting tab labels, the meta line, and a disabled field's text and lock. It points at `--mdt-neutral-50` in light and `--mdt-neutral-60` in dark, and comes with a `faint` colour in the Tailwind config (`mdt-text-faint`, `mdt-bg-faint`, …). No new colour was added to the palette.
+
+  **Two ramp steps land on their documented hex.** `--mdt-neutral-30` rendered `#E4E9F1` against a documented `#E3E8F2`, and `--mdt-red-60` rendered `#DD132B` against `#DB132A` — one unit off in each case. Both now carry the decimals that make them exact, so the field border matches the ruled value. `--mdt-neutral-50`'s comment also said `#8E9FBC` when the value has always rendered `#8FA0BD`; the comment is corrected.
+
+- 5ee8001: **A quick filter can carry its own search box.** Set `searchable` on a `quickFilter` and its menu gets a named search field at the top, for a list long enough to need finding — the organisation filter, where the options are a tenant's own names rather than a fixed handful (Pranjal, 2026-09-17). Keys stay in the box rather than being swallowed by the menu's type-ahead.
+
+  **The Columns panel reorders by drag.** Pick a row up and it lands in front of whichever row is under the pointer. Dragging is off while the list is filtered — a filtered list is not the order — and a column marked `fixed` neither drags nor takes a drop.
+
+  Menus also size to their longest option now, up to 380px, instead of a fixed width that cut long names off.
+
 ## 0.6.0
 
 ### Packaging
