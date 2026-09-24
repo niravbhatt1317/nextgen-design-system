@@ -36,7 +36,7 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 );
 
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'New Components/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {

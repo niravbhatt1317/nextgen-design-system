@@ -5,7 +5,7 @@ import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof TagPill> = {
-  title: 'Components/TagPill',
+  title: 'New Components/TagPill',
   component: TagPill,
   tags: ['autodocs'],
   parameters: {
