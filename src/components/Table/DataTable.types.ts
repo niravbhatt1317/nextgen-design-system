@@ -23,6 +23,12 @@ export interface DataTableQuickFilter<Row> {
    * distinguish visibility").
    */
   renderOption?: ((value: string) => ReactNode) | undefined;
+  /**
+   * A search box at the top of the menu, for a list long enough to need one
+   * (Pranjal, 2026-09-17, the organisation filter: "it will contain search box
+   * as well"). Left unset, none.
+   */
+  searchable?: boolean | undefined;
 }
 
 /** One group in the Filters panel: a label and the values a person can tick. */

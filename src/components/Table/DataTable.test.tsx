@@ -437,3 +437,57 @@ describe('DataTable', { timeout: 20000 }, () => {
     localStorage.clear();
   });
 });
+
+/* Pranjal, 2026-09-17, on the organisation filter: "it will contain search box
+ * as well" - a quick filter whose list is long enough to need finding. */
+describe('a searchable quick filter', () => {
+  const statuses = {
+    columnKey: 'status',
+    label: 'Filter by status',
+    options: ['Active', 'Inactive', 'Invited'],
+    value: (u: SampleUser) => u.status,
+    searchable: true,
+  };
+
+  const openMenu = async () => {
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    return screen.findByRole('menuitemcheckbox', { name: 'Active' });
+  };
+
+  it('offers no search box unless the filter asks for one', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    await screen.findByRole('menuitemcheckbox', { name: 'Active' });
+    expect(screen.queryByLabelText('Search status')).not.toBeInTheDocument();
+  });
+
+  it('puts a named search box at the top when it does', async () => {
+    render(<Users quickFilter={statuses} />);
+    await openMenu();
+    expect(screen.getByLabelText('Search status')).toBeInTheDocument();
+  });
+
+  it('narrows the list to what was typed', async () => {
+    render(<Users quickFilter={statuses} />);
+    await openMenu();
+    await userEvent.type(screen.getByLabelText('Search status'), 'inv');
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Invited' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitemcheckbox', { name: 'Active' })).not.toBeInTheDocument();
+  });
+
+  it('matches without regard to case', async () => {
+    render(<Users quickFilter={statuses} />);
+    await openMenu();
+    await userEvent.type(screen.getByLabelText('Search status'), 'ACTI');
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Active' })).toBeInTheDocument();
+  });
+
+  it('shows the whole list again once the box is cleared', async () => {
+    render(<Users quickFilter={statuses} />);
+    await openMenu();
+    const box = screen.getByLabelText('Search status');
+    await userEvent.type(box, 'inv');
+    await userEvent.clear(box);
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Active' })).toBeInTheDocument();
+  });
+});

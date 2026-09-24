@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { TableColumnsPanel, TableInsertPanel } from './TablePanels';
@@ -214,5 +214,54 @@ describe('TableInsertPanel', () => {
   it('renders nothing while closed', () => {
     insertPanel({ open: false });
     expect(screen.queryByText('Insert a column')).not.toBeInTheDocument();
+  });
+});
+
+describe('TableColumnsPanel — reordering by drag', () => {
+  /* jsdom fires drag events but carries no DataTransfer, so one is supplied.
+     The panel only reads setData and effectAllowed. */
+  const dataTransfer = () => ({ effectAllowed: '', setData: vi.fn(), getData: vi.fn() });
+
+  const rowFor = (label: string) => screen.getByRole('button', { name: new RegExp(label) });
+
+  it('offers no drag until a handler is given', () => {
+    columnsPanel();
+    expect(rowFor('Email')).not.toHaveAttribute('draggable');
+  });
+
+  it('is draggable once a handler is there', () => {
+    columnsPanel({ onMoveBefore: vi.fn() });
+    expect(rowFor('Email')).toHaveAttribute('draggable', 'true');
+  });
+
+  it('moves the dragged column in front of the one under the pointer', () => {
+    const onMoveBefore = vi.fn();
+    columnsPanel({ onMoveBefore });
+    fireEvent.dragStart(rowFor('Email'), { dataTransfer: dataTransfer() });
+    fireEvent.dragOver(rowFor('Role'), { dataTransfer: dataTransfer() });
+    expect(onMoveBefore).toHaveBeenCalledWith('email', 'role');
+  });
+
+  it('does nothing when a row is dragged over itself', () => {
+    const onMoveBefore = vi.fn();
+    columnsPanel({ onMoveBefore });
+    fireEvent.dragStart(rowFor('Email'), { dataTransfer: dataTransfer() });
+    fireEvent.dragOver(rowFor('Email'), { dataTransfer: dataTransfer() });
+    expect(onMoveBefore).not.toHaveBeenCalled();
+  });
+
+  it('marks the row it is carrying, and lets go at the end', () => {
+    columnsPanel({ onMoveBefore: vi.fn() });
+    const row = rowFor('Email');
+    fireEvent.dragStart(row, { dataTransfer: dataTransfer() });
+    expect(row).toHaveAttribute('data-dragging');
+    fireEvent.dragEnd(row);
+    expect(row).not.toHaveAttribute('data-dragging');
+  });
+
+  it('stops dragging while the list is filtered — a filtered list is not the order', async () => {
+    const { user } = columnsPanel({ onMoveBefore: vi.fn() });
+    await user.type(screen.getByPlaceholderText(/search/i), 'Ema');
+    expect(rowFor('Email')).not.toHaveAttribute('draggable');
   });
 });
