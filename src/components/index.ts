@@ -9,6 +9,32 @@
 // every single pull request. Alphabetical insertion puts two new components
 // hundreds of lines apart, and git merges them without a word.
 
+// AdvancedFilter — the "More filters" panel: rows of key · operator · value that
+// stack into AND/OR groups, one level deep. `applyAdvanced` filters a list with
+// what it builds; `countConditions` is the number for the door
+// (Pranjal, 2026-09-22).
+export {
+  AdvancedFilter,
+  OPERATORS,
+  EMPTY_FILTER,
+  isGroup,
+  isComplete,
+  liveItems,
+  countConditions,
+  matchRow,
+  applyAdvanced,
+} from './AdvancedFilter';
+export type {
+  AdvancedFilterProps,
+  FilterKey,
+  FilterKeyType,
+  FilterJoin,
+  FilterRow,
+  FilterGroup,
+  FilterItem,
+  FilterValue,
+} from './AdvancedFilter';
+
 // AiMark - the gradient AI mark. DEPRECATED 2026-09-15: no replacement yet;
 // Toast still draws it for its `ai` tone and has to move off it first.
 export { AiMark } from './AiMark';
