@@ -6,7 +6,7 @@ import { Toolbar, ToolbarSection, ToolbarSpacer } from './Toolbar';
 import { ToolbarButton } from './ToolbarButton';
 
 const meta: Meta<typeof Toolbar> = {
-  title: 'Components/Toolbar',
+  title: 'New Components/Toolbar',
   component: Toolbar,
   tags: ['autodocs'],
   parameters: {

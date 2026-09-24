@@ -6,7 +6,7 @@ import { Badge } from './Badge';
 import type { BadgePalette, BadgeShape, BadgeSize, BadgeTone } from './Badge.types';
 
 const meta: Meta<typeof Badge> = {
-  title: 'Components/Badge',
+  title: 'New Components/Badge',
   component: Badge,
   tags: ['autodocs'],
   parameters: {

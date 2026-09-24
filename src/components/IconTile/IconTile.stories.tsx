@@ -3,7 +3,7 @@ import { IconTile } from './IconTile';
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof IconTile> = {
-  title: 'Components/IconTile',
+  title: 'New Components/IconTile',
   component: IconTile,
   tags: ['autodocs'],
   parameters: {

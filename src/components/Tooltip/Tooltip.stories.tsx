@@ -5,7 +5,7 @@ import { ContactChips, TagList } from '../Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'Components/Tooltip',
+  title: 'New Components/Tooltip',
   component: Tooltip,
   tags: ['autodocs'],
   parameters: {

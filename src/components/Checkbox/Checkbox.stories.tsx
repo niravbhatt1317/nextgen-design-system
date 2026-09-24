@@ -6,7 +6,7 @@ import { Icon } from '../Icon';
 import { FormLabel } from '../Form';
 
 const meta: Meta<typeof Checkbox> = {
-  title: 'Components/Checkbox',
+  title: 'New Components/Checkbox',
   component: Checkbox,
   tags: ['autodocs'],
   parameters: {

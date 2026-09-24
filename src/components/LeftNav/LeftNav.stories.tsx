@@ -10,7 +10,7 @@ import type {
 } from './LeftNav.types';
 
 const meta: Meta<typeof LeftNav> = {
-  title: 'Components/LeftNav',
+  title: 'New Components/LeftNav',
   component: LeftNav,
   tags: ['autodocs'],
   parameters: {

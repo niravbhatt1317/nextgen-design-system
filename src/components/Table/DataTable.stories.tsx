@@ -226,7 +226,7 @@ function UsersTable(
 }
 
 const meta: Meta<typeof UsersTable> = {
-  title: 'Components/Table',
+  title: 'New Components/Table',
   component: UsersTable,
   tags: ['autodocs'],
   parameters: {

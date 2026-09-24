@@ -92,7 +92,7 @@ function useDockOnScroll(
 }
 
 const meta: Meta<typeof Table> = {
-  title: 'Components/Table/Pieces',
+  title: 'New Components/Table/Pieces',
   component: Table,
   tags: ['autodocs'],
   parameters: {
