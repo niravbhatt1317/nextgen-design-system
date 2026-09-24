@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import type { DragEvent, ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Checkbox } from '../Checkbox';
 import { Icon } from '../Icon';
@@ -9,6 +9,8 @@ export interface TableColumnsPanelColumn {
   key: string;
   label: string;
   hidden: boolean;
+  /** Listed and togglable but not part of the order - it neither drags nor takes a drop (the row-number column). */
+  fixed?: boolean;
 }
 
 export interface TableColumnsPanelProps {
@@ -22,11 +24,40 @@ export interface TableColumnsPanelProps {
   onHideAll: () => void;
   onShowAll: () => void;
   onReset: () => void;
+  /**
+   * Drag a row to reorder the columns: put `key` before `beforeKey`. When given, every unlocked row carries the
+   * Users panel's six-dot grip and drags (Pranjal, 2026-09-17: "Users have the drag functionality inside the column
+   * management and other module doesnt have that"); dragging is off while the list is searched, as on Users.
+   */
+  onMoveBefore?: (key: string, beforeKey: string) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-const PANEL = 'mdt-w-[264px] mdt-rounded-xl mdt-px-3.5 mdt-pb-2.5 mdt-pt-4';
+/** The Users panel's grip: six dots, 10 × 14, in the row's quiet grey. */
+function Grip({ hidden }: { hidden?: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'mdt-inline-flex mdt-shrink-0 mdt-cursor-grab mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90',
+        hidden && 'mdt-invisible'
+      )}
+    >
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" className="mdt-block">
+        <circle cx="2.5" cy="2" r="1.4" />
+        <circle cx="7.5" cy="2" r="1.4" />
+        <circle cx="2.5" cy="7" r="1.4" />
+        <circle cx="7.5" cy="7" r="1.4" />
+        <circle cx="2.5" cy="12" r="1.4" />
+        <circle cx="7.5" cy="12" r="1.4" />
+      </svg>
+    </span>
+  );
+}
+
+/* 264 wide and 10 corners - the Users table's Columns panel (Pranjal, 2026-09-17: "same for column management") */
+const PANEL = 'mdt-w-[264px] mdt-rounded-[10px] mdt-px-3.5 mdt-pb-2.5 mdt-pt-4';
 const ROW =
   'mdt-flex mdt-min-h-[34px] mdt-w-full mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130';
 const SECTION =
@@ -71,13 +102,38 @@ function TableColumnsPanel({
   onHideAll,
   onShowAll,
   onReset,
+  onMoveBefore,
   open,
   onOpenChange,
 }: TableColumnsPanelProps) {
   const [q, setQ] = useState('');
+  const [dragKey, setDragKey] = useState<string | null>(null);
   const match = (label: string) => label.toLowerCase().includes(q.trim().toLowerCase());
   const shown = columns.filter((c) => !c.hidden && match(c.label));
   const hidden = columns.filter((c) => c.hidden && match(c.label));
+  /* the rows drag while nothing is searched - a filtered list is not the order */
+  const canDrag = !!onMoveBefore && q.trim() === '';
+  const dragProps = (c: TableColumnsPanelColumn) =>
+    canDrag && !c.fixed
+      ? {
+          draggable: true,
+          onDragStart: (e: DragEvent<HTMLButtonElement>) => {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', c.key);
+            setDragKey(c.key);
+          },
+          /* live reorder: the dragged row lands in front of the row under the pointer */
+          onDragOver: (e: DragEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            if (dragKey && dragKey !== c.key) onMoveBefore(dragKey, c.key);
+          },
+          onDragEnd: () => {
+            setDragKey(null);
+          },
+          'data-dragging': dragKey === c.key ? '' : undefined,
+        }
+      : {};
+  const rowClass = (c: TableColumnsPanelColumn) => cn(ROW, dragKey === c.key && 'mdt-opacity-50');
   return (
     <Popover {...(open !== undefined ? { open } : {})} {...(onOpenChange ? { onOpenChange } : {})}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
@@ -103,6 +159,7 @@ function TableColumnsPanel({
             className={cn(ROW, 'mdt-cursor-default hover:mdt-bg-transparent')}
             aria-disabled="true"
           >
+            {canDrag && <Grip hidden />}
             <span className="mdt-flex-1">{label}</span>
             <Checkbox
               checked
@@ -116,12 +173,14 @@ function TableColumnsPanel({
           <button
             key={c.key}
             type="button"
-            className={ROW}
+            className={rowClass(c)}
             onClick={() => {
               onToggle(c.key);
             }}
             aria-pressed="true"
+            {...dragProps(c)}
           >
+            {canDrag && <Grip hidden={!!c.fixed} />}
             <span className="mdt-flex-1">{c.label}</span>
             <Checkbox
               checked
@@ -143,12 +202,14 @@ function TableColumnsPanel({
               <button
                 key={c.key}
                 type="button"
-                className={ROW}
+                className={rowClass(c)}
                 onClick={() => {
                   onToggle(c.key);
                 }}
                 aria-pressed="false"
+                {...dragProps(c)}
               >
+                {canDrag && <Grip hidden={!!c.fixed} />}
                 <span className="mdt-flex-1">{c.label}</span>
                 <Checkbox
                   checked={false}
