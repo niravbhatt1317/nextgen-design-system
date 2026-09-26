@@ -19,7 +19,7 @@
     --mdt-neutral-10: 210 50% 98%; /* #F6F9FC - Lightest */
     --mdt-neutral-20: 217 52% 95%; /* #ECF1F9 */
     --mdt-neutral-30: 220 34.7% 91.9%; /* #E3E8F2 - decimals so it lands exactly; 30%/92% rendered #E4E9F1, one unit off the ruled field border (2026-09-22) */
-    --mdt-neutral-40: 218 27% 84%; /* #CAD3E2 */
+    --mdt-neutral-40: 218 29% 84%; /* #CAD3E2 - 27% rendered #CBD3E1, a unit off its own hex (C-115, 2026-09-22) */
     --mdt-neutral-50: 218 26% 65%; /* #8E9FBC */
     --mdt-neutral-60: 217 24% 55%; /* #7186A8 */
     --mdt-neutral-70: 216 24% 52%; /* #697FA0 */
@@ -239,6 +239,16 @@
 
     --mdt-primary: var(--mdt-black);
     --mdt-primary-foreground: var(--mdt-white);
+    /* The primary button's two states, as tokens (2026-09-24, Pranjal: "use it properly" - the console's
+       dark theme reads tokens, never the dark: twins, so the Button's hover and pressed steps have to be
+       tokens too). Light walks the ramp darker: neutral-110 under the pointer, neutral-100 held. */
+    --mdt-primary-hover: var(--mdt-neutral-110);
+    --mdt-primary-active: var(--mdt-neutral-100);
+    /* The primary button's two states, as tokens (2026-09-24, Pranjal: "use it properly" - the console's
+       dark theme reads tokens, never the dark: twins, so the Button's hover and pressed steps have to be
+       tokens too). Light walks the ramp darker: neutral-110 under the pointer, neutral-100 held. */
+    --mdt-primary-hover: var(--mdt-neutral-110);
+    --mdt-primary-active: var(--mdt-neutral-100);
 
     /* Two quieter steps of the ink that sits ON the primary surface.
        No new colours - both point at ramp steps that already existed.
@@ -256,7 +266,9 @@
     --mdt-primary-foreground-muted: var(--mdt-neutral-30);
     --mdt-primary-foreground-subtle: var(--mdt-neutral-100);
 
-    --mdt-secondary: var(--mdt-neutral-20);
+    /* the secondary surface is the sunken step - the colour the Users drawer's contact card wears (Pranjal, 2026-09-25:
+       "That will be our secondary from now on in both dark and light theme"); it was neutral-20 */
+    --mdt-secondary: var(--mdt-neutral-10);
     --mdt-secondary-foreground: var(--mdt-black);
 
     --mdt-muted: var(--mdt-neutral-30);
@@ -456,6 +468,49 @@
     --mdt-z-tooltip: 1040;
     --mdt-z-toast: 1050;
 
+    /* ============================================
+       THE LEFT NAV - one token per job (2026-09-24)
+       The rail's ground, its row under the pointer, its selected row, its
+       ink, its section-label grey, its hairlines, the Soon badge, the
+       switcher's door and its Log out red. Light is what the console ships;
+       dark comes from the colour map (component.nav.*, color.text.subtle,
+       color.border, color.background.neutral, color.text.danger). A component
+       reads these and never knows which theme it is in - no ".dark" twin
+       rules anywhere in the rail (Pranjal, 2026-09-24: "solve it from the
+       foundation so that anywhere else it doesnt cause the same issue").
+       ============================================ */
+    --mdt-nav-background: var(--mdt-neutral-10);
+    --mdt-nav-hover: var(--mdt-neutral-20);
+    --mdt-nav-selected: var(
+      --mdt-neutral-20
+    ); /* component.nav.selected - light = hover, as the console shipped */
+    --mdt-nav-text: var(--mdt-foreground);
+    --mdt-nav-rest-alpha: 0.72; /* a row at rest: the ink at reduced strength */
+    --mdt-nav-label: var(
+      --mdt-muted-foreground-subtle
+    ); /* #9B9EAA, the accepted contrast exception */
+    --mdt-nav-line: var(--mdt-neutral-20);
+    --mdt-nav-well: var(
+      --mdt-neutral-20
+    ); /* the theme tabs' inset track: one step under the panel */
+    --mdt-nav-soon-bg: var(--mdt-neutral-30);
+    --mdt-nav-door-bg: var(--mdt-blue-10);
+    --mdt-nav-danger: var(--mdt-destructive);
+    /* THE SIX AVATAR TONES (2026-09-24): the organisation tiles' pairs, as the console approved them in light; dark
+       from the colour map's avatar tier. They were the last typed-in colours in the rail. */
+    --mdt-avatar-blue-fill: 216 76.92% 94.9%; /* #E8F0FC */
+    --mdt-avatar-blue-ink: 216.61 71.08% 51.18%; /* #2A6FDB */
+    --mdt-avatar-green-fill: 150 41.18% 93.33%; /* #E7F5EE */
+    --mdt-avatar-green-ink: 152.9 61.59% 29.61%; /* #1D7A50 */
+    --mdt-avatar-amber-fill: 37.06 89.47% 92.55%; /* #FDF0DB */
+    --mdt-avatar-amber-ink: 37.99 84.92% 39.02%; /* #B87A0F */
+    --mdt-avatar-rose-fill: 349.09 84.62% 94.9%; /* #FDE7EB */
+    --mdt-avatar-rose-ink: 347.56 59.47% 55.49%; /* #D14A66 */
+    --mdt-avatar-purple-fill: 285 57.14% 94.51%; /* #F5E9F9 */
+    --mdt-avatar-purple-ink: 277.44 49.41% 50.39%; /* #9042BF */
+    --mdt-avatar-slate-fill: 220 21.43% 94.51%; /* #EEF0F4 */
+    --mdt-avatar-slate-ink: 217.5 22.86% 41.18%; /* #516381 */
+
     /* How wide a toast is. The promotional toast sits on its own layer outside
        the toaster, so both need to read the width from the same place or they
        drift apart. */
@@ -468,182 +523,233 @@
     --mdt-font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', Consolas, monospace;
   }
 
-  .dark {
-    /* ============================================
-       SEMANTIC COLORS - DARK MODE
-       All semantic colors extend from the color palette
-       Primary uses core color (White)
-       ============================================ */
-    --mdt-background: var(--mdt-neutral-160);
-    --mdt-foreground: var(--mdt-neutral-10);
-
-    --mdt-card: var(--mdt-neutral-150);
-    --mdt-card-foreground: var(--mdt-neutral-10);
-
-    --mdt-popover: var(--mdt-neutral-150);
-    --mdt-popover-foreground: var(--mdt-neutral-10);
-
-    --mdt-primary: var(--mdt-white);
-    --mdt-primary-foreground: var(--mdt-black);
-
-    /* The same two steps, read from the other end of the ramp - the primary
-       surface is white here, so "softer than the label" means darker. */
-    --mdt-primary-foreground-muted: var(--mdt-neutral-130);
-    --mdt-primary-foreground-subtle: var(--mdt-neutral-50);
-
-    --mdt-secondary: var(--mdt-neutral-130);
-    --mdt-secondary-foreground: var(--mdt-neutral-10);
-
-    --mdt-muted: var(--mdt-neutral-120);
-    --mdt-muted-foreground: var(--mdt-neutral-40);
-    --mdt-muted-foreground-subtle: var(
-      --mdt-neutral-50
-    ); /* dark set aside for now (2026-09-03); a readable placeholder */
-    --mdt-faint: var(--mdt-neutral-60); /* dark set aside for now; 4.9:1 on the dark ground */
-
-    --mdt-accent: var(--mdt-blue-90);
-    --mdt-accent-foreground: var(--mdt-blue-20);
-
-    --mdt-destructive: var(--mdt-red-60);
-    --mdt-destructive-foreground: var(--mdt-white);
-
-    --mdt-warning: var(--mdt-orange-60);
-    --mdt-warning-foreground: var(--mdt-black);
-
-    /* Same green 70 as light mode, so there is one success fill to remember
-       rather than two. White on it measures 4.9:1 here as well.
-       Green 70 as *text* on the dark page only reaches 3.7:1, so anything using
-       success as a text colour flips to green 40 with a `dark:` utility - the
-       same pattern Badge uses, and the same missing token pair it logs. */
-    --mdt-success: var(--mdt-green-70);
-    --mdt-success-foreground: var(--mdt-white);
-
-    --mdt-info: var(--mdt-blue-50);
-    --mdt-info-foreground: var(--mdt-black);
-
-    --mdt-border: var(--mdt-neutral-90);
-    --mdt-input: var(--mdt-neutral-90);
-    --mdt-ring: var(--mdt-neutral-50);
-
-    /* ============================================
-       FEEDBACK SURFACE - dark
-
-       Om's banner is light-only, as are all four product systems, so there is
-       nothing exact to copy here.
-
-       These used to come off the ramps at the same steps Badge uses - the -90
-       end of each hue, fully saturated. A badge is a 20px chip, and at that
-       size a saturated dark works. A toast or a banner is a surface several
-       hundred pixels wide, and the same value reads as a block of colour laid
-       on the page rather than a panel that happens to be tinted. Measured, the
-       old orange ground sat 1.9 above the page; a surface wants nearer 1.2.
-
-       So these are the tone's own hue at roughly HALF the saturation and a
-       darker step. Same hue, so a warning still reads warm; far less
-       saturation, so it reads as a surface.
-
-       Not on the ramps, and that is the point worth knowing: the ramps have no
-       desaturated dark step for any of these hues, because nothing needed one
-       until a full-width tinted surface did. Recorded in MISSING-TOKENS.md.
-       These are the only colours defined outside a ramp, and they should go
-       back onto one the day those steps exist.
-
-       Measured against the page and the text they carry:
-
-         tone      ground     title  body   icon   edge/bg  bg/page
-         info      218 55 16   14.97  12.87  7.82   1.56     1.15
-         warning    26 50 14   14.49  12.45 10.49   1.72     1.19
-         danger      0 45 15   15.65  13.45  9.25   1.54     1.10
-         success   151 42 13   13.75  11.82  8.37   1.84     1.26
-         ai        270 38 18   14.80  12.72  8.75   1.49     1.17
-         neutral   217 40 15   15.06  12.95 12.95   1.21     1.15
-
-       Floors are 4.5 for words and 3.0 for a meaningful graphic.
-       ============================================ */
-    /* Ten mixed values, and the only place in this file that does not point at
-       a ramp step. See MISSING-TOKENS.md - "Dark surface tints" - for why, and
-       for what would make them unnecessary.
-
-       The short version: the ramps have no low-saturation dark step. The `90`s
-       are 17-20% lightness at up to 100% saturation against a 10% page, and a
-       panel's worth of that is a slab rather than a tint. The steps below are
-       9-10%, level with the page or darker, and a fill darker than the page it
-       sits on reads as a hole - this codebase shipped that once already, in the
-       dark CodeWell.
-
-       These sit at 13-18% lightness and 38-55% saturation: a lift off the page
-       with the hue intact. The borders are mixed to match at 25-32%, because a
-       bright `70` ramp step around a quiet fill is a rim, not an edge.
-
-       Values by Pranjal Gupta, who hit this drawing Banner beside a real page
-       on the same day. They replaced an alpha wash of the ramp steps that did
-       the same job with no new values but composited against whatever sat
-       behind it - so a callout on the page and the same callout in a dialog
-       were two different colours. A token you cannot predict is worse than a
-       token you had to mix. */
-    --mdt-feedback-info-bg: 218 55% 16%;
-    --mdt-feedback-info-border: 218 55% 30%;
-    --mdt-feedback-info-icon: var(--mdt-blue-30);
-
-    --mdt-feedback-warning-bg: 26 50% 14%;
-    --mdt-feedback-warning-border: 26 55% 27%;
-    --mdt-feedback-warning-icon: var(--mdt-orange-30);
-
-    --mdt-feedback-danger-bg: 0 45% 15%;
-    --mdt-feedback-danger-border: 0 50% 29%;
-    --mdt-feedback-danger-icon: var(--mdt-red-30);
-
-    --mdt-feedback-success-bg: 151 42% 13%;
-    --mdt-feedback-success-border: 151 45% 25%;
-    --mdt-feedback-success-icon: var(--mdt-green-30);
-
-    --mdt-feedback-ai-bg: 270 38% 18%;
-    --mdt-feedback-ai-border: 270 42% 32%;
-    --mdt-feedback-ai-icon: var(--mdt-purple-30);
-
-    /* Not mixed: `neutral-140` already is this value, to the digit. Written as
-       the ramp step it is, so the one tone that has a home keeps it. */
-    --mdt-feedback-neutral-bg: var(--mdt-neutral-140);
-    --mdt-feedback-neutral-border: var(--mdt-neutral-120);
-    --mdt-feedback-neutral-icon: var(--mdt-neutral-30);
-
-    --mdt-feedback-title: var(--mdt-neutral-10);
-    --mdt-feedback-text: var(--mdt-neutral-30);
-
-    /* ============================================
-       RAISED SURFACE - DARK
-
-       Here tone does the work that a shadow cannot. A dark page is already close
-       to black, so darkening beneath a raised surface has nowhere to go - the
-       palette's own black is rgb(7,15,29) against a page of rgb(11,22,40), four
-       points apart.
-
-       neutral-140 sits +13 luminance above the page, which is exactly the step
-       Atlassian's popover uses (31 -> 44). `--mdt-card` was the obvious
-       candidate and is only +6 - half the separation - because `card` means
-       "this is a card", not "this is raised".
-       ============================================ */
-    --mdt-surface-raised: var(--mdt-neutral-140);
-
-    /* ============================================
-       ELEVATION - DARK
-
-       A black shadow at 10% opacity is invisible on a dark surface, so in dark
-       mode every elevated component was reading as flat: a dialog and the page
-       behind it were separated only by their background colours.
-
-       Two things fix it, and both are needed. The drop shadow keeps its
-       geometry but roughly quadruples in opacity, and a hairline light edge is
-       baked into the token as a `0 0 0 1px` ring. The ring is written FIRST so
-       it paints on top of the blur and stays crisp.
-
-       Putting the hairline inside the token matters: no component has to
-       remember to add a border in dark mode, and no component can forget. A
-       component asks for `mdt-shadow-md` and gets the right treatment in both
-       themes.
-
-       `none` stays truly none - flat means flat, with no edge.
-       ============================================ */
+  /* ── THE DARK THEME · GENERATED BY scripts/theme-dark.cjs FROM scripts/dark-theme/tokens.cjs · DO NOT EDIT BY HAND ── */
+  /* 221 colour variables from the map (123 by the semantic token for the job, 98 by the tinted-chip rule for a ramp step);
+     3 colour variables keep their light value (ai-gradient-from, ai-gradient-via, ai-gradient-to); the rest of :root is not colour. */
+  [data-theme='dark'] {
+    --mdt-white: 0 0% 100%; /* #FFFFFF */
+    --mdt-black: 0 0% 0%; /* #000000 */
+    --mdt-neutral-10: 216.43 56% 9.8%; /* #0B1627 */
+    --mdt-neutral-20: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-neutral-30: 216.77 40.26% 15.1%; /* #172336 */
+    --mdt-neutral-40: 217.33 23.81% 37.06%; /* #485975 */
+    --mdt-neutral-50: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-neutral-60: 217.09 24.02% 55.1%; /* #7186A8 */
+    --mdt-neutral-70: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-neutral-80: 217.83 25.56% 64.71%; /* #8E9FBC */
+    --mdt-neutral-90: 217.83 25.56% 64.71%; /* #8E9FBC */
+    --mdt-neutral-100: 217.83 25.56% 64.71%; /* #8E9FBC */
+    --mdt-neutral-110: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-neutral-120: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-neutral-130: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-neutral-140: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-neutral-150: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-neutral-160: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-red-05: 332.5 23.08% 20.39%; /* #402833 */
+    --mdt-red-10: 332.5 23.08% 20.39%; /* #402833 */
+    --mdt-red-20: 355.56 37.5% 28.24%; /* #632D31 */
+    --mdt-red-30: 325.38 21.31% 23.92%; /* #4A303F */
+    --mdt-red-40: 0 84.25% 75.1%; /* #F58A8A */
+    --mdt-red-50: 0 84.25% 75.1%; /* #F58A8A */
+    --mdt-red-60: 0 79.23% 64.12%; /* #EC5B5B */
+    --mdt-red-65: 5.31 58.1% 49.61%; /* #C84235 */
+    --mdt-red-70: 3.33 81.82% 69.8%; /* #F17A73 */
+    --mdt-red-80: 0 88.24% 90%; /* #FCCFCF */
+    --mdt-red-90: 0 88.24% 90%; /* #FCCFCF */
+    --mdt-red-100: 0 88.24% 90%; /* #FCCFCF */
+    --mdt-orange-05: 27 18.52% 21.18%; /* #40352C */
+    --mdt-orange-10: 27 18.52% 21.18%; /* #40352C */
+    --mdt-orange-20: 10.59 12.41% 26.86%; /* #4D3F3C */
+    --mdt-orange-30: 17.14 21.54% 25.49%; /* #4F3B33 */
+    --mdt-orange-40: 27.07 100% 73.92%; /* #FFB67A */
+    --mdt-orange-50: 27.07 100% 73.92%; /* #FFB67A */
+    --mdt-orange-60: 50.16 100% 49.02%; /* #FAD100 */
+    --mdt-orange-65: 27.39 100% 81.96%; /* #FFCDA3 */
+    --mdt-orange-70: 35.29 73.21% 59.02%; /* #E3A44A */
+    --mdt-orange-80: 35.29 73.21% 59.02%; /* #E3A44A */
+    --mdt-orange-90: 35.29 73.21% 59.02%; /* #E3A44A */
+    --mdt-orange-100: 27.06 100% 90%; /* #FFE3CC */
+    --mdt-yellow-05: 54.55 16.18% 26.67%; /* #4F4D39 */
+    --mdt-yellow-10: 54.55 16.18% 26.67%; /* #4F4D39 */
+    --mdt-yellow-20: 54.55 16.18% 26.67%; /* #4F4D39 */
+    --mdt-yellow-30: 54.55 16.18% 26.67%; /* #4F4D39 */
+    --mdt-yellow-40: 45.1 100% 70%; /* #FFD966 */
+    --mdt-yellow-50: 45.1 100% 70%; /* #FFD966 */
+    --mdt-yellow-60: 46.15 100% 77.06%; /* #FFE48A */
+    --mdt-yellow-70: 46.15 100% 77.06%; /* #FFE48A */
+    --mdt-yellow-80: 45.79 100% 85.1%; /* #FFEDB3 */
+    --mdt-yellow-90: 45.79 100% 85.1%; /* #FFEDB3 */
+    --mdt-yellow-100: 45.79 100% 85.1%; /* #FFEDB3 */
+    --mdt-green-05: 181.18 54.84% 18.24%; /* #154748 */
+    --mdt-green-10: 181.18 54.84% 18.24%; /* #154748 */
+    --mdt-green-20: 169.16 67.48% 24.12%; /* #146758 */
+    --mdt-green-30: 178.57 40.38% 20.39%; /* #1F4948 */
+    --mdt-green-40: 150.7 56.33% 55.1%; /* #4CCD8E */
+    --mdt-green-50: 150.7 56.33% 55.1%; /* #4CCD8E */
+    --mdt-green-60: 144.15 65.43% 52.35%; /* #36D576 */
+    --mdt-green-70: 157 59.41% 60.39%; /* #5ED6A8 */
+    --mdt-green-80: 157 59.41% 60.39%; /* #5ED6A8 */
+    --mdt-green-90: 149.54 55.56% 77.06%; /* #A4E5C4 */
+    --mdt-green-100: 149.54 55.56% 77.06%; /* #A4E5C4 */
+    --mdt-blue-05: 211.64 48.67% 22.16%; /* #1D3754 */
+    --mdt-blue-10: 211.64 48.67% 22.16%; /* #1D3754 */
+    --mdt-blue-20: 210 52.17% 27.06%; /* #214569 */
+    --mdt-blue-30: 217.5 54.55% 25.88%; /* #1E3966 */
+    --mdt-blue-40: 214.94 100% 69.02%; /* #61A3FF */
+    --mdt-blue-50: 207.06 100% 50%; /* #008CFF */
+    --mdt-blue-55: 213.93 100% 76.08%; /* #85BAFF */
+    --mdt-blue-60: 207.06 100% 50%; /* #008CFF */
+    --mdt-blue-65: 213.93 100% 76.08%; /* #85BAFF */
+    --mdt-blue-70: 213.93 100% 76.08%; /* #85BAFF */
+    --mdt-blue-80: 212.61 100% 81.96%; /* #A3CDFF */
+    --mdt-blue-90: 212.61 100% 81.96%; /* #A3CDFF */
+    --mdt-blue-100: 212.61 100% 81.96%; /* #A3CDFF */
+    --mdt-purple-05: 244.29 32.81% 25.1%; /* #2E2B55 */
+    --mdt-purple-10: 244.29 32.81% 25.1%; /* #2E2B55 */
+    --mdt-purple-20: 248 28.3% 31.18%; /* #3F3966 */
+    --mdt-purple-30: 248 28.3% 31.18%; /* #3F3966 */
+    --mdt-purple-40: 270 100% 80%; /* #CC99FF */
+    --mdt-purple-50: 270 100% 80%; /* #CC99FF */
+    --mdt-purple-60: 270.74 91.01% 65.1%; /* #A855F7 */
+    --mdt-purple-70: 270 100% 85.1%; /* #D9B3FF */
+    --mdt-purple-80: 270.59 100% 90%; /* #E6CCFF */
+    --mdt-purple-90: 270.59 100% 90%; /* #E6CCFF */
+    --mdt-purple-100: 270.59 100% 90%; /* #E6CCFF */
+    --mdt-indigo-05: 225 31.88% 27.06%; /* #2F3A5B */
+    --mdt-indigo-10: 225 31.88% 27.06%; /* #2F3A5B */
+    --mdt-indigo-20: 225 31.88% 27.06%; /* #2F3A5B */
+    --mdt-indigo-30: 225 31.88% 27.06%; /* #2F3A5B */
+    --mdt-indigo-40: 233.44 50% 74.9%; /* #9FA6DF */
+    --mdt-indigo-50: 233.44 50% 74.9%; /* #9FA6DF */
+    --mdt-indigo-60: 233.48 56.1% 83.92%; /* #BFC4ED */
+    --mdt-indigo-70: 233.48 56.1% 83.92%; /* #BFC4ED */
+    --mdt-indigo-80: 235.86 64.44% 91.18%; /* #DADCF7 */
+    --mdt-indigo-90: 235.86 64.44% 91.18%; /* #DADCF7 */
+    --mdt-indigo-100: 235.86 64.44% 91.18%; /* #DADCF7 */
+    --mdt-teal-05: 195.32 36.43% 25.29%; /* #294C58 */
+    --mdt-teal-10: 195.32 36.43% 25.29%; /* #294C58 */
+    --mdt-teal-20: 195.32 36.43% 25.29%; /* #294C58 */
+    --mdt-teal-30: 195.32 36.43% 25.29%; /* #294C58 */
+    --mdt-teal-40: 174.1 45.86% 73.92%; /* #9EDBD5 */
+    --mdt-teal-50: 174.1 45.86% 73.92%; /* #9EDBD5 */
+    --mdt-teal-60: 174.71 44.74% 85.1%; /* #C8EAE7 */
+    --mdt-teal-70: 174.71 44.74% 85.1%; /* #C8EAE7 */
+    --mdt-teal-80: 174.55 44% 95.1%; /* #EDF8F7 */
+    --mdt-teal-90: 174.55 44% 95.1%; /* #EDF8F7 */
+    --mdt-teal-100: 174.55 44% 95.1%; /* #EDF8F7 */
+    --mdt-magenta-05: 284.12 26.56% 25.1%; /* #482F51 */
+    --mdt-magenta-10: 284.12 26.56% 25.1%; /* #482F51 */
+    --mdt-magenta-20: 284.12 26.56% 25.1%; /* #482F51 */
+    --mdt-magenta-30: 284.12 26.56% 25.1%; /* #482F51 */
+    --mdt-magenta-40: 326.73 70.63% 71.96%; /* #EA85BD */
+    --mdt-magenta-50: 326.73 70.63% 71.96%; /* #EA85BD */
+    --mdt-magenta-60: 328 77.32% 80.98%; /* #F4A9D1 */
+    --mdt-magenta-70: 328 77.32% 80.98%; /* #F4A9D1 */
+    --mdt-magenta-80: 330 80.65% 87.84%; /* #F9C7E0 */
+    --mdt-magenta-90: 330 80.65% 87.84%; /* #F9C7E0 */
+    --mdt-magenta-100: 330 80.65% 87.84%; /* #F9C7E0 */
+    --mdt-cyan-05: 202.94 54.84% 24.31%; /* #1C4660 */
+    --mdt-cyan-10: 202.94 54.84% 24.31%; /* #1C4660 */
+    --mdt-cyan-20: 202.94 54.84% 24.31%; /* #1C4660 */
+    --mdt-cyan-30: 202.94 54.84% 24.31%; /* #1C4660 */
+    --mdt-cyan-40: 194.88 69.94% 66.08%; /* #6CC7E5 */
+    --mdt-cyan-50: 194.88 69.94% 66.08%; /* #6CC7E5 */
+    --mdt-cyan-60: 195.18 70.94% 77.06%; /* #9BD9EE */
+    --mdt-cyan-70: 195.18 70.94% 77.06%; /* #9BD9EE */
+    --mdt-cyan-80: 195 72.73% 87.06%; /* #C6EAF6 */
+    --mdt-cyan-90: 195 72.73% 87.06%; /* #C6EAF6 */
+    --mdt-cyan-100: 195 72.73% 87.06%; /* #C6EAF6 */
+    --mdt-lime-05: 132 20% 24.51%; /* #324B37 */
+    --mdt-lime-10: 132 20% 24.51%; /* #324B37 */
+    --mdt-lime-20: 132 20% 24.51%; /* #324B37 */
+    --mdt-lime-30: 132 20% 24.51%; /* #324B37 */
+    --mdt-lime-40: 87.69 50.84% 64.9%; /* #A9D378 */
+    --mdt-lime-50: 87.69 50.84% 64.9%; /* #A9D378 */
+    --mdt-lime-60: 88.12 52.46% 76.08%; /* #C4E2A2 */
+    --mdt-lime-70: 88.12 52.46% 76.08%; /* #C4E2A2 */
+    --mdt-lime-80: 86.84 52.78% 85.88%; /* #DDEEC8 */
+    --mdt-lime-90: 86.84 52.78% 85.88%; /* #DDEEC8 */
+    --mdt-lime-100: 86.84 52.78% 85.88%; /* #DDEEC8 */
+    --mdt-ink-400: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-ink-500: 217.83 25.56% 64.71%; /* #8E9FBC */
+    --mdt-azure-60: 207.06 100% 50%; /* #008CFF */
+    --mdt-emerald-60: 144.15 65.43% 52.35%; /* #36D576 */
+    --mdt-background: 217.5 63.16% 7.45%; /* #07101F */
+    --mdt-foreground: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-card: 217.5 63.16% 7.45%; /* #07101F */
+    --mdt-card-foreground: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-popover: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-popover-foreground: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-primary: 216.92 52% 95.1%; /* #ECF1F9 */
+    --mdt-primary-foreground: 217.24 56.86% 10%; /* #0B1628 */
+    --mdt-primary-hover: 210 50% 97.65%; /* #F6F9FC */
+    --mdt-primary-active: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-primary-foreground-muted: 217.33 23.81% 37.06%; /* #485975 */
+    --mdt-primary-foreground-subtle: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-secondary: 216.43 56% 9.8%; /* #0B1627 */
+    --mdt-secondary-foreground: 220 36.59% 91.96%; /* #E3E8F2 */
+    --mdt-muted: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-muted-foreground: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-muted-foreground-subtle: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-faint: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-accent: 211.64 48.67% 22.16%; /* #1D3754 */
+    --mdt-accent-foreground: 207.06 100% 50%; /* #008CFF */
+    --mdt-destructive: 0 79.23% 64.12%; /* #EC5B5B */
+    --mdt-destructive-foreground: 217.24 56.86% 10%; /* #0B1628 */
+    --mdt-warning: 50.16 100% 49.02%; /* #FAD100 */
+    --mdt-warning-foreground: 217.24 56.86% 10%; /* #0B1628 */
+    --mdt-success: 144.15 65.43% 52.35%; /* #36D576 */
+    --mdt-success-foreground: 217.24 56.86% 10%; /* #0B1628 */
+    --mdt-info: 207.06 100% 50%; /* #008CFF */
+    --mdt-info-foreground: 217.24 56.86% 10%; /* #0B1628 */
+    --mdt-border: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-input: 216.77 40.26% 15.1%; /* #172336 */
+    --mdt-ring: 217.09 24.02% 55.1%; /* #7186A8 */
+    --mdt-surface-raised: 216.77 40.26% 15.1%; /* #172336 */
+    --mdt-feedback-info-bg: 211.64 48.67% 22.16%; /* #1D3754 */
+    --mdt-feedback-info-border: 210 52.17% 27.06%; /* #214569 */
+    --mdt-feedback-info-icon: 208.45 61.01% 68.82%; /* #7FB2E0 */
+    --mdt-feedback-warning-bg: 27 18.52% 21.18%; /* #40352C */
+    --mdt-feedback-warning-border: 32.07 44.62% 25.49%; /* #5E4324 */
+    --mdt-feedback-warning-icon: 35.29 73.21% 59.02%; /* #E3A44A */
+    --mdt-feedback-danger-bg: 332.5 23.08% 20.39%; /* #402833 */
+    --mdt-feedback-danger-border: 355.56 37.5% 28.24%; /* #632D31 */
+    --mdt-feedback-danger-icon: 3.33 81.82% 69.8%; /* #F17A73 */
+    --mdt-feedback-success-bg: 181.18 54.84% 18.24%; /* #154748 */
+    --mdt-feedback-success-border: 169.16 67.48% 24.12%; /* #146758 */
+    --mdt-feedback-success-icon: 157 59.41% 60.39%; /* #5ED6A8 */
+    --mdt-feedback-ai-bg: 244.29 32.81% 25.1%; /* #2E2B55 */
+    --mdt-feedback-ai-border: 258.26 39.43% 34.31%; /* #4A357A */
+    --mdt-feedback-ai-icon: 270.74 91.01% 65.1%; /* #A855F7 */
+    --mdt-feedback-neutral-bg: 216.43 25% 21.96%; /* #2A3546 */
+    --mdt-feedback-neutral-border: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-feedback-neutral-icon: 216.67 22.13% 52.16%; /* #6A7FA0 */
+    --mdt-feedback-title: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-feedback-text: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-nav-background: 216.43 56% 9.8%; /* #0B1627 */
+    --mdt-nav-hover: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-nav-selected: 216.36 36.26% 17.84%; /* #1D2A3E */
+    --mdt-nav-text: 217.5 29.27% 83.92%; /* #CAD3E2 */
+    --mdt-nav-label: 217.83 25.56% 64.71%; /* #8E9FBC */
+    --mdt-nav-line: 216.77 40.26% 15.1%; /* #172336 */
+    --mdt-nav-well: 216.67 29.51% 23.92%; /* #2B394F */
+    --mdt-nav-soon-bg: 216.67 29.51% 23.92%; /* #2B394F */
+    --mdt-nav-door-bg: 211.64 48.67% 22.16%; /* #1D3754 */
+    --mdt-nav-danger: 0 79.23% 64.12%; /* #EC5B5B */
+    --mdt-avatar-blue-fill: 209.65 71.43% 23.33%; /* #113C66 */
+    --mdt-avatar-blue-ink: 208.45 61.01% 68.82%; /* #7FB2E0 */
+    --mdt-avatar-green-fill: 168.75 44.44% 21.18%; /* #1E4E45 */
+    --mdt-avatar-green-ink: 157 59.41% 60.39%; /* #5ED6A8 */
+    --mdt-avatar-amber-fill: 10.59 12.41% 26.86%; /* #4D3F3C */
+    --mdt-avatar-amber-ink: 35.29 73.21% 59.02%; /* #E3A44A */
+    --mdt-avatar-rose-fill: 325.38 21.31% 23.92%; /* #4A303F */
+    --mdt-avatar-rose-ink: 3.33 81.82% 69.8%; /* #F17A73 */
+    --mdt-avatar-purple-fill: 252.45 36.05% 28.82%; /* #3A2F64 */
+    --mdt-avatar-purple-ink: 261.29 85.32% 78.63%; /* #BB9AF7 */
+    --mdt-avatar-slate-fill: 216.77 40.26% 15.1%; /* #172336 */
+    --mdt-avatar-slate-ink: 0 0% 100%; /* #FFFFFF */
+    --mdt-nav-rest-alpha: 0.84;
+    /* carried over from the hand-written block - the map has no word on these yet */
     --mdt-shadow-none: none;
     --mdt-shadow-xs: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 1px 0 rgb(0 0 0 / 0.3);
     --mdt-shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px 0 rgb(0 0 0 / 0.35);
@@ -656,7 +762,45 @@
     --mdt-shadow-xl:
       0 0 0 1px rgb(255 255 255 / 0.1), 0 20px 25px -5px rgb(0 0 0 / 0.55),
       0 8px 10px -6px rgb(0 0 0 / 0.55);
+    color-scheme: dark;
   }
+  /* the badge tier by tone: badge.css sets --bdg-fill / --bdg-ink / --bdg-dot per tone class in light; the map's dark tier lands the same way */
+  [data-theme='dark'] .bdg-neutral {
+    --bdg-fill: #2a3546;
+    --bdg-ink: #8e9fbc;
+    --bdg-dot: #6a7fa0;
+  }
+  [data-theme='dark'] .bdg-slate {
+    --bdg-fill: #2b394f;
+    --bdg-ink: #a6b0c0;
+    --bdg-dot: #8e9fbc;
+  }
+  [data-theme='dark'] .bdg-success {
+    --bdg-fill: #154748;
+    --bdg-ink: #5ed6a8;
+    --bdg-dot: #36d576;
+  }
+  [data-theme='dark'] .bdg-warning {
+    --bdg-fill: #40352c;
+    --bdg-ink: #e3a44a;
+    --bdg-dot: #fad100;
+  }
+  [data-theme='dark'] .bdg-danger {
+    --bdg-fill: #402833;
+    --bdg-ink: #f17a73;
+    --bdg-dot: #ec5b5b;
+  }
+  [data-theme='dark'] .bdg-info {
+    --bdg-fill: #1d3754;
+    --bdg-ink: #7fb2e0;
+    --bdg-dot: #008cff;
+  }
+  [data-theme='dark'] .bdg-inverse {
+    --bdg-fill: #e3e8f2;
+    --bdg-ink: #07101f;
+    --bdg-dot: #07101f;
+  }
+  /* ── END OF THE GENERATED DARK THEME ── */
 }
 
 @layer base {

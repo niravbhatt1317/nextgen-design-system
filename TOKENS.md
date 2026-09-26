@@ -380,8 +380,8 @@ to look — that is what keeps a dropdown in one product matching a dropdown in 
 | `--mdt-shadow-xl`   | `mdt-shadow-xl`   | Peak — toasts, command palette           |
 
 **Dark mode is not the same shadow.** A black shadow at 10% opacity is invisible on a dark surface,
-so each token carries a second definition in `.dark`: the same geometry at roughly four times the
-opacity, **plus a hairline light edge** baked in as a `0 0 0 1px` ring.
+so each token carries a second definition in the dark block: the same geometry at roughly four times
+the opacity, **plus a hairline light edge** baked in as a `0 0 0 1px` ring.
 
 That ring is part of the token deliberately. It means no component has to remember to add a border
 in dark mode, and no component can forget — asking for `mdt-shadow-md` gets the right treatment in
@@ -426,16 +426,29 @@ Consumers can override either variable to apply their own brand typeface.
 
 ## 5 · Theming
 
-Light mode is defined on `:root`. Dark mode is defined on `.dark`.
+Light mode is defined on `:root`. Dark mode is defined on `[data-theme='dark']`.
 
 ```html
-<html class="dark">
-  <!-- every semantic token flips automatically -->
+<html data-theme="dark">
+  <!-- every colour token flips automatically -->
 </html>
 ```
 
-Only **semantic** tokens change between modes. Primitive tokens are fixed — which is exactly
-why components should reach for semantic tokens first.
+**The dark block is generated, never edited by hand** (since 2026-09-26). Its source is the colour
+map, `scripts/dark-theme/tokens.cjs` — the finalised tokens of 2026-09-24, named in Atlassian's
+grammar (`color.text.*`, `elevation.surface.*`, `color.border.*`, `component.nav.*`…) with a light
+and a dark value for every job. `node scripts/theme-dark.cjs` rewrites the block in `globals.css`
+from it; `node scripts/theme-dark.cjs --check` fails when the file is behind the map. To change a
+dark colour, change the map and regenerate.
+
+In dark the whole ramp moves, not only the semantic layer: the map gives every step of every hue a
+dark value (`neutral-10` is the sunken canvas, `neutral-150` the reading ink, the `-05`/`-10` steps
+of each hue a tinted chip on the raised surface), so a component that reaches for a ramp step still
+lands on the right ground. The `dark:` utilities that remain in some components predate the map and
+are being retired; they do nothing, because nothing sets the `.dark` class any more.
+
+The same switch drives the console (`next-gen-ui`, `<html data-theme>` since 2026-09-24), so the
+storybook and the product read one dark theme.
 
 ---
 

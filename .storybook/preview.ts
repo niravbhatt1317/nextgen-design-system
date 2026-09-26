@@ -9,16 +9,25 @@ import './docs-theme.css';
 /**
  * Applies the design system's own theming to the preview canvas.
  *
- * Adding `.dark` to the root element flips every semantic token, and
+ * Setting `data-theme="dark"` on the root element flips every semantic token, and
  * `globals.css` paints the body from `--mdt-background`. That means the canvas
  * background follows the theme on its own — there is deliberately no separate
  * `backgrounds` toolbar here. One switch, not two.
+ *
+ * WHY data-theme AND NOT THE `.dark` CLASS (2026-09-26): the dark theme is the colour map, generated into
+ * globals.css by scripts/theme-dark.cjs, and it keys off `data-theme` - the switch the console has used since
+ * 2026-09-24. The `dark:` utilities still in the components were written for the old built-in dark palette; under
+ * the map they paint the wrong steps (a menu row's `dark:mdt-text-neutral-10` is near-black now). The console never
+ * sets the class, so those utilities never applied there; the storybook now matches it. They are dead code, retired
+ * family by family (the colour gate counts them down) - every removal should change nothing on screen.
  */
 const withTheme: Decorator = (Story, context) => {
   const theme = (context.globals.theme as string | undefined) ?? 'light';
 
   if (typeof document !== 'undefined') {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+    // a class left by an older preview build would switch the retired utilities back on
+    document.documentElement.classList.remove('dark');
   }
 
   return Story();
