@@ -60,11 +60,13 @@ export const toolbarButtonVariants = cva(
 /**
  * The count wears the slate the glyph wears, on a white ground, so it reads as
  * part of the button rather than a second signal. `palette` is the Badge's
- * door for a colour that is not one of its tones.
+ * door for a colour that is not one of its tones. Its ink is
+ * primary-foreground - the ink on a bold fill in both themes - because the
+ * slate lightens in dark and a typed white vanished on it (2026-09-26).
  */
 const COUNT_PALETTE = {
   fill: 'hsl(var(--mdt-neutral-90))',
-  ink: 'hsl(var(--mdt-white))',
+  ink: 'hsl(var(--mdt-primary-foreground))',
   dot: 'hsl(var(--mdt-neutral-90))',
 };
 

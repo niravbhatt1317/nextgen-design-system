@@ -531,7 +531,8 @@
   height: 28px;
   border-radius: 8px;
   background: hsl(var(--mdt-info));
-  color: hsl(var(--mdt-white));
+  /* the ink on the info fill, both themes (white in light) - never a typed white (2026-09-26) */
+  color: hsl(var(--mdt-info-foreground));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -584,7 +585,7 @@
   align-items: center;
   justify-content: center;
   background: hsl(var(--mdt-info));
-  color: hsl(var(--mdt-white));
+  color: hsl(var(--mdt-info-foreground));
   flex: 0 0 auto;
   font-size: 11px;
   font-weight: 600;
@@ -807,7 +808,7 @@
   align-items: center;
   justify-content: center;
   background: hsl(var(--mdt-info));
-  color: hsl(var(--mdt-white));
+  color: hsl(var(--mdt-info-foreground));
   flex: 0 0 auto;
 }
 .ogsw-fn {

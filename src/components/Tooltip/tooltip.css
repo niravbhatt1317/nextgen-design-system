@@ -8,6 +8,7 @@
 }
 .tt-list {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--mdt-white) / 0.45) transparent;
+  /* the inverse surface's own ink at 45% - white in light, the light ink in dark (2026-09-26) */
+  scrollbar-color: hsl(var(--mdt-inverse-foreground) / 0.45) transparent;
   overscroll-behavior: contain;
 }

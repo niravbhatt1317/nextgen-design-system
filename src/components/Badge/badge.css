@@ -76,7 +76,9 @@
 }
 .bdg-solid {
   background: var(--bdg-dot);
-  color: hsl(var(--mdt-white));
+  /* the ink on a bold fill in both themes: white in light, the dark ink in dark - a typed white read 1.5:1 on the
+   * yellow and the pale purple dots in dark (2026-09-26) */
+  color: hsl(var(--mdt-primary-foreground));
   border-color: transparent;
 }
 .bdg-inverse.bdg-solid {
