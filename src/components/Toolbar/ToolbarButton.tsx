@@ -30,10 +30,6 @@ export const toolbarButtonVariants = cva(
     // open, as a Radix trigger reports it: the same as hover
     'data-[state=open]:mdt-border-neutral-90 data-[state=open]:mdt-bg-neutral-10',
     'disabled:mdt-pointer-events-none disabled:mdt-opacity-50',
-    'dark:mdt-border-neutral-110 dark:mdt-text-neutral-40',
-    'dark:hover:mdt-border-neutral-60 dark:hover:mdt-bg-neutral-120',
-    'dark:focus-visible:mdt-border-neutral-60 dark:focus-visible:mdt-bg-neutral-120',
-    'dark:data-[state=open]:mdt-border-neutral-60 dark:data-[state=open]:mdt-bg-neutral-120',
   ],
   {
     variants: {
@@ -44,12 +40,12 @@ export const toolbarButtonVariants = cva(
       },
       /** The menu or drawer is showing: the hover look, held. */
       open: {
-        true: 'mdt-border-neutral-90 mdt-bg-neutral-10 dark:mdt-border-neutral-60 dark:mdt-bg-neutral-120',
+        true: 'mdt-border-neutral-90 mdt-bg-neutral-10',
         false: '',
       },
       /** Something is applied: the edge stays slate, the ground stays white. */
       active: {
-        true: 'mdt-border-neutral-90 dark:mdt-border-neutral-60',
+        true: 'mdt-border-neutral-90',
         false: '',
       },
     },

@@ -22,7 +22,7 @@ module.exports = {
       name: 'a ToolbarButton with a label (Filters / the More filters door)',
       props: [...PROPS, 'height', 'paddingRight'],
       story: { id: 'new-components-toolbarbutton--default', select: '#storybook-root button' },
-      console: { path: '/users', select: `${CSTRIP} button[aria-label="More filters"]` } /* the door has no aria-haspopup; the dialog one is Columns */,
+      console: { path: '/users', select: `${CSTRIP} button:not([aria-haspopup]):not([aria-label])` } /* the More filters door: the one button in the strip with no aria attribute (its words are its label); the menu and dialog ones are Status, Sort and Columns */,
       mock: null,
     },
     {
