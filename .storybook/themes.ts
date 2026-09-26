@@ -7,26 +7,39 @@ import { create } from 'storybook/theming/create';
  * the CSS variables in `globals.css`. The values below are therefore mirrored
  * from the design system by hand.
  *
- * KEEP IN SYNC WITH: src/styles/globals.css and TOKENS.md
+ * KEEP IN SYNC WITH: scripts/dark-theme/tokens.cjs (the colour map) first —
+ * every dark value below is one of its dark tiers, named beside it — then
+ * src/styles/globals.css and TOKENS.md for the light values.
  * Every value here is a real system token — no stray colours.
  *
  * Used by:
- *   manager.ts  → the interface
+ *   manager.tsx → the interface
  *   preview.ts  → `parameters.docs.theme`, so Docs pages match
  */
 
-// --- Mirrored token values (see TOKENS.md) -------------------------------
+// --- Light: mirrored token values (see TOKENS.md) -------------------------
 const BLUE_50 = '#3d7dff'; // --mdt-blue-50    : primary / accent
 const WHITE = '#ffffff'; // --mdt-white
 const BLACK = '#070f1d'; // --mdt-black      : hsl(218 63% 7%)
 const NEUTRAL_10 = '#f6f9fc'; // --mdt-neutral-10
 const NEUTRAL_20 = '#ecf1f9'; // --mdt-neutral-20
 const NEUTRAL_40 = '#cad3e2'; // --mdt-neutral-40 : light border
-const NEUTRAL_90 = '#516381'; // --mdt-neutral-90 : dark border
 const NEUTRAL_100 = '#485975'; // --mdt-neutral-100: muted text
-const NEUTRAL_140 = '#172336'; // --mdt-neutral-140: dark raised surface
-const NEUTRAL_150 = '#111c2c'; // --mdt-neutral-150: dark surface
-const NEUTRAL_160 = '#0b1628'; // --mdt-neutral-160: dark background
+
+// --- Dark: the colour map's dark tiers (scripts/dark-theme/tokens.cjs) -----
+// One constant per map token, each in the role its light twin above plays.
+// The same hexes reach the components through the generated
+// [data-theme='dark'] block in globals.css (scripts/theme-dark.cjs); the
+// manager, drawn outside the preview iframe, has to carry them by hand.
+const DARK_PAGE = '#07101F'; // elevation.surface        : the page — panels, toolbar, canvas frame
+const DARK_SUNKEN = '#0B1627'; // elevation.surface.sunken : the rail a step below — the sidebar ground
+const DARK_RAISED = '#172336'; // elevation.surface.raised : a lifted control — the selected boolean
+const DARK_FIELD = '#07101F'; // color.background.input   : a field's ground (the map flags this row for Pranjal)
+const DARK_HAIRLINE = '#1D2A3E'; // color.border             : the hairline between panels, and around fields
+const DARK_HEADING_INK = '#E3E8F2'; // color.text.brand         : heading ink — the frame's own text
+const DARK_TEXT = '#CAD3E2'; // color.text               : reading text — a value typed into a field
+const DARK_TEXT_SUBTLE = '#8E9FBC'; // color.text.subtle        : secondary text — muted labels, the toolbar
+const DARK_LINK = '#008CFF'; // color.link               : links, the selected item, hover
 
 // --mdt-radius is 0.5rem (8px); inputs use the derived `md` step (8 - 2)
 const RADIUS = 8;
@@ -73,31 +86,31 @@ export const darkTheme = create({
   ...brand,
   base: 'dark',
 
-  colorPrimary: BLUE_50,
-  colorSecondary: BLUE_50,
+  colorPrimary: DARK_LINK,
+  colorSecondary: DARK_LINK,
 
-  appBg: NEUTRAL_160,
-  appContentBg: NEUTRAL_150,
-  appPreviewBg: NEUTRAL_160,
-  appBorderColor: NEUTRAL_90,
+  appBg: DARK_SUNKEN,
+  appContentBg: DARK_PAGE,
+  appPreviewBg: DARK_PAGE,
+  appBorderColor: DARK_HAIRLINE,
   appBorderRadius: RADIUS,
 
-  textColor: NEUTRAL_10,
-  textInverseColor: BLACK,
-  textMutedColor: NEUTRAL_40,
+  textColor: DARK_HEADING_INK,
+  textInverseColor: DARK_PAGE,
+  textMutedColor: DARK_TEXT_SUBTLE,
 
-  barTextColor: NEUTRAL_40,
-  barSelectedColor: BLUE_50,
-  barHoverColor: BLUE_50,
-  barBg: NEUTRAL_150,
+  barTextColor: DARK_TEXT_SUBTLE,
+  barSelectedColor: DARK_LINK,
+  barHoverColor: DARK_LINK,
+  barBg: DARK_PAGE,
 
-  inputBg: NEUTRAL_150,
-  inputBorder: NEUTRAL_90,
-  inputTextColor: NEUTRAL_10,
+  inputBg: DARK_FIELD,
+  inputBorder: DARK_HAIRLINE,
+  inputTextColor: DARK_TEXT,
   inputBorderRadius: RADIUS_MD,
 
-  booleanBg: NEUTRAL_140,
-  booleanSelectedBg: NEUTRAL_150,
+  booleanBg: DARK_SUNKEN,
+  booleanSelectedBg: DARK_RAISED,
 });
 
 export type ThemeName = 'light' | 'dark';

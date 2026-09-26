@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { addons, types, useGlobals } from 'storybook/manager-api';
 import { IconButton } from 'storybook/internal/components';
-import {
-  getInitialTheme,
-  themeFor,
-  THEME_STORAGE_KEY,
-  type ThemeName,
-} from './themes';
+import { getInitialTheme, themeFor, THEME_STORAGE_KEY, type ThemeName } from './themes';
 
 /**
  * A single theme toggle that switches EVERYTHING at once:
@@ -68,18 +63,27 @@ const MoonIcon = () => (
 
 const ThemeToggle = () => {
   const [globals, updateGlobals] = useGlobals();
-  const current: ThemeName = globals.theme === 'dark' ? 'dark' : 'light';
+  // What the preview has reported, if anything yet. Until the preview boots,
+  // `globals` is `{}` - that is "not known yet", not a choice of light.
+  const reported: ThemeName | undefined =
+    globals.theme === 'dark' ? 'dark' : globals.theme === 'light' ? 'light' : undefined;
+  const current: ThemeName = reported ?? getInitialTheme();
   const next: ThemeName = current === 'dark' ? 'light' : 'dark';
 
-  // Keep the interface and the stored preference in step with the global.
+  // Keep the interface and the stored preference in step with the global -
+  // once there is one. Acting on the empty `{}` wrote "light" over the
+  // remembered choice on every reload, before the preview had read it, so a
+  // dark Storybook came back light and its Docs pages booted on the light
+  // docs theme (found 2026-09-26, while moving the frame onto the colour map).
   useEffect(() => {
-    applyManagerTheme(current);
+    if (reported === undefined) return;
+    applyManagerTheme(reported);
     try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, current);
+      window.localStorage.setItem(THEME_STORAGE_KEY, reported);
     } catch {
       // Storage unavailable - the toggle still works for this session.
     }
-  }, [current]);
+  }, [reported]);
 
   const toggle = useCallback(() => {
     updateGlobals({ theme: next });

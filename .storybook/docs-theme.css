@@ -64,12 +64,19 @@
   box-shadow: none;
 }
 
-/* Zoom / reset toolbar sitting above each preview.
+/* Zoom / reset toolbar sitting above each preview, and the "Show code" chip.
    Storybook injects these styles at runtime, after this stylesheet loads, so
-   they win at equal specificity. `!important` is the only reliable lever. */
-[data-theme='dark'] .sb-bar,
+   they win at equal specificity. `!important` is the only reliable lever.
+   The strip is the same tier as the frame's toolbar around it: the page
+   (elevation.surface, `barBg` in themes.ts) - not a card.
+   Storybook 10 dropped the `.sb-bar` class from the Docs toolbar (2026-09-26:
+   the rule matched nothing and the strip stayed white after a runtime switch
+   to dark); the toolbar is the preview box's child that holds the zoom
+   buttons (labelled by aria-label, not title), so that is how it is reached
+   now. */
+[data-theme='dark'] .sbdocs-preview > div:has(button[aria-label='Zoom in']),
 [data-theme='dark'] .docblock-code-toggle {
-  background-color: hsl(var(--mdt-card)) !important;
+  background-color: hsl(var(--mdt-background)) !important;
   color: hsl(var(--mdt-foreground)) !important;
   border-color: hsl(var(--mdt-border)) !important;
 }
