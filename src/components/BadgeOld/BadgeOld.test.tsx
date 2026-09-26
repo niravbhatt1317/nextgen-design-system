@@ -71,11 +71,6 @@ describe('BadgeOld', () => {
       expect(getBadge()).toHaveClass(expected);
     });
 
-    it.each(ALL_TONES)('gives the %s tone a dark-mode tint too', (tone) => {
-      render(<BadgeOld tone={tone}>{TEXT}</BadgeOld>);
-      expect(getBadge().className).toMatch(/dark:mdt-bg-/);
-    });
-
     it('is neutral by default', () => {
       render(<BadgeOld>{TEXT}</BadgeOld>);
       expect(getBadge()).toHaveClass('mdt-bg-neutral-30');
@@ -108,18 +103,6 @@ describe('BadgeOld', () => {
     it('is subtle by default', () => {
       render(<BadgeOld tone="success">{TEXT}</BadgeOld>);
       expect(getBadge()).toHaveClass('mdt-bg-green-10');
-    });
-
-    // The class merger treats `dark:bg-*` and `bg-*` as separate groups, so a
-    // plain transparent background clears the light fill and leaves the dark
-    // one — an outline badge would render filled in dark mode.
-    it('clears the dark background on an outline badge, not just the light one', () => {
-      render(
-        <BadgeOld tone="success" emphasis="outline">
-          {TEXT}
-        </BadgeOld>
-      );
-      expect(getBadge()).toHaveClass('dark:mdt-bg-transparent');
     });
 
     it('gives an outline badge an edge in the tone colour', () => {

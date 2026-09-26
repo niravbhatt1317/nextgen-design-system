@@ -80,20 +80,17 @@ export const badgeOldVariants = cva(
       {
         tone: 'neutral',
         emphasis: 'subtle',
-        class:
-          'mdt-border-neutral-40 mdt-bg-neutral-30 mdt-text-neutral-110 dark:mdt-border-neutral-110 dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
+        class: 'mdt-border-neutral-40 mdt-bg-neutral-30 mdt-text-neutral-110',
       },
       {
         tone: 'info',
         emphasis: 'subtle',
-        class:
-          'mdt-border-blue-20 mdt-bg-blue-10 mdt-text-blue-80 dark:mdt-border-blue-70 dark:mdt-bg-blue-90 dark:mdt-text-blue-30',
+        class: 'mdt-border-blue-20 mdt-bg-blue-10 mdt-text-blue-80',
       },
       {
         tone: 'success',
         emphasis: 'subtle',
-        class:
-          'mdt-border-green-20 mdt-bg-green-10 mdt-text-green-80 dark:mdt-border-green-70 dark:mdt-bg-green-90 dark:mdt-text-green-30',
+        class: 'mdt-border-green-20 mdt-bg-green-10 mdt-text-green-80',
       },
       // Warning tints with orange 20, not orange 10. Orange at the 10 step
       // reads as a peach smear against white. Avatar and IconTile reached the
@@ -101,14 +98,12 @@ export const badgeOldVariants = cva(
       {
         tone: 'warning',
         emphasis: 'subtle',
-        class:
-          'mdt-border-orange-30 mdt-bg-orange-20 mdt-text-orange-80 dark:mdt-border-orange-70 dark:mdt-bg-orange-90 dark:mdt-text-orange-30',
+        class: 'mdt-border-orange-30 mdt-bg-orange-20 mdt-text-orange-80',
       },
       {
         tone: 'danger',
         emphasis: 'subtle',
-        class:
-          'mdt-border-red-20 mdt-bg-red-10 mdt-text-red-80 dark:mdt-border-red-70 dark:mdt-bg-red-90 dark:mdt-text-red-30',
+        class: 'mdt-border-red-20 mdt-bg-red-10 mdt-text-red-80',
       },
       // AI is the one tone that does not sit at the 80 step. Purple's mid steps
       // run lighter than the other hues, so 80 on a purple 10 tint measures
@@ -116,50 +111,39 @@ export const badgeOldVariants = cva(
       {
         tone: 'ai',
         emphasis: 'subtle',
-        class:
-          'mdt-border-purple-20 mdt-bg-purple-10 mdt-text-purple-90 dark:mdt-border-purple-80 dark:mdt-bg-purple-100 dark:mdt-text-purple-30',
+        class: 'mdt-border-purple-20 mdt-bg-purple-10 mdt-text-purple-90',
       },
 
       // ── outline ── no fill; the edge and the label carry the tone.
-      //
-      // `dark:mdt-bg-transparent` is not redundant. The class merger treats
-      // `dark:bg-*` and `bg-*` as separate groups, so a plain
-      // `mdt-bg-transparent` clears the light fill and leaves any dark one.
       {
         tone: 'neutral',
         emphasis: 'outline',
-        class:
-          'mdt-border-neutral-110 mdt-bg-transparent mdt-text-neutral-110 dark:mdt-border-neutral-30 dark:mdt-bg-transparent dark:mdt-text-neutral-30',
+        class: 'mdt-border-neutral-110 mdt-bg-transparent mdt-text-neutral-110',
       },
       {
         tone: 'info',
         emphasis: 'outline',
-        class:
-          'mdt-border-blue-80 mdt-bg-transparent mdt-text-blue-80 dark:mdt-border-blue-30 dark:mdt-bg-transparent dark:mdt-text-blue-30',
+        class: 'mdt-border-blue-80 mdt-bg-transparent mdt-text-blue-80',
       },
       {
         tone: 'success',
         emphasis: 'outline',
-        class:
-          'mdt-border-green-80 mdt-bg-transparent mdt-text-green-80 dark:mdt-border-green-30 dark:mdt-bg-transparent dark:mdt-text-green-30',
+        class: 'mdt-border-green-80 mdt-bg-transparent mdt-text-green-80',
       },
       {
         tone: 'warning',
         emphasis: 'outline',
-        class:
-          'mdt-border-orange-80 mdt-bg-transparent mdt-text-orange-80 dark:mdt-border-orange-30 dark:mdt-bg-transparent dark:mdt-text-orange-30',
+        class: 'mdt-border-orange-80 mdt-bg-transparent mdt-text-orange-80',
       },
       {
         tone: 'danger',
         emphasis: 'outline',
-        class:
-          'mdt-border-red-80 mdt-bg-transparent mdt-text-red-80 dark:mdt-border-red-30 dark:mdt-bg-transparent dark:mdt-text-red-30',
+        class: 'mdt-border-red-80 mdt-bg-transparent mdt-text-red-80',
       },
       {
         tone: 'ai',
         emphasis: 'outline',
-        class:
-          'mdt-border-purple-90 mdt-bg-transparent mdt-text-purple-90 dark:mdt-border-purple-30 dark:mdt-bg-transparent dark:mdt-text-purple-30',
+        class: 'mdt-border-purple-90 mdt-bg-transparent mdt-text-purple-90',
       },
 
       // ── solid ── counts only. A filled chip whose whole job is to be seen.

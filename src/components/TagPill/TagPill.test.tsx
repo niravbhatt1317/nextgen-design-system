@@ -60,10 +60,9 @@ describe('TagPill', () => {
       expect(getTag().className).not.toMatch(/mdt-border/);
     });
 
-    it('tints neutral in both themes', () => {
+    it('tints neutral', () => {
       render(<TagPill>{TEXT}</TagPill>);
       expect(getTag()).toHaveClass('mdt-bg-neutral-10');
-      expect(getTag()).toHaveClass('dark:mdt-bg-neutral-120');
     });
   });
 

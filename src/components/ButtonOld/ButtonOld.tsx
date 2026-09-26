@@ -54,9 +54,9 @@ export const ButtonOldVariants = cva(
         //
         // Solid uses the semantic tokens. The quieter three need a pale
         // background and a deep text colour per tone, and there are no tokens
-        // for that pair - so they are built from the primitive ramps and flip
-        // in dark mode, exactly as Badge does. That missing pair is logged in
-        // MISSING-TOKENS.md; it is one gap, not nine.
+        // for that pair - so they are built from the primitive ramps, exactly
+        // as Badge does. That missing pair is logged in MISSING-TOKENS.md; it
+        // is one gap, not nine.
         //
         // Hover and press move along the ramp rather than through opacity. The
         // `/90` shortcut blends the fill toward whatever is behind it, so on a
@@ -65,25 +65,24 @@ export const ButtonOldVariants = cva(
         // this changed. Named steps keep contrast climbing instead of dropping.
         //
         // On the pale variants the text deepens alongside the background for the
-        // same reason. In dark mode hover lifts a step and press sinks to the
-        // darkest, which reads as pressed without ever thinning the text.
+        // same reason.
         destructive:
           'mdt-bg-destructive mdt-text-destructive-foreground hover:mdt-bg-red-70 active:mdt-bg-red-80',
         destructiveSoft:
-          'mdt-bg-red-10 mdt-text-red-80 hover:mdt-bg-red-20 hover:mdt-text-red-90 active:mdt-bg-red-30 active:mdt-text-red-100 dark:mdt-bg-red-90 dark:mdt-text-red-30 dark:hover:mdt-bg-red-80 dark:hover:mdt-text-red-20 dark:active:mdt-bg-red-100 dark:active:mdt-text-red-20',
+          'mdt-bg-red-10 mdt-text-red-80 hover:mdt-bg-red-20 hover:mdt-text-red-90 active:mdt-bg-red-30 active:mdt-text-red-100',
         destructiveOutline:
-          'mdt-border mdt-border-destructive mdt-bg-transparent mdt-text-destructive hover:mdt-bg-red-5 hover:mdt-text-red-80 active:mdt-bg-red-10 active:mdt-text-red-80 dark:mdt-border-red-40 dark:mdt-text-red-40 dark:hover:mdt-bg-red-90 dark:active:mdt-bg-red-100',
+          'mdt-border mdt-border-destructive mdt-bg-transparent mdt-text-destructive hover:mdt-bg-red-5 hover:mdt-text-red-80 active:mdt-bg-red-10 active:mdt-text-red-80',
         destructiveGhost:
-          'mdt-bg-transparent mdt-text-destructive hover:mdt-bg-red-5 hover:mdt-text-red-80 active:mdt-bg-red-10 active:mdt-text-red-80 dark:mdt-text-red-40 dark:hover:mdt-bg-red-90 dark:active:mdt-bg-red-100',
+          'mdt-bg-transparent mdt-text-destructive hover:mdt-bg-red-5 hover:mdt-text-red-80 active:mdt-bg-red-10 active:mdt-text-red-80',
 
         success:
           'mdt-bg-success mdt-text-success-foreground hover:mdt-bg-green-80 active:mdt-bg-green-90',
         successSoft:
-          'mdt-bg-green-10 mdt-text-green-80 hover:mdt-bg-green-20 hover:mdt-text-green-90 active:mdt-bg-green-30 active:mdt-text-green-100 dark:mdt-bg-green-90 dark:mdt-text-green-30 dark:hover:mdt-bg-green-80 dark:hover:mdt-text-green-20 dark:active:mdt-bg-green-100 dark:active:mdt-text-green-20',
+          'mdt-bg-green-10 mdt-text-green-80 hover:mdt-bg-green-20 hover:mdt-text-green-90 active:mdt-bg-green-30 active:mdt-text-green-100',
         successOutline:
-          'mdt-border mdt-border-success mdt-bg-transparent mdt-text-success hover:mdt-bg-green-5 hover:mdt-text-green-80 active:mdt-bg-green-10 active:mdt-text-green-80 dark:mdt-border-green-40 dark:mdt-text-green-40 dark:hover:mdt-bg-green-90 dark:active:mdt-bg-green-100',
+          'mdt-border mdt-border-success mdt-bg-transparent mdt-text-success hover:mdt-bg-green-5 hover:mdt-text-green-80 active:mdt-bg-green-10 active:mdt-text-green-80',
         successGhost:
-          'mdt-bg-transparent mdt-text-success hover:mdt-bg-green-5 hover:mdt-text-green-80 active:mdt-bg-green-10 active:mdt-text-green-80 dark:mdt-text-green-40 dark:hover:mdt-bg-green-90 dark:active:mdt-bg-green-100',
+          'mdt-bg-transparent mdt-text-success hover:mdt-bg-green-5 hover:mdt-text-green-80 active:mdt-bg-green-10 active:mdt-text-green-80',
 
         // ── AI ─────────────────────────────────────────────────────────────
         //
@@ -94,7 +93,7 @@ export const ButtonOldVariants = cva(
         //
         // The text deepens along with the background on hover and press, so
         // contrast climbs rather than drops as the tint gets stronger.
-        ai: 'mdt-border mdt-border-purple-20 mdt-bg-purple-10 mdt-text-purple-80 hover:mdt-bg-purple-20 hover:mdt-text-purple-90 active:mdt-bg-purple-30 active:mdt-text-purple-90 dark:mdt-border-purple-70 dark:mdt-bg-purple-90 dark:mdt-text-purple-20 dark:hover:mdt-bg-purple-80 dark:hover:mdt-text-purple-10 dark:active:mdt-bg-purple-100 dark:active:mdt-text-purple-10',
+        ai: 'mdt-border mdt-border-purple-20 mdt-bg-purple-10 mdt-text-purple-80 hover:mdt-bg-purple-20 hover:mdt-text-purple-90 active:mdt-bg-purple-30 active:mdt-text-purple-90',
       },
       /**
        * Size variant of the button
