@@ -13,7 +13,7 @@ export interface TableSortStateOld2 {
 export type TableAlignOld2 = 'left' | 'center' | 'right';
 
 /**
- * One column of a DataTableOld2.
+ * One column of a DataTable.
  *
  * The three console columns that never move (the row number, Name, Action) are
  * described by the table itself; these are the content columns after them.
@@ -155,7 +155,7 @@ export interface TableHeadOld2Props extends Omit<ComponentPropsWithoutRef<'th'>,
   onSort?: (() => void) | undefined;
   /** The heading can be dragged to a new place, and carries the "⋯" menu. */
   movable?: boolean | undefined;
-  /** Pointer down on the grip. The DataTableOld2's drag hook takes over from here. */
+  /** Pointer down on the grip. The DataTable's drag hook takes over from here. */
   onGripPointerDown?: ((event: ReactPointerEvent<HTMLButtonElement>) => void) | undefined;
   /** Arrow keys on a focused grip move the column one place. */
   onGripMove?: ((direction: -1 | 1) => void) | undefined;
@@ -170,7 +170,7 @@ export interface TableHeadOld2Props extends Omit<ComponentPropsWithoutRef<'th'>,
   /** Drag or arrow-key the boundary to resize. */
   resizable?: boolean | undefined;
   onResize?: ((width: number, commit: boolean) => void) | undefined;
-  /** The pointer is over the boundary: the DataTableOld2 may show the insert "+". */
+  /** The pointer is over the boundary: the DataTable may show the insert "+". */
   onBoundaryHover?: ((hovering: boolean) => void) | undefined;
 }
 

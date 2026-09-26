@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
+import { Input } from '../Input';
+import { Toolbar, ToolbarButton, ToolbarSection, ToolbarSpacer } from '../Toolbar';
 import {
   TableOld2,
   TableBodyOld2,
@@ -9,6 +12,8 @@ import {
   TableColGroupOld2,
   TableHeadOld2,
   TableHeaderOld2,
+  TableLeadCellOld2,
+  TableLeadHeadOld2,
   TableRowOld2,
   TableSelectAllOld2,
   TableSelectionCellOld2,
@@ -18,17 +23,79 @@ import {
 import { TableBulkActionOld2, TableBulkBarOld2, TableBulkSeparatorOld2 } from './TableBulkBarOld2';
 import { ContactChipsOld2, PersonCellOld2, TagListOld2, TableEmptyValueOld2 } from './TableCells';
 import { TableLoadMoreOld2, TablePagerOld2 } from './TablePagerOld2';
+import { TableBlankOld2, TableSkeletonOld2 } from './TableStates';
 import { sampleUsers } from './sampleUsers';
 
 const USERS = sampleUsers(8);
 const WIDTHS = [60, 200, 217, 200, 200];
+const PAGE = sampleUsers(25);
+const PAGE_WIDTHS = [60, 200, 217, 200, 200, 200, 200];
+const PAGE_TABLE_WIDTH = PAGE_WIDTHS.reduce((a, b) => a + b, 0) + 60;
+
+/** The console's dock line: the 72px title band plus the 48px toolbar band, less the 2px the card's top edge slides under. */
+const DOCK_LINE = 118;
+/** The card morphs over the last 140px of its approach. */
+const DOCK_RANGE = 140;
+/** The page's side margin the docked card grows into. */
+const PAGE_INSET = 24;
+
+/**
+ * The page's half of docking, kept in the story on purpose: the table only
+ * decides how a docked card looks, a page decides when. This helper reads the
+ * card's distance to the dock line on every scroll frame and turns it into the
+ * 0..1 morph, sizes the card to the room under the dock line, and puts the
+ * rows back to their top when the card lets go. The real one belongs with the
+ * page scaffold.
+ */
+function useDockOnScroll(
+  scroller: RefObject<HTMLDivElement | null>,
+  card: RefObject<HTMLDivElement | null>,
+  rows: RefObject<HTMLDivElement | null>
+) {
+  const [morph, setMorph] = useState(0);
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const sc = scroller.current;
+    const el = card.current;
+    if (!sc || !el) return undefined;
+    let raf = 0;
+    let last = 0;
+    const size = () => {
+      setHeight(sc.clientHeight - DOCK_LINE);
+    };
+    const apply = () => {
+      raf = 0;
+      const top = el.getBoundingClientRect().top - sc.getBoundingClientRect().top;
+      const p = Math.min(1, Math.max(0, (DOCK_LINE + DOCK_RANGE - top) / DOCK_RANGE));
+      if (last >= 1 && p < 1 && rows.current) rows.current.scrollTop = 0;
+      last = p;
+      setMorph(p);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    size();
+    apply();
+    sc.addEventListener('scroll', onScroll, { passive: true });
+    const ro = new ResizeObserver(() => {
+      size();
+      onScroll();
+    });
+    ro.observe(sc);
+    return () => {
+      sc.removeEventListener('scroll', onScroll);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [scroller, card, rows]);
+  return { morph, height };
+}
 
 const meta: Meta<typeof TableOld2> = {
   title: 'Deprecated 2/DataTable Old/Pieces',
   component: TableOld2,
   tags: ['autodocs'],
   parameters: {
-    layout: 'padded',
     status: {
       type: 'deprecated',
       since: '0.5.1',
@@ -40,6 +107,7 @@ const meta: Meta<typeof TableOld2> = {
           'The Table pieces as they were before 11 September 2026. Deprecated 2026-09-22 when Pranjal ruled the new ones in; kept for side-by-side review; Nirav sets the removal version.',
       },
     },
+    layout: 'padded',
     docs: {
       description: {
         component: [
@@ -50,9 +118,8 @@ const meta: Meta<typeof TableOld2> = {
           '',
           '**Do not start anything new on them.**',
           '',
-          'The pieces `DataTableOld2` is built from, shown on their own so each can be compared',
-          'with the live one: the headings and their states, the selection column, the bulk bar,',
-          'the two footers, and the cells the Users list uses.',
+          'The pieces `DataTable` is built from, shown on their own so each can be reviewed: the headings and their states, the selection column, the bulk bar, the two footers, the blank states, the skeleton, and the cells the Users list uses.',
+          'Compose them by hand when a list needs something DataTable does not offer.',
         ].join('\n'),
       },
     },
@@ -266,6 +333,64 @@ export const Footers: Story = {
 };
 
 /** Nothing yet, nothing found, could not load. Centred in the card: an icon, a title, one line, one button. */
+export const BlankStates: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-6">
+      {(['first', 'empty', 'error'] as const).map((kind) => (
+        <TableOld2 key={kind} label={kind}>
+          <TableBlankOld2 kind={kind} onAction={() => undefined} />
+          <TablePagerOld2
+            total={0}
+            page={1}
+            pageSize={25}
+            onPage={() => undefined}
+            onPageSize={() => undefined}
+            noun="users"
+            message={
+              kind === 'first'
+                ? 'No users'
+                : kind === 'empty'
+                  ? 'No users match'
+                  : 'Users not loaded'
+            }
+          />
+        </TableOld2>
+      ))}
+    </div>
+  ),
+};
+
+/** Five grey rows while the list loads. */
+export const Skeleton: Story = {
+  render: () => (
+    <TableOld2 label="Loading">
+      <TableViewportOld2 tableWidth={WIDTHS.reduce((a, b) => a + b, 60)}>
+        <TableColGroupOld2 widths={WIDTHS} />
+        <TableHeaderOld2>
+          <tr>
+            <TableSelectAllOld2 state="none" onToggle={() => undefined} onScope={() => undefined} />
+            <TableHeadOld2 columnKey="name" label="Name" width={200} frozen={60} frozenEdge />
+            <TableHeadOld2 columnKey="email" label="Email" width={217} />
+            <TableHeadOld2 columnKey="contact" label="Contact" width={200} />
+            <TableHeadOld2 columnKey="status" label="Status" width={200} />
+            <TableTailCellOld2 head />
+          </tr>
+        </TableHeaderOld2>
+        <TableSkeletonOld2 widths={WIDTHS} />
+      </TableViewportOld2>
+      <TablePagerOld2
+        total={0}
+        page={1}
+        pageSize={25}
+        onPage={() => undefined}
+        onPageSize={() => undefined}
+        noun="users"
+        message="Loading users…"
+      />
+    </TableOld2>
+  ),
+};
+
 /** The cells the Users list uses: the person, the contact chips, teams with a "+N", a missing value. Every pill is Badge. */
 export const Cells: Story = {
   render: () => (
@@ -306,6 +431,313 @@ export const Cells: Story = {
       <TagListOld2 items={['Platform', 'Security', 'Finance', 'Design']} />
       <span className="mdt-text-muted-foreground">Missing value</span>
       <TableEmptyValueOld2 />
+    </div>
+  ),
+};
+
+/** The card becomes the page. Scroll the frame: the card grows into the 24px margins, its corners square off, and at the dock line under the toolbar the rows scroll inside it with the header and pager pinned. Scroll the rows back to their top and the page takes over again. The table only decides how the docked card looks; the small helper in this story is the page's half, and belongs with the page scaffold. */
+export const DocksOnScroll: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: function DocksOnScrollStory() {
+    const scroller = useRef<HTMLDivElement>(null);
+    const card = useRef<HTMLDivElement>(null);
+    const rows = useRef<HTMLDivElement>(null);
+    const { morph, height } = useDockOnScroll(scroller, card, rows);
+    const [picked, setPicked] = useState<Set<string>>(new Set());
+    const toggle = (id: string) => {
+      setPicked((s) => {
+        const n = new Set(s);
+        if (n.has(id)) n.delete(id);
+        else n.add(id);
+        return n;
+      });
+    };
+    const ids = PAGE.filter((u) => u.status !== 'Invited').map((u) => u.id);
+    const state = picked.size === 0 ? 'none' : ids.every((id) => picked.has(id)) ? 'all' : 'some';
+    const kpi = [
+      ['Total users', '10,001', '+120 this month'],
+      ['Active', '7,004', '70% of everyone'],
+      ['Invited', '1,012', '38 waiting a week or more'],
+    ];
+    return (
+      <div
+        ref={scroller}
+        className="mdt-h-[720px] mdt-overflow-y-auto mdt-bg-neutral-10 mdt-font-sans mdt-text-neutral-130"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        <div className="mdt-sticky mdt-top-0 mdt-z-10 mdt-bg-neutral-10 mdt-px-6">
+          <div className="mdt-flex mdt-h-[72px] mdt-items-center">
+            <h1 className="mdt-m-0 mdt-text-xl mdt-font-semibold">Users</h1>
+          </div>
+          <Toolbar className="mdt-h-12">
+            <ToolbarSection>
+              <Input size="sm" placeholder="Search users" className="mdt-w-[300px]" />
+            </ToolbarSection>
+            <ToolbarSpacer />
+            <ToolbarSection>
+              <ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" />
+              <ToolbarButton icon={<Icon name="columns" />} aria-label="Manage columns" />
+            </ToolbarSection>
+          </Toolbar>
+        </div>
+        <div className="mdt-px-6 mdt-pt-6">
+          <div className="mdt-mb-6 mdt-grid mdt-grid-cols-3 mdt-gap-4">
+            {kpi.map(([k, v, note]) => (
+              <div
+                key={k}
+                className="mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-p-5"
+              >
+                <div className="mdt-text-xs mdt-text-muted-foreground">{k}</div>
+                <div className="mdt-mt-1 mdt-text-2xl mdt-font-semibold mdt-tabular-nums">{v}</div>
+                <div className="mdt-mt-1 mdt-text-xs mdt-text-muted-foreground">{note}</div>
+              </div>
+            ))}
+          </div>
+          <TableOld2
+            ref={card}
+            label="Users"
+            docked={morph}
+            style={{
+              height,
+              width: `calc(100% + ${String(PAGE_INSET * 2 * morph)}px)`,
+              marginInline: -PAGE_INSET * morph,
+            }}
+          >
+            <TableViewportOld2
+              ref={rows}
+              tableWidth={PAGE_TABLE_WIDTH}
+              hasSelection={picked.size > 0}
+            >
+              <TableColGroupOld2 widths={PAGE_WIDTHS} />
+              <TableHeaderOld2>
+                <tr>
+                  <TableSelectAllOld2
+                    state={state}
+                    onToggle={() => {
+                      setPicked(state === 'all' ? new Set() : new Set(ids));
+                    }}
+                    onScope={() => undefined}
+                  />
+                  <TableHeadOld2 columnKey="name" label="Name" width={200} frozen={60} frozenEdge />
+                  <TableHeadOld2 columnKey="email" label="Email" width={217} movable resizable />
+                  <TableHeadOld2 columnKey="status" label="Status" width={200} movable sortable />
+                  <TableHeadOld2 columnKey="source" label="Source" width={200} movable />
+                  <TableHeadOld2 columnKey="teams" label="Teams" width={200} movable />
+                  <TableHeadOld2 columnKey="role" label="Role" width={200} movable />
+                  <TableTailCellOld2 head />
+                </tr>
+              </TableHeaderOld2>
+              <TableBodyOld2>
+                {PAGE.map((u, i) => {
+                  const inert = u.status === 'Invited';
+                  return (
+                    <TableRowOld2
+                      key={u.id}
+                      selected={picked.has(u.id)}
+                      inert={inert}
+                      onToggle={() => {
+                        toggle(u.id);
+                      }}
+                    >
+                      <TableSelectionCellOld2
+                        index={i + 1}
+                        selected={picked.has(u.id)}
+                        inert={inert}
+                        label={u.name}
+                        onToggle={() => {
+                          toggle(u.id);
+                        }}
+                      />
+                      <TableCellOld2 frozen={60} frozenEdge>
+                        <PersonCellOld2 name={u.name} owner={u.owner} muted={inert} />
+                      </TableCellOld2>
+                      <TableCellOld2>
+                        <span className="mdt-text-muted-foreground">{u.email}</span>
+                      </TableCellOld2>
+                      <TableCellOld2>
+                        <Badge
+                          size="sm"
+                          tone={
+                            u.status === 'Active'
+                              ? 'success'
+                              : u.status === 'Inactive'
+                                ? 'slate'
+                                : 'warning'
+                          }
+                          dot
+                        >
+                          {u.status}
+                        </Badge>
+                      </TableCellOld2>
+                      <TableCellOld2>
+                        <Badge size="sm" shape="square">
+                          {u.source}
+                        </Badge>
+                      </TableCellOld2>
+                      <TableCellOld2>
+                        <TagListOld2 items={u.teams} />
+                      </TableCellOld2>
+                      <TableCellOld2>{u.role}</TableCellOld2>
+                      <TableTailCellOld2 />
+                    </TableRowOld2>
+                  );
+                })}
+              </TableBodyOld2>
+            </TableViewportOld2>
+            <TableBulkBarOld2
+              count={picked.size}
+              onClear={() => {
+                setPicked(new Set());
+              }}
+            >
+              <TableBulkActionOld2 icon={<Icon name="toggle-right" />}>
+                Activate
+              </TableBulkActionOld2>
+              <TableBulkActionOld2 icon={<Icon name="toggle-left" />}>
+                Deactivate
+              </TableBulkActionOld2>
+              <TableBulkSeparatorOld2 />
+              <TableBulkActionOld2 icon={<Icon name="trash-2" />}>Delete</TableBulkActionOld2>
+            </TableBulkBarOld2>
+            <TablePagerOld2
+              total={10001}
+              page={1}
+              pageSize={25}
+              onPage={() => undefined}
+              onPageSize={() => undefined}
+              noun="users"
+            />
+          </TableOld2>
+        </div>
+      </div>
+    );
+  },
+};
+/**
+ * **The lead column is one slot with two occupants.**
+ *
+ * A table that can act on many rows at once puts a checkbox here. A table that
+ * cannot puts the row number, under a **hash** — not a blank heading, which
+ * read as a column somebody forgot to label and left the numbers underneath
+ * with no name.
+ *
+ * Same slot, same 60px, same alignment. A page that later grows bulk actions
+ * changes nothing about its columns, and a page that loses them leaves no hole.
+ *
+ * **The page does not choose which.** It says whether it has bulk actions and
+ * `TableLeadHead` / `TableLeadCell` draw the right one. That is the whole
+ * reason this is one component rather than two the caller has to keep in step.
+ *
+ * (Pranjal, 2026-09-11.)
+ */
+export const TheLeadColumn: Story = {
+  render: function LeadColumn() {
+    const [picked, setPicked] = useState<number[]>([2]);
+    const people = ['Sarah Johnson', 'Michael Smith', 'Emily Davis'];
+    const both: { selectable: boolean; caption: string }[] = [
+      { selectable: false, caption: 'No bulk actions — a hash, and the row number' },
+      { selectable: true, caption: 'With bulk actions — a checkbox in the same slot' },
+    ];
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        {both.map((v) => (
+          <div key={v.caption} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 12, color: 'hsl(var(--mdt-neutral-90))' }}>{v.caption}</div>
+            <TableOld2 label={v.caption}>
+              <TableViewportOld2 tableWidth={620} label={v.caption}>
+                <TableColGroupOld2 widths={[60, 240, 200]} />
+                <TableHeaderOld2>
+                  <TableRowOld2 inert>
+                    <TableLeadHeadOld2
+                      selectable={v.selectable}
+                      state={picked.length === 0 ? 'none' : picked.length === 3 ? 'all' : 'some'}
+                      onToggle={() => {
+                        setPicked((p) => (p.length === 0 ? [0, 1, 2] : []));
+                      }}
+                      onScope={() => undefined}
+                    />
+                    <TableHeadOld2 columnKey="name" label="Name" width={240} />
+                    <TableHeadOld2 columnKey="role" label="Role" width={200} />
+                  </TableRowOld2>
+                </TableHeaderOld2>
+                <TableBodyOld2>
+                  {people.map((name, i) => (
+                    <TableRowOld2 key={name} selected={v.selectable && picked.includes(i)}>
+                      <TableLeadCellOld2
+                        index={i + 1}
+                        label={name}
+                        selectable={v.selectable}
+                        selected={picked.includes(i)}
+                        onToggle={() => {
+                          setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
+                        }}
+                      />
+                      <TableCellOld2>{name}</TableCellOld2>
+                      <TableCellOld2>Operator</TableCellOld2>
+                    </TableRowOld2>
+                  ))}
+                </TableBodyOld2>
+              </TableViewportOld2>
+            </TableOld2>
+          </div>
+        ))}
+      </div>
+    );
+  },
+};
+
+/**
+ * **Scroll this one.** The table drives itself: it takes the whole height under
+ * the dock line, widens to the page as it reaches it, then hands the scroll to
+ * its own rows.
+ *
+ * It holds **one row**. That is the point — expansion is a property of the
+ * table, not of how much happens to be in it, so a filtered-down list does not
+ * suddenly behave like a different component, and the pager does not float up
+ * under a short list. (Pranjal's rule, 2026-09-10.)
+ *
+ * **This is the default.** `expand` is written out below only to say so out
+ * loud; leave it off and you get the same table. A table with no page to fill —
+ * in a drawer, a modal or a card — quietly stays an ordinary card instead, so
+ * the default costs nothing where it does not apply. `expand={false}` opts out.
+ */
+export const ExpandsWithASingleRow: Story = {
+  render: () => (
+    <div
+      style={{
+        height: 460,
+        overflowY: 'auto',
+        border: '1px solid hsl(var(--mdt-neutral-20))',
+        // the two band heights a PageFrame publishes; the table reads them
+        ['--mdt-band-b1-h' as string]: '60px',
+        ['--mdt-band-b2t-h' as string]: '60px',
+      }}
+    >
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 36,
+          height: 60,
+          background: 'hsl(var(--mdt-background))',
+          borderBottom: '1px solid hsl(var(--mdt-neutral-20))',
+        }}
+      />
+      <div style={{ height: 140, padding: 16 }}>A hero band, which scrolls away.</div>
+      <div
+        style={{
+          position: 'sticky',
+          top: 58,
+          zIndex: 35,
+          height: 60,
+          background: 'hsl(var(--mdt-background))',
+        }}
+      />
+      <div style={{ padding: '6px 24px 20px' }}>
+        <TableOld2 label="One row, expanding" expand>
+          <div style={{ padding: 16 }}>A single row.</div>
+        </TableOld2>
+      </div>
     </div>
   ),
 };

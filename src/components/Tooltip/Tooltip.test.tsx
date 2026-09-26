@@ -51,7 +51,6 @@ describe('Tooltip', () => {
     const el = await open();
     expect(el).toHaveClass(
       'mdt-bg-neutral-130',
-      'dark:mdt-bg-neutral-10',
       'mdt-text-white',
       'mdt-px-3',
       'mdt-py-1.5',

@@ -89,7 +89,6 @@ const TooltipContent = forwardRef<
           className={cn(
             'tt mdt-z-50 mdt-rounded-md mdt-bg-neutral-130 mdt-px-3 mdt-py-1.5',
             'mdt-text-xs mdt-leading-4 mdt-text-white',
-            'dark:mdt-bg-neutral-10 dark:mdt-text-neutral-130',
             fromLeft ? 'mdt-text-left' : 'mdt-text-center',
             className
           )}
@@ -113,9 +112,7 @@ const TooltipContent = forwardRef<
             </span>
           )}
           {showArrow && (
-            <TooltipPrimitive.Arrow
-              className={cn('mdt-fill-neutral-130 dark:mdt-fill-neutral-10', arrowClassName)}
-            />
+            <TooltipPrimitive.Arrow className={cn('mdt-fill-neutral-130', arrowClassName)} />
           )}
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>

@@ -48,14 +48,14 @@ const ALIGN: Record<TableAlignOld2, string> = {
 };
 
 /**
- * TableOld2 cell styles: 54px rows, a 16px inset, 12px type. Frozen cells stay put
+ * Table cell styles: 54px rows, a 16px inset, 12px type. Frozen cells stay put
  * while the table scrolls sideways.
  */
 export const tableCellOld2Variants = cva(
   [
     'tbl-old2-cell mdt-h-[54px] mdt-px-4 mdt-py-[5px] mdt-align-middle',
     'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
-    'mdt-bg-background mdt-text-neutral-130 dark:mdt-text-neutral-10',
+    'mdt-bg-background mdt-text-neutral-130',
   ],
   {
     variants: {
@@ -73,7 +73,7 @@ export const tableCellOld2Variants = cva(
 export const tableHeadOld2Variants = cva(
   [
     'tbl-old2-head mdt-relative mdt-h-10 mdt-px-4 mdt-py-px mdt-align-middle',
-    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-text-neutral-40',
+    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90',
     'mdt-select-none mdt-whitespace-nowrap mdt-bg-background',
     'mdt-sticky mdt-top-0 mdt-z-[3]',
   ],
@@ -279,18 +279,18 @@ function useSelfDrivenMorph(
 }
 
 /**
- * TableOld2 - the card that holds a list: rows, a bulk bar and a pager.
+ * Table - the card that holds a list: rows, a bulk bar and a pager.
  *
  * @example
  * ```tsx
- * <TableOld2 label="Users">
- *   <TableViewportOld2 tableWidth={1637} maxHeight={600}>
- *     <TableColGroupOld2 widths={[60, 200, 100, 217, 200]} />
- *     <TableHeaderOld2>…</TableHeaderOld2>
- *     <TableBodyOld2>…</TableBodyOld2>
- *   </TableViewportOld2>
- *   <TablePagerOld2 … />
- * </TableOld2>
+ * <Table label="Users">
+ *   <TableViewport tableWidth={1637} maxHeight={600}>
+ *     <TableColGroup widths={[60, 200, 100, 217, 200]} />
+ *     <TableHeader>…</TableHeader>
+ *     <TableBody>…</TableBody>
+ *   </TableViewport>
+ *   <TablePager … />
+ * </Table>
  * ```
  */
 const TableOld2 = forwardRef<HTMLDivElement, TableOld2Props>(function TableOld2(
@@ -323,8 +323,8 @@ const TableOld2 = forwardRef<HTMLDivElement, TableOld2Props>(function TableOld2(
         data-divider={divider}
         data-docked={morph >= 1}
         className={cn(
-          'tbl-old2 mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
-          'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
+          'tbl-old2 mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background',
+          'mdt-font-sans mdt-text-neutral-130',
           className
         )}
         style={{ ...style, '--tbl-old2-morph': morph } as React.CSSProperties}
@@ -604,7 +604,7 @@ const TableHeadOld2 = forwardRef<HTMLTableCellElement, TableHeadOld2Props>(funct
       {movable && (
         <button
           type="button"
-          className="tbl-old2-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90"
+          className="tbl-old2-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing"
           aria-label={`Move column ${label}. Arrow keys move it one place`}
           onPointerDown={onGripPointerDown}
           onKeyDown={gripKey}
@@ -628,7 +628,7 @@ const TableHeadOld2 = forwardRef<HTMLTableCellElement, TableHeadOld2Props>(funct
           : {})}
       >
         {glyph && (
-          <span className="tbl-old2-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 dark:mdt-text-neutral-40 [&_svg]:mdt-size-3.5">
+          <span className="tbl-old2-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 [&_svg]:mdt-size-3.5">
             {glyph}
           </span>
         )}
@@ -647,7 +647,7 @@ const TableHeadOld2 = forwardRef<HTMLTableCellElement, TableHeadOld2Props>(funct
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="tbl-old2-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              className="tbl-old2-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90"
               aria-label={`Options for ${label}`}
             >
               <Icon name="more-horizontal" size={14} />
@@ -716,7 +716,7 @@ function TableSelectionCellOld2({
         </span>
         {!inert && (
           <Checkbox
-            className="tbl-old2-cb data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+            className="tbl-old2-cb data-[state=unchecked]:mdt-border-neutral-40"
             checked={selected}
             tabIndex={-1}
             aria-label={`Select ${label}`}
@@ -773,7 +773,7 @@ function TableNumberCellOld2({ index, inert = false, frozen = 0 }: TableNumberCe
 function TableNick() {
   return (
     <span
-      className="tbl-old2-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+      className="tbl-old2-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30"
       aria-hidden="true"
     />
   );
@@ -809,14 +809,14 @@ function TableSelectAllOld2({ state, onToggle, onScope, frozen = 0 }: TableSelec
     >
       <span className="tbl-old2-selall mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center">
         <Checkbox
-          className="data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+          className="data-[state=unchecked]:mdt-border-neutral-40"
           checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
           onCheckedChange={onToggle}
           aria-label="Select all on this page"
         />
         <button
           type="button"
-          className="tbl-old2-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40"
+          className="tbl-old2-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90"
           aria-label="Choose what to select"
           aria-haspopup="dialog"
           onClick={(e) => {

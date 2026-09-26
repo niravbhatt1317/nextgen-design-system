@@ -13,7 +13,7 @@ import type { TableLoadMoreOld2Props, TablePagerOld2Props } from './TableOld2.ty
 const fmt = (n: number) => n.toLocaleString('en-US');
 
 const CONTROL =
-  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 dark:mdt-border-neutral-110 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40 hover:mdt-border-neutral-90 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130 disabled:mdt-cursor-default disabled:mdt-opacity-40 disabled:hover:mdt-border-neutral-30 disabled:hover:mdt-bg-background';
+  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-border-neutral-90 hover:mdt-bg-neutral-10 disabled:mdt-cursor-default disabled:mdt-opacity-40 disabled:hover:mdt-border-neutral-30 disabled:hover:mdt-bg-background';
 
 /**
  * The pager on the card's foot: the count on the left, rows per page, first,
@@ -48,7 +48,7 @@ function TablePagerOld2({
   const disabled = total === 0;
 
   return (
-    <div className="tbl-old2-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
+    <div className="tbl-old2-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-between mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-4 mdt-py-2 mdt-text-[13px] mdt-font-medium mdt-leading-[1.5] mdt-text-neutral-90">
       <span className="tbl-old2-count">
         {message ?? `${fmt(from)}–${fmt(to)} of ${fmt(total)} ${noun}`}
       </span>
@@ -105,7 +105,7 @@ function TablePagerOld2({
         <input
           className={cn(
             CONTROL,
-            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90 dark:mdt-text-neutral-10'
+            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
           )}
           value={typed}
           inputMode="numeric"
@@ -154,7 +154,7 @@ function TableLoadMoreOld2({
   onMore,
 }: TableLoadMoreOld2Props) {
   return (
-    <div className="tbl-old2-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 dark:mdt-border-neutral-120 dark:mdt-text-neutral-40">
+    <div className="tbl-old2-foot mdt-flex mdt-h-[49px] mdt-items-center mdt-justify-center mdt-gap-3 mdt-border-t mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
       <span>
         Showing {fmt(Math.min(shown, total))} of {fmt(total)} {noun}
       </span>

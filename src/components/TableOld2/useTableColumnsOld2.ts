@@ -81,7 +81,7 @@ function reconcile(order: string[], keys: string[]): string[] {
 }
 
 /**
- * Column layout for a DataTableOld2: order, hidden columns and widths, remembered
+ * Column layout for a DataTable: order, hidden columns and widths, remembered
  * in the browser when a `storageKey` is given. The three fixed columns (row
  * number, Name, Action) are not part of this; only the content columns move.
  */

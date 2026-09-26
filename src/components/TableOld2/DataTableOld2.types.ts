@@ -95,7 +95,7 @@ export interface DataTableOld2Props<Row> {
   /** Remember column order, hidden columns and widths in this browser. */
   storageKey?: string | undefined;
   /**
-   * Bulk-bar actions, as TableBulkActionOld2 elements. Leave unset for a table
+   * Bulk-bar actions, as TableBulkAction elements. Leave unset for a table
    * without selection: its rows then carry plain numbers that never become
    * checkboxes, and "Row number" can be hidden from the Columns panel.
    */
@@ -111,7 +111,7 @@ export interface DataTableOld2Props<Row> {
   maxHeight?: number | string | undefined;
   /**
    * The card becomes the page: `true` docked, a number the in-between while the
-   * page scrolls it to its dock line. See TableOld2's `docked`.
+   * page scrolls it to its dock line. See Table's `docked`.
    */
   docked?: boolean | number | undefined;
   /**

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
+import { Toolbar } from '../Toolbar';
 import { DataTableOld2 } from './DataTableOld2';
 import { TableBulkActionOld2, TableBulkSeparatorOld2 } from './TableBulkBarOld2';
 import { ContactChipsOld2, PersonCellOld2, TagListOld2 } from './TableCells';
@@ -109,11 +110,7 @@ function UsersTable(
                 setNote(`Edit ${u.name}`);
               }}
             >
-              <Icon
-                name="pencil"
-                size={16}
-                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
-              />
+              <Icon name="pencil" size={16} className="mdt-mr-2 mdt-text-neutral-90" />
               Edit details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -124,7 +121,7 @@ function UsersTable(
               <Icon
                 name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'}
                 size={16}
-                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+                className="mdt-mr-2 mdt-text-neutral-90"
               />
               {u.status === 'Active' ? 'Deactivate user' : 'Activate user'}
             </DropdownMenuItem>
@@ -231,7 +228,6 @@ const meta: Meta<typeof UsersTable> = {
   component: UsersTable,
   tags: ['autodocs'],
   parameters: {
-    layout: 'padded',
     status: {
       type: 'deprecated',
       since: '0.5.1',
@@ -243,6 +239,7 @@ const meta: Meta<typeof UsersTable> = {
           'The DataTable as it was before 11 September 2026. Deprecated 2026-09-22 when Pranjal ruled the new one in; kept for side-by-side review; Nirav sets the removal version.',
       },
     },
+    layout: 'padded',
     docs: {
       description: {
         component: [
@@ -253,11 +250,21 @@ const meta: Meta<typeof UsersTable> = {
           '',
           '**Do not start anything new on it.**',
           '',
-          'The merged console Users table as ported on 7 September 2026. `DataTableOld2` assembles',
-          'the pieces: the `Toolbar` strip with search, Filters, a quick filter, Sort and Columns;',
-          'the card with its frozen row-number, Name and Action columns; a bulk bar; a pager or a',
-          '"Load more" footer; and the blank states. Its styles are namespaced `tbl-old2-*`, so',
-          'they never touch the live table.',
+          '**Behaviour reference — Claude artifact:** [Users Table Workbench](https://claude.ai/code/artifact/5a4568b4-1ca7-4b54-ba2c-436e9cce3f14), a working table you can sort, pick, drag and page through. Open it to see how each part is meant to behave — it is what this component was designed and approved from.',
+          '',
+          'The merged console Users table, ported on 7 September 2026. `DataTable` assembles the pieces: the `Toolbar` strip with search, Filters, a quick filter, Sort and Columns; the card with its frozen row-number, Name and Action columns; a bulk bar; a pager or a "Load more" footer; and the blank states.',
+          '',
+          '| Part | Rule |',
+          '| --- | --- |',
+          '| Rows | 54px under a 40px header, 12px type, one hover and selected tint (neutral-10). |',
+          '| Row number | Becomes a checkbox on hover, on focus, once picked, and on every row once anything is picked. Space picks, Enter opens, ↑ ↓ move. |',
+          '| Select all | The header box takes this page; its chevron and "N selected" open the scope menu: this page, all matching, a number. |',
+          '| Headings | 16px inset, grip, 8px, label, 8px, sort arrow; "⋯" at the right edge; all on hover. Click sorts A to Z, Z to A, off. |',
+          '| Move | Drag the grip: the column dims, a copy of the heading follows, a 2px azure line marks the landing. Frozen columns cannot be passed. |',
+          '| Insert | With columns hidden, hovering a boundary shows a "+" that puts one back right there. |',
+          '| Quick filter | Washes its heading blue-10 and turns the column glyph azure; the glyph becomes the grip on hover. No chips, ever. |',
+          '| Pills | Every one is `Badge` at size sm. Pill for status, square for source, teams, roles and "+N". |',
+          '| Pager | Typed page box, first and last, rows per page. Or a "Load more" footer. |',
         ].join('\n'),
       },
     },
@@ -323,3 +330,30 @@ export const PagerAlways: Story = { args: { rows: USERS.slice(0, 8), pager: 'alw
  * **Neither strip.** No toolbar, no pager, a short list — the card alone, which
  * is what a table inside a panel or a tab body looks like.
  */
+export const CardOnly: Story = {
+  args: { toolbar: false, pager: 'never', rows: USERS.slice(0, 6) },
+};
+
+/**
+ * **The page owns the strip.** A screen with no tab bar keeps the 60px
+ * `Toolbar` band as page structure and hands the table the ELEMENT; the table
+ * draws its own search, Filters, quick filter, Sort and Columns inside it
+ * (Pranjal, 2026-09-12). Every control works as it does in the table's own
+ * strip, and there is no second copy for the page to keep in step.
+ */
+export const WithThePagesToolbar: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: function WithThePagesToolbarStory() {
+    const [strip, setStrip] = useState<HTMLDivElement | null>(null);
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-bg-background">
+        <Toolbar ref={setStrip} label="User controls">
+          {null}
+        </Toolbar>
+        <div className="mdt-px-6 mdt-pb-5 mdt-pt-1.5">
+          <UsersTable toolbar={strip ?? false} />
+        </div>
+      </div>
+    );
+  },
+};

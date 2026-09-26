@@ -22,7 +22,7 @@ export interface UseTableSelectionOld2 {
 }
 
 /**
- * Row selection for a DataTableOld2. Ids, not rows, so a pick survives sorting,
+ * Row selection for a DataTable. Ids, not rows, so a pick survives sorting,
  * searching and paging, as it does on the console.
  */
 export function useTableSelectionOld2(): UseTableSelectionOld2 {

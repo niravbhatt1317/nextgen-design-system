@@ -1,4 +1,4 @@
-/* TableOld2 — the merged console Users table (Pranjal's rulings, 7 September 2026).
+/* Table — the merged console Users table (Pranjal's rulings, 7 September 2026).
  * State rules live here because they read across elements: a row's hover
  * changes its number cell, a heading's hover reveals its grip and menu, a
  * selection anywhere shows every checkbox. Geometry and colour sit in the
@@ -81,11 +81,6 @@
 }
 .tbl-old2[data-divider='light'] {
   --tbl-old2-divider: hsl(var(--mdt-neutral-20));
-}
-.dark .tbl-old2 {
-  --tbl-old2-divider: hsl(var(--mdt-border) / 0.6);
-  --tbl-old2-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
-  --tbl-old2-hover: hsl(var(--mdt-muted) / 0.5);
 }
 
 /* dividers: on cells, because the table is border-separate; the sticky heading keeps its line as an inset shadow */
@@ -245,7 +240,4 @@
 /* the owner mark shares the wash recipe: azure at 6% over the page, the console's blue-10 */
 .tbl-old2-owner {
   background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
-}
-.dark .tbl-old2-owner {
-  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
 }
