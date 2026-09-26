@@ -10,7 +10,8 @@ const D = '[role="dialog"]';
 const openExpiry = async (page) => {
   await page.locator('table tbody tr').first().click();
   await page.waitForSelector(D, { timeout: 10000 }); await wait(500);
-  await page.locator(`${D} button.kit-tab`, { hasText: /access profiles/i }).first().click(); await wait(500);
+  /* the drawer band is the library Tabs since 2026-09-26: [role="tab"], not .kit-tab */
+  await page.locator(`${D} [role="tab"]`, { hasText: /access profiles/i }).first().click(); await wait(500);
   await page.locator(D).getByRole('button', { name: /add access/i }).first().click(); await wait(700);
   await page.locator(`${D} label.kit-row-selectable`).first().click(); await wait(300);
   await page.locator(D).last().getByRole('button', { name: /^next$/i }).first().click(); await wait(700);

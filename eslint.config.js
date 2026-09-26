@@ -189,6 +189,8 @@ export default tseslint.config(
       '**/ButtonOld/**',
       '**/TableOld/**',
       '**/TooltipOld/**',
+      // Deprecated 2 (2026-09-22): the previous versions kept beside the new parts, each tagged.
+      '**/*Old2/**',
       // These stories demonstrate what ButtonOld still carries and the new Button
       // deliberately does not: the AI family, shortcut chips inside a button, and a
       // corner badge. They are meant to reach for the deprecated one (2026-09-10).

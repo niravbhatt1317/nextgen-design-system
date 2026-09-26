@@ -122,3 +122,10 @@ junit.xml
 
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
+
+# The parity check: the receipt and the per-laptop switch are local; accepted.json and the twins are shared.
+scripts/parity/.receipt.json
+scripts/parity/.local.json
+
+# The built gallery the reviewer reads on :4196 is an output, never committed.
+storybook-badge/

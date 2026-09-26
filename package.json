@@ -42,6 +42,7 @@
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest run",
+    "parity": "node scripts/parity.cjs",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",

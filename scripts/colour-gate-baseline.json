@@ -1,0 +1,59 @@
+{
+  "note": "The colour gate's ratchet (2026-09-24). Every file may only go DOWN from here; a rise or a new file holds the commit. The token file and the content files are not counted. Run node scripts/colour-gate.cjs --report to see today, --record to agree a fall.",
+  "tokenFiles": ["src/styles/globals.css"],
+  "content": ["src/components/Table/sampleUsers.ts"],
+  "recorded": "2026-09-26",
+  "reasons": {},
+  "totals": {
+    "literal": 28,
+    "dark": 0,
+    "white": 12
+  },
+  "files": {
+    "src/components/Badge/Badge.stories.tsx": {
+      "literal": 7,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/DatePicker/DatePicker.test.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 1
+    },
+    "src/components/HoverCard/HoverCard.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 4
+    },
+    "src/components/LeftNav/LeftNav.tsx": {
+      "literal": 1,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/ScrollArea/ScrollArea.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 3
+    },
+    "src/components/TableOld2/DataTableOld2.stories.tsx": {
+      "literal": 4,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/TableOld2/TableOld2.stories.tsx": {
+      "literal": 4,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/Tabs/Tabs.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 4
+    },
+    "src/docs/foundation/Colors.stories.tsx": {
+      "literal": 12,
+      "dark": 0,
+      "white": 0
+    }
+  }
+}

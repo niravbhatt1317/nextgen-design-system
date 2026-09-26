@@ -8,7 +8,8 @@ const PROPS = [
 ];
 const BOX = '[data-slot="upload-box"]';
 const openBranding = async (page) => {
-  await page.locator('button.kit-tab', { hasText: /branding/i }).first().click();
+  /* the organisation page's band is the library Tabs since 2026-09-26 (PageScaffold TabBand): [role=tab], not .kit-tab */
+  await page.locator('[role="tablist"] [role="tab"]', { hasText: /branding/i }).first().click();
   await page.waitForTimeout(600);
   await page.getByRole('button', { name: /^clear$/i }).first().click();
   await page.waitForSelector(BOX, { timeout: 8000 });
