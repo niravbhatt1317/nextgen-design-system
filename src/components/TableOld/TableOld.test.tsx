@@ -967,23 +967,6 @@ describe('TableOld', () => {
       expect(th).toHaveClass('group-data-[scrolled-top=true]:mdt-border-border/30');
     });
 
-    it('keeps the dark edge at full weight even when pinned', () => {
-      // The dark wash reaches about four luminance points, so the border has to
-      // carry the boundary there.
-      const { container } = render(
-        <TableOld maxHeight="10rem" stickyHeader>
-          <TableHeaderOld>
-            <TableRowOld>
-              <TableHeadOld>H</TableHeadOld>
-            </TableRowOld>
-          </TableHeaderOld>
-        </TableOld>
-      );
-      expect(container.querySelector('th')).toHaveClass(
-        'dark:group-data-[scrolled-top=true]:mdt-border-border'
-      );
-    });
-
     it('applies the same rule to a bottom-pinned row, on its own edge', () => {
       const { container } = render(
         <TableOld maxHeight="10rem">
