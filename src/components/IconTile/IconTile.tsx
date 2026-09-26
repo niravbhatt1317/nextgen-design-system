@@ -20,14 +20,13 @@ export const iconTileVariants = cva(
   {
     variants: {
       tone: {
-        slate:
-          'mdt-bg-neutral-30 mdt-text-neutral-110 dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
-        blue: 'mdt-bg-blue-10 mdt-text-blue-80 dark:mdt-bg-blue-90 dark:mdt-text-blue-30',
-        green: 'mdt-bg-green-10 mdt-text-green-80 dark:mdt-bg-green-90 dark:mdt-text-green-30',
-        amber: 'mdt-bg-orange-20 mdt-text-orange-80 dark:mdt-bg-orange-90 dark:mdt-text-orange-30',
-        rose: 'mdt-bg-red-10 mdt-text-red-80 dark:mdt-bg-red-90 dark:mdt-text-red-30',
-        purple:
-          'mdt-bg-purple-10 mdt-text-purple-90 dark:mdt-bg-purple-100 dark:mdt-text-purple-30',
+        slate: 'mdt-bg-neutral-30 mdt-text-neutral-110',
+        /* THE BLUE INK IS BLUE-60 (Pranjal, 2026-09-12: "use a better blue color this looks really bad" - K-IconTile-07): every Name tile on the console draws its glyph in the accent blue, not the avatar's navy. */
+        blue: 'mdt-bg-blue-10 mdt-text-blue-60',
+        green: 'mdt-bg-green-10 mdt-text-green-80',
+        amber: 'mdt-bg-orange-20 mdt-text-orange-80',
+        rose: 'mdt-bg-red-10 mdt-text-red-80',
+        purple: 'mdt-bg-purple-10 mdt-text-purple-90',
       },
       /* THE TILE SIZES ITS ICON (Pranjal, 2026-09-12: "icon size is too big" - a
        * 20px glyph in a 24px tile). The glyph is a little over half the tile at
