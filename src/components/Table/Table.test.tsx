@@ -34,7 +34,7 @@ function Grid({
         <TableColGroup widths={[60, 200, 217]} />
         <TableHeader>
           <tr>
-            <TableSelectAll state="none" onToggle={() => undefined} onScope={() => undefined} />
+            <TableSelectAll state="none" onToggle={() => undefined} />
             <TableHead
               columnKey="name"
               label="Name"
@@ -101,7 +101,7 @@ describe('Table', () => {
     expect(screen.getByLabelText('Options for Email')).toHaveAttribute('aria-haspopup', 'menu');
     const handle = screen.getByRole('slider', { name: 'Resize Email' });
     expect(handle).toHaveAttribute('aria-valuenow', '217');
-    expect(handle).toHaveAttribute('aria-valuemin', '120');
+    expect(handle).toHaveAttribute('aria-valuemin', '160'); // the floor is 160 (Pranjal, 2026-09-23)
     expect(handle).toHaveAttribute('aria-valuemax', '720');
   });
 
@@ -131,7 +131,7 @@ describe('Table', () => {
     await userEvent.keyboard('{ArrowLeft}');
     expect(onResize).toHaveBeenLastCalledWith(184, true);
     await userEvent.keyboard('{Home}');
-    expect(onResize).toHaveBeenLastCalledWith(120, true);
+    expect(onResize).toHaveBeenLastCalledWith(160, true);
     await userEvent.keyboard('{End}');
     expect(onResize).toHaveBeenLastCalledWith(720, true);
   });
@@ -171,20 +171,12 @@ describe('Table', () => {
     expect(onOpen).toHaveBeenCalledTimes(2);
   });
 
-  it('names the header checkbox and its scope chevron', () => {
+  it('names the header checkbox and draws no scope chevron beside it', () => {
     render(<Grid />);
     expect(screen.getByRole('checkbox', { name: 'Select all on this page' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Choose what to select' })).toHaveAttribute(
-      'aria-haspopup',
-      'dialog'
-    );
-  });
-
-  it('keeps the header checkbox on the column axis: the chevron hangs off it, not beside it', () => {
-    render(<Grid />);
-    const chevron = screen.getByRole('button', { name: 'Choose what to select' });
-    expect(chevron.className).toContain('mdt-absolute');
-    expect(chevron.parentElement?.className).toContain('mdt-relative');
+    /* the chevron and its "Choose what to select" popover went on 2026-09-26 (Pranjal) */
+    expect(screen.queryByRole('button', { name: 'Choose what to select' })).not.toBeInTheDocument();
+    expect(document.querySelector('.tbl-scope')).toBeNull();
   });
 
   it('draws the checkbox border only while unchecked, so a picked box is one solid fill', () => {
@@ -277,10 +269,10 @@ describe('TableBulkBar', () => {
         <TableBulkAction>Activate</TableBulkAction>
       </TableBulkBar>
     );
-    expect(screen.getByRole('button', { name: /1,234 selected/ })).toHaveAttribute(
-      'aria-live',
-      'polite'
-    );
+    /* the count is plain words in a live region, not a button: its popover went on 2026-09-26 (Pranjal) */
+    expect(screen.getByText('1,234 selected')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.queryByRole('button', { name: /1,234 selected/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Choose what to select' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Activate' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Clear selection' })).toBeInTheDocument();
   });

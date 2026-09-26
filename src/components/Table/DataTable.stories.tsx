@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { userEvent, within } from 'storybook/test';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
@@ -21,11 +22,6 @@ const USERS = sampleUsers(26);
 const StatusGlyph = () => <Icon name="loader" />;
 
 const TONE = { Active: 'success', Inactive: 'slate', Invited: 'warning' } as const;
-const SOURCE_PALETTE = {
-  Manual: undefined,
-  LDAP: { fill: '#F2F3FD', ink: '#4F5BC4' },
-  SCIM: { fill: '#EDF8F7', ink: '#1F7A71' },
-} as const;
 
 const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
   {
@@ -33,7 +29,7 @@ const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
     label: 'Email',
     width: 217,
     sortable: true,
-    cell: (u) => <span className="mdt-text-muted-foreground">{u.email}</span>,
+    cell: (u) => <span className="mdt-text-faint">{u.email}</span>,
   },
   {
     key: 'contact',
@@ -46,7 +42,7 @@ const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
     sortable: true,
     glyph: <StatusGlyph />,
     cell: (u) => (
-      <Badge size="sm" tone={TONE[u.status]} dot>
+      <Badge size="md" tone={TONE[u.status]} dot>
         {u.status}
       </Badge>
     ),
@@ -54,18 +50,12 @@ const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
   {
     key: 'source',
     label: 'Source',
-    cell: (u) => {
-      const palette = SOURCE_PALETTE[u.source];
-      return palette ? (
-        <Badge size="sm" shape="square" palette={palette}>
-          {u.source}
-        </Badge>
-      ) : (
-        <Badge size="sm" shape="square">
-          {u.source}
-        </Badge>
-      );
-    },
+    /* every source is the one neutral square, as on /users (a coloured LDAP / SCIM pair was invented here; removed 2026-09-22) */
+    cell: (u) => (
+      <Badge size="sm" shape="square">
+        {u.source}
+      </Badge>
+    ),
   },
   {
     key: 'teams',
@@ -108,11 +98,7 @@ function UsersTable(
                 setNote(`Edit ${u.name}`);
               }}
             >
-              <Icon
-                name="pencil"
-                size={16}
-                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
-              />
+              <Icon name="pencil" size={16} />
               Edit details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -120,20 +106,16 @@ function UsersTable(
                 setStatus([u.id], u.status === 'Active' ? 'Inactive' : 'Active');
               }}
             >
-              <Icon
-                name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'}
-                size={16}
-                className="mdt-mr-2 mdt-text-neutral-90 dark:mdt-text-neutral-40"
-              />
+              <Icon name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'} size={16} />
               {u.status === 'Active' ? 'Deactivate user' : 'Activate user'}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="mdt-text-red-60"
+              variant="destructive"
               onSelect={() => {
                 setRows((r) => r.filter((x) => x.id !== u.id));
               }}
             >
-              <Icon name="trash-2" size={16} className="mdt-mr-2" />
+              <Icon name="trash-2" size={16} />
               Delete user
             </DropdownMenuItem>
           </>
@@ -149,7 +131,7 @@ function UsersTable(
           value: (u) => u.status,
           /* the menu reads like the column: each status as its own pill */
           renderOption: (v) => (
-            <Badge size="sm" tone={TONE[v as SampleUser['status']]} dot>
+            <Badge size="md" tone={TONE[v as SampleUser['status']]} dot>
               {v}
             </Badge>
           ),
@@ -240,12 +222,13 @@ const meta: Meta<typeof UsersTable> = {
           '| --- | --- |',
           '| Rows | 54px under a 40px header, 12px type, one hover and selected tint (neutral-10). |',
           '| Row number | Becomes a checkbox on hover, on focus, once picked, and on every row once anything is picked. Space picks, Enter opens, ↑ ↓ move. |',
-          '| Select all | The header box takes this page; its chevron and "N selected" open the scope menu: this page, all matching, a number. |',
+          '| Select all | The header box takes this page, and only this page; the bulk bar says how many. The chevron beside the box and its "Choose what to select" menu (this page, all matching, a number) went on 26 September 2026. |',
           '| Headings | 16px inset, grip, 8px, label, 8px, sort arrow; "⋯" at the right edge; all on hover. Click sorts A to Z, Z to A, off. |',
           '| Move | Drag the grip: the column dims, a copy of the heading follows, a 2px azure line marks the landing. Frozen columns cannot be passed. |',
           '| Insert | With columns hidden, hovering a boundary shows a "+" that puts one back right there. |',
           '| Quick filter | Washes its heading blue-10 and turns the column glyph azure; the glyph becomes the grip on hover. No chips, ever. |',
-          '| Pills | Every one is `Badge` at size sm. Pill for status, square for source, teams, roles and "+N". |',
+          '| Filters | `filters` for a few tick-boxes; `advancedFilter` for conditions of key · operator · value with groups, the count on the door (2026-09-24). |',
+          '| Pills | Every one is `Badge`. The status pill, in the column and in the quick-filter menu, at size md (the console renders 24); squares at sm for source, teams, roles and "+N". |',
           '| Pager | Typed page box, first and last, rows per page. Or a "Load more" footer. |',
         ].join('\n'),
       },
@@ -262,6 +245,45 @@ export const Users: Story = {};
 /** The other footer: a count and a "Load more" button that also fires as you scroll near the bottom. */
 export const LoadMore: Story = { args: { paging: 'loadMore' } };
 
+/** The blank tail column at the right edge, drawn on request (`tail`): off everywhere since 2026-09-23 (Pranjal: "remove the
+ * most right side column which is nothing but empty. Actually hide it from the code we might need it later"). */
+export const WithTheTail: Story = { args: { tail: true } };
+
+/** THE HEADING AT ITS FLOOR (2026-09-23): every content column is at least 160; a long name truncates under the pointer
+ * so the arrow and the ⋯ keep 20 px between them; the grip, the arrow and the ⋯ appear instantly. Hover a heading. */
+export const NarrowHeadings: Story = {
+  args: {
+    columns: [
+      {
+        key: 'creds',
+        label: 'Total credentials issued',
+        width: 160,
+        sortable: true,
+        cell: (u: SampleUser) => <span>{u.teams.length}</span>,
+      },
+      {
+        key: 'status',
+        label: 'Status',
+        width: 160,
+        sortable: true,
+        glyph: <StatusGlyph />,
+        cell: (u: SampleUser) => (
+          <Badge size="md" tone={TONE[u.status]} dot>
+            {u.status}
+          </Badge>
+        ),
+      },
+      {
+        key: 'owner',
+        label: 'Accountable owner of record',
+        width: 160,
+        sortable: true,
+        cell: (u: SampleUser) => <span>{u.role}</span>,
+      },
+    ],
+  },
+};
+
 /** No selection: the row numbers stay numbers on hover, and "Row number" can be hidden from the Columns panel. No bulk bar. */
 export const WithoutSelection: Story = { args: { bulkActions: undefined } };
 
@@ -276,9 +298,6 @@ export const NoUsersYet: Story = { args: { rows: [] } };
 
 /** The list could not be loaded; search and filters are kept. */
 export const CouldNotLoad: Story = { args: { error: true } };
-
-/** Today's lighter row line, for the divider decision. */
-export const LighterDividers: Story = { args: { divider: 'light' } };
 
 /** The card as the page: square corners, no side edges, a 24px inset on the end cells, the header and pager pinned while the rows scroll inside. `maxHeight` is the card's height here. The page decides when this happens; see Pieces → Docks On Scroll. */
 export const Docked: Story = { args: { docked: true, maxHeight: 520 } };
@@ -337,5 +356,109 @@ export const WithThePagesToolbar: Story = {
         </div>
       </div>
     );
+  },
+};
+
+/**
+ * **Conditions, not tick-boxes.** `advancedFilter` puts the console's Filters door in the strip: rows of key ·
+ * operator · value, with groups, the count on the door, the rows applied to the list. The Users page carried this
+ * door itself until 2026-09-24 (Pranjal: "every fix ... solve it from the foundation so that anywhere else it doesnt
+ * cause the same issue"); now every list gets the same one by naming its keys.
+ */
+export const WithTheAdvancedFilter: Story = {
+  args: {
+    filters: undefined,
+    advancedFilter: {
+      keys: [
+        { id: 'name', label: 'Name', type: 'text' },
+        { id: 'email', label: 'Email', type: 'text' },
+        { id: 'role', label: 'Role', type: 'pick', options: SAMPLE_ROLES },
+        { id: 'source', label: 'Source', type: 'pick', options: ['Manual', 'LDAP', 'SCIM'] },
+      ],
+    },
+  },
+};
+
+/**
+ * **Quick filters hide under an advanced filter** (Pranjal, 2026-09-26: "whenever I apply an advanced filter, the
+ * quick filters won't be visible. All the quick-filter options, like Status and Organisation, which we removed before
+ * from the advanced filter, will all be visible inside the advanced filter now, because the quick filters will be
+ * hidden."). The strip here has the Status square AND a More filters door whose keys include Status. Apply any row in
+ * the panel and the square goes - Status is set from inside the panel instead. Tick a status in the square first and
+ * then apply a row: the tick rides along as a "Status is ..." row (the door's count says so), so no filter is lost.
+ * Clear all brings the square back, empty. This is the table's rule, not the story's: every list with both filters
+ * behaves this way; a page only has to list its quick keys among the advanced keys.
+ */
+export const QuickFiltersHideUnderAnAdvancedFilter: Story = {
+  name: 'Quick filters hide under an advanced filter',
+  args: {
+    filters: undefined,
+    advancedFilter: {
+      keys: [
+        { id: 'name', label: 'Name', type: 'text' },
+        { id: 'email', label: 'Email', type: 'text' },
+        { id: 'status', label: 'Status', type: 'pick', options: ['Active', 'Inactive', 'Invited'] },
+        { id: 'role', label: 'Role', type: 'pick', options: SAMPLE_ROLES },
+        { id: 'source', label: 'Source', type: 'pick', options: ['Manual', 'LDAP', 'SCIM'] },
+      ],
+    },
+  },
+};
+
+/**
+ * **The bar follows the window, not the card** (2026-09-26). This is the table on a page like the console's: a
+ * scrolling frame the height of the window, a 60px band pinned at its top, a title and a strip of counts, and the
+ * card filling the room under the band - so at rest the card's last rows and its pager sit below the fold, exactly as
+ * on Users. The bar used to hang 62px above the card's end, which on the console put it 135px below the fold: rows
+ * picked, nothing to show for it until the page was scrolled. Now it hangs from a hook that sticks to the bottom of
+ * whatever scrolls the card - the page here, a drawer's body elsewhere - 62px up, centred on the card, and it rides up
+ * with the card only once the card's end comes into view. Picking rows changes nothing in the card's layout: the bar
+ * still overlays the last row and the pager does not move. Scroll the frame and watch the bar stay put. A card that
+ * IS the page (Docked, above) keeps the bar above its own end, which is the same line there. Open the story itself:
+ * every row on the page is picked as it opens, and the bar is there without a scroll.
+ */
+export const SelectedOnALongPage: Story = {
+  name: 'Selected on a long page',
+  /* autoplay: the docs page picks the rows too, so the example there shows the bar and not a table at rest */
+  parameters: { layout: 'fullscreen', docs: { story: { autoplay: true } } },
+  render: function SelectedOnALongPageStory() {
+    const counts = [
+      ['All users', '26'],
+      ['Active', '17'],
+      ['Invited', '5'],
+    ];
+    return (
+      <div
+        className="mdt-h-screen mdt-overflow-y-auto mdt-bg-background mdt-font-sans mdt-text-neutral-130"
+        /* the band the card docks under: the frame publishes its line, as the console's page frame does */
+        style={{ scrollbarWidth: 'none', '--mdt-thead-top': '60px' } as React.CSSProperties}
+      >
+        <div className="mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-h-[60px] mdt-items-center mdt-border-b mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-px-6 mdt-text-sm mdt-text-muted-foreground">
+          Access · Users
+        </div>
+        <div className="mdt-px-6 mdt-pb-6 mdt-pt-6">
+          <h1 className="mdt-m-0 mdt-text-xl mdt-font-semibold">Users</h1>
+          <p className="mdt-mb-5 mdt-mt-1 mdt-text-xs mdt-text-muted-foreground">
+            Everyone with a sign-in, across every organisation you can see.
+          </p>
+          <div className="mdt-mb-6 mdt-grid mdt-grid-cols-3 mdt-gap-4">
+            {counts.map(([k, v]) => (
+              <div
+                key={k}
+                className="mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-card mdt-p-5"
+              >
+                <div className="mdt-text-xs mdt-text-muted-foreground">{k}</div>
+                <div className="mdt-mt-1 mdt-text-2xl mdt-font-semibold mdt-tabular-nums">{v}</div>
+              </div>
+            ))}
+          </div>
+          <UsersTable />
+        </div>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(await canvas.findByRole('checkbox', { name: 'Select all on this page' }));
   },
 };

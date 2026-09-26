@@ -24,7 +24,7 @@ function PersonCell({ name, avatar, owner = false, muted = false, className }: P
   return (
     <span
       className={cn(
-        'mdt-inline-flex mdt-min-w-0 mdt-max-w-full mdt-items-center mdt-gap-2.5',
+        'mdt-inline-flex mdt-min-w-0 mdt-max-w-full mdt-items-center mdt-gap-3',
         className
       )}
     >
@@ -39,9 +39,7 @@ function PersonCell({ name, avatar, owner = false, muted = false, className }: P
       <span
         className={cn(
           'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
-          muted
-            ? 'mdt-font-normal mdt-text-muted-foreground'
-            : 'mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10'
+          muted ? 'mdt-font-normal mdt-text-faint' : 'mdt-font-medium mdt-text-neutral-130'
         )}
         title={name}
       >
@@ -49,12 +47,22 @@ function PersonCell({ name, avatar, owner = false, muted = false, className }: P
       </span>
       {owner && (
         <span
-          className="tbl-owner mdt-inline-flex mdt-h-5 mdt-w-5 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full mdt-text-azure-60"
+          className="tbl-owner mdt-inline-flex mdt-h-5 mdt-w-5 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full mdt-bg-blue-10 mdt-text-blue-60"
           role="img"
           aria-label="Tenant owner"
           title="Tenant owner"
         >
-          <Icon name="shield" size={12} />
+          {/* the console's mark: Tabler shield-filled at 12, in the label's ink (fill, not stroke) */}
+          <svg
+            width={12}
+            height={12}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+            className="mdt-block"
+          >
+            <path d="M11.884 2.007l.114 -.007l.118 .007l.059 .008l.061 .013l.111 .034a.993 .993 0 0 1 .217 .112l.104 .082l.255 .218a11 11 0 0 0 7.189 2.537l.342 -.01a1 1 0 0 1 1.005 .717a13 13 0 0 1 -9.208 16.25a1 1 0 0 1 -.502 0a13 13 0 0 1 -9.209 -16.25a1 1 0 0 1 1.005 -.717a11 11 0 0 0 7.531 -2.527l.263 -.225l.096 -.075a.993 .993 0 0 1 .217 -.112l.112 -.034a.97 .97 0 0 1 .119 -.021z" />
+          </svg>
         </span>
       )}
     </span>
@@ -69,7 +77,7 @@ export interface ContactChipsProps {
 }
 
 const CHIP =
-  'mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-azure-60 hover:mdt-text-azure-60 data-[state=delayed-open]:mdt-border-azure-60 data-[state=delayed-open]:mdt-text-azure-60 data-[state=instant-open]:mdt-border-azure-60 data-[state=instant-open]:mdt-text-azure-60 dark:mdt-border-neutral-110 dark:mdt-text-neutral-40 [&+&]:-mdt-ml-1.5';
+  'mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-azure-60 hover:mdt-text-azure-60 data-[state=delayed-open]:mdt-border-azure-60 data-[state=delayed-open]:mdt-text-azure-60 data-[state=instant-open]:mdt-border-azure-60 data-[state=instant-open]:mdt-text-azure-60 [&+&]:-mdt-ml-1.5';
 
 /**
  * One chip: the value in an instant bubble with the click-to-copy hint; after a
@@ -190,7 +198,7 @@ function TagList({ items, max = 2 }: TagListProps) {
 /** A missing value: an em-dash that reads "Not set". */
 function TableEmptyValue() {
   return (
-    <span className="mdt-text-muted-foreground" aria-label="Not set">
+    <span className="mdt-text-faint" aria-label="Not set">
       —
     </span>
   );

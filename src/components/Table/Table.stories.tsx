@@ -17,7 +17,6 @@ import {
   TableRow,
   TableSelectAll,
   TableSelectionCell,
-  TableTailCell,
   TableViewport,
 } from './Table';
 import { TableBulkAction, TableBulkBar, TableBulkSeparator } from './TableBulkBar';
@@ -116,10 +115,10 @@ export const Headings: Story = {
   render: () => (
     <Table label="Headings">
       <TableViewport tableWidth={WIDTHS.reduce((a, b) => a + b, 60)}>
-        <TableColGroup widths={WIDTHS} />
+        <TableColGroup widths={WIDTHS} tail={0} />
         <TableHeader>
           <tr>
-            <TableSelectAll state="none" onToggle={() => undefined} onScope={() => undefined} />
+            <TableSelectAll state="none" onToggle={() => undefined} />
             <TableHead
               columnKey="name"
               label="Name"
@@ -157,7 +156,6 @@ export const Headings: Story = {
               glyph={<Icon name="loader" size={14} />}
               menu={<span className="mdt-px-2 mdt-text-xs">Menu items go here</span>}
             />
-            <TableTailCell head />
           </tr>
         </TableHeader>
         <TableBody>
@@ -183,7 +181,6 @@ export const Headings: Story = {
                   Active
                 </Badge>
               </TableCell>
-              <TableTailCell />
             </TableRow>
           ))}
         </TableBody>
@@ -209,7 +206,7 @@ export const Selection: Story = {
     return (
       <Table label="Selection">
         <TableViewport tableWidth={60 + 200 + 217 + 60} hasSelection={picked.size > 0}>
-          <TableColGroup widths={[60, 200, 217]} />
+          <TableColGroup widths={[60, 200, 217]} tail={0} />
           <TableHeader>
             <tr>
               <TableSelectAll
@@ -217,11 +214,9 @@ export const Selection: Story = {
                 onToggle={() => {
                   setPicked(state === 'all' ? new Set() : new Set(ids));
                 }}
-                onScope={() => undefined}
               />
               <TableHead columnKey="name" label="Name" width={200} frozen={60} frozenEdge />
               <TableHead columnKey="email" label="Email" width={217} />
-              <TableTailCell head />
             </tr>
           </TableHeader>
           <TableBody>
@@ -251,7 +246,6 @@ export const Selection: Story = {
                   <TableCell>
                     <span className="mdt-text-muted-foreground">{u.email}</span>
                   </TableCell>
-                  <TableTailCell />
                 </TableRow>
               );
             })}
@@ -347,15 +341,14 @@ export const Skeleton: Story = {
   render: () => (
     <Table label="Loading">
       <TableViewport tableWidth={WIDTHS.reduce((a, b) => a + b, 60)}>
-        <TableColGroup widths={WIDTHS} />
+        <TableColGroup widths={WIDTHS} tail={0} />
         <TableHeader>
           <tr>
-            <TableSelectAll state="none" onToggle={() => undefined} onScope={() => undefined} />
+            <TableSelectAll state="none" onToggle={() => undefined} />
             <TableHead columnKey="name" label="Name" width={200} frozen={60} frozenEdge />
             <TableHead columnKey="email" label="Email" width={217} />
             <TableHead columnKey="contact" label="Contact" width={200} />
             <TableHead columnKey="status" label="Status" width={200} />
-            <TableTailCell head />
           </tr>
         </TableHeader>
         <TableSkeleton widths={WIDTHS} />
@@ -402,10 +395,18 @@ export const Cells: Story = {
         <Badge size="sm" shape="square">
           Manual
         </Badge>
-        <Badge size="sm" shape="square" palette={{ fill: '#F2F3FD', ink: '#4F5BC4' }}>
+        <Badge
+          size="sm"
+          shape="square"
+          palette={{ fill: 'hsl(var(--mdt-indigo-10))', ink: 'hsl(var(--mdt-indigo-60))' }}
+        >
           LDAP
         </Badge>
-        <Badge size="sm" shape="square" palette={{ fill: '#EDF8F7', ink: '#1F7A71' }}>
+        <Badge
+          size="sm"
+          shape="square"
+          palette={{ fill: 'hsl(var(--mdt-teal-20))', ink: 'hsl(var(--mdt-teal-80))' }}
+        >
           SCIM
         </Badge>
       </span>
@@ -444,10 +445,10 @@ export const DocksOnScroll: Story = {
     return (
       <div
         ref={scroller}
-        className="mdt-h-[720px] mdt-overflow-y-auto mdt-bg-neutral-10 mdt-font-sans mdt-text-neutral-130 dark:mdt-bg-neutral-130 dark:mdt-text-neutral-10"
+        className="mdt-h-[720px] mdt-overflow-y-auto mdt-bg-neutral-10 mdt-font-sans mdt-text-neutral-130"
         style={{ scrollbarWidth: 'none' }}
       >
-        <div className="mdt-sticky mdt-top-0 mdt-z-10 mdt-bg-neutral-10 mdt-px-6 dark:mdt-bg-neutral-130">
+        <div className="mdt-sticky mdt-top-0 mdt-z-10 mdt-bg-neutral-10 mdt-px-6">
           <div className="mdt-flex mdt-h-[72px] mdt-items-center">
             <h1 className="mdt-m-0 mdt-text-xl mdt-font-semibold">Users</h1>
           </div>
@@ -467,7 +468,7 @@ export const DocksOnScroll: Story = {
             {kpi.map(([k, v, note]) => (
               <div
                 key={k}
-                className="mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-p-5 dark:mdt-border-neutral-120"
+                className="mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background mdt-p-5"
               >
                 <div className="mdt-text-xs mdt-text-muted-foreground">{k}</div>
                 <div className="mdt-mt-1 mdt-text-2xl mdt-font-semibold mdt-tabular-nums">{v}</div>
@@ -486,7 +487,7 @@ export const DocksOnScroll: Story = {
             }}
           >
             <TableViewport ref={rows} tableWidth={PAGE_TABLE_WIDTH} hasSelection={picked.size > 0}>
-              <TableColGroup widths={PAGE_WIDTHS} />
+              <TableColGroup widths={PAGE_WIDTHS} tail={0} />
               <TableHeader>
                 <tr>
                   <TableSelectAll
@@ -494,7 +495,6 @@ export const DocksOnScroll: Story = {
                     onToggle={() => {
                       setPicked(state === 'all' ? new Set() : new Set(ids));
                     }}
-                    onScope={() => undefined}
                   />
                   <TableHead columnKey="name" label="Name" width={200} frozen={60} frozenEdge />
                   <TableHead columnKey="email" label="Email" width={217} movable resizable />
@@ -502,7 +502,6 @@ export const DocksOnScroll: Story = {
                   <TableHead columnKey="source" label="Source" width={200} movable />
                   <TableHead columnKey="teams" label="Teams" width={200} movable />
                   <TableHead columnKey="role" label="Role" width={200} movable />
-                  <TableTailCell head />
                 </tr>
               </TableHeader>
               <TableBody>
@@ -556,7 +555,6 @@ export const DocksOnScroll: Story = {
                         <TagList items={u.teams} />
                       </TableCell>
                       <TableCell>{u.role}</TableCell>
-                      <TableTailCell />
                     </TableRow>
                   );
                 })}
@@ -619,7 +617,7 @@ export const TheLeadColumn: Story = {
             <div style={{ fontSize: 12, color: 'hsl(var(--mdt-neutral-90))' }}>{v.caption}</div>
             <Table label={v.caption}>
               <TableViewport tableWidth={620} label={v.caption}>
-                <TableColGroup widths={[60, 240, 200]} />
+                <TableColGroup widths={[60, 240, 200]} tail={0} />
                 <TableHeader>
                   <TableRow inert>
                     <TableLeadHead
@@ -628,7 +626,6 @@ export const TheLeadColumn: Story = {
                       onToggle={() => {
                         setPicked((p) => (p.length === 0 ? [0, 1, 2] : []));
                       }}
-                      onScope={() => undefined}
                     />
                     <TableHead columnKey="name" label="Name" width={240} />
                     <TableHead columnKey="role" label="Role" width={200} />

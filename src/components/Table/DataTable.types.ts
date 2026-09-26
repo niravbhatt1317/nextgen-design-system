@@ -1,5 +1,24 @@
 import type { ReactNode } from 'react';
+import type { FilterKey } from '../AdvancedFilter';
 import type { TableBlankKind, TableColumnDef, TablePagingMode } from './Table.types';
+
+/**
+ * The advanced filter behind the strip's Filters door: rows of key · operator ·
+ * value, with groups, built by the AdvancedFilter component and applied by the
+ * table. A page describes its keys once (2026-09-24, Pranjal: "every fix ... solve
+ * it from the foundation so that anywhere else it doesnt cause the same issue" -
+ * the door and the panel were the Users page's own until then).
+ */
+export interface DataTableAdvancedFilter<Row> {
+  /** The keys a person can filter on. Since 2026-09-26 the page lists its quick filters' keys here too: the quick doors hide while an advanced filter is applied, so their jobs live in the panel. */
+  keys: FilterKey<Row>[];
+  /** The door's word. "More filters" unless the page says otherwise. */
+  label?: string | undefined;
+  /** The panel's heading. "Filters" unless the page says otherwise. */
+  title?: string | undefined;
+  /** The panel's width. 656 unless the page says otherwise. */
+  width?: number | undefined;
+}
 
 /** The toolbar's quick filter: one column, a few values, the square button with the dot. */
 export interface DataTableQuickFilter<Row> {
@@ -89,6 +108,13 @@ export interface DataTableProps<Row> {
    */
   quickFilter?: DataTableQuickFilter<Row> | DataTableQuickFilter<Row>[] | undefined;
   filters?: DataTableFilterGroup<Row>[] | undefined;
+  /**
+   * The advanced filter: a Filters door in the strip that opens the
+   * AdvancedFilter panel, its condition count on the door, its rows applied to
+   * the list. Give `filters` for a few tick-boxes, this for conditions; a page
+   * that gives both gets both doors.
+   */
+  advancedFilter?: DataTableAdvancedFilter<Row> | undefined;
   /** Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. */
   sortFields?: string[] | undefined;
   pageSize?: number | undefined;
@@ -102,6 +128,11 @@ export interface DataTableProps<Row> {
    * checkboxes, and "Row number" can be hidden from the Columns panel.
    */
   bulkActions?: ((selectedIds: string[], clear: () => void) => ReactNode) | undefined;
+  /** The blank 60 px column at the right edge that used to soak up leftover width. OFF by default since 2026-09-23
+   * (Pranjal: "remove the most right side column which is nothing but empty. Actually hide it from the code we might
+   * need it later"): the table ends at its last column and, once a person has dragged a column, the last content
+   * column takes the spare. `true` draws the tail as before. */
+  tail?: boolean | undefined;
   loading?: boolean | undefined;
   refreshing?: boolean | undefined;
   error?: boolean | undefined;
@@ -114,6 +145,11 @@ export interface DataTableProps<Row> {
   /**
    * The card becomes the page: `true` docked, a number the in-between while the
    * page scrolls it to its dock line. See Table's `docked`.
+   *
+   * The bulk bar reads this too (2026-09-26): docked, it hangs 62px above the
+   * card's own end; otherwise it hangs from a hook stuck to the bottom of
+   * whatever scrolls the card - the page, a drawer's body - so picking rows on
+   * a card that runs past the fold still shows the bar without scrolling.
    */
   docked?: boolean | number | undefined;
   /**

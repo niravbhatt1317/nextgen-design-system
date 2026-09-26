@@ -5,9 +5,13 @@
  * Tailwind classes on the components. */
 
 .tbl {
-  --tbl-divider: hsl(var(--mdt-neutral-30));
+  /* neutral-20: the ONE line grey the console draws on every table line (K-Table-05, measured rgb 236 241 249 on /users, 2026-09-22) */
+  --tbl-divider: hsl(var(--mdt-neutral-20));
   --tbl-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
-  --tbl-hover: hsl(var(--mdt-neutral-10));
+  /* the console row hover is neutral-10 at HALF strength over the card (tr bg-muted/50; measured rgba(247,250,252,.5) and rgb(251,252,254) on the pinned cells, 2026-09-22) */
+  --tbl-hover: color-mix(in srgb, hsl(var(--mdt-neutral-10)) 50%, hsl(var(--mdt-background)));
+  /* a picked row: the console paints its pinned cells neutral-10 and its other cells blue-10 at .4 (K-Table-32 OPEN); one tint until he rules */
+  --tbl-selected: hsl(var(--mdt-neutral-10));
   /* the card-to-page morph: 0 at rest, 1 docked (set by the docked prop) */
   --tbl-morph: 0;
   --tbl-radius: 12px;
@@ -82,11 +86,6 @@
 .tbl[data-divider='light'] {
   --tbl-divider: hsl(var(--mdt-neutral-20));
 }
-.dark .tbl {
-  --tbl-divider: hsl(var(--mdt-border) / 0.6);
-  --tbl-wash: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
-  --tbl-hover: hsl(var(--mdt-muted) / 0.5);
-}
 
 /* dividers: on cells, because the table is border-separate; the sticky heading keeps its line as an inset shadow */
 .tbl-cell,
@@ -101,9 +100,11 @@
 }
 
 /* rows: hover and selected share one tint; an invited row does not lift */
-.tbl-row:hover > td,
-.tbl-row[data-state='selected'] > td {
+.tbl-row:hover > td {
   background: var(--tbl-hover);
+}
+.tbl-row[data-state='selected'] > td {
+  background: var(--tbl-selected);
 }
 .tbl-row[data-inert]:hover > td {
   background: hsl(var(--mdt-background));
@@ -152,9 +153,21 @@
 .tbl-more {
   display: none;
 }
+/* INSTANT (Pranjal, 2026-09-23: "instead of any animation make it instant"): the grip, the arrow and the ⋯ appear
+ * at once; the 120 ms slide of the label is gone */
 .tbl-hcell {
   padding-left: 0;
-  transition: padding-left 0.12s;
+}
+/* the parts that never shrink, and the name that always does */
+.tbl-glyph,
+.tbl-sortmark {
+  flex: 0 0 auto;
+}
+.tbl-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .tbl-head[data-movable='true']:hover,
 .tbl-head[data-movable='true']:focus-within,
@@ -169,10 +182,14 @@
 .tbl-head[data-open='true'] .tbl-more {
   display: inline-flex;
 }
+/* NOTHING OVERLAPS (Pranjal, 2026-09-23: "atleast 20 px spacing between sorting icon and action icon"): under the
+ * pointer the label's box ends 20 px before the ⋯ (20 wide, 8 from the edge): the heading's content box is the
+ * width less 32, the box starts at 16 and must end at width - 48, so its most is 100% - 32px. The name truncates first. */
 .tbl-head[data-movable='true']:hover .tbl-hcell,
 .tbl-head[data-movable='true']:focus-within .tbl-hcell,
 .tbl-head[data-open='true'] .tbl-hcell {
   padding-left: 22px;
+  max-width: calc(100% - 32px);
 }
 /* a quick-filter column's glyph becomes the grip, in the same slot */
 .tbl-head[data-movable='true']:hover .tbl-glyph,
@@ -237,12 +254,4 @@
 }
 .tbl-table[data-refreshing='true'] > tbody {
   opacity: 0.6;
-}
-
-/* the owner mark shares the wash recipe: azure at 6% over the page, the console's blue-10 */
-.tbl-owner {
-  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 6%, hsl(var(--mdt-background)));
-}
-.dark .tbl-owner {
-  background: color-mix(in srgb, hsl(var(--mdt-azure-60)) 18%, hsl(var(--mdt-background)));
 }

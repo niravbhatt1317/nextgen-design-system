@@ -25,7 +25,6 @@ export {
 export { TableBulkBar, TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 export { TablePager, TableLoadMore } from './TablePager';
 export { TableBlank, TableSkeleton } from './TableStates';
-export { TableScopeMenu } from './TableScopeMenu';
 export { TableColumnsPanel, TableInsertPanel } from './TablePanels';
 export type {
   TableColumnsPanelProps,
@@ -58,7 +57,6 @@ export type {
   TableAlign,
   TableColumnDef,
   TableColumnsLayout,
-  TableSelectionScope,
   TablePagingMode,
   TableBlankKind,
   TableProps,
@@ -71,7 +69,6 @@ export type {
   TableNumberCellProps,
   TableNumberHeadProps,
   TableSelectAllProps,
-  TableScopeMenuProps,
   TableBulkBarProps,
   TableBulkActionProps,
   TablePagerProps,

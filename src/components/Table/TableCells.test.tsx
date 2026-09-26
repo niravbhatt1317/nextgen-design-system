@@ -45,12 +45,12 @@ describe('PersonCell', () => {
 
   it('goes muted for an invited person', () => {
     render(<PersonCell name="Ada Lovelace" muted />);
-    expect(screen.getByText('Ada Lovelace')).toHaveClass('mdt-text-muted-foreground');
+    expect(screen.getByText('Ada Lovelace')).toHaveClass('mdt-text-faint');
   });
 
   it('is not muted by default', () => {
     render(<PersonCell name="Ada Lovelace" />);
-    expect(screen.getByText('Ada Lovelace')).not.toHaveClass('mdt-text-muted-foreground');
+    expect(screen.getByText('Ada Lovelace')).not.toHaveClass('mdt-text-faint');
   });
 
   it('accepts a className', () => {

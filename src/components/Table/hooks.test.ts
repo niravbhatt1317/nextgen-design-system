@@ -53,7 +53,7 @@ describe('useTableColumns', () => {
     act(() => result.current.setWidth('b', 40));
     expect(result.current.widthOf('b')).toBe(100);
     act(() => result.current.setWidth('a', 40));
-    expect(result.current.widthOf('a')).toBe(120);
+    expect(result.current.widthOf('a')).toBe(160); // the floor is 160 (Pranjal, 2026-09-23)
     act(() => result.current.setWidth('a', 9999));
     expect(result.current.widthOf('a')).toBe(720);
   });

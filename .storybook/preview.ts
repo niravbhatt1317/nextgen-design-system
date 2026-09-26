@@ -5,6 +5,7 @@ import '../src/styles/globals.css';
 // Covers the Docs chrome that `docs.theme` cannot reach when the Theme toolbar
 // is switched manually, away from the operating system preference.
 import './docs-theme.css';
+import './gallery-face.css'; /* the console's Inter stack, so widths measure alike */
 
 /**
  * Applies the design system's own theming to the preview canvas.

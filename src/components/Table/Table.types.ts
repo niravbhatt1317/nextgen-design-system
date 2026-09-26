@@ -46,9 +46,6 @@ export interface TableColumnsLayout {
   widths: Record<string, number>;
 }
 
-/** Which rows a select-all should take: the page, everything that matches, or a number. */
-export type TableSelectionScope = 'page' | 'all' | 'custom';
-
 /** Pages, or a "Load more" footer that also fires as you scroll. Users keeps pages. */
 export type TablePagingMode = 'pages' | 'loadMore';
 
@@ -201,30 +198,14 @@ export interface TableNumberHeadProps {
 export interface TableSelectAllProps {
   /** none, some or all of the selectable rows on the page are picked. */
   state: 'none' | 'some' | 'all';
+  /** The box selects this page, and only this page. */
   onToggle: () => void;
-  /** Opens the scope menu. */
-  onScope: (anchor: HTMLElement) => void;
   frozen?: number | undefined;
-}
-
-export interface TableScopeMenuProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  anchor: HTMLElement | null;
-  /** Selectable rows on this page. */
-  pageCount: number;
-  /** Selectable rows matching the search and filters, across pages. */
-  allCount: number;
-  /** What the table calls its rows: "users". */
-  noun: string;
-  onApply: (scope: TableSelectionScope, count: number) => void;
 }
 
 export interface TableBulkBarProps extends ComponentPropsWithoutRef<'div'> {
   /** How many rows are picked. The bar is not rendered at zero. */
   count: number;
-  /** "N selected" opens the scope menu. */
-  onScope?: ((anchor: HTMLElement) => void) | undefined;
   onClear: () => void;
   children?: ReactNode | undefined;
 }
