@@ -23,9 +23,8 @@
  * Every declaration the previous dark block carried that the map does not cover is carried over verbatim and listed,
  * so nothing disappears in silence.
  *
- * THE SWITCH is <html data-theme="dark"> - the console's. The storybook sets it too (.storybook/preview.ts), beside
- * the `.dark` class it still needs for the `dark:` variants that are being retired family by family. When the last
- * `dark:` variant goes, the class goes with it and there is one switch. */
+ * THE SWITCH is <html data-theme="dark"> - the console's, and since 2026-09-26 the only one: the storybook sets it
+ * (.storybook/preview.ts), the last `dark:` variants left the components that day, and the `.dark` class is history. */
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');

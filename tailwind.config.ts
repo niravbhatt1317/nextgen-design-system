@@ -1,21 +1,15 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  // Dark mode is keyed on the `dark` class, matched via an attribute selector.
-  //
-  // The obvious `darkMode: 'class'` does not work here: Tailwind applies the
-  // `mdt-` prefix to the toggle class as well, emitting
-  // `.dark\:mdt-bg-x:is(.mdt-dark *)` while the app puts plain `.dark` on the
-  // root. The selectors never match, so every `dark:` utility in the library is
-  // silently dead. Writing `['class', '.dark']` does not help either - that
-  // custom selector gets prefixed too.
-  //
-  // An attribute selector is not prefixed, so it survives intact.
-  //
-  // Token-based theming was never affected, because globals.css defines
-  // `.dark { --mdt-* }` in plain CSS. That is why this went unnoticed: the
-  // theme flipped correctly while every `dark:` class quietly did nothing.
-  darkMode: ['class', '[class~="dark"]'],
+  // THE ONE SWITCH is <html data-theme="dark"> (2026-09-26; the console's since
+  // 2026-09-24). The theme itself is tokens: globals.css carries a generated
+  // [data-theme='dark'] block from the colour map, and no component carries a
+  // `dark:` utility any more - the colour gate (scripts/colour-gate.cjs) refuses
+  // a new one. This selector is kept only so that, should a `dark:` class ever
+  // slip in, it follows the same switch rather than the operating system. An
+  // attribute selector is used because Tailwind would prefix a class selector
+  // with `mdt-` and it would never match.
+  darkMode: ['class', '[data-theme="dark"]'],
   content: ['./src/**/*.{ts,tsx}', './.storybook/**/*.{ts,tsx}'],
   prefix: 'mdt-',
   theme: {

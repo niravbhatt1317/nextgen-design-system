@@ -446,8 +446,8 @@ dark colour, change the map and regenerate.
 In dark the whole ramp moves, not only the semantic layer: the map gives every step of every hue a
 dark value (`neutral-10` is the sunken canvas, `neutral-150` the reading ink, the `-05`/`-10` steps
 of each hue a tinted chip on the raised surface), so a component that reaches for a ramp step still
-lands on the right ground. The `dark:` utilities that remain in some components predate the map and
-are being retired; they do nothing, because nothing sets the `.dark` class any more.
+lands on the right ground. No component carries a `dark:` utility any more (2026-09-26: the last ones
+were retired family by family, each proven pixel-identical), and the `.dark` class is gone with them.
 
 The same switch drives the console (`next-gen-ui`, `<html data-theme>` since 2026-09-24), so the
 storybook and the product read one dark theme.
