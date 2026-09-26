@@ -80,6 +80,8 @@ const explicit = {
   /* CARDS ARE FLAT (Pranjal, 2026-09-24): the card token is the page surface in dark too, the edge does the work; the
    * raised step stays for what really lifts */
   card: D('elevation.surface'), 'surface-raised': D('elevation.surface.raised'), popover: D('elevation.surface.overlay'),
+  /* the inverse surface (2026-09-26): the tooltip's ground and words - the map's inverse wash on the raised step */
+  inverse: D('color.background.inverse'), 'inverse-foreground': D('component.tooltip.text'),
   foreground: D('color.text.brand'), 'card-foreground': D('color.text.brand'), 'popover-foreground': D('color.text.brand'), 'secondary-foreground': D('color.text.brand'),
   /* black stays black (the scrim reads it); white stays white (a real colour, not the console's paper) */
   black: '#000000', white: '#FFFFFF', 'neutral-160': D('color.text.brand'),

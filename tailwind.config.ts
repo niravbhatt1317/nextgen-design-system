@@ -38,6 +38,8 @@ const config: Config = {
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
           'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
           'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
+          hover: 'hsl(var(--mdt-primary-hover) / <alpha-value>)',
+          active: 'hsl(var(--mdt-primary-active) / <alpha-value>)',
         },
         // The AI gradient's three stops, so the mark can be drawn from classes
         // as well as from the SVG's own `stop-color`.
@@ -71,6 +73,12 @@ const config: Config = {
         popover: {
           DEFAULT: 'hsl(var(--mdt-popover) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-popover-foreground) / <alpha-value>)',
+        },
+        // The inverse surface: a dark ground on a light page (the tooltip), and the
+        // ink on it. Both themes come from the tokens; see globals.css.
+        inverse: {
+          DEFAULT: 'hsl(var(--mdt-inverse) / <alpha-value>)',
+          foreground: 'hsl(var(--mdt-inverse-foreground) / <alpha-value>)',
         },
         card: {
           DEFAULT: 'hsl(var(--mdt-card) / <alpha-value>)',

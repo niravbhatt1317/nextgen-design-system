@@ -50,14 +50,14 @@ describe('Tooltip', () => {
     render(<Bubble>Tooltip content</Bubble>);
     const el = await open();
     expect(el).toHaveClass(
-      'mdt-bg-neutral-130',
-      'mdt-text-white',
+      'mdt-bg-inverse',
+      'mdt-text-inverse-foreground',
       'mdt-px-3',
       'mdt-py-1.5',
       'mdt-text-center'
     );
     expect(el.style.maxWidth).toBe('280px');
-    expect(el.querySelector('svg')).toHaveClass('mdt-fill-neutral-130');
+    expect(el.querySelector('svg')).toHaveClass('mdt-fill-inverse');
     expect(screen.getByRole('tooltip')).toHaveTextContent('Tooltip content');
   });
 

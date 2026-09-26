@@ -65,14 +65,16 @@ softer than the label" is therefore a different direction on each side, which is
 
 ### Surfaces
 
-| Token                      | Tailwind                      | Light   | Dark          |
-| -------------------------- | ----------------------------- | ------- | ------------- |
-| `--mdt-background`         | `mdt-bg-background`           | `white` | `neutral-160` |
-| `--mdt-foreground`         | `mdt-text-foreground`         | `black` | `neutral-10`  |
-| `--mdt-card`               | `mdt-bg-card`                 | `white` | `neutral-150` |
-| `--mdt-card-foreground`    | `mdt-text-card-foreground`    | `black` | `neutral-10`  |
-| `--mdt-popover`            | `mdt-bg-popover`              | `white` | `neutral-150` |
-| `--mdt-popover-foreground` | `mdt-text-popover-foreground` | `black` | `neutral-10`  |
+| Token                      | Tailwind                      | Light         | Dark                                                         |
+| -------------------------- | ----------------------------- | ------------- | ------------------------------------------------------------ |
+| `--mdt-background`         | `mdt-bg-background`           | `white`       | `neutral-160`                                                |
+| `--mdt-foreground`         | `mdt-text-foreground`         | `black`       | `neutral-10`                                                 |
+| `--mdt-card`               | `mdt-bg-card`                 | `white`       | `neutral-150`                                                |
+| `--mdt-card-foreground`    | `mdt-text-card-foreground`    | `black`       | `neutral-10`                                                 |
+| `--mdt-popover`            | `mdt-bg-popover`              | `white`       | `neutral-150`                                                |
+| `--mdt-popover-foreground` | `mdt-text-popover-foreground` | `black`       | `neutral-10`                                                 |
+| `--mdt-inverse`            | `mdt-bg-inverse`              | `neutral-130` | the map's inverse wash (43 57 79 at 90%, on the raised step) |
+| `--mdt-inverse-foreground` | `mdt-text-inverse-foreground` | `white`       | the map's tooltip ink (#CAD3E2)                              |
 
 ### Actions
 
