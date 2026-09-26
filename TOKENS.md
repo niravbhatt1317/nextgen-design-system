@@ -450,6 +450,15 @@ are being retired; they do nothing, because nothing sets the `.dark` class any m
 The same switch drives the console (`next-gen-ui`, `<html data-theme>` since 2026-09-24), so the
 storybook and the product read one dark theme.
 
+**The badge tones are tokens too** (since 2026-09-26): `--mdt-badge-<tone>-fill`, `-ink` and `-dot` for
+the eight tones (`neutral`, `slate`, `success`, `warning`, `danger`, `info`, `ai`, `inverse`), 24 in all.
+Unlike the rest of the palette they are **full colours, read with `var(--mdt-badge-success-fill)`**, never
+`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill). Light is
+declared in `:root`, copied value for value from the badge as Pranjal ruled it on 3 September 2026 (its six
+values without a palette name are still flagged there); dark is written into the generated block from the
+map's badge tier, and `ai`, which the map's badge table does not name yet, rides the purple ramp as before,
+his ruling pending. `badge.css` reads these names and holds no theme rule and no typed-in colour.
+
 ---
 
 ## 6 · When a token is missing
@@ -483,5 +492,6 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 | Emerald (console)   | 1      |
 | **Primitive total** | **92** |
 | Semantic            | 25     |
+| Badge tones         | 24     |
 | Radius              | 1      |
 | Typography          | 2      |

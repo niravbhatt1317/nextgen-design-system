@@ -14,7 +14,12 @@
  *      entries: the library's --mdt-white stays white and --mdt-black stays black);
  *   2. otherwise a colour ramp step gets the tinted-chip rule (a tint = the hue's mid step at a quarter over the dark
  *      raised surface; an ink = a lighter step of the same hue);
- *   3. otherwise the variable keeps its light value (radius, fonts, shadows, z-index, the AI gradient stops).
+ *   3. otherwise the variable keeps its light value (radius, fonts, shadows, z-index, the AI gradient stops);
+ *   4. the badge tier (2026-09-26): --mdt-badge-<tone>-fill / -ink / -dot, eight tones, FULL colours (several carry an
+ *      alpha or a color-mix, so badge.css reads them with var(), never hsl(var())). Light sits in :root; here the
+ *      seven tones the map's badge table names take its dark values (each wash composited on the raised surface) and
+ *      ai, which the table does not name, rides the purple ramp as it did before - purple-10 / -90 / -80 as this
+ *      same block remaps them; his ruling pending. badge.css holds no theme rule of its own.
  * Every declaration the previous dark block carried that the map does not cover is carried over verbatim and listed,
  * so nothing disappears in silence.
  *
@@ -118,6 +123,7 @@ const generic = (hue, step) => {
 };
 const dark = {}; const byRule = { model: 0, ramp: 0, kept: [] };
 for (const key of order) {
+  if (key.startsWith('badge-')) continue; /* the badge tier: full colours in :root, written by the badge section below */
   if (!P[key]) continue; /* not a colour: radius, fonts, shadows, z-index, alphas, gradient stops */
   if (explicit[key]) { dark[key] = explicit[key]; byRule.model++; continue; }
   const m = key.match(/^([a-z]+)-(\d+)$/);
@@ -126,6 +132,22 @@ for (const key of order) {
 }
 /* the six avatar tones (the organisation tiles): the map's avatar tier, fills composited on the raised surface */
 for (const a of model.avatars) { const fill = solid(a.dark.fill), ink = solid(a.dark.ink); if (fill) { dark['avatar-' + a.tone + '-fill'] = fill; byRule.model++; } if (ink) { dark['avatar-' + a.tone + '-ink'] = ink; byRule.model++; } }
+/* the badge tier: eight tones x fill / ink / dot as full colours, --mdt-badge-<tone>-<part>. The seven tones in the
+ * map's badge table take its dark values; ai is not in the map's badge table - the ramp rule, as before (purple-10 /
+ * -90 / -80 as this block remaps them, read from dark[] so the two can never drift); his ruling pending. */
+const toneClass = (t) => ({ 'information (info)': 'info' }[t.tone] || t.tone.replace(/ .*$/, ''));
+const BADGE_TONES = ['neutral', 'slate', 'success', 'warning', 'danger', 'info', 'ai', 'inverse'];
+const badgeDark = {};
+{
+  const byTone = Object.fromEntries(model.badges.map((t) => [toneClass(t), t]));
+  const lc = (v) => { if (!v) throw new Error('theme-dark: a badge value did not resolve'); return v.toLowerCase(); };
+  for (const tone of BADGE_TONES) {
+    const t = byTone[tone];
+    if (t) badgeDark[tone] = { fill: lc(solid(t.dark.fill)), ink: lc(solid(t.dark.ink)), dot: lc(solid(t.dark.dot)) };
+    else if (tone === 'ai') badgeDark.ai = { fill: lc(dark['purple-10']), ink: lc(dark['purple-90']), dot: lc(dark['purple-80']) };
+    else throw new Error('theme-dark: the map has no dark badge values for the tone ' + tone);
+  }
+}
 /* the nav's resting ink alpha is a token too (light 0.72, dark 0.84) */
 const extras = { 'nav-rest-alpha': '0.84' };
 /* what really keeps its light value: a colour variable nothing above gave a dark value to */
@@ -149,14 +171,22 @@ if (!prev.generated) {
 }
 
 /* ── the block ── */
-const toneClass = (t) => ({ 'information (info)': 'info' }[t.tone] || t.tone.replace(/ .*$/, ''));
 function render() {
   const L = [];
   L.push(BEGIN);
   L.push(`  /* ${Object.keys(dark).length} colour variables from the map (${byRule.model} by the semantic token for the job, ${byRule.ramp} by the tinted-chip rule for a ramp step);`);
-  L.push(`     ${byRule.kept.length} colour variables keep their light value (${byRule.kept.join(', ') || 'none'}); the rest of :root is not colour. */`);
+  L.push(`     ${byRule.kept.length} colour variables keep their light value (${byRule.kept.join(', ') || 'none'}); the ${BADGE_TONES.length * 3} badge tokens`);
+  L.push(`     (--mdt-badge-<tone>-fill / -ink / -dot, full colours) are the map's badge tier; the rest of :root is not colour. */`);
   L.push(`  ${SELECTOR} {`);
   for (const [k, v] of Object.entries(dark)) L.push(`    --mdt-${k}: ${hexToHsl(v)}; /* ${v} */`);
+  L.push("    /* the badge tier by tone - full colours read with var(), the light values sit in :root; the map's dark tier, each wash on the raised surface */");
+  for (const tone of BADGE_TONES) {
+    const b = badgeDark[tone];
+    if (tone === 'ai') L.push("    /* ai is not in the map's badge table - the ramp rule, as before; his ruling pending */");
+    L.push(`    --mdt-badge-${tone}-fill: ${b.fill};`);
+    L.push(`    --mdt-badge-${tone}-ink: ${b.ink};`);
+    L.push(`    --mdt-badge-${tone}-dot: ${b.dot};`);
+  }
   for (const [k, v] of Object.entries(extras)) L.push(`    --mdt-${k}: ${v};`);
   if (carried.length) {
     L.push('    /* carried over from the hand-written block - the map has no word on these yet */');
@@ -164,14 +194,7 @@ function render() {
   }
   L.push('    color-scheme: dark;');
   L.push('  }');
-  L.push('  /* the badge tier by tone: badge.css sets --bdg-fill / --bdg-ink / --bdg-dot per tone class in light; the map\'s dark tier lands the same way */');
-  for (const t of model.badges) {
-    L.push(`  ${SELECTOR} .bdg-${toneClass(t)} {`);
-    L.push(`    --bdg-fill: ${solid(t.dark.fill).toLowerCase()};`);
-    L.push(`    --bdg-ink: ${solid(t.dark.ink).toLowerCase()};`);
-    L.push(`    --bdg-dot: ${solid(t.dark.dot).toLowerCase()};`);
-    L.push('  }');
-  }
+  /* no per-class badge rules any more (2026-09-26): badge.css reads the 24 --mdt-badge-* tokens written above */
   L.push(END);
   return L.join(eol);
 }
@@ -188,6 +211,6 @@ if (require.main === module) {
   fs.writeFileSync(CSS, next);
   /* the repo formats css on commit; formatting here keeps the working file identical to what a commit would hold */
   try { require('child_process').execSync('npx prettier --write src/styles/globals.css', { cwd: ROOT, stdio: 'ignore' }); } catch (e) { console.warn('theme-dark: prettier did not run (' + e.message + ')'); }
-  console.log(`wrote the dark block into src/styles/globals.css: ${Object.keys(dark).length} variables (${byRule.model} by the map, ${byRule.ramp} by the ramp rule, ${byRule.kept.length} kept light: ${byRule.kept.join(', ') || 'none'}), ${model.badges.length} badge tones` + (carried.length ? `; carried over ${carried.length}: ${carried.map(([k]) => k).join(', ')}` : '') + (prev.generated ? '' : ' - replaced the hand-written .dark block'));
+  console.log(`wrote the dark block into src/styles/globals.css: ${Object.keys(dark).length} variables (${byRule.model} by the map, ${byRule.ramp} by the ramp rule, ${byRule.kept.length} kept light: ${byRule.kept.join(', ') || 'none'}), ${BADGE_TONES.length} badge tones as ${BADGE_TONES.length * 3} tokens` + (carried.length ? `; carried over ${carried.length}: ${carried.map(([k]) => k).join(', ')}` : '') + (prev.generated ? '' : ' - replaced the hand-written .dark block'));
 }
-module.exports = { P, light, S, model, explicit, dark, byRule, extras, carried, SELECTOR, solid, over, hexToHsl, hexToRgb, rgbToHex, hslToHex, SURFACE, generic, render };
+module.exports = { P, light, S, model, explicit, dark, badgeDark, BADGE_TONES, byRule, extras, carried, SELECTOR, solid, over, hexToHsl, hexToRgb, rgbToHex, hslToHex, SURFACE, generic, render };
