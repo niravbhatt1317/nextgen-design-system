@@ -101,20 +101,25 @@ const JOBS: Record<number, [string, string]> = {
   160: ['Near-black', 'the darkest ground'],
 };
 
-/** The names the console and this library both use, for different colours. */
-const DISAGREEMENTS: { token: string; library: string; console: string; apart: number }[] = [
-  { token: 'purple-70', library: '#A64DFF', console: '#5B27B0', apart: 2.17 },
-  { token: 'purple-60', library: '#B366FF', console: '#6C2ED1', apart: 2.12 },
-  { token: 'blue-70', library: '#004BCC', console: '#0A2666', apart: 1.94 },
-  { token: 'orange-60', library: '#FF6F00', console: '#FDB13F', apart: 1.53 },
-  { token: 'green-80', library: '#1B6540', console: '#21823A', apart: 1.45 },
-  { token: 'orange-70', library: '#CC5800', console: '#DA7D0B', apart: 1.39 },
-  { token: 'orange-80', library: '#994200', console: '#9F6404', apart: 1.37 },
-  { token: 'neutral-100', library: '#485875', console: '#384861', apart: 1.29 },
-  { token: 'blue-55', library: '#2474FF', console: '#036EBA', apart: 1.27 },
-  { token: 'neutral-110', library: '#2B3950', console: '#1D2B3E', apart: 1.23 },
-  { token: 'red-50', library: '#EC5B5B', console: '#E74536', apart: 1.17 },
-  { token: 'neutral-70', library: '#677FA2', console: '#727283', apart: 1.15 },
+/**
+ * The names the console and this library both use, for different colours. Only the
+ * console's value is typed in: its stylesheet is not loaded here, so it cannot be read
+ * live. The library's value, and how far apart the two sit, are read from the light
+ * stylesheet when the story renders.
+ */
+const DISAGREEMENTS: { token: string; console: string }[] = [
+  { token: 'purple-70', console: '#5B27B0' },
+  { token: 'purple-60', console: '#6C2ED1' },
+  { token: 'blue-70', console: '#0A2666' },
+  { token: 'orange-60', console: '#FDB13F' },
+  { token: 'green-80', console: '#21823A' },
+  { token: 'orange-70', console: '#DA7D0B' },
+  { token: 'orange-80', console: '#9F6404' },
+  { token: 'neutral-100', console: '#384861' },
+  { token: 'blue-55', console: '#036EBA' },
+  { token: 'neutral-110', console: '#1D2B3E' },
+  { token: 'red-50', console: '#E74536' },
+  { token: 'neutral-70', console: '#727283' },
 ];
 const SLIGHT = 12;
 
@@ -125,7 +130,7 @@ const readVar = (name: string): string => {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 };
 
-/** "218 100% 50%" → "#005EFF". Returns '' when the token is missing. */
+/** "218 100% 50%" → that colour as a six-digit hex. Returns '' when the token is missing. */
 const hslToHex = (triplet: string): string => {
   const parts = triplet.replace(/%/g, '').split(/\s+/).map(Number);
   const [h, s, l] = parts;
@@ -172,6 +177,56 @@ const stepName = (step: number): string => (step < 10 ? `0${String(step)}` : Str
 
 const shadeHex = (family: string, step: number): string =>
   hslToHex(readVar(`--mdt-${family}-${stepName(step)}`));
+
+/**
+ * Every `:root` rule in the running stylesheet — where the LIGHT values live, whichever
+ * theme is switched on. Read from the rules rather than from the element, so a
+ * light-against-light comparison still holds while the page is showing dark. A sheet
+ * that hides its rules (a font served from elsewhere) is skipped.
+ */
+const rootRules = (): CSSStyleRule[] => {
+  const found: CSSStyleRule[] = [];
+  if (typeof document === 'undefined') return found;
+  const walk = (rules: CSSRuleList): void => {
+    for (const rule of Array.from(rules)) {
+      if (rule instanceof CSSStyleRule) {
+        if (rule.selectorText === ':root') found.push(rule);
+      } else if (rule instanceof CSSGroupingRule) {
+        walk(rule.cssRules);
+      }
+    }
+  };
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      walk(sheet.cssRules);
+    } catch {
+      /* a cross-origin sheet hides its rules */
+    }
+  }
+  return found;
+};
+
+/** The last light declaration of a token; '' when it is not declared. */
+const lightVar = (rules: CSSStyleRule[], name: string): string => {
+  let value = '';
+  for (const rule of rules) {
+    const own = rule.style.getPropertyValue(name).trim();
+    if (own !== '') value = own;
+  }
+  return value;
+};
+
+/** A token's LIGHT value as a hex, following `var(--mdt-…)` hops; '' when it cannot be read. */
+const lightHex = (rules: CSSStyleRule[], name: string): string => {
+  let value = lightVar(rules, name);
+  for (let hop = 0; hop < 5 && value.startsWith('var('); hop += 1) {
+    const ref = /var\((--mdt-[a-z0-9-]+)\)/.exec(value)?.[1];
+    if (ref === undefined) return '';
+    value = lightVar(rules, ref);
+  }
+  if (value === '') return '';
+  return value.startsWith('#') ? value.toUpperCase() : hslToHex(value);
+};
 
 /* ── page furniture ────────────────────────────────────────── */
 
@@ -261,7 +316,9 @@ const Rung = ({
           display: 'block',
           height: 46,
           background:
-            hex === '' ? 'repeating-linear-gradient(45deg,#f33 0 6px,#fff 6px 12px)' : hex,
+            hex === ''
+              ? 'repeating-linear-gradient(45deg, hsl(var(--mdt-red-60)) 0 6px, hsl(var(--mdt-card)) 6px 12px)'
+              : hex,
         }}
       />
       <span style={{ display: 'block', padding: '5px 4px 6px', textAlign: 'center' }}>
@@ -561,100 +618,124 @@ export const TextOnATint: Story = {
  * fence you are standing on.
  *
  * This is not a bug to fix quietly — it is a decision, and it belongs to Nirav.
+ *
+ * The library column and the distance are read live from the light stylesheet, so
+ * they cannot go stale; the console column is typed in, because the console's
+ * stylesheet is not loaded here. Both columns are light values, whichever theme is on.
  */
 export const StillDisagreed: Story = {
-  render: () => (
-    <div style={page}>
-      <Title lead="Twenty-four token names paint one colour in this library and another in the console. Nothing on either side moves until each one is ruled on.">
-        Where the console and the library disagree
-      </Title>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 620, fontSize: 13 }}>
-          <thead>
-            <tr>
-              {['Token', 'This library', 'The console', 'Apart'].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    textAlign: 'left',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    letterSpacing: '.05em',
-                    textTransform: 'uppercase',
-                    color: 'hsl(var(--mdt-muted-foreground))',
-                    padding: '0 14px 8px 0',
-                    borderBottom: '1px solid hsl(var(--mdt-border))',
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {DISAGREEMENTS.map((row) => (
-              <tr key={row.token}>
-                <td
-                  style={{
-                    ...mono,
-                    fontWeight: 600,
-                    padding: '9px 14px 9px 0',
-                    borderBottom: '1px solid hsl(var(--mdt-border) / 0.5)',
-                  }}
-                >
-                  {row.token}
-                </td>
-                {[row.library, row.console].map((hex) => (
-                  <td
-                    key={hex}
+  render: () => {
+    const light = rootRules();
+    const rows = DISAGREEMENTS.map((row) => {
+      const [family = '', step = ''] = row.token.split('-');
+      const fromRules = lightHex(light, `--mdt-${row.token}`);
+      const library = fromRules === '' ? shadeHex(family, Number(step)) : fromRules;
+      return {
+        token: row.token,
+        library,
+        console: row.console,
+        apart: contrast(library, row.console),
+      };
+    }).sort((a, b) => b.apart - a.apart);
+    return (
+      <div style={page}>
+        <Title lead="Twenty-four token names paint one colour in this library and another in the console. Nothing on either side moves until each one is ruled on.">
+          Where the console and the library disagree
+        </Title>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 620, fontSize: 13 }}>
+            <thead>
+              <tr>
+                {['Token', 'This library', 'The console', 'Apart'].map((h) => (
+                  <th
+                    key={h}
                     style={{
+                      textAlign: 'left',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      letterSpacing: '.05em',
+                      textTransform: 'uppercase',
+                      color: 'hsl(var(--mdt-muted-foreground))',
+                      padding: '0 14px 8px 0',
+                      borderBottom: '1px solid hsl(var(--mdt-border))',
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.token}>
+                  <td
+                    style={{
+                      ...mono,
+                      fontWeight: 600,
                       padding: '9px 14px 9px 0',
                       borderBottom: '1px solid hsl(var(--mdt-border) / 0.5)',
                     }}
                   >
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 22,
-                        height: 22,
-                        borderRadius: 5,
-                        marginRight: 8,
-                        verticalAlign: 'middle',
-                        background: hex,
-                        border: '1px solid hsl(var(--mdt-border))',
-                      }}
-                    />
-                    <span style={{ ...mono, fontSize: 11.5 }}>{hex}</span>
+                    {row.token}
                   </td>
-                ))}
-                <td
-                  style={{
-                    ...mono,
-                    fontWeight: 600,
-                    fontVariantNumeric: 'tabular-nums',
-                    padding: '9px 14px 9px 0',
-                    borderBottom: '1px solid hsl(var(--mdt-border) / 0.5)',
-                    color:
-                      row.apart >= 1.4 ? 'hsl(var(--mdt-red-70))' : 'hsl(var(--mdt-orange-80))',
-                  }}
-                >
-                  {row.apart.toFixed(2)}×
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  {(
+                    [
+                      ['library', row.library],
+                      ['console', row.console],
+                    ] as const
+                  ).map(([side, hex]) => (
+                    <td
+                      key={side}
+                      style={{
+                        padding: '9px 14px 9px 0',
+                        borderBottom: '1px solid hsl(var(--mdt-border) / 0.5)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 22,
+                          height: 22,
+                          borderRadius: 5,
+                          marginRight: 8,
+                          verticalAlign: 'middle',
+                          background: hex,
+                          border: '1px solid hsl(var(--mdt-border))',
+                        }}
+                      />
+                      <span style={{ ...mono, fontSize: 11.5 }}>{hex}</span>
+                    </td>
+                  ))}
+                  <td
+                    style={{
+                      ...mono,
+                      fontWeight: 600,
+                      fontVariantNumeric: 'tabular-nums',
+                      padding: '9px 14px 9px 0',
+                      borderBottom: '1px solid hsl(var(--mdt-border) / 0.5)',
+                      color:
+                        row.apart >= 1.4 ? 'hsl(var(--mdt-red-70))' : 'hsl(var(--mdt-orange-80))',
+                    }}
+                  >
+                    {row.apart.toFixed(2)}×
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ marginTop: 12, fontSize: 12.5, color: 'hsl(var(--mdt-muted-foreground))' }}>
+          Plus {SLIGHT} more that differ only slightly — rounding and near-misses, but still two
+          answers to the same name.
+        </p>
+        <Note>
+          Each of these is one of three things: <b>the console is right</b> and this library should
+          adopt its value; <b>the library is right</b> and the console should drop its override; or{' '}
+          <b>both are right</b> and they are genuinely different colours that need different names.
+          Purple is the loudest — the console&rsquo;s is more than twice as dark as this
+          one&rsquo;s.
+        </Note>
       </div>
-      <p style={{ marginTop: 12, fontSize: 12.5, color: 'hsl(var(--mdt-muted-foreground))' }}>
-        Plus {SLIGHT} more that differ only slightly — rounding and near-misses, but still two
-        answers to the same name.
-      </p>
-      <Note>
-        Each of these is one of three things: <b>the console is right</b> and this library should
-        adopt its value; <b>the library is right</b> and the console should drop its override; or{' '}
-        <b>both are right</b> and they are genuinely different colours that need different names.
-        Purple is the loudest — the console&rsquo;s is more than twice as dark as this one&rsquo;s.
-      </Note>
-    </div>
-  ),
+    );
+  },
 };

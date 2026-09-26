@@ -24,7 +24,11 @@ export const Compare = ({ atomId }: { atomId: string }) => {
   const row = rows.find((r) => r.id === atomId);
 
   if (!row) {
-    return <p style={{ color: 'crimson' }}>No atom row called &quot;{atomId}&quot;.</p>;
+    return (
+      <p style={{ color: 'hsl(var(--mdt-destructive))' }}>
+        No atom row called &quot;{atomId}&quot;.
+      </p>
+    );
   }
 
   const built = systems.filter((s) => (row.specimens[s.key] ?? []).length > 0);
@@ -60,9 +64,7 @@ export const Compare = ({ atomId }: { atomId: string }) => {
                   style={{ background: sys.color }}
                   aria-hidden="true"
                 />
-                <span className="mdt-text-sm mdt-font-medium mdt-text-foreground">
-                  {sys.label}
-                </span>
+                <span className="mdt-text-sm mdt-font-medium mdt-text-foreground">{sys.label}</span>
                 {specs.length === 0 ? (
                   <span className="mdt-text-xs mdt-text-muted-foreground">
                     &mdash; did not build this
@@ -78,9 +80,9 @@ export const Compare = ({ atomId }: { atomId: string }) => {
                         <p
                           style={{
                             fontSize: 13,
-                            color: '#8a6d1f',
-                            background: '#fff8e1',
-                            border: '1px solid #f0e0a8',
+                            color: 'hsl(var(--mdt-orange-80))',
+                            background: 'hsl(var(--mdt-feedback-warning-bg))',
+                            border: '1px solid hsl(var(--mdt-feedback-warning-border))',
                             borderRadius: 6,
                             padding: '8px 10px',
                           }}
