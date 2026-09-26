@@ -352,7 +352,29 @@ export type {
 } from './Pagination';
 
 // Popover
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose } from './Popover';
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+  PopoverClose,
+  popoverSurface,
+} from './Popover';
+// PopoverOld — the previous popover. DEPRECATED 2026-09-26: use Popover (the overlay surface, no private dark rule).
+export {
+  PopoverOld,
+  PopoverOldTrigger,
+  PopoverOldContent,
+  PopoverOldAnchor,
+  PopoverOldClose,
+} from './PopoverOld';
+export type {
+  PopoverOldProps,
+  PopoverOldContentProps,
+  PopoverOldTriggerProps,
+  PopoverOldCloseProps,
+  PopoverOldAnchorProps,
+} from './PopoverOld';
 export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
 
 // Progress — value fill with optional baseline and floor markers
@@ -986,6 +1008,42 @@ export type {
   AvatarOld2Size,
   AvatarOld2Shape,
 } from './AvatarOld2';
+// DropdownMenuOld2 — the DropdownMenu before 2026-09-22 (items 14 at rounded-sm, the text going dark under the
+// pointer). DEPRECATED 2026-09-22: use DropdownMenu, whose root now carries the Users menu.
+export {
+  DropdownMenuOld2,
+  DropdownMenuOld2Trigger,
+  DropdownMenuOld2Content,
+  DropdownMenuOld2Item,
+  DropdownMenuOld2CheckboxItem,
+  DropdownMenuOld2RadioItem,
+  DropdownMenuOld2Label,
+  DropdownMenuOld2Separator,
+  DropdownMenuOld2Shortcut,
+  DropdownMenuOld2Group,
+  DropdownMenuOld2Portal,
+  DropdownMenuOld2Sub,
+  DropdownMenuOld2SubContent,
+  DropdownMenuOld2SubTrigger,
+  DropdownMenuOld2RadioGroup,
+} from './DropdownMenuOld2';
+export type {
+  DropdownMenuOld2Props,
+  DropdownMenuOld2TriggerProps,
+  DropdownMenuOld2ContentProps,
+  DropdownMenuOld2ItemProps,
+  DropdownMenuOld2CheckboxItemProps,
+  DropdownMenuOld2RadioItemProps,
+  DropdownMenuOld2LabelProps,
+  DropdownMenuOld2SeparatorProps,
+  DropdownMenuOld2ShortcutProps,
+  DropdownMenuOld2GroupProps,
+  DropdownMenuOld2PortalProps,
+  DropdownMenuOld2SubProps,
+  DropdownMenuOld2SubContentProps,
+  DropdownMenuOld2SubTriggerProps,
+  DropdownMenuOld2RadioGroupProps,
+} from './DropdownMenuOld2';
 // SwitchOld2 — the MotadataSwitch before 2026-09-22. DEPRECATED 2026-09-22: use MotadataSwitch.
 export {
   MotadataSwitchOld2,

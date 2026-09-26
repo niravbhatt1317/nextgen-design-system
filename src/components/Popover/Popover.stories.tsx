@@ -5,15 +5,25 @@ import { Input } from '../Input';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
 const meta: Meta<typeof Popover> = {
-  title: 'Components/Popover',
+  title: 'New Components/Popover',
   component: Popover,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Displays rich content in a portal, triggered by a button. Built on top of Radix UI Popover.',
+        component: [
+          'Rich content that floats over the page from a trigger, built on Radix Popover. The part that owns',
+          "**the overlay surface**: its ground is `--mdt-popover`, the colour map's `elevation.surface.overlay`",
+          "- white in light, neutral-150 in dark (the storybook's neutral-150; Pranjal, 2026-09-25/26) - a step",
+          'DARKER than a card, so a menu reads as its own thing on any surface, with the hairline visible on it.',
+          'The ink is `--mdt-popover-foreground`. It carries no private dark rule: the theme comes from the tokens.',
+          '',
+          'The same frame is exported as `popoverSurface` for the other parts that float - the row menu, a',
+          'select list, the date panel, the filter panel - so they share one ground and one edge.',
+          '',
+          'Replaces the earlier Popover (now `PopoverOld`, under Deprecated) as of 26 September 2026.',
+        ].join('\n'),
       },
     },
     controls: {
@@ -41,6 +51,34 @@ export const Default: Story = {
         </div>
       </PopoverContent>
     </Popover>
+  ),
+};
+
+/**
+ * The surface itself: the popover's ground beside the page and a card, so the step reads in both themes. In dark the
+ * card is the page colour with an edge (cards are flat), and the popover steps DOWN to neutral-150 with the hairline on it.
+ */
+export const TheSurface: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-items-start mdt-gap-6">
+      <div className="mdt-flex mdt-w-56 mdt-flex-col mdt-gap-2 mdt-rounded-md mdt-border mdt-border-neutral-30 mdt-bg-card mdt-p-4">
+        <h4 className="mdt-m-0 mdt-text-sm mdt-font-medium">A card</h4>
+        <p className="mdt-m-0 mdt-text-sm mdt-text-muted-foreground">--mdt-card, with its edge.</p>
+      </div>
+      <Popover defaultOpen>
+        <PopoverTrigger asChild>
+          <Button variant="outline">The popover</Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" sideOffset={8}>
+          <div className="mdt-flex mdt-flex-col mdt-gap-2">
+            <h4 className="mdt-m-0 mdt-text-sm mdt-font-medium">The overlay surface</h4>
+            <p className="mdt-m-0 mdt-text-sm mdt-text-muted-foreground">
+              --mdt-popover: white in light, neutral-150 in dark, the hairline visible on it.
+            </p>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   ),
 };
 
