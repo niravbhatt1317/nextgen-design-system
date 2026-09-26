@@ -6,7 +6,8 @@ import { iconNames } from './icons';
 import type { IconProps } from './Icon.types';
 
 /**
- * Copy notification component that renders in a portal
+ * Copy notification component that renders in a portal. Its colours are the
+ * success pair and the overlay shadow (tokens), so the toast follows the theme.
  */
 function CopyNotification({ message, onClose }: { message: string | null; onClose: () => void }) {
   useEffect(() => {
@@ -38,11 +39,11 @@ function CopyNotification({ message, onClose }: { message: string | null; onClos
         gap: '8px',
         padding: '12px 20px',
         borderRadius: '8px',
-        backgroundColor: '#10b981',
-        color: '#ffffff',
+        backgroundColor: 'hsl(var(--mdt-success))',
+        color: 'hsl(var(--mdt-success-foreground))',
         fontSize: '14px',
         fontWeight: 500,
-        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+        boxShadow: 'var(--mdt-shadow-lg)',
         animation: 'slideDown 0.3s ease-out',
       }}
     >
@@ -61,7 +62,7 @@ function CopyNotification({ message, onClose }: { message: string | null; onClos
       <span>Copied: </span>
       <code
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          backgroundColor: 'hsl(var(--mdt-success-foreground) / 0.2)',
           padding: '2px 8px',
           borderRadius: '4px',
           fontFamily: 'monospace',

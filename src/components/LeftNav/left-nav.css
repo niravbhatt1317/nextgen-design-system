@@ -18,17 +18,32 @@
  * snapped to palette steps: the control border (neutral-30), the chip tint
  * (blue-10) and the Soon badge fill (neutral-30). Still raw, by his call:
  * the six avatar tone pairs (intentional, no change wanted) and every
- * dark-mode value (set aside for a later pass). */
+ * dark-mode value (set aside for a later pass).
+ *
+ * 2026-09-24 (Pranjal: "every fix ... solve it from the foundation so that anywhere
+ * else it doesnt cause the same issue"): the rail reads TOKENS ONLY. Every colour
+ * here is an --mdt-nav-* token from globals.css (light as shipped, dark from the
+ * colour map) and every ".dark" twin rule is gone - the token carries the theme.
+ * The one residue: the six avatar tone pairs below, kept raw by his call until the
+ * map's avatar tokens land. The console deleted its own copies of this file
+ * (sidebarNav.css, orgSwitcher.css) the same day; this is the one stylesheet. */
 
 /* ══ the console's palette layer, carried WITH the component ══
  *
- * The console re-points these tokens app-wide in LIGHT mode (its global.css
- * does it under `:root:not(.dark)`; in dark it deliberately falls back to the
- * design system's own values, so dark needs no overrides here). The rail was
- * DESIGNED on these values — without them every tint drifts, measured against
- * the live product. Scoped to `.lnn-scope` so nothing else in the design
- * system moves. Each line is a candidate for a real token home — part of this
- * PR's naming review. */
+ * The console re-points these tokens app-wide in LIGHT mode; in dark it
+ * deliberately falls back to the design system's own values, so dark needs no
+ * overrides here. The rail was DESIGNED on these values — without them every
+ * tint drifts, measured against the live product. Scoped to `.lnn-scope` so
+ * nothing else in the design system moves. Each line is a candidate for a real
+ * token home — part of this PR's naming review.
+ *
+ * 2026-09-26: the theme switch is `<html data-theme="dark">`, not the .dark
+ * class, so the old guard `:root:not(.dark)` matched in dark as well and this
+ * light-only layer leaked into dark. The guard now reads
+ * `:root:not([data-theme='dark'])`. Today the two re-points happen to land on
+ * the same values the generated dark block gives --mdt-border and
+ * --mdt-destructive (#1D2A3E and #EC5B5B), so nothing moved on screen; the
+ * guard is right for the day the map moves them apart. */
 .lnn-scope {
   font-family:
     'Inter',
@@ -42,7 +57,7 @@
     system-ui,
     sans-serif;
 }
-:root:not(.dark) .lnn-scope {
+:root:not([data-theme='dark']) .lnn-scope {
   --mdt-border: var(
     --mdt-neutral-20
   ); /* the console's one-border-grey ruling: a re-point of an existing step, still open */
@@ -182,34 +197,24 @@
   text-align: left;
   font: inherit;
   font-size: 14px;
-  color: hsl(var(--mdt-foreground) / 0.72);
+  color: hsl(var(--mdt-nav-text) / var(--mdt-nav-rest-alpha));
   margin-bottom: 2px;
-}
-.dark .snv-row {
-  color: hsl(var(--mdt-foreground) / 0.84);
 }
 .snv-row svg {
   flex: 0 0 auto;
-  color: hsl(var(--mdt-foreground) / 0.72);
-}
-.dark .snv-row svg {
-  color: hsl(var(--mdt-foreground) / 0.84);
+  color: hsl(var(--mdt-nav-text) / var(--mdt-nav-rest-alpha));
 }
 .snv-row:hover {
-  background: hsl(var(--mdt-neutral-20));
+  background: hsl(var(--mdt-nav-hover));
 }
-.dark .snv-row:hover {
-  background: hsl(var(--mdt-neutral-130));
-}
+/* THE SELECTED ROW READS ITS OWN TOKEN (2026-09-24): the console typed #ECF1F9 here and the dark map could not
+ * reach it - the pill stayed light under near-white ink (1.08:1). One token, both themes. */
 .snv-row[data-on='true'] {
-  background: hsl(var(--mdt-neutral-20));
-  color: hsl(var(--mdt-foreground));
-}
-.dark .snv-row[data-on='true'] {
-  background: hsl(var(--mdt-neutral-130));
+  background: hsl(var(--mdt-nav-selected));
+  color: hsl(var(--mdt-nav-text));
 }
 .snv-row[data-on='true'] svg {
-  color: hsl(var(--mdt-foreground));
+  color: hsl(var(--mdt-nav-text));
 }
 .snv-lbl {
   flex: 1;
@@ -237,7 +242,7 @@
 /* not-yet-available: icon + text fade to 40%, the badge keeps full strength */
 .snv-off {
   cursor: default;
-  color: hsl(var(--mdt-foreground));
+  color: hsl(var(--mdt-nav-text));
 }
 .snv-off:hover {
   background: transparent;
@@ -249,7 +254,7 @@
 /* the console's disabled look (Nothing starred yet): whole row, ink at 50% */
 .snv-dis {
   cursor: default;
-  color: hsl(var(--mdt-foreground));
+  color: hsl(var(--mdt-nav-text));
   opacity: 0.5;
 }
 .snv-dis:hover {
@@ -275,10 +280,7 @@
   padding: 0 2px;
   font-size: 12px;
   font-weight: 500;
-  color: hsl(var(--mdt-muted-foreground-subtle));
-}
-.dark .snv-label {
-  color: #a7b0bf;
+  color: hsl(var(--mdt-nav-label));
 }
 .snv-body > .snv-label:first-child {
   margin-top: 6px;
@@ -290,10 +292,7 @@
   right: -2px;
   top: -11px;
   height: 1px;
-  background: hsl(var(--mdt-neutral-20));
-}
-.dark .snv-label::before {
-  background: #222933;
+  background: hsl(var(--mdt-nav-line));
 }
 .snv-body > .snv-label:first-child::before {
   display: none;
@@ -341,22 +340,24 @@
   top: -999px;
   bottom: calc(50% + 7px);
   width: 1px;
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 20%, hsl(var(--mdt-neutral-10)));
+  background: color-mix(
+    in srgb,
+    hsl(var(--mdt-muted-foreground)) 20%,
+    hsl(var(--mdt-nav-background))
+  );
   transition: background 0.15s;
   pointer-events: none;
-}
-.dark .snv-kids .snv-row::after {
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 20%, hsl(var(--mdt-neutral-150)));
 }
 /* connector tones, ordered: rest lightest → hover the middle → selected the darkest */
 .snv-kids .snv-row:hover {
   z-index: 1;
 }
 .snv-kids .snv-row:hover::after {
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 52%, hsl(var(--mdt-neutral-10)));
-}
-.dark .snv-kids .snv-row:hover::after {
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 52%, hsl(var(--mdt-neutral-150)));
+  background: color-mix(
+    in srgb,
+    hsl(var(--mdt-muted-foreground)) 52%,
+    hsl(var(--mdt-nav-background))
+  );
 }
 .snv-kids .snv-row:hover::before {
   border-color: hsl(var(--mdt-muted-foreground) / 0.7);
@@ -365,10 +366,11 @@
   z-index: 2;
 }
 .snv-kids .snv-row[data-on='true']::after {
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 78%, hsl(var(--mdt-neutral-10)));
-}
-.dark .snv-kids .snv-row[data-on='true']::after {
-  background: color-mix(in srgb, hsl(var(--mdt-muted-foreground)) 78%, hsl(var(--mdt-neutral-150)));
+  background: color-mix(
+    in srgb,
+    hsl(var(--mdt-muted-foreground)) 78%,
+    hsl(var(--mdt-nav-background))
+  );
 }
 .snv-kids .snv-row[data-on='true']::before {
   border-color: hsl(var(--mdt-muted-foreground));
@@ -376,12 +378,9 @@
 
 /* ── the pinned bottom zone (Settings) ── */
 .snv-pinned {
-  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  border-top: 1px solid hsl(var(--mdt-nav-line));
   padding: 6px 12px;
   flex: 0 0 auto;
-}
-.dark .snv-pinned {
-  border-top-color: #222933;
 }
 .snv-pinned .snv-row {
   margin-bottom: 0;
@@ -392,14 +391,11 @@
   font-size: 11px;
   font-weight: 500;
   line-height: 16px;
-  color: hsl(var(--mdt-foreground));
+  color: hsl(var(--mdt-nav-text));
   opacity: 0.7;
-  background: hsl(var(--mdt-neutral-30));
+  background: hsl(var(--mdt-nav-soon-bg));
   border-radius: 99px;
   padding: 1px 7px;
-}
-.dark .snv-soon {
-  background: #2a313b;
 }
 
 /* ── the collapse trigger: [panel icon] | breadcrumbs, in the page header band ── */
@@ -418,11 +414,8 @@
   flex: 0 0 auto;
 }
 .snv-trigger:hover {
-  background: hsl(var(--mdt-neutral-20));
-  color: hsl(var(--mdt-foreground));
-}
-.dark .snv-trigger:hover {
-  background: hsl(var(--mdt-neutral-130));
+  background: hsl(var(--mdt-nav-hover));
+  color: hsl(var(--mdt-nav-text));
 }
 .snv-trigdiv {
   width: 1px;
@@ -479,10 +472,7 @@
   padding: 0;
   overflow: hidden;
   color: transparent;
-  background: hsl(var(--mdt-neutral-20));
-}
-.dark .snv-railwrap[data-collapsed='true'] .snv-label {
-  background: #222933;
+  background: hsl(var(--mdt-nav-line));
 }
 .snv-railwrap[data-collapsed='true'] .snv-label::before {
   display: none;
@@ -508,11 +498,8 @@
 .snv-flyhead {
   font-size: 12px;
   font-weight: 500;
-  color: hsl(var(--mdt-muted-foreground-subtle));
+  color: hsl(var(--mdt-nav-label));
   padding: 4px 8px 6px;
-}
-.dark .snv-flyhead {
-  color: #a7b0bf;
 }
 
 /* ══ the account card + destination panel (the console's approved org
@@ -537,14 +524,14 @@
 }
 .ogsw-card:hover,
 .ogsw-card[data-open='true'] {
-  background: hsl(var(--mdt-neutral-20));
+  background: hsl(var(--mdt-nav-hover));
 }
 .ogsw-av {
   width: 28px;
   height: 28px;
   border-radius: 8px;
   background: hsl(var(--mdt-info));
-  color: hsl(0 0% 100%);
+  color: hsl(var(--mdt-white));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -587,7 +574,7 @@
   gap: 9px;
   padding: 10px 12px;
   cursor: default;
-  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+  border-bottom: 1px solid hsl(var(--mdt-nav-line));
 }
 .ogsw-hic {
   width: 26px;
@@ -597,7 +584,7 @@
   align-items: center;
   justify-content: center;
   background: hsl(var(--mdt-info));
-  color: hsl(0 0% 100%);
+  color: hsl(var(--mdt-white));
   flex: 0 0 auto;
   font-size: 11px;
   font-weight: 600;
@@ -791,7 +778,7 @@
 
 /* The way back up — only exists while inside an organization. */
 .ogsw-doorsec {
-  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  border-top: 1px solid hsl(var(--mdt-nav-line));
   flex: 0 0 auto;
 }
 .ogsw-door {
@@ -802,7 +789,7 @@
   width: calc(100% - 12px);
   padding: 8px 10px;
   border: 1px dashed hsl(var(--mdt-info) / 0.4);
-  background: hsl(var(--mdt-blue-10));
+  background: hsl(var(--mdt-nav-door-bg));
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
@@ -820,7 +807,7 @@
   align-items: center;
   justify-content: center;
   background: hsl(var(--mdt-info));
-  color: hsl(0 0% 100%);
+  color: hsl(var(--mdt-white));
   flex: 0 0 auto;
 }
 .ogsw-fn {
@@ -838,7 +825,7 @@
 
 /* Footer: email + ⋯ row and the theme tabs… */
 .ogsw-footsec {
-  border-top: 1px solid hsl(var(--mdt-border));
+  border-top: 1px solid hsl(var(--mdt-nav-line));
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -868,7 +855,8 @@
 .ogsw-tseg {
   display: flex;
   gap: 2px;
-  background: hsl(var(--mdt-neutral-20));
+  /* the track is a WELL, not a hairline (2026-09-24: on the dark panel the two tokens met and the tabs vanished) */
+  background: hsl(var(--mdt-nav-well));
   border-radius: 8px;
   padding: 3px;
   margin: 4px 8px;
@@ -898,7 +886,7 @@
 
 /* …then Log out, sectioned off on its own, red with a light-red hover. */
 .ogsw-outsec {
-  border-top: 1px solid hsl(var(--mdt-neutral-20));
+  border-top: 1px solid hsl(var(--mdt-nav-line));
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -919,15 +907,10 @@
   font-size: 12px;
   font-weight: 500;
   text-align: left;
-  color: hsl(var(--mdt-destructive));
+  color: hsl(var(--mdt-nav-danger));
 }
 .ogsw-out:hover {
-  background: hsl(var(--mdt-destructive) / 0.08);
-}
-/* The dark destructive red measures 3.43:1 on the dark panel — below the 4.5
- * text bar. The approved mock's dark red passes; use it. */
-.dark .ogsw-out {
-  color: #f97066;
+  background: hsl(var(--mdt-nav-danger) / 0.08);
 }
 
 /* "Powered by" quieter than the wordmark beside it. */
@@ -946,74 +929,32 @@
   opacity: 0.75;
 }
 
-/* Dark equivalents for values the `.dark` token block does not redefine —
- * part of the pending-naming review list. */
-.dark .ogsw-card:hover,
-.dark .ogsw-card[data-open='true'] {
-  background: #212936;
-}
-.dark .ogsw-here,
-.dark .ogsw-doorsec,
-.dark .ogsw-outsec {
-  border-color: #222933;
-}
-.dark .ogsw-tseg {
-  background: #222933;
-}
-.dark .ogsw-door {
-  background: #15283e;
-}
-
-/* The six approved avatar tone pairs (light, then dark) — the one non-token
- * palette: the token set has no categorical avatar palette yet. Assigned to
- * an organization by stable index. */
+/* The six avatar tones, assigned to an organization by stable index. Since 2026-09-24 they read
+ * --mdt-avatar-<tone>-fill / -ink (globals.css): light as approved, dark from the map's avatar tier.
+ * This file holds no typed-in colour and no .dark twin any more. */
 .ogsw-t0 {
-  background: #e8f0fc;
-  color: #2a6fdb;
+  background: hsl(var(--mdt-avatar-blue-fill));
+  color: hsl(var(--mdt-avatar-blue-ink));
 }
 .ogsw-t1 {
-  background: #e7f5ee;
-  color: #1d7a50;
+  background: hsl(var(--mdt-avatar-green-fill));
+  color: hsl(var(--mdt-avatar-green-ink));
 }
 .ogsw-t2 {
-  background: #fdf0db;
-  color: #b87a0f;
+  background: hsl(var(--mdt-avatar-amber-fill));
+  color: hsl(var(--mdt-avatar-amber-ink));
 }
 .ogsw-t3 {
-  background: #fde7eb;
-  color: #d14a66;
+  background: hsl(var(--mdt-avatar-rose-fill));
+  color: hsl(var(--mdt-avatar-rose-ink));
 }
 .ogsw-t4 {
-  background: #f5e9f9;
-  color: #9042bf;
+  background: hsl(var(--mdt-avatar-purple-fill));
+  color: hsl(var(--mdt-avatar-purple-ink));
 }
 .ogsw-t5 {
-  background: #eef0f4;
-  color: #516381;
-}
-.dark .ogsw-t0 {
-  background: #1b2a44;
-  color: #7faaf0;
-}
-.dark .ogsw-t1 {
-  background: #16302a;
-  color: #63c79e;
-}
-.dark .ogsw-t2 {
-  background: #33290f;
-  color: #e0b25b;
-}
-.dark .ogsw-t3 {
-  background: #3a1e26;
-  color: #ee93a8;
-}
-.dark .ogsw-t4 {
-  background: #2c1f38;
-  color: #c08fe8;
-}
-.dark .ogsw-t5 {
-  background: #232a34;
-  color: #9aa8bc;
+  background: hsl(var(--mdt-avatar-slate-fill));
+  color: hsl(var(--mdt-avatar-slate-ink));
 }
 
 /* ══ the settings floors: Settings, and Agent Fleet beneath it (ported verbatim
@@ -1072,16 +1013,12 @@ button.snv-chip {
 }
 
 button.snv-chip:hover {
-  background: hsl(var(--mdt-neutral-20));
-  color: hsl(var(--mdt-foreground));
-}
-
-.dark button.snv-chip:hover {
-  background: #222933;
+  background: hsl(var(--mdt-nav-hover));
+  color: hsl(var(--mdt-nav-text));
 }
 
 .snv-chip[data-now='true'] {
-  color: hsl(var(--mdt-foreground));
+  color: hsl(var(--mdt-nav-text));
 }
 
 .snv-btxt {
@@ -1092,13 +1029,9 @@ button.snv-chip:hover {
 }
 
 .snv-csep {
-  color: hsl(var(--mdt-muted-foreground-subtle));
+  color: hsl(var(--mdt-nav-label));
   display: inline-flex;
   flex: 0 0 auto;
-}
-
-.dark .snv-csep {
-  color: #a7b0bf;
 }
 
 /* scrolling the list tucks the search into the trail's right end; back at the top it returns */
@@ -1123,12 +1056,8 @@ button.snv-chip:hover {
 }
 
 .snv-sic:hover {
-  background: hsl(var(--mdt-neutral-20));
-  color: hsl(var(--mdt-foreground));
-}
-
-.dark .snv-sic:hover {
-  background: #222933;
+  background: hsl(var(--mdt-nav-hover));
+  color: hsl(var(--mdt-nav-text));
 }
 
 .snv-mid[data-scrolled='true'] .snv-sic {
@@ -1144,11 +1073,7 @@ button.snv-chip:hover {
 }
 
 .snv-mid[data-scrolled='true'] .snv-crumb {
-  box-shadow: 0 1px 0 hsl(var(--mdt-neutral-20));
-}
-
-.dark .snv-mid[data-scrolled='true'] .snv-crumb {
-  box-shadow: 0 1px 0 #222933;
+  box-shadow: 0 1px 0 hsl(var(--mdt-nav-line));
 }
 
 .snv-railwrap[data-collapsed='true'] .snv-line,
@@ -1163,11 +1088,7 @@ button.snv-chip:hover {
   align-items: center;
   padding: 8px 0;
   flex: 0 0 auto;
-  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
-}
-
-.dark .snv-ccol {
-  border-bottom-color: #222933;
+  border-bottom: 1px solid hsl(var(--mdt-nav-line));
 }
 
 .snv-ccol .snv-row {

@@ -47,11 +47,13 @@ const FOLDER = 'folder';
  * on each of them, not just the nav. */
 const SCOPE = 'lnn-scope';
 /* The panel itself: a column that owns its height, one shade back from the page
- * (neutral-10 light, neutral-150 dark) with a hairline on its right. The same
- * classes the previous LeftNav drew its panel with, so the rail sits in the
- * shell exactly as before. */
+ * (neutral-10; the token carries its own dark value, the canvas step, from the
+ * generated block - the old `dark:mdt-bg-neutral-150` twin was dead once the
+ * switch became data-theme) with a hairline on its right. The same classes the
+ * previous LeftNav drew its panel with, so the rail sits in the shell exactly
+ * as before. */
 const PANEL =
-  'mdt-flex mdt-h-full mdt-w-64 mdt-shrink-0 mdt-flex-col mdt-border-r mdt-border-border mdt-bg-neutral-10 dark:mdt-bg-neutral-150';
+  'mdt-flex mdt-h-full mdt-w-64 mdt-shrink-0 mdt-flex-col mdt-border-r mdt-border-border mdt-bg-neutral-10';
 
 /* ── small helpers, ported from the console ─────────────────────────────── */
 
