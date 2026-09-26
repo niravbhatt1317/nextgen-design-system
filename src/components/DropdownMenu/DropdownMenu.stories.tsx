@@ -1,30 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
-import { Button } from '../Button';
+import { forwardRef, useState, type ComponentPropsWithoutRef } from 'react';
+import { userEvent, within } from 'storybook/test';
 import { Icon } from '../Icon';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from './DropdownMenu';
 
 /**
- * The DropdownMenu component displays a menu of actions or options.
- * Built on Radix UI Dropdown Menu for accessibility and keyboard navigation.
+ * THE ONE DROPDOWN. The console's Users row menu, ruled 2026-09-16 ("the drop down which is in users is
+ * good - proper text color, text sizes, icon sizes and everything. Use that drop down everywhere") and
+ * carried at the root of this part since 2026-09-22. The box: corners 10, 6 inside, a neutral-30 hairline,
+ * the lg shadow, 192 wide for an action menu. An item: 34 tall, 0 10 inside, corners 7, 13/500 in the
+ * reading ink, 10 to its 16 glyph; neutral-10 under the pointer and the text keeps its colour. A
+ * destructive item (`variant="destructive"`) is red-60 with a red glyph and takes the danger wash under
+ * the pointer - it never goes dark.
  */
 const meta: Meta<typeof DropdownMenu> = {
-  title: 'Components/DropdownMenu',
+  title: 'New Components/DropdownMenu',
   component: DropdownMenu,
   tags: ['autodocs'],
   parameters: {
@@ -32,7 +30,7 @@ const meta: Meta<typeof DropdownMenu> = {
     docs: {
       description: {
         component:
-          'An accessible dropdown menu for actions and options. Built with Radix UI primitives. Use Select component for form inputs and value selection.',
+          'The Users row menu, at the root: a 10-cornered box with 6 inside, items 34 tall at 13/500 with corners 7, a destructive item that stays red under its wash. Every action menu, the Sort menu, the Columns panel and the quick-filter menu are this one part.',
       },
     },
   },
@@ -41,34 +39,54 @@ const meta: Meta<typeof DropdownMenu> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/* Every frame opens its menu with a real click after render. A menu that is open on its very first render is
+ * placed off screen by the popper (translate -200%) until something moves - a reader, and the parity check,
+ * must find it in place. */
+const openTheMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  await userEvent.click(within(canvasElement).getByRole('button', { name: 'Row actions' }));
+};
+
+/* The console's row-action door: a 28 box, the vertical ellipsis at 16, the faint ink, neutral-20 under the
+ * pointer. It forwards its ref and takes the trigger's props, or the Radix trigger (asChild) cannot open the
+ * menu from it. */
+const RowActionsButton = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<'button'>>(
+  function RowActionsButton(props, ref) {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        aria-label="Row actions"
+        {...props}
+        className="mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90"
+      >
+        <Icon name="more-vertical" size={16} />
+      </button>
+    );
+  }
+);
+
 /**
- * Basic dropdown menu with items.
+ * The row menu as the Users table draws it: Edit details · Disable user · Delete user, 192 wide.
  */
-export const Default: Story = {
+export const TheMenu: Story = {
+  play: openTheMenu,
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open Menu</Button>
+        <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mdt-w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent align="start" className="mdt-w-48">
         <DropdownMenuItem>
-          Profile
-          <DropdownMenuShortcut>Ctrl+P</DropdownMenuShortcut>
+          <Icon name="pencil" size={16} />
+          Edit details
         </DropdownMenuItem>
         <DropdownMenuItem>
-          Settings
-          <DropdownMenuShortcut>Ctrl+,</DropdownMenuShortcut>
+          <Icon name="toggle-left" size={16} />
+          Disable user
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          Billing
-          <DropdownMenuShortcut>Ctrl+B</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
-          <DropdownMenuShortcut>Ctrl+Q</DropdownMenuShortcut>
+        <DropdownMenuItem variant="destructive">
+          <Icon name="trash-2" size={16} />
+          Delete user
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -76,51 +94,92 @@ export const Default: Story = {
 };
 
 /**
- * Simple menu without shortcuts or labels.
+ * A destructive item: red-60 text and glyph at rest; under the pointer the danger wash, and the text and
+ * glyph STAY red. Hover the last rows.
  */
-export const Simple: Story = {
+export const Destructive: Story = {
+  play: openTheMenu,
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Actions</Button>
+        <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Duplicate</DropdownMenuItem>
-        <DropdownMenuItem>Archive</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="mdt-text-destructive">Delete</DropdownMenuItem>
+      <DropdownMenuContent align="start" className="mdt-w-48">
+        <DropdownMenuItem>
+          <Icon name="pencil" size={16} />
+          Edit team details
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive">
+          <Icon name="trash-2" size={16} />
+          Delete team
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive">
+          <Icon name="x-circle" size={16} />
+          Revoke access
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
 };
 
 /**
- * Dropdown with checkbox items.
+ * The Sort menu's shape: a SORT BY heading at 11/600 in the muted grey, one row per field with the active
+ * one carrying its arrow, a hairline, and Clear sort in the muted grey. 220 wide.
  */
-export const WithCheckboxItems: Story = {
-  render: function CheckboxDropdown() {
-    const [showStatusBar, setShowStatusBar] = useState(true);
-    const [showActivityBar, setShowActivityBar] = useState(false);
-    const [showPanel, setShowPanel] = useState(false);
+export const WithAHeading: Story = {
+  play: openTheMenu,
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <RowActionsButton />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="mdt-w-[220px]">
+        <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+        <DropdownMenuItem>
+          Name
+          <span className="mdt-ml-auto mdt-text-sm" aria-label="ascending">
+            {'↑'}
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="mdt-text-neutral-90">Status</DropdownMenuItem>
+        <DropdownMenuItem className="mdt-text-neutral-90">Last active</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="mdt-text-neutral-50">Clear sort</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};
 
+/**
+ * The quick-filter menu's shape: a checkbox per row, several at once.
+ */
+export const WithCheckboxes: Story = {
+  play: openTheMenu,
+  render: function WithCheckboxesStory() {
+    const [picked, setPicked] = useState<string[]>(['Active']);
+    const toggle = (v: string) => {
+      setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
+    };
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">View Options</Button>
+          <RowActionsButton />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mdt-w-56">
-          <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
-            Status Bar
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showActivityBar} onCheckedChange={setShowActivityBar}>
-            Activity Bar
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
-            Panel
-          </DropdownMenuCheckboxItem>
+        <DropdownMenuContent align="start" className="mdt-w-48">
+          {['Active', 'Inactive', 'Invited', 'Suspended'].map((v) => (
+            <DropdownMenuCheckboxItem
+              key={v}
+              checked={picked.includes(v)}
+              onCheckedChange={() => {
+                toggle(v);
+              }}
+              onSelect={(e) => {
+                e.preventDefault();
+              }}
+            >
+              {v}
+            </DropdownMenuCheckboxItem>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -128,189 +187,23 @@ export const WithCheckboxItems: Story = {
 };
 
 /**
- * Dropdown with radio items for single selection.
+ * A disabled row: half opacity, no pointer.
  */
-export const WithRadioItems: Story = {
-  render: function RadioDropdown() {
-    const [position, setPosition] = useState('bottom');
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Panel Position: {position}</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="mdt-w-56">
-          <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-            <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="left">Left</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
-};
-
-/**
- * Dropdown with submenu.
- */
-export const WithSubmenu: Story = {
+export const Disabled: Story = {
+  play: openTheMenu,
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open Menu</Button>
+        <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mdt-w-56">
-        <DropdownMenuItem>New File</DropdownMenuItem>
-        <DropdownMenuItem>New Window</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Share</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem>Email</DropdownMenuItem>
-            <DropdownMenuItem>Slack</DropdownMenuItem>
-            <DropdownMenuItem>Twitter</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Copy Link</DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Export</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem>PDF</DropdownMenuItem>
-            <DropdownMenuItem>CSV</DropdownMenuItem>
-            <DropdownMenuItem>JSON</DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-/**
- * Dropdown with grouped items.
- */
-export const WithGroups: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">More Options</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="mdt-w-56">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Navigation</DropdownMenuLabel>
-          <DropdownMenuItem>Back</DropdownMenuItem>
-          <DropdownMenuItem>Forward</DropdownMenuItem>
-          <DropdownMenuItem>Reload</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Tools</DropdownMenuLabel>
-          <DropdownMenuItem>Developer Tools</DropdownMenuItem>
-          <DropdownMenuItem>Task Manager</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Help</DropdownMenuLabel>
-          <DropdownMenuItem>Documentation</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-/**
- * Dropdown with icons.
- */
-export const WithIcons: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" iconOnly aria-label="Open menu">
-          <Icon name="more-horizontal" size="sm" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="mdt-w-56">
-        <DropdownMenuItem>
-          <Icon name="pencil" size="sm" className="mdt-mr-2" />
-          Edit
+      <DropdownMenuContent align="start" className="mdt-w-48">
+        <DropdownMenuItem disabled>
+          <Icon name="lock" size={16} />
+          Read-only
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Icon name="copy" size="sm" className="mdt-mr-2" />
+          <Icon name="copy" size={16} />
           Duplicate
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Icon name="archive" size="sm" className="mdt-mr-2" />
-          Archive
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="mdt-text-destructive">
-          <Icon name="trash" size="sm" className="mdt-mr-2" />
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-/**
- * Dropdown with disabled items.
- */
-export const WithDisabledItems: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open Menu</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>Active Item</DropdownMenuItem>
-        <DropdownMenuItem disabled>Disabled Item</DropdownMenuItem>
-        <DropdownMenuItem>Another Active Item</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>Also Disabled</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-/**
- * Context menu style dropdown (typically triggered on right-click).
- */
-export const ContextMenuStyle: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="mdt-h-[150px] mdt-w-[300px] mdt-border-dashed mdt-text-muted-foreground"
-          aria-label="Open context menu"
-        >
-          Click here to open menu
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="mdt-w-64">
-        <DropdownMenuItem>
-          Cut
-          <DropdownMenuShortcut>Ctrl+X</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          Copy
-          <DropdownMenuShortcut>Ctrl+C</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          Paste
-          <DropdownMenuShortcut>Ctrl+V</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Select All
-          <DropdownMenuShortcut>Ctrl+A</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

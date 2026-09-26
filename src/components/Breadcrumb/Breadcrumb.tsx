@@ -6,18 +6,19 @@ import { Icon } from '../Icon';
 import type { BreadcrumbItem, BreadcrumbProps, BreadcrumbVariant } from './Breadcrumb.types';
 
 /**
- * The row.
+ * The row - the console's `ui/Breadcrumb.jsx` and `ui/DrawerCrumb.jsx`, read
+ * off the running console 2026-09-22.
  *
  * `page` is the header band's 12/500 on a line-height of 1, six apart, in the
- * quiet ink. `drawer` is the title slot it stands in: the title's 16 on its
- * 24 line, ten apart, and the same quiet ink for everything that is not the
- * step.
+ * faint ink (#8FA0BD - the console's muted foreground). `drawer` is the title
+ * slot it stands in: the title's 16 on its 24 line, ten apart, and the same
+ * faint ink for everything that is not the step.
  */
-export const breadcrumbVariants = cva('mdt-flex mdt-min-w-0 mdt-items-center', {
+export const breadcrumbVariants = cva('mdt-flex mdt-items-center', {
   variants: {
     variant: {
-      page: 'mdt-gap-1.5 mdt-text-xs mdt-font-medium mdt-leading-none mdt-text-muted-foreground',
-      drawer: 'mdt-gap-2.5 mdt-text-base mdt-leading-6 mdt-text-muted-foreground',
+      page: 'mdt-gap-1.5 mdt-text-xs mdt-font-medium mdt-leading-none mdt-text-faint',
+      drawer: 'mdt-gap-2.5 mdt-text-base mdt-leading-6 mdt-text-faint',
     },
   },
   defaultVariants: { variant: 'page' },
@@ -44,16 +45,21 @@ const ANCESTOR: Record<BreadcrumbVariant, string> = {
   drawer: 'mdt-font-normal',
 };
 
-/** Where you are now: the foreground, and in the drawer the title's 600. */
+/**
+ * Where you are now: on the page the foreground (#070F1D); in the drawer the
+ * title's 600 in the title's soft ink (#1D2B3E - what the console's drawer
+ * title renders, P-106).
+ */
 const CURRENT: Record<BreadcrumbVariant, string> = {
   page: 'mdt-text-foreground',
-  drawer: 'mdt-font-semibold mdt-text-foreground',
+  drawer: 'mdt-font-semibold mdt-text-neutral-130',
 };
 
 /**
  * A clickable place. Nothing is drawn that a plain span would not draw -
- * the pointer is the only hover cue, as the console had it (the hover
- * treatment is one of the crumb's open calls) - but the keyboard gets a ring.
+ * the pointer is the only hover cue, as the console has it - but the keyboard
+ * gets a ring, because the console's span cannot be reached by keyboard and
+ * this one can.
  */
 const LINK = [
   'mdt-cursor-pointer mdt-rounded-sm',
@@ -81,9 +87,12 @@ const defaultBackLabel = (parent: BreadcrumbItem | undefined): string =>
  * Two forms. The `page` form sits in the header band after the panel icon and
  * lets the ancestors be followed. The `drawer` form replaces a drawer's title
  * while a page is open inside it - a back button, a nick, the parent in the
- * quiet ink, a chevron, the step - and there **only the back button
+ * faint ink, a chevron, the step - and there **only the back button
  * navigates**, so the way back is one thing and it is visible before anyone
  * commits.
+ *
+ * Every name stays on one line and is never shortened - the console's crumb is
+ * `white-space: nowrap` throughout.
  *
  * Announced as a navigation landmark named "Breadcrumb" holding a list, with
  * the last item marked as the current page. The chevrons are drawing only.
@@ -113,10 +122,10 @@ export const Breadcrumb = ({
 
   const renderLabel = (item: BreadcrumbItem, isLast: boolean): ReactNode => {
     const tone = isLast ? CURRENT[variant] : ANCESTOR[variant];
-    // The current place keeps its whole name; the ones behind it give way.
-    const flow = isLast ? 'mdt-shrink-0 mdt-whitespace-nowrap' : 'mdt-min-w-0 mdt-truncate';
-    const title = !isLast && typeof item.label === 'string' ? { title: item.label } : {};
-    const shared = { 'data-slot': 'breadcrumb-label', className: cn(flow, tone), ...title };
+    const shared = {
+      'data-slot': 'breadcrumb-label',
+      className: cn('mdt-shrink-0 mdt-whitespace-nowrap', tone),
+    };
 
     // In a drawer the crumb names the way back; it does not offer three of them.
     if (!inDrawer && linkable(item.href)) {
@@ -138,7 +147,13 @@ export const Breadcrumb = ({
         </button>
       );
     }
-    return <span {...shared}>{item.label}</span>;
+    // The console's page crumb sets `cursor: default` on a place you cannot
+    // follow; its drawer crumb sets nothing.
+    return (
+      <span {...shared} className={cn(shared.className, !inDrawer && 'mdt-cursor-default')}>
+        {item.label}
+      </span>
+    );
   };
 
   return (
@@ -161,19 +176,17 @@ export const Breadcrumb = ({
             title={back}
             data-slot="breadcrumb-back"
           />
+          {/* the nick: 1 x 16 in neutral-30, the console's `t.border` */}
           <span
             aria-hidden="true"
             data-slot="breadcrumb-nick"
-            className="mdt-h-4 mdt-w-px mdt-shrink-0 mdt-bg-border"
+            className="mdt-h-4 mdt-w-px mdt-shrink-0 mdt-bg-neutral-30"
           />
         </>
       ) : null}
       <ol
         data-slot="breadcrumb-trail"
-        className={cn(
-          'mdt-m-0 mdt-flex mdt-min-w-0 mdt-list-none mdt-items-center mdt-p-0',
-          TRAIL[variant]
-        )}
+        className={cn('mdt-m-0 mdt-flex mdt-list-none mdt-items-center mdt-p-0', TRAIL[variant])}
       >
         {items.map((item, index) => {
           const isLast = index === last;
@@ -181,11 +194,7 @@ export const Breadcrumb = ({
             <li
               key={item.id ?? index}
               data-slot="breadcrumb-item"
-              className={cn(
-                'mdt-flex mdt-items-center',
-                TRAIL[variant],
-                isLast ? 'mdt-shrink-0' : 'mdt-min-w-0'
-              )}
+              className={cn('mdt-flex mdt-shrink-0 mdt-items-center', TRAIL[variant])}
               {...(isLast ? { 'aria-current': 'page' as const } : {})}
             >
               {index > 0 ? (
