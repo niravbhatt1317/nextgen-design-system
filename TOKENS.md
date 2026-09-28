@@ -65,14 +65,16 @@ softer than the label" is therefore a different direction on each side, which is
 
 ### Surfaces
 
-| Token                      | Tailwind                      | Light   | Dark          |
-| -------------------------- | ----------------------------- | ------- | ------------- |
-| `--mdt-background`         | `mdt-bg-background`           | `white` | `neutral-160` |
-| `--mdt-foreground`         | `mdt-text-foreground`         | `black` | `neutral-10`  |
-| `--mdt-card`               | `mdt-bg-card`                 | `white` | `neutral-150` |
-| `--mdt-card-foreground`    | `mdt-text-card-foreground`    | `black` | `neutral-10`  |
-| `--mdt-popover`            | `mdt-bg-popover`              | `white` | `neutral-150` |
-| `--mdt-popover-foreground` | `mdt-text-popover-foreground` | `black` | `neutral-10`  |
+| Token                      | Tailwind                      | Light         | Dark                                                         |
+| -------------------------- | ----------------------------- | ------------- | ------------------------------------------------------------ |
+| `--mdt-background`         | `mdt-bg-background`           | `white`       | `neutral-160`                                                |
+| `--mdt-foreground`         | `mdt-text-foreground`         | `black`       | `neutral-10`                                                 |
+| `--mdt-card`               | `mdt-bg-card`                 | `white`       | `neutral-150`                                                |
+| `--mdt-card-foreground`    | `mdt-text-card-foreground`    | `black`       | `neutral-10`                                                 |
+| `--mdt-popover`            | `mdt-bg-popover`              | `white`       | `neutral-150`                                                |
+| `--mdt-popover-foreground` | `mdt-text-popover-foreground` | `black`       | `neutral-10`                                                 |
+| `--mdt-inverse`            | `mdt-bg-inverse`              | `neutral-130` | the map's inverse wash (43 57 79 at 90%, on the raised step) |
+| `--mdt-inverse-foreground` | `mdt-text-inverse-foreground` | `white`       | the map's tooltip ink (#CAD3E2)                              |
 
 ### Actions
 
@@ -380,8 +382,8 @@ to look — that is what keeps a dropdown in one product matching a dropdown in 
 | `--mdt-shadow-xl`   | `mdt-shadow-xl`   | Peak — toasts, command palette           |
 
 **Dark mode is not the same shadow.** A black shadow at 10% opacity is invisible on a dark surface,
-so each token carries a second definition in `.dark`: the same geometry at roughly four times the
-opacity, **plus a hairline light edge** baked in as a `0 0 0 1px` ring.
+so each token carries a second definition in the dark block: the same geometry at roughly four times
+the opacity, **plus a hairline light edge** baked in as a `0 0 0 1px` ring.
 
 That ring is part of the token deliberately. It means no component has to remember to add a border
 in dark mode, and no component can forget — asking for `mdt-shadow-md` gets the right treatment in
@@ -426,16 +428,38 @@ Consumers can override either variable to apply their own brand typeface.
 
 ## 5 · Theming
 
-Light mode is defined on `:root`. Dark mode is defined on `.dark`.
+Light mode is defined on `:root`. Dark mode is defined on `[data-theme='dark']`.
 
 ```html
-<html class="dark">
-  <!-- every semantic token flips automatically -->
+<html data-theme="dark">
+  <!-- every colour token flips automatically -->
 </html>
 ```
 
-Only **semantic** tokens change between modes. Primitive tokens are fixed — which is exactly
-why components should reach for semantic tokens first.
+**The dark block is generated, never edited by hand** (since 2026-09-26). Its source is the colour
+map, `scripts/dark-theme/tokens.cjs` — the finalised tokens of 2026-09-24, named in Atlassian's
+grammar (`color.text.*`, `elevation.surface.*`, `color.border.*`, `component.nav.*`…) with a light
+and a dark value for every job. `node scripts/theme-dark.cjs` rewrites the block in `globals.css`
+from it; `node scripts/theme-dark.cjs --check` fails when the file is behind the map. To change a
+dark colour, change the map and regenerate.
+
+In dark the whole ramp moves, not only the semantic layer: the map gives every step of every hue a
+dark value (`neutral-10` is the sunken canvas, `neutral-150` the reading ink, the `-05`/`-10` steps
+of each hue a tinted chip on the raised surface), so a component that reaches for a ramp step still
+lands on the right ground. No component carries a `dark:` utility any more (2026-09-26: the last ones
+were retired family by family, each proven pixel-identical), and the `.dark` class is gone with them.
+
+The same switch drives the console (`next-gen-ui`, `<html data-theme>` since 2026-09-24), so the
+storybook and the product read one dark theme.
+
+**The badge tones are tokens too** (since 2026-09-26): `--mdt-badge-<tone>-fill`, `-ink` and `-dot` for
+the eight tones (`neutral`, `slate`, `success`, `warning`, `danger`, `info`, `ai`, `inverse`), 24 in all.
+Unlike the rest of the palette they are **full colours, read with `var(--mdt-badge-success-fill)`**, never
+`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill). Light is
+declared in `:root`, copied value for value from the badge as Pranjal ruled it on 3 September 2026 (its six
+values without a palette name are still flagged there); dark is written into the generated block from the
+map's badge tier, and `ai`, which the map's badge table does not name yet, rides the purple ramp as before,
+his ruling pending. `badge.css` reads these names and holds no theme rule and no typed-in colour.
 
 ---
 
@@ -470,5 +494,6 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 | Emerald (console)   | 1      |
 | **Primitive total** | **92** |
 | Semantic            | 25     |
+| Badge tones         | 24     |
 | Radius              | 1      |
 | Typography          | 2      |

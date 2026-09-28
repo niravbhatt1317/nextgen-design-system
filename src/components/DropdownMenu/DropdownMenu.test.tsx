@@ -176,6 +176,82 @@ describe('DropdownMenu', () => {
     });
   });
 
+  describe('THE ONE DROPDOWN (the Users menu at the root, 2026-09-22)', () => {
+    it('an item is 34 tall with corners 7, 0 10 inside, 13/500, 10 to its glyph', async () => {
+      const user = userEvent.setup();
+      render(
+        <DropdownMenu>
+          <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Edit details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+      await user.click(screen.getByText('Open'));
+      const item = await screen.findByRole('menuitem', { name: 'Edit details' });
+      for (const c of [
+        'mdt-min-h-[34px]',
+        'mdt-rounded-[7px]',
+        'mdt-px-2.5',
+        'mdt-py-0',
+        'mdt-gap-2.5',
+        'mdt-text-[13px]',
+        'mdt-font-medium',
+        'mdt-text-neutral-150',
+        'data-[highlighted]:mdt-bg-neutral-10',
+      ]) {
+        expect(item).toHaveClass(c);
+      }
+      expect(item).not.toHaveClass('focus:mdt-text-foreground');
+      expect(item).not.toHaveClass('mdt-rounded-sm');
+      expect(item).not.toHaveClass('mdt-text-sm');
+    });
+
+    it('the box has corners 10, 6 inside, a neutral-30 hairline and the lg shadow', async () => {
+      const user = userEvent.setup();
+      render(
+        <DropdownMenu>
+          <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Edit details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+      await user.click(screen.getByText('Open'));
+      const box = await screen.findByRole('menu');
+      for (const c of [
+        'mdt-rounded-[10px]',
+        'mdt-p-1.5',
+        'mdt-border-neutral-30',
+        'mdt-shadow-lg',
+      ]) {
+        expect(box).toHaveClass(c);
+      }
+      expect(box).not.toHaveClass('mdt-rounded-md');
+      expect(box).not.toHaveClass('mdt-shadow-md');
+    });
+
+    it('a destructive item is red-60 and takes the danger wash, never a dark text under the pointer', async () => {
+      const user = userEvent.setup();
+      render(
+        <DropdownMenu>
+          <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem variant="destructive">Delete user</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+      await user.click(screen.getByText('Open'));
+      const item = await screen.findByRole('menuitem', { name: 'Delete user' });
+      expect(item).toHaveAttribute('data-variant', 'destructive');
+      expect(item).toHaveClass('mdt-text-red-60');
+      expect(item).toHaveClass('data-[highlighted]:mdt-bg-feedback-danger-bg');
+      expect(item).not.toHaveClass('mdt-text-neutral-150');
+      expect(item).not.toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+      expect(item).not.toHaveClass('focus:mdt-text-foreground');
+    });
+  });
+
   describe('DropdownMenuLabel', () => {
     it('renders label', async () => {
       const user = userEvent.setup();

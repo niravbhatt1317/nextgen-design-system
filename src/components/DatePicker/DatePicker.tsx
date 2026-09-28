@@ -61,12 +61,10 @@ function firstView(value: string | undefined, lo: Day | null, hi: Day | null): M
 /* the day cell: 34 high, corners 8, 13 / 500 (the console's numbers) */
 const DAY =
   'mdt-flex mdt-h-[34px] mdt-w-full mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-[13px] mdt-font-medium mdt-transition-colors focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-inset focus-visible:mdt-ring-blue-40';
-const DAY_OK =
-  'mdt-cursor-pointer mdt-text-foreground hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130';
+const DAY_OK = 'mdt-cursor-pointer mdt-text-foreground hover:mdt-bg-neutral-10';
 const DAY_OFF = 'mdt-cursor-default mdt-text-neutral-50';
 const DAY_TODAY = 'mdt-ring-1 mdt-ring-inset mdt-ring-neutral-40';
-const DAY_SELECTED =
-  'mdt-bg-primary mdt-text-primary-foreground hover:mdt-bg-primary dark:mdt-bg-neutral-20 dark:mdt-text-neutral-160 dark:hover:mdt-bg-neutral-20';
+const DAY_SELECTED = 'mdt-bg-primary mdt-text-primary-foreground hover:mdt-bg-primary';
 
 interface Cell {
   key: string;

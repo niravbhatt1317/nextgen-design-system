@@ -36,9 +36,12 @@ import './table.css';
 
 /** The width of the row-number column and of the elastic tail. */
 export const TABLE_GUTTER = 60;
-/** Every content column starts here on the console; a person can drag it from 120 to 720. */
+/** Every content column starts here on the console; a person can drag it from 160 to 720. */
 export const TABLE_COLUMN_WIDTH = 200;
-export const TABLE_COLUMN_MIN = 120;
+/** THE FLOOR IS 160 FOR EVERY CONTENT COLUMN, IN EVERY MODULE (Pranjal, 2026-09-23: "keep 160 px as minimum width for
+ * any module") - declared or dragged. At 160 the heading under the pointer still has room: 16 + 14 grip + 8 + the name +
+ * 8 + 12 arrow + 20 clear + 20 ⋯ + 8 leaves 54 for the name, which truncates first. */
+export const TABLE_COLUMN_MIN = 160;
 export const TABLE_COLUMN_MAX = 720;
 
 const ALIGN: Record<TableAlign, string> = {
@@ -55,7 +58,8 @@ export const tableCellVariants = cva(
   [
     'tbl-cell mdt-h-[54px] mdt-px-4 mdt-py-[5px] mdt-align-middle',
     'mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap',
-    'mdt-bg-background mdt-text-neutral-130 dark:mdt-text-neutral-10',
+    /* the card's ground, not the page's (2026-09-24): a table sits on the raised step - white in light, elevation.surface.raised in the colour map - and its frozen cells must match the card they cover */
+    'mdt-bg-card mdt-text-neutral-130',
   ],
   {
     variants: {
@@ -73,8 +77,8 @@ export const tableCellVariants = cva(
 export const tableHeadVariants = cva(
   [
     'tbl-head mdt-relative mdt-h-10 mdt-px-4 mdt-py-px mdt-align-middle',
-    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90 dark:mdt-text-neutral-40',
-    'mdt-select-none mdt-whitespace-nowrap mdt-bg-background',
+    'mdt-text-[11px] mdt-font-normal mdt-leading-[1.5] mdt-text-neutral-90',
+    'mdt-select-none mdt-whitespace-nowrap mdt-bg-card',
     'mdt-sticky mdt-top-0 mdt-z-[3]',
   ],
   {
@@ -323,8 +327,8 @@ const Table = forwardRef<HTMLDivElement, TableProps>(function Table(
         data-divider={divider}
         data-docked={morph >= 1}
         className={cn(
-          'tbl mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-background dark:mdt-border-neutral-120',
-          'mdt-font-sans mdt-text-neutral-130 dark:mdt-text-neutral-10',
+          'tbl mdt-relative mdt-flex mdt-flex-col mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-card',
+          'mdt-font-sans mdt-text-neutral-130',
           className
         )}
         style={{ ...style, '--tbl-morph': morph } as React.CSSProperties}
@@ -382,7 +386,8 @@ const TableViewport = forwardRef<HTMLDivElement, TableViewportProps>(function Ta
 });
 TableViewport.displayName = 'TableViewport';
 
-/** One `<col>` per visible column plus the 60px elastic tail. */
+/** One `<col>` per visible column, plus the elastic tail when a table still draws one (`tail` 0 draws none -
+ * the DataTable hides it since 2026-09-23; the primitive keeps the 60 default for hand-built tables and tests). */
 function TableColGroup({ widths, tail = TABLE_GUTTER }: TableColGroupProps) {
   return (
     <colgroup>
@@ -390,7 +395,7 @@ function TableColGroup({ widths, tail = TABLE_GUTTER }: TableColGroupProps) {
         // eslint-disable-next-line react/no-array-index-key -- a col has no identity but its position
         <col key={i} style={{ width: w }} />
       ))}
-      <col style={{ width: tail }} />
+      {tail > 0 && <col style={{ width: tail }} />}
     </colgroup>
   );
 }
@@ -601,7 +606,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
       {movable && (
         <button
           type="button"
-          className="tbl-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90"
+          className="tbl-grip mdt-absolute mdt-left-4 mdt-top-3 mdt-h-4 mdt-w-3.5 mdt-cursor-grab mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40 active:mdt-cursor-grabbing"
           aria-label={`Move column ${label}. Arrow keys move it one place`}
           onPointerDown={onGripPointerDown}
           onKeyDown={gripKey}
@@ -625,11 +630,14 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           : {})}
       >
         {glyph && (
-          <span className="tbl-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 dark:mdt-text-neutral-40 [&_svg]:mdt-size-3.5">
+          <span className="tbl-glyph mdt-mr-2 mdt-inline-flex mdt-w-3.5 mdt-justify-center mdt-text-neutral-90 [&_svg]:mdt-size-3.5">
             {glyph}
           </span>
         )}
-        <span className="mdt-overflow-hidden mdt-text-ellipsis">{children ?? label}</span>
+        {/* the name is the one thing that gives way under the pointer (table.css: the box ends 20 before the ⋯) */}
+        <span className="tbl-label mdt-min-w-0 mdt-overflow-hidden mdt-text-ellipsis mdt-whitespace-nowrap">
+          {children ?? label}
+        </span>
         {sortable && (
           <span
             className="tbl-sortmark mdt-ml-2 mdt-text-azure-60 [&_svg]:mdt-size-3"
@@ -644,7 +652,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="tbl-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90 dark:mdt-text-neutral-40"
+              className="tbl-more mdt-absolute mdt-right-2 mdt-top-2.5 mdt-h-5 mdt-w-5 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-90"
               aria-label={`Options for ${label}`}
             >
               <Icon name="more-horizontal" size={14} />
@@ -705,12 +713,12 @@ function TableSelectionCell({
       style={{ left: frozen }}
     >
       <span className="tbl-rowsel mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
-        <span className="tbl-num mdt-font-medium mdt-text-muted-foreground" aria-hidden={!inert}>
+        <span className="tbl-num mdt-font-medium mdt-text-faint" aria-hidden={!inert}>
           {index}
         </span>
         {!inert && (
           <Checkbox
-            className="tbl-cb data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+            className="tbl-cb data-[state=unchecked]:mdt-border-neutral-40"
             checked={selected}
             tabIndex={-1}
             aria-label={`Select ${label}`}
@@ -737,12 +745,7 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
       style={{ left: frozen }}
     >
       <span className="tbl-rownum mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
-        <span
-          className={cn(
-            'tbl-num mdt-font-medium mdt-text-muted-foreground',
-            inert && 'mdt-opacity-60'
-          )}
-        >
+        <span className={cn('tbl-num mdt-font-medium mdt-text-faint', inert && 'mdt-opacity-60')}>
           {index}
         </span>
       </span>
@@ -767,7 +770,7 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
 function TableNick() {
   return (
     <span
-      className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30 dark:mdt-bg-neutral-100"
+      className="tbl-nick mdt-pointer-events-none mdt-absolute mdt-right-0 mdt-top-3 mdt-h-4 mdt-w-px mdt-bg-neutral-30"
       aria-hidden="true"
     />
   );
@@ -787,32 +790,26 @@ function TableNumberHead({ frozen = 0 }: TableNumberHeadProps) {
   );
 }
 
-/** The header's checkbox and the chevron that opens the scope menu. */
-function TableSelectAll({ state, onToggle, onScope, frozen = 0 }: TableSelectAllProps) {
+/**
+ * The header's checkbox: it selects this page, and only this page. The small
+ * chevron that hung off its right edge and opened the "Choose what to select"
+ * popover (this page / all matching / a number) went on 2026-09-26 (Pranjal),
+ * here and in the bulk bar alike. The box keeps its slot and its geometry.
+ */
+function TableSelectAll({ state, onToggle, frozen = 0 }: TableSelectAllProps) {
   return (
     <th
       scope="col"
       className={cn(tableHeadVariants({ frozen: true, align: 'center' }), 'mdt-w-[60px] !mdt-px-0')}
       style={{ left: frozen, width: TABLE_GUTTER }}
     >
-      <span className="tbl-selall mdt-relative mdt-inline-flex mdt-items-center mdt-justify-center">
+      <span className="tbl-selall mdt-inline-flex mdt-items-center mdt-justify-center">
         <Checkbox
-          className="data-[state=unchecked]:mdt-border-neutral-40 dark:data-[state=unchecked]:mdt-border-neutral-90"
+          className="data-[state=unchecked]:mdt-border-neutral-40"
           checked={state === 'all' ? true : state === 'some' ? 'indeterminate' : false}
           onCheckedChange={onToggle}
           aria-label="Select all on this page"
         />
-        <button
-          type="button"
-          className="tbl-scope mdt-absolute mdt-left-[calc(100%+2px)] mdt-inline-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-muted-foreground hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 dark:hover:mdt-bg-neutral-120 dark:hover:mdt-text-neutral-40"
-          aria-label="Choose what to select"
-          aria-haspopup="dialog"
-          onClick={(e) => {
-            onScope(e.currentTarget);
-          }}
-        >
-          <Icon name="chevron-down" size={12} />
-        </button>
       </span>
       <TableNick />
     </th>
@@ -835,20 +832,18 @@ function TableLeadHead({
   selectable = false,
   state = 'none',
   onToggle,
-  onScope,
   frozen = 0,
 }: {
   /** Does this table act on many rows at once? */
   selectable?: boolean | undefined;
   state?: TableSelectAllProps['state'] | undefined;
   onToggle?: (() => void) | undefined;
-  onScope?: ((anchor: HTMLElement) => void) | undefined;
   frozen?: number | undefined;
 }) {
-  if (!selectable || onToggle === undefined || onScope === undefined) {
+  if (!selectable || onToggle === undefined) {
     return <TableNumberHead frozen={frozen} />;
   }
-  return <TableSelectAll state={state} onToggle={onToggle} onScope={onScope} frozen={frozen} />;
+  return <TableSelectAll state={state} onToggle={onToggle} frozen={frozen} />;
 }
 
 /** The lead cell: a checkbox where the table selects, the row number where it does not. */

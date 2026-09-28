@@ -24,10 +24,7 @@ type Story = StoryObj<typeof meta>;
 
 /** A page-like frame: a 24px margin on the hero ground. */
 const Frame = ({ width = 984, children }: { width?: number; children: React.ReactNode }) => (
-  <div
-    className="mdt-bg-neutral-10 mdt-px-6 mdt-py-5 mdt-font-sans dark:mdt-bg-neutral-130"
-    style={{ width }}
-  >
+  <div className="mdt-bg-neutral-10 mdt-px-6 mdt-py-5 mdt-font-sans" style={{ width }}>
     {children}
   </div>
 );

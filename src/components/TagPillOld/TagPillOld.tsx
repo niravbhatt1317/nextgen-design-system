@@ -34,7 +34,6 @@ export const tagPillOldVariants = cva(
     // against the page, which is what a subtle chip is supposed to do.
     // Neutral only. Colour is a separate decision - see TagPillOld.types.ts.
     'mdt-bg-neutral-20 mdt-text-neutral-110',
-    'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
   {
@@ -65,7 +64,7 @@ export const tagPillOldVariants = cva(
        * than a hover. The palette has nothing between them.
        */
       interactive: {
-        true: 'hover:mdt-bg-neutral-30 dark:hover:mdt-bg-neutral-110',
+        true: 'hover:mdt-bg-neutral-30',
         false: '',
       },
       disabled: {
@@ -105,7 +104,6 @@ const REMOVE_CLASSES = [
   // One step above the hovered chip. Two steps measured 2.18 against it and
   // read as a hard grey blob rather than a surface.
   'hover:mdt-bg-neutral-40 hover:mdt-text-neutral-110',
-  'dark:hover:mdt-bg-neutral-100 dark:hover:mdt-text-neutral-30',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
   'disabled:mdt-pointer-events-none',
 ];

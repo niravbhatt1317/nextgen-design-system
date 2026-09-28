@@ -48,9 +48,11 @@ const ROW = 'mdt-h-8 mdt-rounded-md mdt-px-2';
  * The strip, the two directions and the "already at that end" state are shared
  * from `@/utils/scroll-fade` - `Dialog` draws the same edge. Only the colour
  * stays here, because a fade ends in whatever it sits on and a nav panel and a
- * dialog card are not the same colour.
+ * dialog card are not the same colour. One token, both themes: neutral-10
+ * carries its own dark value (the canvas step) from the generated block; the
+ * old `dark:` twin was dead once the switch became data-theme.
  */
-const FADE_SURFACE = 'mdt-from-neutral-10 dark:mdt-from-neutral-150';
+const FADE_SURFACE = 'mdt-from-neutral-10';
 
 const FADE_DOWN = cn(SCROLL_FADE_DOWN, FADE_SURFACE);
 const FADE_UP = cn(SCROLL_FADE_UP, FADE_SURFACE);
@@ -257,7 +259,7 @@ const LeftNavOld = forwardRef<HTMLElement, LeftNavOldProps>(
             // `neutral-150` in dark, one step off the `neutral-160` background, for
             // the same reason: a panel has to be a different surface, not a
             // different colour.
-            'mdt-border-r mdt-border-border mdt-bg-neutral-10 dark:mdt-bg-neutral-150',
+            'mdt-border-r mdt-border-border mdt-bg-[hsl(var(--mdt-nav-background))]',
             className
           )}
           {...props}
@@ -692,7 +694,7 @@ const LeftNavSection = forwardRef<HTMLDivElement, LeftNavSectionProps>(
             // control holds its 16px glyph 4px in, and 4 + 4 makes up the 8.
             'mdt-sticky mdt-top-0 mdt-z-10 mdt-flex mdt-items-center mdt-gap-1 mdt-pl-1',
             'mdt-pb-2.5 mdt-pt-2',
-            'mdt-bg-neutral-10 dark:mdt-bg-neutral-150'
+            'mdt-bg-[hsl(var(--mdt-nav-background))]'
           )}
         >
           <button

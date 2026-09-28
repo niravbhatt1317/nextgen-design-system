@@ -423,3 +423,25 @@ on, as distinct from the page. Worth naming before a second component needs it a
 different shade.
 
 ---
+
+## A surface that does not follow the theme
+
+`CodeWell`'s `surface="dark"` is the terminal look: a near-black ground with light monospace on
+it, chosen for the _content_, not the theme. It is built from `mdt-bg-neutral-160`, and under the
+generated dark block every ramp step flips — `neutral-160` is `#0B1628` in light and `#E3E8F2` in
+dark. So the terminal well renders as a **near-white slab** on the dark page, which is the
+inversion its own comment was written to prevent under the retired `.dark` palette. Measured in
+the gallery, both themes, 2026-09-28; `Components/CodeWell → Surfaces` shows it.
+
+Nothing in the palette answers this. Every colour token is either a ramp step (flips) or a
+semantic pair (flips by design). `--mdt-white` and `--mdt-black` are the only two the generator
+leaves alone, and a surface built from `black` is a raw value wearing a token's name.
+
+The missing thing is a **theme-invariant surface**: something like `--mdt-terminal` /
+`--mdt-terminal-foreground`, a ground whose whole point is that it does _not_ follow the theme,
+the way a code block or a log pane does not. One pair, two names, and the `dark:` twins in
+`CodeWell.tsx` go with it.
+
+Until it exists `CodeWell surface="dark"` is wrong in dark mode, and it is the last live
+`dark:` pair in the library outside `Switch` (which is blocked on the neutral 40–50 step above)
+and `Callout` (whose `dark:mdt-bg-transparent` is the class-merger pairing, not a colour).

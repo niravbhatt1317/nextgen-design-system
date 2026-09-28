@@ -45,7 +45,8 @@ export interface UseTableColumns<Row> {
 
 const DEFAULT_WIDTH = 200;
 /** The same floor and ceiling the heading's resize handle uses. */
-const MIN_WIDTH = 120;
+/* 160 for every content column, declared or dragged (Pranjal, 2026-09-23: "keep 160 px as minimum width for any module") */
+const MIN_WIDTH = 160;
 const MAX_WIDTH = 720;
 
 function load(storageKey: string | undefined): TableColumnsLayout | null {

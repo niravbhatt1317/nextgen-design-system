@@ -19,8 +19,21 @@ import type {
 // ============================================================================
 // Shared CSS class constants to reduce duplication (SonarJS: no-duplicate-string)
 // ============================================================================
+/* THE ONE DROPDOWN — the console's Users menu, ruled 2026-09-16 ("the drop down which is in users is good
+ * proper text color, text sizes, icon sizes and everything. Use that drop down everywhere") and carried at
+ * the root since 2026-09-22, so no consumer has to patch it: the box has corners 10, 6 inside, a neutral-30
+ * hairline and the lg shadow; an item is 34 tall, 0 10 inside, corners 7, 13/500 in the reading ink, 10 to
+ * its 16 glyph; under the pointer it takes the neutral-10 ground and KEEPS its text colour; a destructive
+ * item is red-60 and takes the danger wash, red text and red glyph throughout. */
+const MENU_BOX_CLASSES =
+  'mdt-z-50 mdt-min-w-[8rem] mdt-overflow-hidden mdt-rounded-[10px] mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-p-1.5 mdt-text-popover-foreground mdt-shadow-lg';
+const MENU_ITEM_BASE_CLASSES =
+  'mdt-relative mdt-flex mdt-min-h-[34px] mdt-cursor-pointer mdt-select-none mdt-items-center mdt-gap-2.5 mdt-rounded-[7px] mdt-px-2.5 mdt-py-0 mdt-text-[13px] mdt-font-medium mdt-text-neutral-150 mdt-outline-none';
+const MENU_ITEM_GLYPH_CLASSES = '[&>svg]:mdt-size-4 [&>svg]:mdt-shrink-0';
 const MENU_ITEM_TRANSITION_CLASSES = 'mdt-transition-colors';
-const MENU_ITEM_FOCUS_CLASSES = 'focus:mdt-bg-muted focus:mdt-text-foreground';
+const MENU_ITEM_FOCUS_CLASSES = 'data-[highlighted]:mdt-bg-neutral-10 focus:mdt-bg-neutral-10';
+const MENU_ITEM_DESTRUCTIVE_CLASSES =
+  'mdt-text-red-60 data-[highlighted]:mdt-bg-feedback-danger-bg focus:mdt-bg-feedback-danger-bg';
 const MENU_ITEM_DISABLED_CLASSES =
   'data-[disabled]:mdt-pointer-events-none data-[disabled]:mdt-opacity-50';
 
@@ -64,9 +77,10 @@ const DropdownMenuSubTrigger = forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'mdt-flex mdt-cursor-default mdt-select-none mdt-items-center mdt-gap-2',
-      'mdt-rounded-sm mdt-px-2 mdt-py-1.5 mdt-text-sm mdt-outline-none',
-      'focus:mdt-bg-muted data-[state=open]:mdt-bg-muted',
+      MENU_ITEM_BASE_CLASSES,
+      MENU_ITEM_TRANSITION_CLASSES,
+      MENU_ITEM_FOCUS_CLASSES,
+      'data-[state=open]:mdt-bg-neutral-10',
       '[&_svg]:mdt-pointer-events-none [&_svg]:mdt-size-4 [&_svg]:mdt-shrink-0',
       inset && 'mdt-pl-8',
       className
@@ -89,8 +103,7 @@ const DropdownMenuSubContent = forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      'mdt-z-50 mdt-min-w-[8rem] mdt-overflow-hidden mdt-rounded-md mdt-border',
-      'mdt-bg-popover mdt-p-1 mdt-text-popover-foreground mdt-shadow-lg',
+      MENU_BOX_CLASSES,
       'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
       className
     )}
@@ -124,8 +137,7 @@ const DropdownMenuContent = forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'mdt-z-50 mdt-min-w-[8rem] mdt-overflow-hidden mdt-rounded-md mdt-border',
-        'mdt-bg-popover mdt-p-1 mdt-text-popover-foreground mdt-shadow-md',
+        MENU_BOX_CLASSES,
         'data-[state=closed]:mdt-animate-zoom-out data-[state=open]:mdt-animate-zoom-in',
         className
       )}
@@ -141,16 +153,17 @@ DropdownMenuContent.displayName = 'DropdownMenuContent';
 const DropdownMenuItem = forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   DropdownMenuItemProps
->(({ className, inset, ...props }, ref) => (
+>(({ className, inset, variant = 'default', ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
+    data-variant={variant}
     className={cn(
-      'mdt-relative mdt-flex mdt-cursor-default mdt-select-none mdt-items-center mdt-gap-2',
-      'mdt-rounded-sm mdt-px-2 mdt-py-1.5 mdt-text-sm mdt-outline-none',
+      MENU_ITEM_BASE_CLASSES,
       MENU_ITEM_TRANSITION_CLASSES,
       MENU_ITEM_FOCUS_CLASSES,
       MENU_ITEM_DISABLED_CLASSES,
-      '[&>svg]:mdt-size-4 [&>svg]:mdt-shrink-0',
+      MENU_ITEM_GLYPH_CLASSES,
+      variant === 'destructive' && MENU_ITEM_DESTRUCTIVE_CLASSES,
       inset && 'mdt-pl-8',
       className
     )}
@@ -169,8 +182,8 @@ const DropdownMenuCheckboxItem = forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      'mdt-relative mdt-flex mdt-cursor-default mdt-select-none mdt-items-center',
-      'mdt-rounded-sm mdt-py-1.5 mdt-pl-8 mdt-pr-2 mdt-text-sm mdt-outline-none',
+      MENU_ITEM_BASE_CLASSES,
+      'mdt-pl-8',
       MENU_ITEM_TRANSITION_CLASSES,
       MENU_ITEM_FOCUS_CLASSES,
       MENU_ITEM_DISABLED_CLASSES,
@@ -179,7 +192,7 @@ const DropdownMenuCheckboxItem = forwardRef<
     {...(checked !== undefined && { checked })}
     {...props}
   >
-    <span className="mdt-absolute mdt-left-2 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
+    <span className="mdt-absolute mdt-left-2.5 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
         <Icon name="check" size="sm" aria-hidden />
       </DropdownMenuPrimitive.ItemIndicator>
@@ -199,8 +212,8 @@ const DropdownMenuRadioItem = forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      'mdt-relative mdt-flex mdt-cursor-default mdt-select-none mdt-items-center',
-      'mdt-rounded-sm mdt-py-1.5 mdt-pl-8 mdt-pr-2 mdt-text-sm mdt-outline-none',
+      MENU_ITEM_BASE_CLASSES,
+      'mdt-pl-8',
       MENU_ITEM_TRANSITION_CLASSES,
       MENU_ITEM_FOCUS_CLASSES,
       MENU_ITEM_DISABLED_CLASSES,
@@ -208,7 +221,7 @@ const DropdownMenuRadioItem = forwardRef<
     )}
     {...props}
   >
-    <span className="mdt-absolute mdt-left-2 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
+    <span className="mdt-absolute mdt-left-2.5 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
         <Icon name="circle" size="xs" aria-hidden />
       </DropdownMenuPrimitive.ItemIndicator>
@@ -228,7 +241,7 @@ const DropdownMenuLabel = forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
-      'mdt-px-2 mdt-py-1.5 mdt-text-sm mdt-font-semibold',
+      'mdt-px-2.5 mdt-pb-1 mdt-pt-1.5 mdt-text-[11px] mdt-font-semibold mdt-uppercase mdt-tracking-[0.04em] mdt-text-neutral-50',
       inset && 'mdt-pl-8',
       className
     )}

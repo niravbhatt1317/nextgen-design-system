@@ -34,7 +34,6 @@ export const tagPillVariants = cva(
     // Neutral only, by ruling (4 September 2026): the same neutral as Badge, so the
     // pair reads as one family. Colour on a chip means the system set it: a Badge.
     'mdt-bg-neutral-10 mdt-text-neutral-130',
-    'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
     'mdt-transition-colors',
   ],
   {
@@ -46,8 +45,7 @@ export const tagPillVariants = cva(
        */
       emphasis: {
         fill: '',
-        outline:
-          'mdt-bg-transparent mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-30))] dark:mdt-bg-transparent dark:mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-100))]',
+        outline: 'mdt-bg-transparent mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-neutral-30))]',
       },
       shape: {
         pill: 'mdt-rounded-full',
@@ -75,7 +73,7 @@ export const tagPillVariants = cva(
        * than a hover. The palette has nothing between them.
        */
       interactive: {
-        true: 'hover:mdt-bg-neutral-20 dark:hover:mdt-bg-neutral-110',
+        true: 'hover:mdt-bg-neutral-20',
         false: '',
       },
       disabled: {
@@ -113,12 +111,13 @@ const REMOVE_CLASSES = [
   'mdt-relative mdt-inline-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center',
   // The visible well is 16px; this invisible ring keeps the pointer target at 24 x 24.
   "before:mdt-absolute before:-mdt-inset-1 before:mdt-content-['']",
-  'mdt-rounded-full mdt-border-0 mdt-bg-transparent mdt-p-0',
+  // Corners 8 on the 16px well: the full circle, drawn the way the console's icon-only rule
+  // (2026-08-24: icon-only buttons are rounded squares of 8) renders it - measured equal by the twin.
+  'mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0',
   'mdt-text-muted-foreground mdt-transition-colors',
   // One step above the hovered chip. Two steps measured 2.18 against it and
   // read as a hard grey blob rather than a surface.
   'hover:mdt-bg-neutral-30 hover:mdt-text-neutral-130',
-  'dark:hover:mdt-bg-neutral-100 dark:hover:mdt-text-neutral-30',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
   'disabled:mdt-pointer-events-none',
 ];

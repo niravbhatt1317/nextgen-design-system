@@ -63,12 +63,7 @@ export const cardVariants = cva(
         // 1.14 light, 1.26 dark. The fill carries it, so no border.
         secondary: 'mdt-border-transparent mdt-bg-secondary mdt-text-card-foreground',
         outline: 'mdt-border-border mdt-bg-transparent mdt-text-card-foreground',
-        // In dark the shadow is invisible, so the lift comes from a lighter
-        // surface instead: neutral-140 against a neutral-150 card measures 1.14.
-        elevated: [
-          'mdt-border-transparent mdt-bg-card mdt-text-card-foreground mdt-shadow-md',
-          'dark:mdt-bg-neutral-140',
-        ],
+        elevated: 'mdt-border-transparent mdt-bg-card mdt-text-card-foreground mdt-shadow-md',
       },
       padding: { normal: '', compact: '', none: '' },
     },

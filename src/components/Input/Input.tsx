@@ -17,7 +17,7 @@ export const InputVariants = cva(
     /* THE FIELD (Pranjal, 2026-09-17): corners 8, the typed value in neutral-90, the placeholder in the faint ink (#8FA0BD); under
      * the pointer the border is the primary colour; focused, the same border with a 3-px halo of it; disabled sits on
      * neutral-10 in the placeholder colour, not dimmed. */
-    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30 dark:mdt-border-neutral-110',
+    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
     'mdt-bg-background mdt-text-neutral-90',
     'mdt-transition-[border-color,box-shadow]',
     'file:mdt-border-0 file:mdt-bg-transparent file:mdt-text-sm file:mdt-font-medium',

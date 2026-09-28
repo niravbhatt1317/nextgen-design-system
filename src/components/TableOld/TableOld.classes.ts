@@ -43,33 +43,21 @@ export const STUCK_SHADOW_BASE =
 // third-weight edge under a header that is not doing anything yet reads as
 // disconnected from the table. The moment content scrolls underneath, the wash
 // arrives and the border steps back to let it carry the separation.
-//
-// Light mode only. In dark the wash can reach about four luminance points, so
-// the edge has to keep its full weight or the pinned row loses its boundary
-// altogether.
 export const STUCK_BORDER_TOP =
-  'mdt-border-border group-data-[scrolled-top=true]:mdt-border-border/30 dark:group-data-[scrolled-top=true]:mdt-border-border';
+  'mdt-border-border group-data-[scrolled-top=true]:mdt-border-border/30';
 export const STUCK_BORDER_BOTTOM =
-  'mdt-border-border group-data-[scrolled-bottom=true]:mdt-border-border/30 dark:group-data-[scrolled-bottom=true]:mdt-border-border';
+  'mdt-border-border group-data-[scrolled-bottom=true]:mdt-border-border/30';
 
-// One wash, darkening, in both themes. The band is the same 24px height in each
-// - only the opacity differs, and only because the two backgrounds give it very
-// different amounts of room.
-//
-// Light has the whole page to fall through. Dark does not: the page is
-// luminance 21 and `--mdt-black` is 14, about seven points of range. But a small
-// absolute dip near black is a large RELATIVE change, so dark needs far less
-// opacity than the raw numbers suggest, not more. At full strength it read as a
-// heavy band. Seven luminance points is the hard ceiling here - `--mdt-black` is
-// lum 14 against a page of lum 21 - so 70% lands at about five, which is as much
-// depth as this palette can give a dark surface without a tonal lift.
+// One wash, darkening, in both themes: the same band at the same opacity in
+// each. (Its private dark twin at 70% went with the `.dark` class, 2026-09-26;
+// the dark ground now comes from the tokens.)
 //
 // This cannot be a `box-shadow`, and so cannot reuse the --mdt-shadow-* tokens:
 // on a table cell a box-shadow casts on all four sides, and on a `<tr>` browsers
 // still render it per cell. Either way the left and right halves stack into a
 // visible seam at every column boundary. A gradient band pinned across the
 // cell's width only ever fades one way, and adjacent bands butt together.
-export const STUCK_WASH = 'after:mdt-from-black/5 dark:after:mdt-from-black/70';
+export const STUCK_WASH = 'after:mdt-from-black/5';
 
 export const STUCK_TOP = [
   STUCK_BASE,
@@ -149,7 +137,6 @@ export const FROZEN_EDGE = 'mdt-sticky mdt-bg-background';
 export const FROZEN_LAST_EDGE = [
   'mdt-border-r mdt-border-border',
   'group-data-[scrolled-x=true]:mdt-border-border/30',
-  'dark:group-data-[scrolled-x=true]:mdt-border-border',
 ].join(' ');
 
 // The band is separate from the edge because the corner cell wants the edge
@@ -171,7 +158,7 @@ export const FROZEN_LAST_EDGE = [
 export const FROZEN_BAND = [
   "before:mdt-pointer-events-none before:mdt-absolute before:mdt-top-0 before:mdt-bottom-0 before:mdt-left-full before:mdt-w-4 before:mdt-opacity-0 before:mdt-transition-opacity before:mdt-content-['']",
   'before:mdt-bg-gradient-to-r before:mdt-to-transparent',
-  'before:mdt-from-black/5 dark:before:mdt-from-black/70',
+  'before:mdt-from-black/5',
   'group-data-[scrolled-x=true]:before:mdt-opacity-100',
 ].join(' ');
 
@@ -198,7 +185,6 @@ export const FROZEN_STICKY_CORNER = [
   'mdt-sticky mdt-top-0 mdt-z-sticky-corner mdt-bg-background',
   'mdt-border-b mdt-border-border',
   'group-data-[scrolled-top=true]:mdt-border-border/30',
-  'dark:group-data-[scrolled-top=true]:mdt-border-border',
   STUCK_SHADOW_BASE,
   'after:mdt-top-full after:mdt-bg-gradient-to-b after:mdt-to-transparent',
   STUCK_WASH,

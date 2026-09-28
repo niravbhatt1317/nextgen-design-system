@@ -41,10 +41,9 @@ describe('Card', () => {
       expect(getCard()).toHaveClass('mdt-border-transparent');
     });
 
-    it('lifts elevated by making the surface lighter in dark, not the shadow darker', () => {
+    it('lifts elevated with a shadow', () => {
       render(<Card surface="elevated" />);
       expect(getCard()).toHaveClass('mdt-shadow-md');
-      expect(getCard()).toHaveClass('dark:mdt-bg-neutral-140');
     });
 
     it('merges a custom className', () => {

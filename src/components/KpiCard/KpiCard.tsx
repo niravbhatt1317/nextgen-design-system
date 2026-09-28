@@ -37,10 +37,7 @@ export function formatKpiValue(n: number): string {
 }
 
 const SETTINGS_GEAR = (
-  <span
-    className="kpi-gear mdt-hidden mdt-shrink-0 mdt-text-neutral-50 dark:mdt-text-neutral-70"
-    aria-hidden="true"
-  >
+  <span className="kpi-gear mdt-hidden mdt-shrink-0 mdt-text-neutral-50" aria-hidden="true">
     <Icon name="settings" size={16} />
   </span>
 );
@@ -72,11 +69,11 @@ function KpiBody({
   return (
     <>
       <div className="kpi-top mdt-flex mdt-min-h-[18px] mdt-items-center mdt-justify-between mdt-gap-2">
-        <span className="kpi-label mdt-min-w-0 mdt-truncate mdt-text-xs mdt-font-medium mdt-leading-[18px] mdt-text-neutral-90 dark:mdt-text-neutral-40">
+        <span className="kpi-label mdt-min-w-0 mdt-truncate mdt-text-xs mdt-font-medium mdt-leading-[18px] mdt-text-neutral-90">
           {label}
         </span>
         {icon ? (
-          <span className="mdt-inline-flex mdt-shrink-0 mdt-text-neutral-50 dark:mdt-text-neutral-70 [&_svg]:mdt-size-4">
+          <span className="mdt-inline-flex mdt-shrink-0 mdt-text-neutral-50 [&_svg]:mdt-size-4">
             {icon}
           </span>
         ) : clickable ? (
@@ -84,7 +81,7 @@ function KpiBody({
         ) : null}
       </div>
       <div className="mdt-mt-2 mdt-flex mdt-items-baseline mdt-gap-2">
-        <span className="kpi-value mdt-text-2xl mdt-font-medium mdt-tabular-nums mdt-leading-[1.2] mdt-tracking-[-0.01em] mdt-text-neutral-130 dark:mdt-text-neutral-10">
+        <span className="kpi-value mdt-text-2xl mdt-font-medium mdt-tabular-nums mdt-leading-[1.2] mdt-tracking-[-0.01em] mdt-text-neutral-130">
           {typeof value === 'number' ? formatKpiValue(value) : value}
         </span>
         {delta && (
@@ -97,7 +94,7 @@ function KpiBody({
         )}
       </div>
       {hint !== undefined && hint !== null && (
-        <span className="kpi-hint mdt-mt-0.5 mdt-truncate mdt-text-xs mdt-font-medium mdt-leading-[18px] mdt-text-neutral-50 dark:mdt-text-neutral-70">
+        <span className="kpi-hint mdt-mt-0.5 mdt-truncate mdt-text-xs mdt-font-medium mdt-leading-[18px] mdt-text-neutral-50">
           {hint}
         </span>
       )}
@@ -186,7 +183,7 @@ const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props,
       aria-label={groupLabel}
       data-kpi={grouped ? 'group' : 'card'}
       className={cn(
-        'kpi-card mdt-flex mdt-items-stretch mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-font-sans dark:mdt-border-neutral-110',
+        'kpi-card mdt-flex mdt-items-stretch mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-card mdt-font-sans',
         className
       )}
       style={

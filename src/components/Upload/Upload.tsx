@@ -57,7 +57,6 @@ export const uploadVariants = cva(
         rest: [
           'mdt-border-neutral-50 mdt-bg-background mdt-text-muted-foreground',
           'hover:mdt-border-neutral-100 hover:mdt-bg-secondary',
-          'dark:hover:mdt-border-neutral-40',
         ],
         // Mid-drag there is nothing to click, so the action never arrives. The
         // dash closing up says "you have arrived" without reaching for a colour.
@@ -113,7 +112,6 @@ const OVERLAY_ACTION = cn(
   'mdt-text-sm mdt-font-medium mdt-text-foreground mdt-shadow-sm',
   'mdt-transition-[background-color,border-color,box-shadow] mdt-duration-150',
   'hover:mdt-border-neutral-100 hover:mdt-bg-muted hover:mdt-shadow-md',
-  'dark:hover:mdt-border-neutral-40',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-2'
 );
 
@@ -241,7 +239,7 @@ const UploadFileRow = forwardRef<HTMLDivElement, UploadFileRowProps>(
             // Red at token strength measures 3.62 as words on a dark page. Badge
             // and Button already work around it the same way - the token for
             // fills, a lighter ramp step for text.
-            <span role="alert" className="mdt-text-xs mdt-text-destructive dark:mdt-text-red-30">
+            <span role="alert" className="mdt-text-xs mdt-text-destructive">
               {reason}
             </span>
           ) : null}
@@ -298,7 +296,7 @@ const UploadFileRow = forwardRef<HTMLDivElement, UploadFileRowProps>(
             type="button"
             aria-label={status === 'uploading' ? `Cancel ${item.name}` : `Remove ${item.name}`}
             onClick={() => onRemove?.(item.id)}
-            className="mdt-inline-flex mdt-h-8 mdt-w-8 mdt-items-center mdt-justify-center mdt-rounded-md mdt-text-muted-foreground mdt-transition-colors hover:mdt-bg-red-10 hover:mdt-text-destructive dark:hover:mdt-bg-red-90 dark:hover:mdt-text-red-30"
+            className="mdt-inline-flex mdt-h-8 mdt-w-8 mdt-items-center mdt-justify-center mdt-rounded-md mdt-text-muted-foreground mdt-transition-colors hover:mdt-bg-red-10 hover:mdt-text-destructive"
           >
             <Icon name="x" size="sm" />
           </button>
@@ -518,8 +516,7 @@ function UploadImagePreview({ item, minHeight, onChange, onRemove }: UploadImage
           className={cn(
             OVERLAY_ACTION,
             'mdt-border-destructive mdt-text-destructive',
-            'hover:mdt-border-red-70 hover:mdt-bg-red-10',
-            'dark:mdt-border-red-30 dark:mdt-text-red-30 dark:hover:mdt-border-red-20 dark:hover:mdt-bg-red-90'
+            'hover:mdt-border-red-70 hover:mdt-bg-red-10'
           )}
         >
           <Icon name="trash-2" size="sm" />
@@ -638,7 +635,7 @@ function UploadHint({
       {...(isError ? { role: 'alert' as const } : {})}
       className={cn(
         'mdt-m-0 mdt-flex mdt-min-h-[18px] mdt-items-start mdt-gap-1.5 mdt-text-xs',
-        isError ? 'mdt-text-destructive dark:mdt-text-red-30' : 'mdt-text-muted-foreground'
+        isError ? 'mdt-text-destructive' : 'mdt-text-muted-foreground'
       )}
     >
       {isError ? (
