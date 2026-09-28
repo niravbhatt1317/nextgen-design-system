@@ -40,7 +40,7 @@ function Grip({ hidden }: { hidden?: boolean }) {
     <span
       aria-hidden="true"
       className={cn(
-        'mdt-inline-flex mdt-shrink-0 mdt-cursor-grab mdt-text-neutral-40 active:mdt-cursor-grabbing dark:mdt-text-neutral-90',
+        'mdt-inline-flex mdt-shrink-0 mdt-cursor-grab mdt-text-neutral-40 active:mdt-cursor-grabbing',
         hidden && 'mdt-invisible'
       )}
     >
@@ -57,13 +57,13 @@ function Grip({ hidden }: { hidden?: boolean }) {
 }
 
 /* 264 wide and 10 corners - the Users table's Columns panel (Pranjal, 2026-09-17: "same for column management") */
-const PANEL = 'mdt-w-[264px] mdt-rounded-[10px] mdt-px-3.5 mdt-pb-2.5 mdt-pt-4';
+const PANEL = 'mdt-w-[264px] mdt-rounded-[10px] mdt-px-3.5 mdt-pb-2.5 mdt-pt-3.5';
 const ROW =
-  'mdt-flex mdt-min-h-[34px] mdt-w-full mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130';
+  'mdt-flex mdt-min-h-[34px] mdt-w-full mdt-items-center mdt-gap-2.5 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-0 mdt-text-left mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10';
 const SECTION =
-  'mdt-mb-0.5 mdt-mt-2.5 mdt-flex mdt-min-h-6 mdt-items-center mdt-justify-between mdt-text-xs mdt-font-medium mdt-text-neutral-90 dark:mdt-text-neutral-40';
+  'mdt-mb-0.5 mdt-mt-2.5 mdt-flex mdt-min-h-6 mdt-items-center mdt-justify-between mdt-text-xs mdt-font-medium mdt-text-neutral-90';
 const LINK =
-  'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 dark:mdt-text-neutral-10 hover:mdt-bg-neutral-10 dark:hover:mdt-bg-neutral-130 -mdt-mr-1.5';
+  'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-1.5 mdt-py-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-130 hover:mdt-bg-neutral-10 -mdt-mr-1.5';
 
 function Search({
   value,
@@ -75,10 +75,12 @@ function Search({
   label: string;
 }) {
   return (
-    <label className="mdt-mb-3 mdt-flex mdt-h-8 mdt-items-center mdt-gap-2 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-px-2.5 mdt-text-muted-foreground focus-within:mdt-border-neutral-90 dark:mdt-border-neutral-110">
+    <label className="mdt-mb-3 mdt-flex mdt-h-8 mdt-items-center mdt-gap-2 mdt-rounded-lg mdt-border mdt-border-solid mdt-border-neutral-30 mdt-px-2.5 mdt-text-muted-foreground focus-within:mdt-border-primary focus-within:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]">
       <Icon name="search" size={14} />
       <input
-        className="mdt-min-w-0 mdt-flex-1 mdt-border-0 mdt-bg-transparent mdt-text-[13px] mdt-text-neutral-130 mdt-outline-none placeholder:mdt-text-muted-foreground dark:mdt-text-neutral-10"
+        /* ONE RING (Pranjal, 2026-09-23: "theres an extra blue color outline"): the wrapper draws the Input's focus look;
+         * the box inside draws nothing, on focus or focus-visible */
+        className="mdt-min-w-0 mdt-flex-1 mdt-border-0 mdt-bg-transparent mdt-text-[13px] mdt-text-neutral-130 mdt-shadow-none mdt-outline-none placeholder:mdt-text-muted-foreground focus:mdt-shadow-none focus:mdt-outline-none focus-visible:mdt-outline-none"
         placeholder="Search"
         aria-label={label}
         value={value}
@@ -139,9 +141,7 @@ function TableColumnsPanel({
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent align="end" sideOffset={6} className={PANEL} aria-label="Columns">
         <div className="mdt-mb-2.5 mdt-flex mdt-items-center mdt-justify-between">
-          <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
-            Columns
-          </span>
+          <span className="mdt-text-base mdt-font-semibold mdt-text-neutral-130">Columns</span>
           <button type="button" className={LINK} onClick={onReset}>
             Reset
           </button>
@@ -165,7 +165,7 @@ function TableColumnsPanel({
               checked
               disabled
               aria-label={`${label} is always shown`}
-              className="mdt-border-neutral-40 data-[state=checked]:mdt-border-neutral-40 data-[state=checked]:mdt-bg-neutral-50 dark:mdt-border-neutral-90"
+              className="mdt-border-neutral-40 data-[state=checked]:mdt-border-neutral-40 data-[state=checked]:mdt-bg-neutral-50"
             />
           </div>
         ))}
@@ -186,7 +186,7 @@ function TableColumnsPanel({
               checked
               tabIndex={-1}
               aria-hidden="true"
-              className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+              className="mdt-pointer-events-none mdt-border-neutral-40"
             />
           </button>
         ))}
@@ -215,7 +215,7 @@ function TableColumnsPanel({
                   checked={false}
                   tabIndex={-1}
                   aria-hidden="true"
-                  className="mdt-pointer-events-none mdt-border-neutral-40 dark:mdt-border-neutral-90"
+                  className="mdt-pointer-events-none mdt-border-neutral-40"
                 />
               </button>
             ))}
@@ -259,7 +259,7 @@ function TableInsertPanel({
         className={PANEL}
         aria-label={`Insert a column after ${afterLabel}`}
       >
-        <div className="mdt-mb-2.5 mdt-text-base mdt-font-semibold mdt-text-neutral-130 dark:mdt-text-neutral-10">
+        <div className="mdt-mb-2.5 mdt-text-base mdt-font-semibold mdt-text-neutral-130">
           Insert a column
         </div>
         <Search value={q} onChange={setQ} label="Search hidden columns" />
@@ -276,7 +276,7 @@ function TableInsertPanel({
             }}
           >
             <span className="mdt-flex-1">{c.label}</span>
-            <Icon name="plus" size={14} className="mdt-text-neutral-90 dark:mdt-text-neutral-40" />
+            <Icon name="plus" size={14} className="mdt-text-neutral-90" />
           </button>
         ))}
         {list.length === 0 && (

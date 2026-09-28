@@ -3,38 +3,44 @@ import { forwardRef, type ComponentPropsWithoutRef, type ElementRef } from 'reac
 import { cn } from '@/utils';
 
 /**
- * Popover root component - controls the open state.
+ * Popover - rich content that floats over the page from a trigger, on Radix Popover.
+ *
+ * THE PART THAT OWNS THE OVERLAY SURFACE (Pranjal, 2026-09-26: "create a popover component where you use this color.
+ * so that atleast this popover color issue will be resolved. keep it in new component and if a old component does
+ * exist move it depricated."). Its ground is `--mdt-popover`, the colour map's `elevation.surface.overlay`: #FFFFFF
+ * in light, #111C2C in dark - the storybook's neutral-150, tried on the console's Users page on 2026-09-25 ("for
+ * popovers try bg of 111c2c neutral 150") and ruled for the map on 2026-09-26 ("we have changed the popover color
+ * but its not getting mapped properly"). In dark that is a step DARKER than a card, so a menu reads as its own thing
+ * on any surface and the hairline (#1D2A3E) stays visible on it. The ink is `--mdt-popover-foreground`.
+ *
+ * No private dark rule lives here: the theme is the tokens', switched by <html data-theme="dark">. The earlier
+ * Popover (now PopoverOld, under Deprecated) carried a `dark:` border variant written for the old built-in palette.
+ *
+ * `popoverSurface` is the same frame as a class list, for the other parts that float - the row menu, a select list,
+ * the date panel, the filter panel - so they share one ground and one edge instead of each naming their own.
  *
  * @example
  * ```tsx
  * <Popover>
- *   <PopoverTrigger>Click me</PopoverTrigger>
- *   <PopoverContent>Popover content</PopoverContent>
+ *   <PopoverTrigger asChild><Button variant="outline">Open</Button></PopoverTrigger>
+ *   <PopoverContent>…</PopoverContent>
  * </Popover>
  * ```
  */
+
+/** The overlay surface as one class list: ground, ink, hairline edge, radius, the elevated shadow. */
+export const popoverSurface =
+  'mdt-rounded-md mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-text-popover-foreground mdt-shadow-lg';
+
 const Popover = PopoverPrimitive.Root;
 
-/**
- * PopoverTrigger - the button that toggles the popover.
- */
+/** The button that toggles the popover. */
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
-/**
- * PopoverAnchor - an optional element to anchor the popover to.
- */
+/** An optional element to anchor the popover to. */
 const PopoverAnchor = PopoverPrimitive.Anchor;
 
-/**
- * PopoverContent - the content container for the popover.
- *
- * @example
- * ```tsx
- * <PopoverContent>
- *   <div>Your content here</div>
- * </PopoverContent>
- * ```
- */
+/** The floating panel: the overlay surface, 4 under its trigger, 16 of padding, 288 wide unless told otherwise. */
 const PopoverContent = forwardRef<
   ElementRef<typeof PopoverPrimitive.Content>,
   ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
@@ -44,10 +50,10 @@ const PopoverContent = forwardRef<
       ref={ref}
       align={align}
       sideOffset={sideOffset}
+      data-surface="overlay"
       className={cn(
-        'mdt-z-50 mdt-w-72 mdt-rounded-md mdt-border mdt-border-border',
-        'mdt-bg-popover mdt-p-4 mdt-text-popover-foreground mdt-shadow-md',
-        'mdt-outline-none',
+        'mdt-z-50 mdt-w-72 mdt-p-4 mdt-outline-none',
+        popoverSurface,
         'data-[state=open]:mdt-animate-in data-[state=closed]:mdt-animate-out',
         'data-[state=closed]:mdt-fade-out-0 data-[state=open]:mdt-fade-in-0',
         'data-[state=closed]:mdt-zoom-out-95 data-[state=open]:mdt-zoom-in-95',
@@ -62,9 +68,7 @@ const PopoverContent = forwardRef<
 
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-/**
- * PopoverClose - an optional close button for the popover.
- */
+/** An optional close button for the popover. */
 const PopoverClose = PopoverPrimitive.Close;
 
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose };

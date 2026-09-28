@@ -61,7 +61,7 @@ const meta: Meta<typeof LeftNav> = {
           '### Colour, and the one exception',
           '',
           'Every colour is a palette step. The two small headings, **Collections** and **Favorite**, use',
-          '`muted-foreground-subtle` (ink-400, #9B9EAA), which measures 2.67:1 on the panel: an accepted',
+          '`muted-foreground-subtle` (ink-400, the quiet heading grey), which measures 2.67:1 on the panel: an accepted',
           'exception, chosen so a heading whispers. The six avatar tone pairs in the account panel are',
           'intentional and outside the palette by decision. Dark mode is carried but not yet audited.',
         ].join('\n'),

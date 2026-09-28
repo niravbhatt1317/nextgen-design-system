@@ -1,3 +1,5 @@
+**READ FIRST: the design rulebook lives in the product repo** - `Functional/next-gen-ui/DESIGN-LANGUAGE.md` on Azure DevOps (Motadata/NextGen/platform-documentation). Every number a part in this library carries is a rule there, with its status and who decided it; the parts keep their numbers in their own comments and stories, the book is where they are ruled. A rule changes only when the person running the session says so, recorded there with the date and their words. Console pages ride this library through a packed copy in the console's `vendor/`; a capability the library lacks is built here first, with a story, then the console rides it.
+
 **On session start:** If `HANDOFF.md` exists in this directory, read it before anything else for the latest state of the work.
 
 # CLAUDE.md - AI Assistant Instructions
@@ -861,34 +863,36 @@ Your role: implement solutions, run tests/builds/lint, create code changes.
 
 ## Important Files
 
-| File                                     | Purpose                                                              |
-| ---------------------------------------- | -------------------------------------------------------------------- |
-| `src/components/index.ts`                | Component exports                                                    |
-| `src/utils/cn.ts`                        | Class merger - **see the class order note below**                    |
-| `src/components/Icon/icons/`             | 1209 generated icon files - **never edit by hand**                   |
-| `src/components/Icon/icons/index.ts`     | Generated registry: every name, and the `IconName` type              |
-| `src/components/Toast/ToastBody.tsx`     | The toast surface: six tones, one calm text colour                   |
-| `src/components/Toast/ToastPromo.tsx`    | The promotional toast: picture, paragraph, one action                |
-| `src/components/Toast/promoStore.ts`     | Holds the one promotional toast, outside the library                 |
-| `src/components/Tabs/useEditableTabs.ts` | The rules for adding and closing tabs                                |
-| `tailwind.config.ts`                     | Tailwind config - **see the dark mode note below**                   |
-| `src/styles/globals.css`                 | All design tokens live here                                          |
-| `vitest.config.ts`                       | Test config                                                          |
-| `eslint.config.js`                       | ESLint + sonarjs                                                     |
-| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check                           |
-| `.github/workflows/storybook.yml`        | Deploys Storybook to GitHub Pages                                    |
-| `TOKENS.md`                              | Every token that exists, grouped by category                         |
-| `MISSING-TOKENS.md`                      | Every token category that does **not** exist yet                     |
-| `TOKEN-REPORT.md`                        | Generated: hardcoded values, with file and line                      |
-| `COMPONENT-GAP.md`                       | This library vs the four product design systems                      |
-| `component-catalog.json`                 | Generated: every component and variant, machine-readable             |
-| `CAPABILITIES.md`                        | Generated: every component, hook and utility - **search this first** |
-| `capability-catalog.json`                | The same list, machine-readable                                      |
-| `scripts/check-tokens.mjs`               | Finds values that should be tokens                                   |
-| `scripts/check-exports.mjs`              | Finds components that exist but cannot be imported                   |
-| `scripts/extract-variants.mjs`           | Builds `component-catalog.json` from the CVA definitions             |
-| `scripts/extract-capabilities.mjs`       | Builds the capability catalogue, and answers `npm run find`          |
-| `scripts/generate-icons.mjs`             | Rebuilds the icon set from Lucide - **see the icon rule below**      |
+| File                                     | Purpose                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `src/components/index.ts`                | Component exports                                                     |
+| `src/utils/cn.ts`                        | Class merger - **see the class order note below**                     |
+| `src/components/Icon/icons/`             | 1209 generated icon files - **never edit by hand**                    |
+| `src/components/Icon/icons/index.ts`     | Generated registry: every name, and the `IconName` type               |
+| `src/components/Toast/ToastBody.tsx`     | The toast surface: six tones, one calm text colour                    |
+| `src/components/Toast/ToastPromo.tsx`    | The promotional toast: picture, paragraph, one action                 |
+| `src/components/Toast/promoStore.ts`     | Holds the one promotional toast, outside the library                  |
+| `src/components/Tabs/useEditableTabs.ts` | The rules for adding and closing tabs                                 |
+| `tailwind.config.ts`                     | Tailwind config - **see the dark mode note below**                    |
+| `src/styles/globals.css`                 | All design tokens, light and the generated dark block                 |
+| `scripts/theme-dark.cjs`                 | Generates the dark block from the colour map - **never hand-edit it** |
+| `scripts/colour-gate.cjs`                | Refuses a new typed-in colour or `dark:` rule; ratchets the rest down |
+| `vitest.config.ts`                       | Test config                                                           |
+| `eslint.config.js`                       | ESLint + sonarjs                                                      |
+| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check                            |
+| `.github/workflows/storybook.yml`        | Deploys Storybook to GitHub Pages                                     |
+| `TOKENS.md`                              | Every token that exists, grouped by category                          |
+| `MISSING-TOKENS.md`                      | Every token category that does **not** exist yet                      |
+| `TOKEN-REPORT.md`                        | Generated: hardcoded values, with file and line                       |
+| `COMPONENT-GAP.md`                       | This library vs the four product design systems                       |
+| `component-catalog.json`                 | Generated: every component and variant, machine-readable              |
+| `CAPABILITIES.md`                        | Generated: every component, hook and utility - **search this first**  |
+| `capability-catalog.json`                | The same list, machine-readable                                       |
+| `scripts/check-tokens.mjs`               | Finds values that should be tokens                                    |
+| `scripts/check-exports.mjs`              | Finds components that exist but cannot be imported                    |
+| `scripts/extract-variants.mjs`           | Builds `component-catalog.json` from the CVA definitions              |
+| `scripts/extract-capabilities.mjs`       | Builds the capability catalogue, and answers `npm run find`           |
+| `scripts/generate-icons.mjs`             | Rebuilds the icon set from Lucide - **see the icon rule below**       |
 
 ### Extra commands
 
@@ -985,22 +989,42 @@ Deliberate, and worth not undoing:
 
 ## ⚠️ Dark mode - read before writing any `dark:` class
 
-`tailwind.config.ts` sets `darkMode: ['class', '[class~="dark"]']`. The attribute selector is
-**required and must not be simplified to `'class'`**.
+**Do not write one.** The theme is tokens, and the switch is `<html data-theme="dark">`
+(2026-09-26; the console's since 2026-09-24). `globals.css` carries a `[data-theme='dark']` block
+**generated** by `scripts/theme-dark.cjs` from `scripts/dark-theme/tokens.cjs`. Never hand-edit
+that block; run the script, and `node scripts/theme-dark.cjs --check` says whether the file matches
+the map.
 
-With `prefix: 'mdt-'`, Tailwind prefixes the dark-mode toggle class too, emitting selectors that
-look for `.mdt-dark` while the app puts plain `.dark` on the root element. They never match, and
-**every `dark:` utility in the library silently does nothing**. Naming a custom selector like
-`['class', '.dark']` does not help either - that gets prefixed as well. An attribute selector is
-not prefixed, so it survives.
+**Every ramp step carries its own dark value.** `blue-10` is `#EBF4FF` in light and `#1D3754` in
+dark; `blue-80` is `#003899` and `#A3CDFF`. So a component that names a wash and an ink already
+gets a dark wash under a light ink, unaided:
 
-This went unnoticed for a long time because token theming was never affected: `globals.css` defines
-`.dark { --mdt-* }` in plain CSS, so the theme flipped correctly while every `dark:` class quietly
-did nothing.
+```tsx
+// ✅ Right - two classes, both themes
+'mdt-bg-blue-10 mdt-text-blue-80';
 
-**Also:** the class merger treats `dark:bg-*` and `bg-*` as separate groups. If a variant sets a
-dark background, a plain `mdt-bg-transparent` will clear the light one and leave the dark one. Pair
-them: `mdt-bg-transparent dark:mdt-bg-transparent`.
+// ❌ Wrong - the twin names the OTHER end of the ramp, so dark renders a near-white chip
+'mdt-bg-blue-10 mdt-text-blue-80 dark:mdt-bg-blue-90 dark:mdt-text-blue-30';
+```
+
+That second line is not hypothetical: nineteen of them were removed in one pass once the switch
+changed, each painting a near-white control on the dark page while 3,600 tests passed.
+`scripts/colour-gate.cjs` counts the remainder down and refuses a new one.
+
+**`darkMode: ['class', '[data-theme="dark"]']` in `tailwind.config.ts` is still an attribute
+selector on purpose**, and must not be simplified to `'class'` or named as a class. With
+`prefix: 'mdt-'`, Tailwind prefixes a class selector too - it would emit `.mdt-dark` while the root
+says something else, and every `dark:` utility would silently do nothing. It is kept only so that a
+`dark:` class which does slip in follows the same switch.
+
+**Breaking, as of this change:** the `.dark` class block is gone. An app on 1.0.0 that sets
+`<html class="dark">` gets the light theme. There is deliberately no fallback - a second switch is
+a second way to do something.
+
+**Also:** the class merger treats `dark:bg-*` and `bg-*` as separate groups. If something does
+still set a dark background, a plain `mdt-bg-transparent` will clear the light one and leave the
+dark one. Pair them: `mdt-bg-transparent dark:mdt-bg-transparent` (`Callout` is the one place left
+that needs this).
 
 ---
 

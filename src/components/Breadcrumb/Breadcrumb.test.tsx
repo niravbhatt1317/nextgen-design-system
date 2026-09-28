@@ -59,11 +59,23 @@ describe('Breadcrumb', () => {
       expect(current.className).not.toContain('mdt-truncate');
     });
 
-    it('lets an ancestor truncate and carry its whole name as a title', () => {
+    it('keeps every name on one line and never shortens it, as the console does', () => {
       render(<Breadcrumb items={PAGE} />);
       const ancestor = labelOf(items()[1] as HTMLElement);
-      expect(ancestor).toHaveAttribute('title', 'User management');
-      expect(ancestor.className).toContain('mdt-truncate');
+      expect(ancestor).not.toHaveAttribute('title');
+      expect(ancestor.className).toContain('mdt-whitespace-nowrap');
+      expect(ancestor.className).not.toContain('mdt-truncate');
+    });
+
+    it('reads the faint ink, the nick neutral-30 and the drawer step the soft ink - the console’s rendered values', () => {
+      render(<Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} />);
+      expect(nav().className).toContain('mdt-text-faint');
+      expect(nav().className).not.toContain('mdt-text-muted-foreground');
+      expect(nav().querySelector('[data-slot="breadcrumb-nick"]')).toHaveClass('mdt-bg-neutral-30');
+      expect(labelOf(items()[1] as HTMLElement)).toHaveClass(
+        'mdt-font-semibold',
+        'mdt-text-neutral-130'
+      );
     });
   });
 

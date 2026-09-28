@@ -10,8 +10,8 @@ import './button.css';
  *
  * Fading a fill blends it toward whatever sits behind it, so on a white page a
  * mid-tone gets *lighter* on hover and the white label loses contrast. Named
- * steps climb instead. The neutral ramp does not flip in dark, so every fixed
- * neutral carries a `dark:` partner.
+ * steps climb instead. The dark theme comes from the tokens behind these steps
+ * (the `data-theme` switch flips the ramp), never from `dark:` twins.
  */
 export const buttonVariants = cva(
   [
@@ -28,30 +28,23 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: [
+          /* rest, hover and pressed are tokens (2026-09-24): light walks the ramp darker, dark lighter, and the
+           * console's data-theme switch reads the same three - no dark: twins here */
           'mdt-bg-primary mdt-text-primary-foreground',
-          'hover:mdt-bg-neutral-110 active:mdt-bg-neutral-100',
-          'dark:mdt-bg-neutral-20 dark:mdt-text-neutral-160',
-          'dark:hover:mdt-bg-neutral-10 dark:active:mdt-bg-neutral-40',
+          'hover:mdt-bg-primary-hover active:mdt-bg-primary-active',
         ].join(' '),
         secondary: [
           'mdt-bg-neutral-20 mdt-text-neutral-130',
           'hover:mdt-bg-neutral-30 active:mdt-bg-neutral-40',
-          'dark:mdt-bg-neutral-120 dark:mdt-text-neutral-20',
-          'dark:hover:mdt-bg-neutral-110 dark:active:mdt-bg-neutral-100',
         ].join(' '),
         outline: [
           'mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
           'hover:mdt-border-neutral-40 hover:mdt-bg-neutral-10 hover:mdt-text-neutral-130',
           'active:mdt-bg-neutral-20',
-          'dark:mdt-border-neutral-100 dark:mdt-text-neutral-40',
-          'dark:hover:mdt-border-neutral-90 dark:hover:mdt-bg-neutral-130 dark:hover:mdt-text-neutral-20',
-          'dark:active:mdt-bg-neutral-120',
         ].join(' '),
         ghost: [
           'mdt-text-neutral-90',
           'hover:mdt-bg-neutral-10 hover:mdt-text-neutral-130 active:mdt-bg-neutral-20',
-          'dark:mdt-text-neutral-40',
-          'dark:hover:mdt-bg-neutral-130 dark:hover:mdt-text-neutral-20 dark:active:mdt-bg-neutral-120',
         ].join(' '),
         destructive: [
           'mdt-bg-destructive mdt-text-destructive-foreground',
@@ -60,12 +53,10 @@ export const buttonVariants = cva(
         destructiveGhost: [
           'mdt-text-destructive',
           'hover:mdt-bg-red-10 hover:mdt-text-red-70 active:mdt-bg-red-20',
-          'dark:hover:mdt-bg-red-80 dark:hover:mdt-text-red-10 dark:active:mdt-bg-red-80',
         ].join(' '),
         link: [
           'mdt-h-auto mdt-rounded-sm mdt-border-0 mdt-bg-transparent mdt-p-0',
           'mdt-text-blue-60 mdt-underline-offset-4 hover:mdt-underline',
-          'dark:mdt-text-blue-30',
         ].join(' '),
       },
       size: {
@@ -220,7 +211,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     padding,
     FOCUS,
     fullWidth && 'mdt-w-full',
-    active && !off && 'mdt-bg-neutral-20 dark:mdt-bg-neutral-120',
+    active && !off && 'mdt-bg-neutral-20',
     className
   );
 

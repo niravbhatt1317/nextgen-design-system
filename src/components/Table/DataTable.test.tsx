@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { Badge } from '../Badge';
@@ -91,27 +91,16 @@ describe('DataTable', { timeout: 20000 }, () => {
     render(<Users />);
     const boxes = screen.getAllByLabelText(/^Select (?!all)/);
     await userEvent.click(boxes[0] as HTMLElement);
-    expect(screen.getByRole('button', { name: /1 selected/ })).toBeInTheDocument();
+    expect(screen.getByText(/1 selected/)).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Users' })).toHaveAttribute(
       'data-has-selection',
       'true'
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Select all on this page' }));
     const selectable = USERS.slice(0, 25).filter((u) => u.status !== 'Invited').length;
-    expect(
-      screen.getByRole('button', { name: new RegExp(`${selectable} selected`) })
-    ).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`${selectable} selected`))).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
     expect(screen.queryByRole('region', { name: 'Selection' })).not.toBeInTheDocument();
-  });
-
-  it('opens the scope menu and can take everything that matches', async () => {
-    render(<Users />);
-    await userEvent.click(screen.getByRole('button', { name: 'Choose what to select' }));
-    const all = USERS.filter((u) => u.status !== 'Invited').length;
-    await userEvent.click(screen.getByRole('radio', { name: /Select all users/ }));
-    await userEvent.click(screen.getByRole('button', { name: 'Apply' }));
-    expect(screen.getByRole('button', { name: new RegExp(`${all} selected`) })).toBeInTheDocument();
   });
 
   it('goes to a typed page and keeps the row numbers absolute', async () => {
@@ -249,15 +238,29 @@ describe('DataTable', { timeout: 20000 }, () => {
     const cols = [...document.querySelectorAll('colgroup col')].map(
       (c) => (c as HTMLElement).style.width
     );
-    /* row number 60, Name 200, Action 100, then Status - never 110 */
-    expect(cols[3]).toBe('120px');
+    /* row number 60, Name 200, Action 100, then Status - never 110: the floor is 160 (Pranjal, 2026-09-23) */
+    expect(cols[3]).toBe('160px');
+  });
+
+  /* the tail is hidden by default (Pranjal, 2026-09-23: "remove the most right side column which is nothing but empty.
+   * Actually hide it from the code we might need it later") and drawn on request */
+  it('draws no tail column unless asked, and a 60px one when asked', () => {
+    const { unmount } = render(<Users />);
+    const heads = () => [...document.querySelectorAll('thead th')];
+    expect(heads().filter((th) => th.getAttribute('aria-hidden') === 'true')).toHaveLength(0);
+    expect(document.querySelectorAll('colgroup col')).toHaveLength(heads().length);
+    unmount();
+    render(<Users tail />);
+    const tailHeads = heads().filter((th) => th.getAttribute('aria-hidden') === 'true');
+    expect(tailHeads).toHaveLength(1);
+    expect((tailHeads[0] as HTMLElement).style.width).toBe('60px');
   });
 
   /* Pranjal, 2026-09-12: "if there's space left then columns should automatically
    * stretch equally to fill the full width of the table". */
   it('shares spare width equally among the content columns, and only them', () => {
     const wide = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
-    /* the card is 1600 wide; the columns cover 60 + 200 + 100 + 3 × 200 + the 60 tail = 1020 */
+    /* the card is 1600 wide; the columns cover 60 + 200 + 100 + 3 × 200 = 960 - no tail since 2026-09-23 */
     Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
       configurable: true,
       get() {
@@ -270,11 +273,10 @@ describe('DataTable', { timeout: 20000 }, () => {
         parseFloat((c as HTMLElement).style.width)
       );
       expect(cols.slice(0, 3)).toEqual([60, 200, 100]);
-      const content = cols.slice(3, -1);
+      const content = cols.slice(3);
       expect(content).toHaveLength(3);
-      /* 1600 - 1020 = 580 spare, 193.33 each */
-      for (const w of content) expect(w).toBeCloseTo(200 + 580 / 3, 1);
-      expect(cols.at(-1)).toBe(60);
+      /* 1600 - 960 = 640 spare, 213.33 each; the table ends at its last column */
+      for (const w of content) expect(w).toBeCloseTo(200 + 640 / 3, 1);
       expect(cols.reduce((a, b) => a + b, 0)).toBeCloseTo(1600, 1);
     } finally {
       if (wide) Object.defineProperty(HTMLElement.prototype, 'clientWidth', wide);
@@ -436,11 +438,27 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(stored.widths.role).toBe(720);
     localStorage.clear();
   });
+
+  it('offers the advanced filter door when keys are given, opens the panel and closes it on Escape', async () => {
+    render(
+      <Users
+        filters={undefined}
+        advancedFilter={{
+          keys: [{ id: 'role', label: 'Role', type: 'pick', options: ['Admin', 'Member'] }],
+        }}
+      />
+    );
+    expect(screen.queryByRole('dialog', { name: 'Filters' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /More filters/ }));
+    expect(screen.getByRole('dialog', { name: 'Filters' })).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog', { name: 'Filters' })).not.toBeInTheDocument();
+  });
 });
 
 /* Pranjal, 2026-09-17, on the organisation filter: "it will contain search box
  * as well" - a quick filter whose list is long enough to need finding. */
-describe('a searchable quick filter', () => {
+describe('a searchable quick filter', { timeout: 20000 }, () => {
   const statuses = {
     columnKey: 'status',
     label: 'Filter by status',
@@ -489,5 +507,87 @@ describe('a searchable quick filter', () => {
     await userEvent.type(box, 'inv');
     await userEvent.clear(box);
     expect(screen.getByRole('menuitemcheckbox', { name: 'Active' })).toBeInTheDocument();
+  });
+});
+
+/* The insert-in-place affordance (Pranjal, 2026-09-26): a hidden column comes back
+ * where you want it, not at the end. Hovering a heading boundary offers a "+", and
+ * the panel behind it lists what is hidden. */
+describe('putting a hidden column back in place', { timeout: 20000 }, () => {
+  const seed = (key: string, hidden: string[]) => {
+    localStorage.setItem(
+      key,
+      JSON.stringify({ order: ['email', 'status', 'role'], hidden, widths: {} })
+    );
+  };
+  const plus = () => screen.queryByRole('button', { name: 'Insert a column after Email' });
+
+  it('offers the "+" at a heading boundary while something is hidden', async () => {
+    seed('t.insert', ['role']);
+    render(<Users storageKey="t.insert" />);
+    expect(plus()).not.toBeInTheDocument();
+    await userEvent.hover(screen.getByRole('slider', { name: 'Resize Email' }));
+    expect(plus()).toBeInTheDocument();
+  });
+
+  it('offers nothing when every column is already on the table', async () => {
+    seed('t.insert-none', []);
+    render(<Users storageKey="t.insert-none" />);
+    await userEvent.hover(screen.getByRole('slider', { name: 'Resize Email' }));
+    expect(plus()).not.toBeInTheDocument();
+  });
+
+  it('opens a panel named after the column the new one will follow', async () => {
+    seed('t.insert-open', ['role']);
+    render(<Users storageKey="t.insert-open" />);
+    await userEvent.hover(screen.getByRole('slider', { name: 'Resize Email' }));
+    await userEvent.click(plus() as HTMLElement);
+    const panel = screen.getByRole('dialog', { name: 'Insert a column after Email' });
+    expect(within(panel).getByText('Insert a column')).toBeInTheDocument();
+    expect(within(panel).getByRole('button', { name: 'Role' })).toBeInTheDocument();
+  });
+
+  it('narrows the hidden list to what was typed, and says so when nothing matches', async () => {
+    seed('t.insert-search', ['role']);
+    render(<Users storageKey="t.insert-search" />);
+    await userEvent.hover(screen.getByRole('slider', { name: 'Resize Email' }));
+    await userEvent.click(plus() as HTMLElement);
+    const box = screen.getByLabelText('Search hidden columns');
+    await userEvent.type(box, 'rol');
+    expect(screen.getByRole('button', { name: 'Role' })).toBeInTheDocument();
+    await userEvent.clear(box);
+    await userEvent.type(box, 'zzz');
+    expect(screen.getByText('Nothing hidden matches.')).toBeInTheDocument();
+  });
+
+  it('puts the picked column back right after that heading, and remembers it', async () => {
+    seed('t.insert-pick', ['role']);
+    render(<Users storageKey="t.insert-pick" />);
+    expect(screen.queryByRole('columnheader', { name: 'Role' })).not.toBeInTheDocument();
+    await userEvent.hover(screen.getByRole('slider', { name: 'Resize Email' }));
+    await userEvent.click(plus() as HTMLElement);
+    await userEvent.click(screen.getByRole('button', { name: 'Role' }));
+    const heads = screen
+      .getAllByRole('columnheader')
+      .map((h) => h.textContent?.replace(/\s+/g, ' ').trim());
+    expect(heads.indexOf('Role')).toBe(heads.indexOf('Email') + 1);
+    const stored = JSON.parse(localStorage.getItem('t.insert-pick') || '{}') as {
+      hidden: string[];
+      order: string[];
+    };
+    expect(stored.hidden).toEqual([]);
+    expect(stored.order).toEqual(['email', 'role', 'status']);
+  });
+
+  it('takes the "+" away once the pointer leaves and the panel is shut', async () => {
+    seed('t.insert-leave', ['role']);
+    render(<Users storageKey="t.insert-leave" />);
+    const handle = screen.getByRole('slider', { name: 'Resize Email' });
+    await userEvent.hover(handle);
+    expect(plus()).toBeInTheDocument();
+    await userEvent.unhover(handle);
+    await waitFor(() => {
+      expect(plus()).not.toBeInTheDocument();
+    });
   });
 });

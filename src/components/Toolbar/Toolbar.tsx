@@ -27,7 +27,7 @@ export const toolbarVariants = cva(
        The Input's own border is one step darker than a ToolbarButton's; side by
        side the two read as two different controls. Set here, on the strip, so
        every strip - the table's own or the page's - keeps the pair matched. */
-    '[&_input]:mdt-border-neutral-30 dark:[&_input]:mdt-border-neutral-110',
+    '[&_input]:mdt-border-neutral-30',
   ],
   {
     variants: {

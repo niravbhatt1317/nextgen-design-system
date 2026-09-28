@@ -36,15 +36,20 @@ export const avatarVariants = cva(
   ],
   {
     variants: {
+      /* A WASH AND AN INK, ONE PAIR PER TONE, and no dark twin: under
+       * [data-theme='dark'] the ramp step itself flips - blue-10 is #EBF4FF in
+       * light and #1D3754 in dark, blue-80 #003899 and #A3CDFF - so the same
+       * two classes give a dark wash under a light ink without being told.
+       * The `dark:` pairs that used to sit here were written for the retired
+       * `.dark` palette and, under the generated map, named the wrong end of
+       * every ramp: they painted a near-white circle on the dark page. */
       tone: {
-        slate:
-          'mdt-bg-neutral-30 mdt-text-neutral-110 dark:mdt-bg-neutral-120 dark:mdt-text-neutral-30',
-        blue: 'mdt-bg-blue-10 mdt-text-blue-80 dark:mdt-bg-blue-90 dark:mdt-text-blue-30',
-        green: 'mdt-bg-green-10 mdt-text-green-80 dark:mdt-bg-green-90 dark:mdt-text-green-30',
-        amber: 'mdt-bg-orange-20 mdt-text-orange-80 dark:mdt-bg-orange-90 dark:mdt-text-orange-30',
-        rose: 'mdt-bg-red-10 mdt-text-red-80 dark:mdt-bg-red-90 dark:mdt-text-red-30',
-        purple:
-          'mdt-bg-purple-10 mdt-text-purple-90 dark:mdt-bg-purple-100 dark:mdt-text-purple-30',
+        slate: 'mdt-bg-neutral-30 mdt-text-neutral-110',
+        blue: 'mdt-bg-blue-10 mdt-text-blue-80',
+        green: 'mdt-bg-green-10 mdt-text-green-80',
+        amber: 'mdt-bg-orange-20 mdt-text-orange-80',
+        rose: 'mdt-bg-red-10 mdt-text-red-80',
+        purple: 'mdt-bg-purple-10 mdt-text-purple-90',
       },
       /* THE TYPE IS A STEP SMALLER than the scale would give (Pranjal, 2026-08-24,
        * with the one letter: "text one step smaller than the DS default"):

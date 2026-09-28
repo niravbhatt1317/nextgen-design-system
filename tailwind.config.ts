@@ -1,21 +1,15 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  // Dark mode is keyed on the `dark` class, matched via an attribute selector.
-  //
-  // The obvious `darkMode: 'class'` does not work here: Tailwind applies the
-  // `mdt-` prefix to the toggle class as well, emitting
-  // `.dark\:mdt-bg-x:is(.mdt-dark *)` while the app puts plain `.dark` on the
-  // root. The selectors never match, so every `dark:` utility in the library is
-  // silently dead. Writing `['class', '.dark']` does not help either - that
-  // custom selector gets prefixed too.
-  //
-  // An attribute selector is not prefixed, so it survives intact.
-  //
-  // Token-based theming was never affected, because globals.css defines
-  // `.dark { --mdt-* }` in plain CSS. That is why this went unnoticed: the
-  // theme flipped correctly while every `dark:` class quietly did nothing.
-  darkMode: ['class', '[class~="dark"]'],
+  // THE ONE SWITCH is <html data-theme="dark"> (2026-09-26; the console's since
+  // 2026-09-24). The theme itself is tokens: globals.css carries a generated
+  // [data-theme='dark'] block from the colour map, and no component carries a
+  // `dark:` utility any more - the colour gate (scripts/colour-gate.cjs) refuses
+  // a new one. This selector is kept only so that, should a `dark:` class ever
+  // slip in, it follows the same switch rather than the operating system. An
+  // attribute selector is used because Tailwind would prefix a class selector
+  // with `mdt-` and it would never match.
+  darkMode: ['class', '[data-theme="dark"]'],
   content: ['./src/**/*.{ts,tsx}', './.storybook/**/*.{ts,tsx}'],
   prefix: 'mdt-',
   theme: {
@@ -38,6 +32,8 @@ const config: Config = {
           foreground: 'hsl(var(--mdt-primary-foreground) / <alpha-value>)',
           'foreground-muted': 'hsl(var(--mdt-primary-foreground-muted) / <alpha-value>)',
           'foreground-subtle': 'hsl(var(--mdt-primary-foreground-subtle) / <alpha-value>)',
+          hover: 'hsl(var(--mdt-primary-hover) / <alpha-value>)',
+          active: 'hsl(var(--mdt-primary-active) / <alpha-value>)',
         },
         // The AI gradient's three stops, so the mark can be drawn from classes
         // as well as from the SVG's own `stop-color`.
@@ -63,6 +59,11 @@ const config: Config = {
           foreground: 'hsl(var(--mdt-muted-foreground) / <alpha-value>)',
           'foreground-subtle': 'hsl(var(--mdt-muted-foreground-subtle) / <alpha-value>)',
         },
+        // The faint ink - placeholders, resting tab labels, the meta line, a
+        // disabled field's text and its lock. The console's neutral-70
+        // (#8FA0BD), which the library's neutral ramp does not hold; see
+        // globals.css.
+        faint: 'hsl(var(--mdt-faint) / <alpha-value>)',
         accent: {
           DEFAULT: 'hsl(var(--mdt-accent) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-accent-foreground) / <alpha-value>)',
@@ -70,6 +71,12 @@ const config: Config = {
         popover: {
           DEFAULT: 'hsl(var(--mdt-popover) / <alpha-value>)',
           foreground: 'hsl(var(--mdt-popover-foreground) / <alpha-value>)',
+        },
+        // The inverse surface: a dark ground on a light page (the tooltip), and the
+        // ink on it. Both themes come from the tokens; see globals.css.
+        inverse: {
+          DEFAULT: 'hsl(var(--mdt-inverse) / <alpha-value>)',
+          foreground: 'hsl(var(--mdt-inverse-foreground) / <alpha-value>)',
         },
         card: {
           DEFAULT: 'hsl(var(--mdt-card) / <alpha-value>)',

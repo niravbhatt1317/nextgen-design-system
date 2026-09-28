@@ -408,7 +408,29 @@ export type {
 } from './Pagination';
 
 // Popover
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverClose } from './Popover';
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+  PopoverClose,
+  popoverSurface,
+} from './Popover';
+// PopoverOld — the previous popover. DEPRECATED 2026-09-26: use Popover (the overlay surface, no private dark rule).
+export {
+  PopoverOld,
+  PopoverOldTrigger,
+  PopoverOldContent,
+  PopoverOldAnchor,
+  PopoverOldClose,
+} from './PopoverOld';
+export type {
+  PopoverOldProps,
+  PopoverOldContentProps,
+  PopoverOldTriggerProps,
+  PopoverOldCloseProps,
+  PopoverOldAnchorProps,
+} from './PopoverOld';
 export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
 
 // Progress — value fill with optional baseline and floor markers
@@ -713,7 +735,6 @@ export {
   TableLoadMore,
   TableBlank,
   TableSkeleton,
-  TableScopeMenu,
   TableColumnsPanel,
   TableInsertPanel,
   PersonCell,
@@ -733,7 +754,6 @@ export type {
   TableAlign,
   TableColumnDef,
   TableColumnsLayout,
-  TableSelectionScope,
   TablePagingMode,
   TableBlankKind,
   TableProps,
@@ -746,7 +766,6 @@ export type {
   TableNumberCellProps,
   TableNumberHeadProps,
   TableSelectAllProps,
-  TableScopeMenuProps,
   TableBulkBarProps,
   TableBulkActionProps,
   TablePagerProps,

@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { createRef } from 'react';
 import { Badge, badgeVariants } from './Badge';
 
@@ -18,6 +20,16 @@ const ALL_TONES = [
   'ai',
   'inverse',
 ] as const;
+
+/* Category colours are a product's own, handed through `palette` as written - the component adds nothing to them.
+ * So the tests hand through token references (LDAP is indigo, SCIM is teal, as Badge.types says) and assert they
+ * arrive untouched: no colour is typed in here, and the gate keeps it that way. */
+const LDAP = { fill: 'hsl(var(--mdt-indigo-10))', ink: 'hsl(var(--mdt-indigo-60))' };
+const SCIM = {
+  fill: 'hsl(var(--mdt-teal-20))',
+  ink: 'hsl(var(--mdt-teal-80))',
+  dot: 'hsl(var(--mdt-teal-70))',
+};
 
 describe('Badge', () => {
   describe('rendering', () => {
@@ -236,40 +248,64 @@ describe('Badge', () => {
   describe('category colours', () => {
     it('takes a palette in place of a tone, with the dot defaulting to the ink', () => {
       render(
-        <Badge shape="square" palette={{ fill: '#F2F3FD', ink: '#4F5BC4' }} dot>
+        <Badge shape="square" palette={LDAP} dot>
           LDAP
         </Badge>
       );
       const badge = screen.getByTestId('badge');
       expect(badge).toHaveAttribute('data-tone', 'custom');
-      expect(badge.style.getPropertyValue('--bdg-fill')).toBe('#F2F3FD');
-      expect(badge.style.getPropertyValue('--bdg-ink')).toBe('#4F5BC4');
-      expect(badge.style.getPropertyValue('--bdg-dot')).toBe('#4F5BC4');
+      expect(badge.style.getPropertyValue('--bdg-fill')).toBe(LDAP.fill);
+      expect(badge.style.getPropertyValue('--bdg-ink')).toBe(LDAP.ink);
+      expect(badge.style.getPropertyValue('--bdg-dot')).toBe(LDAP.ink);
     });
 
     it('lets the palette name its own dot, on a chip and on the marker', () => {
-      const scim = { fill: '#EDF8F7', ink: '#1F7A71', dot: '#22857B' };
       const { rerender } = render(
-        <Badge palette={scim} dot>
+        <Badge palette={SCIM} dot>
           SCIM
         </Badge>
       );
-      expect(screen.getByTestId('badge').style.getPropertyValue('--bdg-dot')).toBe('#22857B');
-      rerender(<Badge palette={scim} dot aria-label="SCIM" />);
+      expect(screen.getByTestId('badge').style.getPropertyValue('--bdg-dot')).toBe(SCIM.dot);
+      rerender(<Badge palette={SCIM} dot aria-label="SCIM" />);
       const mark = screen.getByTestId('badge-dot');
       expect(mark).toHaveAttribute('data-tone', 'custom');
-      expect(mark.style.getPropertyValue('--bdg-dot')).toBe('#22857B');
+      expect(mark.style.getPropertyValue('--bdg-dot')).toBe(SCIM.dot);
     });
 
     it('keeps a caller style alongside the palette variables', () => {
       render(
-        <Badge palette={{ fill: '#F2F3FD', ink: '#4F5BC4' }} style={{ marginLeft: 4 }}>
+        <Badge palette={LDAP} style={{ marginLeft: 4 }}>
           LDAP
         </Badge>
       );
       const badge = screen.getByTestId('badge');
       expect(badge.style.marginLeft).toBe('4px');
-      expect(badge.style.getPropertyValue('--bdg-ink')).toBe('#4F5BC4');
+      expect(badge.style.getPropertyValue('--bdg-ink')).toBe(LDAP.ink);
+    });
+  });
+
+  /* THE TONE COLOURS ARE TOKENS (2026-09-26): --mdt-badge-<tone>-fill / -ink / -dot, light in :root, dark in the
+   * generated block. badge.css only reads them, so it holds no theme rule and no typed-in colour. This is the guard:
+   * jsdom does not cascade a stylesheet's custom properties, so the sheet itself is read (vitest runs from the repo
+   * root, and under jsdom import.meta.url is not a file URL). */
+  describe('the tone colours are tokens', () => {
+    const sheet = readFileSync(
+      resolve(process.cwd(), 'src', 'components', 'Badge', 'badge.css'),
+      'utf8'
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it.each(ALL_TONES)('%s reads its fill, ink and dot from --mdt-badge-%s-*', (tone) => {
+      const block = sheet.match(new RegExp(`\\.bdg-${tone}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+      for (const part of ['fill', 'ink', 'dot'] as const) {
+        expect(block).toContain(`--bdg-${part}: var(--mdt-badge-${tone}-${part})`);
+      }
+    });
+
+    it('holds no theme rule and no typed-in colour', () => {
+      expect(sheet).not.toMatch(/\.dark\b/);
+      expect(sheet).not.toMatch(/\[data-theme/);
+      expect(sheet).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+      expect(sheet).not.toMatch(/\b(?:rgba?|hsla?)\(\s*\d/);
     });
   });
 });

@@ -71,6 +71,11 @@ export interface DropdownMenuItemProps extends ComponentPropsWithoutRef<
    * Whether to apply inset padding
    */
   inset?: boolean;
+  /**
+   * A destructive action (Delete, Revoke, Remove, Cancel) reads red-60 and takes the danger wash under the
+   * pointer - the text and its glyph stay red. Never colour a destructive item through className.
+   */
+  variant?: 'default' | 'destructive';
 }
 
 /**

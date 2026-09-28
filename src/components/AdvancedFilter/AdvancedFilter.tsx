@@ -644,9 +644,11 @@ export function AdvancedFilter<Row = unknown>({
                 <Prefix index={i} join={draft.join} onToggle={toggleJoin} />
               </div>
               <div
-                /* neutral-10 alone left the group reading near-white on a dark panel; the
-                   dark ground is neutral-160, so 150 is the same subtle lift */
-                className="mdt-flex mdt-min-w-0 mdt-flex-col mdt-gap-3 mdt-rounded-[8px] mdt-bg-neutral-10 mdt-p-3 dark:mdt-bg-neutral-150"
+                /* neutral-10 is the lift, in both themes: #F7FAFC on white and #0B1627 on
+                   the #07101F card. The `dark:mdt-bg-neutral-150` twin this used to carry was
+                   written when ramp steps did not flip, and under the generated map it painted
+                   the near-white panel it was added to prevent. */
+                className="mdt-flex mdt-min-w-0 mdt-flex-col mdt-gap-3 mdt-rounded-[8px] mdt-bg-neutral-10 mdt-p-3"
                 data-panel=""
               >
                 <div
