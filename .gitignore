@@ -127,3 +127,10 @@ junit.xml
 # uploads it; a stale one committed alongside means the artifact carries two
 # and somebody installs the wrong version.
 *.tgz
+
+# The parity check: the receipt and the per-laptop switch are local; accepted.json and the twins are shared.
+scripts/parity/.receipt.json
+scripts/parity/.local.json
+
+# The built gallery the reviewer reads on :4196 is an output, never committed.
+storybook-badge/

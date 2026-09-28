@@ -1,1 +1,3 @@
+node scripts/parity-gate.cjs
 npx lint-staged
+node scripts/colour-gate.cjs

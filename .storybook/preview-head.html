@@ -1,0 +1,16 @@
+<!-- The gallery renders the same face the console does. The console's index.html loads Inter and JetBrains Mono from
+     Google Fonts; without this the gallery fell back to the system stack and every text width differed by a few
+     pixels from the console (found by the parity check, 2026-09-22). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+/>
+<!-- Loading the face is not enough: the library's --mdt-font-sans token is the system stack, so nothing used Inter and every
+     width still read ~7% narrower than the console (found by the Table twin, 2026-09-26). The gallery is the reference the
+     console is measured against, and the console's index.html + global.css put Inter first - so the gallery's own head does
+     the same. This is the gallery's face only; the library's default token is unchanged for every other consumer. -->
+<style>
+  :root { --mdt-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+</style>
