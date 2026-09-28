@@ -105,7 +105,14 @@ the twins in `scripts/parity/twins/` are unverified against anything.
 
 **7. `TableOld2` is not a faithful snapshot.** It imports the _current_ `Avatar`,
 `Input`, `Toolbar` and `Checkbox`, so it renders the old table wearing this
-release's one-letter avatar and 32px field.
+release's one-letter avatar and 32px field. And since the switch moved, the two
+`.dark .tbl-old2` rules in `tableOld2.css` (lines 85 and 249) are **dead** — the
+only ones left in the library. They bump a wash from 6% to 18% and swap a
+divider, so the deprecated table still renders in dark, just a shade flatter than
+the snapshot it is meant to be. Left alone deliberately: spelling them
+`[data-theme='dark']` would restore the look while sliding past the colour gate,
+which counts `.dark` and not the attribute — and whether a frozen copy should
+carry a private dark rule at all is a question for whoever retires the family.
 
 **8. Close issues #1, #2, #5** — Stat/KPI tile, Banner, Wizard stepper are built.
 Still open: **#4** Empty state, **#6** Tag input, **#7** `Select.tsx` over the
