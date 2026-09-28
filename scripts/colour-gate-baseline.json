@@ -1,0 +1,395 @@
+{
+  "note": "The colour gate's ratchet (2026-09-24). Every file may only go DOWN from here; a rise or a new file holds the commit. The token file and the content files are not counted. Run node scripts/colour-gate.cjs --report to see today, --record to agree a fall.",
+  "tokenFiles": [
+    "src/styles/globals.css"
+  ],
+  "content": [
+    "src/components/Table/sampleUsers.ts"
+  ],
+  "recorded": "2026-09-28",
+  "reasons": {
+    "2026-09-28": "Baseline re-recorded against main: the branch's baseline was taken after the dark migration removed the private dark: rules, which are still here, so it refused every commit. The ratchet starts from today and the migration will read as a fall."
+  },
+  "totals": {
+    "literal": 129,
+    "dark": 462,
+    "white": 34
+  },
+  "files": {
+    "src/components/AdvancedFilter/AdvancedFilter.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 1
+    },
+    "src/components/Avatar/Avatar.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/AvatarOld2/AvatarOld2.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/Badge/Badge.stories.tsx": {
+      "literal": 7,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/Badge/Badge.test.tsx": {
+      "literal": 13,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/Badge/badge.css": {
+      "literal": 6,
+      "dark": 10,
+      "white": 4
+    },
+    "src/components/BadgeOld/BadgeOld.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/BadgeOld/BadgeOld.tsx": {
+      "literal": 0,
+      "dark": 36,
+      "white": 0
+    },
+    "src/components/Button/Button.tsx": {
+      "literal": 0,
+      "dark": 23,
+      "white": 0
+    },
+    "src/components/ButtonOld/ButtonOld.tsx": {
+      "literal": 0,
+      "dark": 33,
+      "white": 0
+    },
+    "src/components/Callout/Callout.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Callout/Callout.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Card/Card.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Card/Card.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/CodeWell/CodeWell.tsx": {
+      "literal": 0,
+      "dark": 2,
+      "white": 0
+    },
+    "src/components/DatePicker/DatePicker.tsx": {
+      "literal": 0,
+      "dark": 4,
+      "white": 0
+    },
+    "src/components/Form/FormDescription.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Form/FormLabel.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Form/FormMessage.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/HoverCard/HoverCard.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 4
+    },
+    "src/components/Icon/Icon.stories.tsx": {
+      "literal": 4,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/Icon/Icon.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/IconTile/IconTile.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/Input/Input.stories.tsx": {
+      "literal": 7,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/Input/Input.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/InputOld2/InputOld2.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/KpiCard/KpiCard.tsx": {
+      "literal": 0,
+      "dark": 6,
+      "white": 0
+    },
+    "src/components/KpiCard/KpiStrip.stories.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/KpiCard/kpiCard.css": {
+      "literal": 0,
+      "dark": 13,
+      "white": 0
+    },
+    "src/components/LeftNav/LeftNav.stories.tsx": {
+      "literal": 1,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/LeftNav/LeftNav.tsx": {
+      "literal": 1,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/LeftNav/left-nav.css": {
+      "literal": 43,
+      "dark": 33,
+      "white": 0
+    },
+    "src/components/LeftNavOld/LeftNavOld.tsx": {
+      "literal": 0,
+      "dark": 3,
+      "white": 0
+    },
+    "src/components/PageFrame/PageFrame.stories.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/ScrollArea/ScrollArea.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 3
+    },
+    "src/components/Switch/Switch.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Table/DataTable.stories.tsx": {
+      "literal": 4,
+      "dark": 2,
+      "white": 0
+    },
+    "src/components/Table/DataTable.tsx": {
+      "literal": 0,
+      "dark": 23,
+      "white": 0
+    },
+    "src/components/Table/Table.stories.tsx": {
+      "literal": 4,
+      "dark": 4,
+      "white": 0
+    },
+    "src/components/Table/Table.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/Table/TableBulkBar.tsx": {
+      "literal": 0,
+      "dark": 10,
+      "white": 7
+    },
+    "src/components/Table/TableCells.tsx": {
+      "literal": 0,
+      "dark": 3,
+      "white": 0
+    },
+    "src/components/Table/TablePager.tsx": {
+      "literal": 0,
+      "dark": 8,
+      "white": 0
+    },
+    "src/components/Table/TablePanels.tsx": {
+      "literal": 0,
+      "dark": 14,
+      "white": 0
+    },
+    "src/components/Table/TableScopeMenu.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 1
+    },
+    "src/components/Table/TableStates.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 1
+    },
+    "src/components/Table/table.css": {
+      "literal": 0,
+      "dark": 2,
+      "white": 0
+    },
+    "src/components/TableOld/TableOld.classes.ts": {
+      "literal": 0,
+      "dark": 6,
+      "white": 0
+    },
+    "src/components/TableOld/TableOld.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/TableOld2/DataTableOld2.stories.tsx": {
+      "literal": 4,
+      "dark": 2,
+      "white": 0
+    },
+    "src/components/TableOld2/DataTableOld2.tsx": {
+      "literal": 0,
+      "dark": 23,
+      "white": 0
+    },
+    "src/components/TableOld2/TableBulkBarOld2.tsx": {
+      "literal": 0,
+      "dark": 10,
+      "white": 0
+    },
+    "src/components/TableOld2/TableCells.tsx": {
+      "literal": 0,
+      "dark": 3,
+      "white": 0
+    },
+    "src/components/TableOld2/TableOld2.stories.tsx": {
+      "literal": 4,
+      "dark": 0,
+      "white": 0
+    },
+    "src/components/TableOld2/TableOld2.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/TableOld2/TablePagerOld2.tsx": {
+      "literal": 0,
+      "dark": 8,
+      "white": 0
+    },
+    "src/components/TableOld2/TablePanels.tsx": {
+      "literal": 0,
+      "dark": 13,
+      "white": 0
+    },
+    "src/components/TableOld2/TableScopeMenuOld2.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/TableOld2/TableStates.tsx": {
+      "literal": 0,
+      "dark": 12,
+      "white": 0
+    },
+    "src/components/TableOld2/tableOld2.css": {
+      "literal": 0,
+      "dark": 2,
+      "white": 0
+    },
+    "src/components/Tabs/Tabs.stories.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 4
+    },
+    "src/components/Tabs/Tabs.test.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 3
+    },
+    "src/components/Tabs/Tabs.tsx": {
+      "literal": 0,
+      "dark": 0,
+      "white": 3
+    },
+    "src/components/TagPill/TagPill.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/TagPill/TagPill.tsx": {
+      "literal": 0,
+      "dark": 7,
+      "white": 0
+    },
+    "src/components/TagPillOld/TagPillOld.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/TagPillOld/TagPillOld.tsx": {
+      "literal": 0,
+      "dark": 5,
+      "white": 0
+    },
+    "src/components/Toolbar/Toolbar.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Toolbar/ToolbarButton.tsx": {
+      "literal": 0,
+      "dark": 11,
+      "white": 1
+    },
+    "src/components/Tooltip/Tooltip.test.tsx": {
+      "literal": 0,
+      "dark": 1,
+      "white": 1
+    },
+    "src/components/Tooltip/Tooltip.tsx": {
+      "literal": 0,
+      "dark": 3,
+      "white": 1
+    },
+    "src/components/Tooltip/tooltip.css": {
+      "literal": 2,
+      "dark": 1,
+      "white": 0
+    },
+    "src/components/Upload/Upload.tsx": {
+      "literal": 0,
+      "dark": 10,
+      "white": 0
+    },
+    "src/docs/atoms/Compare.tsx": {
+      "literal": 3,
+      "dark": 0,
+      "white": 0
+    },
+    "src/docs/foundation/Colors.stories.tsx": {
+      "literal": 26,
+      "dark": 0,
+      "white": 0
+    }
+  }
+}
