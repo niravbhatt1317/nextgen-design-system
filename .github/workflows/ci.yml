@@ -125,6 +125,20 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
+      # WITHOUT THIS THE SITE LOSES EVERY STORY (2026-09-30).
+      #
+      # GitHub Pages runs a branch-served site through Jekyll unless the root
+      # carries a `.nojekyll` file, and Jekyll does not copy Storybook's `assets/`
+      # directory - which is where every story chunk lives. The shell loads, the
+      # sidebar renders, and not one story opens. Nothing fails; the site is just
+      # quietly hollow.
+      #
+      # It is written here, into the artifact, rather than in the deploy job, so
+      # that BOTH publishes carry it: the site root and every pull request preview
+      # deploy from this same build.
+      - name: Keep Jekyll off the published site
+        run: touch storybook-static/.nojekyll
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
