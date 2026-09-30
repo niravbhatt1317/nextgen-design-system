@@ -160,6 +160,13 @@ jobs:
           name: storybook-${{ github.run_id }}
           path: storybook-static
           retention-days: 1
+          # WITHOUT THIS THE `.nojekyll` ABOVE NEVER LEAVES THE BUILD JOB.
+          # upload-artifact v4 skips dotfiles by default and says nothing about
+          # it - no warning, no failure, just an artifact quietly missing the one
+          # file the site cannot be published without. Measured: the step ran,
+          # the log printed `include-hidden-files: false`, and the deployed
+          # preview had no `.nojekyll`.
+          include-hidden-files: true
 
   deploy:
     name: Deploy to GitHub Pages
