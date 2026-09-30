@@ -879,8 +879,8 @@ Your role: implement solutions, run tests/builds/lint, create code changes.
 | `scripts/colour-gate.cjs`                | Refuses a new typed-in colour or `dark:` rule; ratchets the rest down |
 | `vitest.config.ts`                       | Test config                                                           |
 | `eslint.config.js`                       | ESLint + sonarjs                                                      |
-| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check                            |
-| `.github/workflows/storybook.yml`        | Deploys Storybook to GitHub Pages                                     |
+| `.github/workflows/ci.yml`               | Tests, lint, typecheck, build, token check, and both Pages publishes  |
+| `.github/workflows/preview-cleanup.yml`  | Takes a pull request's preview down when it closes                    |
 | `TOKENS.md`                              | Every token that exists, grouped by category                          |
 | `MISSING-TOKENS.md`                      | Every token category that does **not** exist yet                      |
 | `TOKEN-REPORT.md`                        | Generated: hardcoded values, with file and line                       |
@@ -984,6 +984,43 @@ Deliberate, and worth not undoing:
 | The 17 brand logos                  | Lost                                              | Kept                                           |
 | Offline / air-gapped builds         | No                                                | Yes                                            |
 | Cost                                | —                                                 | 1209 files in the repo, one command to refresh |
+
+---
+
+## 🔎 Per-pull-request Storybook previews
+
+Every pull request from a branch in this repository gets its own Storybook at
+`…github.io/nextgen-design-system/pr-preview/pr-<number>/`, linked in one sticky
+comment that updates on each push and is rewritten when the pull request closes.
+
+**Same pattern as the console's design system** (`niravbhatt1317/motadata-design-system`),
+deliberately: the same `rossjrw/pr-preview-action@v1`, the same `pr-preview` umbrella
+directory, the same comment. Two design-system repositories that publish differently
+are two things to learn instead of one.
+
+**The site is a branch, not an artifact.** GitHub Pages serves exactly one deployment
+per repository, so `main` and the previews cannot be separate deployments - they are
+directories on `gh-pages`:
+
+```
+/                        what `main` publishes
+/pr-preview/pr-123/      a preview, while pull request 123 is open
+```
+
+**The one line that matters** is `clean-exclude: pr-preview/` on the `deploy` job in
+`ci.yml`. A publish to the site root otherwise deletes everything else on the branch,
+so merging ONE pull request would silently take down every other open preview and
+leave their comments linking at a 404. The console's design system has no such line
+and does not need one: nothing automated writes its root. Here, every merge does.
+
+**Previews cost no extra build.** Storybook was already built on every pull request to
+prove it compiles; that same artifact is the preview. The deploy and the removal are
+split across two workflows for the same reason - ci.yml does not trigger on `closed`,
+and adding it would run the full suite to delete a directory.
+
+**Fork pull requests get no preview, deliberately.** Their token is read-only by
+design, and a preview built from untrusted code would be served from this site's own
+origin, sharing storage with the real Storybook. They still get every check.
 
 ---
 
