@@ -25,12 +25,12 @@ on:
   # rescued the stack above.
   workflow_dispatch:
 
-# Needed by the deploy job. `contents: read` is everything the checks require;
-# `pages` and `id-token` are what publishing to GitHub Pages needs.
+# `contents: read` is everything the checks need, and the default for every job
+# here. The two jobs that publish raise their own permissions locally instead -
+# `pages: write` and `id-token: write` are gone entirely, because the site is no
+# longer an artifact deployment (see the deploy job).
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Cancel superseded runs on a pull request branch, but never on `main`.
 #
@@ -134,17 +134,18 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # Only a push to `main` publishes. A pull request builds Storybook to prove
-      # it compiles, then throws it away.
-      - name: Configure Pages
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v5
-
-      - name: Upload Storybook for Pages
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
+      # Handed to whichever job publishes it: `deploy` for a push to `main`,
+      # `preview` for a pull request. A pull request used to build Storybook only
+      # to prove it compiles and then throw it away; now the same build is the
+      # preview, so the previews cost no extra build time.
+      #
+      # One day of retention: the only consumer is the job directly below.
+      - name: Upload Storybook
+        uses: actions/upload-artifact@v4
         with:
+          name: storybook-${{ github.run_id }}
           path: storybook-static
+          retention-days: 1
 
   deploy:
     name: Deploy to GitHub Pages
@@ -156,18 +157,92 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
-    # GitHub Pages allows one deployment at a time, and a run that is mid-publish
-    # must never be cancelled. This is scoped to the job so it does not interfere
-    # with the workflow-level group above.
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    # WHY THIS IS NOT `actions/deploy-pages` ANY MORE (2026-09-30).
+    #
+    # GitHub Pages serves exactly ONE deployment per repository, and the artifact
+    # flow replaces the whole site on every publish. That left nowhere to put a
+    # per-pull-request preview: anything deployed beside the site would be wiped by
+    # the next merge, and anything deployed instead of it would take the site down.
+    #
+    # So the site is a BRANCH now - `gh-pages` - with `main` at the root and each
+    # open pull request under `pr-preview/pr-<number>/`. Same public URL. This is
+    # the layout the console's design system already uses
+    # (niravbhatt1317/motadata-design-system), and the two repositories are kept
+    # the same on purpose.
+    permissions:
+      contents: write
 
     steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # Required: the publish action runs git in the workspace, and fails to
+      # initialise without a repository there.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Storybook
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-${{ github.run_id }}
+          path: storybook-static
+
+      # `clean-exclude` IS THE WHOLE BALLGAME. Without it, publishing `main`
+      # deletes everything else on the branch - including `pr-preview/` - so
+      # merging ONE pull request would silently take down the previews of every
+      # other open one, and the links in their comments would 404 with nothing to
+      # explain why.
+      #
+      # The console's design system does not need this line because nothing
+      # automated writes its site root; here, every merge does.
+      - name: Publish to the site root
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: storybook-static
+          clean: true
+          clean-exclude: |
+            pr-preview/
+          commit-message: 'Deploy Storybook from ${{ github.sha }}'
+
+  preview:
+    name: Preview this pull request
+    needs: quality
+    # Same-repo pull requests only. A fork's run gets a read-only token by design,
+    # so it could not write `gh-pages` even if we asked it to - and a preview built
+    # from untrusted code would be served from this site's own origin, sharing
+    # storage with the real Storybook. A fork pull request still gets every check
+    # above; it just gets no preview.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      # Required, same as the deploy job: the action runs git in the workspace.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The build that already happened, rather than a second one. `main` used to
+      # build Storybook twice for the same reason and it cost two and a half
+      # minutes a merge (see the note on the Build Storybook step above), so the
+      # preview reuses the artifact instead of repeating the build.
+      - name: Download Storybook
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-${{ github.run_id }}
+          path: storybook-static
+
+      # The same action the console's design system uses. It writes the preview,
+      # updates it on each push and leaves ONE sticky comment with the link.
+      #
+      # `action: deploy` rather than the default `auto`: `auto` decides from the
+      # event, and this job never sees a `closed` event - ci.yml does not trigger
+      # on it, because running 3,600 tests to delete a directory is absurd. The
+      # removal is preview-cleanup.yml.
+      - name: Deploy the preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: storybook-static
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: deploy

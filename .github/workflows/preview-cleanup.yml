@@ -1,0 +1,48 @@
+name: Remove the preview
+
+# A closed pull request's preview is dead weight: a link that still works but shows
+# code nobody merged, and `gh-pages` grows a directory per pull request forever.
+#
+# This is its own workflow rather than another job in ci.yml because ci.yml's
+# `pull_request` trigger does not fire on `closed` (the default types are opened,
+# synchronize and reopened). Adding `closed` there would run lint, both typechecks,
+# 3,600 tests and two builds in order to delete a directory.
+#
+# The console's design system does this in one workflow because its previews build
+# there too; here the build lives in ci.yml, so the removal is what is left over.
+#
+# `closed` covers merged and abandoned alike - the preview goes either way.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    name: Remove the preview
+    # Same condition as the job that created it. A fork pull request never had a
+    # preview, so there is nothing to take down.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      # Required: the action runs git in the workspace and cannot initialise
+      # without a repository there.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Takes the directory off `gh-pages` and rewrites the sticky comment to say
+      # the preview is gone - rather than leaving a link that 404s with no
+      # explanation. Same action and same umbrella directory as the deploy.
+      - name: Remove the preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: remove
