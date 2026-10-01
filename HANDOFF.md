@@ -1,13 +1,22 @@
-# Handoff — 2026-09-28
+# Handoff — 2026-09-30
 
 ## Read first
 
-**#121 is folded into a branch and waiting on CI.** `nirav/fold-121` carries the
-console workstream and the dark theme as one merge commit. Nothing else is open.
+**Everything is merged and live. Nothing is open.**
+
+**Pull request previews are on.** Every pull request from a branch here gets its
+own Storybook at `…github.io/nextgen-design-system/pr-preview/pr-<number>/`,
+linked in one sticky comment, removed when the pull request closes. Same pattern
+as the console's design system, deliberately - see the section below, and the
+`.nojekyll` trap in it before touching anything about Pages.
+
+**#121 is folded in.** `main` carries the console workstream and the dark theme
+as one merge commit, with #121's five commits in the history.
 
 ```
-99fbee1  feat(table,theme): fold the console workstream in, and make
-         data-theme the one dark switch                     (nirav/fold-121)
+744554c  fix(pages): write .nojekyll into the build                   (#125)
+0e9ba3d  ci(pages): a Storybook preview per pull request              (#124)
+b5e4a79  the fold: the console workstream and the dark theme          (#123)
 658d908  chore(parity): the measurement apparatus, from #121          (#122)
 af20ebe  chore(release): 1.0.0                                        (#119)
 ```
@@ -40,10 +49,10 @@ on the dark page. Rendered in both themes and looked at, not reasoned about.
 
 ## In progress
 
-**Waiting on CI for `nirav/fold-121`**, then a pull request. Locally: **3602
-tests**, branches **90.24%**, lint and both typechecks clean, **76 components
-reachable**, colour gate green, build and `verify:package` green, storybook
-builds.
+**Nothing.** `main` is green, **3602 tests**, branches **90.24%**, lint and both
+typechecks clean, **76 components reachable**, colour gate green, build and
+`verify:package` green. The live Storybook was checked in a browser after the
+last deploy: sidebar loads, stories render in both themes, no failed requests.
 
 ---
 
@@ -70,6 +79,39 @@ tests.
 | **`AdvancedFilter` and `NumberInput` were exported twice** once the barrels met | One copy renamed every `AdvancedFilter` export. Renaming a 1.0.0 export is breaking; the published, alphabetically placed pair stays.                                                                             |
 | **`DataTable` fenced keystrokes on a plain `<div>`**                            | Moved onto the `Input` the keys come from.                                                                                                                                                                        |
 | **`AdvancedFilter`'s dark twin had inverted itself**                            | Added in #115 because `neutral-10` alone read near-white on a dark panel. Under the map `neutral-10` **is** the lift (`#0B1627` on the `#07101F` card), so the twin was painting the bug it was added to prevent. |
+
+---
+
+## Pull request previews, and the trap in them
+
+`gh-pages` is the site now, not an artifact. `main` publishes to its root and each
+open pull request to `pr-preview/pr-<number>/`. Pages is `build_type=legacy`,
+source `gh-pages` at `/`. The public URL did not change.
+
+**Two things will bite whoever touches this next, and both cost an afternoon:**
+
+**1. `.nojekyll` is not optional, and losing it fails silently.** A branch-served
+Pages site runs through Jekyll unless the root carries that file, and Jekyll does
+not copy Storybook's `assets/` - where every story chunk lives. When it went
+missing, the site returned **200**, `index.html` hashed identical to the branch,
+and `iframe.html`, `sb-manager/`, `sb-addons/`, `index.json` and the fonts all
+served. Only `assets/` was gone, so the shell loaded, the sidebar rendered its
+full tree, and **not one story opened**. Nothing reported an error anywhere.
+
+**2. `upload-artifact` drops dotfiles.** The first fix - `touch
+storybook-static/.nojekyll` - did nothing, because `actions/upload-artifact@v4`
+skips hidden files unless `include-hidden-files: true`, and says so only as one
+line in the run log. Both lines are in `ci.yml` now, with the reasoning beside
+them. Merging the broken fix would have deleted the hand-restored `.nojekyll` and
+emptied the site again, behind a green run and a 200.
+
+The lesson both times: **a 200 from the site proves nothing.** Check a
+content-hashed asset, or open a story in a browser.
+
+**Worth watching, not acting on:** `gh-pages` gains a whole Storybook build per
+merge, so the repository will grow. The console's design system does not hit this
+because its root is pushed by hand. In a few months, truncate that branch's
+history.
 
 ---
 
