@@ -91,6 +91,31 @@ const TRIGGER_TYPE: Record<TabsType, string> = {
   ),
 };
 
+/* THE LABEL HOLDS ITS 600 WIDTH (2026-10-06).
+ *
+ * K-Tabs-07 puts the active underline label at 600 while the rest stay at 500,
+ * and 600 is WIDER. So selecting a tab widened its own label and shoved every
+ * tab after it sideways - measured at 1.31px across the five-tab Underline
+ * story, and worse than that sounds: the shift is sub-pixel and the browser
+ * rounds it differently per tab, so the row reads as jitter rather than a
+ * slide.
+ *
+ * The label is a one-column grid holding two things: the real text, and an
+ * `::after` copy of it fixed at 600 with no height. The column is as wide as
+ * the wider of the two, which is always the 600 copy - so the width is the
+ * same whether or not the tab is active, and the real weights still render.
+ * K-Tabs-07 is untouched; only the jitter goes.
+ *
+ * ONLY ON `underline`. The chip never changes weight (K-Tabs-11 holds it at
+ * 500), so reserving a 600 width there would widen every filled tab for a
+ * weight it never reaches. */
+const LABEL_RESERVE = cn(
+  'mdt-inline-grid',
+  'after:mdt-col-start-1 after:mdt-row-start-2 after:mdt-h-0 after:mdt-overflow-hidden',
+  'after:mdt-invisible after:mdt-select-none after:mdt-content-[attr(data-text)]',
+  'after:mdt-font-semibold'
+);
+
 /* THE COUNT (K-Tabs-14): the console's CountBadge as it is - 18 high, 11/600 on
  * a line of 1, a muted pill that inverts on the active tab (neutral-90 under
  * white) and fades with a disabled label. On the filled track it sits a step
@@ -248,7 +273,17 @@ const TabsTrigger = forwardRef<ElementRef<typeof TabsPrimitive.Trigger>, TabsTri
           </span>
         ) : null}
 
-        {children}
+        {/* A string label gets the width reservation above. Anything else is
+         * passed straight through: `attr(data-text)` can only read a string,
+         * and duplicating an arbitrary node to measure it would run whatever
+         * is inside it twice. Those tabs keep today's behaviour. */}
+        {type === 'underline' && typeof children === 'string' ? (
+          <span className={LABEL_RESERVE} data-text={children}>
+            {children}
+          </span>
+        ) : (
+          children
+        )}
 
         {/* The space before the count and the badge is for the screen reader
          * ("Grants 3", not "Grants3"); a flex container never draws a
