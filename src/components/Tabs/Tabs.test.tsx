@@ -129,6 +129,71 @@ describe('the label (K-Tabs-02 to 05, 07)', () => {
   });
 });
 
+describe('the label holds its 600 width (K-Tabs-07)', () => {
+  /* The active underline label is 600 while the rest are 500, and 600 is wider -
+   * so selecting a tab used to widen it and shove every tab after it sideways
+   * (measured 1.31px across the Underline story, 0.00 after this). The width is
+   * reserved by an `::after` copy fixed at 600, which jsdom cannot render; what
+   * is asserted here is the structure that produces it. The px belong in a
+   * browser, and that is where they were taken. */
+  const labelOf = (name: string) => tab(name).querySelector('[data-text]');
+
+  it('wraps an underline label in a grid that reserves the 600 width', () => {
+    render(three());
+    const label = labelOf('Grants');
+    expect(label).not.toBeNull();
+    expect(label).toHaveAttribute('data-text', 'Grants');
+    expect(label).toHaveClass('mdt-inline-grid', 'after:mdt-content-[attr(data-text)]');
+  });
+
+  it('reserves it at 600, with no height and out of the accessibility tree', () => {
+    render(three());
+    /* `invisible` is load-bearing twice over: it hides the copy, and because
+     * `visibility: hidden` drops a node from the accessibility tree, it is also
+     * why a screen reader does not read the label twice. Verified in Chrome's
+     * own tree; jsdom computes neither. */
+    expect(labelOf('Grants')).toHaveClass(
+      'after:mdt-font-semibold',
+      'after:mdt-h-0',
+      'after:mdt-invisible',
+      'after:mdt-overflow-hidden'
+    );
+  });
+
+  it('leaves the accessible name alone', () => {
+    render(three());
+    expect(screen.getByRole('tab', { name: 'Grants' })).toBeInTheDocument();
+  });
+
+  it('still reserves it when the tab carries a count', () => {
+    render(three(undefined, { count: 3 }));
+    expect(labelOf('Grants')).toHaveAttribute('data-text', 'Grants');
+    expect(screen.getByRole('tab', { name: 'Grants 3' })).toBeInTheDocument();
+  });
+
+  it('does NOT reserve on the chip, whose label never changes weight (K-Tabs-11)', () => {
+    render(three('filled'));
+    expect(labelOf('Grants')).toBeNull();
+  });
+
+  it('passes a non-string label straight through, since attr() cannot read one', () => {
+    render(
+      <Tabs defaultValue="about">
+        <TabsList>
+          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="grants">
+            <span data-testid="rich">Grants</span>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="about">About panel</TabsContent>
+        <TabsContent value="grants">Grants panel</TabsContent>
+      </Tabs>
+    );
+    expect(screen.getByTestId('rich')).toBeInTheDocument();
+    expect(tab('Grants').querySelector('[data-text]')).toBeNull();
+  });
+});
+
 describe('underline geometry (K-Tabs-06, 08)', () => {
   it('pads the label 12 at both sides, 9 above and 11 below', () => {
     render(three());
