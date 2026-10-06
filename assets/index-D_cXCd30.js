@@ -1,0 +1,2 @@
+import{r as f,j as p}from"./iframe-Bjx_Kh3y.js";import{P as m,c as u}from"./index-CMDREd8O.js";import{u as c}from"./index-CGr31MeA.js";var a="Toggle",r=f.forwardRef((e,o)=>{const{pressed:t,defaultPressed:d,onPressedChange:l,...n}=e,[s,i]=c({prop:t,onChange:l,defaultProp:d??!1,caller:a});return p.jsx(m.button,{type:"button","aria-pressed":s,"data-state":s?"on":"off","data-disabled":e.disabled?"":void 0,...n,ref:o,onClick:u(e.onClick,()=>{e.disabled||i(!s)})})});r.displayName=a;var v=r;export{v as R,r as T};
+//# sourceMappingURL=index-D_cXCd30.js.map
