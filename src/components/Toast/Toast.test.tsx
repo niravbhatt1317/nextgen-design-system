@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { Toast, toast } from './Toast';
 import { ToastBody } from './ToastBody';
+import { FEEDBACK_ICON_TABLER } from '../../utils/feedback-tones';
 import { ToastPromo } from './ToastPromo';
 import { promoStore } from './promoStore';
 
@@ -170,6 +171,78 @@ describe('ToastBody — the surface', () => {
   it('announces itself without stealing focus', () => {
     render(<ToastBody description="Saved" />);
     expect(screen.getByTestId('toast').tagName).toBe('OUTPUT');
+  });
+});
+
+describe('ToastBody — the 2026-09/10 rulings', () => {
+  const TONES = ['info', 'warning', 'danger', 'success', 'ai', 'neutral'] as const;
+  const surface = () => screen.getByTestId('toast');
+
+  it('hugs its content rather than filling the toaster', () => {
+    /* Pranjal, 2026-10-04: "it should be almost same as text and other elements
+     * no extra space". `max-w-full` is the pair that matters - without it a long
+     * line would push the toast past the toaster instead of wrapping. */
+    render(<ToastBody description="Body" />);
+    expect(surface()).toHaveClass('mdt-w-fit', 'mdt-max-w-full');
+  });
+
+  it.each(TONES)('draws no border on %s - the tint and the shadow carry it', (tone) => {
+    /* Pranjal, 2026-09-29: "we should remove borders from every toast". The tone's
+     * edge colour still lives in FEEDBACK_SURFACE for Callout, and draws nothing
+     * here without a width - so this asserts the width is gone, not the colour. */
+    render(<ToastBody tone={tone} description="Body" />);
+    expect(surface()).not.toHaveClass('mdt-border');
+  });
+
+  it('takes its tone glyph from the Tabler set, and the info tone is the bulb', () => {
+    /* Pranjal, 2026-09-29: "use tabler icons for toasts ... in info toast the blue
+     * one use bulb icon from tabler. keep the info icon on neutral info toast." The
+     * bulb reads as a tip; the information circle stays on the neutral toast. */
+    expect(FEEDBACK_ICON_TABLER.info).toBe('bulb');
+    expect(FEEDBACK_ICON_TABLER.neutral).toBe('tabler-info-circle');
+    expect(Object.values(FEEDBACK_ICON_TABLER).filter((n) => n !== 'sparkles')).toSatisfy(
+      (names: string[]) => names.every((n) => n === 'bulb' || n.startsWith('tabler-'))
+    );
+    render(<ToastBody tone="info" description="Body" />);
+    expect(screen.getByTestId('toast').querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('fits a caller’s own icon to the tone glyph’s box', () => {
+    /* Pranjal, 2026-09-29: the Icons examples sat bigger than the tone glyphs and
+     * pushed the text off its line. Any svg now fills the box rather than setting
+     * its own size. */
+    render(
+      <ToastBody
+        description="Body"
+        icon={
+          <svg data-testid="own-glyph" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+        }
+      />
+    );
+    const slot = screen.getByTestId('own-glyph').parentElement;
+    expect(slot).toHaveClass('[&>svg]:mdt-h-full', '[&>svg]:mdt-w-full');
+    expect(slot).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('sets an emoji icon at the box size instead, since it has no svg to stretch', () => {
+    /* `sm` is the default size, so `md` is named explicitly rather than omitted. */
+    const emoji = <span data-testid="own-emoji">🎉</span>;
+    const { rerender } = render(<ToastBody description="Body" icon={emoji} size="sm" />);
+    expect(screen.getByTestId('own-emoji').parentElement).toHaveClass('mdt-text-[14px]');
+    rerender(<ToastBody description="Body" icon={emoji} size="md" />);
+    expect(screen.getByTestId('own-emoji').parentElement).toHaveClass('mdt-text-[16px]');
+  });
+
+  it('draws no glyph at all when the icon is null - null means none, not "default"', () => {
+    /* `undefined` falls through to the tone glyph; `null` is the caller saying they
+     * want the row without one. Asserted because the two read alike at a glance and
+     * the branch that tells them apart is one line. */
+    const { rerender } = render(<ToastBody tone="success" description="Body" icon={null} />);
+    const withoutIcon = screen.getByTestId('toast').querySelectorAll('svg').length;
+    rerender(<ToastBody tone="success" description="Body" />);
+    expect(screen.getByTestId('toast').querySelectorAll('svg').length).toBeGreaterThan(withoutIcon);
   });
 });
 

@@ -99,6 +99,16 @@ jobs:
         run: npm run check:tokens
         continue-on-error: true
 
+      # FAILS the build, and it has already earned its place. Two tokens reached a
+      # pull request with their dark values typed straight into the block marked
+      # DO NOT EDIT BY HAND. Everything was green - lint, types, 3,600 tests, the
+      # colour gate - and the next person to run the generator would have deleted
+      # both, putting a near-white hover inside a dark popover and bringing back
+      # the invisible ink the token was added to fix. Nothing anywhere ran this
+      # check, so nothing could have caught it.
+      - name: The dark theme matches its map
+        run: npm run check:theme
+
       # Unlike the token check above, this one FAILS the build. There are no
       # known violations to grandfather - every component is reachable today -
       # so blocking costs nothing, and the thing it catches is invisible

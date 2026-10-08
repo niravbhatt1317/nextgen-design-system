@@ -29,12 +29,11 @@
 }
 .kpi-btn:hover,
 .kpi-btn:focus-visible {
-  transform: scale(0.97);
-  outline: none;
+  outline: none; /* no shrink: the segment carries the divider, which shrank with it (Pranjal 2026-10-04) */
 }
 .kpi-btn:hover::after,
 .kpi-btn:focus-visible::after {
-  background: hsl(var(--mdt-neutral-10));
+  background: hsl(var(--mdt-neutral-20)); /* one step up from the card, so it shows on the grey card too */
 }
 .kpi-btn:focus-visible {
   box-shadow: inset 0 0 0 2px hsl(var(--mdt-ring));

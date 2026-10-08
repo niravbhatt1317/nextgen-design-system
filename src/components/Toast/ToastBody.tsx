@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 import {
-  FEEDBACK_ICON,
+  FEEDBACK_ICON_TABLER,
   FEEDBACK_ICON_COLOUR,
   FEEDBACK_MARK_TONES,
   FEEDBACK_SURFACE,
@@ -25,7 +25,11 @@ import type { ToastBodyProps, ToastSize } from './Toast.types';
  */
 export const toastVariants = cva(
   [
-    'mdt-flex mdt-w-full mdt-rounded-lg mdt-border',
+    // No border (Pranjal, 2026-09-29: "we should remove borders from every toast"): the tint and the shadow carry the
+    // shape; the tone's edge colour stays in FEEDBACK_SURFACE for Callout, and draws nothing here without a width.
+    // As wide as its content, never wider (Pranjal, 2026-10-04: "it should be almost same as text and other elements no extra
+    // space. only 20 px between cross and text"); the toaster still caps it at the toast width.
+    'mdt-flex mdt-w-fit mdt-max-w-full mdt-rounded-lg',
     // Top-aligned, with the icon nudged down by half the gap between the line
     // box and the glyph. On a single line that nudge lands the icon exactly on
     // the centre line; the moment the text wraps, the same rule leaves it
@@ -82,13 +86,28 @@ export const ToastBody = ({
   const glyphClass = cn(ICON_SIZE[size], 'mdt-mt-0.5 mdt-shrink-0', FEEDBACK_ICON_COLOUR[tone]);
 
   const renderIcon = (): ReactNode => {
-    if (icon !== undefined) return <span className={glyphClass}>{icon}</span>;
-    if (loading) return <Icon name="loader-2" className={cn(glyphClass, 'mdt-animate-spin')} />;
+    // A custom icon is fitted to the tone glyph's own box (Pranjal, 2026-09-29: the Icons examples sat bigger than the
+    // tone glyphs and pushed the text off its line): any svg fills the box, an emoji is set at the box's size.
+    if (icon !== undefined && icon !== null)
+      return (
+        <span
+          className={cn(
+            glyphClass,
+            'mdt-inline-flex mdt-items-center mdt-justify-center mdt-leading-none [&>svg]:mdt-h-full [&>svg]:mdt-w-full',
+            size === 'sm' ? 'mdt-text-[14px]' : 'mdt-text-[16px]'
+          )}
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+      );
+    if (icon === null) return null;
+    if (loading) return <Icon name="tabler-loader-2" className={cn(glyphClass, 'mdt-animate-spin')} />;
     // The `ai` tone is a brand rather than a status, and the gradient is what
     // says so - see FEEDBACK_MARK_TONES. Line, because every other tone glyph
-    // in this row is a Lucide outline.
+    // in this row is an outline (Tabler's, since 2026-09-29).
     if (FEEDBACK_MARK_TONES.has(tone)) return <AiMark appearance="line" className={glyphClass} />;
-    return <Icon name={FEEDBACK_ICON[tone]} className={glyphClass} />;
+    return <Icon name={FEEDBACK_ICON_TABLER[tone]} className={glyphClass} />;
   };
 
   return (
@@ -100,7 +119,7 @@ export const ToastBody = ({
       {renderIcon()}
 
       {/* min-w-0 lets long words wrap instead of forcing the toast wider */}
-      <div className="mdt-min-w-0 mdt-flex-1 mdt-text-feedback-text">
+      <div className="mdt-min-w-0 mdt-text-feedback-text">
         {title !== undefined && title !== '' ? (
           <span
             className={cn(
@@ -142,10 +161,15 @@ export const ToastBody = ({
           onClick={onClose}
           aria-label="Dismiss"
           // Deliberately outside the tone system. Om's rule is that only the
-          // icon and the border carry the tone, and a coloured close would
+          // tint and the icon carry the tone, and a coloured close would
           // compete with the icon for the same job.
           className={cn(
-            'mdt-mt-0.5 mdt-shrink-0 mdt-rounded-sm mdt-p-0.5',
+            // No top nudge (Pranjal, 2026-09-29, the ✕ sat 2px under the text): the 2px well around the glyph already
+            // makes the box one line tall, so its centre is the first line's centre.
+            // The glyph is centred IN the box, not set on a text line: as an inline svg it sat on the button's baseline
+            // and landed 4px under the box's centre (Pranjal, 2026-09-29: "even now all elements are not aligning").
+            'mdt-inline-flex mdt-items-center mdt-justify-center',
+            'mdt-shrink-0 mdt-rounded-sm mdt-p-0.5',
             // 70%, not 60. Held back so it does not compete with the tone
             // glyph, but a dismiss has to be findable - 60% measured at 3.8
             // against the palest tint, 70% lands at 5.1.
@@ -154,11 +178,13 @@ export const ToastBody = ({
             'mdt-transition-colors',
             'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring',
             ICON_SIZE[size],
+            // 20px from the text to the close: the row gap plus this (sm 10 + 10, md 12 + 8)
+            size === 'sm' ? 'mdt-ml-2.5' : 'mdt-ml-2',
             'mdt-box-content'
           )}
           data-testid="toast-close"
         >
-          <Icon name="x" className={ICON_SIZE[size]} />
+          <Icon name="tabler-x" className={ICON_SIZE[size]} />
         </button>
       ) : null}
     </output>

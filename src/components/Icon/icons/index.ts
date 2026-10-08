@@ -673,6 +673,15 @@ import { LeafyGreenIcon } from './leafy-green';
 import { LibraryIcon } from './library';
 import { LifeBuoyIcon } from './life-buoy';
 import { LigatureIcon } from './ligature';
+import { BulbIcon } from './bulb';
+import { TablerXIcon } from './tabler-x';
+import { TablerLoader2Icon } from './tabler-loader-2';
+import { TablerSparklesIcon } from './tabler-sparkles';
+import { TablerAlertTriangleIcon } from './tabler-alert-triangle';
+import { TablerAlertCircleIcon } from './tabler-alert-circle';
+import { TablerCircleXIcon } from './tabler-circle-x';
+import { TablerCircleCheckIcon } from './tabler-circle-check';
+import { TablerInfoCircleIcon } from './tabler-info-circle';
 import { LightbulbIcon } from './lightbulb';
 import { LightbulbOffIcon } from './lightbulb-off';
 import { LineChartIcon } from './line-chart';
@@ -1892,6 +1901,15 @@ export const iconRegistry = {
   library: LibraryIcon,
   'life-buoy': LifeBuoyIcon,
   ligature: LigatureIcon,
+  bulb: BulbIcon,
+  'tabler-x': TablerXIcon,
+  'tabler-loader-2': TablerLoader2Icon,
+  'tabler-sparkles': TablerSparklesIcon,
+  'tabler-alert-triangle': TablerAlertTriangleIcon,
+  'tabler-alert-circle': TablerAlertCircleIcon,
+  'tabler-circle-x': TablerCircleXIcon,
+  'tabler-circle-check': TablerCircleCheckIcon,
+  'tabler-info-circle': TablerInfoCircleIcon,
   lightbulb: LightbulbIcon,
   'lightbulb-off': LightbulbOffIcon,
   'line-chart': LineChartIcon,

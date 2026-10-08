@@ -22,7 +22,8 @@ import { Icon } from '../Icon';
 type ToastStoryArgs = ToasterProps & { tone: ToastTone };
 
 const meta: Meta<ToastStoryArgs> = {
-  title: 'Components/Toast',
+  // moved 2026-09-29 (Pranjal: "after the changes move them into new component section")
+  title: 'New Components/Toast',
   component: Toast,
   tags: ['autodocs'],
   parameters: {
@@ -57,7 +58,7 @@ const meta: Meta<ToastStoryArgs> = {
       control: 'select',
       options: ['success', 'danger', 'warning', 'info', 'neutral', 'ai'],
       description:
-        'Which tone the toast below uses. Only the icon and the border carry it — the text stays the same in all six.',
+        'Which tone the toast below uses. Only the tint and the icon carry it — no border, and the text stays the same in all six.',
       table: {
         category: 'Toast',
         defaultValue: { summary: 'success' },
@@ -290,7 +291,7 @@ export const ToastVariants: Story = {
   parameters: { layout: 'padded', controls: { disable: true } },
   render: () => (
     <div className="mdt-flex mdt-max-w-3xl mdt-flex-col mdt-gap-7">
-      <Row label="Types" note="Six tones. Only the icon and the border carry the tone.">
+      <Row label="Types" note="Six tones. Only the tint and the icon carry the tone - no border.">
         <Fire onClick={() => toast.success('Changes saved successfully')}>Success</Fire>
         <Fire onClick={() => toast.danger('Failed to save changes')}>Danger</Fire>
         <Fire onClick={() => toast.warning('Please review your input')}>Warning</Fire>
@@ -398,7 +399,7 @@ export const ToastVariants: Story = {
         <Fire
           onClick={() =>
             toast.success('Payment processed successfully', {
-              icon: <Icon name="check-circle" size="md" aria-hidden={true} />,
+              icon: <Icon name="tabler-circle-check" aria-hidden={true} />,
             })
           }
         >
@@ -407,7 +408,7 @@ export const ToastVariants: Story = {
         <Fire
           onClick={() =>
             toast.error('Failed to process payment', {
-              icon: <Icon name="x-circle" size="md" aria-hidden={true} />,
+              icon: <Icon name="tabler-circle-x" aria-hidden={true} />,
             })
           }
         >
@@ -416,7 +417,7 @@ export const ToastVariants: Story = {
         <Fire
           onClick={() =>
             toast.warning('Your session will expire soon', {
-              icon: <Icon name="alert-triangle" size="md" aria-hidden={true} />,
+              icon: <Icon name="tabler-alert-triangle" aria-hidden={true} />,
             })
           }
         >
@@ -425,7 +426,7 @@ export const ToastVariants: Story = {
         <Fire
           onClick={() =>
             toast.info('New update available', {
-              icon: <Icon name="info" size="md" aria-hidden={true} />,
+              icon: <Icon name="tabler-info-circle" aria-hidden={true} />,
             })
           }
         >

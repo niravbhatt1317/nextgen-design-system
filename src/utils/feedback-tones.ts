@@ -67,6 +67,21 @@ export const FEEDBACK_ICON: Record<FeedbackTone, IconName> = {
 };
 
 /**
+ * Toast's and Banner's glyphs: Tabler's outline set (Pranjal, 2026-09-29: "use tabler icons for toasts ... in info
+ * toast the blue one use bulb icon from tabler. keep the info icon on neutral info toast. Do the same for banner").
+ * Info is the bulb - it reads as a tip, not an alert; neutral keeps the information circle. Callout still reads
+ * FEEDBACK_ICON above - he named only these two.
+ */
+export const FEEDBACK_ICON_TABLER: Record<FeedbackTone, IconName> = {
+  info: 'bulb',
+  neutral: 'tabler-info-circle',
+  warning: 'tabler-alert-triangle',
+  danger: 'tabler-alert-circle',
+  success: 'tabler-circle-check',
+  ai: 'tabler-sparkles',
+};
+
+/**
  * The tones whose glyph is a mark rather than an icon.
  *
  * `ai` draws `AiMark` — three colours sweeping across a star — instead of a

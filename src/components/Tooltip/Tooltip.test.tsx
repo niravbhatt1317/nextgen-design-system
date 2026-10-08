@@ -46,14 +46,14 @@ describe('Tooltip', () => {
     expect(bubble()).toBeNull();
   });
 
-  it('opens on hover with the console fill, the library padding and a 280px cap, centred', async () => {
+  it('opens on hover with the console fill, 12 on every side, the 8 radius and a 280px cap, centred', async () => {
     render(<Bubble>Tooltip content</Bubble>);
     const el = await open();
     expect(el).toHaveClass(
       'mdt-bg-inverse',
       'mdt-text-inverse-foreground',
-      'mdt-px-3',
-      'mdt-py-1.5',
+      'mdt-p-3',
+      'mdt-rounded-lg',
       'mdt-text-center'
     );
     expect(el.style.maxWidth).toBe('280px');

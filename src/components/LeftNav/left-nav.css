@@ -920,14 +920,18 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 8px 12px 12px;
+  padding: 10px 12px;
   font-size: 11px;
   color: hsl(var(--mdt-muted-foreground) / 0.65);
   flex: 0 0 auto;
+  /* its own grey band at the foot of the switcher (Pranjal 2026-10-06: "keep the powered by motadata in grey area") */
+  background: hsl(var(--mdt-secondary));
+  border-top: 1px solid hsl(var(--mdt-border));
 }
 .ogsw-powered svg {
   display: block;
-  opacity: 0.75;
+  /* the wordmark in its own colours - ink letters, the coral quarter (Pranjal 2026-10-06: "make the logo a little darker ... use the original colors") */
+  color: hsl(var(--mdt-foreground));
 }
 
 /* The six avatar tones, assigned to an organization by stable index. Since 2026-09-24 they read
