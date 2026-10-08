@@ -87,7 +87,7 @@ const TooltipContent = forwardRef<
           sideOffset={sideOffset}
           align={align}
           className={cn(
-            'tt mdt-z-50 mdt-rounded-md mdt-bg-inverse mdt-px-3 mdt-py-1.5',
+            'tt mdt-z-50 mdt-rounded-lg mdt-bg-inverse mdt-p-3', // 8 radius, 12 on every side (Pranjal 2026-10-03),
             'mdt-text-xs mdt-leading-4 mdt-text-inverse-foreground',
             fromLeft ? 'mdt-text-left' : 'mdt-text-center',
             className

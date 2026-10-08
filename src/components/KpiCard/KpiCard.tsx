@@ -38,7 +38,7 @@ export function formatKpiValue(n: number): string {
 
 const SETTINGS_GEAR = (
   <span className="kpi-gear mdt-hidden mdt-shrink-0 mdt-text-neutral-50" aria-hidden="true">
-    <Icon name="settings" size={16} />
+    <Icon name="external-link" size={14} /> {/* opens another place, so the link glyph, a size down (Pranjal 2026-10-04) */}
   </span>
 );
 
