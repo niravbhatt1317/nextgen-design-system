@@ -928,5 +928,9 @@
 
 /* A toast hugs its content (2026-10-04), so it sits on the side of the stack it belongs to: centred under a centred
    toaster, against the right edge under a right one. */
-[data-sonner-toaster][data-x-position='center'] [data-testid='toast'] { margin-inline: auto; }
-[data-sonner-toaster][data-x-position='right'] [data-testid='toast'] { margin-left: auto; }
+[data-sonner-toaster][data-x-position='center'] [data-testid='toast'] {
+  margin-inline: auto;
+}
+[data-sonner-toaster][data-x-position='right'] [data-testid='toast'] {
+  margin-left: auto;
+}
