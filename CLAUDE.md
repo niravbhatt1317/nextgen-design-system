@@ -904,15 +904,33 @@ npm run check:tokens          # report hardcoded values (does not fail)
 npm run check:tokens:strict   # same, but exits non-zero on violations
 npm run check:tokens:report   # also writes TOKEN-REPORT.md
 node scripts/extract-variants.mjs --json   # rebuild component-catalog.json
-npm run generate-icons        # re-cut every icon from Lucide's own source
+npm run generate-icons        # re-cut the Lucide icons; Tabler ones are kept as-is
 ```
 
 ---
 
 ## 🎨 The icon rule - read before adding any icon
 
-**Lucide is the only icon source.** Reach for it first, every time. If Lucide genuinely has nothing
-suitable, say what you looked for and what was missing - do not quietly substitute the nearest thing.
+**Two sources, and nothing outside them: Tabler and Lucide** (Nirav, 2026-10-08). Tabler is the one
+reached for most - it is what the console draws, and what Toast and Banner take their tone glyphs
+from since 2026-09-29. **Lucide is the fallback**, and still the bulk of the set: 1,209 of the icons
+here came from it. If neither has what you need, say what you looked for and what was missing - do
+not quietly substitute the nearest thing, and do not bring in a third set.
+
+**A Tabler icon is named `tabler-<name>`** where it sits beside a Lucide icon for the same shape,
+which is most of them so far: `tabler-x` beside `x`, `tabler-alert-circle` beside `alert-circle`,
+`tabler-circle-check` beside `check-circle`. That prefix is the whole disambiguation, so **reach for
+the one the surface you are building already uses** rather than whichever name you remember. The
+nine that exist today are the feedback glyphs: `bulb`, `tabler-info-circle`, `tabler-alert-triangle`,
+`tabler-alert-circle`, `tabler-circle-check`, `tabler-circle-x`, `tabler-x`, `tabler-loader-2`,
+`tabler-sparkles`.
+
+**The generator only knows Lucide**, and that is a gap, not a design. `scripts/generate-icons.mjs`
+re-cuts from `node_modules/lucide-static`; there is no Tabler devDependency, so the nine Tabler
+icons were added by hand and the generator reports them under _"No longer in the source, kept as-is"_
+with the seventeen brand logos. They survive a refresh - that path is deliberate and tested - but
+they never refresh FROM anything. Twenty-six icons now sit in that bucket. Wiring a Tabler source
+into the generator is the fix; until someone does, a new Tabler icon is a hand-add.
 
 **One icon means one thing.** Never use the same glyph for two different features. Before reusing an
 icon, check where it is already used; if it is taken, find a different one. An icon is often the only
@@ -972,9 +990,10 @@ them by name on every run, so the list stays visible rather than becoming invisi
 Do **not** simply skip an icon that has no upstream file. The first version of this script did, and
 it left those seventeen as the only icons in the set where `strokeWidth` still did nothing.
 
-### Why the icon set is not `lucide-react`
+### Why neither set is imported as a package
 
-Deliberate, and worth not undoing:
+Deliberate, and worth not undoing. Written about `lucide-react`, and it applies to
+`@tabler/icons-react` word for word:
 
 |                                     | Import the package                                | Copy the artwork in                            |
 | ----------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
