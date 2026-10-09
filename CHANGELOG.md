@@ -1,5 +1,228 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- Dark mode is `[data-theme="dark"]`, and it is the colour map — not a second palette.
+
+  `<html data-theme="dark">` is the switch - the console's since 2026-09-24, so the
+  storybook and the console now read one dark theme rather than three. The block is
+  generated from the finalised colour map by `scripts/theme-dark.cjs`.
+
+  **`<html class="dark">` keeps working**, and is a migration aid rather than a second
+  switch: the generated block carries both selectors and the `dark:` variant matches
+  both, so an app on 1.0.0 upgrades without moving its toggle in the same breath as
+  everything else here. It goes in 3.0.0. Nothing in this library sets it.
+
+  **Still breaking, for a different reason.** The dark values themselves come from the
+  map now, so a theme built against 1.0.0's hand-written dark block will shift - the
+  switch survives the upgrade, the exact colours do not.
+
+  Under the map, **every ramp step carries its own dark value** — `blue-10` is `#EBF4FF`
+  in light and `#1D3754` in dark, `blue-80` is `#003899` and `#A3CDFF`. A component that
+  names a wash and an ink gets a dark wash under a light ink without being told, so the
+  `dark:` twins that used to sit beside them are not just redundant, they name the wrong
+  end of the ramp. Nineteen were removed across Avatar, Input, Form, Upload, DatePicker,
+  AdvancedFilter and Table — each one had begun painting a near-white control on the dark
+  page. Nothing changes in light mode.
+
+  `CodeWell surface="dark"` is the one left standing, and it is logged in
+  `MISSING-TOKENS.md`: the terminal look needs a ground that deliberately does _not_
+  follow the theme, and the palette has no such token yet.
+
+### Minor Changes
+
+- c67fc9f: AdvancedFilter's five helpers are also exported under qualified names.
+
+  `ADVANCED_FILTER_OPERATORS`, `isFilterGroup`, `isFilterComplete`,
+  `liveFilterItems` and `matchFilterRow` are aliases of `OPERATORS`, `isGroup`,
+  `isComplete`, `liveItems` and `matchRow` - the same functions, not copies.
+
+  The plain names are specific inside `AdvancedFilter.tsx` and vague at the
+  package root, where `isComplete` could belong to anything. The qualified forms
+  say what they filter. Prefer them in new code; nothing is deprecated, and
+  nothing is renamed - renaming a name 1.0.0 published would break every consumer
+  of it to tidy a word.
+
+- fcb3ac4: IconTile: a `2xl` size (56, glyph 24, radius 12 when square) - the identity mark at the top of an object drawer, the height of the 56 avatar Users puts there.
+- 6cfe5dc: Table: `expand` — the table drives its own morph **by default**, and one row behaves like a thousand
+
+  Until now the Table only _rendered_ a morph value someone else computed. Its own
+  documentation said so: "the page decides when, the table only decides how it
+  looks. The page also sets the card's height once docked." That left Pranjal's
+  rule living in whoever called the table rather than in the table.
+
+  `expand` moves it inside, and it is **on unless you turn it off** — a rule that
+  has to be remembered at every call site is a rule that gets forgotten at one of
+  them. Every table:
+  - takes the full height under the page's dock line **whatever it holds**
+  - widens to the page as it reaches that line, and hands the scroll to its rows
+  - keeps its pager on screen instead of letting it float up under a short list
+
+  One rule, two consequences, and neither can now be got wrong by a caller: a
+  table expands on scroll **even holding a single row**, and a filtered-down list
+  does not suddenly behave like a different component.
+
+  The dock line is read from the page rather than typed: the frame's own published
+  offset where that is a plain value, otherwise the band heights it is derived
+  from — so changing a band height cannot leave the table docking in the wrong
+  place. `dockOffset` is there for pages that are not a `PageFrame`.
+
+  ### What the default does not touch
+
+  The default is safe wherever a table lands because it only engages once it has
+  actually found a page to fill — a scrolling ancestor, and room under the dock
+  line worth taking. A table in a drawer, a modal or a card finds neither, stays
+  an ordinary card and keeps its own `maxHeight`, exactly as before.
+
+  A scrolling box that is **taller than the window** does not count as a page
+  either. That is a box growing with its content, not a viewport — the gallery's
+  own docs page wraps every story in one — and filling it ratchets: the table
+  stretches to the box, the box grows to the table, again and again, until every
+  table on the page is 8,000px tall. The table skips such a box and keeps looking
+  upward, and a page with no real scroller above the table stays an ordinary card.
+
+  `docked` also keeps its exact contract: pass one and the page keeps the job of
+  driving the morph, because `expand` stands down unless it is passed explicitly
+  alongside. `expand={false}` opts out of everything.
+
+  ### What it does change
+
+  Any table sitting directly in a scrolling page now fills the height under its
+  dock line instead of ending where its rows end. That is the point of the change,
+  and it is visible on every list at once — including lists nobody had got round
+  to switching on.
+
+- a092264: Table: the lead column is one thing with two faces — a checkbox where the table has bulk actions, a row number under a `#` where it does not.
+  - `TableLeadHead` / `TableLeadCell` are new. Pass `selectable` and they draw the right face; a page declares whether it acts on many rows and the component does the rest.
+  - The heading over the row numbers now shows `#`. It used to be blank by design, which read as a column somebody forgot to label.
+  - Story: Table → Pieces → The lead column, both faces side by side.
+
+- 2f7bd74: DataTable: one icon for a quick filter, and pills in its menu.
+  - The quick-filter square wears the glyph of the column it filters unless given its own icon, so the strip and the heading always show one mark.
+  - `quickFilter.renderOption` draws each value in the menu the way the page asks — Users draws each status as its own Badge, so the menu reads like the column.
+  - The Users story's Status mark is the library's own eight-spoke `loader` icon, on the heading and the square alike.
+
+- 2561313: Table: the pager strip only appears when there is something to page.
+
+  `pager="auto"` (the default) draws it once there IS a second page — 25 rows at 25 a page have none, 26 have one — and never while loading or in a blank state, where six disabled controls under an empty table were furniture and the blank state already carries the message. A "Load more" footer likewise goes once everything is loaded. `pager="always"` keeps the strip for a list about to grow; `pager="never"` drops it for a list that shows all it has.
+
+- bb372d7: DataTable: `quickFilter` takes one quick filter or several — each gets its own square and menu in the strip, and a row must satisfy every one that has a tick. A filter's `value` may return several strings; the row passes when any of them is ticked (a service account's home organisation and its reach).
+- cd12316: Toolbar and DataTable: three details of the strip, by ruling.
+  - **Every quick-filter row carries a checkbox**, on or off, like the Filters panel's rows: a person sees at a glance which values are on and that several can be. The menu's own tick, which only appeared once checked, gives way to the box.
+  - **The Filters button wears Tabler's funnel.** A new `funnel` icon joins the set — Tabler's `filter`, inlined — and every Filters button in the library draws it in place of the three lines.
+  - **A search box inside a Toolbar wears the strip's border**, the same neutral-30 as a ToolbarButton, so the pair reads as one family of controls.
+
+- 6f3e95b: DataTable: `toolbar` can take the page's own Toolbar element.
+
+  A page with no tab strip keeps the 60px `Toolbar` band as page structure. Hand its element to the table (`toolbar={stripEl}`) and the table draws its own search, Filters, quick filter, Sort and Columns inside it instead of in a strip of its own — every control keeps working, and the page has no copy to keep in step. `true` still draws the table's own strip; `false` still draws none. Use a callback ref or state for the element so the table sees it once it exists.
+
+- 88d5d68: Table: `toolbar={false}` — the table without its own strip above it.
+
+  On a screen with a tab strip the page carries its own toolbar up there, and a second strip on the table would draw search, Filters, Sort and Columns twice. Pass `toolbar={false}` and the page supplies its own `Toolbar` instead; everything inside the card — frozen columns, grips, heading menus, pager — is unchanged. On by default.
+
+- 8a46c01: Table: three rules the card and its columns now keep.
+  - **The reshaping runs over the travel the card actually has.** It was measured against a flat 140px, so a card starting 81px above its dock line rested 42% reshaped, corners half flattened before anyone scrolled. Every card now rests at 0 and reaches 1 exactly at the dock line, however far from it it starts.
+  - **A declared column width is held to the minimum (120)**, the same floor the resize handle keeps. A page can no longer declare 110 and get it.
+  - **Spare width is shared equally among the content columns**, so a wide card shows wider columns rather than a blank run past the last one. The lead, Name and Action columns keep their ruled widths; a card narrower than its columns still scrolls sideways.
+
+### Patch Changes
+
+- 3664287: Banner drops its edge and takes Toast's Tabler glyphs.
+  - **No border, in either placement** (Pranjal, 2026-09-28: "in banner we will
+    remove the borders"). The tint alone marks the banner out; an outline around
+    it was one line too many inside a form card, which is where most banners sit.
+    `inline` keeps its rounding, `page` still loses it - there is nothing beside
+    an edge-to-edge banner to be rounded against.
+  - **The tone glyphs are Tabler's**, the same set Toast moved to on 2026-09-29,
+    with the bulb on the blue info banner. Om Vekariya's rule is unchanged: only
+    the icon and the tint carry the tone, and the words stay one colour.
+  - **The stories moved to New Components/Banner**, with the rest of the parts
+    reworked for the console.
+
+  Worth knowing before you place one on a bare page: with the edge gone, the tint
+  is all there is, and on white it is faint - 1.03:1 for warning, 1.08:1 at best.
+  That is by design on a card, where the card draws the boundary. On a plain page
+  the icon and the text are what say a banner is there.
+
+- 856c615: The package can be built on Windows.
+
+  `scripts/build-package.mjs` spawned Tailwind through `npx`. On Windows the
+  executable is `npx.cmd`, and since the 2024 argument-injection fix Node refuses
+  to spawn a `.cmd` without `shell: true` - so the build stopped before it started,
+  and the console had to work around it by hand to package its own copy.
+
+  Tailwind's bin is a plain JavaScript file, so it is now run the way Node runs
+  anything: this interpreter, that file. No shell, no `.cmd`, no PATH lookup, and
+  the same behaviour on every platform. `shell: true` would also have fixed it, and
+  brought the quoting rules of two shells along with it.
+
+- cf12b83: Toast, Tooltip, KpiCard and LeftNav take the console's held-back rulings.
+  - **Toast** draws no border (2026-09-29: "we should remove borders from every
+    toast") - the tint and the shadow carry the shape. It is as wide as its
+    content rather than the full toaster, and a custom icon is fitted to the tone
+    glyph's own box, so an oversized one no longer pushes the text off its line.
+    The tone glyphs are Tabler's outline set, with the blue info toast on the bulb;
+    neutral keeps the information circle.
+  - **Tooltip** is 8 at the corners with 12 on every side (2026-10-03).
+  - **KpiCard** opens elsewhere, so the gear becomes the external-link glyph at 14.
+    The segment no longer shrinks under the pointer - the divider shrank with it -
+    and the hover wash moves a step up so it shows on a grey card too.
+  - **LeftNav** gives "powered by Motadata" its own grey band at the foot of the
+    switcher, with the wordmark in its own colours (2026-10-06).
+
+  Two new semantic tokens, both pointing at ramp steps that already existed:
+  `--mdt-overlay-hover` (the hover ground inside a floating panel) and
+  `--mdt-tile-blue-ink` (the blue icon tile's glyph, which was unreadable on the
+  dark Name tiles).
+
+- ec77b92: IconTile: the tile sizes its own glyph — 14 in the 24px tile, 16 in 32, 20 in 40, 24 in 48. A page no longer has to know the ratio, and an icon that arrives at its default 20px no longer overflows the small tile.
+- 95fc40e: Input: the border is neutral-30 (neutral-110 in dark), the same edge as the outline Button and the Toolbar's controls. The Toolbar had been forcing that colour onto any input inside it; an Input anywhere else - a search above a table in a drawer - came out darker (the --mdt-input token, neutral-40).
+- bfee256: A published name can no longer leave the package by accident.
+
+  `npm run check:api` compares the built `dist/` against a committed baseline of
+  every name the package exports, and fails if one is gone. Added names are free.
+
+  It exists because five of them already did leave. 1.0.0 published `OPERATORS`,
+  `isGroup`, `isComplete`, `liveItems` and `matchRow`; the console imported the
+  qualified forms, which a pull request had carried and the fold of that pull
+  request did not keep. Lint, 3,600 tests and the build were green the whole way,
+  and the first anyone knew was every table with More filters failing to load.
+
+  Nothing about the package changes for a consumer - this is a gate, not an API
+  change.
+
+- 03c9201: DataTable: the Name column resizes like any content column - drag or arrow keys on its heading, a floor of 160 (nameColumn.minWidth overrides it), the shared 720 ceiling, and the width is remembered under the table's storageKey with the other widths. The lead column (checkbox or row number) and Action stay fixed. useTableColumns gains hasWidth(key).
+- 76ca0ab: DataTable: the column resize handle sits fully inside its own heading (12px ending at the boundary line). It used to straddle the boundary, and because every heading is sticky with a z-index the next heading painted over its far half - only about three pixels could be grabbed with the mouse.
+- 7e866cc: Table: the table's own toolbar sits flush with the card's edges — the search box starts where the card starts, the last button ends where it ends — is only as tall as its controls, and keeps 16px to the card. A standalone `Toolbar` keeps its 60px band and 24px inset; a table without its own toolbar leaves the spacing to the page's structure.
+- d22322a: DataTable: widening one column never narrows another. At rest the content columns share the card's spare width; the first drag freezes every column at its rendered width, after which the elastic tail takes the spare and the table scrolls sideways when the columns outgrow the card. Reset columns brings the sharing back. useTableColumns gains hasAnyWidth and setWidths; TableColGroup takes a tail width.
+- c2fcbda: Tabs: the underline row no longer shifts when you change tabs.
+
+  K-Tabs-07 puts the active underline label at 600 while the rest stay at 500, and
+  600 is wider - so selecting a tab widened its own label and pushed every tab
+  after it sideways. Measured at **1.31px** across the five-tab Underline story,
+  and worse than that sounds: the shift is sub-pixel and the browser rounds it
+  differently per tab, so the row read as jitter rather than a slide.
+
+  The label now sits in a one-column grid holding the real text and an `::after`
+  copy of it fixed at 600 with no height. The column is as wide as the wider of the
+  two - always the 600 copy - so the width is identical whether or not the tab is
+  active. **1.31px becomes 0.00px**, and the real 500 and 600 weights still render:
+  K-Tabs-07 is untouched.
+  - **Only `underline`.** The chip holds its label at 500 in every state
+    (K-Tabs-11), so reserving a 600 width there would widen every filled tab for a
+    weight it never reaches. Filled already measured 0.00px and is unchanged.
+  - **Only a string label.** `attr(data-text)` can read nothing else, and
+    duplicating an arbitrary node to measure it would run whatever is inside it
+    twice. A non-string label passes straight through, exactly as before.
+  - **The inactive tabs widen** to their 600 width - +4px across the five in that
+    story, absorbed by the row's existing slack. The active tab does not move at
+    all, since it was already 600.
+  - **Nothing is read twice.** `visibility: hidden` drops the copy from the
+    accessibility tree, so the accessible names are unchanged - checked against
+    Chrome's own tree, since jsdom renders no pseudo-element and could not tell.
+
 ## 1.0.0
 
 ### Major Changes
