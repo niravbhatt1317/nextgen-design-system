@@ -9,6 +9,7 @@
  * 2,785 JavaScript files and not one rule of styling.
  */
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import {
   appendFileSync,
   copyFileSync,
@@ -34,9 +35,28 @@ const dist = (file) => resolve(root, 'dist', file);
  * of the rules that use them.
  */
 function buildStyles() {
+  /* RUN TAILWIND'S CLI WITH NODE, NOT THROUGH `npx` (2026-10-09).
+   *
+   * `execFileSync('npx', ...)` cannot build this package on Windows. There, the
+   * executable is `npx.cmd`, and since the 2024 argument-injection fix Node
+   * refuses to spawn a `.cmd` at all without `shell: true` - so the build stops
+   * before it starts. The console hit this packaging its own copy and had to
+   * work around it by hand.
+   *
+   * `shell: true` would fix it and bring the quoting rules of two shells with
+   * it. Tailwind's bin is a plain JavaScript file, so the honest fix is to run
+   * it the way Node runs anything: this interpreter, that file. No shell, no
+   * `.cmd`, no PATH lookup, and the same on every platform. */
   execFileSync(
-    'npx',
-    ['tailwindcss', '-i', 'src/styles/globals.css', '-o', 'dist/styles.css', '--minify'],
+    process.execPath,
+    [
+      createRequire(import.meta.url).resolve('tailwindcss/lib/cli.js'),
+      '-i',
+      'src/styles/globals.css',
+      '-o',
+      'dist/styles.css',
+      '--minify',
+    ],
     { cwd: root, stdio: ['ignore', 'ignore', 'inherit'] }
   );
 
@@ -114,7 +134,8 @@ function foldComponentCss() {
   /* Now the imports. Rollup writes them as a bare `import './x.css';` or
    * `require('./x.css');` with no binding, so they can be cut whole - there is
    * no name left behind to go undefined. */
-  const BARE_CSS = /(?:^|(?<=[;\n]))\s*(?:import\s*['"][^'"]+\.css['"]\s*;?|require\(['"][^'"]+\.css['"]\)\s*;?)/gm;
+  const BARE_CSS =
+    /(?:^|(?<=[;\n]))\s*(?:import\s*['"][^'"]+\.css['"]\s*;?|require\(['"][^'"]+\.css['"]\)\s*;?)/gm;
   let touched = 0;
   const scrub = (dir) => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
