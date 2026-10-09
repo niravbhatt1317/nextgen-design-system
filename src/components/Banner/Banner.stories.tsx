@@ -5,7 +5,8 @@ import { Button } from '../Button';
 import type { BannerTone } from './Banner.types';
 
 const meta: Meta<typeof Banner> = {
-  title: 'Components/Banner',
+  // moved 2026-09-29 (Pranjal: "after the changes move them into new component section")
+  title: 'New Components/Banner',
   component: Banner,
   tags: ['autodocs'],
   parameters: {
@@ -318,8 +319,9 @@ export const Dismissible: Story = {
 };
 
 /**
- * `page` runs the banner edge to edge across the top of a view — no rounding
- * and no side edges, because there is nothing beside it to be edged against.
+ * `page` runs the banner edge to edge across the top of a view — no rounding,
+ * because there is nothing beside it to be rounded against. Neither placement
+ * wears an edge; the tint alone marks it out.
  */
 export const Placement: Story = {
   parameters: { controls: { disable: true }, layout: 'fullscreen' },

@@ -220,15 +220,16 @@ describe('Banner', () => {
   });
 
   describe('placement', () => {
-    it('is rounded and fully bordered inline', () => {
+    it('is rounded inline, with no edge', () => {
       render(<Banner title={TITLE} />);
       expect(surface().className).toContain('mdt-rounded-lg');
+      expect(surface().className).not.toMatch(/mdt-border/);
     });
 
-    it('loses its rounding and its side edges across a page', () => {
+    it('loses its rounding across a page, still with no edge', () => {
       render(<Banner title={TITLE} placement="page" />);
       expect(surface().className).toContain('mdt-rounded-none');
-      expect(surface().className).toContain('mdt-border-x-0');
+      expect(surface().className).not.toMatch(/mdt-border/);
     });
   });
 

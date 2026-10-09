@@ -10,15 +10,18 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/utils';
+import { FEEDBACK_ICON_TABLER } from '@/utils/feedback-tones';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
 import type { BannerProps, BannerTone } from './Banner.types';
 
 /**
- * The banner surface - the same tint, edge and glyph Toast wears.
+ * The banner surface - the same tint and glyph Toast wears, with no edge.
  *
- * Om Vekariya's rule carries over exactly: *only the icon and the border carry
- * the tone.* The words stay one colour in every tone, so a danger banner is not
+ * Pranjal, 2026-09-28: "in banner we will remove the borders". The tint alone
+ * marks the banner out; an outline around it was one line too many inside a
+ * form card. Om Vekariya's rule still holds: only the icon and the tint carry
+ * the tone. The words stay one colour in every tone, so a danger banner is not
  * also harder to read than an info one.
  *
  * No shadow, and that is the difference you can see. A toast is lifted off the
@@ -28,19 +31,19 @@ import type { BannerProps, BannerTone } from './Banner.types';
 export const bannerVariants = cva(['mdt-flex mdt-w-full mdt-text-sm mdt-leading-normal'], {
   variants: {
     tone: {
-      info: 'mdt-border-feedback-info-border mdt-bg-feedback-info-bg',
-      warning: 'mdt-border-feedback-warning-border mdt-bg-feedback-warning-bg',
-      danger: 'mdt-border-feedback-danger-border mdt-bg-feedback-danger-bg',
-      success: 'mdt-border-feedback-success-border mdt-bg-feedback-success-bg',
-      ai: 'mdt-border-feedback-ai-border mdt-bg-feedback-ai-bg',
-      neutral: 'mdt-border-feedback-neutral-border mdt-bg-feedback-neutral-bg',
+      info: 'mdt-bg-feedback-info-bg',
+      warning: 'mdt-bg-feedback-warning-bg',
+      danger: 'mdt-bg-feedback-danger-bg',
+      success: 'mdt-bg-feedback-success-bg',
+      ai: 'mdt-bg-feedback-ai-bg',
+      neutral: 'mdt-bg-feedback-neutral-bg',
     },
     placement: {
-      inline: 'mdt-gap-2.5 mdt-rounded-lg mdt-border mdt-py-3 mdt-pl-3.5 mdt-pr-3',
-      // Edge to edge: no rounding and no side edges, because there is nothing
-      // beside it to be edged against. A touch more room at the sides, since
-      // the banner is now as wide as the view.
-      page: 'mdt-gap-2.5 mdt-rounded-none mdt-border-x-0 mdt-border-y mdt-py-3 mdt-pl-5 mdt-pr-4',
+      inline: 'mdt-gap-2.5 mdt-rounded-lg mdt-py-3 mdt-pl-3.5 mdt-pr-3',
+      // Edge to edge: no rounding, because there is nothing beside it to be
+      // rounded against. A touch more room at the sides, since the banner is
+      // now as wide as the view.
+      page: 'mdt-gap-2.5 mdt-rounded-none mdt-py-3 mdt-pl-5 mdt-pr-4',
     },
     /**
      * A single row of content - everything centres on it together. Once the
@@ -86,15 +89,10 @@ const ICON_TONE: Record<BannerTone, string> = {
  */
 const ALLOWED_ACTIONS = ['ghost', 'link'];
 
-/** The same glyph per tone that Toast uses - same meaning, same mark. */
-const TONE_ICON: Record<BannerTone, IconName> = {
-  info: 'info',
-  neutral: 'info',
-  warning: 'alert-triangle',
-  danger: 'alert-circle',
-  success: 'check',
-  ai: 'sparkles',
-};
+/** The same glyph per tone that Toast uses - same meaning, same mark: Tabler's outline set, the bulb for info
+ * (Pranjal, 2026-09-29: "Do the same for banner component, remove border, use tabler icons and for blue banner use
+ * bulb icon from tabler"). */
+const TONE_ICON: Record<BannerTone, IconName> = FEEDBACK_ICON_TABLER;
 
 /**
  * The glyph sits in a box exactly one line tall and centres itself inside it.
@@ -297,7 +295,7 @@ export const Banner = ({
               aria-label={dismissLabel}
               data-slot="banner-dismiss"
               // Deliberately outside the tone system, exactly as Toast's is.
-              // Only the icon and the border carry the tone, and a coloured
+              // Only the icon and the tint carry the tone, and a coloured
               // cross would compete with the glyph for the same job. Its hover
               // is the banner's own words at a tenth - so it darkens whatever
               // surface it is on rather than laying a grey patch over it.
@@ -308,7 +306,7 @@ export const Banner = ({
                 'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
               )}
             >
-              <Icon name="x" size="sm" aria-hidden />
+              <Icon name="tabler-x" size="sm" aria-hidden />
             </button>
           ) : null}
         </div>
