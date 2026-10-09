@@ -72,6 +72,7 @@
     "catalog": "node scripts/extract-capabilities.mjs --write",
     "find": "node scripts/extract-capabilities.mjs --find",
     "check:theme": "node scripts/theme-dark.cjs --check",
+    "check:api": "node scripts/check-api.mjs",
     "check:exports": "node scripts/check-exports.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:tokens:strict": "node scripts/check-tokens.mjs --strict",
