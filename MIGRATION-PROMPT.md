@@ -56,7 +56,30 @@ import '@mtdt/nextgen-design-system/styles.css';
 renders correct, accessible, and completely unstyled, with no error anywhere. If
 anything looks like raw HTML later, check this first.
 
-Confirm the app still builds and runs before continuing.
+### Dark mode is one attribute, and it fails silently too
+
+The switch is `data-theme` on the root element — nothing else:
+
+```
+<html data-theme="dark">    the dark theme
+<html data-theme="light">   the light theme, and what you get with no attribute
+```
+
+**If this project already has a dark mode, point its toggle at that attribute.**
+Setting `class="dark"` was the switch in 1.0.0 and earlier; from 2.0.0 it does
+nothing at all, and the failure looks like nothing failing — every token stays
+at its light value, the page renders perfectly, in the wrong theme. There is no
+console warning, because no rule matched and nothing threw.
+
+Everything else follows from the attribute. **Do not write `dark:` classes**:
+every colour token already carries its own dark value, so a pair like
+`mdt-bg-blue-10 mdt-text-blue-80` is a pale wash under a dark ink in light, and
+a dark wash under a pale ink in dark, with no second class. A `dark:` variant
+on top names the _other_ end of the ramp and paints a near-white control on the
+dark page - which is a real bug this library shipped nineteen times before the
+switch moved.
+
+Confirm the app still builds and runs **in both themes** before continuing.
 
 ## Step 2 — Read the rules, then write them into this project
 
