@@ -584,7 +584,8 @@
   /* 225 colour variables from the map (127 by the semantic token for the job, 98 by the tinted-chip rule for a ramp step);
      3 colour variables keep their light value (ai-gradient-from, ai-gradient-via, ai-gradient-to); the 24 badge tokens
      (--mdt-badge-<tone>-fill / -ink / -dot, full colours) are the map's badge tier; the rest of :root is not colour. */
-  [data-theme='dark'] {
+  [data-theme='dark'],
+  .dark {
     --mdt-white: 0 0% 100%; /* #FFFFFF */
     --mdt-black: 0 0% 0%; /* #000000 */
     --mdt-neutral-10: 216.43 56% 9.8%; /* #0B1627 */

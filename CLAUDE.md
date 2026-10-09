@@ -1073,9 +1073,15 @@ selector on purpose**, and must not be simplified to `'class'` or named as a cla
 says something else, and every `dark:` utility would silently do nothing. It is kept only so that a
 `dark:` class which does slip in follows the same switch.
 
-**Breaking, as of this change:** the `.dark` class block is gone. An app on 1.0.0 that sets
-`<html class="dark">` gets the light theme. There is deliberately no fallback - a second switch is
-a second way to do something.
+**`.dark` still matches, as a migration aid.** The generated block carries both selectors
+(`[data-theme='dark'], .dark`) and the `dark:` variant is configured for both, so an app coming
+from 1.0.0 upgrades without moving its toggle. It is dated: out in 3.0.0, and **nothing in this
+library sets it** - the storybook, the console and every component use `data-theme`.
+
+**The second selector must stay an attribute selector.** `tailwind.config.ts` writes it as
+`[class~="dark"]`, not `.dark`, and that is not a style choice: with `prefix: 'mdt-'` Tailwind
+prefixes a class even inside a literal variant string, so `&:is(.dark *)` compiles to
+`:is(.mdt-dark *)` and matches nothing. Measured in the built CSS, which is the only way to know.
 
 **Also:** the class merger treats `dark:bg-*` and `bg-*` as separate groups. If something does
 still set a dark background, a plain `mdt-bg-transparent` will clear the light one and leave the
