@@ -66,10 +66,9 @@ The switch is `data-theme` on the root element — nothing else:
 ```
 
 **If this project already has a dark mode, point its toggle at that attribute.**
-Setting `class="dark"` was the switch in 1.0.0 and earlier; from 2.0.0 it does
-nothing at all, and the failure looks like nothing failing — every token stays
-at its light value, the page renders perfectly, in the wrong theme. There is no
-console warning, because no rule matched and nothing threw.
+`class="dark"` was the switch in 1.0.0 and earlier and still works, so an app
+upgrading does not have to move its toggle on day one - but it is a migration
+aid, it goes in 3.0.0, and new code should not use it.
 
 Everything else follows from the attribute. **Do not write `dark:` classes**:
 every colour token already carries its own dark value, so a pair like

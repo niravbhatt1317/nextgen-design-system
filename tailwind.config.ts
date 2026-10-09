@@ -9,7 +9,17 @@ const config: Config = {
   // slip in, it follows the same switch rather than the operating system. An
   // attribute selector is used because Tailwind would prefix a class selector
   // with `mdt-` and it would never match.
-  darkMode: ['class', '[data-theme="dark"]'],
+  // Both switches, matching the block globals.css emits: `data-theme` is the real one,
+  // and `[class~="dark"]` is the migration aid for an app coming from 1.0.0 (out in
+  // 3.0.0). `variant` is the strategy that takes two; `class` takes one.
+  //
+  // THE SECOND ONE IS AN ATTRIBUTE SELECTOR AND MUST STAY THAT WAY. Writing it as
+  // `.dark` is the trap this file has fallen into twice: with `prefix: 'mdt-'`,
+  // Tailwind prefixes a class even inside a literal variant string, so `&:is(.dark *)`
+  // compiles to `:is(.mdt-dark *)` and matches nothing, while the app puts plain
+  // `.dark` on the root. An attribute selector is not prefixed, so it survives.
+  // Measured in the built CSS: both `:is([data-theme="dark"]` and `:is([class~="dark"]`.
+  darkMode: ['variant', ['&:is([data-theme="dark"] *)', '&:is([class~="dark"] *)']],
   content: ['./src/**/*.{ts,tsx}', './.storybook/**/*.{ts,tsx}'],
   prefix: 'mdt-',
   theme: {
