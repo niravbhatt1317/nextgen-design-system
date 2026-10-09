@@ -1,0 +1,69 @@
+import{r as S,j as a}from"./iframe-CJZew7-4.js";import{c as ue}from"./index-ChEho857.js";import{c as E}from"./index-CcRgbaMz.js";import"./preload-helper-Dp1pzeXC.js";function e(){var l="/home/runner/work/nextgen-design-system/nextgen-design-system/src/components/TextareaOld2/TextareaOld2.tsx",s="02dc700ff8f9c102f6613dee2297109d0c5a2853",o=globalThis,n="__coverage__",i={path:"/home/runner/work/nextgen-design-system/nextgen-design-system/src/components/TextareaOld2/TextareaOld2.tsx",statementMap:{0:{start:{line:5,column:36},end:{line:55,column:1}},1:{start:{line:56,column:21},end:{line:97,column:1}},2:{start:{line:69,column:24},end:{line:69,column:31}},3:{start:{line:70,column:15},end:{line:70,column:36}},4:{start:{line:71,column:20},end:{line:71,column:33}},5:{start:{line:72,column:21},end:{line:72,column:35}},6:{start:{line:73,column:21},end:{line:73,column:35}},7:{start:{line:75,column:4},end:{line:79,column:5}},8:{start:{line:76,column:6},end:{line:76,column:28}},9:{start:{line:77,column:11},end:{line:79,column:5}},10:{start:{line:78,column:6},end:{line:78,column:29}},11:{start:{line:80,column:4},end:{line:95,column:9}},12:{start:{line:98,column:0},end:{line:98,column:42}},13:{start:{line:100,column:0},end:{line:106,column:50}},14:{start:{line:102,column:4},end:{line:102,column:46}},15:{start:{line:104,column:4},end:{line:104,column:1203}}},fnMap:{0:{name:"(anonymous_0)",decl:{start:{line:57,column:2},end:{line:57,column:3}},loc:{start:{line:68,column:13},end:{line:96,column:3}},line:68}},branchMap:{0:{loc:{start:{line:70,column:15},end:{line:70,column:36}},type:"binary-expr",locations:[{start:{line:70,column:15},end:{line:70,column:21}},{start:{line:70,column:25},end:{line:70,column:36}}],line:70},1:{loc:{start:{line:75,column:4},end:{line:79,column:5}},type:"if",locations:[{start:{line:75,column:4},end:{line:79,column:5}},{start:{line:77,column:11},end:{line:79,column:5}}],line:75},2:{loc:{start:{line:77,column:11},end:{line:79,column:5}},type:"if",locations:[{start:{line:77,column:11},end:{line:79,column:5}},{start:{line:void 0,column:void 0},end:{line:void 0,column:void 0}}],line:77},3:{loc:{start:{line:81,column:6},end:{line:81,column:139}},type:"binary-expr",locations:[{start:{line:81,column:6},end:{line:81,column:11}},{start:{line:81,column:31},end:{line:81,column:139}}],line:81},4:{loc:{start:{line:93,column:6},end:{line:93,column:135}},type:"binary-expr",locations:[{start:{line:93,column:6},end:{line:93,column:11}},{start:{line:93,column:31},end:{line:93,column:135}}],line:93},5:{loc:{start:{line:94,column:6},end:{line:94,column:146}},type:"binary-expr",locations:[{start:{line:94,column:6},end:{line:94,column:12}},{start:{line:94,column:16},end:{line:94,column:26}},{start:{line:94,column:46},end:{line:94,column:146}}],line:94}},s:{0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0},f:{0:0},b:{0:[0,0],1:[0,0],2:[0,0],3:[0,0],4:[0,0],5:[0,0,0]},inputSourceMap:{version:3,file:null,sources:["/home/runner/work/nextgen-design-system/nextgen-design-system/src/components/TextareaOld2/TextareaOld2.tsx"],names:[],mappings:"AA0HM;AA1HN;AACA;AACA;AAOO;AAA6B;AAAA;AAElC;AACE;AACA;AACA;AACA;AACA;AACA;AACF;AACA;AACY;AAAA;AAAA;AAAA;AAIF;AACA;AACA;AACA;AACN;AAAA;AAAA;AAAA;AAIS;AACE;AACD;AACV;AAAA;AAAA;AAAA;AAIU;AACF;AACC;AACT;AAAA;AAAA;AAAA;AAIQ;AACA;AACI;AACJ;AACR;AACF;AACiB;AACT;AACG;AACC;AACF;AACV;AAEJ;AAgCA;AAAqB;AAEjB;AACE;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACI;AACD;AAIL;AACA;AACA;AACA;AACA;AAGA;AACA;AACE;AAAc;AAEd;AAAc;AAGhB;AAEK;AAGC;AAEF;AAAC;AAAA;AACC;AACA;AACkF;AACpE;AACI;AACd;AAAA;AACN;AAIE;AAKA;AAEJ;AAGN;AAEA;AAEA;;;;;;;"},_coverageSchema:"1a1c01bbd47fc00a2c39e90264f33305004495a9",hash:"02dc700ff8f9c102f6613dee2297109d0c5a2853"},t=o[n]||(o[n]={});(!t[l]||t[l].hash!==s)&&(t[l]=i);var d=t[l];return e=function(){return d},d}e();const Ae=(e().s[0]++,ue(["mdt-flex mdt-w-full mdt-rounded-md mdt-border mdt-border-input","mdt-bg-background mdt-text-foreground","mdt-transition-colors","placeholder:mdt-text-muted-foreground","focus-visible:mdt-outline-none","disabled:mdt-cursor-not-allowed disabled:mdt-opacity-50"],{variants:{size:{sm:"mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-xs",md:"mdt-min-h-[100px] mdt-px-3 mdt-py-2 mdt-text-sm",lg:"mdt-min-h-[120px] mdt-px-4 mdt-py-3 mdt-text-base"},variant:{default:"",filled:"mdt-bg-muted"},hasError:{true:"mdt-border-destructive",false:""},resize:{none:"mdt-resize-none",vertical:"mdt-resize-y",both:"mdt-resize"}},defaultVariants:{size:"md",variant:"default",hasError:!1,resize:"vertical"}})),r=(e().s[1]++,S.forwardRef(({className:l,wrapperClassName:s,size:o,variant:n,resize:i,error:t,label:d,helperText:y,id:ie,...de},ce)=>{e().f[0]++;const me=(e().s[2]++,S.useId()),c=(e().s[3]++,e().b[0][0]++,ie??(e().b[0][1]++,me)),V=(e().s[4]++,`${c}-error`),O=(e().s[5]++,`${c}-helper`),z=(e().s[6]++,!!t);let T;return e().s[7]++,z?(e().b[1][0]++,e().s[8]++,T=V):(e().b[1][1]++,e().s[9]++,y?(e().b[2][0]++,e().s[10]++,T=O):e().b[2][1]++),e().s[11]++,a.jsxs("div",{className:E("mdt-flex mdt-flex-col mdt-gap-1.5",s),children:[(e().b[3][0]++,d&&(e().b[3][1]++,a.jsx("label",{htmlFor:c,className:"mdt-text-sm mdt-font-medium mdt-text-foreground",children:d}))),a.jsx("textarea",{id:c,ref:ce,className:E(Ae({size:o,variant:n,hasError:z,resize:i}),l),"aria-invalid":z,"aria-describedby":T,...de}),(e().b[4][0]++,t&&(e().b[4][1]++,a.jsx("p",{id:V,className:"mdt-text-xs mdt-text-destructive",role:"alert",children:t}))),(e().b[5][0]++,!t&&(e().b[5][1]++,y)&&(e().b[5][2]++,a.jsx("p",{id:O,className:"mdt-text-xs mdt-text-muted-foreground",children:y})))]})}));e().s[12]++;r.displayName="TextareaOld2";e().s[13]++;try{e().s[14]++,r.displayName="TextareaOld2",e().s[15]++,r.__docgenInfo={description:`TextareaOld2 variants using Class Variance Authority (CVA)
+Provides consistent styling with support for multiple sizes and states`,displayName:"TextareaOld2",props:{size:{defaultValue:null,description:"Size variant of the textarea",name:"size",required:!1,type:{name:'"sm" | "md" | "lg" | null'}},variant:{defaultValue:null,description:"Visual style variant of the textarea",name:"variant",required:!1,type:{name:'"default" | "filled" | null'}},hasError:{defaultValue:null,description:"Whether the textarea is in an error state",name:"hasError",required:!1,type:{name:"boolean | null"}},resize:{defaultValue:null,description:"Resize control for the textarea",name:"resize",required:!1,type:{name:'"none" | "both" | "vertical" | null'}},class:{defaultValue:null,description:"",name:"class",required:!1,type:{name:"ClassValue"}},className:{defaultValue:null,description:"",name:"className",required:!1,type:{name:"ClassValue"}}}}}catch{}const be={title:"Deprecated 2/Textarea Old",component:r,tags:["autodocs"],parameters:{layout:"centered",status:{type:"deprecated",since:"0.5.1",deprecation:{deprecatedSince:"0.5.1",removalIn:"to be set by Nirav",replacement:"Textarea",message:"The Textarea as it was before 17 September 2026. Deprecated 2026-09-22 when Pranjal ruled the new one in; kept for side-by-side review; Nirav sets the removal version."}},docs:{description:{component:["## ⚠️ Deprecated — use `Textarea`","","The Textarea as it was before 17 September 2026. Deprecated 2026-09-22 when Pranjal","ruled the new one in; kept for side-by-side review; Nirav sets the removal version.","","**Do not start anything new on it.**","","A multi-line text field with a label, an error line and helper text. Three sizes,","a `filled` variant, and `resize` set to none, vertical or both."].join(`
+`)}}},argTypes:{size:{control:"select",options:["sm","md","lg"],table:{defaultValue:{summary:"md"}}},variant:{control:"select",options:["default","filled"],table:{defaultValue:{summary:"default"}}},resize:{control:"select",options:["none","vertical","both"],table:{defaultValue:{summary:"vertical"}}}},decorators:[l=>a.jsx("div",{style:{width:"400px"},children:a.jsx(l,{})})]},m={args:{placeholder:"Enter your message...","aria-label":"Message"}},u={args:{label:"Description",placeholder:"Describe the issue"}},A={args:{label:"Bio",placeholder:"Tell us about yourself",helperText:"Shown on your public profile."}},p={args:{label:"Message",defaultValue:"",error:"A message is required."}},h={render:()=>a.jsxs("div",{className:"mdt-flex mdt-flex-col mdt-gap-4",children:[a.jsx(r,{size:"sm",placeholder:"Small (min 80px)","aria-label":"Small"}),a.jsx(r,{size:"md",placeholder:"Medium (min 100px)","aria-label":"Medium"}),a.jsx(r,{size:"lg",placeholder:"Large (min 120px)","aria-label":"Large"})]})},x={render:()=>a.jsxs("div",{className:"mdt-flex mdt-flex-col mdt-gap-4",children:[a.jsx(r,{variant:"default",placeholder:"Default","aria-label":"Default"}),a.jsx(r,{variant:"filled",placeholder:"Filled","aria-label":"Filled"})]})},f={render:()=>a.jsxs("div",{className:"mdt-flex mdt-flex-col mdt-gap-4",children:[a.jsx(r,{resize:"none",placeholder:"No resize","aria-label":"No resize"}),a.jsx(r,{resize:"vertical",placeholder:"Vertical only","aria-label":"Vertical"}),a.jsx(r,{resize:"both",placeholder:"Both directions","aria-label":"Both"})]})},b={render:function(){const[s,o]=S.useState(""),n=200;return a.jsx(r,{label:"Bio",placeholder:"Up to 200 characters",maxLength:n,value:s,onChange:i=>{o(i.target.value)},helperText:`${String(s.length)} / ${String(n)}`})}},g={args:{label:"Disabled",placeholder:"Cannot type here",disabled:!0}},C={args:{label:"Read only",defaultValue:"A value you can copy but not change",readOnly:!0}},v={args:{label:"Reason",placeholder:"Required",required:!0}};var N,j,D;m.parameters={...m.parameters,docs:{...(N=m.parameters)==null?void 0:N.docs,source:{originalSource:`{
+  args: {
+    placeholder: 'Enter your message...',
+    'aria-label': 'Message'
+  }
+}`,...(D=(j=m.parameters)==null?void 0:j.docs)==null?void 0:D.source}}};var w,_,R;u.parameters={...u.parameters,docs:{...(w=u.parameters)==null?void 0:w.docs,source:{originalSource:`{
+  args: {
+    label: 'Description',
+    placeholder: 'Describe the issue'
+  }
+}`,...(R=(_=u.parameters)==null?void 0:_.docs)==null?void 0:R.source}}};var q,B,I;A.parameters={...A.parameters,docs:{...(q=A.parameters)==null?void 0:q.docs,source:{originalSource:`{
+  args: {
+    label: 'Bio',
+    placeholder: 'Tell us about yourself',
+    helperText: 'Shown on your public profile.'
+  }
+}`,...(I=(B=A.parameters)==null?void 0:B.docs)==null?void 0:I.source}}};var M,F,W;p.parameters={...p.parameters,docs:{...(M=p.parameters)==null?void 0:M.docs,source:{originalSource:`{
+  args: {
+    label: 'Message',
+    defaultValue: '',
+    error: 'A message is required.'
+  }
+}`,...(W=(F=p.parameters)==null?void 0:F.docs)==null?void 0:W.source}}};var L,k,$;h.parameters={...h.parameters,docs:{...(L=h.parameters)==null?void 0:L.docs,source:{originalSource:`{
+  render: () => <div className="mdt-flex mdt-flex-col mdt-gap-4">
+      <TextareaOld2 size="sm" placeholder="Small (min 80px)" aria-label="Small" />
+      <TextareaOld2 size="md" placeholder="Medium (min 100px)" aria-label="Medium" />
+      <TextareaOld2 size="lg" placeholder="Large (min 120px)" aria-label="Large" />
+    </div>
+}`,...($=(k=h.parameters)==null?void 0:k.docs)==null?void 0:$.source}}};var G,H,J;x.parameters={...x.parameters,docs:{...(G=x.parameters)==null?void 0:G.docs,source:{originalSource:`{
+  render: () => <div className="mdt-flex mdt-flex-col mdt-gap-4">
+      <TextareaOld2 variant="default" placeholder="Default" aria-label="Default" />
+      <TextareaOld2 variant="filled" placeholder="Filled" aria-label="Filled" />
+    </div>
+}`,...(J=(H=x.parameters)==null?void 0:H.docs)==null?void 0:J.source}}};var P,U,K;f.parameters={...f.parameters,docs:{...(P=f.parameters)==null?void 0:P.docs,source:{originalSource:`{
+  render: () => <div className="mdt-flex mdt-flex-col mdt-gap-4">
+      <TextareaOld2 resize="none" placeholder="No resize" aria-label="No resize" />
+      <TextareaOld2 resize="vertical" placeholder="Vertical only" aria-label="Vertical" />
+      <TextareaOld2 resize="both" placeholder="Both directions" aria-label="Both" />
+    </div>
+}`,...(K=(U=f.parameters)==null?void 0:U.docs)==null?void 0:K.source}}};var Q,Y,X;b.parameters={...b.parameters,docs:{...(Q=b.parameters)==null?void 0:Q.docs,source:{originalSource:`{
+  render: function WithCharacterCountStory() {
+    const [value, setValue] = useState('');
+    const max = 200;
+    return <TextareaOld2 label="Bio" placeholder="Up to 200 characters" maxLength={max} value={value} onChange={e => {
+      setValue(e.target.value);
+    }} helperText={\`\${String(value.length)} / \${String(max)}\`} />;
+  }
+}`,...(X=(Y=b.parameters)==null?void 0:Y.docs)==null?void 0:X.source}}};var Z,ee,ae;g.parameters={...g.parameters,docs:{...(Z=g.parameters)==null?void 0:Z.docs,source:{originalSource:`{
+  args: {
+    label: 'Disabled',
+    placeholder: 'Cannot type here',
+    disabled: true
+  }
+}`,...(ae=(ee=g.parameters)==null?void 0:ee.docs)==null?void 0:ae.source}}};var re,le,te;C.parameters={...C.parameters,docs:{...(re=C.parameters)==null?void 0:re.docs,source:{originalSource:`{
+  args: {
+    label: 'Read only',
+    defaultValue: 'A value you can copy but not change',
+    readOnly: true
+  }
+}`,...(te=(le=C.parameters)==null?void 0:le.docs)==null?void 0:te.source}}};var ne,se,oe;v.parameters={...v.parameters,docs:{...(ne=v.parameters)==null?void 0:ne.docs,source:{originalSource:`{
+  args: {
+    label: 'Reason',
+    placeholder: 'Required',
+    required: true
+  }
+}`,...(oe=(se=v.parameters)==null?void 0:se.docs)==null?void 0:oe.source}}};const ge=["Default","WithLabel","WithHelperText","WithError","Sizes","Variants","ResizeVariants","WithCharacterCount","Disabled","ReadOnly","Required"];export{m as Default,g as Disabled,C as ReadOnly,v as Required,f as ResizeVariants,h as Sizes,x as Variants,b as WithCharacterCount,p as WithError,A as WithHelperText,u as WithLabel,ge as __namedExportsOrder,be as default};
+//# sourceMappingURL=TextareaOld2.stories-Bb1ZIyXg.js.map
