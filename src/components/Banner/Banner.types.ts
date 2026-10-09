@@ -16,10 +16,9 @@ export type BannerTone = 'info' | 'warning' | 'danger' | 'success' | 'ai' | 'neu
 /**
  * Where the banner sits.
  *
- * `inline` is the ordinary one: rounded, bordered all round, living inside a
+ * `inline` is the ordinary one: rounded, a tint with no edge, living inside a
  * panel or a form. `page` runs edge to edge across the top of a view - no
- * rounding and no side edges, because there is nothing beside it to be edged
- * against.
+ * rounding, because there is nothing beside it to be rounded against.
  */
 export type BannerPlacement = 'inline' | 'page';
 
