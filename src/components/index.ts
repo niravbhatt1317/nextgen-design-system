@@ -35,6 +35,25 @@ export type {
   FilterValue,
 } from './AdvancedFilter';
 
+/* THE SAME FIVE, UNDER THEIR QUALIFIED NAMES (2026-10-09).
+ *
+ * `OPERATORS`, `isGroup`, `isComplete`, `liveItems` and `matchRow` are general
+ * words for a package this size - specific inside AdvancedFilter.tsx, vague at
+ * the package root, where `isComplete` could belong to anything. The console
+ * imports the qualified forms, and it is right to.
+ *
+ * Both are exported rather than one renamed: the plain names are what 1.0.0
+ * published, and renaming a published export breaks every consumer of it to
+ * tidy a name. These are aliases of the same functions - not copies, and not a
+ * second way to do the thing. Prefer the qualified name in new code. */
+export {
+  OPERATORS as ADVANCED_FILTER_OPERATORS,
+  isGroup as isFilterGroup,
+  isComplete as isFilterComplete,
+  liveItems as liveFilterItems,
+  matchRow as matchFilterRow,
+} from './AdvancedFilter';
+
 // AiMark - the gradient AI mark. DEPRECATED 2026-09-15: no replacement yet;
 // Toast still draws it for its `ai` tone and has to move off it first.
 export { AiMark } from './AiMark';
