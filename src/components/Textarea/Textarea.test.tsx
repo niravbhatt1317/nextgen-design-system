@@ -60,7 +60,7 @@ describe('Textarea', () => {
       const textarea = screen.getByLabelText('Small');
       expect(textarea).toHaveClass('mdt-min-h-[80px]');
       // the field's text is 13 (Pranjal, 2026-09-17) - text-xs is 12
-      expect(textarea).toHaveClass('mdt-text-[13px]');
+      expect(textarea).toHaveClass('mdt-text-sm', 'mdt-font-medium', 'mdt-text-neutral-130');
     });
 
     it('renders medium size (default)', () => {
@@ -254,7 +254,7 @@ describe('Textarea', () => {
 
     it('accepts required attribute', () => {
       render(<Textarea required label="Required field" />);
-      const textarea = screen.getByLabelText('Required field');
+      const textarea = screen.getByLabelText(/Required field/);
       expect(textarea).toBeRequired();
     });
 

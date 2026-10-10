@@ -13,9 +13,9 @@ export const textareaVariants = cva(
   [
     /* THE FIELD (Pranjal, 2026-09-17) - the same box as the Input, grown */
     'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
-    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-bg-background mdt-font-medium mdt-text-neutral-130',
     'mdt-transition-[border-color,box-shadow]',
-    'placeholder:mdt-text-faint',
+    'placeholder:mdt-font-normal placeholder:mdt-text-faint',
     'hover:mdt-border-primary',
     'focus:mdt-border-primary focus-visible:mdt-outline-none ' +
       'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
@@ -27,7 +27,7 @@ export const textareaVariants = cva(
        * Size variant of the textarea
        */
       size: {
-        sm: 'mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-[13px]',
+        sm: 'mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-sm',
         md: 'mdt-min-h-[100px] mdt-px-3 mdt-py-2 mdt-text-sm',
         lg: 'mdt-min-h-[120px] mdt-px-4 mdt-py-3 mdt-text-base',
       },
@@ -101,6 +101,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       helperText,
       locked,
       disabled,
+      required,
       id: propId,
       ...props
     },
@@ -127,6 +128,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
             {label}
+            {/* the asterisk in the danger red, 3 after the label - as the Input and the console draw it (K-Field-05) */}
+            {required && <span className="mdt-ml-[3px] mdt-text-destructive">*</span>}
           </label>
         )}
         <div className="mdt-relative mdt-flex">
@@ -141,6 +144,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             aria-invalid={hasError}
             aria-describedby={describedBy}
             disabled={held || disabled}
+            required={required}
             {...props}
           />
           {held && (

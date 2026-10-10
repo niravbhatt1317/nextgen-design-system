@@ -64,12 +64,20 @@ function OptionPrefix({ option }: Readonly<{ option: SelectOption }>) {
 }
 
 /**
- * Renders the selection indicator (check/x icons)
+ * Renders the selection indicator (check/x icons).
+ * `deselectable` (2026-09-25): in the multi list a selected row swaps its tick for an X under the pointer because a
+ * click there deselects it. A single pick does no such thing - clicking the picked option keeps it picked - so the
+ * tick stays (Pranjal: "why does it show x icon when hovered on selected one. It should just reselect it again").
  */
-function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
+function SelectionIndicator({
+  isSelected,
+  deselectable = true,
+}: Readonly<{ isSelected: boolean; deselectable?: boolean }>) {
   return (
     <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-flex-shrink-0 mdt-items-center mdt-justify-center">
-      {isSelected ? (
+      {isSelected && !deselectable ? (
+        <Icon name="check" size={16} aria-hidden />
+      ) : isSelected ? (
         <>
           <Icon name="check" size={16} className="group-hover:mdt-hidden" aria-hidden />
           <Icon name="x" size={12} className="mdt-hidden group-hover:mdt-block" aria-hidden />
@@ -202,17 +210,17 @@ function CustomRenderItemWrapper({
  */
 export const selectTriggerVariants = cva(
   [
-    /* THE FIELD (Pranjal, 2026-09-17): the trigger is the Input's box - corners 8, neutral-90 text, the primary border
+    /* THE FIELD (Pranjal, 2026-09-17; the value's ink 2026-09-27): the trigger is the Input's box - corners 8, the value in the reading ink (neutral-130, 14/500), the primary border
      * under the pointer and, open or focused, with the 3-px halo; disabled on neutral-10 */
     'mdt-flex mdt-w-full mdt-items-center mdt-justify-between',
     'mdt-rounded-lg',
-    'mdt-bg-background mdt-text-neutral-90',
+    'mdt-bg-background mdt-font-medium mdt-text-neutral-130',
     'mdt-transition-[border-color,box-shadow]',
     'focus-visible:mdt-border-primary focus-visible:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
     'data-[state=open]:mdt-border-primary data-[state=open]:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
     'aria-expanded:mdt-border-primary aria-expanded:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
     'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10 disabled:mdt-text-faint',
-    'data-[placeholder]:mdt-text-faint',
+    'data-[placeholder]:mdt-font-normal data-[placeholder]:mdt-text-faint',
   ],
   {
     variants: {
@@ -222,7 +230,7 @@ export const selectTriggerVariants = cva(
         borderless: 'mdt-border mdt-border-transparent hover:mdt-border-neutral-30',
       },
       size: {
-        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-[13px]',
+        sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-sm',
         md: 'mdt-h-9 mdt-gap-2 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-gap-2 mdt-px-4 mdt-text-base',
       },
@@ -412,6 +420,9 @@ function renderSingleSelectMode(props: {
                         OPTION_ITEM_BASE_CLASSES,
                         OPTION_ITEM_STYLE_CLASSES,
                         'mdt-text-foreground hover:mdt-bg-neutral-10',
+                        /* the picked option wears blue-10 - the ground a selected row wears everywhere else (Pranjal,
+                         * 2026-09-25: "give some bg color to selected option otherwise its not visible properly") */
+                        'data-[state=checked]:mdt-bg-blue-10',
                         OPTION_ITEM_DATA_STATE_CLASSES
                       )}
                     >
@@ -421,7 +432,7 @@ function renderSingleSelectMode(props: {
                           <OptionContent option={option} />
                         </SelectPrimitive.ItemText>
                       </div>
-                      <SelectionIndicator isSelected={isSelected} />
+                      <SelectionIndicator isSelected={isSelected} deselectable={false} />
                     </SelectPrimitive.Item>
                     <OptionSeparator show={showSeparator} />
                   </div>
@@ -633,11 +644,13 @@ function renderSelectedValueDisplay(props: {
 
   // Show count if there are selected options
   if (selectedOptions.length > 0) {
-    return <span className="mdt-text-sm">{selectedOptions.length} selected</span>;
+    return <span>{selectedOptions.length} selected</span>;
   }
 
   // Show placeholder when no selection
-  return <span className="mdt-text-sm mdt-text-muted-foreground">{placeholder}</span>;
+  /* the placeholder at the trigger's own size in the faint ink #8FA0BD (K-Field-02, K-Field-03) - it read 14 in the
+   * muted grey before (measured 2026-09-22 against the mock) */
+  return <span className="mdt-text-faint">{placeholder}</span>;
 }
 
 /**
@@ -823,9 +836,9 @@ function renderMultiSelectSearchInput(props: {
         autoFocus={_autoFocus}
         className={cn(
           'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
-          'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
-          'mdt-px-3 mdt-py-1 mdt-text-[13px]',
-          'placeholder:mdt-text-faint',
+          'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-font-medium mdt-text-neutral-130',
+          'mdt-px-3 mdt-py-1 mdt-text-sm',
+          'placeholder:mdt-font-normal placeholder:mdt-text-faint',
           'hover:mdt-border-primary',
           'focus:mdt-border-primary focus:mdt-outline-none ' +
             'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
@@ -2101,6 +2114,8 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       showAvatar: _showAvatar = false,
 
       // Pills props
+      /* pills are the ruled multi-select (K-Field-21) and the console passes showPills on every multi Select; the default
+       * stays false as pushed - seven tests hold "N selected" as the default - flagged 2026-09-22 for the main session */
       showPills: _showPills = false,
       /* ONE pick shows, the rest fold into a "+N" badge (Pranjal, 2026-09-17) */
       maxPills: _maxPills = 1,
@@ -2226,6 +2241,94 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       onOpen,
       onClose,
     });
+
+    /* SEARCH IN A SINGLE SELECT (Pranjal, 2026-09-27): `mode="single" searchable` opens the multiple mode's searchable
+     * list (the search box, the empty message, the tick on the picked row); a pick sets the one value and closes. The
+     * box is the single trigger: the value in the reading ink, the chevron (the lock when held), the placeholder faint. */
+    if (mode === 'single' && _searchable) {
+      const one = Array.isArray(currentValue) ? currentValue[0] : currentValue;
+      const picked = one == null ? undefined : sortedOptions.find((o) => String(o.value) === String(one));
+      const singleDescribedBy = computeAriaDescribedBy(hasError, errorId, helperText, helperId, ariaDescribedBy);
+      const singleTrigger = (
+        <button
+          ref={ref}
+          type="button"
+          id={selectId}
+          role="combobox"
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          aria-label={ariaLabel}
+          aria-describedby={singleDescribedBy}
+          aria-invalid={ariaInvalid ?? hasError}
+          disabled={disabled || locked}
+          data-state={open ? 'open' : 'closed'}
+          {...(picked ? {} : { 'data-placeholder': '' })}
+          className={cn('mdt-group', selectTriggerVariants({ variant, size, hasError }), className)}
+        >
+          {prefixIcon && (
+            <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-muted-foreground">{prefixIcon}</span>
+          )}
+          <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate mdt-text-left">{picked ? picked.label : placeholder}</span>
+          {locked ? (
+            <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-faint">
+              <Icon name="lock" size={14} aria-hidden />
+            </span>
+          ) : (
+            <Icon
+              name="chevron-down"
+              size={14}
+              aria-hidden
+              className="mdt-shrink-0 mdt-text-muted-foreground mdt-transition-transform group-data-[state=open]:mdt-rotate-180"
+            />
+          )}
+        </button>
+      );
+      const pickOne = (value: string) => {
+        handleValueChange(value);
+        handleOpenChange(false);
+      };
+      const singleListProps = buildMultiSelectModeProps({
+        wrapperClassName,
+        label,
+        selectId,
+        required,
+        open,
+        handleOpenChange,
+        triggerElement: singleTrigger,
+        popoverSideOffset: computePopoverOffset(placement),
+        showSearchInput: true,
+        _searchPlaceholder,
+        searchQuery,
+        handleSearchChange,
+        _autoFocus,
+        showSelectAllButton: false,
+        handleSelectAll,
+        filteredOptions,
+        parentRef,
+        maxHeight,
+        _loading,
+        displayOptions: sortedOptions,
+        renderEmpty,
+        emptyMessage,
+        _grouped,
+        groupedOptions,
+        multiValue: picked ? [String(picked.value)] : [],
+        _renderItem,
+        handleMultiSelectToggle: pickOne,
+        _virtual: false,
+        itemsToRender: sortedOptions,
+        virtualizer,
+        sortedOptions,
+        showSelectedOnTop,
+        showLoadMoreButton: Boolean(_hasMore && _loadMore),
+        _loadMore,
+        error,
+        errorId,
+        helperText,
+        helperId,
+      });
+      return renderMultiSelectMode(singleListProps);
+    }
 
     // Single select: Radix UI Select handles this natively
     if (mode === 'single') {
