@@ -227,3 +227,16 @@ describe('Input', () => {
     });
   });
 });
+
+describe('the placeholder size (2026-10-10)', () => {
+  it('keeps a search box placeholder at 13', () => {
+    render(<Input placeholder="Search people" />);
+    expect(screen.getByPlaceholderText('Search people')).toHaveClass('placeholder:mdt-text-[13px]');
+  });
+  it('leaves a form field with a leading glyph at the field size', () => {
+    render(<Input placeholder="contact@company.com" startAdornment={<span>@</span>} />);
+    expect(screen.getByPlaceholderText('contact@company.com')).not.toHaveClass(
+      'placeholder:mdt-text-[13px]'
+    );
+  });
+});
