@@ -1038,9 +1038,17 @@ dropped names show up as deleted lines in the diff - which a live lookup against
 would. That is also why it reads a committed baseline rather than the registry: a gate that
 needs the network fails when the network does.
 
-**It reads `dist/`, so it runs after the build** - the package as a consumer gets it, not the
-source we hope matches it. Two sources, because neither is complete on its own: the
-`export declare` lines in `index.d.ts` and the runtime keys of `index.cjs`.
+**It reads `dist/`, so it runs after the build** - the package as a consumer gets it, not
+the source we hope matches it. Three sources, because none is complete alone: the
+`export declare` lines in `index.d.ts`, the runtime keys of `index.cjs`, and **every
+`--mdt-*` token in `styles.css`**.
+
+**The tokens are in the ratchet for a reason.** The first version covered the JavaScript
+names only, which left a token free to vanish with every gate green - a consumer's
+`hsl(var(--mdt-gone))` resolves to nothing, painting no colour rather than erroring. The
+console asked whether we had dropped one; answering took a hand comparison of three
+tarballs, which is the shape of a question a gate should already answer. 952 names and 278
+tokens today, and nothing has ever been removed from either.
 
 ---
 
