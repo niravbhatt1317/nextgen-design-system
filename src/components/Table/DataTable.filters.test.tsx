@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Badge } from '../Badge';
 import type { FilterKey } from '../AdvancedFilter';
@@ -8,11 +8,16 @@ import { sampleUsers } from './sampleUsers';
 import type { SampleUser } from './sampleUsers';
 import type { TableColumnDef } from './Table.types';
 
-/* QUICK FILTERS HIDE UNDER AN ADVANCED FILTER (Pranjal, 2026-09-26: "whenever I apply an advanced filter, the quick
- * filters won't be visible. All the quick-filter options, like Status and Organisation, which we removed before from
- * the advanced filter, will all be visible inside the advanced filter now, because the quick filters will be hidden.")
- * These tests hold the table to that rule: the square is there at rest, gone while a row is applied, back on Clear
- * all; a tick in the square rides into the applied rows; a quick key the page forgot to list is never dropped. */
+/* QUICK FILTERS ARE DISABLED UNDER AN ADVANCED FILTER - disabled, not hidden (Pranjal, 2026-09-27: "make quick filter
+ * disabled instead of disappearing them"; the day before, 2026-09-26, they hid: "whenever I apply an advanced filter,
+ * the quick filters won't be visible. All the quick-filter options, like Status and Organisation, which we removed
+ * before from the advanced filter, will all be visible inside the advanced filter now, because the quick filters will
+ * be hidden." - that quote is history). These tests hold the table to the rule: the square is there and live at rest,
+ * still there but disabled while a row is applied - no menu, a bubble that says where to set it - and live again on
+ * Clear all; a tick in the square rides into the applied rows; a quick key the page forgot to list is never dropped. */
+
+/** The words on the disabled square's bubble. */
+const HINT = 'Set inside More filters while a filter is applied';
 
 const USERS = sampleUsers(40);
 const ACTIVE = USERS.filter((u) => u.status === 'Active').length;
@@ -103,96 +108,177 @@ async function clearAll(user: ReturnType<typeof userEvent.setup>) {
   await user.click(within(panel).getByRole('button', { name: 'Clear all' }));
 }
 
+/** The square's wrapper - the Tooltip's trigger, a span around the button (a disabled button takes no pointer). */
+const wrapper = () => (square() as HTMLElement).parentElement as HTMLElement;
+
+/** What a browser sends when the square is pressed: the pointer's own event, not user-event's (which refuses a
+ * disabled button outright). React lets pointer and key events through to a disabled button, so these reach the Radix
+ * trigger's guard - the thing under test. */
+function press(el: HTMLElement) {
+  fireEvent.pointerDown(el, { button: 0, ctrlKey: false, pointerType: 'mouse' });
+  fireEvent.keyDown(el, { key: 'Enter' });
+  fireEvent.keyDown(el, { key: 'ArrowDown' });
+}
+
 beforeEach(() => localStorage.clear());
 
-describe('DataTable: quick filters hide under an advanced filter', { timeout: 30000 }, () => {
-  it('draws the Status square at rest, beside the More filters door', () => {
-    render(<Users />);
-    expect(square()).toBeInTheDocument();
-    expect(door()).toBeInTheDocument();
-    expect(rowCount()).toBe(USERS.length);
-  });
+describe(
+  'DataTable: quick filters are disabled under an advanced filter',
+  { timeout: 30000 },
+  () => {
+    it('draws the Status square at rest, live, beside the More filters door', () => {
+      render(<Users />);
+      expect(square()).toBeInTheDocument();
+      expect(square()).toBeEnabled();
+      expect(square()).not.toHaveAttribute('aria-disabled');
+      expect(door()).toBeInTheDocument();
+      expect(rowCount()).toBe(USERS.length);
+    });
 
-  it('hides the square once an advanced row is applied, and brings it back on Clear all', async () => {
-    const user = userEvent.setup();
-    render(<Users />);
-    await applyEmailContains(user, 'a');
-    expect(doorCount()).toBe('1');
-    expect(square()).not.toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: /Status/ })).not.toHaveAttribute(
-      'data-filtered',
-      'true'
-    );
-    await clearAll(user);
-    expect(doorCount()).toBe('');
-    expect(square()).toBeInTheDocument();
-    expect(square()).not.toHaveAttribute('data-active', 'true');
-    expect(rowCount()).toBe(USERS.length);
-  });
+    it('disables the square once an advanced row is applied - still in the strip - and wakes it on Clear all', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      await applyEmailContains(user, 'a');
+      expect(doorCount()).toBe('1');
+      expect(square()).toBeInTheDocument();
+      expect(square()).toBeDisabled();
+      expect(square()).toHaveAttribute('aria-disabled', 'true');
+      expect(square()).toHaveAttribute('aria-label', 'Filter by status');
+      expect(screen.getByRole('columnheader', { name: /Status/ })).not.toHaveAttribute(
+        'data-filtered',
+        'true'
+      );
+      await clearAll(user);
+      expect(doorCount()).toBe('');
+      expect(square()).toBeEnabled();
+      expect(square()).not.toHaveAttribute('aria-disabled');
+      expect(square()).not.toHaveAttribute('data-active', 'true');
+      expect(rowCount()).toBe(USERS.length);
+    });
 
-  it('folds a ticked quick value into the applied rows, then clears the square', async () => {
-    const user = userEvent.setup();
-    render(<Users />);
-    await tickStatus(user, 'Active');
-    expect(rowCount()).toBe(ACTIVE);
-    expect(square()).toHaveAttribute('data-active', 'true');
-    /* "Email contains ." matches everyone, so whatever narrows the list is the Status row that rode along */
-    await applyEmailContains(user, '.');
-    expect(square()).not.toBeInTheDocument();
-    expect(doorCount()).toBe('2');
-    expect(rowCount()).toBe(ACTIVE);
-    /* the panel shows the row: a Status key holding the Active pill */
-    await user.click(door());
-    const panel = await screen.findByRole('dialog', { name: 'Filters' });
-    expect(within(panel).getAllByText('Status').length).toBeGreaterThan(0);
-    expect(within(panel).getByText('Active')).toBeInTheDocument();
-    /* Clear all: the square is back and empty - its tick moved into the panel and left with it */
-    await user.click(within(panel).getByRole('button', { name: 'Clear all' }));
-    expect(square()).toBeInTheDocument();
-    expect(square()).not.toHaveAttribute('data-active', 'true');
-    expect(rowCount()).toBe(USERS.length);
-  });
+    it('a disabled square opens no menu, by pointer or by key', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      /* the control: the same press on the live square does open it */
+      press(square() as HTMLElement);
+      expect(await screen.findByRole('menu')).toBeInTheDocument();
+      await user.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      });
+      await applyEmailContains(user, 'a');
+      expect(square()).toBeDisabled();
+      press(square() as HTMLElement);
+      await act(() => new Promise((r) => setTimeout(r, 50)));
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitemcheckbox', { name: 'Active' })).not.toBeInTheDocument();
+    });
 
-  it('keeps a quick value applied when its key is not among the advanced keys', async () => {
-    const user = userEvent.setup();
-    render(<Users advancedFilter={{ keys: KEYS_WITHOUT_STATUS }} />);
-    await tickStatus(user, 'Inactive');
-    expect(rowCount()).toBe(INACTIVE);
-    await applyEmailContains(user, '.');
-    /* the square is hidden, nothing rode along (the door counts one), and the list is STILL narrowed by the tick */
-    expect(square()).not.toBeInTheDocument();
-    expect(doorCount()).toBe('1');
-    expect(rowCount()).toBe(INACTIVE);
-    /* clear the advanced filter: the square returns with its tick still on */
-    await clearAll(user);
-    expect(square()).toHaveAttribute('data-active', 'true');
-    expect(rowCount()).toBe(INACTIVE);
-  });
+    it('says where to set it: the disabled square shows the bubble on hover and on keyboard focus, never while live', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      /* live: the wrapper is out of the tab order and hovering it shows no bubble */
+      expect(wrapper()).not.toHaveAttribute('tabindex');
+      await user.hover(wrapper());
+      await act(() => new Promise((r) => setTimeout(r, 250)));
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      await user.unhover(wrapper());
+      await applyEmailContains(user, 'a');
+      /* held: the pointer resting on the square (its wrapper takes the hover) opens the bubble with the words */
+      expect(square()).toBeDisabled();
+      expect(wrapper()).toHaveAttribute('tabindex', '0');
+      await user.hover(wrapper());
+      await waitFor(() => {
+        expect(screen.getByRole('tooltip')).toHaveTextContent(HINT);
+      });
+      /* the pointer moves off: in a browser the bubble closes on the pointer's next move outside its grace area, an
+       * event jsdom never sends - Escape is the bubble's other way out and closes it here */
+      await user.unhover(wrapper());
+      await user.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      });
+      /* held: keyboard focus opens it too, and the words describe the wrapper for a screen reader */
+      act(() => {
+        wrapper().focus();
+      });
+      await waitFor(() => {
+        expect(screen.getByRole('tooltip')).toHaveTextContent(HINT);
+      });
+      expect(wrapper()).toHaveAttribute('aria-describedby', screen.getByRole('tooltip').id);
+    });
 
-  it('takes the heading wash off while the square is hidden', async () => {
-    const user = userEvent.setup();
-    render(<Users />);
-    await tickStatus(user, 'Active');
-    expect(screen.getByRole('columnheader', { name: /Status/ })).toHaveAttribute(
-      'data-filtered',
-      'true'
-    );
-    await applyEmailContains(user, '.');
-    expect(screen.getByRole('columnheader', { name: /Status/ })).not.toHaveAttribute(
-      'data-filtered',
-      'true'
-    );
-  });
+    it('folds a ticked quick value into the applied rows, then clears the square and disables it', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      await tickStatus(user, 'Active');
+      expect(rowCount()).toBe(ACTIVE);
+      expect(square()).toHaveAttribute('data-active', 'true');
+      /* "Email contains ." matches everyone, so whatever narrows the list is the Status row that rode along */
+      await applyEmailContains(user, '.');
+      /* the square is still there, disabled, and EMPTY: its tick moved into the panel */
+      expect(square()).toBeInTheDocument();
+      expect(square()).toBeDisabled();
+      expect(square()).not.toHaveAttribute('data-active', 'true');
+      expect(doorCount()).toBe('2');
+      expect(rowCount()).toBe(ACTIVE);
+      /* the panel shows the row: a Status key holding the Active pill */
+      await user.click(door());
+      const panel = await screen.findByRole('dialog', { name: 'Filters' });
+      expect(within(panel).getAllByText('Status').length).toBeGreaterThan(0);
+      expect(within(panel).getByText('Active')).toBeInTheDocument();
+      /* Clear all: the square wakes, empty - its tick moved into the panel and left with it */
+      await user.click(within(panel).getByRole('button', { name: 'Clear all' }));
+      expect(square()).toBeEnabled();
+      expect(square()).not.toHaveAttribute('data-active', 'true');
+      expect(rowCount()).toBe(USERS.length);
+    });
 
-  it('applying with nothing complete folds nothing: the square stays, ticks and all', async () => {
-    const user = userEvent.setup();
-    render(<Users />);
-    await tickStatus(user, 'Active');
-    await user.click(door());
-    const panel = await screen.findByRole('dialog', { name: 'Filters' });
-    await user.click(within(panel).getByRole('button', { name: /^Apply/ }));
-    expect(square()).toBeInTheDocument();
-    expect(square()).toHaveAttribute('data-active', 'true');
-    expect(rowCount()).toBe(ACTIVE);
-  });
-});
+    it('keeps a quick value applied when its key is not among the advanced keys', async () => {
+      const user = userEvent.setup();
+      render(<Users advancedFilter={{ keys: KEYS_WITHOUT_STATUS }} />);
+      await tickStatus(user, 'Inactive');
+      expect(rowCount()).toBe(INACTIVE);
+      await applyEmailContains(user, '.');
+      /* the square is disabled with its dot still on - nothing rode along (the door counts one), nothing was dropped,
+       * and the list is STILL narrowed by the tick */
+      expect(square()).toBeDisabled();
+      expect(square()).toHaveAttribute('data-active', 'true');
+      expect(doorCount()).toBe('1');
+      expect(rowCount()).toBe(INACTIVE);
+      /* clear the advanced filter: the square wakes with its tick still on */
+      await clearAll(user);
+      expect(square()).toBeEnabled();
+      expect(square()).toHaveAttribute('data-active', 'true');
+      expect(rowCount()).toBe(INACTIVE);
+    });
+
+    it('takes the heading wash off while the square is disabled', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      await tickStatus(user, 'Active');
+      expect(screen.getByRole('columnheader', { name: /Status/ })).toHaveAttribute(
+        'data-filtered',
+        'true'
+      );
+      await applyEmailContains(user, '.');
+      expect(screen.getByRole('columnheader', { name: /Status/ })).not.toHaveAttribute(
+        'data-filtered',
+        'true'
+      );
+    });
+
+    it('applying with nothing complete folds nothing: the square stays, ticks and all', async () => {
+      const user = userEvent.setup();
+      render(<Users />);
+      await tickStatus(user, 'Active');
+      await user.click(door());
+      const panel = await screen.findByRole('dialog', { name: 'Filters' });
+      await user.click(within(panel).getByRole('button', { name: /^Apply/ }));
+      expect(square()).toBeInTheDocument();
+      expect(square()).toBeEnabled();
+      expect(square()).toHaveAttribute('data-active', 'true');
+      expect(rowCount()).toBe(ACTIVE);
+    });
+  }
+);

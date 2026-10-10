@@ -380,17 +380,20 @@ export const WithTheAdvancedFilter: Story = {
 };
 
 /**
- * **Quick filters hide under an advanced filter** (Pranjal, 2026-09-26: "whenever I apply an advanced filter, the
- * quick filters won't be visible. All the quick-filter options, like Status and Organisation, which we removed before
- * from the advanced filter, will all be visible inside the advanced filter now, because the quick filters will be
- * hidden."). The strip here has the Status square AND a More filters door whose keys include Status. Apply any row in
- * the panel and the square goes - Status is set from inside the panel instead. Tick a status in the square first and
- * then apply a row: the tick rides along as a "Status is ..." row (the door's count says so), so no filter is lost.
- * Clear all brings the square back, empty. This is the table's rule, not the story's: every list with both filters
- * behaves this way; a page only has to list its quick keys among the advanced keys.
+ * **Quick filters are disabled under an advanced filter** - disabled, not hidden (Pranjal, 2026-09-27: "make quick
+ * filter disabled instead of disappearing them"). The day before they hid (Pranjal, 2026-09-26: "whenever I apply an
+ * advanced filter, the quick filters won't be visible. All the quick-filter options, like Status and Organisation,
+ * which we removed before from the advanced filter, will all be visible inside the advanced filter now, because the
+ * quick filters will be hidden." - history now: the panel still owns the quick keys while it holds a filter, but the
+ * square stays where the eye left it). The strip here has the Status square AND a More filters door whose keys
+ * include Status. Apply any row in the panel and the square greys out: it opens no menu, and hovering or tabbing to
+ * it says "Set inside More filters while a filter is applied" - Status is set from inside the panel instead. Tick a
+ * status in the square first and then apply a row: the tick rides along as a "Status is ..." row (the door's count
+ * says so), so no filter is lost. Clear all wakes the square again, empty. This is the table's rule, not the story's:
+ * every list with both filters behaves this way; a page only has to list its quick keys among the advanced keys.
  */
-export const QuickFiltersHideUnderAnAdvancedFilter: Story = {
-  name: 'Quick filters hide under an advanced filter',
+export const QuickFiltersDisabledUnderAnAdvancedFilter: Story = {
+  name: 'Quick filters are disabled under an advanced filter',
   args: {
     filters: undefined,
     advancedFilter: {
