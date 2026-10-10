@@ -59,9 +59,9 @@ describe('DateInput', () => {
       expect(screen.getByLabelText('Expires on')).toHaveTextContent('22 Oct 2026');
     });
 
-    it('wears the field box: 32 high, corners 8, the 13 text', () => {
+    it('wears the field box: 32 high, corners 8, the 14 text', () => {
       render(<DateInput aria-label="Expires on" />);
-      expect(field()).toHaveClass('mdt-h-8', 'mdt-rounded-lg', 'mdt-text-[13px]');
+      expect(field()).toHaveClass('mdt-h-8', 'mdt-rounded-lg', 'mdt-text-sm');
     });
 
     it('takes the other two heights', () => {
@@ -94,41 +94,56 @@ describe('DateInput', () => {
       expect(calendar()).toBeInTheDocument();
     });
 
-    it('picks a day, reports it and closes', async () => {
+    it('picks a day as a draft; Apply reports it, closes and hands the focus back', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(<DateInput aria-label="Expires on" value="2026-10-22" onChange={onChange} />);
       await user.click(field());
       await user.click(screen.getByRole('button', { name: '5 October 2026' }));
+      expect(onChange).not.toHaveBeenCalled();
+      expect(calendar()).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Apply' }));
       expect(onChange).toHaveBeenCalledWith('2026-10-05');
       expect(calendar()).not.toBeInTheDocument();
+      expect(field()).toHaveFocus();
     });
 
-    it('closes on Done without changing the value', async () => {
+    it('puts the focus on the picked day when it opens', async () => {
+      const user = userEvent.setup();
+      render(<DateInput aria-label="Expires on" value="2026-10-22" />);
+      await user.click(field());
+      expect(screen.getByRole('button', { name: '22 October 2026' })).toHaveFocus();
+    });
+
+    it('closes on Escape without saving the draft', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(<DateInput aria-label="Expires on" value="2026-10-22" onChange={onChange} />);
       await user.click(field());
-      await user.click(screen.getByRole('button', { name: 'Done' }));
+      await user.click(screen.getByRole('button', { name: '5 October 2026' }));
+      await user.keyboard('{Escape}');
       expect(onChange).not.toHaveBeenCalled();
       expect(calendar()).not.toBeInTheDocument();
+      expect(field()).toHaveTextContent('22 Oct 2026');
     });
 
-    it('shows Clear only when clearable, and clearing reports "" and closes', async () => {
+    it('Reset empties the draft; only a clearable field can then apply "" and close', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       const { unmount } = render(
         <DateInput aria-label="Expires on" value="2026-10-22" onChange={onChange} />
       );
       await user.click(field());
-      expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+      expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
       unmount();
 
       render(
         <DateInput aria-label="Expires on" value="2026-10-22" onChange={onChange} clearable />
       );
       await user.click(field());
-      await user.click(screen.getByRole('button', { name: 'Clear' }));
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+      await user.click(screen.getByRole('button', { name: 'Apply' }));
       expect(onChange).toHaveBeenCalledWith('');
       expect(calendar()).not.toBeInTheDocument();
     });
@@ -183,6 +198,40 @@ describe('DateInput', () => {
       render(<DateInput aria-label="Expires on" helperText="Leave empty for no expiry" />);
       const helper = screen.getByText('Leave empty for no expiry');
       expect(field()).toHaveAttribute('aria-describedby', helper.id);
+    });
+  });
+
+  describe('withTime', () => {
+    it('shows the day and the time, and says so when empty', () => {
+      const { rerender } = render(<DateInput aria-label="Expires on" withTime />);
+      expect(field()).toHaveTextContent('Pick a date and time');
+      rerender(<DateInput aria-label="Expires on" withTime value="2026-10-13T14:30" />);
+      expect(field()).toHaveTextContent('13 Oct 2026, 14:30');
+    });
+
+    it('reports YYYY-MM-DDTHH:mm on Apply', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <DateInput aria-label="Expires on" withTime value="2026-10-13T14:30" onChange={onChange} />
+      );
+      await user.click(field());
+      expect(screen.getByRole('listbox', { name: 'Times' })).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: '20 October 2026' }));
+      await user.click(screen.getByRole('option', { name: '09:30' }));
+      await user.click(screen.getByRole('button', { name: 'Apply' }));
+      expect(onChange).toHaveBeenCalledWith('2026-10-20T09:30');
+    });
+
+    it('keeps the date-only value a plain day', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<DateInput aria-label="Expires on" value="2026-10-13" onChange={onChange} />);
+      await user.click(field());
+      expect(screen.queryByRole('listbox', { name: 'Times' })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: '14 October 2026' }));
+      await user.click(screen.getByRole('button', { name: 'Apply' }));
+      expect(onChange).toHaveBeenCalledWith('2026-10-14');
     });
   });
 });
