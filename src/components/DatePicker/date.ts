@@ -1,10 +1,11 @@
 /**
- * Day arithmetic for the date field and the calendar.
+ * Day and time arithmetic for the date field and the calendar.
  *
- * A value is a DAY - "YYYY-MM-DD" - never a time. Expiry is day-only (Pranjal,
- * 2026-09-22: "no need to provide select time option"), and date arithmetic is
- * date-only (K-Field-30: an end-of-day anchor once made a 10-day save reopen as
- * 11). Nothing here touches hours.
+ * A value is a DAY - "YYYY-MM-DD" - unless the picker runs `withTime`, when it is
+ * a day and a local 24-hour time, "YYYY-MM-DDTHH:mm" (2026-09-28: the date and
+ * time popover). Day arithmetic stays date-only (K-Field-30: an end-of-day anchor
+ * once made a 10-day save reopen as 11); the time rides along as text and never
+ * moves the day.
  */
 export interface Day {
   /** the full year, 2026 */
@@ -49,7 +50,7 @@ export const MONTHS_SHORT = [
 /** The weekday initials the console's calendar draws, Sunday first. */
 export const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
-const pad = (n: number): string => (n < 10 ? `0${String(n)}` : String(n));
+export const pad = (n: number): string => (n < 10 ? `0${String(n)}` : String(n));
 
 /** How many days the month has - 28..31. */
 export const daysInMonth = (y: number, mo: number): number => new Date(y, mo + 1, 0).getDate();
@@ -83,3 +84,35 @@ export function formatDay(value: string | null | undefined): string {
   if (!p) return '';
   return `${String(p.d)} ${MONTHS_SHORT[p.mo] ?? ''} ${String(p.y)}`;
 }
+
+/** The weekday names, Sunday first, for the time column's header ("Tue, 13 Oct"). */
+export const WEEKDAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
+/** "2026-10-13T14:30" -> "14:30"; no time, or an impossible one -> null. */
+export function parseTime(value: string | null | undefined): string | null {
+  const m = /^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})/.exec(value ?? '');
+  if (!m) return null;
+  const h = Number(m[1]);
+  const mi = Number(m[2]);
+  if (h > 23 || mi > 59) return null;
+  return `${pad(h)}:${pad(mi)}`;
+}
+
+/** Every time of day on a step of `step` minutes: "00:00" .. "23:30" for 30. A step outside 1..720 falls back to 30. */
+export function timeSlots(step = 30): string[] {
+  const s = Number.isFinite(step) && step >= 1 && step <= 720 ? Math.floor(step) : 30;
+  const out: string[] = [];
+  for (let m = 0; m < 24 * 60; m += s) out.push(`${pad(Math.floor(m / 60))}:${pad(m % 60)}`);
+  return out;
+}
+
+/** "2026-10-13T14:30" -> "13 Oct 2026, 14:30"; a day with no time reads as the day alone. */
+export function formatDateTime(value: string | null | undefined): string {
+  const day = formatDay(value);
+  if (!day) return '';
+  const t = parseTime(value);
+  return t ? `${day}, ${t}` : day;
+}
+
+/** The day of the week, 0 = Sunday. */
+export const weekday = ({ y, mo, d }: Day): number => new Date(y, mo, d).getDay();
