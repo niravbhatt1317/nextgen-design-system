@@ -109,6 +109,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const hasError = Boolean(error);
     /* A HELD FIELD (Pranjal, 2026-09-17): disabled, the lock inside at the right, the value truncating before it */
     const held = Boolean(locked);
+    const isSearch = typeof props.placeholder === 'string' && /^search\b/i.test(props.placeholder);
     /* the ✕ shows only while there is something to clear, and never on a held or disabled field */
     const own = useRef<HTMLInputElement | null>(null);
     const clearable = Boolean(onClear) && !held && !disabled && String(props.value ?? '') !== '';
@@ -150,10 +151,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               InputVariants({ size, hasError }),
               /* 12 to the glyph, 6 to the text, 12 at the right (Pranjal, 2026-09-17) */
               startAdornment && 'mdt-pl-8',
-              /* a search box - the field with a leading glyph - keeps its placeholder at 13 (Pranjal, 2026-10-10: "keep the
-               * latest placeholder" for search); a form field's placeholder is 14, as its value */
-              startAdornment && 'placeholder:mdt-text-[13px]',
-              (endAdornment || clearable) && 'mdt-pr-8',
+              /* a search box keeps its placeholder at 13 (Pranjal, 2026-10-10: "keep the latest placeholder" for search); a
+               * form field's placeholder is 14, as its value - a leading glyph alone (a mail or globe in a form) is not a
+               * search. A search is the field whose placeholder says Search (WD-68, the guard's own reading). */
+              isSearch && 'placeholder:mdt-text-[13px]',
+              (Boolean(endAdornment) || clearable) && 'mdt-pr-8',
               /* held: the text stops 34 short of the edge (12 + the 14 lock + 8) and ends in an ellipsis */
               held && 'mdt-text-ellipsis mdt-pr-[34px]',
               className
