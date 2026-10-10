@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions -- the panel takes Enter from anywhere inside it */
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
@@ -51,7 +51,14 @@ import type {
  *   there) and its own Add filter; its action offers Ungroup and Remove group.
  *   One level deep.
  * - **Apply**, or Enter, hands the page a FilterValue; **Clear all** hands it
- *   the empty one. Escape and a press outside close the panel.
+ *   the empty one. Escape, the ✕ in the header, Apply, Clear all and the door close the panel; a press
+ *   outside does NOT (Pranjal, 2026-09-26) - the panel is a place of work, so the press is swallowed and
+ *   the panel wears a soft halo for a second to say "finish or close me" (2026-09-27: a 4px wash of
+ *   `--mdt-nudge` at 12%, the edge unchanged; the first press starts the second, a press during it is
+ *   swallowed but does not restart it).
+ * - **Inside the panel** (Pranjal's "H", 2026-09-27): a value in a field wears the reading ink; the
+ *   labels - Where, the group's GROUP - stay at neutral-90 (2026-10-10). Add filter is a plain text action with a plus
+ *   (the Button's ghost look); Clear all stays outline, Apply stays primary.
  *
  * ## Where it sits
  *
@@ -230,8 +237,19 @@ const INNER =
   'mdt-grid mdt-grid-cols-[64px_146px_106px_156px_28px] mdt-items-center mdt-gap-2 [&>*]:mdt-min-w-0';
 /* a group in the outer list: the join outside, the panel from the key column on */
 const GWRAP = 'mdt-grid mdt-grid-cols-[64px_1fr] mdt-items-start mdt-gap-2';
-const PRE =
-  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-px-0.5 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90';
+/* THE PANEL NEVER RUNS OFF THE PAGE (Pranjal, 2026-09-27: "provide a scroll with max length, right now it was going
+ * out of page"): its height is capped to the room under it - the viewport's bottom less PANEL_GAP - and never below
+ * PANEL_MIN; the header and the footer stay where they are and the rows scroll inside ([data-scroll]). */
+const PANEL_GAP = 16;
+const PANEL_MIN = 240;
+/* THE INK INSIDE THE PANEL (Pranjal's "H", 2026-09-27): a value in a field wears the reading ink. The labels - Where, the
+ * group's GROUP - stay at neutral-90 (Pranjal, 2026-10-10: the darker label 2.0.0 shipped is kept; it was one step back,
+ * neutral-70, before). */
+const LABEL_INK = 'mdt-text-neutral-90';
+const PRE = cn(
+  'mdt-inline-flex mdt-h-8 mdt-items-center mdt-px-0.5 mdt-text-[13px] mdt-font-medium',
+  LABEL_INK
+);
 /* the And / Or switch: a 32 chip, 8 in, with the exchange glyph */
 const SWITCH = cn(
   'mdt-inline-flex mdt-h-8 mdt-cursor-pointer mdt-items-center mdt-gap-1.5 mdt-rounded-[8px] mdt-border mdt-border-neutral-30 mdt-bg-background mdt-px-2',
@@ -246,19 +264,27 @@ const BOX = cn(
   'focus-visible:mdt-shadow-[0_0_0_1px_hsl(var(--mdt-primary)),0_0_0_4px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
   'data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-primary'
 );
+/* a value the panel's fields hold reads in the reading ink (Pranjal's "H"): set here, on the panel's own field classes,
+ * on purpose - the Select and the Input ship neutral-90 and whether that changes platform-wide is his call. The
+ * placeholder stays faint (the field's own data-[placeholder] / placeholder: rule, a variant this does not touch). */
+const VALUE_INK = 'mdt-text-neutral-130';
 /* a long value or placeholder reads from the left on one line and ends in an ellipsis: the field's value sits in a flex
  * child that would not shrink, and a button centres its text by default */
 const SELECT_FIX = cn(
   'mdt-text-left',
+  VALUE_INK,
   '[&>span:first-child]:mdt-min-w-0 [&>span:first-child]:mdt-flex-1 [&>span:first-child]:mdt-truncate [&>span:first-child]:mdt-text-left',
   '[&>span:first-child_span]:mdt-block [&>span:first-child_span]:mdt-truncate'
 );
 /* the many-value field: its pill row shrinks to the field and stays on one line; a lone pick may take the whole width
  * (the 64 the library keeps is for the +N) */
 const MULTI_FIX = cn(
+  VALUE_INK,
   'mdt-overflow-hidden [&>div]:mdt-min-w-0 [&>div]:mdt-flex-nowrap',
   '[&>div:not(:has(.mdt-select-overflow))>.mdt-select-pill]:mdt-max-w-full'
 );
+/* the typed value: text, days, a date */
+const INPUT_FIX = VALUE_INK;
 
 /* Where on the first row, the one switch on the second, the word after */
 function Prefix({
@@ -412,6 +438,7 @@ function Controls<Row>({ r, keys, keyOptions, onPatch }: ControlsProps<Row>) {
       ) : def.type === 'text' ? (
         <Input
           size="sm"
+          className={INPUT_FIX}
           placeholder="Type a value"
           value={textValue}
           onChange={(e) => {
@@ -440,6 +467,7 @@ function Controls<Row>({ r, keys, keyOptions, onPatch }: ControlsProps<Row>) {
       ) : r.op === 'within' ? (
         <Input
           size="sm"
+          className={INPUT_FIX}
           type="number"
           min={1}
           placeholder="Days"
@@ -451,6 +479,7 @@ function Controls<Row>({ r, keys, keyOptions, onPatch }: ControlsProps<Row>) {
       ) : (
         <Input
           size="sm"
+          className={INPUT_FIX}
           type="date"
           value={textValue}
           onChange={(e) => {
@@ -477,9 +506,21 @@ export function AdvancedFilter<Row = unknown>({
     rows: value.rows.length ? value.rows.map(cloneItem) : [blank()],
   });
   const [draft, setDraft] = useState<FilterValue>(fromValue);
-  /* every open starts from what is applied */
+  /* the one-second light after a press outside: `nudge` paints it, `lit` is the same fact without a render (the press
+   * handler reads it), `nudgeTimer` drops it */
+  const [nudge, setNudge] = useState(false);
+  const lit = useRef(false);
+  const nudgeTimer = useRef<number | undefined>(undefined);
+  const unlight = () => {
+    window.clearTimeout(nudgeTimer.current);
+    lit.current = false;
+    setNudge(false);
+  };
+  useEffect(() => () => { window.clearTimeout(nudgeTimer.current); }, []);
+  /* every open starts from what is applied; a close puts the light out, so a reopen inside the second is not lit */
   useEffect(() => {
     if (open) setDraft(fromValue());
+    else unlight();
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setItems = (fn: (rows: FilterItem[]) => FilterItem[]) => {
@@ -560,42 +601,106 @@ export function AdvancedFilter<Row = unknown>({
     onApply(EMPTY_FILTER);
   };
 
-  /* the panel closes on a press outside it that is not inside a dropdown, a listbox, the many-value field's dialog or a
-   * menu, and on Escape when no dropdown is open (an open one takes the Escape itself, on capture, and prevents the
-   * default) */
+  /* A press outside the panel does NOT close it (Pranjal, 2026-09-26: "if clicked outside it should not get closed.
+   * in fact it should highlight the popover for 1 second"). The panel is a place of work: the press is swallowed on
+   * CAPTURE - pointerdown (a menu trigger opens on it) and the click that follows - so nothing else opens under it,
+   * and the panel wears a soft light for a second (data-nudge: a 4px halo of --mdt-nudge at 12% - the interactive
+   * blue in light, the primary in dark - laid over the panel's own shadow; the edge does not change. Pranjal's pick
+   * on the 2026-09-27 mock; before it the border and a 1px outline went primary, near black in light). THE PRESS
+   * RULE (same mock): the first press starts the second; a press during that second is swallowed all the same but
+   * does NOT restart it; once the light drops, the next press lights it again. Not swallowed: a press inside the
+   * panel or on its door (the host), inside a dropdown, a listbox, a dialog or a menu, or while one of the panel's own
+   * dropdowns is open (that press closes the dropdown, as before). The ways out: the ✕ in the header, Apply, Clear
+   * all, the door, and Escape when no dropdown is open (an open one takes the Escape itself, on capture, and prevents
+   * the default). */
+  const POPPER = '[data-radix-popper-content-wrapper]';
   const panel = useRef<HTMLDivElement>(null);
+  /* the cap: measured when the panel opens, and again when the window resizes or anything scrolls (the page scrolls
+   * under the panel; a scroll inside the panel measures the same number and changes nothing) */
+  const [maxHeight, setMaxHeight] = useState<number | undefined>(undefined);
   useEffect(() => {
     if (!open) return undefined;
-    const outside = (e: MouseEvent) => {
-      const el = e.target as Element | null;
+    const measure = () => {
+      const el = panel.current;
+      if (!el) return;
+      const room = window.innerHeight - el.getBoundingClientRect().top - PANEL_GAP;
+      setMaxHeight(Math.max(PANEL_MIN, Math.floor(room)));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
+    };
+  }, [open]);
+  /* the scrollbar's gutter: a classic scrollbar (Windows) takes its width from the rows and would squeeze the grid, so
+   * while the body scrolls the panel widens by exactly that width; overlay scrollbars measure 0. Read after every
+   * render: adding or removing a row changes whether the body scrolls. */
+  const [gutter, setGutter] = useState(0);
+  useLayoutEffect(() => {
+    const body = panel.current?.querySelector<HTMLElement>('[data-scroll]');
+    const g = body ? body.offsetWidth - body.clientWidth : 0;
+    if (g !== gutter) setGutter(g);
+  });
+  useEffect(() => {
+    if (!open) return undefined;
+    const isOutside = (el: Element | null) => {
       const host = panel.current?.parentElement;
-      if (host && el && host.contains(el)) return;
+      if (host && el && host.contains(el)) return false;
       if (
         el?.closest(
           '[data-radix-popper-content-wrapper], [role="listbox"], [role="dialog"], [role="menu"]'
         )
       )
-        return;
-      onClose?.();
+        return false;
+      return true;
+    };
+    const outside = (e: PointerEvent) => {
+      if (!isOutside(e.target as Element | null)) return;
+      /* one of the panel's own dropdowns is open: the press closes it and goes no further, as before */
+      if (document.querySelector(POPPER)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      /* already lit: swallowed, and the second runs on from the FIRST press */
+      if (lit.current) return;
+      lit.current = true;
+      setNudge(true);
+      nudgeTimer.current = window.setTimeout(() => {
+        lit.current = false;
+        setNudge(false);
+      }, 1000);
+    };
+    /* the click that follows a swallowed press: swallowed too, so a plain button under it does not fire */
+    const outsideClick = (e: MouseEvent) => {
+      if (!isOutside(e.target as Element | null)) return;
+      if (document.querySelector(POPPER)) return;
+      e.preventDefault();
+      e.stopPropagation();
     };
     const key = (e: KeyboardEvent) => {
       if (
         e.key === 'Escape' &&
         !e.defaultPrevented &&
-        !document.querySelector('[data-radix-popper-content-wrapper]')
+        !document.querySelector(POPPER)
       ) {
         onClose?.();
       }
     };
-    document.addEventListener('mousedown', outside);
+    document.addEventListener('pointerdown', outside, true);
+    document.addEventListener('click', outsideClick, true);
     document.addEventListener('keydown', key);
     return () => {
-      document.removeEventListener('mousedown', outside);
+      document.removeEventListener('pointerdown', outside, true);
+      document.removeEventListener('click', outsideClick, true);
       document.removeEventListener('keydown', key);
     };
   }, [open, onClose]);
 
   if (!open) return null;
+
+  const panelWidth =
+    gutter > 0 && width !== undefined ? (typeof width === 'number' ? width + gutter : `calc(${String(width)} + ${String(gutter)}px)`) : width;
 
   const renderRow = (
     r: FilterRow,
@@ -619,11 +724,21 @@ export function AdvancedFilter<Row = unknown>({
       role="dialog"
       aria-label={title}
       className={cn(
-        'mdt-absolute mdt-left-0 mdt-top-10 mdt-box-border mdt-rounded-[8px] mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-p-3 mdt-text-left mdt-text-popover-foreground',
+        'mdt-absolute mdt-left-0 mdt-top-10 mdt-box-border mdt-flex mdt-flex-col mdt-rounded-[8px] mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-p-3 mdt-text-left mdt-text-popover-foreground',
         'mdt-shadow-[0_12px_32px_-12px_rgba(29,43,62,0.22),0_2px_8px_rgba(29,43,62,0.06)]',
+        /* the nudge (Pranjal, 2026-09-27): for one second after a press outside, a 4px halo of --mdt-nudge at 12% - the
+         * edge stays as it is. The panel's own shadow is repeated after the halo, or it would drop while lit: keep the
+         * two lists the same. */
+        'mdt-transition-shadow mdt-duration-150',
+        'data-[nudge]:mdt-shadow-[0_0_0_4px_hsl(var(--mdt-nudge)/0.12),0_12px_32px_-12px_rgba(29,43,62,0.22),0_2px_8px_rgba(29,43,62,0.06)]',
         className
       )}
-      style={{ width, zIndex: 'calc(var(--mdt-z-dropdown) - 1)' }}
+      data-nudge={nudge ? '' : undefined}
+      /* one layer under the dropdowns (L-13). The layer the library's menus, listboxes and popovers actually render
+       * at is 50 (`mdt-z-50` on every popper content; Radix lifts it onto the wrapper) - not the 1020 of
+       * `--mdt-z-dropdown`, which nothing draws at. At 1019 the panel painted OVER its own open menus wherever no
+       * ancestor made a stacking context (the story did; the console's toolbar band happened to). Measured 2026-09-22. */
+      style={{ width: panelWidth, zIndex: 49, maxHeight }}
       onKeyDown={(e) => {
         const target = e.target as Element;
         if (e.key === 'Enter' && !target.closest('[role=listbox], [role=menu]')) {
@@ -632,9 +747,22 @@ export function AdvancedFilter<Row = unknown>({
         }
       }}
     >
-      <div className="mdt-mb-4 mdt-flex mdt-h-7 mdt-items-center">
+      <div className="mdt-mb-4 mdt-flex mdt-h-7 mdt-items-center mdt-justify-between">
         <h3 className="mdt-m-0 mdt-text-sm mdt-font-medium mdt-text-neutral-90">{title}</h3>
+        {/* the ✕ (Pranjal, 2026-09-26: "a cross ghost icon cta"): the same 28 box as the row's ✕ and the three-dot */}
+        <button
+          type="button"
+          className={BOX}
+          aria-label={`Close ${title.toLowerCase()}`}
+          title="Close"
+          data-close=""
+          onClick={() => onClose?.()}
+        >
+          <Icon name="x" size={16} />
+        </button>
       </div>
+      {/* the scrolling body: 4px of give on every side so a field's focus halo is not clipped at the edge */}
+      <div className="-mdt-m-1 mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto mdt-overscroll-contain mdt-p-1" data-scroll="">
       <div className="mdt-flex mdt-flex-col mdt-gap-3">
         {draft.rows.map((it, i) =>
           isGroup(it) ? (
@@ -656,7 +784,10 @@ export function AdvancedFilter<Row = unknown>({
                   data-group-head=""
                 >
                   <span
-                    className="mdt-text-xs mdt-font-semibold mdt-uppercase mdt-tracking-[0.02em] mdt-text-neutral-90"
+                    className={cn(
+                      'mdt-text-xs mdt-font-semibold mdt-uppercase mdt-tracking-[0.02em]',
+                      LABEL_INK
+                    )}
                     data-group-label=""
                   >
                     Group
@@ -708,8 +839,10 @@ export function AdvancedFilter<Row = unknown>({
                   )
                 )}
                 <div>
+                  {/* Add filter is a plain text action with a plus (Pranjal, 2026-09-27): the Button's ghost look */}
                   <Button
-                    variant="outline"
+                    variant="ghost"
+                    className={VALUE_INK}
                     leftIcon={<Icon name="plus" size={14} />}
                     onClick={() => {
                       addInner(i);
@@ -757,13 +890,15 @@ export function AdvancedFilter<Row = unknown>({
       </div>
       <div className="mdt-mt-3">
         <Button
-          variant="outline"
+          variant="ghost"
+          className={VALUE_INK}
           leftIcon={<Icon name="plus" size={14} />}
           onClick={addOuter}
           disabled={!lastComplete || !keysLeft}
         >
           Add filter
         </Button>
+      </div>
       </div>
       <div className="mdt-mt-4 mdt-flex mdt-items-center mdt-justify-between mdt-border-t mdt-border-neutral-20 mdt-pt-3">
         <Button variant="outline" onClick={clearAll}>
@@ -773,7 +908,7 @@ export function AdvancedFilter<Row = unknown>({
           Apply
           <span
             aria-hidden
-            className="mdt-ml-1 mdt-inline-flex mdt-h-[18px] mdt-w-[18px] mdt-items-center mdt-justify-center mdt-rounded-[4px] mdt-border mdt-border-white/[0.28]"
+            className="mdt-ml-1 mdt-inline-flex mdt-h-[18px] mdt-w-[18px] mdt-items-center mdt-justify-center mdt-rounded-[4px] mdt-border mdt-border-primary-foreground/[0.28]"
           >
             <Icon name="corner-down-left" size={10} />
           </span>

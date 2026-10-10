@@ -2,9 +2,22 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 import { AdvancedFilter, applyAdvanced, countConditions, EMPTY_FILTER } from './AdvancedFilter';
 import type { FilterKey, FilterValue } from './AdvancedFilter.types';
-import { Badge } from '@/components/Badge';
-import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
+
+/* The door is the console's own More filters button (ToolbarControls.jsx MoreFiltersButton, a `.tool-square`), drawn at
+ * its rendered numbers on 2026-09-22: 32 high, white, a 1px neutral-30 edge, corners 8, 0 12 0 10 in, 6 to the 14 funnel,
+ * 13/500 neutral-90, neutral-10 under the pointer, the 2px #0262DE ring on keyboard focus. Not the library Button: that
+ * one is 12/16 in, a 16 glyph and goes neutral-40 / neutral-130 under the pointer, which the console's door never does. */
+const DOOR = [
+  'mdt-inline-flex mdt-h-8 mdt-shrink-0 mdt-cursor-pointer mdt-items-center mdt-gap-1.5 mdt-rounded-[8px]',
+  'mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-pl-2.5 mdt-pr-3',
+  'mdt-text-[13px] mdt-font-medium mdt-text-neutral-90 hover:mdt-bg-neutral-10',
+  'focus-visible:mdt-outline focus-visible:mdt-outline-2 focus-visible:mdt-outline-offset-2 focus-visible:mdt-outline-[#0262DE]',
+].join(' ');
+/* the applied count is the console's CountBadge (compat/om/atoms.jsx) in its active dress: an 18 pill, 0 5 in, 11/600
+ * white on neutral-90 */
+const COUNT =
+  'mdt-inline-flex mdt-h-[18px] mdt-min-w-[18px] mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-[9px] mdt-bg-neutral-90 mdt-px-[5px] mdt-text-[11px] mdt-font-semibold mdt-leading-none mdt-text-primary-foreground';
 
 /**
  * The "More filters" panel: rows of key · operator · value that stack, and
@@ -201,20 +214,17 @@ function Demo({
       <div className="mdt-flex mdt-items-center mdt-gap-2.5">
         {/* the door and the panel share one relative wrapper: the panel hangs 40 under the door's top, on its left edge */}
         <span className="mdt-relative mdt-inline-flex">
-          <Button
-            variant="outline"
-            leftIcon={<Icon name="sliders-horizontal" size={16} />}
+          <button
+            type="button"
+            className={DOOR}
             onClick={() => {
               setOpen((v) => !v);
             }}
           >
+            <Icon name="filter" size={14} aria-hidden />
             More filters
-            {count > 0 && (
-              <Badge tone="neutral" size="sm">
-                {count}
-              </Badge>
-            )}
-          </Button>
+            {count > 0 && <span className={COUNT}>{count}</span>}
+          </button>
           <AdvancedFilter<Person>
             open={open}
             onClose={() => {
@@ -317,6 +327,39 @@ export const Applied: Story = {
         rows: [
           { key: 'vip', op: 'is', value: ['Yes'] },
           { key: 'lastLogin', op: 'within', value: '7' },
+        ],
+      }}
+    />
+  ),
+};
+
+/** Every key in use and a group among them: taller than the room under the door on most screens, so the rows scroll
+ * while the header and the footer stay put (Pranjal, 2026-09-27: "provide a scroll with max length"). Make the
+ * window short to see the cap. */
+const firstOf = (id: string): string => {
+  const options = KEYS.find((k) => k.id === id)?.options;
+  const list = typeof options === 'function' ? options() : (options ?? []);
+  return String(list[0] ?? '');
+};
+export const ManyRows: Story = {
+  render: () => (
+    <Demo
+      initial={{
+        join: 'and',
+        rows: [
+          { key: 'name', op: 'contains', value: 'a' },
+          { key: 'email', op: 'contains', value: '@' },
+          { key: 'role', op: 'is', value: [firstOf('role')] },
+          {
+            group: true,
+            join: 'or',
+            rows: [
+              { key: 'team', op: 'is', value: [firstOf('team')] },
+              { key: 'source', op: 'is', value: ['LDAP'] },
+            ],
+          },
+          { key: 'org', op: 'is', value: [firstOf('org')] },
+          { key: 'vip', op: 'is', value: ['Yes'] },
         ],
       }}
     />
