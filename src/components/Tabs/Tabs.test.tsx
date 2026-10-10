@@ -41,7 +41,7 @@ describe('Tabs — the two types (K-Tabs-01)', () => {
   it('hands the type to every tab inside, so it is set once', () => {
     render(three('filled'));
     expect(tab('About')).toHaveAttribute('data-type', 'filled');
-    expect(tab('Teams')).toHaveClass('mdt-h-[26px]');
+    expect(tab('Teams')).toHaveClass('mdt-h-[25px]');
     expect(tab('Teams')).not.toHaveClass('mdt-border-b-2');
   });
 
@@ -109,7 +109,7 @@ describe('the label (K-Tabs-02 to 05, 07)', () => {
   it('tints a hovered chip primary at 4%, and leaves the active chip white', () => {
     render(three('filled'));
     expect(tab('Grants')).toHaveClass('hover:mdt-bg-primary/[0.04]');
-    expect(tab('About')).toHaveClass('data-[state=active]:hover:mdt-bg-white');
+    expect(tab('About')).toHaveClass('data-[state=active]:hover:mdt-bg-background');
   });
 
   it('reads neutral-40 with a not-allowed cursor when disabled — never dimmed or unhoverable', () => {
@@ -209,7 +209,22 @@ describe('underline geometry (K-Tabs-06, 08)', () => {
   it('pulls the line 1 down so it sits on the strip’s hairline, not above it', () => {
     render(three());
     expect(tab('About')).toHaveClass('-mdt-mb-px');
-    expect(list()).toHaveClass('mdt-border-b', 'mdt-border-neutral-20');
+    expect(list()).toHaveClass('mdt-border-b', 'mdt-border-neutral-30');
+  });
+
+  it('draws no line on the page band (hairline={false}): the tabs stretch and the line is not pulled down', () => {
+    render(
+      <Tabs defaultValue="about">
+        <TabsList hairline={false}>
+          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="teams">Teams</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    expect(list()).not.toHaveClass('mdt-border-b');
+    expect(list()).toHaveClass('mdt-items-stretch');
+    expect(list()).toHaveAttribute('data-hairline', 'false');
+    expect(tab('About')).not.toHaveClass('-mdt-mb-px');
   });
 
   it('bottom-aligns the tabs so a taller band still lands the line on the divider', () => {
@@ -229,26 +244,26 @@ describe('underline geometry (K-Tabs-06, 08)', () => {
 });
 
 describe('filled geometry (K-Tabs-09 to 11)', () => {
-  it('draws a 32 track with corners 8 on neutral-20, 3 in, 2 between chips', () => {
+  it('draws a 32 track with corners 8 on neutral-20, 3.5 in at the sides, 2 between chips', () => {
     render(three('filled'));
     expect(list()).toHaveClass(
       'mdt-h-8',
       'mdt-rounded-[8px]',
       'mdt-bg-neutral-20',
-      'mdt-p-[3px]',
+      'mdt-px-[3.5px]',
       'mdt-gap-0.5'
     );
   });
 
   it('draws a 26 chip with corners 5 and 10 at the sides', () => {
     render(three('filled'));
-    expect(tab('Grants')).toHaveClass('mdt-h-[26px]', 'mdt-rounded-[5px]', 'mdt-px-2.5');
+    expect(tab('Grants')).toHaveClass('mdt-h-[25px]', 'mdt-rounded-[5px]', 'mdt-px-2.5');
   });
 
   it('paints the active chip white under the hairline shadow', () => {
     render(three('filled'));
     expect(tab('About')).toHaveClass(
-      'data-[state=active]:mdt-bg-white',
+      'data-[state=active]:mdt-bg-background',
       'data-[state=active]:mdt-shadow-[0_1px_2px_rgba(29,43,62,0.10),0_0_0_1px_rgba(29,43,62,0.04)]'
     );
   });
@@ -303,9 +318,9 @@ describe('the icon and the count (K-Tabs-13, 14, 20)', () => {
     expect(tab('Grants').lastElementChild).toBe(count);
   });
 
-  it('mutes the count on neutral-20, a step darker on the filled track', () => {
+  it('mutes the count on neutral-10, a step darker on the filled track', () => {
     const { unmount } = render(three(undefined, { count: 3 }));
-    expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-20', 'mdt-text-faint');
+    expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-10', 'mdt-text-faint');
     unmount();
     render(three('filled', { count: 3 }));
     expect(screen.getByTestId('tab-count')).toHaveClass('mdt-bg-neutral-30');
@@ -315,7 +330,7 @@ describe('the icon and the count (K-Tabs-13, 14, 20)', () => {
     render(three(undefined, { count: 3 }));
     expect(screen.getByTestId('tab-count')).toHaveClass(
       '[[data-state=active]_&]:mdt-bg-neutral-90',
-      '[[data-state=active]_&]:mdt-text-white',
+      '[[data-state=active]_&]:mdt-text-primary-foreground',
       '[:disabled_&]:mdt-text-neutral-40'
     );
   });
@@ -565,9 +580,9 @@ describe('TabsAdd (K-Tabs-22)', () => {
 });
 
 describe('TabsContent (K-Tabs-23)', () => {
-  it('sits 8 under the strip', () => {
+  it('has no spacing of its own - the surface it sits in decides (2026-10-10)', () => {
     render(three());
-    expect(screen.getByText('About panel')).toHaveClass('mdt-mt-2');
+    expect(screen.getByText('About panel')).not.toHaveClass('mdt-mt-2');
   });
 });
 
