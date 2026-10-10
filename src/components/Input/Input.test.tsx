@@ -41,11 +41,25 @@ describe('Input', () => {
     // Renamed 2026-09-22: "applies md size by default" no longer holds. By ruling
     // (Pranjal, 2026-09-17) the field is 32 high with 13-px text, so sm is the
     // default; md and lg stay for the places that ask for them.
-    it('applies sm size by default (32 high, text 13)', () => {
+    /* THE FORM LADDER (Pranjal, 2026-09-17; the ink 2026-09-27). The console
+     * reported it as "a filled value looks like an empty placeholder", which is
+     * what these two classes being equal would mean. Asserted as a pair,
+     * because the bug is the RELATIONSHIP: a value one weight and one ink away
+     * from its own placeholder. */
+    it('gives the typed value the reading ink at 500, and holds the placeholder at 400', () => {
+      render(<Input placeholder="Enter a name" />);
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveClass('mdt-text-neutral-130', 'mdt-font-medium');
+      expect(input).toHaveClass('placeholder:mdt-text-faint', 'placeholder:mdt-font-normal');
+      // the value must not wear the placeholder's ink, which is the reported bug
+      expect(input).not.toHaveClass('mdt-text-faint');
+    });
+
+    it("applies sm size by default (32 high, the ladder's 14)", () => {
       render(<Input />);
       const input = screen.getByRole('textbox');
       expect(input).toHaveClass('mdt-h-8');
-      expect(input).toHaveClass('mdt-text-[13px]');
+      expect(input).toHaveClass('mdt-text-sm');
       expect(input).not.toHaveClass('mdt-h-9');
     });
 
@@ -53,7 +67,7 @@ describe('Input', () => {
       render(<Input size="sm" />);
       const input = screen.getByRole('textbox');
       expect(input).toHaveClass('mdt-h-8');
-      expect(input).toHaveClass('mdt-text-[13px]');
+      expect(input).toHaveClass('mdt-text-sm');
     });
 
     it('applies md size when asked', () => {
