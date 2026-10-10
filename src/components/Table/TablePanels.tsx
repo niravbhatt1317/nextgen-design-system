@@ -88,6 +88,22 @@ function Search({
           onChange(e.target.value);
         }}
       />
+      {/* the same ✕ as the library Input's clear (Pranjal, 2026-09-28): only while there is text */}
+      {value !== '' && (
+        <button
+          type="button"
+          aria-label="Clear search"
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+          onClick={() => {
+            onChange('');
+          }}
+          className="-mdt-mr-1 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-shrink-0 mdt-cursor-pointer mdt-items-center mdt-justify-center mdt-rounded mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90"
+        >
+          <Icon name="x" size={14} aria-hidden />
+        </button>
+      )}
     </label>
   );
 }
