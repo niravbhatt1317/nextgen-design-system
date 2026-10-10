@@ -217,6 +217,8 @@ const explicit = {
   input: D('color.border.input'),
   ring: D('color.border.focused'),
   /* the primary button = the storybook's neutral-20 in dark, through three tokens (Pranjal, 2026-09-24 night) */
+  /* 2026-09-27: the filter panel's one-second light - the interactive blue in light, the primary in dark (Pranjal) */
+  nudge: D('color.background.brand.bold'),
   primary: D('color.background.brand.bold'),
   'primary-hover': D('color.background.brand.bold.hovered'),
   'primary-active': D('color.background.brand.bold.pressed'),
