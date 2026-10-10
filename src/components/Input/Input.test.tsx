@@ -41,11 +41,11 @@ describe('Input', () => {
     // Renamed 2026-09-22: "applies md size by default" no longer holds. By ruling
     // (Pranjal, 2026-09-17) the field is 32 high with 13-px text, so sm is the
     // default; md and lg stay for the places that ask for them.
-    it('applies sm size by default (32 high, text 13)', () => {
+    it('applies sm size by default (32 high, text 14 in the reading ink)', () => {
       render(<Input />);
       const input = screen.getByRole('textbox');
       expect(input).toHaveClass('mdt-h-8');
-      expect(input).toHaveClass('mdt-text-[13px]');
+      expect(input).toHaveClass('mdt-text-sm', 'mdt-font-medium', 'mdt-text-neutral-130');
       expect(input).not.toHaveClass('mdt-h-9');
     });
 
@@ -53,7 +53,7 @@ describe('Input', () => {
       render(<Input size="sm" />);
       const input = screen.getByRole('textbox');
       expect(input).toHaveClass('mdt-h-8');
-      expect(input).toHaveClass('mdt-text-[13px]');
+      expect(input).toHaveClass('mdt-text-sm', 'mdt-font-medium', 'mdt-text-neutral-130');
     });
 
     it('applies md size when asked', () => {
@@ -225,5 +225,18 @@ describe('Input', () => {
       expect(input).toHaveClass('mdt-pr-[34px]', 'mdt-text-ellipsis');
       expect(input.parentElement?.querySelector('svg')).not.toBeNull();
     });
+  });
+});
+
+describe('the placeholder size (2026-10-10)', () => {
+  it('keeps a search box placeholder at 13', () => {
+    render(<Input placeholder="Search people" />);
+    expect(screen.getByPlaceholderText('Search people')).toHaveClass('placeholder:mdt-text-[13px]');
+  });
+  it('leaves a form field with a leading glyph at the field size', () => {
+    render(<Input placeholder="contact@company.com" startAdornment={<span>@</span>} />);
+    expect(screen.getByPlaceholderText('contact@company.com')).not.toHaveClass(
+      'placeholder:mdt-text-[13px]'
+    );
   });
 });

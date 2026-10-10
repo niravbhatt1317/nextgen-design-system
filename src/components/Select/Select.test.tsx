@@ -1722,3 +1722,52 @@ describe('Select', () => {
     });
   });
 });
+
+/* SEARCH IN A SINGLE SELECT (Pranjal, 2026-09-27): `mode="single" searchable` - a search box in the list, typing filters,
+ * a pick sets the one value and closes, the box shows the picked label. */
+describe('Select - single mode with search', () => {
+  const people: SelectOption[] = [
+    { value: 'Sarah Johnson', label: 'Sarah Johnson' },
+    { value: 'Emily Davis', label: 'Emily Davis' },
+    { value: 'Isabella Wilson', label: 'Isabella Wilson' },
+  ];
+  it('filters by the search, picks one value and closes', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Select
+        mode="single"
+        searchable
+        searchPlaceholder="Search members"
+        emptyMessage="No members match"
+        options={people}
+        defaultValue="Sarah Johnson"
+        onChange={onChange}
+        aria-label="Owner"
+      />
+    );
+    const trigger = screen.getByRole('combobox', { name: 'Owner' });
+    expect(trigger).toHaveTextContent('Sarah Johnson');
+    expect(trigger.className).toContain('mdt-text-neutral-130');
+    await user.click(trigger);
+    const search = await screen.findByPlaceholderText('Search members');
+    await user.type(search, 'davi');
+    expect(screen.queryByText('Isabella Wilson')).not.toBeInTheDocument();
+    await user.click(screen.getByText('Emily Davis'));
+    expect(onChange).toHaveBeenLastCalledWith('Emily Davis');
+    await waitFor(() => {
+      expect(screen.queryByPlaceholderText('Search members')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('combobox', { name: 'Owner' })).toHaveTextContent('Emily Davis');
+  });
+  it('shows the empty message when nothing matches', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select mode="single" searchable searchPlaceholder="Search members" emptyMessage="No members match" options={people} placeholder="Select an owner" aria-label="Owner" />
+    );
+    expect(screen.getByRole('combobox', { name: 'Owner' })).toHaveTextContent('Select an owner');
+    await user.click(screen.getByRole('combobox', { name: 'Owner' }));
+    await user.type(await screen.findByPlaceholderText('Search members'), 'zzzz');
+    expect(await screen.findByText('No members match')).toBeInTheDocument();
+  });
+});
