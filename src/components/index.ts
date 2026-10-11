@@ -618,7 +618,10 @@ export type { StackProps, StackVariants } from './Stack';
 
 // Stepper — a named, ordered journey with a place you are now. Not Tabs: if you
 // can do them in any order, it is Tabs. Not Progress either, which is one number
-// with no names. Horizontal only; vertical is a separate component.
+// with no names. `layout="vertical"` sets the same journey down a left rail, as
+// the navigation of a two-column flow (Pranjal, 2026-10-11: "a variant not a new
+// component"). The console called that VerticalStepper locally; there is no such
+// export here, and a page moving over renames it at the call.
 export { Stepper, stepperVariants } from './Stepper';
 export type {
   StepperProps,
