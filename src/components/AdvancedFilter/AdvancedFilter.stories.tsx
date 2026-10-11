@@ -339,7 +339,7 @@ export const Applied: Story = {
 const firstOf = (id: string): string => {
   const options = KEYS.find((k) => k.id === id)?.options;
   const list = typeof options === 'function' ? options() : (options ?? []);
-  return String(list[0] ?? '');
+  return list[0] ?? '';
 };
 export const ManyRows: Story = {
   render: () => (

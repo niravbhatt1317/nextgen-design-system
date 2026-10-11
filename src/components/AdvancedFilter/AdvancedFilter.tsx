@@ -516,7 +516,12 @@ export function AdvancedFilter<Row = unknown>({
     lit.current = false;
     setNudge(false);
   };
-  useEffect(() => () => { window.clearTimeout(nudgeTimer.current); }, []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(nudgeTimer.current);
+    },
+    []
+  );
   /* every open starts from what is applied; a close puts the light out, so a reopen inside the second is not lit */
   useEffect(() => {
     if (open) setDraft(fromValue());
@@ -638,6 +643,11 @@ export function AdvancedFilter<Row = unknown>({
    * while the body scrolls the panel widens by exactly that width; overlay scrollbars measure 0. Read after every
    * render: adding or removing a row changes whether the body scrolls. */
   const [gutter, setGutter] = useState(0);
+  /* eslint-disable-next-line react-hooks/exhaustive-deps -- no dependency list, deliberately:
+   * the gutter has to be re-read after EVERY render, because adding or removing a row is what
+   * changes whether the body scrolls, and `gutter` itself is the thing being measured. With
+   * `[gutter]` the effect would only run once the value it is meant to discover had already
+   * changed. The `g !== gutter` guard below is what stops the loop the rule is warning about. */
   useLayoutEffect(() => {
     const body = panel.current?.querySelector<HTMLElement>('[data-scroll]');
     const g = body ? body.offsetWidth - body.clientWidth : 0;
@@ -679,11 +689,7 @@ export function AdvancedFilter<Row = unknown>({
       e.stopPropagation();
     };
     const key = (e: KeyboardEvent) => {
-      if (
-        e.key === 'Escape' &&
-        !e.defaultPrevented &&
-        !document.querySelector(POPPER)
-      ) {
+      if (e.key === 'Escape' && !e.defaultPrevented && !document.querySelector(POPPER)) {
         onClose?.();
       }
     };
@@ -699,8 +705,9 @@ export function AdvancedFilter<Row = unknown>({
 
   if (!open) return null;
 
-  const panelWidth =
-    gutter > 0 && width !== undefined ? (typeof width === 'number' ? width + gutter : `calc(${String(width)} + ${String(gutter)}px)`) : width;
+  /* `width` carries a default of 656, so it is always a number here - the undefined and
+   * string branches this used to have could not be reached. */
+  const panelWidth = gutter > 0 ? width + gutter : width;
 
   const renderRow = (
     r: FilterRow,
@@ -762,143 +769,148 @@ export function AdvancedFilter<Row = unknown>({
         </button>
       </div>
       {/* the scrolling body: 4px of give on every side so a field's focus halo is not clipped at the edge */}
-      <div className="-mdt-m-1 mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto mdt-overscroll-contain mdt-p-1" data-scroll="">
-      <div className="mdt-flex mdt-flex-col mdt-gap-3">
-        {draft.rows.map((it, i) =>
-          isGroup(it) ? (
-            <div key={'g' + String(i)} className={GWRAP} data-group="">
-              {/* the join that binds the group to the rows around it - outside the panel, level with its header */}
-              <div className="mdt-mt-3">
-                <Prefix index={i} join={draft.join} onToggle={toggleJoin} />
-              </div>
-              <div
-                /* neutral-10 is the lift, in both themes: #F7FAFC on white and #0B1627 on
+      <div
+        className="-mdt-m-1 mdt-min-h-0 mdt-flex-1 mdt-overflow-y-auto mdt-overscroll-contain mdt-p-1"
+        data-scroll=""
+      >
+        <div className="mdt-flex mdt-flex-col mdt-gap-3">
+          {draft.rows.map((it, i) =>
+            isGroup(it) ? (
+              <div key={'g' + String(i)} className={GWRAP} data-group="">
+                {/* the join that binds the group to the rows around it - outside the panel, level with its header */}
+                <div className="mdt-mt-3">
+                  <Prefix index={i} join={draft.join} onToggle={toggleJoin} />
+                </div>
+                <div
+                  /* neutral-10 is the lift, in both themes: #F7FAFC on white and #0B1627 on
                    the #07101F card. The `dark:mdt-bg-neutral-150` twin this used to carry was
                    written when ramp steps did not flip, and under the generated map it painted
                    the near-white panel it was added to prevent. */
-                className="mdt-flex mdt-min-w-0 mdt-flex-col mdt-gap-3 mdt-rounded-[8px] mdt-bg-neutral-10 mdt-p-3"
-                data-panel=""
-              >
-                <div
-                  className="mdt-grid mdt-h-8 mdt-grid-cols-[1fr_28px] mdt-items-center mdt-gap-2"
-                  data-group-head=""
+                  className="mdt-flex mdt-min-w-0 mdt-flex-col mdt-gap-3 mdt-rounded-[8px] mdt-bg-neutral-10 mdt-p-3"
+                  data-panel=""
                 >
-                  <span
-                    className={cn(
-                      'mdt-text-xs mdt-font-semibold mdt-uppercase mdt-tracking-[0.02em]',
-                      LABEL_INK
-                    )}
-                    data-group-label=""
+                  <div
+                    className="mdt-grid mdt-h-8 mdt-grid-cols-[1fr_28px] mdt-items-center mdt-gap-2"
+                    data-group-head=""
                   >
-                    Group
-                  </span>
-                  <ActionMenu
-                    label="Group actions"
-                    items={[
-                      [
-                        'Ungroup',
-                        'corner-up-left',
-                        () => {
-                          ungroup(i);
-                        },
-                      ],
-                      [
-                        'Remove group',
-                        'trash-2',
-                        () => {
-                          removeGroup(i);
-                        },
-                        true,
-                      ],
-                    ]}
-                  />
-                </div>
-                {it.rows.map((r, j) =>
-                  renderRow(
-                    r,
-                    j,
-                    'inner',
-                    it.join,
-                    () => {
-                      toggleGroupJoin(i);
-                    },
-                    (patch) => {
-                      patchInner(i, j, patch);
-                    },
-                    <button
-                      type="button"
-                      className={BOX}
-                      aria-label={it.rows.length === 1 ? 'Clear this filter' : 'Remove this filter'}
-                      data-remove=""
-                      onClick={() => {
-                        removeInner(i, j);
-                      }}
+                    <span
+                      className={cn(
+                        'mdt-text-xs mdt-font-semibold mdt-uppercase mdt-tracking-[0.02em]',
+                        LABEL_INK
+                      )}
+                      data-group-label=""
                     >
-                      <Icon name="x" size={16} aria-hidden />
-                    </button>
-                  )
-                )}
-                <div>
-                  {/* Add filter is a plain text action with a plus (Pranjal, 2026-09-27): the Button's ghost look */}
-                  <Button
-                    variant="ghost"
-                    className={VALUE_INK}
-                    leftIcon={<Icon name="plus" size={14} />}
-                    onClick={() => {
-                      addInner(i);
-                    }}
-                    disabled={!isRowComplete(it.rows[it.rows.length - 1]) || !keysLeft}
-                  >
-                    Add filter
-                  </Button>
+                      Group
+                    </span>
+                    <ActionMenu
+                      label="Group actions"
+                      items={[
+                        [
+                          'Ungroup',
+                          'corner-up-left',
+                          () => {
+                            ungroup(i);
+                          },
+                        ],
+                        [
+                          'Remove group',
+                          'trash-2',
+                          () => {
+                            removeGroup(i);
+                          },
+                          true,
+                        ],
+                      ]}
+                    />
+                  </div>
+                  {it.rows.map((r, j) =>
+                    renderRow(
+                      r,
+                      j,
+                      'inner',
+                      it.join,
+                      () => {
+                        toggleGroupJoin(i);
+                      },
+                      (patch) => {
+                        patchInner(i, j, patch);
+                      },
+                      <button
+                        type="button"
+                        className={BOX}
+                        aria-label={
+                          it.rows.length === 1 ? 'Clear this filter' : 'Remove this filter'
+                        }
+                        data-remove=""
+                        onClick={() => {
+                          removeInner(i, j);
+                        }}
+                      >
+                        <Icon name="x" size={16} aria-hidden />
+                      </button>
+                    )
+                  )}
+                  <div>
+                    {/* Add filter is a plain text action with a plus (Pranjal, 2026-09-27): the Button's ghost look */}
+                    <Button
+                      variant="ghost"
+                      className={VALUE_INK}
+                      leftIcon={<Icon name="plus" size={14} />}
+                      onClick={() => {
+                        addInner(i);
+                      }}
+                      disabled={!isRowComplete(it.rows[it.rows.length - 1]) || !keysLeft}
+                    >
+                      Add filter
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            renderRow(
-              it,
-              i,
-              'outer',
-              draft.join,
-              toggleJoin,
-              (patch) => {
-                patchOuter(i, patch);
-              },
-              <ActionMenu
-                label="Filter actions"
-                items={[
-                  [
-                    'Create group',
-                    'box-select',
-                    () => {
-                      createGroup(i);
-                    },
-                  ],
-                  [
-                    'Remove',
-                    'trash-2',
-                    () => {
-                      removeOuter(i);
-                    },
-                    true,
-                  ],
-                ]}
-              />
+            ) : (
+              renderRow(
+                it,
+                i,
+                'outer',
+                draft.join,
+                toggleJoin,
+                (patch) => {
+                  patchOuter(i, patch);
+                },
+                <ActionMenu
+                  label="Filter actions"
+                  items={[
+                    [
+                      'Create group',
+                      'box-select',
+                      () => {
+                        createGroup(i);
+                      },
+                    ],
+                    [
+                      'Remove',
+                      'trash-2',
+                      () => {
+                        removeOuter(i);
+                      },
+                      true,
+                    ],
+                  ]}
+                />
+              )
             )
-          )
-        )}
-      </div>
-      <div className="mdt-mt-3">
-        <Button
-          variant="ghost"
-          className={VALUE_INK}
-          leftIcon={<Icon name="plus" size={14} />}
-          onClick={addOuter}
-          disabled={!lastComplete || !keysLeft}
-        >
-          Add filter
-        </Button>
-      </div>
+          )}
+        </div>
+        <div className="mdt-mt-3">
+          <Button
+            variant="ghost"
+            className={VALUE_INK}
+            leftIcon={<Icon name="plus" size={14} />}
+            onClick={addOuter}
+            disabled={!lastComplete || !keysLeft}
+          >
+            Add filter
+          </Button>
+        </div>
       </div>
       <div className="mdt-mt-4 mdt-flex mdt-items-center mdt-justify-between mdt-border-t mdt-border-neutral-20 mdt-pt-3">
         <Button variant="outline" onClick={clearAll}>
