@@ -88,7 +88,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
+          <label htmlFor={id} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
             {label}
           </label>
         )}

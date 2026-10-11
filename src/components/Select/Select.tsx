@@ -349,7 +349,7 @@ function renderSingleSelectMode(props: {
   return (
     <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
       {label && (
-        <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
+        <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
           {label}
           {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
         </label>
@@ -950,7 +950,7 @@ function renderSelectLabel(props: {
   if (!label) return null;
 
   return (
-    <label htmlFor={selectId} className="mdt-text-[13px] mdt-text-neutral-90">
+    <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
       {label}
       {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
     </label>
