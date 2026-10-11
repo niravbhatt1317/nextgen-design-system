@@ -51,7 +51,8 @@ const meta: Meta<typeof Stepper> = {
     },
   },
   argTypes: {
-    layout: { control: 'inline-radio', options: ['stacked', 'inline'] },
+    layout: { control: 'inline-radio', options: ['stacked', 'inline', 'underline', 'vertical'] },
+    reached: { control: { type: 'number', min: 0, max: 6 } },
     current: { control: { type: 'number', min: 0, max: 4 } },
     responsive: { control: 'boolean' },
     steps: { control: false },
@@ -373,4 +374,91 @@ export const InAWizard: Story = {
       </div>
     );
   },
+};
+
+const CREATE_ORG: StepperStep[] = [
+  { label: 'Essentials', description: 'Required · 3 fields' },
+  { label: 'Profile' },
+  { label: 'Security policy' },
+  { label: 'Allowed domains' },
+  { label: 'Sites' },
+  { label: 'Branding & portal' },
+  { label: 'Tags & attributes' },
+];
+
+/**
+ * **`layout="vertical"`** - the journey set down a rail, as the navigation of a two-column flow (the console's
+ * Create organization): the rail on the left, the panel beside it showing one step at a time.
+ *
+ * It reads a second counter, `reached` - the furthest step unlocked so far - so somebody can go back to step 2 and
+ * forward again to step 4 without redoing 3. Every unlocked step but the current one is clickable; everything past
+ * `reached` is locked, faint, and titled "Opens after ...". On step 3 here, with step 4 already unlocked.
+ */
+export const Vertical: Story = {
+  args: {
+    layout: 'vertical',
+    steps: CREATE_ORG,
+    current: 2,
+    reached: 3,
+    'aria-label': 'Create organization',
+  },
+  render: function Render(args) {
+    const [current, setCurrent] = useState(args.current);
+    const [reached, setReached] = useState(args.reached ?? args.current);
+    return (
+      <div className="mdt-w-[280px] mdt-p-4">
+        <Stepper
+          {...args}
+          current={current}
+          reached={reached}
+          onStepSelect={(index) => {
+            setCurrent(index);
+            setReached((r) => Math.max(r, index));
+          }}
+        />
+      </div>
+    );
+  },
+};
+
+const RAIL_STATES: StepperStep[] = [
+  { label: 'Complete', description: 'Behind you' },
+  { label: 'Current', description: 'The one in the panel' },
+  { label: 'Complete, ahead', description: 'Reached, then went back' },
+  { label: 'Disabled', description: 'Set by hand', state: 'disabled' },
+  { label: 'Locked', description: 'Opens after Disabled' },
+];
+
+/** Every vertical state, readable without colour - a tick for done, a number everywhere else, the ink dropping as the step gets further away. */
+export const VerticalStates: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div className="mdt-flex mdt-flex-wrap mdt-gap-8">
+      <div className="mdt-w-[280px] mdt-p-4">
+        <p className="mdt-mb-3 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
+          clickable - current 1, reached 2
+        </p>
+        <Stepper
+          layout="vertical"
+          steps={RAIL_STATES}
+          current={1}
+          reached={2}
+          onStepSelect={() => undefined}
+          aria-label="Every state"
+        />
+      </div>
+      <div className="mdt-w-[280px] mdt-p-4">
+        <p className="mdt-mb-3 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
+          read only - no onStepSelect
+        </p>
+        <Stepper
+          layout="vertical"
+          steps={RAIL_STATES}
+          current={1}
+          reached={2}
+          aria-label="Every state"
+        />
+      </div>
+    </div>
+  ),
 };
