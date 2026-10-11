@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -603,5 +603,93 @@ describe('the panel — a key with a list of options', () => {
     await user.click(screen.getByRole('button', { name: 'Remove Admin' }));
     await user.click(screen.getByRole('button', { name: /Apply/ }));
     expect((onApply.mock.calls[0]?.[0] as FilterValue).rows).toHaveLength(0);
+  });
+});
+
+describe('the panel stays open and shows the way out (Pranjal, 2026-09-26/27)', () => {
+  /* The panel listens on `pointerdown` (capture), and swallows the `click` that
+   * follows it so a plain button underneath does not fire either. Tests fire
+   * pointer events for that reason - `mouseDown` reaches nothing and would pass
+   * every assertion here for the wrong reason. */
+  const open = () => {
+    const onApply = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <>
+        <button type="button" data-testid="behind">
+          Behind
+        </button>
+        <div>
+          <AdvancedFilter<User> open keys={KEYS} onApply={onApply} onClose={onClose} />
+        </div>
+      </>
+    );
+    return { onClose, panel: () => screen.getByRole('dialog', { name: 'Filters' }) };
+  };
+
+  it('does not close on a press outside, where it used to', () => {
+    const { onClose, panel } = open();
+    fireEvent.pointerDown(document.body);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(panel()).toBeInTheDocument();
+  });
+
+  it('lights for a second, then stops', () => {
+    vi.useFakeTimers();
+    try {
+      const { panel } = open();
+      fireEvent.pointerDown(document.body);
+      expect(panel()).toHaveAttribute('data-nudge');
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(panel()).not.toHaveAttribute('data-nudge');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a press during the light does not restart it', () => {
+    /* Otherwise holding the pointer down outside keeps the panel lit for as long as
+     * you like, and the light stops meaning anything. */
+    vi.useFakeTimers();
+    try {
+      const { panel } = open();
+      fireEvent.pointerDown(document.body);
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+      fireEvent.pointerDown(document.body);
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+      expect(panel()).not.toHaveAttribute('data-nudge');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('swallows the click that follows, so a button underneath does not fire', () => {
+    /* The panel treats its own parent as inside, so the door that opened it still
+     * works; "Behind" sits outside that wrapper to be genuinely outside. */
+    open();
+    const behind = screen.getByTestId('behind');
+    const pressed = vi.fn();
+    behind.addEventListener('click', pressed);
+    fireEvent.pointerDown(behind);
+    fireEvent.click(behind);
+    expect(pressed).not.toHaveBeenCalled();
+  });
+
+  it('closes on the ✕, which is the way out that replaced the press', () => {
+    const { onClose } = open();
+    fireEvent.click(screen.getByRole('button', { name: 'Close filters' }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('still closes on Escape', () => {
+    const { onClose } = open();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalled();
   });
 });

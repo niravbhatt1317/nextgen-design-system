@@ -38,6 +38,14 @@ export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'siz
    */
   locked?: boolean;
   /**
+   * A clear button (Pranjal, 2026-09-28, on the table search: "we need to provide a cross icon on the right so that i
+   * can clear all at once instead of backspacing each time"). Given, a ghost ✕ sits inside at the right while the
+   * field holds text; pressing it calls this and puts the caret back in the field. Every search box sets it.
+   */
+  onClear?: () => void;
+  /** The clear button's spoken name. "Clear" unless the field says otherwise ("Clear search"). */
+  clearLabel?: string;
+  /**
    * Wrapper className for the container div
    */
   wrapperClassName?: string;
