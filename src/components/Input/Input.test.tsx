@@ -254,3 +254,30 @@ describe('the placeholder size (2026-10-10)', () => {
     );
   });
 });
+
+describe('Escape clears (2026-10-11)', () => {
+  it('empties a clearable field on Escape, the same as its ✕', async () => {
+    const user = userEvent.setup();
+    const onClear = vi.fn();
+    render(<Input placeholder="Search users" value="ana" onChange={() => {}} onClear={onClear} />);
+    await user.type(screen.getByPlaceholderText('Search users'), '{Escape}');
+    expect(onClear).toHaveBeenCalledTimes(1);
+  });
+  it('leaves Escape alone when there is nothing to clear', async () => {
+    const user = userEvent.setup();
+    const onClear = vi.fn();
+    const onKeyDown = vi.fn();
+    render(
+      <Input
+        placeholder="Search users"
+        value=""
+        onChange={() => {}}
+        onClear={onClear}
+        onKeyDown={onKeyDown}
+      />
+    );
+    await user.type(screen.getByPlaceholderText('Search users'), '{Escape}');
+    expect(onClear).not.toHaveBeenCalled();
+    expect(onKeyDown).toHaveBeenCalled();
+  });
+});

@@ -102,6 +102,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       locked,
       onClear,
       clearLabel = 'Clear',
+      onKeyDown,
       disabled,
       required,
       id: propId,
@@ -172,6 +173,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled={held || disabled}
             required={required}
             {...props}
+            /* Escape empties a clearable field, the same as its ✕ (Pranjal, 2026-10-11: every search clears with ✕ and Escape) */
+            onKeyDown={(e) => {
+              onKeyDown?.(e);
+              if (!e.defaultPrevented && e.key === 'Escape' && clearable) {
+                e.preventDefault();
+                e.stopPropagation();
+                onClear?.();
+              }
+            }}
           />
           {held ? (
             <div className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint">
