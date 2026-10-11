@@ -1,5 +1,103 @@
 # Changelog
 
+## 2.1.0
+
+### Minor Changes
+
+- 07b8658: The More filters panel: a close ✕ in its header, a plain "Add filter", and it stays open.
+
+  Values and the operator box wear the reading ink. A press outside no longer closes
+  the panel: it glows for one second instead (the new `--mdt-nudge` token - the
+  interactive blue in light, the primary in dark); the ways out are the ✕, Apply,
+  Clear all, the button that opened it, and Escape. Its height is capped to the room
+  below it and the rows scroll inside. The Where and GROUP labels keep 2.0.0's ink.
+
+- 174b7d3: DateInput takes `withTime`; choices are a draft until Apply.
+
+  With `withTime` the value is "YYYY-MM-DDTHH:mm" and the panel adds a time column
+  (`timeStep`). Reset clears the draft, Apply saves and closes, Escape or a press
+  outside closes without saving. The month title opens a month / year picker.
+
+- 14b6d6a: Fields: a clear ✕, the search placeholder at 13, the picked dropdown row, a searchable single Select.
+
+  Builds on #140 (the typed value in the reading ink at 14/500). Input takes `onClear`
+  / `clearLabel`: a ✕ inside the right edge while there is text. A search box (a
+  placeholder starting "Search") keeps its placeholder at 13px. Select: in a single
+  pick the picked row wears blue-10 and keeps its tick under the pointer, and
+  `mode="single" searchable` opens the searchable list. The red required asterisk
+  sits 3px after the label, Textarea included. The table pager's page box reads 14
+  in the reading ink.
+
+- 39a7902: Input, Select and Textarea: the typed value is reading text again.
+
+  The form ladder (Pranjal, 2026-09-17; the value's ink 2026-09-27): what a person
+  typed wears the **reading ink at 14/500** — `neutral-130`, the same as a picked
+  Select value — and the placeholder stays **faint at 400**. The small size's text
+  goes from 13 to 14; the 32px box is unchanged.
+
+  The console reported this as _"a filled value looks like an empty placeholder"_,
+  on every form. It was: value and placeholder sat one weight and one ink apart in
+  the same size, so the only thing telling them apart was the words.
+
+  Measured in both themes, in a browser:
+
+  ```
+  light   value 14px w500 #1D2B3E    placeholder 14px w400 #8FA0BD
+  dark    value 14px w500 #CAD3E2    placeholder 14px w400 #6A7FA0
+  ```
+
+  `DateInput` borrows the Input's box, so it moves with it.
+
+  **`size="md"` was never the answer** and is not what changed here: the console's
+  fields were always the 32px box, and all three of the differences were in the
+  text — size, weight and ink. `md` would have made every field 36px.
+
+- 947bf78: InlineTags: a row of TagPills with a dashed "Add tag" that opens a field in place.
+
+  Suggested tags show under the field while it is open, and earlier tags are listed
+  as you type. Each pill keeps its own ✕. The console's Create organization, Edit
+  details and organization header already use it; until now it lived only in the
+  console as a local copy.
+
+- e9a5515: Stepper takes `layout="vertical"`: the journey set down a rail, as the navigation of a two-column flow.
+
+  A second counter, `reached`, is the furthest step unlocked so far: somebody can go back
+  to step 2 and forward again to step 4 without redoing 3. Every unlocked step but the
+  current one is clickable; a locked step is faint and says what opens it. `reached` is
+  ignored by the horizontal layouts. Nothing changes for `stacked`, `inline` or `underline`.
+
+- 8db4ef1: DataTable: quick filters are disabled, not hidden, while More filters holds a filter.
+
+  The squares stay in the strip with a tooltip, "Set inside More filters while a
+  filter is applied". Every search in the table carries a clear ✕. The empty state's
+  button reads Clear search, Clear filters or Clear all by what is applied, and the
+  blank state sits in the middle of the visible table. Row and heading menus widen
+  for a long item. DataTable passes `dockOffset` to the card.
+
+- 77c8864: Tabs: `hairline` on TabsList, the 25px chip, the paper chip, no panel margin.
+
+  `hairline={false}` draws a page band - no line under the tabs, the tabs stretched
+  to the band; a drawer band keeps its line, now neutral-30. The filled chip is 25px
+  in a track 3.5px in, and the active chip wears the background token so it holds in
+  dark. TabsContent has no top margin of its own - the surface decides.
+
+### Patch Changes
+
+- 39a7902: The public API ratchet now covers tokens as well as names.
+
+  `check:api` watched the JavaScript exports and nothing else, which left a token
+  free to vanish from `styles.css` with every gate green. A consumer's
+  `hsl(var(--mdt-gone))` resolves to nothing and paints no colour rather than
+  erroring, so it would have been found by eye, late.
+
+  The console asked whether we had dropped one. Answering took a hand comparison of
+  three published tarballs — which is the shape of a question a gate should already
+  answer. (We had not: 220 tokens in 0.5.1, 225 in 1.0.0, 278 in 2.0.0, none ever
+  removed.)
+
+  952 names and 278 tokens are baselined now. Nothing about the package changes for
+  a consumer.
+
 ## 2.0.0
 
 ### Major Changes
