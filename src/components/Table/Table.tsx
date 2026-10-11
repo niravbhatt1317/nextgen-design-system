@@ -658,7 +658,8 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
               <Icon name="more-horizontal" size={14} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="mdt-w-48">
+          {/* 192px is the floor, not the width (2026-10-09): a long item widens the menu, as the row menu does */}
+          <DropdownMenuContent align="end" className="mdt-min-w-48">
             {menu}
           </DropdownMenuContent>
         </DropdownMenu>

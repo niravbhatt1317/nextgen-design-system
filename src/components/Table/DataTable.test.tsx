@@ -130,13 +130,40 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.queryByText(/Status: Active/)).not.toBeInTheDocument();
   });
 
-  it('shows nothing-found with a Clear filters button that brings the rows back', async () => {
+  /* Pranjal, 2026-09-28: the empty state's button undoes what is actually applied - a search alone is Clear search */
+  it('shows nothing-found for a search with a Clear search button that brings the rows back', async () => {
     render(<Users initialQuery="zzqx" />);
-    expect(within(screen.getByRole('status')).getByText('No users match')).toBeInTheDocument();
+    const blank = screen.getByRole('status');
+    expect(within(blank).getByText('No users match')).toBeInTheDocument();
     /* the blank state says it; the footer no longer repeats it under six dead controls */
     expect(document.querySelector('.tbl-foot')).toBeNull();
-    await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+    expect(within(blank).queryByRole('button', { name: 'Clear filters' })).toBeNull();
+    await userEvent.click(within(blank).getByRole('button', { name: 'Clear search' }));
     expect(screen.getByText('1–25 of 60 users')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Search users' })).toHaveValue('');
+  });
+
+  it('says Clear all when a search and a filter are both on, and clears both', async () => {
+    render(<Users initialQuery="zzqx" />);
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    await userEvent.click(screen.getByRole('menuitemcheckbox', { name: /Active/ }));
+    await userEvent.keyboard('{Escape}');
+    const blank = screen.getByRole('status');
+    await userEvent.click(within(blank).getByRole('button', { name: 'Clear all' }));
+    expect(screen.getByText('1–25 of 60 users')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Search users' })).toHaveValue('');
+  });
+
+  /* Pranjal, 2026-09-28: "we need to provide a cross icon on the right so that i can clear all at once" */
+  it('puts a clear ✕ in the search box only while it holds words', async () => {
+    render(<Users />);
+    const box = screen.getByRole('textbox', { name: 'Search users' });
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+    await userEvent.type(box, 'ava');
+    await userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(box).toHaveValue('');
+    expect(box).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
   });
 
   it('shows the first-run, loading and error states', () => {

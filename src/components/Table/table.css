@@ -29,6 +29,10 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+/* a blank state takes the card's body, the viewport keeps only its heading row (2026-09-28, the blank centred in view) */
+.tbl:has(> .tbl-blank) > .tbl-viewport {
+  flex: 0 0 auto;
+}
 /* a page is scrolling the card to its dock line: until it lands, the rows are clipped, not scrolled */
 .tbl-viewport[data-clip='true'] {
   overflow-y: clip;

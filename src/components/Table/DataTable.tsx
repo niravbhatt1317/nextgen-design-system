@@ -24,6 +24,7 @@ import { Input } from '../Input';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Checkbox } from '../Checkbox';
 import { Toolbar, ToolbarButton, ToolbarSection, ToolbarSpacer } from '../Toolbar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 import {
   TABLE_COLUMN_MAX,
   TABLE_COLUMN_MIN,
@@ -55,7 +56,7 @@ import { useTableColumns } from './useTableColumns';
 import { useTablePaging } from './useTablePaging';
 import { useTableSelection } from './useTableSelection';
 import { useTableSort } from './useTableSort';
-import type { DataTableProps, DataTableQuickFilter } from './DataTable.types';
+import type { DataTableFilterGroup, DataTableProps, DataTableQuickFilter } from './DataTable.types';
 import type { TableColumnDef, TableSortDirection } from './Table.types';
 
 const ACTION_WIDTH = 100;
@@ -147,16 +148,22 @@ function saveNumbers(storageKey: string | undefined, on: boolean): void {
  *
  * Every pill inside is the library Badge; every control is a ToolbarButton.
  *
- * QUICK FILTERS HIDE UNDER AN ADVANCED FILTER (Pranjal, 2026-09-26: "whenever I
- * apply an advanced filter, the quick filters won't be visible. All the
- * quick-filter options, like Status and Organisation, which we removed before
- * from the advanced filter, will all be visible inside the advanced filter now,
- * because the quick filters will be hidden.") The rule, which every table
- * follows:
- *   - While the advanced filter holds at least one applied row, the strip draws
- *     no quick-filter squares and no heading wears a quick filter's wash. A page
- *     therefore lists its quick-filter keys (Status, Organisation ...) among the
- *     advanced keys, so they can still be set from inside the panel.
+ * QUICK FILTERS ARE DISABLED UNDER AN ADVANCED FILTER - disabled, not hidden
+ * (Pranjal, 2026-09-27: "make quick filter disabled instead of disappearing
+ * them"). The day before they hid (Pranjal, 2026-09-26: "whenever I apply an
+ * advanced filter, the quick filters won't be visible. All the quick-filter
+ * options, like Status and Organisation, which we removed before from the
+ * advanced filter, will all be visible inside the advanced filter now, because
+ * the quick filters will be hidden.") - that quote is history; the panel still
+ * owns the quick keys while it holds a filter, but the squares stay in the strip
+ * so the eye finds them where it left them. The rule, which every table follows:
+ *   - While the advanced filter holds at least one applied row, every quick-
+ *     filter square stays in the strip but is DISABLED: the ToolbarButton's own
+ *     disabled look (half opacity, no pointer), no menu on click or key, and a
+ *     bubble on hover or keyboard focus reading "Set inside More filters while a
+ *     filter is applied". No heading wears a quick filter's wash meanwhile. A
+ *     page therefore lists its quick-filter keys (Status, Organisation ...)
+ *     among the advanced keys, so they can still be set from inside the panel.
  *   - Applying the advanced filter never loses a quick filter: every value
  *     ticked in a square at that moment is folded into the applied filter as a
  *     row on the advanced key whose id is the square's columnKey - the "is"
@@ -165,12 +172,21 @@ function saveNumbers(storageKey: string | undefined, on: boolean): void {
  *     panel already holds an "is" row on that key the values join it. The
  *     square's own ticks are then cleared, so nothing is filtered twice.
  *   - A square whose key the page did not list among the advanced keys keeps
- *     its ticks and keeps filtering (nothing is dropped silently) - it is just
- *     not visible until the advanced filter is empty again. A page owes the
- *     panel every one of its quick keys.
+ *     its ticks and keeps filtering (nothing is dropped silently) - its dot
+ *     stays on, under the disabled wash, until the advanced filter is empty
+ *     again. A page owes the panel every one of its quick keys.
  *   - When the advanced filter goes back to empty (Clear all, or every row
- *     removed and applied) the squares return, empty.
+ *     removed and applied) the squares are enabled again, empty.
+ *
+ * Why the bubble hangs on a wrapper: a disabled button is pointer-events: none
+ * (ToolbarButton, like Button), so it never sees a hover; the Tooltip's trigger
+ * is an inline span around the square instead, focusable only while held so a
+ * keyboard reaches the same words. While the square is free the Tooltip is held
+ * shut (open={false}) rather than unmounted, so the strip's DOM never changes
+ * shape between the two states.
  */
+/** The words on the disabled square's bubble. */
+const QUICK_HELD_HINT = 'Set inside More filters while a filter is applied';
 /** One filter value as a word; an object or nothing is no word (the panel's own reading). */
 function word(v: unknown): string {
   return typeof v === 'string'
@@ -253,6 +269,74 @@ function loadMoreWanted(mode: 'auto' | 'always' | 'never', shown: number, total:
   return shown < total;
 }
 
+/**
+ * What the empty state's one action says: it has to name what it will clear, or
+ * somebody presses "Clear filters" and loses their search as well.
+ *
+ * Its own function because the component sits on the cognitive-complexity limit,
+ * and a three-way label is the cheapest branch to lift out of it.
+ */
+function clearLabel(searching: boolean, filtering: boolean): string {
+  if (searching && filtering) return 'Clear all';
+  return searching ? 'Clear search' : 'Clear filters';
+}
+
+/**
+ * Does one row survive the search box, the quick filters and the filter menus?
+ *
+ * Every rule here is "narrow unless it matches", so the first failure returns.
+ * The advanced filter is NOT here: it reads its own keys and runs over what is
+ * left, after this.
+ *
+ * A function of its own because `DataTable` was one branch over the complexity
+ * limit and this is the densest, most self-contained part of it - three nested
+ * loops of conditions that answer one question and touch no state.
+ */
+function passesFilters<Row>(
+  row: Row,
+  f: {
+    q: string;
+    search: DataTableProps<Row>['search'];
+    quickFilters: DataTableQuickFilter<Row>[];
+    quick: Record<string, Set<string>>;
+    filters: DataTableFilterGroup<Row>[];
+    ticked: Record<string, Set<string>>;
+  }
+): boolean {
+  if (f.q && f.search && !f.search.match(row, f.q)) return false;
+  for (const qf of f.quickFilters) {
+    const s = f.quick[qf.columnKey];
+    if (!s || s.size === 0) continue;
+    const v = qf.value(row);
+    const values = Array.isArray(v) ? v : [v];
+    if (!values.some((x) => s.has(x))) return false;
+  }
+  for (const g of f.filters) {
+    const s = f.ticked[g.key];
+    if (s && s.size > 0 && !g.match(row, s)) return false;
+  }
+  return true;
+}
+
+/**
+ * One quick-filter value ticked or unticked, as a new map.
+ *
+ * Lifted out of `DataTable` because it is pure and the component was one branch
+ * over the complexity limit with it inline - the add/remove fork counts against a
+ * function that already carries the whole table. Nothing here reads state.
+ */
+function withTick(
+  all: Record<string, Set<string>>,
+  key: string,
+  value: string,
+  on: boolean
+): Record<string, Set<string>> {
+  const next = new Set(all[key] ?? []);
+  if (on) next.add(value);
+  else next.delete(value);
+  return { ...all, [key]: next };
+}
+
 function DataTable<Row>({
   label,
   noun = 'rows',
@@ -282,6 +366,7 @@ function DataTable<Row>({
   divider = 'default',
   maxHeight = 600,
   docked,
+  dockOffset,
   toolbar = true,
   pager = 'auto',
   className,
@@ -299,21 +384,15 @@ function DataTable<Row>({
   );
   const quickCount = useMemo(() => Object.values(quick).reduce((t, s) => t + s.size, 0), [quick]);
   const tickQuick = (key: string, value: string, on: boolean) => {
-    setQuick((all) => {
-      const next = new Set(all[key] ?? []);
-      if (on) next.add(value);
-      else next.delete(value);
-      return { ...all, [key]: next };
-    });
+    setQuick((all) => withTick(all, key, value, on));
   };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   /* the advanced filter's applied rows, and whether its panel is open (the door toggles it) */
   const [advanced, setAdvanced] = useState<FilterValue>(EMPTY_FILTER);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const advancedCount = advancedFilter ? countConditions(advanced) : 0;
-  /* the quick filters step aside while an advanced filter is applied (Pranjal, 2026-09-26; the rule is in the header) */
-  const quickHidden = advancedFilter !== undefined && advanced.rows.length > 0;
-  const shownQuickFilters = quickHidden ? [] : quickFilters;
+  /* the quick filters are held - disabled, not hidden - while an advanced filter is applied (Pranjal, 2026-09-27; the rule is in the header) */
+  const quickHeld = advancedFilter !== undefined && advanced.rows.length > 0;
   const sort = useTableSort();
   const pagingState = useTablePaging({ pageSize, mode: paging });
   const selection = useTableSelection();
@@ -376,21 +455,9 @@ function DataTable<Row>({
   );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const kept = rows.filter((row) => {
-      if (q && search && !search.match(row, q)) return false;
-      for (const qf of quickFilters) {
-        const s = quick[qf.columnKey];
-        if (!s || s.size === 0) continue;
-        const v = qf.value(row);
-        const values = Array.isArray(v) ? v : [v];
-        if (!values.some((x) => s.has(x))) return false;
-      }
-      for (const g of filters) {
-        const s = ticked[g.key];
-        if (s && s.size > 0 && !g.match(row, s)) return false;
-      }
-      return true;
-    });
+    const kept = rows.filter((row) =>
+      passesFilters(row, { q, search, quickFilters, quick, filters, ticked })
+    );
     /* the advanced filter's conditions, last: its own matcher reads the keys */
     return advancedFilter && advanced.rows.length > 0
       ? applyAdvanced(kept, advanced, advancedFilter.keys)
@@ -571,9 +638,30 @@ function DataTable<Row>({
     setAdvanced(EMPTY_FILTER);
     resetPaging();
   };
+  /* THE EMPTY STATE'S BUTTON UNDOES WHAT IS ACTUALLY APPLIED (Pranjal, 2026-09-28: "clear filter should not be visible
+   * instead it should clear search because its based on search result ... when both search and filter are applied then
+   * show reset results or a better term which is industry used ... but button should be dynamic ... in every table").
+   * A search alone: Clear search, which leaves any filter alone. Filters alone: Clear filters, which keeps the words.
+   * Both: Clear all. The page's own wording for the empty button still wins when it gives one. */
+  const searching = query.trim() !== '';
+  const filtering = quickCount > 0 || filterCount > 0 || advancedCount > 0;
+  const emptyActionLabel = clearLabel(searching, filtering);
+  const clearSearch = () => {
+    setQuery('');
+    resetPaging();
+  };
+  const clearFilters = () => {
+    setQuick({});
+    setTicked({});
+    setAdvanced(EMPTY_FILTER);
+    resetPaging();
+  };
   const blankAction = () => {
-    if (blankKind === 'empty') clearAll();
-    else blank?.[blankKind ?? 'empty']?.onAction?.();
+    if (blankKind === 'empty') {
+      if (searching && !filtering) clearSearch();
+      else if (filtering && !searching) clearFilters();
+      else clearAll();
+    } else blank?.[blankKind ?? 'empty']?.onAction?.();
   };
   const rowIndex = (i: number) =>
     (pagingState.mode === 'pages' ? (pagingState.page - 1) * pagingState.pageSize : 0) + i + 1;
@@ -651,6 +739,11 @@ function DataTable<Row>({
             onQuery(e.target.value);
           }}
           startAdornment={<Icon name="search" size={14} />}
+          /* the ✕ clears the words at once (Pranjal, 2026-09-28) */
+          onClear={() => {
+            onQuery('');
+          }}
+          clearLabel="Clear search"
         />
       )}
       {filters.length > 0 && (
@@ -742,7 +835,7 @@ function DataTable<Row>({
             keys={advancedFilter.keys}
             value={advanced}
             onApply={(next) => {
-              /* the squares' ticks ride along into the applied rows, then the squares clear and hide (2026-09-26) */
+              /* the squares' ticks ride along into the applied rows, then the squares clear and are held (2026-09-26; held, not hidden, since 2026-09-27) */
               const folded = foldQuickIntoAdvanced(next, quick, quickFilters, advancedFilter.keys);
               setAdvanced(folded.advanced);
               setQuick(folded.quick);
@@ -755,117 +848,140 @@ function DataTable<Row>({
       )}
       {/* ONE SQUARE PER QUICK FILTER, in the order the page gives them (Pranjal,
           2026-09-12: Status and Organisation side by side on Service accounts) -
-          and NONE while an advanced filter is applied (Pranjal, 2026-09-26: "the
-          quick filters won't be visible"; their keys live in the panel then). */}
-      {shownQuickFilters.map((qf) => {
+          every one DISABLED while an advanced filter is applied (Pranjal,
+          2026-09-27: "make quick filter disabled instead of disappearing them";
+          their keys live in the panel then). The Tooltip's trigger is the span
+          around the square, because the disabled button takes no pointer; it is
+          held shut while the square is free, so nothing remounts. */}
+      {quickFilters.map((qf) => {
         const set = quick[qf.columnKey] ?? new Set<string>();
         return (
-          <DropdownMenu
-            key={qf.columnKey}
-            onOpenChange={(o) => {
-              if (!o) setQuickQuery((m) => ({ ...m, [qf.columnKey]: '' }));
-              /* the search box takes focus once the menu has placed its own (Radix focuses the content on mount) */ else if (
-                qf.searchable
-              )
-                window.setTimeout(() => quickSearchRefs.current[qf.columnKey]?.focus(), 0);
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <ToolbarButton
-                icon={
-                  qf.icon ??
-                  /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
-                       icon we used in users is different here"): one icon for the
-                       filter, in the strip and in the heading it filters. */
-                  allColumns.find((c) => c.key === qf.columnKey)?.glyph ?? (
-                    <Icon name="check-circle" />
-                  )
-                }
-                dot={set.size > 0}
-                aria-label={qf.label}
-                activeLabel="applied"
-              />
-            </DropdownMenuTrigger>
-            {/* THE MENU IS AS WIDE AS ITS LONGEST NAME, up to 380 (Pranjal, 2026-09-17:
+          <TooltipProvider key={qf.columnKey}>
+            <Tooltip {...(quickHeld ? {} : { open: false })}>
+              <TooltipTrigger asChild>
+                <span
+                  className={cn('mdt-inline-flex', quickHeld && 'mdt-cursor-not-allowed')}
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the only way a keyboard reaches the disabled square's words
+                  tabIndex={quickHeld ? 0 : undefined}
+                  data-quick-held={quickHeld ? 'true' : undefined}
+                >
+                  <DropdownMenu
+                    onOpenChange={(o) => {
+                      if (!o) setQuickQuery((m) => ({ ...m, [qf.columnKey]: '' }));
+                      /* the search box takes focus once the menu has placed its own (Radix focuses the content on mount) */ else if (
+                        qf.searchable
+                      )
+                        window.setTimeout(() => quickSearchRefs.current[qf.columnKey]?.focus(), 0);
+                    }}
+                  >
+                    {/* `disabled` on the trigger itself: Radix then ignores the pointer and the keys, not only the browser */}
+                    <DropdownMenuTrigger asChild disabled={quickHeld}>
+                      <ToolbarButton
+                        icon={
+                          qf.icon ??
+                          /* THE SQUARE WEARS THE COLUMN'S GLYPH (Pranjal, 2026-09-12: "the status
+                             icon we used in users is different here"): one icon for the
+                             filter, in the strip and in the heading it filters. */
+                          allColumns.find((c) => c.key === qf.columnKey)?.glyph ?? (
+                            <Icon name="check-circle" />
+                          )
+                        }
+                        dot={set.size > 0}
+                        aria-label={qf.label}
+                        activeLabel="applied"
+                        disabled={quickHeld}
+                        aria-disabled={quickHeld ? true : undefined}
+                      />
+                    </DropdownMenuTrigger>
+                    {/* THE MENU IS AS WIDE AS ITS LONGEST NAME, up to 380 (Pranjal, 2026-09-17:
                 "increase the width of the drop down. And truncate it after 40-50
                 characters. But till then width should be flexible"): past 380 a name
                 ends in an ellipsis and carries its full text as a title. A menu with a
                 search box starts at 240 so the box has room; one without keeps 192. */}
-            <DropdownMenuContent
-              align="start"
-              className={cn(
-                'mdt-w-max mdt-max-w-[380px]',
-                qf.searchable ? 'mdt-min-w-[240px]' : 'mdt-min-w-48'
-              )}
-            >
-              {qf.searchable && (
-                /* the search box (Pranjal, 2026-09-17: "it will contain search box as
+                    <DropdownMenuContent
+                      align="start"
+                      className={cn(
+                        'mdt-w-max mdt-max-w-[380px]',
+                        qf.searchable ? 'mdt-min-w-[240px]' : 'mdt-min-w-48'
+                      )}
+                    >
+                      {qf.searchable && (
+                        /* the search box (Pranjal, 2026-09-17: "it will contain search box as
                    well"): keys stay in the box - the menu's own type-ahead and arrow
                    handling would otherwise swallow them */
-                <div className="mdt-p-1 mdt-pb-2">
-                  <Input
-                    ref={(el) => {
-                      quickSearchRefs.current[qf.columnKey] = el;
-                    }}
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                    }}
-                    size="sm"
-                    className="mdt-rounded-lg"
-                    value={quickQuery[qf.columnKey] ?? ''}
-                    onChange={(e) => {
-                      setQuickQuery((m) => ({ ...m, [qf.columnKey]: e.target.value }));
-                    }}
-                    placeholder="Search"
-                    aria-label={`Search ${qf.label.replace(/^Filter by /i, '')}`}
-                    startAdornment={<Icon name="search" size={14} />}
-                  />
-                </div>
-              )}
-              {(() => {
-                const needle = (quickQuery[qf.columnKey] ?? '').trim().toLowerCase();
-                const shown = needle
-                  ? qf.options.filter((o) => o.toLowerCase().includes(needle))
-                  : qf.options;
-                if (shown.length === 0) {
-                  return (
-                    <div className="mdt-px-2.5 mdt-py-2 mdt-text-[13px] mdt-text-neutral-60">
-                      No matches
-                    </div>
-                  );
-                }
-                return shown.map((o) => (
-                  <DropdownMenuCheckboxItem
-                    key={o}
-                    /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
+                        <div className="mdt-p-1 mdt-pb-2">
+                          <Input
+                            ref={(el) => {
+                              quickSearchRefs.current[qf.columnKey] = el;
+                            }}
+                            onKeyDown={(e) => {
+                              e.stopPropagation();
+                            }}
+                            size="sm"
+                            className="mdt-rounded-lg"
+                            value={quickQuery[qf.columnKey] ?? ''}
+                            onChange={(e) => {
+                              setQuickQuery((m) => ({ ...m, [qf.columnKey]: e.target.value }));
+                            }}
+                            placeholder="Search"
+                            aria-label={`Search ${qf.label.replace(/^Filter by /i, '')}`}
+                            startAdornment={<Icon name="search" size={14} />}
+                            onClear={() => {
+                              setQuickQuery((m) => ({ ...m, [qf.columnKey]: '' }));
+                            }}
+                            clearLabel="Clear search"
+                          />
+                        </div>
+                      )}
+                      {(() => {
+                        const needle = (quickQuery[qf.columnKey] ?? '').trim().toLowerCase();
+                        const shown = needle
+                          ? qf.options.filter((o) => o.toLowerCase().includes(needle))
+                          : qf.options;
+                        if (shown.length === 0) {
+                          return (
+                            <div className="mdt-px-2.5 mdt-py-2 mdt-text-[13px] mdt-text-neutral-60">
+                              No matches
+                            </div>
+                          );
+                        }
+                        return shown.map((o) => (
+                          <DropdownMenuCheckboxItem
+                            key={o}
+                            /* THE ROW CARRIES A CHECKBOX (Pranjal, 2026-09-12: "i need checkboxes
                          here"), as the Filters panel's rows do and as Users' quick filter
                          always has: a person sees at a glance which values are on and
                          that several can be. The menu's own tick, which only appears
                          once checked, is hidden in favour of the box. */
-                    className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
-                    checked={set.has(o)}
-                    onSelect={(e) => {
-                      e.preventDefault();
-                    }}
-                    onCheckedChange={(v) => {
-                      tickQuick(qf.columnKey, o, v);
-                      resetPaging();
-                    }}
-                  >
-                    <Checkbox
-                      className="mdt-pointer-events-none mdt-border-neutral-40"
-                      checked={set.has(o)}
-                      tabIndex={-1}
-                      aria-hidden="true"
-                    />
-                    <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate" title={o}>
-                      {qf.renderOption ? qf.renderOption(o) : o}
-                    </span>
-                  </DropdownMenuCheckboxItem>
-                ));
-              })()}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                            className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
+                            checked={set.has(o)}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                            }}
+                            onCheckedChange={(v) => {
+                              tickQuick(qf.columnKey, o, v);
+                              resetPaging();
+                            }}
+                          >
+                            <Checkbox
+                              className="mdt-pointer-events-none mdt-border-neutral-40"
+                              checked={set.has(o)}
+                              tabIndex={-1}
+                              aria-hidden="true"
+                            />
+                            <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate" title={o}>
+                              {qf.renderOption ? qf.renderOption(o) : o}
+                            </span>
+                          </DropdownMenuCheckboxItem>
+                        ));
+                      })()}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{QUICK_HELD_HINT}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         );
       })}
       <ToolbarSpacer />
@@ -966,6 +1082,7 @@ function DataTable<Row>({
         label={label}
         divider={divider}
         docked={docked}
+        dockOffset={dockOffset}
         style={tableMorphOf(docked).driven ? { height: maxHeight } : undefined}
       >
         <TableViewport
@@ -1030,7 +1147,7 @@ function DataTable<Row>({
                   menu={headMenu(c)}
                   glyph={c.glyph}
                   filtered={
-                    !quickHidden &&
+                    !quickHeld &&
                     quickFilters.some(
                       (qf) => qf.columnKey === c.key && (quick[qf.columnKey]?.size ?? 0) > 0
                     )
@@ -1115,7 +1232,10 @@ function DataTable<Row>({
                                 <Icon name="more-horizontal" size={16} strokeWidth={1.5} />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="mdt-w-48">
+                            {/* 192px is the floor, not the width (2026-10-09, Pranjal: "if theres a name which is bigger
+                                than the card than increase the width of the card accordingly"): a long item widens the
+                                menu instead of being cut off */}
+                            <DropdownMenuContent align="start" className="mdt-min-w-48">
                               {rowActions(row)}
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1154,7 +1274,9 @@ function DataTable<Row>({
             kind={blankKind}
             title={blank?.[blankKind]?.title}
             body={blank?.[blankKind]?.body}
-            action={blank?.[blankKind]?.action}
+            action={
+              blank?.[blankKind]?.action ?? (blankKind === 'empty' ? emptyActionLabel : undefined)
+            }
             onAction={
               blankKind === 'empty' || blank?.[blankKind]?.onAction ? blankAction : undefined
             }

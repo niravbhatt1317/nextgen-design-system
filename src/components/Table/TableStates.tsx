@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
@@ -31,14 +32,47 @@ const COPY: Record<
 /**
  * The three blank states, centred in the visible card: nothing yet, nothing
  * found, could not load. An icon, a title, one line, one button.
+ *
+ * CENTRED IN WHAT YOU CAN SEE (Pranjal, 2026-09-28: "in empty state why are not showing it in the middle of the table
+ * its hiding at the bottom a little getting cutoff as well. It should be in the middle based on the view port. as in
+ * table viewport."). The page-filling card is as tall as the room under the dock line, so at rest its foot sits below
+ * the window; a fixed 300px block under an ever-growing viewport landed at that foot, half off screen. Now the block
+ * takes the card's whole body (300 at least - a card with no page to fill looks as before), and the part of it hidden
+ * below the window becomes bottom padding, so the message sits in the middle of the visible table and moves back to
+ * the true middle as the page scrolls the card up.
  */
 function TableBlank({ kind, title, body, action, onAction }: TableBlankProps) {
   const c = COPY[kind];
   const primary = kind === 'first';
+  const ref = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el === null) return undefined;
+    let page: HTMLElement | null = el.parentElement;
+    while (page !== null && !/(auto|scroll)/.test(getComputedStyle(page).overflowY)) page = page.parentElement;
+    const place = (): void => {
+      el.style.paddingBottom = '';
+      const box = el.getBoundingClientRect();
+      const bottom = Math.min(window.innerHeight, page ? page.getBoundingClientRect().bottom : window.innerHeight);
+      const hidden = Math.max(0, Math.round(box.bottom - bottom));
+      /* never so much that the message would have less than the 300 it always had */
+      const room = Math.max(0, box.height - 300);
+      if (hidden > 0) el.style.paddingBottom = `${String(24 + Math.min(hidden, room))}px`;
+    };
+    place();
+    const target: HTMLElement | Window = page ?? window;
+    target.addEventListener('scroll', place, { passive: true });
+    window.addEventListener('resize', place);
+    return () => {
+      target.removeEventListener('scroll', place);
+      window.removeEventListener('resize', place);
+    };
+  }, []);
   return (
     <div
+      ref={ref}
       role="status"
-      className="mdt-flex mdt-h-[300px] mdt-flex-col mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-p-6 mdt-text-center"
+      className="tbl-blank mdt-flex mdt-min-h-[300px] mdt-flex-1 mdt-flex-col mdt-items-center mdt-justify-center mdt-gap-1.5 mdt-p-6 mdt-text-center"
     >
       <span
         className={cn(

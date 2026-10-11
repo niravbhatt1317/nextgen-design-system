@@ -153,6 +153,13 @@ export interface DataTableProps<Row> {
    */
   docked?: boolean | number | undefined;
   /**
+   * Where the page pins the card, in px - handed to the card's own `dockOffset`. Leave it out and the card reads the
+   * frame's published offset once, on mount. Pass it when something pinned above the table comes and goes after that
+   * (a page-wide banner under the header, 2026-09-30): the card re-sizes to the new line and its heading stops below
+   * it instead of under it.
+   */
+  dockOffset?: number | undefined;
+  /**
    * The strip above the table: search, Filters, the quick filter, Sort and
    * Columns. ON by default.
    *
