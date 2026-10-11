@@ -475,7 +475,8 @@ const Icon = forwardRef<SVGSVGElement, IconProps>(
     {
       size = 'md',
       color = 'current',
-      strokeWidth = 2,
+      /* thin line everywhere (Pranjal, 2026-10-11: the console's design picks chose the 1.5 line over 2) */
+      strokeWidth = 1.5,
       className,
       'aria-label': ariaLabel,
       'aria-hidden': ariaHidden = false,

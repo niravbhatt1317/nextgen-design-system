@@ -50,7 +50,7 @@ interface IconBaseProps
 
   /**
    * Stroke width for the icon
-   * @default 2
+   * @default 1.5 (2026-10-11; was 2)
    */
   strokeWidth?: number;
 

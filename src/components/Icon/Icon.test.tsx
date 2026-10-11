@@ -95,11 +95,11 @@ describe('Icon', () => {
   });
 
   describe('Stroke Width', () => {
-    it('applies default stroke width of 2', () => {
+    it('applies default stroke width of 1.5', () => {
       const { container } = render(<Icon name="user" aria-label="User" />);
       const svg = container.querySelector('svg');
       // React renders strokeWidth as stroke-width attribute in the DOM
-      expect(svg).toHaveAttribute('stroke-width', '2');
+      expect(svg).toHaveAttribute('stroke-width', '1.5');
     });
 
     it('applies custom stroke width', () => {
