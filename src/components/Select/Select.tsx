@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
+import { Input } from '../Input';
 import type {
   SelectOption,
   SelectProps,
@@ -832,25 +833,23 @@ function renderMultiSelectSearchInput(props: {
 
   return (
     <div className="mdt-border-b mdt-p-2">
-      <input
+      {/* the library field (Pranjal, 2026-10-11: every search clears with its ✕ and Escape); with nothing typed, Escape
+       * passes through and closes the list as before */}
+      <Input
         type="text"
+        size="sm"
         placeholder={_searchPlaceholder}
+        aria-label={_searchPlaceholder}
         value={searchQuery}
         onChange={(e) => {
           handleSearchChange(e.target.value);
         }}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
+        onClear={() => {
+          handleSearchChange('');
+        }}
+        clearLabel="Clear search"
+        // eslint-disable-next-line jsx-a11y/no-autofocus -- the list opens to type into its search
         autoFocus={_autoFocus}
-        className={cn(
-          'mdt-flex mdt-h-8 mdt-w-full mdt-rounded-lg',
-          'mdt-border mdt-border-neutral-30 mdt-bg-background mdt-font-medium mdt-text-neutral-130',
-          'mdt-px-3 mdt-py-1 mdt-text-sm',
-          'placeholder:mdt-font-normal placeholder:mdt-text-faint',
-          'hover:mdt-border-primary',
-          'focus:mdt-border-primary focus:mdt-outline-none ' +
-            'focus:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]',
-          'disabled:mdt-cursor-not-allowed disabled:mdt-bg-neutral-10'
-        )}
       />
     </div>
   );
