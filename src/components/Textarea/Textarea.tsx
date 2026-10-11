@@ -13,6 +13,12 @@ export const textareaVariants = cva(
   [
     /* THE FIELD (Pranjal, 2026-09-17) - the same box as the Input, grown */
     'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
+    /* THE FORM LADDER (Pranjal, 2026-09-17; the value's ink 2026-09-27): what a
+     * person typed is READING text - the reading ink at 14/500, the same as a
+     * picked Select value - and the placeholder stays faint at 400. The two had
+     * been one weight and one ink apart from each other, so a filled field read
+     * like an empty one. The weight is set here and undone on the placeholder,
+     * because a placeholder inherits it otherwise. */
     'mdt-bg-background mdt-font-medium mdt-text-neutral-130',
     'mdt-transition-[border-color,box-shadow]',
     'placeholder:mdt-font-normal placeholder:mdt-text-faint',
@@ -27,6 +33,7 @@ export const textareaVariants = cva(
        * Size variant of the textarea
        */
       size: {
+        /* 14, not 13: the ladder's reading text (2026-09-17). */
         sm: 'mdt-min-h-[80px] mdt-px-3 mdt-py-2 mdt-text-sm',
         md: 'mdt-min-h-[100px] mdt-px-3 mdt-py-2 mdt-text-sm',
         lg: 'mdt-min-h-[120px] mdt-px-4 mdt-py-3 mdt-text-base',

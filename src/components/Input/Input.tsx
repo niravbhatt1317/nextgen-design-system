@@ -18,6 +18,12 @@ export const InputVariants = cva(
      * the pointer the border is the primary colour; focused, the same border with a 3-px halo of it; disabled sits on
      * neutral-10 in the placeholder colour, not dimmed. */
     'mdt-flex mdt-w-full mdt-rounded-lg mdt-border mdt-border-neutral-30',
+    /* THE FORM LADDER (Pranjal, 2026-09-17; the value's ink 2026-09-27): what a
+     * person typed is READING text - the reading ink at 14/500, the same as a
+     * picked Select value - and the placeholder stays faint at 400. The two had
+     * been one weight and one ink apart from each other, so a filled field read
+     * like an empty one. The weight is set here and undone on the placeholder,
+     * because a placeholder inherits it otherwise. */
     'mdt-bg-background mdt-font-medium mdt-text-neutral-130',
     'mdt-transition-[border-color,box-shadow]',
     'file:mdt-border-0 file:mdt-bg-transparent file:mdt-text-sm file:mdt-font-medium',
@@ -34,6 +40,7 @@ export const InputVariants = cva(
        */
       size: {
         /* the field's text is 13 (Pranjal, 2026-09-17) - text-xs is 12 */
+        /* 14, not 13: the ladder's reading text, in the 32 box (2026-09-17). */
         sm: 'mdt-h-8 mdt-px-3 mdt-text-sm',
         md: 'mdt-h-9 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-px-4 mdt-text-base',

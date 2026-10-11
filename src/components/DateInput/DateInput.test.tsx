@@ -59,7 +59,9 @@ describe('DateInput', () => {
       expect(screen.getByLabelText('Expires on')).toHaveTextContent('22 Oct 2026');
     });
 
-    it('wears the field box: 32 high, corners 8, the 14 text', () => {
+    it('wears the field box: 32 high, corners 8, the ladder’s 14 text', () => {
+      /* It borrows the Input's box, so the form ladder reaches it too
+       * (Pranjal, 2026-09-17): 14, not 13, in the same 32 slot. */
       render(<DateInput aria-label="Expires on" />);
       expect(field()).toHaveClass('mdt-h-8', 'mdt-rounded-lg', 'mdt-text-sm');
     });
