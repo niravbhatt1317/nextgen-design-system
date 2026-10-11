@@ -59,8 +59,8 @@ describe('Textarea', () => {
       render(<Textarea size="sm" label="Small" />);
       const textarea = screen.getByLabelText('Small');
       expect(textarea).toHaveClass('mdt-min-h-[80px]');
-      // the field's text is 13 (Pranjal, 2026-09-17) - text-xs is 12
-      expect(textarea).toHaveClass('mdt-text-[13px]');
+      // 14, the form ladder's reading text (Pranjal, 2026-09-17) - text-sm is 14
+      expect(textarea).toHaveClass('mdt-text-sm');
     });
 
     it('renders medium size (default)', () => {
