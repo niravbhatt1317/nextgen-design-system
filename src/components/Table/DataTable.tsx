@@ -56,7 +56,7 @@ import { useTableColumns } from './useTableColumns';
 import { useTablePaging } from './useTablePaging';
 import { useTableSelection } from './useTableSelection';
 import { useTableSort } from './useTableSort';
-import type { DataTableProps, DataTableQuickFilter } from './DataTable.types';
+import type { DataTableFilterGroup, DataTableProps, DataTableQuickFilter } from './DataTable.types';
 import type { TableColumnDef, TableSortDirection } from './Table.types';
 
 const ACTION_WIDTH = 100;
@@ -269,6 +269,74 @@ function loadMoreWanted(mode: 'auto' | 'always' | 'never', shown: number, total:
   return shown < total;
 }
 
+/**
+ * What the empty state's one action says: it has to name what it will clear, or
+ * somebody presses "Clear filters" and loses their search as well.
+ *
+ * Its own function because the component sits on the cognitive-complexity limit,
+ * and a three-way label is the cheapest branch to lift out of it.
+ */
+function clearLabel(searching: boolean, filtering: boolean): string {
+  if (searching && filtering) return 'Clear all';
+  return searching ? 'Clear search' : 'Clear filters';
+}
+
+/**
+ * Does one row survive the search box, the quick filters and the filter menus?
+ *
+ * Every rule here is "narrow unless it matches", so the first failure returns.
+ * The advanced filter is NOT here: it reads its own keys and runs over what is
+ * left, after this.
+ *
+ * A function of its own because `DataTable` was one branch over the complexity
+ * limit and this is the densest, most self-contained part of it - three nested
+ * loops of conditions that answer one question and touch no state.
+ */
+function passesFilters<Row>(
+  row: Row,
+  f: {
+    q: string;
+    search: DataTableProps<Row>['search'];
+    quickFilters: DataTableQuickFilter<Row>[];
+    quick: Record<string, Set<string>>;
+    filters: DataTableFilterGroup<Row>[];
+    ticked: Record<string, Set<string>>;
+  }
+): boolean {
+  if (f.q && f.search && !f.search.match(row, f.q)) return false;
+  for (const qf of f.quickFilters) {
+    const s = f.quick[qf.columnKey];
+    if (!s || s.size === 0) continue;
+    const v = qf.value(row);
+    const values = Array.isArray(v) ? v : [v];
+    if (!values.some((x) => s.has(x))) return false;
+  }
+  for (const g of f.filters) {
+    const s = f.ticked[g.key];
+    if (s && s.size > 0 && !g.match(row, s)) return false;
+  }
+  return true;
+}
+
+/**
+ * One quick-filter value ticked or unticked, as a new map.
+ *
+ * Lifted out of `DataTable` because it is pure and the component was one branch
+ * over the complexity limit with it inline - the add/remove fork counts against a
+ * function that already carries the whole table. Nothing here reads state.
+ */
+function withTick(
+  all: Record<string, Set<string>>,
+  key: string,
+  value: string,
+  on: boolean
+): Record<string, Set<string>> {
+  const next = new Set(all[key] ?? []);
+  if (on) next.add(value);
+  else next.delete(value);
+  return { ...all, [key]: next };
+}
+
 function DataTable<Row>({
   label,
   noun = 'rows',
@@ -316,12 +384,7 @@ function DataTable<Row>({
   );
   const quickCount = useMemo(() => Object.values(quick).reduce((t, s) => t + s.size, 0), [quick]);
   const tickQuick = (key: string, value: string, on: boolean) => {
-    setQuick((all) => {
-      const next = new Set(all[key] ?? []);
-      if (on) next.add(value);
-      else next.delete(value);
-      return { ...all, [key]: next };
-    });
+    setQuick((all) => withTick(all, key, value, on));
   };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   /* the advanced filter's applied rows, and whether its panel is open (the door toggles it) */
@@ -392,21 +455,9 @@ function DataTable<Row>({
   );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const kept = rows.filter((row) => {
-      if (q && search && !search.match(row, q)) return false;
-      for (const qf of quickFilters) {
-        const s = quick[qf.columnKey];
-        if (!s || s.size === 0) continue;
-        const v = qf.value(row);
-        const values = Array.isArray(v) ? v : [v];
-        if (!values.some((x) => s.has(x))) return false;
-      }
-      for (const g of filters) {
-        const s = ticked[g.key];
-        if (s && s.size > 0 && !g.match(row, s)) return false;
-      }
-      return true;
-    });
+    const kept = rows.filter((row) =>
+      passesFilters(row, { q, search, quickFilters, quick, filters, ticked })
+    );
     /* the advanced filter's conditions, last: its own matcher reads the keys */
     return advancedFilter && advanced.rows.length > 0
       ? applyAdvanced(kept, advanced, advancedFilter.keys)
@@ -594,7 +645,7 @@ function DataTable<Row>({
    * Both: Clear all. The page's own wording for the empty button still wins when it gives one. */
   const searching = query.trim() !== '';
   const filtering = quickCount > 0 || filterCount > 0 || advancedCount > 0;
-  const emptyActionLabel = searching && filtering ? 'Clear all' : searching ? 'Clear search' : 'Clear filters';
+  const emptyActionLabel = clearLabel(searching, filtering);
   const clearSearch = () => {
     setQuery('');
     resetPaging();
@@ -1223,7 +1274,9 @@ function DataTable<Row>({
             kind={blankKind}
             title={blank?.[blankKind]?.title}
             body={blank?.[blankKind]?.body}
-            action={blank?.[blankKind]?.action ?? (blankKind === 'empty' ? emptyActionLabel : undefined)}
+            action={
+              blank?.[blankKind]?.action ?? (blankKind === 'empty' ? emptyActionLabel : undefined)
+            }
             onAction={
               blankKind === 'empty' || blank?.[blankKind]?.onAction ? blankAction : undefined
             }
