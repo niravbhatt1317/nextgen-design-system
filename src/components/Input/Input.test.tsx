@@ -281,3 +281,19 @@ describe('Escape clears (2026-10-11)', () => {
     expect(onKeyDown).toHaveBeenCalled();
   });
 });
+
+describe('Escape inside a layer that closes on Escape (2026-10-11)', () => {
+  it('clears first and keeps the Escape from the document', async () => {
+    const user = userEvent.setup();
+    const onClear = vi.fn();
+    const heard = vi.fn();
+    document.addEventListener('keydown', heard, true);
+    render(
+      <Input placeholder="Search members" value="ana" onChange={() => {}} onClear={onClear} />
+    );
+    await user.type(screen.getByPlaceholderText('Search members'), '{Escape}');
+    document.removeEventListener('keydown', heard, true);
+    expect(onClear).toHaveBeenCalledTimes(1);
+    expect(heard).not.toHaveBeenCalled();
+  });
+});
