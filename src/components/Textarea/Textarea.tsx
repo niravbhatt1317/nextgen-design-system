@@ -108,6 +108,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       helperText,
       locked,
       disabled,
+      required,
       id: propId,
       ...props
     },
@@ -134,6 +135,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
             {label}
+            {/* the asterisk in the danger red, 3 after the label - as the Input and the console draw it (K-Field-05) */}
+            {required && <span className="mdt-ml-[3px] mdt-text-destructive">*</span>}
           </label>
         )}
         <div className="mdt-relative mdt-flex">
@@ -148,6 +151,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             aria-invalid={hasError}
             aria-describedby={describedBy}
             disabled={held || disabled}
+            required={required}
             {...props}
           />
           {held && (
