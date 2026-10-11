@@ -1,6 +1,6 @@
-import { forwardRef, useId, useState } from 'react';
+import { forwardRef, useId, useRef, useState } from 'react';
 import { cn } from '@/utils';
-import { DatePicker, formatDay } from '../DatePicker';
+import { DatePicker, formatDateTime, formatDay } from '../DatePicker';
 import { Icon } from '../Icon';
 import { InputVariants } from '../Input/Input';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
@@ -19,10 +19,13 @@ import type { DateInputProps } from './DateInput.types';
  * 12 from the edge (K-Field-28); held, the 14 lock takes its place and the
  * value truncates before it (K-Field-11).
  *
- * Click, Enter or Space opens the DatePicker below in the library Popover;
- * picking a day, Clear, Done and Escape close it. The value is a DAY,
- * "YYYY-MM-DD", shown as "22 Oct 2026" - three-letter months always, never the
- * browser's "Sept".
+ * Click, Enter or Space opens the DatePicker in the library Popover - below the
+ * field, above it when there is no room - with the focus on the picked day (or
+ * today). Choices there are a draft: Apply saves and closes, Escape or a press
+ * outside closes without saving, and the focus returns to the field. The value
+ * is a DAY, "YYYY-MM-DD", shown as "22 Oct 2026" - three-letter months always,
+ * never the browser's "Sept". With `withTime` (a developer setting, never a
+ * switch people see) it is "YYYY-MM-DDTHH:mm", shown as "13 Oct 2026, 14:30".
  *
  * @example
  * <DateInput label="Expires on" value={day} onChange={setDay} min={todayAsDay} />
@@ -33,7 +36,9 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     {
       value,
       onChange,
-      placeholder = 'Pick a date',
+      withTime = false,
+      timeStep,
+      placeholder,
       min,
       max,
       disabled,
@@ -60,14 +65,17 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     const hasError = Boolean(error);
     const [open, setOpen] = useState(false);
 
-    const shown = formatDay(value);
+    const panelRef = useRef<HTMLDivElement>(null);
+
+    const shown = withTime ? formatDateTime(value) : formatDay(value);
+    const empty = placeholder ?? (withTime ? 'Pick a date and time' : 'Pick a date');
     const filled = shown !== '';
 
     const close = () => {
       setOpen(false);
     };
-    const pick = (day: string) => {
-      onChange?.(day);
+    const apply = (next: string) => {
+      onChange?.(next);
       close();
     };
 
@@ -113,17 +121,15 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
                 )}
                 {...rest}
               >
-                <span className={cn('mdt-truncate', !filled && 'mdt-text-faint')}>
-                  {filled ? shown : placeholder}
+                <span className={cn('mdt-truncate', !filled && 'mdt-font-normal mdt-text-faint')}>
+                  {filled ? shown : empty}
                 </span>
               </button>
             </PopoverTrigger>
             <span
-              /* the lock in the disabled text colour (K-Field-11); the calendar glyph as it was */
-              className={cn(
-                'mdt-pointer-events-none mdt-absolute mdt-right-3 mdt-flex mdt-items-center',
-                held ? 'mdt-text-faint' : 'mdt-text-neutral-70'
-              )}
+              /* the lock and the calendar glyph both in the faint ink #8FA0BD, as the console's date field draws its glyph
+               * (measured 2026-09-22; the library's neutral-70 is a different grey, C-112) */
+              className="mdt-pointer-events-none mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint"
               aria-hidden
             >
               {held ? (
@@ -134,23 +140,27 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             </span>
           </div>
           <PopoverContent
+            ref={panelRef}
             align="start"
+            /* 4 under the field (above it when there is no room below - Radix flips it), corners 12, the panel's
+             * own padding inside the picker; the overlay ground, the neutral-30 hairline and the lg shadow */
             sideOffset={4}
-            className="mdt-w-auto mdt-rounded-2xl mdt-p-5"
+            collisionPadding={8}
+            className="mdt-w-auto mdt-rounded-xl mdt-p-0"
+            onOpenAutoFocus={(e) => {
+              /* the focus lands on the picked day (or today), not on the first arrow */
+              e.preventDefault();
+              panelRef.current?.querySelector<HTMLElement>('[data-day][tabindex="0"]')?.focus();
+            }}
           >
             <DatePicker
               value={value}
+              withTime={withTime}
+              timeStep={timeStep}
               min={min}
               max={max}
-              onChange={pick}
-              onClear={
-                clearable
-                  ? () => {
-                      pick('');
-                    }
-                  : undefined
-              }
-              onDone={close}
+              clearable={clearable}
+              onChange={apply}
               aria-label={calendarName}
             />
           </PopoverContent>

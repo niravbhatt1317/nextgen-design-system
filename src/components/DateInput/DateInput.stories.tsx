@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { userEvent, within } from 'storybook/test';
 import { toDay } from '../DatePicker';
 import { Input } from '../Input';
 import { DateInput } from './DateInput';
@@ -17,7 +18,10 @@ import type { DateInputProps } from './DateInput.types';
  * the message under at 12. The calendar glyph is 16 at the RIGHT, 12 from the
  * edge, and the calendar opens below (K-Field-28). The value is a DAY,
  * "YYYY-MM-DD", shown as "22 Oct 2026" - three-letter months, never the
- * browser's "Sept". No time: expiry is day-only (Pranjal, 2026-09-22).
+ * browser's "Sept". With `withTime` (2026-09-28, a developer setting, never a
+ * switch people see) the popover gains the time column and the value is
+ * "YYYY-MM-DDTHH:mm", shown as "13 Oct 2026, 14:30". Choices in the popover
+ * are a draft until Apply.
  */
 const meta: Meta<typeof DateInput> = {
   title: 'New Components/DateInput',
@@ -28,7 +32,7 @@ const meta: Meta<typeof DateInput> = {
     docs: {
       description: {
         component:
-          'The date field: the Input\'s box (32 high, corners 8, 13 text in neutral-90, placeholder neutral-70, neutral-30 edge, 12 at the sides) as a button, with the 16 calendar glyph at the right, 12 from the edge. Hover turns the border primary; focus and open add the 3-px 8% halo; disabled sits on neutral-10 in the placeholder colour; held swaps the glyph for the 14 lock and truncates the value before it; error is the danger border with the red halo and a 12 message under. Click, Enter or Space opens the DatePicker below in the library Popover; a pick, Clear, Done or Escape closes it. The value is a day, "YYYY-MM-DD", shown as "22 Oct 2026". There is no time option; `withTime` is a later addition, not built.',
+          'The date field: the Input\'s box (32 high, corners 8, 13 text in neutral-90, placeholder neutral-70, neutral-30 edge, 12 at the sides) as a button, with the 16 calendar glyph at the right, 12 from the edge. Hover turns the border primary; focus and open add the 3-px 8% halo; disabled sits on neutral-10 in the placeholder colour; held swaps the glyph for the 14 lock and truncates the value before it; error is the danger border with the red halo and a 12 message under. Click, Enter or Space opens the DatePicker below the field in the library Popover (above it when there is no room), the focus on the picked day. Choices there are a draft: Apply saves and closes; Escape or a press outside closes without saving; the focus returns to the field. The value is a day, "YYYY-MM-DD", shown as "22 Oct 2026"; with `withTime` (a developer setting) it is "YYYY-MM-DDTHH:mm", shown as "13 Oct 2026, 14:30", and the popover gains the time column. `clearable` lets Reset + Apply empty the field ("").',
       },
     },
   },
@@ -51,8 +55,9 @@ const plusDays = (n: number) => {
   return iso(d);
 };
 
-/** Empty: "Pick a date" in the placeholder colour (neutral-70), the calendar glyph 16 at the right. Click it - the calendar opens below, 4 under the field. */
+/** Empty: "Pick a date" in the placeholder colour, the calendar glyph 16 at the right. Click it - the picker opens below, 4 under the field. */
 export const Default: Story = {
+  name: 'Date',
   render: () => (
     <div className="mdt-w-[220px]">
       <Demo label="Expires on" />
@@ -111,8 +116,55 @@ export const States: Story = {
   ),
 };
 
-/** Bounds from today to 90 days out: the calendar greys every earlier and later day and its month nav stops at the bound. Useful for an expiry that cannot sit in the past. */
+/** `withTime`: "13 Oct 2026, 14:30". Open it - the calendar and the time column side by side, the list opened on 14:30; pick, then Apply. */
+export const DateAndTime: Story = {
+  name: 'Date & time',
+  render: () => (
+    <div className="mdt-w-[240px]">
+      <Demo label="Starts at" withTime initial="2026-10-13T14:30" />
+    </div>
+  ),
+};
+
+/** The popover open, date only - the panel hugs its days. */
+export const DateOpen: Story = {
+  name: 'Date · open',
+  render: () => (
+    <div className="mdt-h-[440px] mdt-w-[240px]">
+      <Demo label="Expires on" initial="2026-10-13" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Expires on' }));
+  },
+};
+
+/** The popover open with time - one fixed height, the time column beside the calendar. */
+export const DateAndTimeOpen: Story = {
+  name: 'Date & time · open',
+  render: () => (
+    <div className="mdt-h-[480px] mdt-w-[240px]">
+      <Demo label="Starts at" withTime initial="2026-10-13T14:30" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Starts at' }));
+  },
+};
+
+/** Near the bottom of the page the popover opens ABOVE the field (the library Popover flips when there is no room below). */
+export const FlipsAbove: Story = {
+  name: 'Flips above',
+  render: () => (
+    <div className="mdt-flex mdt-h-[560px] mdt-w-[240px] mdt-flex-col mdt-justify-end">
+      <Demo label="Expires on" initial="2026-10-13" />
+    </div>
+  ),
+};
+
+/** Bounds from today to 90 days out: the calendar greys every earlier and later day, month and year, and its arrows stop at the bound. Useful for an expiry that cannot sit in the past. */
 export const WithBounds: Story = {
+  name: 'With min / max',
   render: () => (
     <div className="mdt-w-[220px]">
       <Demo
@@ -125,7 +177,7 @@ export const WithBounds: Story = {
   ),
 };
 
-/** In a form beside a text field: the same label (13 in neutral-90, 6 under it), the same 32 box, the same edge. `clearable` adds Clear to the calendar, which reports "" and closes. */
+/** In a form beside a text field: the same label (13 in neutral-90, 6 under it), the same 32 box, the same edge. `clearable` lets Reset then Apply empty the field, reporting "". */
 export const InAForm: Story = {
   render: function InAFormStory() {
     const [name, setName] = useState('Night shift access');

@@ -6,7 +6,8 @@ export type DateInputSize = 'sm' | 'md' | 'lg';
 /**
  * Props for the DateInput - the date field.
  *
- * The field is a button: it holds a day and opens the calendar. It wears the
+ * The field is a button: it holds a day (or, with `withTime`, a day and a time) and opens the
+ * picker below it - above when there is no room. It wears the
  * Input's ruled states (K-Field-01..12) and takes the calendar glyph at the
  * right (K-Field-28), or the lock when held (K-Field-11).
  */
@@ -14,11 +15,21 @@ export interface DateInputProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'value' | 'onChange' | 'disabled' | 'type'
 > {
-  /** The chosen day, "YYYY-MM-DD". Shown as "22 Oct 2026". */
+  /**
+   * The saved value. "YYYY-MM-DD", shown as "22 Oct 2026"; with `withTime`, "YYYY-MM-DDTHH:mm"
+   * (local, 24-hour), shown as "13 Oct 2026, 14:30".
+   */
   value?: string | undefined;
-  /** Fires with the picked day as "YYYY-MM-DD"; with "" when cleared. */
-  onChange?: ((day: string) => void) | undefined;
-  /** What the empty field says, in the placeholder colour. Defaults to "Pick a date". */
+  /** Fires on Apply with the value in the same shape; with "" when a `clearable` field is emptied. */
+  onChange?: ((value: string) => void) | undefined;
+  /**
+   * A developer setting, never a switch shown to people: the picker gains the time column and
+   * the value carries the time. Default false.
+   */
+  withTime?: boolean | undefined;
+  /** Minutes between the times in the column. Default 30. */
+  timeStep?: number | undefined;
+  /** What the empty field says, in the placeholder colour. Defaults to "Pick a date" ("Pick a date and time" with `withTime`). */
   placeholder?: string | undefined;
   /** The earliest day that can be picked, "YYYY-MM-DD". */
   min?: string | undefined;
@@ -40,7 +51,10 @@ export interface DateInputProps extends Omit<
   label?: ReactNode | undefined;
   /** 32 (sm, the default) · 36 (md) · 40 (lg) */
   size?: DateInputSize | undefined;
-  /** Shows a Clear button in the calendar; clearing reports "" and closes. */
+  /**
+   * Lets the field be emptied: after Reset in the picker, Apply stays on, reports "" and closes.
+   * (Before 2026-09-28 this showed a Clear button; Reset now sits in every picker.)
+   */
   clearable?: boolean | undefined;
   /** The accessible name when there is no label. */
   'aria-label'?: string | undefined;
