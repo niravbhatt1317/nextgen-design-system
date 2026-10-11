@@ -1,1 +1,0 @@
-{"version":3,"file":"index-DkSUl2wM.js","sources":["../../src/components/Badge/index.ts"],"sourcesContent":["export { Badge, badgeVariants } from './Badge';\nexport type {\n  BadgeProps,\n  BadgeOwnProps,\n  BadgeVariantsType,\n  BadgeTone,\n  BadgeEmphasis,\n  BadgeShape,\n  BadgeSize,\n  BadgePalette,\n} from './Badge.types';\n"],"names":["cov_1c3hnie1x8"],"mappings":"ytBAAAA"}
