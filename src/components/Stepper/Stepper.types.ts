@@ -20,10 +20,16 @@ export type StepperVariantsType = VariantProps<typeof stepperVariants>;
  * shape a dialog wants, where a stepper has to fit above a body without taking
  * a third of the height.
  *
- * Vertical is deliberately not here. It is a different component with different
- * rules, not a fourth value on this switch.
+ * `vertical` sets the journey down a rail, as the navigation of a two-column
+ * flow: the rail on the left, the panel beside it showing one step at a time.
+ * It is the one layout that IS the navigation rather than a report above a
+ * form, so it reads one more counter, `reached`, and lets you click back to
+ * any unlocked step - not only finished ones. (Until 2026-10-11 this comment
+ * said vertical was a different component; Pranjal ruled it a variant: "we
+ * already have steppers so it should be sent as a variant not a new
+ * component".)
  */
-export type StepperLayout = 'stacked' | 'inline' | 'underline';
+export type StepperLayout = 'stacked' | 'inline' | 'underline' | 'vertical';
 
 /**
  * What a step is, at this moment.
@@ -79,6 +85,20 @@ export interface StepperOwnProps {
   layout?: StepperLayout | undefined;
 
   /**
+   * `vertical` only: the furthest step unlocked so far. Never less than
+   * `current`.
+   *
+   * This is what lets somebody go **back** without losing their place: step 4
+   * was reached, they returned to step 2 to fix a field, and steps 3 and 4 are
+   * still open to them - shown finished, and clickable. Everything past it is
+   * locked: plain text, faint, titled "Opens after <the step before>".
+   * Ignored by the horizontal layouts.
+   *
+   * @default current
+   */
+  reached?: number | undefined;
+
+  /**
    * Lets `stacked` drop to `inline` when there is not room for it.
    *
    * Measured, not guessed at from the window - a stepper in a side panel has to
@@ -90,7 +110,8 @@ export interface StepperOwnProps {
   responsive?: boolean | undefined;
 
   /**
-   * Makes finished steps clickable, and only finished ones.
+   * Makes finished steps clickable, and only finished ones. On `vertical`,
+   * every unlocked step except the one you are on (see `reached`).
    *
    * Leave it out and no step is focusable at all, which is right for a wizard
    * that acts as it goes - you cannot return to step 1 because step 2 already
