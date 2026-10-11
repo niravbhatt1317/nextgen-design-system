@@ -190,6 +190,9 @@ const explicit = {
    * to what was typed: overlay-hover #172336, tile-blue-ink #7FB2E0. */
   'overlay-hover': D('elevation.surface.raised'),
   'tile-blue-ink': D('color.text.information'),
+  /* the nudge halo: the interactive blue in light (its :root value), the primary in dark
+   * (Pranjal, 2026-09-27) - a blue glow on the dark ground reads as an edge, not a light */
+  nudge: D('color.background.brand.bold'),
   /* the inverse surface (2026-09-26): the tooltip's ground and words - the map's inverse wash on the raised step */
   inverse: D('color.background.inverse'),
   'inverse-foreground': D('component.tooltip.text'),

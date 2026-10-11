@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -603,5 +603,114 @@ describe('the panel — a key with a list of options', () => {
     await user.click(screen.getByRole('button', { name: 'Remove Admin' }));
     await user.click(screen.getByRole('button', { name: /Apply/ }));
     expect((onApply.mock.calls[0]?.[0] as FilterValue).rows).toHaveLength(0);
+  });
+});
+
+describe('the panel refuses a press outside it (Pranjal, 2026-09-26/27)', () => {
+  const open = () => {
+    const onApply = vi.fn();
+    const onClose = vi.fn();
+    /* The panel treats its own PARENT as inside, so that the door which opened it can
+     * be pressed without the press being refused. "Behind" therefore has to sit
+     * outside that wrapper to be genuinely outside. */
+    render(
+      <>
+        <button type="button" data-testid="behind">
+          Behind the panel
+        </button>
+        <div>
+          <AdvancedFilter<User> open keys={KEYS} onApply={onApply} onClose={onClose} />
+        </div>
+      </>
+    );
+    return { onClose, panel: () => screen.getByRole('dialog', { name: 'Filters' }) };
+  };
+
+  it('does NOT close, where it used to', () => {
+    /* "if clicked outside it should not get closed. in fact it should highlight the
+     * popover for 1 second". The panel is a place of work: a stray press should not
+     * throw away half-built rows. */
+    const { onClose, panel } = open();
+    fireEvent.mouseDown(document.body);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(panel()).toBeInTheDocument();
+  });
+
+  it('lights for a second instead, then stops', () => {
+    vi.useFakeTimers();
+    try {
+      const { panel } = open();
+      fireEvent.mouseDown(document.body);
+      expect(panel()).toHaveAttribute('data-nudge');
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(panel()).not.toHaveAttribute('data-nudge');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a press during the second does not restart it', () => {
+    /* Without this, holding the pointer down outside keeps the panel lit for as long
+     * as you like and the light stops meaning anything. */
+    vi.useFakeTimers();
+    try {
+      const { panel } = open();
+      fireEvent.mouseDown(document.body);
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+      fireEvent.mouseDown(document.body); // during the light
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+      // 1000ms after the FIRST press, so the light is out despite the second
+      expect(panel()).not.toHaveAttribute('data-nudge');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('lights again once the light has dropped', () => {
+    vi.useFakeTimers();
+    try {
+      const { panel } = open();
+      fireEvent.mouseDown(document.body);
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      fireEvent.mouseDown(document.body);
+      expect(panel()).toHaveAttribute('data-nudge');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('swallows the press, so nothing behind it is pressed', () => {
+    const { onClose } = open();
+    const behind = screen.getByTestId('behind');
+    const clicked = vi.fn();
+    behind.addEventListener('mousedown', clicked);
+    fireEvent.mouseDown(behind);
+    expect(clicked).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('closes on the header ✕, which is the way out that replaced it', () => {
+    const { onClose } = open();
+    fireEvent.click(screen.getByTestId('filter-close'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('names the ✕ for a screen reader', () => {
+    open();
+    expect(screen.getByRole('button', { name: 'Close filters' })).toBeInTheDocument();
+  });
+
+  it('still closes on Escape', () => {
+    const { onClose } = open();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalled();
   });
 });

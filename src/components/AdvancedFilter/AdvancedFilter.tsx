@@ -462,6 +462,10 @@ function Controls<Row>({ r, keys, keyOptions, onPatch }: ControlsProps<Row>) {
   );
 }
 
+/* How long the panel stays lit after a refused press (Pranjal, 2026-09-27: "it should
+ * highlight the popover for 1 second"). */
+const NUDGE_MS = 1000;
+
 export function AdvancedFilter<Row = unknown>({
   open,
   onClose,
@@ -560,10 +564,22 @@ export function AdvancedFilter<Row = unknown>({
     onApply(EMPTY_FILTER);
   };
 
-  /* the panel closes on a press outside it that is not inside a dropdown, a listbox, the many-value field's dialog or a
-   * menu, and on Escape when no dropdown is open (an open one takes the Escape itself, on capture, and prevents the
-   * default) */
+  /* A PRESS OUTSIDE DOES NOT CLOSE THE PANEL (Pranjal, 2026-09-26: "if clicked outside it should not get closed. in
+   * fact it should highlight the popover for 1 second").
+   *
+   * The panel is a place of work, not a menu: half-built filter rows are easy to lose and a stray press should not
+   * throw them away. So the press is SWALLOWED on capture - it never reaches whatever was under it - and the panel
+   * wears a light for a second instead.
+   *
+   * THE PRESS RULE (the same mock): the first press starts the second; a press DURING that second is swallowed all the
+   * same but does not restart it; once the light drops, the next press lights it again. Without that, holding the
+   * pointer down outside would keep the panel lit indefinitely and the light would stop meaning anything.
+   *
+   * The ways out are all deliberate: the ✕ in the header, Apply, Clear all, the door that opened it, and Escape when
+   * no dropdown is open (an open one takes the Escape itself, on capture, and prevents the default). */
   const panel = useRef<HTMLDivElement>(null);
+  const [nudged, setNudged] = useState(false);
+  const nudgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!open) return undefined;
     const outside = (e: MouseEvent) => {
@@ -576,7 +592,16 @@ export function AdvancedFilter<Row = unknown>({
         )
       )
         return;
-      onClose?.();
+      /* swallowed: the press does not reach the page behind, so nothing is opened,
+       * selected or navigated by a press whose only effect should be the light */
+      e.preventDefault();
+      e.stopPropagation();
+      if (nudgeTimer.current) return; // already lit - do not restart it
+      setNudged(true);
+      nudgeTimer.current = setTimeout(() => {
+        nudgeTimer.current = null;
+        setNudged(false);
+      }, NUDGE_MS);
     };
     const key = (e: KeyboardEvent) => {
       if (
@@ -587,11 +612,16 @@ export function AdvancedFilter<Row = unknown>({
         onClose?.();
       }
     };
-    document.addEventListener('mousedown', outside);
+    /* CAPTURE, so the press is stopped before the thing under it sees it */
+    document.addEventListener('mousedown', outside, true);
     document.addEventListener('keydown', key);
     return () => {
-      document.removeEventListener('mousedown', outside);
+      document.removeEventListener('mousedown', outside, true);
       document.removeEventListener('keydown', key);
+      if (nudgeTimer.current) {
+        clearTimeout(nudgeTimer.current);
+        nudgeTimer.current = null;
+      }
     };
   }, [open, onClose]);
 
@@ -621,8 +651,15 @@ export function AdvancedFilter<Row = unknown>({
       className={cn(
         'mdt-absolute mdt-left-0 mdt-top-10 mdt-box-border mdt-rounded-[8px] mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-p-3 mdt-text-left mdt-text-popover-foreground',
         'mdt-shadow-[0_12px_32px_-12px_rgba(29,43,62,0.22),0_2px_8px_rgba(29,43,62,0.06)]',
+        /* the refused press's light: a 4px halo of the nudge colour at 12%, laid OVER the
+         * panel's own shadow so the edge itself does not move or change colour - a border
+         * that changed would read as an error rather than a nudge */
+        nudged &&
+          'mdt-shadow-[0_0_0_4px_hsl(var(--mdt-nudge)/0.12),0_12px_32px_-12px_rgba(29,43,62,0.22),0_2px_8px_rgba(29,43,62,0.06)]',
+        'mdt-transition-shadow mdt-duration-150',
         className
       )}
+      {...(nudged ? { 'data-nudge': '' } : {})}
       style={{ width, zIndex: 'calc(var(--mdt-z-dropdown) - 1)' }}
       onKeyDown={(e) => {
         const target = e.target as Element;
@@ -632,8 +669,26 @@ export function AdvancedFilter<Row = unknown>({
         }
       }}
     >
-      <div className="mdt-mb-4 mdt-flex mdt-h-7 mdt-items-center">
+      <div className="mdt-mb-4 mdt-flex mdt-h-7 mdt-items-center mdt-justify-between">
         <h3 className="mdt-m-0 mdt-text-sm mdt-font-medium mdt-text-neutral-90">{title}</h3>
+        {/* THE WAY OUT (Pranjal, 2026-09-26: "a cross ghost icon cta"). Since a press
+         * outside refuses to close the panel, leaving has to be something you can see:
+         * the same 28 box as a row's ✕ and the three-dot, so the header's right edge
+         * lines up with the rows beneath it. */}
+        <button
+          type="button"
+          aria-label={`Close ${title.toLowerCase()}`}
+          data-testid="filter-close"
+          onClick={() => onClose?.()}
+          className={cn(
+            'mdt-inline-flex mdt-size-7 mdt-shrink-0 mdt-items-center mdt-justify-center',
+            'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-text-neutral-70',
+            'hover:mdt-bg-neutral-10 hover:mdt-text-neutral-130',
+            'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring'
+          )}
+        >
+          <Icon name="x" size={16} aria-hidden />
+        </button>
       </div>
       <div className="mdt-flex mdt-flex-col mdt-gap-3">
         {draft.rows.map((it, i) =>
