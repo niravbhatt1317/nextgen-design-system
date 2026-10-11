@@ -82,6 +82,14 @@ export interface TabsListProps extends ComponentPropsWithoutRef<typeof TabsPrimi
    * @default false
    */
   fullWidth?: boolean;
+
+  /**
+   * Underline only: the strip's own hairline (neutral-30), which a drawer band
+   * closes with. A page band has none - pass `false` and the tabs stretch to the
+   * band, the active 2px line as its last 2px (B-23).
+   * @default true
+   */
+  hairline?: boolean;
 }
 
 /**

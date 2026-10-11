@@ -1,7 +1,7 @@
 'use client';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { createContext, forwardRef, useContext } from 'react';
+import { createContext, forwardRef, useContext, useMemo } from 'react';
 import type { ElementRef, KeyboardEvent, MouseEvent } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
@@ -23,12 +23,17 @@ import type {
  * the faint ink (#8FA0BD), the active one 600 in the primary colour; a 2px primary line ON
  * the strip's hairline spanning the label plus 12 at both sides; the tabs flush,
  * so labels read 24 apart; 9 above the label, 11 below; the strip starts on the
- * content edge so the active line lines up with the text under it.
+ * content edge so the active line lines up with the text under it. The drawer
+ * band's hairline is neutral-30 (every console drawer closes with that line,
+ * B-06); the page band has none (B-23, `hairline={false}`) and its tabs
+ * stretch to the band (Pranjal, 2026-10-10: keep the version-8 tabs).
  *
- * FILLED - a switch inside a body: a 32 track, corners 8, neutral-20, 3 in; the
- * chip 26 high, corners 5, 10 at the sides, 2 between; the active chip white
- * with the label at 500 in the primary colour and a hairline shadow; hover tints
- * the chip primary at 4%; the active chip ignores a click.
+ * FILLED - a switch inside a body: a 32 track, corners 8, neutral-20, 3.5 in at
+ * the sides; the chip 25 high, corners 5, 10 at the sides, 2 between, centred in
+ * the track; the active chip the page's paper (background - white in light, the
+ * dark paper in dark, never a typed white) with the label at 500 in the primary
+ * colour and a hairline shadow; hover tints the chip primary at 4%; the active
+ * chip ignores a click.
  *
  * Both: hover darkens the label to neutral-90; disabled reads neutral-40 with a
  * not-allowed cursor; an icon is 14 with 6 before the label; a count is an
@@ -39,18 +44,28 @@ import type {
  * 32 track (K-Tabs-10), the icon at 14 with 6 (K-Tabs-13).
  */
 
-/** The type set once on the TabsList, read by every trigger inside it. */
-const TabsTypeContext = createContext<TabsType>('underline');
+interface TabsListContextValue {
+  type: TabsType;
+  hairline: boolean;
+}
 
-/* THE STRIP. Underline: the band's own hairline, full width, starting on the
- * content edge (K-Tabs-06, K-Tabs-08); the tabs end-aligned so a taller band
- * (the drawer's 48) still lands the line on the divider. Filled: the 32 track
- * (K-Tabs-09), 3 in so the 26 chip sits at exactly 3 · 3 (K-Tabs-10), 2 between
- * chips. */
-const LIST_TYPE: Record<TabsType, string> = {
-  underline: 'mdt-flex mdt-w-full mdt-items-end mdt-gap-0 mdt-border-b mdt-border-neutral-20',
-  filled:
-    'mdt-inline-flex mdt-h-8 mdt-items-center mdt-gap-0.5 mdt-rounded-[8px] mdt-bg-neutral-20 mdt-p-[3px]',
+/** The type and the hairline, set once on the TabsList, read by every trigger inside it. */
+const TabsListContext = createContext<TabsListContextValue>({ type: 'underline', hairline: true });
+
+/* THE STRIP. Underline with a hairline: the drawer band's own line (neutral-30),
+ * full width, starting on the content edge (K-Tabs-06, K-Tabs-08); the tabs
+ * end-aligned so a taller band (the drawer's 48) still lands the line on the
+ * divider. Without: the page band - no line, the tabs stretched to the band so
+ * the 2px line is its last 2px. Filled: the 32 track (K-Tabs-09), 3.5 in at the
+ * sides so the 25 chip sits centred with 3.5 above and below (K-Tabs-10), 2
+ * between chips. */
+const listClass = (type: TabsType, hairline: boolean): string => {
+  if (type === 'filled') {
+    return 'mdt-inline-flex mdt-h-8 mdt-items-center mdt-gap-0.5 mdt-rounded-[8px] mdt-bg-neutral-20 mdt-px-[3.5px] mdt-py-0';
+  }
+  return hairline
+    ? 'mdt-flex mdt-w-full mdt-items-end mdt-gap-0 mdt-border-b mdt-border-neutral-30'
+    : 'mdt-flex mdt-w-full mdt-items-stretch mdt-gap-0';
 };
 
 /* THE LABEL, both types (K-Tabs-02 to K-Tabs-05): 13/500 on an 18 line in
@@ -68,27 +83,33 @@ const TRIGGER_BASE = cn(
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-1 focus-visible:mdt-ring-inset focus-visible:mdt-ring-blue-40'
 );
 
-const TRIGGER_TYPE: Record<TabsType, string> = {
+const triggerClass = (type: TabsType, hairline: boolean): string => {
+  if (type === 'filled') {
+    /* The chip: 25 high, corners 5 (concentric with the track's 8 at 3.5 in),
+     * 10 at the sides (K-Tabs-09, K-Tabs-10). Active: the page's paper (the
+     * background token - white in light), the label at 500 - not bold, the
+     * paper chip and the colour carry it - under the hairline shadow
+     * (K-Tabs-11). Hover: primary at 4% (K-Tabs-04); the active chip stays
+     * the paper. */
+    return cn(
+      'mdt-h-[25px] mdt-rounded-[5px] mdt-bg-transparent mdt-px-2.5',
+      'hover:mdt-bg-primary/[0.04]',
+      'data-[state=active]:mdt-bg-background data-[state=active]:mdt-font-medium data-[state=active]:hover:mdt-bg-background',
+      'data-[state=active]:mdt-shadow-[0_1px_2px_rgba(29,43,62,0.10),0_0_0_1px_rgba(29,43,62,0.04)]',
+      'disabled:mdt-bg-transparent'
+    );
+  }
   /* 12 at both sides; 9 above the label, 11 below; the 2px line is the tab's
-   * own bottom border, pulled 1 down (-mb-px) so it sits ON the strip's
-   * hairline rather than above it (K-Tabs-06). The active label is 600
-   * (K-Tabs-07, built at the console's value). */
-  underline: cn(
-    '-mdt-mb-px mdt-px-3 mdt-pb-[11px] mdt-pt-[9px]',
+   * own bottom border. On a strip with a hairline it is pulled 1 down (-mb-px)
+   * so it sits ON the hairline rather than above it (K-Tabs-06); on the page
+   * band there is no hairline and nothing to pull onto. The active label is
+   * 600 (K-Tabs-07, the console's value). */
+  return cn(
+    hairline ? '-mdt-mb-px' : 'mdt-mb-0',
+    'mdt-px-3 mdt-pb-[11px] mdt-pt-[9px]',
     'mdt-border-b-2 mdt-border-transparent mdt-bg-transparent',
     'data-[state=active]:mdt-border-primary data-[state=active]:mdt-font-semibold'
-  ),
-  /* The chip: 26 high, corners 5 (concentric with the track's 8 at 3 in), 10
-   * at the sides (K-Tabs-09, K-Tabs-10). Active: white, the label at 500 - not
-   * bold, the white chip and the colour carry it - under the hairline shadow
-   * (K-Tabs-11). Hover: primary at 4% (K-Tabs-04); the active chip stays white. */
-  filled: cn(
-    'mdt-h-[26px] mdt-rounded-[5px] mdt-bg-transparent mdt-px-2.5',
-    'hover:mdt-bg-primary/[0.04]',
-    'data-[state=active]:mdt-bg-white data-[state=active]:mdt-font-medium data-[state=active]:hover:mdt-bg-white',
-    'data-[state=active]:mdt-shadow-[0_1px_2px_rgba(29,43,62,0.10),0_0_0_1px_rgba(29,43,62,0.04)]',
-    'disabled:mdt-bg-transparent'
-  ),
+  );
 };
 
 /* THE LABEL HOLDS ITS 600 WIDTH (2026-10-06).
@@ -124,12 +145,12 @@ const COUNT_BASE = cn(
   'mdt-inline-flex mdt-h-[18px] mdt-min-w-[18px] mdt-shrink-0 mdt-items-center mdt-justify-center',
   'mdt-rounded-[9px] mdt-px-[5px] mdt-text-[11px] mdt-font-semibold mdt-leading-none',
   'mdt-text-faint',
-  '[[data-state=active]_&]:mdt-bg-neutral-90 [[data-state=active]_&]:mdt-text-white',
+  '[[data-state=active]_&]:mdt-bg-neutral-90 [[data-state=active]_&]:mdt-text-primary-foreground',
   '[:disabled_&]:mdt-text-neutral-40'
 );
 
 const COUNT_TYPE: Record<TabsType, string> = {
-  underline: 'mdt-bg-neutral-20',
+  underline: 'mdt-bg-neutral-10',
   filled: 'mdt-bg-neutral-30',
 };
 
@@ -189,17 +210,19 @@ Tabs.displayName = 'Tabs';
  * to every trigger inside, so it is written once.
  */
 const TabsList = forwardRef<ElementRef<typeof TabsPrimitive.List>, TabsListProps>(
-  ({ className, type: typeProp, variant, fullWidth = false, ...props }, ref) => {
+  ({ className, type: typeProp, variant, fullWidth = false, hairline = true, ...props }, ref) => {
     const type = typeProp ?? variant ?? 'underline';
+    const context = useMemo(() => ({ type, hairline }), [type, hairline]);
     return (
-      <TabsTypeContext.Provider value={type}>
+      <TabsListContext.Provider value={context}>
         <TabsPrimitive.List
           ref={ref}
           data-type={type}
-          className={cn(LIST_TYPE[type], fullWidth && 'mdt-flex mdt-w-full', className)}
+          data-hairline={type === 'underline' ? String(hairline) : undefined}
+          className={cn(listClass(type, hairline), fullWidth && 'mdt-flex mdt-w-full', className)}
           {...props}
         />
-      </TabsTypeContext.Provider>
+      </TabsListContext.Provider>
     );
   }
 );
@@ -232,8 +255,8 @@ const TabsTrigger = forwardRef<ElementRef<typeof TabsPrimitive.Trigger>, TabsTri
     },
     ref
   ) => {
-    const inherited = useContext(TabsTypeContext);
-    const type = typeProp ?? variant ?? inherited;
+    const inherited = useContext(TabsListContext);
+    const type = typeProp ?? variant ?? inherited.type;
 
     const trigger = (
       <TabsPrimitive.Trigger
@@ -241,7 +264,7 @@ const TabsTrigger = forwardRef<ElementRef<typeof TabsPrimitive.Trigger>, TabsTri
         data-type={type}
         className={cn(
           TRIGGER_BASE,
-          TRIGGER_TYPE[type],
+          triggerClass(type, inherited.hairline),
           fullWidth && 'mdt-flex-1',
           // Room for the close control, which sits over the tab's right edge
           // rather than inside it. After the type's own padding, so it wins:
@@ -377,15 +400,15 @@ const TabsAdd = forwardRef<HTMLButtonElement, TabsAddProps>(
 TabsAdd.displayName = 'TabsAdd';
 
 /**
- * TabsContent - the panel for one tab. Sits 8 under the strip (K-Tabs-23);
- * a page surface under a tab band insets 16 instead, which the PageFrame owns.
+ * TabsContent - the panel for one tab. No spacing of its own: the surface it
+ * sits in decides - a drawer body puts 20 under the strip, a page surface 16
+ * (S-16) - exactly as the console, which has no panel element at all.
  */
 const TabsContent = forwardRef<ElementRef<typeof TabsPrimitive.Content>, TabsContentProps>(
   ({ className, ...props }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
       className={cn(
-        'mdt-mt-2',
         'focus-visible:mdt-outline-none focus-visible:mdt-ring-1 focus-visible:mdt-ring-blue-40',
         className
       )}

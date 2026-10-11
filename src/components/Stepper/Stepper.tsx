@@ -2,7 +2,11 @@ import { cva } from 'class-variance-authority';
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
+import { StepperRail } from './StepperRail';
 import type { StepState, StepperLayout, StepperProps, StepperStep } from './Stepper.types';
+
+/** The three layouts drawn across the page; `vertical` is the rail, drawn by StepperRail. */
+type AcrossLayout = Exclude<StepperLayout, 'vertical'>;
 
 /**
  * The strip.
@@ -20,6 +24,7 @@ export const stepperVariants = cva('mdt-flex mdt-w-full mdt-list-none mdt-p-0', 
       // Equal columns, so the bars read as one track cut into parts rather than
       // as labels that happen to be underlined.
       underline: 'mdt-items-stretch mdt-gap-3',
+      vertical: 'mdt-m-0 mdt-flex-col',
     },
   },
   defaultVariants: { layout: 'stacked' },
@@ -86,13 +91,13 @@ const DISC_BASE = [
   SETTLES,
 ];
 
-const DISC_SIZE: Record<StepperLayout, string> = {
+const DISC_SIZE: Record<AcrossLayout, string> = {
   stacked: 'mdt-h-8 mdt-w-8 mdt-border-2 mdt-text-[13px]',
   inline: 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs',
   underline: 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs',
 };
 
-const MARK_SIZE: Record<StepperLayout, 'sm' | 'xs'> = {
+const MARK_SIZE: Record<AcrossLayout, 'sm' | 'xs'> = {
   stacked: 'sm',
   inline: 'xs',
   underline: 'xs',
@@ -118,7 +123,7 @@ const BAR_STATE: Record<StepState, string> = {
 };
 
 /** How one step's label sits beside its disc, per layout. */
-const LABEL_FLOW: Record<StepperLayout, string> = {
+const LABEL_FLOW: Record<AcrossLayout, string> = {
   stacked: 'mdt-text-[13px]',
   // Must not wrap - its steps sit on one row and a broken word breaks the row.
   inline: 'mdt-whitespace-nowrap mdt-text-sm',
@@ -127,7 +132,7 @@ const LABEL_FLOW: Record<StepperLayout, string> = {
 };
 
 /** What a clickable step's button holds, per layout. */
-const TRIGGER_FLOW: Record<StepperLayout, string> = {
+const TRIGGER_FLOW: Record<AcrossLayout, string> = {
   // No padding above, on purpose. The connector is pinned to the disc's own
   // centre line, so anything that pushes the disc down leaves the line hanging.
   stacked:
@@ -139,7 +144,7 @@ const TRIGGER_FLOW: Record<StepperLayout, string> = {
 };
 
 /** How one step's own box behaves in the row, per layout. */
-const STEP_FLOW: Record<StepperLayout, string> = {
+const STEP_FLOW: Record<AcrossLayout, string> = {
   stacked:
     'mdt-relative mdt-min-w-[92px] mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-items-center mdt-gap-2 mdt-text-center',
   inline: 'mdt-items-center mdt-gap-2',
@@ -207,7 +212,7 @@ const useMeasuredWidth = (enabled: boolean): [React.RefObject<HTMLDivElement>, n
 };
 
 /** Warns once, in development, about a description on a layout with no room for one. */
-const useDescriptionFits = (steps: readonly StepperStep[], layout: StepperLayout): void => {
+const useDescriptionFits = (steps: readonly StepperStep[], layout: AcrossLayout): void => {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production' || layout !== 'inline') return;
     if (!steps.some((s) => s.description !== undefined && s.description !== '')) return;
@@ -254,6 +259,7 @@ export const Stepper = ({
   current,
   layout = 'stacked',
   responsive = true,
+  reached,
   onStepSelect,
   className,
   ...props
@@ -266,9 +272,24 @@ export const Stepper = ({
   const [ref, width] = useMeasuredWidth(watching);
 
   const tooNarrow = width !== null && width < steps.length * STACKED_STEP_WIDTH;
-  const shown: StepperLayout = watching && tooNarrow ? 'inline' : layout;
+  const across: AcrossLayout = layout === 'vertical' ? 'stacked' : layout;
+  const shown: AcrossLayout = watching && tooNarrow ? 'inline' : across;
 
   useDescriptionFits(steps, shown);
+
+  /* the rail: its own rules (the second counter, any unlocked step clickable), after every hook above has run */
+  if (layout === 'vertical') {
+    return (
+      <StepperRail
+        steps={steps}
+        current={current}
+        reached={reached}
+        onStepSelect={onStepSelect}
+        className={className}
+        {...props}
+      />
+    );
+  }
 
   const at = Math.min(Math.max(current, 0), Math.max(steps.length - 1, 0));
 
