@@ -226,6 +226,12 @@ const explicit = {
   'primary-foreground-muted': '#485975',
   'primary-foreground-subtle': '#6A7FA0',
   'destructive-foreground': D('color.text.inverse'),
+  /* the filled destructive button keeps the light reds and a white label in dark (Pranjal 2026-10-11); the red INK
+   * (--mdt-destructive) stays the map's light #EC5B5B for text on the dark ground */
+  'destructive-fill': '#DB132A',
+  'destructive-fill-hover': '#AD1111',
+  'destructive-fill-active': '#750C0C',
+  'destructive-fill-foreground': '#FFFFFF',
   'info-foreground': D('color.text.inverse'),
   'success-foreground': D('color.text.inverse'),
   'warning-foreground': D('color.text.inverse'),

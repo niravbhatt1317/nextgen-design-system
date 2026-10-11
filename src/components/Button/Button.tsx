@@ -47,8 +47,9 @@ export const buttonVariants = cva(
           'hover:mdt-bg-neutral-10 hover:mdt-text-neutral-130 active:mdt-bg-neutral-20',
         ].join(' '),
         destructive: [
-          'mdt-bg-destructive mdt-text-destructive-foreground',
-          'hover:mdt-bg-red-70 active:mdt-bg-red-80',
+          /* its own fill steps and a white label in both themes (Pranjal 2026-10-11) - not the red ink token */
+          'mdt-bg-[hsl(var(--mdt-destructive-fill))] mdt-text-[hsl(var(--mdt-destructive-fill-foreground))]',
+          'hover:mdt-bg-[hsl(var(--mdt-destructive-fill-hover))] active:mdt-bg-[hsl(var(--mdt-destructive-fill-active))]',
         ].join(' '),
         destructiveGhost: [
           'mdt-text-destructive',
