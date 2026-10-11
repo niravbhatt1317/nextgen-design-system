@@ -834,6 +834,11 @@ export type {
   TagPillEmphasis,
 } from './TagPill';
 
+// InlineTags — a row of TagPills with a dashed "Add tag" that opens a field in place;
+// suggested tags under it while open, earlier tags listed as you type (2026-09-29).
+export { InlineTags } from './InlineTags';
+export type { InlineTagsProps, InlineTagsOwnProps } from './InlineTags';
+
 // TagPillOld — the previous tag (24px, 10px inset, 4px square corner, no outline).
 // DEPRECATED 2026-09-04: use TagPill.
 export { TagPillOld, tagPillOldVariants } from './TagPillOld';
