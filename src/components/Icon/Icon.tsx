@@ -1,8 +1,43 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef, cloneElement, useState, useEffect, type ReactElement } from 'react';
 import { cn } from '@/utils';
-import type { IconProps } from './Icon.types';
+import type { IconProps, IconSize } from './Icon.types';
 import { iconRegistry } from './icons';
+
+/* THE STROKE LADDER (Nirav, 2026-10-11) - the default line weight depends on how big the icon is drawn.
+ *
+ * The artwork is a 24-unit viewBox, so the line a person actually sees is `strokeWidth x size / 24`.
+ * One number for every size therefore does not give one line: stroke 1.5 renders 2px at 32 and 0.75px
+ * at 12. Measured at 1x, that 0.75px line never exceeds **38% ink** - a glyph asked for in neutral-110
+ * arrives at roughly a third of that contrast. Below 24px nothing lands on a pixel boundary, so the
+ * stroke smears across two columns and the small sizes are where it hurts.
+ *
+ *   rendered px / peak ink at 1x      12px        16px        20px        24px        32px
+ *   stroke 2                       1.00 / 50%  1.33 / 67%  1.67 / 84%  2.00 / 100%  2.66 / 100%
+ *   stroke 1.75                    0.87 / 44%  1.16 / 58%  1.45 / 73%  1.75 /  87%  2.33 / 100%
+ *   stroke 1.5                     0.75 / 38%  1.00 / 50%  1.25 / 62%  1.50 /  75%  2.00 / 100%
+ *
+ * So: 1.5 from 20px up, where it is unambiguously better - the dense icons (settings, calendar, copy)
+ * clog at 2 and resolve at 1.5. And 1.75 at 16 and below, which is where the console actually lives:
+ * table rows, buttons, input affixes.
+ *
+ * `size` also takes a raw pixel number, so the rule is written against resolved pixels rather than the
+ * size names - one sentence that covers both: **16px and under carry 1.75, everything above carries 1.5.** */
+const SIZE_PX = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 } as const;
+const LADDER_STEP_PX = 16;
+const STROKE_SMALL = 1.75;
+const STROKE_LARGE = 1.5;
+
+/**
+ * The default stroke width for an icon drawn at `size`, per the stroke ladder.
+ *
+ * @param size - a size name, a pixel number, or undefined (which means the `md` default)
+ * @returns 1.75 when the icon renders at 16px or smaller, otherwise 1.5
+ */
+export function defaultStrokeFor(size: IconSize | undefined): number {
+  const px = typeof size === 'number' ? size : SIZE_PX[size ?? 'md'];
+  return px <= LADDER_STEP_PX ? STROKE_SMALL : STROKE_LARGE;
+}
 
 /**
  * Icon variants using Class Variance Authority (CVA)
@@ -475,8 +510,8 @@ const Icon = forwardRef<SVGSVGElement, IconProps>(
     {
       size = 'md',
       color = 'current',
-      /* thin line everywhere (Pranjal, 2026-10-11: the console's design picks chose the 1.5 line over 2) */
-      strokeWidth = 1.5,
+      /* unset means the ladder decides from `size` - see defaultStrokeFor above */
+      strokeWidth,
       className,
       'aria-label': ariaLabel,
       'aria-hidden': ariaHidden = false,
@@ -496,11 +531,12 @@ const Icon = forwardRef<SVGSVGElement, IconProps>(
 
     // Build common SVG props
     const ariaHiddenValue = ariaHidden || !ariaLabel ? ('true' as const) : undefined;
+    const resolvedStroke = strokeWidth ?? defaultStrokeFor(size);
     const commonSvgProps: CommonSvgProps = {
       ref,
       className: combinedClassName,
       style: customSizeStyle,
-      strokeWidth,
+      strokeWidth: resolvedStroke,
       'aria-label': ariaLabel,
       'aria-hidden': ariaHiddenValue,
       role: ariaLabel ? ('img' as const) : undefined,
@@ -513,7 +549,7 @@ const Icon = forwardRef<SVGSVGElement, IconProps>(
 
     // Render external SVG by src
     if (src) {
-      return renderExternalSvg(commonSvgProps, isLoading, error, svgContent, strokeWidth);
+      return renderExternalSvg(commonSvgProps, isLoading, error, svgContent, resolvedStroke);
     }
 
     // Should never reach here due to TypeScript discriminated union
