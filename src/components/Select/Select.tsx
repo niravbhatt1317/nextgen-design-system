@@ -214,6 +214,12 @@ export const selectTriggerVariants = cva(
      * under the pointer and, open or focused, with the 3-px halo; disabled on neutral-10 */
     'mdt-flex mdt-w-full mdt-items-center mdt-justify-between',
     'mdt-rounded-lg',
+    /* THE FORM LADDER (Pranjal, 2026-09-17; the value's ink 2026-09-27): what a
+     * person typed is READING text - the reading ink at 14/500, the same as a
+     * picked Select value - and the placeholder stays faint at 400. The two had
+     * been one weight and one ink apart from each other, so a filled field read
+     * like an empty one. The weight is set here and undone on the placeholder,
+     * because a placeholder inherits it otherwise. */
     'mdt-bg-background mdt-font-medium mdt-text-neutral-130',
     'mdt-transition-[border-color,box-shadow]',
     'focus-visible:mdt-border-primary focus-visible:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
@@ -230,6 +236,7 @@ export const selectTriggerVariants = cva(
         borderless: 'mdt-border mdt-border-transparent hover:mdt-border-neutral-30',
       },
       size: {
+        /* 14, not 13: the ladder's reading text, in the 32 box (2026-09-17). */
         sm: 'mdt-h-8 mdt-gap-1 mdt-px-3 mdt-text-sm',
         md: 'mdt-h-9 mdt-gap-2 mdt-px-3 mdt-text-sm',
         lg: 'mdt-h-10 mdt-gap-2 mdt-px-4 mdt-text-base',
@@ -2247,13 +2254,22 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
      * box is the single trigger: the value in the reading ink, the chevron (the lock when held), the placeholder faint. */
     if (mode === 'single' && _searchable) {
       const one = Array.isArray(currentValue) ? currentValue[0] : currentValue;
-      const picked = one == null ? undefined : sortedOptions.find((o) => String(o.value) === String(one));
-      const singleDescribedBy = computeAriaDescribedBy(hasError, errorId, helperText, helperId, ariaDescribedBy);
+      const picked =
+        one === undefined ? undefined : sortedOptions.find((o) => String(o.value) === one);
+      const singleDescribedBy = computeAriaDescribedBy(
+        hasError,
+        errorId,
+        helperText,
+        helperId,
+        ariaDescribedBy
+      );
       const singleTrigger = (
         <button
           ref={ref}
           type="button"
           id={selectId}
+          // aria-controls is set at run time: the Popover trigger this sits in (asChild) stamps it with the list's id
+          // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
@@ -2266,9 +2282,13 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
           className={cn('mdt-group', selectTriggerVariants({ variant, size, hasError }), className)}
         >
           {prefixIcon && (
-            <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-muted-foreground">{prefixIcon}</span>
+            <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-muted-foreground">
+              {prefixIcon}
+            </span>
           )}
-          <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate mdt-text-left">{picked ? picked.label : placeholder}</span>
+          <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate mdt-text-left">
+            {picked ? picked.label : placeholder}
+          </span>
           {locked ? (
             <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />
