@@ -226,8 +226,19 @@ export { DateInput } from './DateInput';
 export type { DateInputProps, DateInputSize } from './DateInput';
 
 // DatePicker — the calendar on its own: month grid, min/max bounds, a today
-// mark, Clear and Done. No time picker (Pranjal, 2026-09-22).
-export { DatePicker, formatDay, parseDay, toDay, MONTHS_SHORT } from './DatePicker';
+// mark, Clear and Done. Since 2026-10-10 it can carry a time as well, which is
+// what `formatDateTime`, `parseTime` and `timeSlots` are for; the note here used
+// to say "No time picker (Pranjal, 2026-09-22)" and that ruling has moved.
+export {
+  DatePicker,
+  formatDay,
+  formatDateTime,
+  parseDay,
+  parseTime,
+  timeSlots,
+  toDay,
+  MONTHS_SHORT,
+} from './DatePicker';
 export type { DatePickerProps, Day } from './DatePicker';
 
 // Dialog
