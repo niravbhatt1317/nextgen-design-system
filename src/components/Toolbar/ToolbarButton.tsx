@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
+import { cloneElement, forwardRef, isValidElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Badge } from '../Badge';
 import type { ToolbarButtonProps } from './ToolbarButton.types';
@@ -80,6 +81,16 @@ const COUNT_PALETTE = {
  * <PopoverTrigger asChild><ToolbarButton icon={<Icon name="arrow-up-down" />} aria-label="Sort" /></PopoverTrigger>
  * ```
  */
+/* An icon handed in without a size is given the size this button draws it at (14px), so the stroke ladder
+ * (defaultStrokeFor) reads the real size - otherwise the Icon defaults to md (20), takes the 20px line, and the
+ * button's [&_svg] rule squeezes it to 14px, a hair lighter than its neighbours (Pranjal 2026-10-12: "dont squeeze them"). */
+const atDrawnSize = (node: ReactNode, px: number): ReactNode => {
+  if (!isValidElement(node)) return node;
+  const props = node.props as { name?: unknown; size?: unknown };
+  if (typeof props.name !== 'string' || props.size !== undefined) return node;
+  return cloneElement(node as ReactElement<{ size?: number }>, { size: px });
+};
+
 const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(function ToolbarButton(
   {
     icon,
@@ -111,7 +122,7 @@ const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(function
       )}
       {...rest}
     >
-      {icon}
+      {atDrawnSize(icon, 14)}
       {hasLabel ? <span>{children}</span> : null}
       {hasCount ? (
         <>

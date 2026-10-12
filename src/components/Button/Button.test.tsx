@@ -1,3 +1,4 @@
+import { Icon } from '../Icon';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -194,5 +195,21 @@ describe('Button', () => {
   it('is type=button by default, so it never submits a form by accident', () => {
     render(<Button>Go</Button>);
     expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
+  });
+});
+
+describe('an icon is drawn at the size it shows (2026-10-12)', () => {
+  it('gives a size-less Icon the 16px size, so the stroke ladder picks the small line', () => {
+    const { container } = render(<Button leftIcon={<Icon name="plus" />}>Invite users</Button>);
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveStyle({ width: '16px' });
+    expect(svg?.getAttribute('stroke-width')).toBe('1.75');
+  });
+  it('keeps a size the caller asked for', () => {
+    const { container } = render(
+      <Button leftIcon={<Icon name="plus" size="lg" />}>Invite users</Button>
+    );
+    /* lg is 24px, so the ladder keeps the 1.5 line - the button did not resize it */
+    expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.5');
   });
 });
