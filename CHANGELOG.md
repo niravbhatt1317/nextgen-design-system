@@ -1,5 +1,50 @@
 # Changelog
 
+## 2.2.0
+
+### Minor Changes
+
+- 544900b: Button destructive: its own fill tokens (`--mdt-destructive-fill`, `-hover`, `-active`, `-foreground`) with a white
+  label in both themes - dark keeps the deep reds (#DB132A, white reads 5.1:1) while the red ink for text stays light.
+- 544900b: Field labels (Input, Select, DateInput, NumberInput, Textarea) are 13px at weight 500 in the secondary ink - the form
+  ladder's label step (Pranjal, 2026-10-11 design picks).
+- 544900b: Icon: the stroke ladder - the default line weight follows the size.
+
+  The artwork is a 24-unit viewBox, so the line a person sees is `strokeWidth x size / 24`. One
+  number for every size therefore does not give one line: a flat 1.5 draws 2px at `xl` and 0.75px
+  at `xs`, and measured at 1x that 0.75px line never exceeds 38% ink - an icon asked for in
+  `neutral-110` arrives at about a third of that contrast.
+
+  So the default steps once: **1.75 at 16px and under, 1.5 above.** Written against resolved pixels,
+  so a raw `size={14}` follows the same rule as `size="sm"`. Passing `strokeWidth` still overrides it.
+
+  `defaultStrokeFor(size)` is exported, so a surface drawing its own SVG can match the library
+  rather than guess.
+
+- 544900b: Icon draws a 1.5 line by default (was 2).
+
+  The console's design review of 2026-10-11 picked the thinner line for every icon. A
+  caller that wants the heavier line still passes `strokeWidth={2}`.
+
+- 544900b: Input: Escape empties a field that has a clear action (`onClear`), the same as its ✕; with nothing to clear,
+  Escape passes through.
+
+  Select: the search box inside a searchable list is now the library Input, so it gains the same ✕ and Escape
+  (with nothing typed, Escape still closes the list).
+
+- 544900b: TagList: the "+N" is quiet muted text (12px) instead of a slate pill - the value wears the badge, the counter does not;
+  its bubble still lists the rest on hover and focus.
+
+### Patch Changes
+
+- 544900b: IconTile's blue glyph reads `--mdt-tile-blue-ink`, and a popover opened inside a drawer scrolls.
+
+  The blue tile glyph was blue-60 in both themes; in dark it is now the info badge's ink
+  (#7FB2E0), as the 2026-09-28 ruling asked - the bright blue was hard to see on the dark
+  tile. A popover portalled out of a drawer or dialog had its wheel and touch scrolling
+  swallowed by the dialog's scroll lock (the date picker's time list did not move); the
+  popover now stops those events from reaching it.
+
 ## 2.1.0
 
 ### Minor Changes
