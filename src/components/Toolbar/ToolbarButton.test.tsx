@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
+import { Icon } from '../Icon';
 import { ToolbarButton } from './ToolbarButton';
 
 const Glyph = () => (
@@ -128,5 +129,21 @@ describe('ToolbarButton', () => {
       expect(screen.getByRole('button')).not.toHaveAttribute('data-active');
       expect(screen.getByRole('button')).not.toHaveClass('mdt-border-neutral-90');
     });
+  });
+});
+
+describe('an icon is drawn at the size it shows (2026-10-12)', () => {
+  it('gives a size-less Icon the 14px size, so the stroke ladder picks the small line', () => {
+    const { container } = render(<ToolbarButton icon={<Icon name="plus" />} aria-label="Add" />);
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveStyle({ width: '14px' });
+    expect(svg?.getAttribute('stroke-width')).toBe('1.75');
+  });
+
+  it('keeps a size the caller asked for', () => {
+    const { container } = render(
+      <ToolbarButton icon={<Icon name="plus" size="lg" />} aria-label="Add" />
+    );
+    expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.5');
   });
 });
