@@ -452,7 +452,7 @@ function SwitcherPanel({
             aria-label="Account options"
             title="Account options"
           >
-            <Icon name="more-horizontal" size={14} strokeWidth={1.5} />
+            <Icon name="more-horizontal" size={14} />
           </button>
         </div>
         <div className="ogsw-tseg" role="group" aria-label="Theme">

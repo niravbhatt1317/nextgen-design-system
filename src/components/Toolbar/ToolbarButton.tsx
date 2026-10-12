@@ -1,8 +1,12 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import { iconAtDrawnSize } from '@/utils/icon-at-drawn-size';
 import { Badge } from '../Badge';
 import type { ToolbarButtonProps } from './ToolbarButton.types';
+
+/** The glyph size this button draws at — it must match the `[&_svg]:mdt-size-3.5` rule above. */
+const ICON_PX = 14;
 
 /**
  * ToolbarButton styles.
@@ -111,7 +115,7 @@ const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(function
       )}
       {...rest}
     >
-      {icon}
+      {iconAtDrawnSize(icon, ICON_PX)}
       {hasLabel ? <span>{children}</span> : null}
       {hasCount ? (
         <>

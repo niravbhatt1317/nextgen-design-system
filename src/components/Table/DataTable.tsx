@@ -1229,7 +1229,7 @@ function DataTable<Row>({
                                 aria-label="Row actions"
                                 tabIndex={-1}
                               >
-                                <Icon name="more-horizontal" size={16} strokeWidth={1.5} />
+                                <Icon name="more-horizontal" size={16} />
                               </button>
                             </DropdownMenuTrigger>
                             {/* 192px is the floor, not the width (2026-10-09, Pranjal: "if theres a name which is bigger

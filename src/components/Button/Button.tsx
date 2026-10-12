@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { iconAtDrawnSize } from '../../utils/icon-at-drawn-size';
 import type { ButtonProps, ButtonSize, ButtonVariant } from './Button.types';
 import './button.css';
 
@@ -158,6 +159,9 @@ function paddingFor(
   return cn(hasLead ? EDGE.icon : EDGE.text, hasTrail ? EDGE.iconR : EDGE.textR);
 }
 
+/** The glyph size this button draws at — it must match the `[&_svg]:mdt-size-4` rule above. */
+const ICON_PX = 16;
+
 /**
  * Button — the merged console's button.
  *
@@ -199,8 +203,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 
   // A spinner takes the leading glyph's place, or the whole square when there
   // is no label to sit beside.
-  const lead = loading ? SPINNER : leftIcon;
-  const trail = isLink && !loading ? OUTBOUND : rightIcon;
+  const lead = loading ? SPINNER : iconAtDrawnSize(leftIcon, ICON_PX);
+  const trail = isLink && !loading ? OUTBOUND : iconAtDrawnSize(rightIcon, ICON_PX);
   const label = loading && loadingText ? loadingText : children;
 
   const hasLead = filled(lead);
