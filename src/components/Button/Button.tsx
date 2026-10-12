@@ -1,7 +1,8 @@
-import { cloneElement, forwardRef, isValidElement } from 'react';
-import type { ReactElement, ReactNode } from 'react';
+import { forwardRef } from 'react';
+import type { ReactNode } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { iconAtDrawnSize } from '../../utils/icon-at-drawn-size';
 import type { ButtonProps, ButtonSize, ButtonVariant } from './Button.types';
 import './button.css';
 
@@ -158,6 +159,9 @@ function paddingFor(
   return cn(hasLead ? EDGE.icon : EDGE.text, hasTrail ? EDGE.iconR : EDGE.textR);
 }
 
+/** The glyph size this button draws at — it must match the `[&_svg]:mdt-size-4` rule above. */
+const ICON_PX = 16;
+
 /**
  * Button — the merged console's button.
  *
@@ -171,16 +175,6 @@ function paddingFor(
  * <Button variant="outline" size="sm">Cancel</Button>
  * <Button iconOnly variant="ghost" ariaLabel="Row actions" leftIcon={<Icon name="more-vertical" />} />
  */
-/* An icon handed in without a size is given the size this button draws it at (16px), so the stroke ladder
- * (defaultStrokeFor) reads the real size - otherwise the Icon defaults to md (20), takes the 20px line, and the
- * button's [&_svg] rule squeezes it to 16px, a hair lighter than its neighbours (Pranjal 2026-10-12: "dont squeeze them"). */
-const atDrawnSize = (node: ReactNode, px: number): ReactNode => {
-  if (!isValidElement(node)) return node;
-  const props = node.props as { name?: unknown; size?: unknown };
-  if (typeof props.name !== 'string' || props.size !== undefined) return node;
-  return cloneElement(node as ReactElement<{ size?: number }>, { size: px });
-};
-
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     variant = 'primary',
@@ -209,8 +203,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 
   // A spinner takes the leading glyph's place, or the whole square when there
   // is no label to sit beside.
-  const lead = loading ? SPINNER : atDrawnSize(leftIcon, 16);
-  const trail = isLink && !loading ? OUTBOUND : atDrawnSize(rightIcon, 16);
+  const lead = loading ? SPINNER : iconAtDrawnSize(leftIcon, ICON_PX);
+  const trail = isLink && !loading ? OUTBOUND : iconAtDrawnSize(rightIcon, ICON_PX);
   const label = loading && loadingText ? loadingText : children;
 
   const hasLead = filled(lead);
