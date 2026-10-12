@@ -22,7 +22,8 @@ export const iconTileVariants = cva(
       tone: {
         slate: 'mdt-bg-neutral-30 mdt-text-neutral-110',
         /* THE BLUE INK IS BLUE-60 (Pranjal, 2026-09-12: "use a better blue color this looks really bad" - K-IconTile-07): every Name tile on the console draws its glyph in the accent blue, not the avatar's navy. */
-        blue: 'mdt-bg-blue-10 mdt-text-blue-60',
+        /* 2026-09-28: the glyph reads --mdt-tile-blue-ink - blue-60 in light, the info badge's #7FB2E0 in dark (Pranjal: the dark tile's icon was not visible enough) */
+        blue: 'mdt-bg-blue-10 mdt-text-[hsl(var(--mdt-tile-blue-ink))]',
         green: 'mdt-bg-green-10 mdt-text-green-80',
         amber: 'mdt-bg-orange-20 mdt-text-orange-80',
         rose: 'mdt-bg-red-10 mdt-text-red-80',

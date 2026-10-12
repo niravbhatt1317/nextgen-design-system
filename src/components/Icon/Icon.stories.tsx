@@ -180,7 +180,7 @@ const meta: Meta<typeof Icon> = {
     docs: {
       description: {
         component:
-          'A flexible icon component system for custom SVG icons designed by your UX team. No third-party dependencies required. All icons use consistent sizing, colors from the theme system, and support full accessibility.',
+          'A flexible icon component system for custom SVG icons designed by your UX team. No third-party dependencies required. All icons use consistent sizing, colors from the theme system, and support full accessibility.\n\n**Line weight is automatic.** Do not pass `strokeWidth` — the stroke ladder sets it from `size` (1.75 at 16px and under, 1.5 above), because the line you see is `strokeWidth × size / 24` and one number does not give one line across five sizes. See the *Stroke ladder* story.',
       },
     },
     controls: {
@@ -225,9 +225,13 @@ const meta: Meta<typeof Icon> = {
     },
     strokeWidth: {
       control: 'number',
-      description: 'Stroke width of the icon',
+      description:
+        'Stroke width. **Leave it unset.** The stroke ladder picks it from `size`: 1.75 at 16px ' +
+        'and under, 1.5 above. Set it only to override the ladder deliberately — see the ' +
+        '*Stroke ladder* story for why one number does not work at every size.',
       table: {
-        defaultValue: { summary: '2' },
+        defaultValue: { summary: 'the ladder — 1.75 at xs/sm, 1.5 at md/lg/xl' },
+        type: { summary: 'number' },
       },
     },
     'aria-label': {
@@ -380,6 +384,125 @@ export const Colors: Story = {
 
 /**
  * Different stroke widths.
+ */
+/**
+ * **The stroke ladder — the line weight is automatic, and you should not set it.**
+ *
+ * The artwork is a 24-unit viewBox, so the line a person sees is `strokeWidth × size / 24`.
+ * One number for every size therefore does not give one line: a flat 1.5 draws 2px at `xl`
+ * and 0.75px at `xs`. Measured at 1x, that 0.75px line never exceeds **38% ink** — an icon
+ * asked for in `neutral-110` arrives at about a third of that contrast.
+ *
+ * So the default steps once: **1.75 at 16px and under, 1.5 above.** The top row is what you
+ * get for free. The second row is a flat 1.5 at every size, for comparison — look at `xs`
+ * and `sm`, which is where the console actually lives: table rows, buttons, input affixes.
+ */
+export const StrokeLadder: Story = {
+  parameters: { layout: 'padded' },
+  render: () => {
+    const sizes = [
+      { size: 'xs', px: 12, stroke: 1.75 },
+      { size: 'sm', px: 16, stroke: 1.75 },
+      { size: 'md', px: 20, stroke: 1.5 },
+      { size: 'lg', px: 24, stroke: 1.5 },
+      { size: 'xl', px: 32, stroke: 1.5 },
+    ] as const;
+    const names = ['search', 'settings', 'calendar', 'user', 'check'] as const;
+
+    const row = (label: string, flat: number | undefined) => (
+      <div className="mdt-flex mdt-items-end mdt-gap-8">
+        <span className="mdt-w-28 mdt-shrink-0 mdt-text-xs mdt-text-muted-foreground">{label}</span>
+        {sizes.map((s) => (
+          <div key={s.size} className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-2">
+            <div className="mdt-flex mdt-items-end mdt-gap-3" style={{ minHeight: 32 }}>
+              {names.map((n) => (
+                <Icon
+                  key={n}
+                  name={n}
+                  size={s.size}
+                  {...(flat === undefined ? {} : { strokeWidth: flat })}
+                  aria-hidden
+                />
+              ))}
+            </div>
+            <span className="mdt-text-[11px] mdt-text-muted-foreground">
+              {s.size} · {s.px}px · {flat ?? s.stroke}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-8">
+        {row('the ladder', undefined)}
+        {row('flat 1.5', 1.5)}
+        <div className="mdt-text-xs mdt-text-muted-foreground">
+          <p className="mdt-mb-2 mdt-font-medium mdt-text-foreground">
+            Rendered line and peak ink, measured at 1x
+          </p>
+          <table className="mdt-border-collapse">
+            <thead>
+              <tr>
+                {['', '12px', '16px', '20px', '24px', '32px'].map((h) => (
+                  <th key={h} className="mdt-px-3 mdt-py-1 mdt-text-left mdt-font-medium">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                [
+                  'stroke 2',
+                  '1.00 / 50%',
+                  '1.33 / 67%',
+                  '1.67 / 84%',
+                  '2.00 / 100%',
+                  '2.66 / 100%',
+                ],
+                [
+                  'stroke 1.75',
+                  '0.87 / 44%',
+                  '1.16 / 58%',
+                  '1.45 / 73%',
+                  '1.75 / 87%',
+                  '2.33 / 100%',
+                ],
+                [
+                  'stroke 1.5',
+                  '0.75 / 38%',
+                  '1.00 / 50%',
+                  '1.25 / 62%',
+                  '1.50 / 75%',
+                  '2.00 / 100%',
+                ],
+              ].map((r) => (
+                <tr key={r[0]}>
+                  {r.map((c, i) => (
+                    <td
+                      key={c}
+                      className={
+                        i === 0 ? 'mdt-px-3 mdt-py-1 mdt-font-medium' : 'mdt-px-3 mdt-py-1'
+                      }
+                    >
+                      {c}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * **Overriding the ladder.** `strokeWidth` still wins when you pass it, but you are opting out
+ * of a rule that exists for a measured reason — so have one. Every value here is drawn at `xl`,
+ * where the difference is easiest to see and least consequential.
  */
 export const StrokeWidth: Story = {
   render: () => (

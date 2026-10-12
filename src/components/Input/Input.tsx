@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority';
-import { forwardRef, useId, useRef } from 'react';
+import { forwardRef, useEffect, useId, useRef } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import type { InputProps } from './Input.types';
@@ -120,6 +120,24 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     /* the ✕ shows only while there is something to clear, and never on a held or disabled field */
     const own = useRef<HTMLInputElement | null>(null);
     const clearable = Boolean(onClear) && !held && !disabled && String(props.value ?? '') !== '';
+    /* ESCAPE EMPTIES A CLEARABLE FIELD, the same as its ✕ (Pranjal, 2026-10-11: every search clears with ✕ and Escape).
+     * Caught on the window before anything else hears it, because a drawer, dialog or open list closes on an Escape it
+     * hears at the document; with nothing left to clear, Escape passes through and closes them as before. */
+    const clearRef = useRef(onClear);
+    clearRef.current = onClear;
+    useEffect(() => {
+      if (!clearable) return undefined;
+      const onKey = (ev: KeyboardEvent) => {
+        if (ev.key !== 'Escape' || ev.target !== own.current) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        clearRef.current?.();
+      };
+      window.addEventListener('keydown', onKey, true);
+      return () => {
+        window.removeEventListener('keydown', onKey, true);
+      };
+    }, [clearable]);
     const setRef = (el: HTMLInputElement | null) => {
       own.current = el;
       if (typeof ref === 'function') ref(el);
@@ -137,7 +155,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn('mdt-flex mdt-flex-col mdt-gap-1.5', wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="mdt-text-[13px] mdt-text-neutral-90">
+          <label htmlFor={id} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
             {label}
             {/* the asterisk in the danger red (K-Field-05), 3 after the label as the console draws it (measured 2026-09-22) */}
             {required && <span className="mdt-ml-[3px] mdt-text-destructive">*</span>}

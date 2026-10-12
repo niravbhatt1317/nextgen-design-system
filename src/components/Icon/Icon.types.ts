@@ -49,8 +49,15 @@ interface IconBaseProps
   color?: IconColor;
 
   /**
-   * Stroke width for the icon
-   * @default 2
+   * Stroke width for the icon.
+   *
+   * Leave it unset and the **stroke ladder** picks it from `size`: 1.75 when the icon draws at
+   * 16px or smaller, 1.5 above that. The artwork is a 24-unit viewBox, so the line you see is
+   * `strokeWidth x size / 24` - one number for every size does not give one line, and a flat 1.5
+   * peaks at 38% ink at 12px. Set this only to override the ladder deliberately.
+   *
+   * @default the ladder - 1.75 at xs/sm (12/16px), 1.5 at md/lg/xl (20/24/32px)
+   * @see defaultStrokeFor
    */
   strokeWidth?: number;
 

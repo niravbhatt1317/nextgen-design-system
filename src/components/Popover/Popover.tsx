@@ -44,9 +44,20 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 const PopoverContent = forwardRef<
   ElementRef<typeof PopoverPrimitive.Content>,
   ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = 'center', sideOffset = 4, ...props }, ref) => (
+>(({ className, align = 'center', sideOffset = 4, onWheel, onTouchMove, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
+      /* A popover opened from a drawer or dialog is portalled outside it, so the dialog's scroll lock swallowed its
+         wheel and touch scrolling (the date picker's time list did not move, 2026-09-28). Stopping the event here
+         keeps it from reaching that document-level lock; the popover's own lists scroll natively. */
+      onWheel={(e) => {
+        e.stopPropagation();
+        onWheel?.(e);
+      }}
+      onTouchMove={(e) => {
+        e.stopPropagation();
+        onTouchMove?.(e);
+      }}
       ref={ref}
       align={align}
       sideOffset={sideOffset}

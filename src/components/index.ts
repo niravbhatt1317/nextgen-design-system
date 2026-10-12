@@ -349,7 +349,10 @@ export type {
 } from './HoverCard';
 
 // Icon
-export { Icon, iconVariants, iconRegistry, iconNames } from './Icon';
+// `defaultStrokeFor` is the stroke ladder in one function: 1.75 when an icon draws at 16px or
+// smaller, 1.5 above. Exported so a surface drawing its own SVG can match the library's weight
+// rather than guessing at it (Nirav, 2026-10-11).
+export { Icon, iconVariants, iconRegistry, iconNames, defaultStrokeFor } from './Icon';
 export type { IconProps, IconVariants, IconName, IconSize, IconColor } from './Icon';
 
 // IconTile — tinted container for a single icon. Org Mgmt's most duplicated

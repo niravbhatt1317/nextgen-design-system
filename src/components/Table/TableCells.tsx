@@ -161,7 +161,8 @@ export interface TagListProps {
   max?: number;
 }
 
-/** Teams, roles and the like: neutral square Badges, and a slate "+N" whose bubble lists the rest. */
+/** Teams, roles and the like: neutral square Badges, and a quiet "+N" whose bubble lists the rest - the value wears the
+ * badge, the counter is plain muted text (Pranjal 2026-10-11: one "+N" across the console). */
 function TagList({ items, max = 2 }: TagListProps) {
   if (items.length === 0) return <TableEmptyValue />;
   const shown = items.slice(0, max);
@@ -179,12 +180,10 @@ function TagList({ items, max = 2 }: TagListProps) {
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="mdt-inline-flex mdt-cursor-default mdt-rounded mdt-border-0 mdt-bg-transparent mdt-p-0"
+                className="mdt-inline-flex mdt-cursor-default mdt-rounded mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-xs mdt-text-muted-foreground focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-primary"
                 aria-label={`${String(rest.length)} more: ${rest.join(', ')}`}
               >
-                <Badge size="sm" shape="square" tone="slate" aria-hidden="true">
-                  +{rest.length}
-                </Badge>
+                <span aria-hidden="true">+{rest.length}</span>
               </button>
             </TooltipTrigger>
             <TooltipContent items={rest} />

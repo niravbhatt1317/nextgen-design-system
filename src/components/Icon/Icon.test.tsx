@@ -1,6 +1,6 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Icon } from './Icon';
+import { Icon, defaultStrokeFor } from './Icon';
 
 describe('Icon', () => {
   describe('Rendering', () => {
@@ -95,18 +95,52 @@ describe('Icon', () => {
   });
 
   describe('Stroke Width', () => {
-    it('applies default stroke width of 2', () => {
-      const { container } = render(<Icon name="user" aria-label="User" />);
-      const svg = container.querySelector('svg');
-      // React renders strokeWidth as stroke-width attribute in the DOM
-      expect(svg).toHaveAttribute('stroke-width', '2');
+    const strokeOf = (ui: React.ReactElement): string | null =>
+      render(ui).container.querySelector('svg')?.getAttribute('stroke-width') ?? null;
+
+    it('applies the md default of 1.5', () => {
+      // React renders strokeWidth as the stroke-width attribute in the DOM
+      expect(strokeOf(<Icon name="user" aria-label="User" />)).toBe('1.5');
     });
 
     it('applies custom stroke width', () => {
-      const { container } = render(<Icon name="user" strokeWidth={3} aria-label="User" />);
-      const svg = container.querySelector('svg');
-      // cloneElement overrides the prop, React renders as stroke-width
-      expect(svg).toHaveAttribute('stroke-width', '3');
+      // cloneElement overrides the artwork's own stroke-width="2"
+      expect(strokeOf(<Icon name="user" strokeWidth={3} aria-label="User" />)).toBe('3');
+    });
+
+    /* THE STROKE LADDER - 16px and under carry 1.75, above carries 1.5. The rendered line is
+     * strokeWidth x size / 24, so one number for every size does not give one line. */
+    it.each([
+      ['xs', '1.75'],
+      ['sm', '1.75'],
+      ['md', '1.5'],
+      ['lg', '1.5'],
+      ['xl', '1.5'],
+    ] as const)('size %s takes stroke %s by default', (size, expected) => {
+      expect(strokeOf(<Icon name="user" size={size} aria-label="User" />)).toBe(expected);
+    });
+
+    it.each([
+      [8, '1.75'],
+      [16, '1.75'],
+      [17, '1.5'],
+      [48, '1.5'],
+    ])('a raw size of %ipx takes stroke %s', (size, expected) => {
+      expect(strokeOf(<Icon name="user" size={size} aria-label="User" />)).toBe(expected);
+    });
+
+    it('an explicit strokeWidth still beats the ladder at a small size', () => {
+      expect(strokeOf(<Icon name="user" size="xs" strokeWidth={1} aria-label="User" />)).toBe('1');
+    });
+
+    it('defaultStrokeFor answers for an undefined size as it does for md', () => {
+      expect(defaultStrokeFor(undefined)).toBe(defaultStrokeFor('md'));
+      expect(defaultStrokeFor(undefined)).toBe(1.5);
+    });
+
+    it('defaultStrokeFor steps at exactly 16px', () => {
+      expect(defaultStrokeFor(16)).toBe(1.75);
+      expect(defaultStrokeFor(16.5)).toBe(1.5);
     });
   });
 
