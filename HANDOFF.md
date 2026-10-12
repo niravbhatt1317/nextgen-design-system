@@ -218,6 +218,24 @@ ships in the package, but nothing serves it at a URL and there is no `llms.txt`.
 `validate_usage`) and has never been used — worth finding out whether it already
 serves this before building one.
 
+**10. Twenty-seven icons draw their dots as `r="1"` stroked circles**, so the
+stroke width _is_ what fills the centre. At the old default of 2 the dot is
+solid; at the stroke ladder's 1.5 it leaves a hole of radius 0.25 units and
+becomes a tiny ring. At 16–24px that hole is sub-pixel and reads as a slightly
+lighter dot — at `size="xl"` (32px) and any larger custom size it starts to
+show. `more-horizontal` is the row-actions menu on every table, so this is not
+an obscure corner. `grep -rl 'r="1"' src/components/Icon/icons/` lists all
+twenty-seven: `dot`, `more-vertical`, `grip`, `circle-dot`, `accessibility`,
+`shopping-cart` and the rest. **Deferred deliberately (Nirav, 2026-10-12)** —
+not worth holding the ladder for, and the ladder did not cause it: 1.5 is
+Pranjal's pick in #155, and the ladder only keeps it at `md` and above. The fix
+is **not** a hand-edit, since `src/components/Icon/icons/` is generated. It is
+one rule in `scripts/generate-icons.mjs`, beside the carve-out that already
+keeps `fill` on a child for the ten icons that need it: a stroked `circle` with
+`r="1"` also gets `fill="currentColor"`. Then re-cut. Strictly non-regressive —
+at stroke 2 those dots are already solid, so nothing changes for anyone who
+overrides the ladder.
+
 ---
 
 ## Decisions made
