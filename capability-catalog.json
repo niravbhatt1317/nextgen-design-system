@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1203,
+  "capabilityCount": 1289,
   "counts": {
-    "story": 823,
-    "component": 304,
-    "utility": 41,
-    "hook": 35
+    "story": 881,
+    "component": 323,
+    "utility": 47,
+    "hook": 38
   },
   "capabilities": [
     {
@@ -74,6 +74,26 @@
       "propDocs": ""
     },
     {
+      "name": "AddPill",
+      "kind": "component",
+      "file": "src/components/TagPill/AddPill.tsx",
+      "area": "TagPill",
+      "summary": "AddPill - the dashed pill that adds a tag to a row of them.",
+      "doc": "AddPill - the dashed pill that adds a tag to a row of them. ```tsx <AddPill onClick={openField} title=\"Create or add a tag\">Add tag</AddPill> <AddPill onClick={() => assign('production')}>Production</AddPill> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AddPillStory",
+      "kind": "story",
+      "file": "src/components/TagPill/TagPill.stories.tsx",
+      "area": "TagPill",
+      "summary": "Story: New Components/TagPill / AddPillStory",
+      "doc": "New Components/TagPill AddPillStory",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Adornments",
       "kind": "story",
       "file": "src/components/Input/Input.stories.tsx",
@@ -100,6 +120,16 @@
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / AdvancedToolbar",
       "doc": "Components/ButtonGroup AdvancedToolbar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AfterBadges",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / AfterBadges",
+      "doc": "Components/OverflowCount AfterBadges",
       "props": [],
       "propDocs": ""
     },
@@ -519,7 +549,7 @@
       "file": "src/components/Avatar/Avatar.tsx",
       "area": "Avatar",
       "summary": "Avatar - a person or a thing, as a photo, one letter, or an icon.",
-      "doc": "Avatar - a person or a thing, as a photo, one letter, or an icon. Ruled by Pranjal on mocks/foundation/avatar.html (2026-09-20 → 21): ONE letter at every size; the type a step smaller than the scale; a PERSON is a circle and a THING is a square - the default follows the content (a letter or a photo → circle, an icon → the rounded square), and either can be forced; the square's corners are 6, and 12 at 56; the tone comes from the name and is never slate for a person; a photo falls back to the letter. ```tsx <Avatar name=\"Sarah Johnson\" /> <Avatar name=\"Sarah Johnson\" src=\"/sarah.jpg\" size=\"xl\" /> <Avatar name=\"Design team\" icon={<Icon name=\"users\" />} tone=\"blue\" /> <Avatar name=\"Sarah Johnson\" shape=\"rounded\" size=\"lg\" /> ```",
+      "doc": "Avatar - a person or a thing, as a photo, one letter, or an icon. Ruled by Pranjal on mocks/foundation/avatar.html (2026-09-20 → 21): ONE letter at every size; the type a step smaller than the scale; a PERSON is a circle and a THING is a square - the default follows the content (a letter or a photo → circle, an icon → the rounded square), and either can be forced; the square's corners are 6, and 12 at 56; the tone comes from the name and is never slate for a person; a photo falls back to the letter. ```tsx <Avatar name=\"Sarah Johnson\" /> <Avatar name=\"Sarah Johnson\" src=\"/sarah.jpg\" size=\"xl\" /> <Avatar name=\"Design team\" icon={<Icon name=\"users\" />} tone=\"blue\" /> <Avatar name=\"Sarah Johnson\" shape=\"rounded\" size=\"lg\" /> <Avatar name=\"Acme Corp\" logo=\"/acme.png\" size=\"xl\" status=\"active\" /> <Avatar name=\"Sarah Johnson\" src={photo} size=\"xl\" shape=\"rounded\" onEdit={setPhotoFile} /> ``` Ported from the console (Pranjal, 2026-10-13): the logo that fills the square (ui/OrgMark.jsx), the status dot on the corner (OrgHeader.jsx PresenceAvatar) and the camera button (ProfileDrawer.jsx). With a dot or a camera button the avatar sits in a frame; `ref` and `className` stay on the avatar its",
       "props": [],
       "propDocs": ""
     },
@@ -590,6 +620,16 @@
       "area": "Banner",
       "summary": "Banner - a message that sits in the page and stays there.",
       "doc": "Banner - a message that sits in the page and stays there. It is about the thing it sits above, it waits for you, and it can carry as many actions as the situation actually needs. **It is not a Toast**, though they share the six tones and the same palette deliberately. A toast floats over the page, arrives on its own and leaves on a timer, so you may not be looking when it appears and it can never hold the only copy of something important. A banner is in the layout, has no timer, and leaves only when the reason for it has gone. *The one-line test: if you would still need the message after a refresh, it is a banner.* It is announced as a region and read in the order it appears, not as a live region that interrupts - which is the other half of the same difference. The region takes its name from the title, so a banner with no title is not a landmark at all. ```tsx <Banner tone=\"warning\" title=\"Your trial ends in 3 days\" description=\"After that, agents keep read-only access until a plan is chosen.\" actions={<Button variant=\"secondary\" size=\"sm\">Choose a plan</Button>} onDismiss={hide} /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "BannerStack",
+      "kind": "component",
+      "file": "src/components/BannerStack/BannerStack.tsx",
+      "area": "BannerStack",
+      "summary": "BannerStack - several page notices folded into one fanned stack.",
+      "doc": "BannerStack - several page notices folded into one fanned stack. The highest-priority notice is shown in full at the front; a rail of ticks beside its glyph says how many wait behind it. Hover, Tab in or tap to fan them all out on a shade; each keeps its own actions and its own cross. The notices are library `Banner`s at `placement=\"page\"`. Dismissing is the notice's own `onDismiss` - remove it from `items` and the open fan re-flows in place. ```tsx <BannerStack items={[ { id: 'suspended', tone: 'danger', title: 'Suspended', description: 'Members can't sign in' }, { id: 'import-7', tone: 'success', title: 'Import complete', onDismiss: () => drop('import-7') }, ]} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -680,6 +720,16 @@
       "area": "Progress",
       "summary": "Story: Components/Progress / BreakdownWithoutMax",
       "doc": "Components/Progress BreakdownWithoutMax",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Busy",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Busy",
+      "doc": "Components/ConfirmDialog Busy",
       "props": [],
       "propDocs": ""
     },
@@ -981,6 +1031,16 @@
       "propDocs": "What the checkbox holds: the label of a chip, or the content of a card. Overrides the group's size for this chip alone."
     },
     {
+      "name": "CheckboxGrid",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / CheckboxGrid",
+      "doc": "New Components/SelectableCard CheckboxGrid",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "CheckboxGroup",
       "kind": "component",
       "file": "src/components/Checkbox/Checkbox.tsx",
@@ -1007,6 +1067,16 @@
       "area": "Checkbox",
       "summary": "Story: New Components/Checkbox / Chips",
       "doc": "New Components/Checkbox Chips",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Chips",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / Chips",
+      "doc": "New Components/SelectableCard Chips",
       "props": [],
       "propDocs": ""
     },
@@ -1177,6 +1247,16 @@
       "area": "Tabs",
       "summary": "Story: New Components/Tabs / Closable",
       "doc": "New Components/Tabs Closable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ClosingOptions",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ClosingOptions",
+      "doc": "New Components/Drawer ClosingOptions",
       "props": [],
       "propDocs": ""
     },
@@ -1480,6 +1560,33 @@
       "propDocs": ""
     },
     {
+      "name": "ConfirmDialog",
+      "kind": "component",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.tsx",
+      "area": "ConfirmDialog",
+      "summary": "ConfirmDialog - a ready-made \"are you sure\".",
+      "doc": "ConfirmDialog - a ready-made \"are you sure\". A title, what will happen and what will be lost, Cancel as the safe answer and one action. Give it a `typedWord` and the action stays locked until that word is typed (pasting counts). Return a promise from `onConfirm` and the action turns busy until it settles, with every way out held shut meanwhile. Built on `Dialog` and `useTypedConfirmation`; it adds the console's header (16 / 24 title over a hairline), its two widths and the bin on delete verbs. ```tsx <ConfirmDialog open={open} onOpenChange={setOpen} title=\"Delete team\" tone=\"destructive\" typedWord=\"delete\" confirmLabel=\"Delete team\" onConfirm={() => api.deleteTeam(id)} > This will permanently delete <b>Platform</b> and revoke its access. </ConfirmDialog> ```",
+      "props": [
+        "open",
+        "onOpenChange",
+        "title",
+        "description",
+        "children",
+        "confirmLabel",
+        "cancelLabel",
+        "tone",
+        "confirmIcon",
+        "typedWord",
+        "confirmDisabled",
+        "hideCancel",
+        "onConfirm",
+        "onCancel",
+        "width",
+        "className"
+      ],
+      "propDocs": "Whether the dialog is showing. Called with `false` whenever the dialog wants to close: Cancel, Escape, a press outside, the ✕, or the action finishing. The question, as a verb and its object: \"Delete team\", \"Disable user\". One supporting line under the title, inside the header. For the sentence that frames the decision (\"Roles are definitions - retiring one means deciding what happens to its holders.\"). The body: what will happen and what will be lost. Plain text renders at 14 / 1.5 in the reading ink; `<b>` or `<strong>` around a name lifts it to the heading ink. A `Banner` listing the consequences goes here too. The action's label - the concrete verb, never \"OK\" or \"Confirm\". The safe way out. Defaults to \"Cancel\". `destructive` for a red action. Defaults to `default`. The glyph before the action's label. Left unset, a destructive action whose label starts with Delete, Remove or Permanently delete gets the bin; `null` takes it away. A word the person has to type before the action unlocks - \"delete\" across the console. Matched trimmed and ignoring case, so a pasted word with a trailing space still counts. A further lock on the action, for a confirm that asks something else first ("
+    },
+    {
       "name": "ContactChips",
       "kind": "component",
       "file": "src/components/Table/TableCells.tsx",
@@ -1546,6 +1653,16 @@
       "area": "Pagination",
       "summary": "Story: Components/Pagination / Controlled",
       "doc": "Components/Pagination Controlled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Controlled",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Controlled",
+      "doc": "Components/PhoneInput Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1660,6 +1777,27 @@
       "propDocs": ""
     },
     {
+      "name": "CopyField",
+      "kind": "component",
+      "file": "src/components/CopyField/CopyField.tsx",
+      "area": "CopyField",
+      "summary": "CopyField - one line holding a value, with an icon-only copy button at its right end.",
+      "doc": "CopyField - one line holding a value, with an icon-only copy button at its right end. The button says \"Copy\" in a tooltip under the pointer and \"Copied\" for a moment after a press. The value can be masked. ```tsx <CopyField label=\"Base URL\" value=\"https://scim.oneops.example.com/v2\" /> <CopyField label=\"Bearer token\" value={token} masked /> <CopyField label=\"Entity ID\" value={entityId} info={<InfoTip label=\"About Entity ID\">…</InfoTip>} /> ```",
+      "props": [
+        "value",
+        "label",
+        "info",
+        "masked",
+        "mono",
+        "copyable",
+        "copyLabel",
+        "tip",
+        "onCopy",
+        "className"
+      ],
+      "propDocs": "The value shown, and the text the button copies - the whole of it, even when the line cuts it short. The field's name, above the line at 13/500. It also names the copy button (\"Copy Base URL\") and the masked dots (\"Hidden Base URL\"). Something beside the label - an InfoTip, usually. Shown only with a `label`. Shows the library's SecretDots in place of the value. The button still copies the real value; pass `copyable={false}` when it must not. The value in the monospace face. Off for plain words. Shows the copy button. Off for a value there is nothing to copy from. The copy button's accessible name. Defaults to \"Copy {label}\", or \"Copy\" without a label. The word in the tooltip while the pointer rests on the button. After a press it reads \"Copied\" for 1.4 seconds. Called with the value after every copy."
+    },
+    {
       "name": "CouldNotLoad",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
@@ -1686,6 +1824,26 @@
       "area": "AdvancedFilter",
       "summary": "The number the door shows: a group's rows count one each.",
       "doc": "The number the door shows: a group's rows count one each.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CountOnly",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / CountOnly",
+      "doc": "Components/OverflowCount CountOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "countryName",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "A country's English name from its ISO code (the console's few fixes first, then Intl, then the code itself).",
+      "doc": "A country's English name from its ISO code (the console's few fixes first, then Intl, then the code itself).",
       "props": [],
       "propDocs": ""
     },
@@ -1746,6 +1904,26 @@
       "area": "Banner",
       "summary": "Story: New Components/Banner / CustomIcon",
       "doc": "New Components/Banner CustomIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomIcon",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / CustomIcon",
+      "doc": "Components/EmptyState CustomIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomIcon",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / CustomIcon",
+      "doc": "Components/InfoTip CustomIcon",
       "props": [],
       "propDocs": ""
     },
@@ -2331,6 +2509,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Default",
+      "doc": "Components/BannerStack Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / Default",
@@ -2401,10 +2589,30 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Default",
+      "doc": "Components/ConfirmDialog Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Container/Container.stories.tsx",
       "area": "Container",
       "summary": "Story: Layout/Container / Default",
       "doc": "Layout/Container Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Default",
+      "doc": "Components/CopyField Default",
       "props": [],
       "propDocs": ""
     },
@@ -2425,6 +2633,16 @@
       "area": "Dialog",
       "summary": "Story: New Components/Dialog / Default",
       "doc": "New Components/Dialog Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / Default",
+      "doc": "Components/EmptyState Default",
       "props": [],
       "propDocs": ""
     },
@@ -2485,6 +2703,16 @@
       "area": "IconTile",
       "summary": "Story: New Components/IconTile / Default",
       "doc": "New Components/IconTile Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / Default",
+      "doc": "Components/InfoTip Default",
       "props": [],
       "propDocs": ""
     },
@@ -2571,10 +2799,30 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / Default",
+      "doc": "Components/OverflowCount Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
       "summary": "Story: Components/Pagination / Default",
       "doc": "Components/Pagination Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Default",
+      "doc": "Components/PhoneInput Default",
       "props": [],
       "propDocs": ""
     },
@@ -2899,6 +3147,16 @@
       "propDocs": ""
     },
     {
+      "name": "DeleteWithReplacement",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / DeleteWithReplacement",
+      "doc": "Components/ConfirmDialog DeleteWithReplacement",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Density",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -3005,6 +3263,16 @@
       "area": "Button Old",
       "summary": "Story: Deprecated/Button Old / DestructiveFamily",
       "doc": "Deprecated/Button Old DestructiveFamily",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "dialOf",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "A country's dial code without the \"+\", or \"\" for a code the directory does not know.",
+      "doc": "A country's dial code without the \"+\", or \"\" for a code the directory does not know.",
       "props": [],
       "propDocs": ""
     },
@@ -3289,6 +3557,16 @@
     {
       "name": "Disabled",
       "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Disabled",
+      "doc": "Components/PhoneInput Disabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Disabled",
+      "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
       "area": "Select",
       "summary": "Story: New Components/Select / Disabled",
@@ -3443,6 +3721,46 @@
       "area": "Breadcrumb",
       "summary": "Story: New Components/Breadcrumb / Drawer",
       "doc": "New Components/Breadcrumb Drawer",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerFooterSlots",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerFooterSlots",
+      "doc": "New Components/Sheet DrawerFooterSlots",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerSizes",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerSizes",
+      "doc": "New Components/Sheet DrawerSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerWithStepperBand",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerWithStepperBand",
+      "doc": "New Components/Sheet DrawerWithStepperBand",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerWithTabsBand",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerWithTabsBand",
+      "doc": "New Components/Sheet DrawerWithTabsBand",
       "props": [],
       "propDocs": ""
     },
@@ -3695,6 +4013,16 @@
       "doc": "Components/InlineTags Empty",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "EmptyState",
+      "kind": "component",
+      "file": "src/components/EmptyState/EmptyState.tsx",
+      "area": "EmptyState",
+      "summary": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table.",
+      "doc": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table. It is a status: the words change as a search or a filter empties the list, so a screen reader hears \"No people match\" without moving to it. Override `role` where the state is the only thing on a page that will never change. ```tsx <EmptyState icon=\"users\" title=\"No members yet\" description=\"Add people to give them this team's access.\" /> <EmptyState icon=\"search\" title=\"No people match\" description=\"Nothing here matches the search.\" action={<Button variant=\"outline\" size=\"sm\" onClick={clear}>Clear search</Button>} /> ```",
+      "props": ["icon", "title", "description", "action"],
+      "propDocs": "The glyph in the tile: an icon name from the library's set, or a node of your own. Defaults to `inbox`, as the console's block did. A node is drawn at the tile's 18px whatever size it asks for, so a glyph from another set lands the same as a named one. The headline - what is empty. No full stop (Pranjal, 2026-10-11). One muted line under the title: why it is empty, or what fills it. Optional - \"No attributes tracked yet\" needs nothing more. One control under the text, usually a `Button` - \"Clear search\", \"All organizations\". The console's pages pass an outline or secondary button at `sm`; the state does not pick it for them."
     },
     {
       "name": "EmptyState",
@@ -4047,6 +4375,16 @@
       "propDocs": "Content to display inside the description"
     },
     {
+      "name": "FormDialog",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / FormDialog",
+      "doc": "Components/ConfirmDialog FormDialog",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "FormExample",
       "kind": "story",
       "file": "src/components/OTPInput/OTPInput.stories.tsx",
@@ -4177,6 +4515,16 @@
       "propDocs": ""
     },
     {
+      "name": "FromString",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / FromString",
+      "doc": "Components/PhoneInput FromString",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "FrozenColumn",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -4303,6 +4651,16 @@
       "area": "Stack",
       "summary": "Story: Layout/Stack / GapSizes",
       "doc": "Layout/Stack GapSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "GaugeRing",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: New Components/KPI Card / GaugeRing",
+      "doc": "New Components/KPI Card GaugeRing",
       "props": [],
       "propDocs": ""
     },
@@ -4728,6 +5086,16 @@
       "propDocs": ""
     },
     {
+      "name": "InADrawerSection",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / InADrawerSection",
+      "doc": "Components/EmptyState InADrawerSection",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InAForm",
       "kind": "story",
       "file": "src/components/DateInput/DateInput.stories.tsx",
@@ -4830,6 +5198,16 @@
     {
       "name": "InContext",
       "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / InContext",
+      "doc": "Components/InfoTip InContext",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InContext",
+      "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
       "summary": "Story: Components/Label / InContext",
@@ -4858,6 +5236,16 @@
       "propDocs": ""
     },
     {
+      "name": "InfoFilledGlyph",
+      "kind": "component",
+      "file": "src/components/InfoTip/InfoFilledGlyph.tsx",
+      "area": "InfoTip",
+      "summary": "",
+      "doc": "",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InForm",
       "kind": "story",
       "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
@@ -4866,6 +5254,16 @@
       "doc": "Deprecated/Tooltip Old InForm",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "InfoTip",
+      "kind": "component",
+      "file": "src/components/InfoTip/InfoTip.tsx",
+      "area": "InfoTip",
+      "summary": "InfoTip - the ⓘ beside a heading or a label.",
+      "doc": "InfoTip - the ⓘ beside a heading or a label. Its explainer opens on hover, on keyboard focus and on a press, in the library Tooltip, optionally with a \"Learn more\" link. ```tsx <InfoTip label=\"About Security policy\">Applies to every user in this organization.</InfoTip> <InfoTip label=\"About SCIM\" learnMore={{ href: '/docs/scim', newTab: true }}> Your identity provider creates, updates and removes users here. </InfoTip> ```",
+      "props": ["label", "children", "learnMore", "side", "align", "maxWidth", "icon", "className"],
+      "propDocs": "The ⓘ's accessible name: \"About Security policy\". Required - nothing else names it. The explainer. Sentences read from the left. A link at the foot of the explainer. The pointer can travel into the bubble to reach it; from the keyboard, Tab on the open ⓘ moves into it. Which side of the ⓘ the explainer opens on. Near a screen edge it flips by itself. Where along the ⓘ the explainer sits. The widest the explainer grows before it wraps. Another glyph in place of the filled ⓘ, with the same explainer - a warning triangle, say."
     },
     {
       "name": "initialsForName",
@@ -5265,6 +5663,16 @@
       "propDocs": "Icon to display before the label Main label text Secondary description text Whether the item is disabled Whether the item is currently active/selected Click handler"
     },
     {
+      "name": "joinPhone",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "The stored phone from the field's two parts: \"+<dial> <national>\", the trunk 0 dropped outside the NANP.",
+      "doc": "The stored phone from the field's two parts: \"+<dial> <national>\", the trunk 0 dropped outside the NANP.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "JustifyContent",
       "kind": "story",
       "file": "src/components/Flex/Flex.stories.tsx",
@@ -5351,9 +5759,9 @@
       "file": "src/components/KpiCard/KpiCharts.tsx",
       "area": "KpiCard",
       "summary": "A half ring: a share of a limit, the percent inside, a caption under it.",
-      "doc": "A half ring: a share of a limit, the percent inside, a caption under it.",
-      "props": ["percent", "caption", "label"],
-      "propDocs": "0 to 100. The word under the number: \"capacity\". Spoken description; defaults to \"<percent>% <caption>\"."
+      "doc": "A half ring: a share of a limit, the percent inside, a caption under it. `shape=\"ring\"` draws the full health ring.",
+      "props": ["percent", "caption", "label", "shape", "bad"],
+      "propDocs": "0 to 100. The word under the number: \"capacity\". Drawn by the half gauge only; the ring only speaks it. Spoken description; defaults to \"<percent>% <caption>\". `half`: 104 × 62 in the neutral ladder, for a KpiCard's chart area. `ring`: the console Overview's health ring, 150 × 150, in the success green; a thin outer ring at 100%. Ring only: the fill in the danger colour instead of the success green. @default false"
     },
     {
       "name": "KpiStrip",
@@ -5801,6 +6209,16 @@
       "propDocs": ""
     },
     {
+      "name": "Locked",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Locked",
+      "doc": "Components/PhoneInput Locked",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LoginFormExample",
       "kind": "story",
       "file": "src/components/Separator/Separator.stories.tsx",
@@ -5881,12 +6299,42 @@
       "propDocs": ""
     },
     {
+      "name": "LongList",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / LongList",
+      "doc": "Components/OverflowCount LongList",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LongMessage",
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
       "summary": "Story: New Components/Banner / LongMessage",
       "doc": "New Components/Banner LongMessage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LongValue",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / LongValue",
+      "doc": "Components/CopyField LongValue",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Many",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Many",
+      "doc": "Components/BannerStack Many",
       "props": [],
       "propDocs": ""
     },
@@ -5927,6 +6375,16 @@
       "area": "CodeWell",
       "summary": "Story: Components/CodeWell / Maskable",
       "doc": "Components/CodeWell Maskable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Masked",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Masked",
+      "doc": "Components/CopyField Masked",
       "props": [],
       "propDocs": ""
     },
@@ -5997,6 +6455,16 @@
       "area": "ScrollArea",
       "summary": "Story: Components/ScrollArea / MenuList",
       "doc": "Components/ScrollArea MenuList",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "metaLine",
+      "kind": "utility",
+      "file": "src/components/_internal/MetaLine/metaLine.tsx",
+      "area": "_internal",
+      "summary": "metaLine - a meta line's parts split by a short hairline: \"SAML 2.0 | 2,104 sign-ins\".",
+      "doc": "metaLine - a meta line's parts split by a short hairline: \"SAML 2.0 | 2,104 sign-ins\". Shared by ActionCard and SheetIdentity so the separator is drawn one way.",
       "props": [],
       "propDocs": ""
     },
@@ -6247,6 +6715,16 @@
       "propDocs": ""
     },
     {
+      "name": "NestedPages",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / NestedPages",
+      "doc": "New Components/Drawer NestedPages",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NestedPanels",
       "kind": "story",
       "file": "src/components/Resizable/Resizable.stories.tsx",
@@ -6283,6 +6761,16 @@
       "area": "Dialog stories",
       "summary": "Story: Deprecated/Dialog stories / NoCloseButton",
       "doc": "Deprecated/Dialog stories NoCloseButton",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "NoCountry",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / NoCountry",
+      "doc": "Components/PhoneInput NoCountry",
       "props": [],
       "propDocs": ""
     },
@@ -6347,6 +6835,16 @@
       "propDocs": ""
     },
     {
+      "name": "NotFound",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / NotFound",
+      "doc": "Components/EmptyState NotFound",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NothingFound",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
@@ -6363,6 +6861,16 @@
       "area": "DataTable Old",
       "summary": "Story: Deprecated 2/DataTable Old / NothingFound",
       "doc": "Deprecated 2/DataTable Old NothingFound",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "NoticeOnly",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / NoticeOnly",
+      "doc": "Components/ConfirmDialog NoticeOnly",
       "props": [],
       "propDocs": ""
     },
@@ -6417,6 +6925,16 @@
       "propDocs": ""
     },
     {
+      "name": "ObjectDrawer",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ObjectDrawer",
+      "doc": "New Components/Drawer ObjectDrawer",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "OldButton",
       "kind": "component",
       "file": "src/utils/deprecated.ts",
@@ -6433,6 +6951,16 @@
       "area": "Callout",
       "summary": "Story: Deprecated/Callout / OnATintedSurface",
       "doc": "Deprecated/Callout OnATintedSurface",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "One",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / One",
+      "doc": "Components/BannerStack One",
       "props": [],
       "propDocs": ""
     },
@@ -6473,6 +7001,26 @@
       "area": "Upload",
       "summary": "Story: Components/Upload / OneImage",
       "doc": "Components/Upload OneImage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Open",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Open",
+      "doc": "Components/ConfirmDialog Open",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OrderedByTone",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / OrderedByTone",
+      "doc": "Components/BannerStack OrderedByTone",
       "props": [],
       "propDocs": ""
     },
@@ -6523,6 +7071,16 @@
       "area": "ToggleGroup",
       "summary": "Story: Components/ToggleGroup / OutlineVariant",
       "doc": "Components/ToggleGroup OutlineVariant",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OverflowCount",
+      "kind": "component",
+      "file": "src/components/OverflowCount/OverflowCount.tsx",
+      "area": "OverflowCount",
+      "summary": "",
+      "doc": "",
       "props": [],
       "propDocs": ""
     },
@@ -6857,6 +7415,36 @@
       "propDocs": ""
     },
     {
+      "name": "PhoneInput",
+      "kind": "component",
+      "file": "src/components/PhoneInput/PhoneInput.tsx",
+      "area": "PhoneInput",
+      "summary": "PhoneInput - one field joining a searchable country-code picker and the national number, with the library Input's label, help, error, held state and sizes.",
+      "doc": "PhoneInput - one field joining a searchable country-code picker and the national number, with the library Input's label, help, error, held state and sizes. ```tsx const [phone, setPhone] = useState({ country: 'IN', number: '' }); <PhoneInput label=\"Phone\" value={phone} onChange={(next) => setPhone(next)} /> // a stored string in and out <PhoneInput label=\"Phone\" value={record.phone} defaultCountry=\"US\" onChange={(_, phone) => save(phone)} /> ```",
+      "props": [
+        "value",
+        "defaultValue",
+        "defaultCountry",
+        "onChange",
+        "countries",
+        "renderFlag",
+        "countryLabel",
+        "searchPlaceholder",
+        "emptyMessage"
+      ],
+      "propDocs": "Controlled value: the two parts `{ country, number }`, or a stored phone string (\"+44 20 7946 0958\"), which is split into its country and national number. Uncontrolled starting value, in either shape. The country chosen while nothing says otherwise - for an empty string value, a bare number, or a dial code several countries share (+1 picks this one when it is a NANP country). Called on every change of the country or the number, with the two parts and the stored phone they join into (\"+<dial> <national>\", the trunk 0 dropped outside the NANP; \"\" while the number is empty). The countries offered. Every ITU dial-code country by default (`PHONE_COUNTRIES`). Draws a country's flag at 18 px (the console passes its flag-icons square). Without it, or when it returns nothing, the country's two-letter code sits in a small tile - the console's own fallback. The country picker's spoken name while no country is chosen. @default \"Country code\" The search box's placeholder in the country list. @default \"Search\" The country list's empty message. @default \"No country matches\""
+    },
+    {
+      "name": "phonePlaceholder",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "The national format the number field hints with for a country.",
+      "doc": "The national format the number field hints with for a country.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PicksItsOwnImage",
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
@@ -7147,6 +7735,16 @@
       "propDocs": ""
     },
     {
+      "name": "ProfileDrawer",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ProfileDrawer",
+      "doc": "New Components/Drawer ProfileDrawer",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "ProfileExample",
       "kind": "story",
       "file": "src/components/Popover/Popover.stories.tsx",
@@ -7235,6 +7833,16 @@
       "doc": "RadioGroupItem component for individual radio button items. ```tsx // Default radio <RadioGroupItem value=\"option1\" id=\"r1\" /> // Card variant <RadioGroupItem value=\"option1\" id=\"r1\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Option 1</div> <div className=\"text-sm text-muted-foreground\">Description</div> </div> </div> </RadioGroupItem> // One segment of a segmented group <RadioGroupItem value=\"low\">Low</RadioGroupItem> ```",
       "props": ["children", "size"],
       "propDocs": "What the item holds: the label of a segment, or the content of a card. Overrides the group's size for this segment alone."
+    },
+    {
+      "name": "RadioWithFollowUp",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / RadioWithFollowUp",
+      "doc": "New Components/SelectableCard RadioWithFollowUp",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "ReadOnly",
@@ -7737,6 +8345,37 @@
       "propDocs": ""
     },
     {
+      "name": "SelectableCard",
+      "kind": "component",
+      "file": "src/components/SelectableCard/SelectableCard.tsx",
+      "area": "SelectableCard",
+      "summary": "SelectableCard - one answer in a SelectableCardGroup, or a checkbox card on its own.",
+      "doc": "SelectableCard - one answer in a SelectableCardGroup, or a checkbox card on its own. Put a picker in `children` to ask the follow-up in place. <SelectableCard value=\"existing\" title=\"Replace with an existing access profile\" description=\"Every holder moves to the chosen profile.\"> {mode === 'existing' && <Select … />} </SelectableCard>",
+      "props": [
+        "value",
+        "checked",
+        "onCheckedChange",
+        "type",
+        "title",
+        "description",
+        "icon",
+        "tag",
+        "disabled",
+        "children"
+      ],
+      "propDocs": "This card's answer in a radio set. A checkbox card's state, when it is not in a radio set. Called with the new state when a checkbox card is pressed. A card outside any group is a checkbox. @default 'checkbox' The card's name: also its accessible name. The line under the title: also its accessible description. Not drawn on a chip. A bare glyph on the title's line. A hairline tag beside the title (\"Fastest\"), never filled. Holds this card. What the card holds under its words: a picker, a hint, an action. Anything interactive here keeps its press to itself and never picks the card."
+    },
+    {
+      "name": "SelectableCardGroup",
+      "kind": "component",
+      "file": "src/components/SelectableCard/SelectableCard.tsx",
+      "area": "SelectableCard",
+      "summary": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set.",
+      "doc": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set. <SelectableCardGroup value={mode} onValueChange={setMode} aria-labelledby=\"mode-label\"> <SelectableCard value=\"replace\" title=\"Replace with an existing profile\" description=\"…\" /> <SelectableCard value=\"remove\" title=\"Remove without replacement\" description=\"…\" /> </SelectableCardGroup>",
+      "props": ["type", "value", "onValueChange", "layout", "columns", "disabled"],
+      "propDocs": " The chosen card's `value` in a radio set. Called with the picked card's `value` in a radio set.  A grid of 2 or 3 columns. Unset, the grid fits as many 220px columns as it can. Holds every card in the set."
+    },
+    {
       "name": "SelectableRows",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -7977,6 +8616,26 @@
       "propDocs": ""
     },
     {
+      "name": "SheetBand",
+      "kind": "component",
+      "file": "src/components/Sheet/Sheet.tsx",
+      "area": "Sheet",
+      "summary": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both).",
+      "doc": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both). Pinned: it does not scroll with the body. THE HAIRLINE UNDER THE BAND IS THE BAND'S CALL (Pranjal, 2026-09-25): \"when we are using underline steppers variant we dont need a bottom border in sidedrawers only for non underline stepper variants we will be using the bottom border.\" The line is drawn, and taken away when the band holds the underline stepper - its own bars are the line - or a tab strip that carries its own hairline (one line, never two), however deep the caller wrapped it. Tabs without their hairline, an identity strip and the compact progress stepper keep it. `hairline={false}` switches it off for any other reason. A stepper wraps itself in 12 of vertical padding (`mdt-py-3`) in the band, as the console's StepsBand does.",
+      "props": ["children", "hairline"],
+      "propDocs": "The hairline under the band. `true` lets the band decide: the line is drawn, except when the band holds the underline stepper or a tab strip with its own hairline. `false` switches it off for any other band that wants no line."
+    },
+    {
+      "name": "SheetBody",
+      "kind": "component",
+      "file": "src/components/Sheet/Sheet.tsx",
+      "area": "Sheet",
+      "summary": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls.",
+      "doc": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls. 20 above and below, the frame's inset at the sides.",
+      "props": ["children"],
+      "propDocs": ""
+    },
+    {
       "name": "SheetClose",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
@@ -7992,9 +8651,19 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetContent - the main content container for the sheet.",
-      "doc": "SheetContent - the main content container for the sheet. ```tsx <Sheet> <SheetTrigger asChild> <Button>Open Sheet</Button> </SheetTrigger> <SheetContent side=\"right\"> <SheetHeader> <SheetTitle>Sheet Title</SheetTitle> <SheetDescription>Sheet description</SheetDescription> </SheetHeader> <p>Sheet content goes here</p> <SheetFooter> <Button>Action</Button> </SheetFooter> </SheetContent> </Sheet> ```",
-      "props": ["side", "showCloseButton"],
-      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button"
+      "doc": "SheetContent - the main content container for the sheet. `layout=\"drawer\"` is the console's drawer frame, composed from `SheetHeader` (title, actions, ✕ in one row), `SheetBand` (tabs or a stepper), `SheetBody` (scrolls) and `SheetFooter` (start group left, end group right). `size` picks the width from the drawer scale. ```tsx <Sheet> <SheetTrigger asChild> <Button>Open Sheet</Button> </SheetTrigger> <SheetContent side=\"right\"> <SheetHeader> <SheetTitle>Sheet Title</SheetTitle> <SheetDescription>Sheet description</SheetDescription> </SheetHeader> <p>Sheet content goes here</p> <SheetFooter> <Button>Action</Button> </SheetFooter> </SheetContent> </Sheet> ``` ```tsx <SheetContent size=\"lg\" layout=\"drawer\" inset={20}> <SheetHeader actions={<RowMenu />}> <SheetTitle>Asha Rao</SheetTitle> </SheetHeader> <SheetBand> <Tabs>…</Tabs> </SheetBand> <SheetBody>…</SheetBody> <SheetFooter start={<Button variant=\"destructiveGhost\">Delete</Button>}> <SheetClose asChild><Button variant=\"ghost\">Cancel</Button></SheetClose> <Button>Save</Button> </SheetFooter> </SheetContent> ```",
+      "props": [
+        "side",
+        "showCloseButton",
+        "size",
+        "width",
+        "layout",
+        "inset",
+        "closeOnOutsideClick",
+        "closeOnEscape",
+        "overlay"
+      ],
+      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button pinned to the corner The width from the drawer scale (left and right sheets only): sm 480 · md 560 · lg 720 · xl 780. Unset keeps the original width (75% on mobile, capped at 24rem). A width class in `className` still wins. A free width for a left or right sheet, instead of the `size` scale: a number is pixels (`600`), a string is any CSS length (`'40%'`, `'600px'`, `'50vw'`). Wins over `size`, and never grows past the screen. `drawer` turns the content into the console's drawer frame - compose it from `SheetHeader`, `SheetBand`, `SheetBody` and `SheetFooter`. The side inset of the drawer frame's header, band, body and footer, in px. Whether a press outside the panel - on the scrim, or on the page when there is no scrim - closes it. Turn it off for a form whose draft a stray click would lose. Whether Escape closes it. A control marked `data-escape-stays` keeps the key either way. Whether the scrim dims the page behind. Without it the page still cannot be used while the panel is open; pass `modal={false}` on `Sheet` as well to keep the page live beside it."
     },
     {
       "name": "SheetDescription",
@@ -8007,14 +8676,24 @@
       "propDocs": ""
     },
     {
+      "name": "SheetField",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right.",
+      "doc": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right. The same row reads a record and edits it. <SheetField label=\"Email\">sarah.johnson@company.com</SheetField> <SheetField label=\"Job title\" htmlFor=\"job\"><Input id=\"job\" defaultValue=\"HR Coordinator\" /></SheetField>",
+      "props": ["label", "htmlFor", "children"],
+      "propDocs": "The label on the left, in the slate ink. Ties the label to a control on the right, so a press on the label focuses it. The value or the control on the right."
+    },
+    {
       "name": "SheetFooter",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetFooter - container for action buttons.",
-      "doc": "SheetFooter - container for action buttons.",
-      "props": ["children"],
-      "propDocs": ""
+      "doc": "SheetFooter - container for action buttons. Three parts (the console's O9 footer): `start` pinned left - the escape, or a destructive action - a spacer the footer owns, then the children as the end group - the supporting action and the primary verb. Without `start` the children sit right-aligned as before. In the drawer frame it is pinned under the body with a hairline over it.",
+      "props": ["children", "start"],
+      "propDocs": "The end group (right): the supporting action, then the primary verb. The start group (left): the escape (Cancel / Close) or a destructive action. When set, the footer is one row - start, a spacer, then the children - in any layout."
     },
     {
       "name": "SheetHeader",
@@ -8022,8 +8701,38 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetHeader - container for title and description.",
-      "doc": "SheetHeader - container for title and description.",
-      "props": ["children"],
+      "doc": "SheetHeader - container for title and description. In the drawer frame it is the console's header row: the title (or a crumb) left, then the `actions`, then the ✕ - all centred on the row, 60 high at least so a wrapping title grows it instead of clipping, a hairline under it.",
+      "props": ["children", "actions", "showClose"],
+      "propDocs": "Controls at the right end of the header row, before the close - a ⋮ menu, say. Drawer layout only. Whether the header row carries the close (✕), centred on the title. Drawer layout only."
+    },
+    {
+      "name": "SheetIdentity",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles).",
+      "doc": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles). <SheetIdentity mark={<IconTile icon={<Icon name=\"key-round\" />} tone=\"blue\" size=\"xl\" />} name=\"Helpdesk Access\" status={<Badge tone=\"success\" dot>Active</Badge>} lines={[['IT Support, Security Team', 'Teams'], ['Created by Natasha Manglore', '12 Aug 2026']]} actions={<Button variant=\"outline\" size=\"sm\">Edit</Button>} />",
+      "props": ["mark", "name", "status", "lines", "actions", "children"],
+      "propDocs": "The mark on the left: an IconTile, an Avatar, a logo. The object's name, 16/600, truncated on one line. A Badge beside the name: Active, Tenant owner. The lines under the name, in the quiet ink. A line given as an array is split by short hairlines: `['IT Support, Security Team', 'Teams']`. Controls at the top right: Edit, the ⋯ menu. What sits under the identity row: a strip of key facts, say."
+    },
+    {
+      "name": "SheetNavigation",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back.",
+      "doc": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back. Generic: any page can push any other, as deep as it needs. Put it inside `SheetContent`; it starts over at `root` every time the drawer opens, because the content unmounts when it closes. <SheetContent layout=\"drawer\"> <SheetNavigation root={{ id: 'view', title: 'User management' }}> <SheetHeader><SheetTitle><SheetNavigationTitle /></SheetTitle></SheetHeader> <SheetPage id=\"view\"><ProfileView /></SheetPage> <SheetPage id=\"edit\"><EditForm /></SheetPage> </SheetNavigation> </SheetContent> // anywhere inside: const { push, back } = useSheetNavigation(); // push({ id: 'edit', title: 'Edit details' })",
+      "props": ["root", "onPageChange", "children"],
+      "propDocs": "The page the drawer opens on. Called with the new current page and the whole stack after every push, back and reset."
+    },
+    {
+      "name": "SheetNavigationTitle",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetNavigationTitle - the header's words: the first page's title on its own, and on any page after it the trail with a back button (the Breadcrumb's drawer form).",
+      "doc": "SheetNavigationTitle - the header's words: the first page's title on its own, and on any page after it the trail with a back button (the Breadcrumb's drawer form). Put it inside SheetTitle, so the drawer is named by its place. Focus follows the page: after a push it lands on back, after the last back on the title - the button that was pressed has gone with its page.",
+      "props": [],
       "propDocs": ""
     },
     {
@@ -8037,6 +8746,16 @@
       "propDocs": ""
     },
     {
+      "name": "SheetPage",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page.",
+      "doc": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page. A page brings its own SheetBand, SheetBody and SheetFooter.",
+      "props": ["id", "children"],
+      "propDocs": "Matches a SheetNavigationEntry's id."
+    },
+    {
       "name": "SheetPortal",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
@@ -8047,12 +8766,22 @@
       "propDocs": ""
     },
     {
+      "name": "SheetSection",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content.",
+      "doc": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content. Sections that follow one another are split by a hairline, never by a card inside a drawer. <SheetSection title=\"Access details\" hint=\"Set how long guest users can access your organization\"> <SheetField label=\"Access started\">Apr 1, 2026</SheetField> </SheetSection>",
+      "props": ["title", "hint", "action", "children"],
+      "propDocs": "The heading, 14/600. One quiet line under the heading. A control at the right end of the heading row: Add, Edit."
+    },
+    {
       "name": "SheetTitle",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetTitle - the title of the sheet.",
-      "doc": "SheetTitle - the title of the sheet.",
+      "doc": "SheetTitle - the title of the sheet. In the drawer frame: 16/600 in the heading ink (18 was off the type scale - Pranjal 2026-08-24), taking the row's free width so the actions and the ✕ stay at the right end.",
       "props": [],
       "propDocs": ""
     },
@@ -8379,6 +9108,16 @@
     {
       "name": "Sizes",
       "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Sizes",
+      "doc": "Components/PhoneInput Sizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sizes",
+      "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
       "summary": "Story: Components/Progress / Sizes",
@@ -8527,6 +9266,16 @@
       "propDocs": ""
     },
     {
+      "name": "SmallWithIcon",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: New Components/Badge / SmallWithIcon",
+      "doc": "New Components/Badge SmallWithIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Snapping",
       "kind": "story",
       "file": "src/components/KpiCard/KpiStrip.stories.tsx",
@@ -8575,6 +9324,16 @@
       "doc": "Spinner - Loading indicator component A versatile spinner component for indicating loading states with the following features: - Multiple color variants (default, primary, secondary, accent) - Multiple size variants (sm, md, lg) - CSS animation-based spinning - SVG-based for crisp rendering at all sizes - Accessible with proper ARIA attributes ```tsx // Basic usage <Spinner /> // With variant and size <Spinner variant=\"primary\" size=\"lg\" /> // With custom label <Spinner aria-label=\"Loading data...\" /> ```",
       "props": ["className"],
       "propDocs": "Custom class name to apply to the spinner"
+    },
+    {
+      "name": "splitPhone",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "\"+44 20 7946 0958\" → { country: \"GB\", number: \"20 7946 0958\" }; a bare number keeps the hinted country.",
+      "doc": "\"+44 20 7946 0958\" → { country: \"GB\", number: \"20 7946 0958\" }; a bare number keeps the hinted country.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "Stack",
@@ -10220,6 +10979,16 @@
       "propDocs": ""
     },
     {
+      "name": "TitleOnly",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / TitleOnly",
+      "doc": "Components/EmptyState TitleOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "toast",
       "kind": "utility",
       "file": "src/components/Toast/Toast.tsx",
@@ -10688,6 +11457,16 @@
       "propDocs": ""
     },
     {
+      "name": "Two",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Two",
+      "doc": "Components/BannerStack Two",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TwoFrozenColumns",
       "kind": "story",
       "file": "src/components/TableOld/TableColumnControls.stories.tsx",
@@ -10704,6 +11483,16 @@
       "area": "Table Old Cell Recipes",
       "summary": "Story: Deprecated/Table Old Cell Recipes / TwoLine",
       "doc": "Deprecated/Table Old Cell Recipes TwoLine",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TypedDelete",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / TypedDelete",
+      "doc": "Components/ConfirmDialog TypedDelete",
       "props": [],
       "propDocs": ""
     },
@@ -10878,6 +11667,16 @@
       "propDocs": ""
     },
     {
+      "name": "useForm",
+      "kind": "hook",
+      "file": "src/components/Form/useForm.ts",
+      "area": "Form",
+      "summary": "useForm - one form's values, checks and Save rule, for every form in the library.",
+      "doc": "useForm - one form's values, checks and Save rule, for every form in the library. Save waits until something has changed and every required field is filled; a wrong format shows when the field is left or Save is pressed, not while typing; a submit with a problem focuses the first field that has one. const form = useForm({ initialValues: { name: 'Helpdesk Access', email: '' }, rules: { name: { required: 'Enter a name' }, email: { required: true, validate: (v) => (/@/.test(v) ? undefined : 'Enter a valid email') }, }, onSubmit: save, }); <Form id=\"edit\" onSubmit={form.handleSubmit}> <Input label=\"Name\" {...form.field('name')} /> </Form> <Button type=\"submit\" form=\"edit\" disabled={!form.canSubmit}>Save changes</Button>",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useInfiniteScrollOld",
       "kind": "hook",
       "file": "src/components/TableOld/useInfiniteScroll.ts",
@@ -10944,6 +11743,26 @@
       "area": "TableOld",
       "summary": "Holds a table's saved views.",
       "doc": "Holds a table's saved views. A view is a name for a table you have set up - the columns you kept, the sort you chose, the filters you applied - so you can get back to it tomorrow without doing it again. It is the payoff for everything in 5a to 5f: each of those controls already reports its state, and this is what makes that state worth something. Like the rest of TableOld, **it holds state and never touches your rows**, and it does not persist anything either. Pass `initial` in and write `onChange` out; where they go is the product's decision, and the interesting ones - views shared with a team, views in a URL - are impossible for a hook that assumed `localStorage`. ```tsx const current = useMemo(() => ({ columns: cols.state, sort: sort.rules }), [cols.state, sort.rules]); const views = useSavedViewsOld({ current, initial: stored }); // Applying one: const next = views.apply(id); if (next) { cols.restore(next.columns); sort.restore(next.sort); } ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSheetLeaveGuard",
+      "kind": "hook",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "useSheetLeaveGuard - lets a page stop back from leaving it: return `false` to stay (open \"Discard unsaved changes?\", say), then call `back({ force: true })` once the answer is yes.",
+      "doc": "useSheetLeaveGuard - lets a page stop back from leaving it: return `false` to stay (open \"Discard unsaved changes?\", say), then call `back({ force: true })` once the answer is yes. It guards the page it is used in, and only while that page is mounted. useSheetLeaveGuard(() => { if (!dirty) return true; setAsking(true); return false; });",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSheetNavigation",
+      "kind": "hook",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "useSheetNavigation - the drawer's page stack, from anywhere inside a SheetNavigation: `push` a page, go `back`, `reset` to the first, and read where you are (`current`, `depth`, `stack`).",
+      "doc": "useSheetNavigation - the drawer's page stack, from anywhere inside a SheetNavigation: `push` a page, go `back`, `reset` to the first, and read where you are (`current`, `depth`, `stack`).",
       "props": [],
       "propDocs": ""
     },
@@ -11200,6 +12019,16 @@
     {
       "name": "Variations",
       "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Variations",
+      "doc": "Components/CopyField Variations",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Variations",
+      "kind": "story",
       "file": "src/components/KpiCard/KpiCard.stories.tsx",
       "area": "KPI Card",
       "summary": "Story: New Components/KPI Card / Variations",
@@ -11384,6 +12213,16 @@
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / Wide",
       "doc": "Deprecated/Sidebar Wide",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithAction",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / WithAction",
+      "doc": "Components/EmptyState WithAction",
       "props": [],
       "propDocs": ""
     },
@@ -11628,6 +12467,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithConsequences",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / WithConsequences",
+      "doc": "Components/ConfirmDialog WithConsequences",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithCounts",
       "kind": "story",
       "file": "src/components/Tabs/Tabs.stories.tsx",
@@ -11684,6 +12533,16 @@
       "area": "Banner",
       "summary": "Story: New Components/Banner / WithDescription",
       "doc": "New Components/Banner WithDescription",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithDescription",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / WithDescription",
+      "doc": "Components/ConfirmDialog WithDescription",
       "props": [],
       "propDocs": ""
     },
@@ -11768,6 +12627,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithEditButton",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithEditButton",
+      "doc": "New Components/Avatar WithEditButton",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithEllipsis",
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
@@ -11804,6 +12673,16 @@
       "area": "Input Old",
       "summary": "Story: Deprecated 2/Input Old / WithError",
       "doc": "Deprecated 2/Input Old WithError",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithError",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / WithError",
+      "doc": "Components/PhoneInput WithError",
       "props": [],
       "propDocs": ""
     },
@@ -11914,6 +12793,16 @@
       "area": "Input Old",
       "summary": "Story: Deprecated 2/Input Old / WithHelperText",
       "doc": "Deprecated 2/Input Old WithHelperText",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithHelperText",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / WithHelperText",
+      "doc": "Components/PhoneInput WithHelperText",
       "props": [],
       "propDocs": ""
     },
@@ -12118,6 +13007,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithLearnMore",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / WithLearnMore",
+      "doc": "Components/InfoTip WithLearnMore",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithLeftIcon",
       "kind": "story",
       "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
@@ -12144,6 +13043,16 @@
       "area": "Table Old",
       "summary": "Story: Deprecated/Table Old / WithLoadingState",
       "doc": "Deprecated/Table Old WithLoadingState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithLogo",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithLogo",
+      "doc": "New Components/Avatar WithLogo",
       "props": [],
       "propDocs": ""
     },
@@ -12394,6 +13303,16 @@
       "area": "Resizable",
       "summary": "Story: Components/Resizable / WithSizeConstraints",
       "doc": "Components/Resizable WithSizeConstraints",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithStatus",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithStatus",
+      "doc": "New Components/Avatar WithStatus",
       "props": [],
       "propDocs": ""
     },

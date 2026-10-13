@@ -426,6 +426,9 @@ const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
         // carries a tag, which makes its line taller and closes that gap on its
         // own. `DialogTitle` takes the 2px back in that case.
         'mdt-flex mdt-flex-col mdt-space-y-2 mdt-text-center sm:mdt-text-left',
+        // THE CONSOLE HEADER (Kevin 2026-10-13, from the console's Modal and ConfirmDialog): a line under the header,
+        // 14 below the words. Tabs bring their own underline, so a tabbed header keeps none of its own.
+        tabs === undefined && 'mdt-border-b mdt-border-border mdt-pb-3.5',
         className
       )}
       {...props}
@@ -686,7 +689,8 @@ const DialogTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, D
     <DialogPrimitive.Title
       ref={ref}
       className={cn(
-        'mdt-text-lg mdt-font-semibold mdt-leading-none mdt-tracking-tight',
+        // 16/24, the console's dialog title = the drawer title (Kevin 2026-10-13; it was 18 on a tight line)
+        'mdt-text-base mdt-font-semibold mdt-leading-6 mdt-tracking-tight',
         tag !== undefined && [
           'mdt-flex mdt-items-center mdt-gap-2',
           // 6 under a title that carries a tag, against 8 under one that does

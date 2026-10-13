@@ -142,8 +142,8 @@ function ConfirmDialogPanel({
     <>
       {/* THE DIALOG HEADER = THE DRAWER HEADER (Pranjal, 2026-10-03): the title at 16 / 24, not the library
        * dialog's 18, and the border-token hairline under the header, 14 below the words (atoms.jsx `Modal`). */}
-      <DialogHeader className="mdt-border-b mdt-border-border mdt-pb-3.5">
-        <DialogTitle className="mdt-text-base mdt-leading-6">{title}</DialogTitle>
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
         {description !== undefined && <DialogDescription>{description}</DialogDescription>}
       </DialogHeader>
 

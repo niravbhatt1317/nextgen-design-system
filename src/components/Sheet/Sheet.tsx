@@ -183,6 +183,10 @@ const SIZE_CLASS: Record<SheetSize, string> = {
   xl: 'mdt-w-[780px] mdt-max-w-[100vw]',
 };
 
+/** A width as CSS: a number, or a string of bare digits ("600"), is pixels; anything else passes through. */
+const asLength = (width: number | string): string =>
+  typeof width === 'number' || /^\d+(\.\d+)?$/.test(width) ? `${String(width)}px` : width;
+
 /* the drawer's side inset - the console's `pad`: 24 by default, 20 for the Users and
  * Organizations drawers, 16 asked for once */
 const INSET_CLASS: Record<SheetInset, string> = {
@@ -272,7 +276,13 @@ const SheetContent = forwardRef<
       size,
       layout = 'stack',
       inset = 24,
+      closeOnOutsideClick = true,
+      closeOnEscape = true,
+      overlay = true,
+      width,
+      style,
       onEscapeKeyDown,
+      onInteractOutside,
       ...props
     },
     ref
@@ -285,28 +295,37 @@ const SheetContent = forwardRef<
     const hasWidthClass = className && /mdt-w-|mdt-max-w-/.test(className);
     const defaultWidthClass = sideways ? 'mdt-w-3/4 sm:mdt-max-w-sm' : '';
     const widthClass = size && sideways ? SIZE_CLASS[size] : defaultWidthClass;
+    // a free width wins over `size`: a number is pixels, a string is any CSS length ('40%', '600px')
+    const ownWidth = width !== undefined && sideways;
+    const widthStyle = ownWidth ? { width: asLength(width), maxWidth: '100vw' } : undefined;
 
     return (
       <SheetPortal>
-        <SheetOverlay />
+        {overlay && <SheetOverlay />}
         <SheetFrameContext.Provider value={{ layout, inset }}>
           <DialogPrimitive.Content
             ref={ref}
             data-layout={layout}
-            data-size={size && sideways ? size : undefined}
+            data-size={size && sideways && !ownWidth ? size : undefined}
+            style={widthStyle ? { ...widthStyle, ...style } : style}
             onEscapeKeyDown={(event) => {
               /* ESCAPE INSIDE A CONTROL THAT HANDLES IT (the console's drawer, 2026-10-05): a control marked
                * `data-escape-stays` takes the key for itself and the drawer stays open - Radix listens on the
                * document in the capture phase, so the control cannot stop it on its own */
               const target = event.target;
-              if (drawer && target instanceof Element && target.closest('[data-escape-stays]')) {
-                event.preventDefault();
-              }
+              const stays =
+                drawer && target instanceof Element && target.closest('[data-escape-stays]');
+              if (!closeOnEscape || stays) event.preventDefault();
               onEscapeKeyDown?.(event);
+            }}
+            onInteractOutside={(event) => {
+              // a press outside the panel (on the scrim, or the page when there is none) closes it unless held
+              if (!closeOnOutsideClick) event.preventDefault();
+              onInteractOutside?.(event);
             }}
             className={cn(
               sheetVariants({ side }),
-              !hasWidthClass && widthClass,
+              !hasWidthClass && !ownWidth && widthClass,
               /* the frame: header, band, body and footer each carry their own inset; and NO EDGE ON A
                * SIDE DRAWER (Pranjal 2026-09-10) - the panel already separates itself from the page by
                * sitting on top of the scrim, a hairline down its side read as a stray grey strip */

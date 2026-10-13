@@ -22,15 +22,15 @@
     --mdt-neutral-40: 218 29% 84%; /* #CAD3E2 - 27% rendered #CBD3E1, a unit off its own hex (C-115, 2026-09-22) */
     --mdt-neutral-50: 218 26% 65%; /* #8FA0BD - the comment read #8E9FBC; 218 26% 65% has always rendered #8FA0BD */
     --mdt-neutral-60: 217 24% 55%; /* #7186A8 */
-    --mdt-neutral-70: 216 24% 52%; /* #697FA0 */
+    --mdt-neutral-70: 218 26% 65%; /* #8FA0BD - the console's muted ink, the same as neutral-50 (Kevin 2026-10-13: adopt the console's light values; was 216 24% 52% #697FA0) */
     --mdt-neutral-80: 217 22% 45%; /* #5A6D8C */
     --mdt-neutral-90: 218 23% 41%; /* #516381 */
     --mdt-neutral-100: 218 24% 37%; /* #485975 */
-    --mdt-neutral-110: 217 30% 24%; /* #2B394F */
+    --mdt-neutral-110: 216 36% 18%; /* #1D2A3E - the console's body ink, the same as neutral-130 (Kevin 2026-10-13; was 217 30% 24% #2B394F) */
     --mdt-neutral-120: 218 33% 21%; /* #243147 */
     --mdt-neutral-130: 216 36% 18%; /* #1D2A3E */
     --mdt-neutral-140: 217 40% 15%; /* #172336 */
-    --mdt-neutral-150: 216 44% 12%; /* #111C2C */
+    --mdt-neutral-150: 216 36% 18%; /* #1D2A3E - the console points this at neutral-110 (Kevin 2026-10-13; was 216 44% 12% #111C2C) */
     --mdt-neutral-160: 217 57% 10%; /* #0B1628 - Darkest */
 
     /* ============================================
@@ -99,13 +99,13 @@
        BLUE SCALE (Info/Primary)
        ============================================ */
     --mdt-blue-05: 217 100% 98%; /* #f0f6ff */
-    --mdt-blue-10: 213 100% 96%; /* #e8f1ff */
+    --mdt-blue-10: 214 90% 97%; /* #F0F6FE - the console's chip and tint wash (Kevin 2026-10-13; was 213 100% 96%) */
     --mdt-blue-20: 213 100% 82%; /* #a8c8ff */
     --mdt-blue-30: 214 100% 76%; /* #85b3ff */
     --mdt-blue-40: 215 100% 69%; /* #619eff */
     --mdt-blue-50: 218 100% 60%; /* #3d7dff - Primary blue */
     --mdt-blue-55: 218 100% 57%; /* #2970ff */
-    --mdt-blue-60: 218 100% 50%; /* #0052ff */
+    --mdt-blue-60: 214 98% 44%; /* #0262DE - the console's interactive blue, = azure-60 (Kevin 2026-10-13; was 218 100% 50%) */
     --mdt-blue-65: 218 100% 45%; /* #0047e6 */
     --mdt-blue-70: 218 100% 40%; /* #003dcc */
     --mdt-blue-80: 218 100% 30%; /* #002e99 */
@@ -283,9 +283,8 @@
     --mdt-secondary-foreground: var(--mdt-black);
 
     --mdt-muted: var(--mdt-neutral-30);
-    --mdt-muted-foreground: var(
-      --mdt-ink-500
-    ); /* 2026-09-03: the console's muted text; was neutral-100 */
+    /* the console's muted text, neutral-70 = #8FA0BD (Kevin 2026-10-13; was ink-500 #727283) */
+    --mdt-muted-foreground: var(--mdt-neutral-70);
     --mdt-muted-foreground-subtle: var(
       --mdt-ink-400
     ); /* quiet headings (the nav's "Collections" / "Favorite"); 2.67:1 by design */
@@ -345,7 +344,8 @@
     --mdt-info: var(--mdt-azure-60); /* 2026-09-03: the console's interactive blue; was blue-50 */
     --mdt-info-foreground: var(--mdt-white);
 
-    --mdt-border: var(--mdt-neutral-40);
+    /* the console's border: the table's divider grey (Kevin 2026-10-13, adopting the console's global.css; was neutral-40) */
+    --mdt-border: var(--mdt-neutral-20);
     --mdt-input: var(--mdt-neutral-40);
     --mdt-ring: var(
       --mdt-azure-60
@@ -390,7 +390,9 @@
        a little - his amber is browner, his green purer. Every tone still
        clears the readability minimum by a wide margin.
        ============================================ */
-    --mdt-feedback-info-bg: var(--mdt-blue-05);
+    --mdt-feedback-info-bg: var(
+      --mdt-blue-10
+    ); /* the console's info wash (Kevin 2026-10-13; was blue-05) */
     --mdt-feedback-info-border: var(--mdt-blue-20);
     --mdt-feedback-info-icon: var(--mdt-blue-60);
 

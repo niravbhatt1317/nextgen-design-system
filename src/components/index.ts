@@ -174,6 +174,15 @@ export type {
   CollapsibleCardOwnProps,
 } from './Card';
 
+// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right
+export { SelectableCard, SelectableCardGroup } from './SelectableCard';
+export type {
+  SelectableCardProps,
+  SelectableCardGroupProps,
+  SelectableCardType,
+  SelectableCardLayout,
+} from './SelectableCard';
+
 // ActionCard
 export { ActionCard, actionCardVariants } from './ActionCard';
 export type { ActionCardProps, ActionCardVariant } from './ActionCard';
@@ -324,7 +333,22 @@ export { Flex, flexVariants } from './Flex';
 export type { FlexProps, FlexVariants } from './Flex';
 
 // Form
-export { Form, FormField, FormLabel, FormControl, FormMessage, FormDescription } from './Form';
+export {
+  Form,
+  FormField,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  FormDescription,
+  useForm,
+} from './Form';
+export type {
+  UseFormOptions,
+  UseFormReturn,
+  FormRules,
+  FormFieldRule,
+  FormFieldBinding,
+} from './Form';
 export type {
   FormProps,
   FormFieldProps,
@@ -536,8 +560,23 @@ export {
   SheetDescription,
   sheetVariants,
   SHEET_SIZES,
+  SheetIdentity,
+  SheetSection,
+  SheetField,
+  SheetNavigation,
+  SheetPage,
+  SheetNavigationTitle,
+  useSheetNavigation,
+  useSheetLeaveGuard,
 } from './Sheet';
 export type {
+  SheetIdentityProps,
+  SheetSectionProps,
+  SheetFieldProps,
+  SheetNavigationEntry,
+  SheetNavigationProps,
+  SheetNavigationValue,
+  SheetPageProps,
   SheetProps,
   SheetTriggerProps,
   SheetPortalProps,
