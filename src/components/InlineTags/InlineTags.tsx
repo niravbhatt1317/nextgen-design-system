@@ -136,6 +136,13 @@ const InlineTags = forwardRef<HTMLDivElement, InlineTagsProps>(
         value={d.query}
         placeholder={placeholder}
         aria-label={placeholder}
+        /* The field drives a list that lives in a popover, so it has to say so: without
+         * aria-activedescendant the arrow keys move a highlight only a sighted person can follow. */
+        role="combobox"
+        aria-expanded
+        aria-autocomplete="list"
+        aria-controls={d.listId}
+        {...(d.activeId ? { 'aria-activedescendant': d.activeId } : {})}
         startAdornment={<Icon name="search" size={14} aria-hidden />}
         {...(d.query
           ? {
