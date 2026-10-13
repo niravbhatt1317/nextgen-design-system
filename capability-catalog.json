@@ -1,11 +1,11 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1174,
+  "capabilityCount": 1261,
   "counts": {
-    "story": 803,
-    "component": 301,
-    "utility": 35,
+    "story": 866,
+    "component": 314,
+    "utility": 46,
     "hook": 35
   },
   "capabilities": [
@@ -24,8 +24,8 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / ActionPlacement",
-      "doc": "Components/Banner ActionPlacement",
+      "summary": "Story: New Components/Banner / ActionPlacement",
+      "doc": "New Components/Banner ActionPlacement",
       "props": [],
       "propDocs": ""
     },
@@ -46,6 +46,26 @@
       "area": "Item",
       "summary": "Story: Deprecated/Item / ActiveState",
       "doc": "Deprecated/Item ActiveState",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AddPill",
+      "kind": "component",
+      "file": "src/components/TagPill/AddPill.tsx",
+      "area": "TagPill",
+      "summary": "AddPill - the dashed pill that adds a tag to a row of them.",
+      "doc": "AddPill - the dashed pill that adds a tag to a row of them. ```tsx <AddPill onClick={openField} title=\"Create or add a tag\">Add tag</AddPill> <AddPill onClick={() => assign('production')}>Production</AddPill> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AddPillStory",
+      "kind": "story",
+      "file": "src/components/TagPill/TagPill.stories.tsx",
+      "area": "TagPill",
+      "summary": "Story: New Components/TagPill / AddPillStory",
+      "doc": "New Components/TagPill AddPillStory",
       "props": [],
       "propDocs": ""
     },
@@ -76,6 +96,16 @@
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / AdvancedToolbar",
       "doc": "Components/ButtonGroup AdvancedToolbar",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AfterBadges",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / AfterBadges",
+      "doc": "Components/OverflowCount AfterBadges",
       "props": [],
       "propDocs": ""
     },
@@ -485,7 +515,7 @@
       "file": "src/components/Avatar/Avatar.tsx",
       "area": "Avatar",
       "summary": "Avatar - a person or a thing, as a photo, one letter, or an icon.",
-      "doc": "Avatar - a person or a thing, as a photo, one letter, or an icon. Ruled by Pranjal on mocks/foundation/avatar.html (2026-09-20 → 21): ONE letter at every size; the type a step smaller than the scale; a PERSON is a circle and a THING is a square - the default follows the content (a letter or a photo → circle, an icon → the rounded square), and either can be forced; the square's corners are 6, and 12 at 56; the tone comes from the name and is never slate for a person; a photo falls back to the letter. ```tsx <Avatar name=\"Sarah Johnson\" /> <Avatar name=\"Sarah Johnson\" src=\"/sarah.jpg\" size=\"xl\" /> <Avatar name=\"Design team\" icon={<Icon name=\"users\" />} tone=\"blue\" /> <Avatar name=\"Sarah Johnson\" shape=\"rounded\" size=\"lg\" /> ```",
+      "doc": "Avatar - a person or a thing, as a photo, one letter, or an icon. Ruled by Pranjal on mocks/foundation/avatar.html (2026-09-20 → 21): ONE letter at every size; the type a step smaller than the scale; a PERSON is a circle and a THING is a square - the default follows the content (a letter or a photo → circle, an icon → the rounded square), and either can be forced; the square's corners are 6, and 12 at 56; the tone comes from the name and is never slate for a person; a photo falls back to the letter. ```tsx <Avatar name=\"Sarah Johnson\" /> <Avatar name=\"Sarah Johnson\" src=\"/sarah.jpg\" size=\"xl\" /> <Avatar name=\"Design team\" icon={<Icon name=\"users\" />} tone=\"blue\" /> <Avatar name=\"Sarah Johnson\" shape=\"rounded\" size=\"lg\" /> <Avatar name=\"Acme Corp\" logo=\"/acme.png\" size=\"xl\" status=\"active\" /> <Avatar name=\"Sarah Johnson\" src={photo} size=\"xl\" shape=\"rounded\" onEdit={setPhotoFile} /> ``` Ported from the console (Pranjal, 2026-10-13): the logo that fills the square (ui/OrgMark.jsx), the status dot on the corner (OrgHeader.jsx PresenceAvatar) and the camera button (ProfileDrawer.jsx). With a dot or a camera button the avatar sits in a frame; `ref` and `className` stay on the avatar its",
       "props": [],
       "propDocs": ""
     },
@@ -556,6 +586,16 @@
       "area": "Banner",
       "summary": "Banner - a message that sits in the page and stays there.",
       "doc": "Banner - a message that sits in the page and stays there. It is about the thing it sits above, it waits for you, and it can carry as many actions as the situation actually needs. **It is not a Toast**, though they share the six tones and the same palette deliberately. A toast floats over the page, arrives on its own and leaves on a timer, so you may not be looking when it appears and it can never hold the only copy of something important. A banner is in the layout, has no timer, and leaves only when the reason for it has gone. *The one-line test: if you would still need the message after a refresh, it is a banner.* It is announced as a region and read in the order it appears, not as a live region that interrupts - which is the other half of the same difference. The region takes its name from the title, so a banner with no title is not a landmark at all. ```tsx <Banner tone=\"warning\" title=\"Your trial ends in 3 days\" description=\"After that, agents keep read-only access until a plan is chosen.\" actions={<Button variant=\"secondary\" size=\"sm\">Choose a plan</Button>} onDismiss={hide} /> ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "BannerStack",
+      "kind": "component",
+      "file": "src/components/BannerStack/BannerStack.tsx",
+      "area": "BannerStack",
+      "summary": "BannerStack - several page notices folded into one fanned stack.",
+      "doc": "BannerStack - several page notices folded into one fanned stack. The highest-priority notice is shown in full at the front; a rail of ticks beside its glyph says how many wait behind it. Hover, Tab in or tap to fan them all out on a shade; each keeps its own actions and its own cross. The notices are library `Banner`s at `placement=\"page\"`. Dismissing is the notice's own `onDismiss` - remove it from `items` and the open fan re-flows in place. ```tsx <BannerStack items={[ { id: 'suspended', tone: 'danger', title: 'Suspended', description: 'Members can't sign in' }, { id: 'import-7', tone: 'success', title: 'Import complete', onDismiss: () => drop('import-7') }, ]} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -646,6 +686,16 @@
       "area": "Progress",
       "summary": "Story: Components/Progress / BreakdownWithoutMax",
       "doc": "Components/Progress BreakdownWithoutMax",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Busy",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Busy",
+      "doc": "Components/ConfirmDialog Busy",
       "props": [],
       "propDocs": ""
     },
@@ -1436,6 +1486,33 @@
       "propDocs": ""
     },
     {
+      "name": "ConfirmDialog",
+      "kind": "component",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.tsx",
+      "area": "ConfirmDialog",
+      "summary": "ConfirmDialog - a ready-made \"are you sure\".",
+      "doc": "ConfirmDialog - a ready-made \"are you sure\". A title, what will happen and what will be lost, Cancel as the safe answer and one action. Give it a `typedWord` and the action stays locked until that word is typed (pasting counts). Return a promise from `onConfirm` and the action turns busy until it settles, with every way out held shut meanwhile. Built on `Dialog` and `useTypedConfirmation`; it adds the console's header (16 / 24 title over a hairline), its two widths and the bin on delete verbs. ```tsx <ConfirmDialog open={open} onOpenChange={setOpen} title=\"Delete team\" tone=\"destructive\" typedWord=\"delete\" confirmLabel=\"Delete team\" onConfirm={() => api.deleteTeam(id)} > This will permanently delete <b>Platform</b> and revoke its access. </ConfirmDialog> ```",
+      "props": [
+        "open",
+        "onOpenChange",
+        "title",
+        "description",
+        "children",
+        "confirmLabel",
+        "cancelLabel",
+        "tone",
+        "confirmIcon",
+        "typedWord",
+        "confirmDisabled",
+        "hideCancel",
+        "onConfirm",
+        "onCancel",
+        "width",
+        "className"
+      ],
+      "propDocs": "Whether the dialog is showing. Called with `false` whenever the dialog wants to close: Cancel, Escape, a press outside, the ✕, or the action finishing. The question, as a verb and its object: \"Delete team\", \"Disable user\". One supporting line under the title, inside the header. For the sentence that frames the decision (\"Roles are definitions - retiring one means deciding what happens to its holders.\"). The body: what will happen and what will be lost. Plain text renders at 14 / 1.5 in the reading ink; `<b>` or `<strong>` around a name lifts it to the heading ink. A `Banner` listing the consequences goes here too. The action's label - the concrete verb, never \"OK\" or \"Confirm\". The safe way out. Defaults to \"Cancel\". `destructive` for a red action. Defaults to `default`. The glyph before the action's label. Left unset, a destructive action whose label starts with Delete, Remove or Permanently delete gets the bin; `null` takes it away. A word the person has to type before the action unlocks - \"delete\" across the console. Matched trimmed and ignoring case, so a pasted word with a trailing space still counts. A further lock on the action, for a confirm that asks something else first ("
+    },
+    {
       "name": "ContactChips",
       "kind": "component",
       "file": "src/components/Table/TableCells.tsx",
@@ -1488,16 +1565,6 @@
     {
       "name": "Controlled",
       "kind": "story",
-      "file": "src/components/DatePicker/DatePicker.stories.tsx",
-      "area": "DatePicker",
-      "summary": "Story: New Components/DatePicker / Controlled",
-      "doc": "New Components/DatePicker Controlled",
-      "props": [],
-      "propDocs": ""
-    },
-    {
-      "name": "Controlled",
-      "kind": "story",
       "file": "src/components/Dialog/Dialog.deprecated.stories.tsx",
       "area": "Dialog stories",
       "summary": "Story: Deprecated/Dialog stories / Controlled",
@@ -1512,6 +1579,16 @@
       "area": "Pagination",
       "summary": "Story: Components/Pagination / Controlled",
       "doc": "Components/Pagination Controlled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Controlled",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Controlled",
+      "doc": "Components/PhoneInput Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1626,6 +1703,27 @@
       "propDocs": ""
     },
     {
+      "name": "CopyField",
+      "kind": "component",
+      "file": "src/components/CopyField/CopyField.tsx",
+      "area": "CopyField",
+      "summary": "CopyField - one line holding a value, with an icon-only copy button at its right end.",
+      "doc": "CopyField - one line holding a value, with an icon-only copy button at its right end. The button says \"Copy\" in a tooltip under the pointer and \"Copied\" for a moment after a press. The value can be masked. ```tsx <CopyField label=\"Base URL\" value=\"https://scim.oneops.example.com/v2\" /> <CopyField label=\"Bearer token\" value={token} masked /> <CopyField label=\"Entity ID\" value={entityId} info={<InfoTip label=\"About Entity ID\">…</InfoTip>} /> ```",
+      "props": [
+        "value",
+        "label",
+        "info",
+        "masked",
+        "mono",
+        "copyable",
+        "copyLabel",
+        "tip",
+        "onCopy",
+        "className"
+      ],
+      "propDocs": "The value shown, and the text the button copies - the whole of it, even when the line cuts it short. The field's name, above the line at 13/500. It also names the copy button (\"Copy Base URL\") and the masked dots (\"Hidden Base URL\"). Something beside the label - an InfoTip, usually. Shown only with a `label`. Shows the library's SecretDots in place of the value. The button still copies the real value; pass `copyable={false}` when it must not. The value in the monospace face. Off for plain words. Shows the copy button. Off for a value there is nothing to copy from. The copy button's accessible name. Defaults to \"Copy {label}\", or \"Copy\" without a label. The word in the tooltip while the pointer rests on the button. After a press it reads \"Copied\" for 1.4 seconds. Called with the value after every copy."
+    },
+    {
       "name": "CouldNotLoad",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
@@ -1652,6 +1750,26 @@
       "area": "AdvancedFilter",
       "summary": "The number the door shows: a group's rows count one each.",
       "doc": "The number the door shows: a group's rows count one each.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CountOnly",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / CountOnly",
+      "doc": "Components/OverflowCount CountOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "countryName",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "A country's English name from its ISO code (the console's few fixes first, then Intl, then the code itself).",
+      "doc": "A country's English name from its ISO code (the console's few fixes first, then Intl, then the code itself).",
       "props": [],
       "propDocs": ""
     },
@@ -1710,8 +1828,28 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / CustomIcon",
-      "doc": "Components/Banner CustomIcon",
+      "summary": "Story: New Components/Banner / CustomIcon",
+      "doc": "New Components/Banner CustomIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomIcon",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / CustomIcon",
+      "doc": "Components/EmptyState CustomIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomIcon",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / CustomIcon",
+      "doc": "Components/InfoTip CustomIcon",
       "props": [],
       "propDocs": ""
     },
@@ -1981,6 +2119,7 @@
         "divider",
         "maxHeight",
         "docked",
+        "dockOffset",
         "toolbar",
         "pager",
         "className"
@@ -2073,15 +2212,57 @@
       "propDocs": "Spoken name of the table: \"Users\". What the rows are called in counts: \"users\". The frozen Name column: avatar, name, owner mark. The content columns after Name and Action, in default order. Menu items for the row's kebab, as DropdownMenuItem elements. Leave unset for no Action column. Rows that cannot be picked or opened: invited people. A click on the row body, or Enter on a focused row. Search box in the toolbar. What the search box holds to begin with. One quick filter, or several — each is its own square in the strip with its own menu, and the row must satisfy every one that has a tick (Pranjal, 2026-09-12: Service accounts filters by Status AND by Organisation, side by side, as version 3 did). Column keys the toolbar Sort menu offers. Defaults to Name plus every sortable column. Remember column order, hidden columns and widths in this browser. Bulk-bar actions, as TableBulkActionOld2 elements. Leave unset for a table without selection: its rows then carry plain numbers that never become checkboxes, and \"Row number\" can be hidden from the Columns panel. Wording for the three blank states; \"Try again\" for error calls `onAction`. Row lines: neutral-30 as proposed, or the lighter"
     },
     {
+      "name": "DateAndTime",
+      "kind": "story",
+      "file": "src/components/DateInput/DateInput.stories.tsx",
+      "area": "DateInput",
+      "summary": "Story: New Components/DateInput / DateAndTime",
+      "doc": "New Components/DateInput DateAndTime",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DateAndTime",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / DateAndTime",
+      "doc": "New Components/DatePicker DateAndTime",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DateAndTimeMonthLevel",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / DateAndTimeMonthLevel",
+      "doc": "New Components/DatePicker DateAndTimeMonthLevel",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DateAndTimeOpen",
+      "kind": "story",
+      "file": "src/components/DateInput/DateInput.stories.tsx",
+      "area": "DateInput",
+      "summary": "Story: New Components/DateInput / DateAndTimeOpen",
+      "doc": "New Components/DateInput DateAndTimeOpen",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "DateInput",
       "kind": "component",
       "file": "src/components/DateInput/DateInput.tsx",
       "area": "DateInput",
       "summary": "DateInput - THE FIELD for a day (Pranjal, 2026-09-22: \"move date picker field in input field\").",
-      "doc": "DateInput - THE FIELD for a day (Pranjal, 2026-09-22: \"move date picker field in input field\"). It is a button wearing the Input's box, so every ruled state comes from the one place: 32 high, corners 8, 13 text in neutral-90, the placeholder in the faint ink (#8FA0BD), a neutral-30 edge; the primary border under the pointer; the primary border with the 3-px 8% halo when focused or open; disabled on the neutral-10 ground in the placeholder colour; error in the danger border with the red halo and the message under. The calendar glyph is 16 at the RIGHT, 12 from the edge (K-Field-28); held, the 14 lock takes its place and the value truncates before it (K-Field-11). Click, Enter or Space opens the DatePicker below in the library Popover; picking a day, Clear, Done and Escape close it. The value is a DAY, \"YYYY-MM-DD\", shown as \"22 Oct 2026\" - three-letter months always, never the browser's \"Sept\". <DateInput label=\"Expires on\" value={day} onChange={setDay} min={todayAsDay} /> <DateInput label=\"Joined\" value=\"2024-03-01\" locked />",
+      "doc": "DateInput - THE FIELD for a day (Pranjal, 2026-09-22: \"move date picker field in input field\"). It is a button wearing the Input's box, so every ruled state comes from the one place: 32 high, corners 8, 13 text in neutral-90, the placeholder in the faint ink (#8FA0BD), a neutral-30 edge; the primary border under the pointer; the primary border with the 3-px 8% halo when focused or open; disabled on the neutral-10 ground in the placeholder colour; error in the danger border with the red halo and the message under. The calendar glyph is 16 at the RIGHT, 12 from the edge (K-Field-28); held, the 14 lock takes its place and the value truncates before it (K-Field-11). Click, Enter or Space opens the DatePicker in the library Popover - below the field, above it when there is no room - with the focus on the picked day (or today). Choices there are a draft: Apply saves and closes, Escape or a press outside closes without saving, and the focus returns to the field. The value is a DAY, \"YYYY-MM-DD\", shown as \"22 Oct 2026\" - three-letter months always, never the browser's \"Sept\". With `withTime` (a developer setting, never a switch people see) it is \"YYYY-MM-DDTHH:mm\", shown as \"13 Oct 2026, 1",
       "props": [
         "value",
         "onChange",
+        "withTime",
+        "timeStep",
         "placeholder",
         "min",
         "max",
@@ -2096,7 +2277,27 @@
         "wrapperClassName",
         "className"
       ],
-      "propDocs": "The chosen day, \"YYYY-MM-DD\". Shown as \"22 Oct 2026\". Fires with the picked day as \"YYYY-MM-DD\"; with \"\" when cleared. What the empty field says, in the placeholder colour. Defaults to \"Pick a date\". The earliest day that can be picked, \"YYYY-MM-DD\". The latest day that can be picked, \"YYYY-MM-DD\". Off for a moment: the neutral-10 ground, placeholder-colour text, no lock. Does not open. A held field (K-Field-11): disabled, the 14 lock inside at the right, 12 from the edge, in the disabled text colour, taking the calendar glyph's place; the value truncates 8 before it. For a day something else owns. Does not open. Error text under the field; also paints the danger border and turns the focus halo red. Helper text under the field, shown when there is no error. Optional label above, 13 in neutral-90, 6 under it. 32 (sm, the default) · 36 (md) · 40 (lg) Shows a Clear button in the calendar; clearing reports \"\" and closes. The accessible name when there is no label. Class name for the outer wrapper. Class name for the field itself."
+      "propDocs": "The saved value. \"YYYY-MM-DD\", shown as \"22 Oct 2026\"; with `withTime`, \"YYYY-MM-DDTHH:mm\" (local, 24-hour), shown as \"13 Oct 2026, 14:30\". Fires on Apply with the value in the same shape; with \"\" when a `clearable` field is emptied. A developer setting, never a switch shown to people: the picker gains the time column and the value carries the time. Default false. Minutes between the times in the column. Default 30. What the empty field says, in the placeholder colour. Defaults to \"Pick a date\" (\"Pick a date and time\" with `withTime`). The earliest day that can be picked, \"YYYY-MM-DD\". The latest day that can be picked, \"YYYY-MM-DD\". Off for a moment: the neutral-10 ground, placeholder-colour text, no lock. Does not open. A held field (K-Field-11): disabled, the 14 lock inside at the right, 12 from the edge, in the disabled text colour, taking the calendar glyph's place; the value truncates 8 before it. For a day something else owns. Does not open. Error text under the field; also paints the danger border and turns the focus halo red. Helper text under the field, shown when there is no error. Optional label above, 13 in neutral-90, 6 under it. 32 (sm, the default) · 36 (md) · 40 (l"
+    },
+    {
+      "name": "DateOnly",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / DateOnly",
+      "doc": "New Components/DatePicker DateOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DateOpen",
+      "kind": "story",
+      "file": "src/components/DateInput/DateInput.stories.tsx",
+      "area": "DateInput",
+      "summary": "Story: New Components/DateInput / DateOpen",
+      "doc": "New Components/DateInput DateOpen",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "DatePicker",
@@ -2105,8 +2306,21 @@
       "area": "DatePicker",
       "summary": "",
       "doc": "",
-      "props": ["value", "onChange", "min", "max", "onClear", "onDone", "className", "aria-label"],
-      "propDocs": "The chosen day, as \"YYYY-MM-DD\". Anything else reads as no choice. Fires with the picked day as \"YYYY-MM-DD\". The earliest day that can be picked, \"YYYY-MM-DD\". Days before it grey out and the month nav stops. The latest day that can be picked, \"YYYY-MM-DD\". Days after it grey out and the month nav stops. Given, the Clear button (ghost, sm) shows at the left of the footer and fires here. Given, the Done button (primary, sm) shows at the right of the footer and fires here. Class name for the calendar's root. Names the calendar for assistive tech. Defaults to \"Calendar\"."
+      "props": [
+        "value",
+        "onChange",
+        "withTime",
+        "timeStep",
+        "min",
+        "max",
+        "clearable",
+        "onReset",
+        "onClear",
+        "onDone",
+        "className",
+        "aria-label"
+      ],
+      "propDocs": "The saved value. \"YYYY-MM-DD\" for a day; with `withTime`, \"YYYY-MM-DDTHH:mm\" (local, 24-hour). Anything else reads as no choice. The draft starts from it, and starts again when it changes. Fires on Apply with the draft: \"YYYY-MM-DD\", or \"YYYY-MM-DDTHH:mm\" with `withTime`; \"\" when an emptied draft is applied. A developer setting, never a switch shown to people: adds the 184-wide time column at the right - the picked day on top, then a time every `timeStep` minutes - and the value carries the time. Default false. Minutes between the times in the column. Default 30 (00:00 .. 23:30). The earliest day that can be picked, \"YYYY-MM-DD\". Days, months and years before it grey out and the arrows stop. The latest day that can be picked, \"YYYY-MM-DD\". Days, months and years after it grey out and the arrows stop. Lets an emptied draft be applied: after Reset, Apply stays on and reports \"\". Default false. Fires when Reset empties the draft.   Class name for the picker's root. Names the calendar for assistive tech. Defaults to \"Calendar\"."
     },
     {
       "name": "dayKey",
@@ -2203,8 +2417,18 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / Default",
-      "doc": "Components/Banner Default",
+      "summary": "Story: New Components/Banner / Default",
+      "doc": "New Components/Banner Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Default",
+      "doc": "Components/BannerStack Default",
       "props": [],
       "propDocs": ""
     },
@@ -2281,10 +2505,30 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Default",
+      "doc": "Components/ConfirmDialog Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Container/Container.stories.tsx",
       "area": "Container",
       "summary": "Story: Layout/Container / Default",
       "doc": "Layout/Container Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Default",
+      "doc": "Components/CopyField Default",
       "props": [],
       "propDocs": ""
     },
@@ -2301,20 +2545,20 @@
     {
       "name": "Default",
       "kind": "story",
-      "file": "src/components/DatePicker/DatePicker.stories.tsx",
-      "area": "DatePicker",
-      "summary": "Story: New Components/DatePicker / Default",
-      "doc": "New Components/DatePicker Default",
+      "file": "src/components/Dialog/Dialog.stories.tsx",
+      "area": "Dialog",
+      "summary": "Story: New Components/Dialog / Default",
+      "doc": "New Components/Dialog Default",
       "props": [],
       "propDocs": ""
     },
     {
       "name": "Default",
       "kind": "story",
-      "file": "src/components/Dialog/Dialog.stories.tsx",
-      "area": "Dialog",
-      "summary": "Story: New Components/Dialog / Default",
-      "doc": "New Components/Dialog Default",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / Default",
+      "doc": "Components/EmptyState Default",
       "props": [],
       "propDocs": ""
     },
@@ -2375,6 +2619,26 @@
       "area": "IconTile",
       "summary": "Story: New Components/IconTile / Default",
       "doc": "New Components/IconTile Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / Default",
+      "doc": "Components/InfoTip Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / Default",
+      "doc": "Components/InlineTags Default",
       "props": [],
       "propDocs": ""
     },
@@ -2451,10 +2715,30 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / Default",
+      "doc": "Components/OverflowCount Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
       "summary": "Story: Components/Pagination / Default",
       "doc": "Components/Pagination Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Default",
+      "doc": "Components/PhoneInput Default",
       "props": [],
       "propDocs": ""
     },
@@ -2703,8 +2987,8 @@
       "kind": "story",
       "file": "src/components/Toast/Toast.stories.tsx",
       "area": "Toast",
-      "summary": "Story: Components/Toast / Default",
-      "doc": "Components/Toast Default",
+      "summary": "Story: New Components/Toast / Default",
+      "doc": "New Components/Toast Default",
       "props": [],
       "propDocs": ""
     },
@@ -2885,6 +3169,16 @@
       "area": "Button Old",
       "summary": "Story: Deprecated/Button Old / DestructiveFamily",
       "doc": "Deprecated/Button Old DestructiveFamily",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "dialOf",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "A country's dial code without the \"+\", or \"\" for a code the directory does not know.",
+      "doc": "A country's dial code without the \"+\", or \"\" for a code the directory does not know.",
       "props": [],
       "propDocs": ""
     },
@@ -3109,6 +3403,16 @@
     {
       "name": "Disabled",
       "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / Disabled",
+      "doc": "Components/InlineTags Disabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Disabled",
+      "kind": "story",
       "file": "src/components/InputGroup/InputGroup.stories.tsx",
       "area": "InputGroup",
       "summary": "Story: Components/InputGroup / Disabled",
@@ -3153,6 +3457,16 @@
       "area": "Pagination",
       "summary": "Story: Components/Pagination / Disabled",
       "doc": "Components/Pagination Disabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Disabled",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Disabled",
+      "doc": "Components/PhoneInput Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -3251,8 +3565,8 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / Dismissible",
-      "doc": "Components/Banner Dismissible",
+      "summary": "Story: New Components/Banner / Dismissible",
+      "doc": "New Components/Banner Dismissible",
       "props": [],
       "propDocs": ""
     },
@@ -3313,6 +3627,46 @@
       "area": "Breadcrumb",
       "summary": "Story: New Components/Breadcrumb / Drawer",
       "doc": "New Components/Breadcrumb Drawer",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerFooterSlots",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerFooterSlots",
+      "doc": "New Components/Sheet DrawerFooterSlots",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerSizes",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerSizes",
+      "doc": "New Components/Sheet DrawerSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerWithStepperBand",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerWithStepperBand",
+      "doc": "New Components/Sheet DrawerWithStepperBand",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DrawerWithTabsBand",
+      "kind": "story",
+      "file": "src/components/Sheet/Sheet.stories.tsx",
+      "area": "Sheet",
+      "summary": "Story: New Components/Sheet / DrawerWithTabsBand",
+      "doc": "New Components/Sheet DrawerWithTabsBand",
       "props": [],
       "propDocs": ""
     },
@@ -3547,6 +3901,36 @@
       "propDocs": ""
     },
     {
+      "name": "Empty",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / Empty",
+      "doc": "New Components/DatePicker Empty",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Empty",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / Empty",
+      "doc": "Components/InlineTags Empty",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "EmptyState",
+      "kind": "component",
+      "file": "src/components/EmptyState/EmptyState.tsx",
+      "area": "EmptyState",
+      "summary": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table.",
+      "doc": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table. It is a status: the words change as a search or a filter empties the list, so a screen reader hears \"No people match\" without moving to it. Override `role` where the state is the only thing on a page that will never change. ```tsx <EmptyState icon=\"users\" title=\"No members yet\" description=\"Add people to give them this team's access.\" /> <EmptyState icon=\"search\" title=\"No people match\" description=\"Nothing here matches the search.\" action={<Button variant=\"outline\" size=\"sm\" onClick={clear}>Clear search</Button>} /> ```",
+      "props": ["icon", "title", "description", "action"],
+      "propDocs": "The glyph in the tile: an icon name from the library's set, or a node of your own. Defaults to `inbox`, as the console's block did. A node is drawn at the tile's 18px whatever size it asks for, so a glyph from another set lands the same as a named one. The headline - what is empty. No full stop (Pranjal, 2026-10-11). One muted line under the title: why it is empty, or what fills it. Optional - \"No attributes tracked yet\" needs nothing more. One control under the text, usually a `Button` - \"Clear search\", \"All organizations\". The console's pages pass an outline or secondary button at `sm`; the state does not pick it for them."
+    },
+    {
       "name": "EmptyState",
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
@@ -3757,6 +4141,16 @@
       "propDocs": ""
     },
     {
+      "name": "FlipsAbove",
+      "kind": "story",
+      "file": "src/components/DateInput/DateInput.stories.tsx",
+      "area": "DateInput",
+      "summary": "Story: New Components/DateInput / FlipsAbove",
+      "doc": "New Components/DateInput FlipsAbove",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Focus",
       "kind": "story",
       "file": "src/components/Button/Button.stories.tsx",
@@ -3803,6 +4197,16 @@
       "area": "Flex",
       "summary": "Story: Layout/Flex / FormActions",
       "doc": "Layout/Flex FormActions",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "formatDateTime",
+      "kind": "utility",
+      "file": "src/components/DatePicker/date.ts",
+      "area": "DatePicker",
+      "summary": "\"2026-10-13T14:30\" -> \"13 Oct 2026, 14:30\"; a day with no time reads as the day alone.",
+      "doc": "\"2026-10-13T14:30\" -> \"13 Oct 2026, 14:30\"; a day with no time reads as the day alone.",
       "props": [],
       "propDocs": ""
     },
@@ -3997,6 +4401,16 @@
       "propDocs": ""
     },
     {
+      "name": "FromString",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / FromString",
+      "doc": "Components/PhoneInput FromString",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "FrozenColumn",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -4123,6 +4537,16 @@
       "area": "Stack",
       "summary": "Story: Layout/Stack / GapSizes",
       "doc": "Layout/Stack GapSizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "GaugeRing",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: New Components/KPI Card / GaugeRing",
+      "doc": "New Components/KPI Card GaugeRing",
       "props": [],
       "propDocs": ""
     },
@@ -4418,6 +4842,16 @@
       "propDocs": ""
     },
     {
+      "name": "iconAtDrawnSize",
+      "kind": "utility",
+      "file": "src/utils/icon-at-drawn-size.ts",
+      "area": "..",
+      "summary": "Hands an `Icon` the size it will actually be drawn at.",
+      "doc": "Hands an `Icon` the size it will actually be drawn at. **The stroke ladder reads the size an icon is _asked_ to be, not the size it ends up.** A control that passes `<Icon name=\"…\" />` with no size gets `md` (20px), which takes the 20px line of 1.5 - and then a `[&_svg]` rule scales the whole SVG down. The stroke scales with it: 1.5 x 16/24 draws a 1.0px line where a real 16px icon draws 1.16px. The glyph lands a shade lighter than its neighbours, and nothing in the markup says why. So a control that squeezes its icon says so, and the ladder reads the true size. **An explicit size is never touched** - a caller who asked for one has already made the decision this is covering for. First needed by `Button` and `ToolbarButton` on the same day; shared from here rather than copied, because the next control that squeezes an icon will want it too. not an element, not an `Icon`, or already carries a size ```tsx // Button draws its glyph at 16px via [&_svg]:mdt-size-4 const lead = iconAtDrawnSize(leftIcon, ICON_PX); ```",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "IconButton",
       "kind": "story",
       "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
@@ -4538,6 +4972,16 @@
       "propDocs": ""
     },
     {
+      "name": "InADrawerSection",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / InADrawerSection",
+      "doc": "Components/EmptyState InADrawerSection",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InAForm",
       "kind": "story",
       "file": "src/components/DateInput/DateInput.stories.tsx",
@@ -4640,6 +5084,16 @@
     {
       "name": "InContext",
       "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / InContext",
+      "doc": "Components/InfoTip InContext",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InContext",
+      "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
       "summary": "Story: Components/Label / InContext",
@@ -4668,6 +5122,16 @@
       "propDocs": ""
     },
     {
+      "name": "InfoFilledGlyph",
+      "kind": "component",
+      "file": "src/components/InfoTip/InfoFilledGlyph.tsx",
+      "area": "InfoTip",
+      "summary": "InfoFilledGlyph - the filled ⓘ mark, drawn in currentColor and sized by its class.",
+      "doc": "InfoFilledGlyph - the filled ⓘ mark, drawn in currentColor and sized by its class. **A third inline `<svg>` in shipped code, which the icon rule does not allow** - only `Icon.tsx` and `Spinner.tsx` may carry one. It is here because the registry has the outline `info-circle` and not Tabler's filled one, and adding an icon name is a decision for the design owner. The fix is `tabler-info-circle-filled` hand-added to the set, the way the other nine Tabler icons were, after which this file goes.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InForm",
       "kind": "story",
       "file": "src/components/TooltipOld/TooltipOld.stories.tsx",
@@ -4676,6 +5140,16 @@
       "doc": "Deprecated/Tooltip Old InForm",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "InfoTip",
+      "kind": "component",
+      "file": "src/components/InfoTip/InfoTip.tsx",
+      "area": "InfoTip",
+      "summary": "InfoTip - the ⓘ beside a heading or a label.",
+      "doc": "InfoTip - the ⓘ beside a heading or a label. Its explainer opens on hover, on keyboard focus and on a press, in the library Tooltip, optionally with a \"Learn more\" link. ```tsx <InfoTip label=\"About Security policy\">Applies to every user in this organization.</InfoTip> <InfoTip label=\"About SCIM\" learnMore={{ href: '/docs/scim', newTab: true }}> Your identity provider creates, updates and removes users here. </InfoTip> ```",
+      "props": ["label", "children", "learnMore", "side", "align", "maxWidth", "icon", "className"],
+      "propDocs": "The ⓘ's accessible name: \"About Security policy\". Required - nothing else names it. The explainer. Sentences read from the left. A link at the foot of the explainer. The pointer can travel into the bubble to reach it; from the keyboard, Tab on the open ⓘ moves into it. Which side of the ⓘ the explainer opens on. Near a screen edge it flips by itself. Where along the ⓘ the explainer sits. The widest the explainer grows before it wraps. Another glyph in place of the filled ⓘ, with the same explainer - a warning triangle, say."
     },
     {
       "name": "initialsForName",
@@ -4694,6 +5168,16 @@
       "area": "AvatarOld2",
       "summary": "\"Sarah Johnson\" -> \"SJ\", \"monitoring\" -> \"mo\".",
       "doc": "\"Sarah Johnson\" -> \"SJ\", \"monitoring\" -> \"mo\".",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "InlineTags",
+      "kind": "component",
+      "file": "src/components/InlineTags/InlineTags.tsx",
+      "area": "InlineTags",
+      "summary": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place.",
+      "doc": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place. ```tsx <InlineTags value={tags} onChange={setTags} suggestions={['Pilot', 'APAC']} options={everyTagUsedBefore} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -4781,9 +5265,11 @@
         "startAdornment",
         "endAdornment",
         "locked",
+        "onClear",
+        "clearLabel",
         "wrapperClassName"
       ],
-      "propDocs": "Error message to display below the input Label text for the input Helper text displayed below the input Icon or element to display at the start of the input Icon or element to display at the end of the input A held field (Pranjal, 2026-09-17): disabled, with a lock inside at the right - 14 like the search glyph, 12 from the edge, in the disabled text colour - and the value truncating before it. For a value something else owns (a directory, a fixed identity); the label above stays plain. Wrapper className for the container div"
+      "propDocs": "Error message to display below the input Label text for the input Helper text displayed below the input Icon or element to display at the start of the input Icon or element to display at the end of the input A held field (Pranjal, 2026-09-17): disabled, with a lock inside at the right - 14 like the search glyph, 12 from the edge, in the disabled text colour - and the value truncating before it. For a value something else owns (a directory, a fixed identity); the label above stays plain. A clear button (Pranjal, 2026-09-28, on the table search: \"we need to provide a cross icon on the right so that i can clear all at once instead of backspacing each time\"). Given, a ghost ✕ sits inside at the right while the field holds text; pressing it calls this and puts the caret back in the field. Every search box sets it. The clear button's spoken name. \"Clear\" unless the field says otherwise (\"Clear search\"). Wrapper className for the container div"
     },
     {
       "name": "InputGroup",
@@ -5053,6 +5539,16 @@
       "propDocs": "Icon to display before the label Main label text Secondary description text Whether the item is disabled Whether the item is currently active/selected Click handler"
     },
     {
+      "name": "joinPhone",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "The stored phone from the field's two parts: \"+<dial> <national>\", the trunk 0 dropped outside the NANP.",
+      "doc": "The stored phone from the field's two parts: \"+<dial> <national>\", the trunk 0 dropped outside the NANP.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "JustifyContent",
       "kind": "story",
       "file": "src/components/Flex/Flex.stories.tsx",
@@ -5139,9 +5635,9 @@
       "file": "src/components/KpiCard/KpiCharts.tsx",
       "area": "KpiCard",
       "summary": "A half ring: a share of a limit, the percent inside, a caption under it.",
-      "doc": "A half ring: a share of a limit, the percent inside, a caption under it.",
-      "props": ["percent", "caption", "label"],
-      "propDocs": "0 to 100. The word under the number: \"capacity\". Spoken description; defaults to \"<percent>% <caption>\"."
+      "doc": "A half ring: a share of a limit, the percent inside, a caption under it. `shape=\"ring\"` draws the full health ring.",
+      "props": ["percent", "caption", "label", "shape", "bad"],
+      "propDocs": "0 to 100. The word under the number: \"capacity\". Drawn by the half gauge only; the ring only speaks it. Spoken description; defaults to \"<percent>% <caption>\". `half`: 104 × 62 in the neutral ladder, for a KpiCard's chart area. `ring`: the console Overview's health ring, 150 × 150, in the success green; a thin outer ring at 100%. Ring only: the fill in the danger colour instead of the success green. @default false"
     },
     {
       "name": "KpiStrip",
@@ -5589,6 +6085,16 @@
       "propDocs": ""
     },
     {
+      "name": "Locked",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Locked",
+      "doc": "Components/PhoneInput Locked",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LoginFormExample",
       "kind": "story",
       "file": "src/components/Separator/Separator.stories.tsx",
@@ -5669,12 +6175,42 @@
       "propDocs": ""
     },
     {
+      "name": "LongList",
+      "kind": "story",
+      "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
+      "area": "OverflowCount",
+      "summary": "Story: Components/OverflowCount / LongList",
+      "doc": "Components/OverflowCount LongList",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LongMessage",
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / LongMessage",
-      "doc": "Components/Banner LongMessage",
+      "summary": "Story: New Components/Banner / LongMessage",
+      "doc": "New Components/Banner LongMessage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "LongValue",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / LongValue",
+      "doc": "Components/CopyField LongValue",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Many",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Many",
+      "doc": "Components/BannerStack Many",
       "props": [],
       "propDocs": ""
     },
@@ -5685,6 +6221,16 @@
       "area": "Upload",
       "summary": "Story: Components/Upload / ManyFiles",
       "doc": "Components/Upload ManyFiles",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ManyRows",
+      "kind": "story",
+      "file": "src/components/AdvancedFilter/AdvancedFilter.stories.tsx",
+      "area": "AdvancedFilter",
+      "summary": "Story: New Components/AdvancedFilter / ManyRows",
+      "doc": "New Components/AdvancedFilter ManyRows",
       "props": [],
       "propDocs": ""
     },
@@ -5705,6 +6251,16 @@
       "area": "CodeWell",
       "summary": "Story: Components/CodeWell / Maskable",
       "doc": "Components/CodeWell Maskable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Masked",
+      "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Masked",
+      "doc": "Components/CopyField Masked",
       "props": [],
       "propDocs": ""
     },
@@ -5805,6 +6361,16 @@
       "area": "ButtonGroup",
       "summary": "Story: Components/ButtonGroup / MixedVariants",
       "doc": "Components/ButtonGroup MixedVariants",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "MonthLevel",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / MonthLevel",
+      "doc": "New Components/DatePicker MonthLevel",
       "props": [],
       "propDocs": ""
     },
@@ -6055,6 +6621,16 @@
       "propDocs": ""
     },
     {
+      "name": "NoCountry",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / NoCountry",
+      "doc": "Components/PhoneInput NoCountry",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NoPaddingHorizontal",
       "kind": "story",
       "file": "src/components/ToolbarOld/ToolbarOld.stories.tsx",
@@ -6115,6 +6691,16 @@
       "propDocs": ""
     },
     {
+      "name": "NotFound",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / NotFound",
+      "doc": "Components/EmptyState NotFound",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NothingFound",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
@@ -6131,6 +6717,16 @@
       "area": "DataTable Old",
       "summary": "Story: Deprecated 2/DataTable Old / NothingFound",
       "doc": "Deprecated 2/DataTable Old NothingFound",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "NoticeOnly",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / NoticeOnly",
+      "doc": "Components/ConfirmDialog NoticeOnly",
       "props": [],
       "propDocs": ""
     },
@@ -6205,6 +6801,16 @@
       "propDocs": ""
     },
     {
+      "name": "One",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / One",
+      "doc": "Components/BannerStack One",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "OneFileDone",
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
@@ -6241,6 +6847,26 @@
       "area": "Upload",
       "summary": "Story: Components/Upload / OneImage",
       "doc": "Components/Upload OneImage",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Open",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / Open",
+      "doc": "Components/ConfirmDialog Open",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OrderedByTone",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / OrderedByTone",
+      "doc": "Components/BannerStack OrderedByTone",
       "props": [],
       "propDocs": ""
     },
@@ -6295,6 +6921,16 @@
       "propDocs": ""
     },
     {
+      "name": "OverflowCount",
+      "kind": "component",
+      "file": "src/components/OverflowCount/OverflowCount.tsx",
+      "area": "OverflowCount",
+      "summary": "OverflowCount - the quiet \"+N\" that ends a row of badges, avatars or tags, with the hidden values in its tooltip.",
+      "doc": "OverflowCount - the quiet \"+N\" that ends a row of badges, avatars or tags, with the hidden values in its tooltip. One counter everywhere (Pranjal, 2026-10-11): the value wears the badge, the counter does not. `Table`'s TagList renders this rather than its own copy - it was drawn twice for one release and that is exactly how two of them drift.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "OverlayPlacement",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -6311,6 +6947,16 @@
       "area": "Select Old",
       "summary": "Story: Deprecated 2/Select Old / OverlayPlacement",
       "doc": "Deprecated 2/Select Old OverlayPlacement",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "pad",
+      "kind": "utility",
+      "file": "src/components/DatePicker/date.ts",
+      "area": "DatePicker",
+      "summary": "",
+      "doc": "",
       "props": [],
       "propDocs": ""
     },
@@ -6565,6 +7211,16 @@
       "propDocs": ""
     },
     {
+      "name": "parseTime",
+      "kind": "utility",
+      "file": "src/components/DatePicker/date.ts",
+      "area": "DatePicker",
+      "summary": "\"2026-10-13T14:30\" -> \"14:30\"; no time, or an impossible one -> null.",
+      "doc": "\"2026-10-13T14:30\" -> \"14:30\"; no time, or an impossible one -> null.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PasswordToggle",
       "kind": "story",
       "file": "src/components/InputGroup/InputGroup.stories.tsx",
@@ -6605,6 +7261,36 @@
       "propDocs": ""
     },
     {
+      "name": "PhoneInput",
+      "kind": "component",
+      "file": "src/components/PhoneInput/PhoneInput.tsx",
+      "area": "PhoneInput",
+      "summary": "PhoneInput - one field joining a searchable country-code picker and the national number, with the library Input's label, help, error, held state and sizes.",
+      "doc": "PhoneInput - one field joining a searchable country-code picker and the national number, with the library Input's label, help, error, held state and sizes. ```tsx const [phone, setPhone] = useState({ country: 'IN', number: '' }); <PhoneInput label=\"Phone\" value={phone} onChange={(next) => setPhone(next)} /> // a stored string in and out <PhoneInput label=\"Phone\" value={record.phone} defaultCountry=\"US\" onChange={(_, phone) => save(phone)} /> ```",
+      "props": [
+        "value",
+        "defaultValue",
+        "defaultCountry",
+        "onChange",
+        "countries",
+        "renderFlag",
+        "countryLabel",
+        "searchPlaceholder",
+        "emptyMessage"
+      ],
+      "propDocs": "Controlled value: the two parts `{ country, number }`, or a stored phone string (\"+44 20 7946 0958\"), which is split into its country and national number. Uncontrolled starting value, in either shape. The country chosen while nothing says otherwise - for an empty string value, a bare number, or a dial code several countries share (+1 picks this one when it is a NANP country). Called on every change of the country or the number, with the two parts and the stored phone they join into (\"+<dial> <national>\", the trunk 0 dropped outside the NANP; \"\" while the number is empty). The countries offered. Every ITU dial-code country by default (`PHONE_COUNTRIES`). Draws a country's flag at 18 px (the console passes its flag-icons square). Without it, or when it returns nothing, the country's two-letter code sits in a small tile - the console's own fallback. The country picker's spoken name while no country is chosen. @default \"Country code\" The search box's placeholder in the country list. @default \"Search\" The country list's empty message. @default \"No country matches\""
+    },
+    {
+      "name": "phonePlaceholder",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "The national format the number field hints with for a country.",
+      "doc": "The national format the number field hints with for a country.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PicksItsOwnImage",
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
@@ -6639,8 +7325,8 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / Placement",
-      "doc": "Components/Banner Placement",
+      "summary": "Story: New Components/Banner / Placement",
+      "doc": "New Components/Banner Placement",
       "props": [],
       "propDocs": ""
     },
@@ -6945,12 +7631,12 @@
       "propDocs": ""
     },
     {
-      "name": "QuickFiltersHideUnderAnAdvancedFilter",
+      "name": "QuickFiltersDisabledUnderAnAdvancedFilter",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
       "area": "Table",
-      "summary": "Story: New Components/Table / QuickFiltersHideUnderAnAdvancedFilter",
-      "doc": "New Components/Table QuickFiltersHideUnderAnAdvancedFilter",
+      "summary": "Story: New Components/Table / QuickFiltersDisabledUnderAnAdvancedFilter",
+      "doc": "New Components/Table QuickFiltersDisabledUnderAnAdvancedFilter",
       "props": [],
       "propDocs": ""
     },
@@ -7715,6 +8401,26 @@
       "propDocs": ""
     },
     {
+      "name": "SheetBand",
+      "kind": "component",
+      "file": "src/components/Sheet/Sheet.tsx",
+      "area": "Sheet",
+      "summary": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both).",
+      "doc": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both). Pinned: it does not scroll with the body. THE HAIRLINE UNDER THE BAND IS THE BAND'S CALL (Pranjal, 2026-09-25): \"when we are using underline steppers variant we dont need a bottom border in sidedrawers only for non underline stepper variants we will be using the bottom border.\" The line is drawn, and taken away when the band holds the underline stepper - its own bars are the line - or a tab strip that carries its own hairline (one line, never two), however deep the caller wrapped it. Tabs without their hairline, an identity strip and the compact progress stepper keep it. `hairline={false}` switches it off for any other reason. A stepper wraps itself in 12 of vertical padding (`mdt-py-3`) in the band, as the console's StepsBand does.",
+      "props": ["children", "hairline"],
+      "propDocs": "The hairline under the band. `true` lets the band decide: the line is drawn, except when the band holds the underline stepper or a tab strip with its own hairline. `false` switches it off for any other band that wants no line."
+    },
+    {
+      "name": "SheetBody",
+      "kind": "component",
+      "file": "src/components/Sheet/Sheet.tsx",
+      "area": "Sheet",
+      "summary": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls.",
+      "doc": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls. 20 above and below, the frame's inset at the sides.",
+      "props": ["children"],
+      "propDocs": ""
+    },
+    {
       "name": "SheetClose",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
@@ -7730,9 +8436,9 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetContent - the main content container for the sheet.",
-      "doc": "SheetContent - the main content container for the sheet. ```tsx <Sheet> <SheetTrigger asChild> <Button>Open Sheet</Button> </SheetTrigger> <SheetContent side=\"right\"> <SheetHeader> <SheetTitle>Sheet Title</SheetTitle> <SheetDescription>Sheet description</SheetDescription> </SheetHeader> <p>Sheet content goes here</p> <SheetFooter> <Button>Action</Button> </SheetFooter> </SheetContent> </Sheet> ```",
-      "props": ["side", "showCloseButton"],
-      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button"
+      "doc": "SheetContent - the main content container for the sheet. `layout=\"drawer\"` is the console's drawer frame, composed from `SheetHeader` (title, actions, ✕ in one row), `SheetBand` (tabs or a stepper), `SheetBody` (scrolls) and `SheetFooter` (start group left, end group right). `size` picks the width from the drawer scale. ```tsx <Sheet> <SheetTrigger asChild> <Button>Open Sheet</Button> </SheetTrigger> <SheetContent side=\"right\"> <SheetHeader> <SheetTitle>Sheet Title</SheetTitle> <SheetDescription>Sheet description</SheetDescription> </SheetHeader> <p>Sheet content goes here</p> <SheetFooter> <Button>Action</Button> </SheetFooter> </SheetContent> </Sheet> ``` ```tsx <SheetContent size=\"lg\" layout=\"drawer\" inset={20}> <SheetHeader actions={<RowMenu />}> <SheetTitle>Asha Rao</SheetTitle> </SheetHeader> <SheetBand> <Tabs>…</Tabs> </SheetBand> <SheetBody>…</SheetBody> <SheetFooter start={<Button variant=\"destructiveGhost\">Delete</Button>}> <SheetClose asChild><Button variant=\"ghost\">Cancel</Button></SheetClose> <Button>Save</Button> </SheetFooter> </SheetContent> ```",
+      "props": ["side", "showCloseButton", "size", "layout", "inset"],
+      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button pinned to the corner The width from the drawer scale (left and right sheets only): sm 480 · md 560 · lg 720 · xl 780. Unset keeps the original width (75% on mobile, capped at 24rem). A width class in `className` still wins. `drawer` turns the content into the console's drawer frame - compose it from `SheetHeader`, `SheetBand`, `SheetBody` and `SheetFooter`. The side inset of the drawer frame's header, band, body and footer, in px."
     },
     {
       "name": "SheetDescription",
@@ -7750,9 +8456,9 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetFooter - container for action buttons.",
-      "doc": "SheetFooter - container for action buttons.",
-      "props": ["children"],
-      "propDocs": ""
+      "doc": "SheetFooter - container for action buttons. Three parts (the console's O9 footer): `start` pinned left - the escape, or a destructive action - a spacer the footer owns, then the children as the end group - the supporting action and the primary verb. Without `start` the children sit right-aligned as before. In the drawer frame it is pinned under the body with a hairline over it.",
+      "props": ["children", "start"],
+      "propDocs": "The end group (right): the supporting action, then the primary verb. The start group (left): the escape (Cancel / Close) or a destructive action. When set, the footer is one row - start, a spacer, then the children - in any layout."
     },
     {
       "name": "SheetHeader",
@@ -7760,9 +8466,9 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetHeader - container for title and description.",
-      "doc": "SheetHeader - container for title and description.",
-      "props": ["children"],
-      "propDocs": ""
+      "doc": "SheetHeader - container for title and description. In the drawer frame it is the console's header row: the title (or a crumb) left, then the `actions`, then the ✕ - all centred on the row, 60 high at least so a wrapping title grows it instead of clipping, a hairline under it.",
+      "props": ["children", "actions", "showClose"],
+      "propDocs": "Controls at the right end of the header row, before the close - a ⋮ menu, say. Drawer layout only. Whether the header row carries the close (✕), centred on the title. Drawer layout only."
     },
     {
       "name": "SheetOverlay",
@@ -7790,7 +8496,7 @@
       "file": "src/components/Sheet/Sheet.tsx",
       "area": "Sheet",
       "summary": "SheetTitle - the title of the sheet.",
-      "doc": "SheetTitle - the title of the sheet.",
+      "doc": "SheetTitle - the title of the sheet. In the drawer frame: 16/600 in the heading ink (18 was off the type scale - Pranjal 2026-08-24), taking the row's free width so the actions and the ✕ stay at the right end.",
       "props": [],
       "propDocs": ""
     },
@@ -8117,6 +8823,16 @@
     {
       "name": "Sizes",
       "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / Sizes",
+      "doc": "Components/PhoneInput Sizes",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Sizes",
+      "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
       "summary": "Story: Components/Progress / Sizes",
@@ -8265,6 +8981,16 @@
       "propDocs": ""
     },
     {
+      "name": "SmallWithIcon",
+      "kind": "story",
+      "file": "src/components/Badge/Badge.stories.tsx",
+      "area": "Badge",
+      "summary": "Story: New Components/Badge / SmallWithIcon",
+      "doc": "New Components/Badge SmallWithIcon",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Snapping",
       "kind": "story",
       "file": "src/components/KpiCard/KpiStrip.stories.tsx",
@@ -8313,6 +9039,16 @@
       "doc": "Spinner - Loading indicator component A versatile spinner component for indicating loading states with the following features: - Multiple color variants (default, primary, secondary, accent) - Multiple size variants (sm, md, lg) - CSS animation-based spinning - SVG-based for crisp rendering at all sizes - Accessible with proper ARIA attributes ```tsx // Basic usage <Spinner /> // With variant and size <Spinner variant=\"primary\" size=\"lg\" /> // With custom label <Spinner aria-label=\"Loading data...\" /> ```",
       "props": ["className"],
       "propDocs": "Custom class name to apply to the spinner"
+    },
+    {
+      "name": "splitPhone",
+      "kind": "utility",
+      "file": "src/components/PhoneInput/countries.ts",
+      "area": "PhoneInput",
+      "summary": "\"+44 20 7946 0958\" → { country: \"GB\", number: \"20 7946 0958\" }; a bare number keeps the hinted country.",
+      "doc": "\"+44 20 7946 0958\" → { country: \"GB\", number: \"20 7946 0958\" }; a bare number keeps the hinted country.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "Stack",
@@ -8455,6 +9191,16 @@
       "propDocs": ""
     },
     {
+      "name": "StepperRail",
+      "kind": "component",
+      "file": "src/components/Stepper/StepperRail.tsx",
+      "area": "Stepper",
+      "summary": "The rail.",
+      "doc": "The rail. A step is a button only when you can actually go there: `onStepSelect` is given, it is unlocked, and it is not the one you are on. A locked step is plain text, marked disabled, and says what opens it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "StickyHeader",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -8491,6 +9237,16 @@
       "area": "Table Old",
       "summary": "Story: Deprecated/Table Old / StripedRows",
       "doc": "Deprecated/Table Old StripedRows",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "StrokeLadder",
+      "kind": "story",
+      "file": "src/components/Icon/Icon.stories.tsx",
+      "area": "Icon",
+      "summary": "Story: Components/Icon / StrokeLadder",
+      "doc": "Components/Icon StrokeLadder",
       "props": [],
       "propDocs": ""
     },
@@ -8610,7 +9366,7 @@
       "file": "src/components/Table/TableStates.tsx",
       "area": "Table",
       "summary": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load.",
-      "doc": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load. An icon, a title, one line, one button.",
+      "doc": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load. An icon, a title, one line, one button. CENTRED IN WHAT YOU CAN SEE (Pranjal, 2026-09-28: \"in empty state why are not showing it in the middle of the table its hiding at the bottom a little getting cutoff as well. It should be in the middle based on the view port. as in table viewport.\"). The page-filling card is as tall as the room under the dock line, so at rest its foot sits below the window; a fixed 300px block under an ever-growing viewport landed at that foot, half off screen. Now the block takes the card's whole body (300 at least - a card with no page to fill looks as before), and the part of it hidden below the window becomes bottom padding, so the message sits in the middle of the visible table and moves back to the true middle as the page scrolls the card up.",
       "props": ["kind", "title", "body", "action", "onAction"],
       "propDocs": "Titles and lines default to the Users wording."
     },
@@ -9600,7 +10356,7 @@
       "file": "src/components/Tabs/Tabs.tsx",
       "area": "Tabs",
       "summary": "TabsContent - the panel for one tab.",
-      "doc": "TabsContent - the panel for one tab. Sits 8 under the strip (K-Tabs-23); a page surface under a tab band insets 16 instead, which the PageFrame owns.",
+      "doc": "TabsContent - the panel for one tab. No spacing of its own: the surface it sits in decides - a drawer body puts 20 under the strip, a page surface 16 (S-16) - exactly as the console, which has no panel element at all.",
       "props": ["value"],
       "propDocs": "The value of the tab that this content belongs to."
     },
@@ -9621,8 +10377,8 @@
       "area": "Tabs",
       "summary": "TabsList - the strip (underline) or the track (filled).",
       "doc": "TabsList - the strip (underline) or the track (filled). Its `type` is handed to every trigger inside, so it is written once.",
-      "props": ["type", "variant", "fullWidth"],
-      "propDocs": "Which of the two types the strip draws. Every trigger inside inherits it, so it is set once here and never repeated on the tabs. The older name for `type`; prefer `type`. Stretches each tab to share the width equally."
+      "props": ["type", "variant", "fullWidth", "hairline"],
+      "propDocs": "Which of the two types the strip draws. Every trigger inside inherits it, so it is set once here and never repeated on the tabs. The older name for `type`; prefer `type`. Stretches each tab to share the width equally. Underline only: the strip's own hairline (neutral-30), which a drawer band closes with. A page band has none - pass `false` and the tabs stretch to the band, the active 2px line as its last 2px (B-23)."
     },
     {
       "name": "TabsListOld2",
@@ -9692,8 +10448,8 @@
       "kind": "component",
       "file": "src/components/Table/TableCells.tsx",
       "area": "Table",
-      "summary": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" whose bubble lists the rest.",
-      "doc": "Teams, roles and the like: neutral square Badges, and a slate \"+N\" whose bubble lists the rest.",
+      "summary": "Teams, roles and the like: neutral square Badges, and a quiet \"+N\" whose bubble lists the rest - the value wears the badge, the counter is plain muted text (Pranjal 2026-10-11: one \"+N\" across the console).",
+      "doc": "Teams, roles and the like: neutral square Badges, and a quiet \"+N\" whose bubble lists the rest - the value wears the badge, the counter is plain muted text (Pranjal 2026-10-11: one \"+N\" across the console).",
       "props": [],
       "propDocs": ""
     },
@@ -9928,6 +10684,26 @@
       "propDocs": ""
     },
     {
+      "name": "timeSlots",
+      "kind": "utility",
+      "file": "src/components/DatePicker/date.ts",
+      "area": "DatePicker",
+      "summary": "Every time of day on a step of `step` minutes: \"00:00\" ..",
+      "doc": "Every time of day on a step of `step` minutes: \"00:00\" .. \"23:30\" for 30. A step outside 1..720 falls back to 30.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TitleOnly",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / TitleOnly",
+      "doc": "Components/EmptyState TitleOnly",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "toast",
       "kind": "utility",
       "file": "src/components/Toast/Toast.tsx",
@@ -10001,8 +10777,8 @@
       "kind": "story",
       "file": "src/components/Toast/Toast.stories.tsx",
       "area": "Toast",
-      "summary": "Story: Components/Toast / ToastVariants",
-      "doc": "Components/Toast ToastVariants",
+      "summary": "Story: New Components/Toast / ToastVariants",
+      "doc": "New Components/Toast ToastVariants",
       "props": [],
       "propDocs": ""
     },
@@ -10131,8 +10907,8 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / Tones",
-      "doc": "Components/Banner Tones",
+      "summary": "Story: New Components/Banner / Tones",
+      "doc": "New Components/Banner Tones",
       "props": [],
       "propDocs": ""
     },
@@ -10396,6 +11172,16 @@
       "propDocs": ""
     },
     {
+      "name": "Two",
+      "kind": "story",
+      "file": "src/components/BannerStack/BannerStack.stories.tsx",
+      "area": "BannerStack",
+      "summary": "Story: Components/BannerStack / Two",
+      "doc": "Components/BannerStack Two",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TwoFrozenColumns",
       "kind": "story",
       "file": "src/components/TableOld/TableColumnControls.stories.tsx",
@@ -10412,6 +11198,16 @@
       "area": "Table Old Cell Recipes",
       "summary": "Story: Deprecated/Table Old Cell Recipes / TwoLine",
       "doc": "Deprecated/Table Old Cell Recipes TwoLine",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TypedDelete",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / TypedDelete",
+      "doc": "Components/ConfirmDialog TypedDelete",
       "props": [],
       "propDocs": ""
     },
@@ -10908,6 +11704,16 @@
     {
       "name": "Variations",
       "kind": "story",
+      "file": "src/components/CopyField/CopyField.stories.tsx",
+      "area": "CopyField",
+      "summary": "Story: Components/CopyField / Variations",
+      "doc": "Components/CopyField Variations",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Variations",
+      "kind": "story",
       "file": "src/components/KpiCard/KpiCard.stories.tsx",
       "area": "KPI Card",
       "summary": "Story: New Components/KPI Card / Variations",
@@ -10946,6 +11752,16 @@
       "propDocs": ""
     },
     {
+      "name": "Vertical",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / Vertical",
+      "doc": "Components/Stepper Vertical",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "VerticalOrientation",
       "kind": "story",
       "file": "src/components/TabsOld2/TabsOld2.stories.tsx",
@@ -10972,6 +11788,16 @@
       "area": "Container",
       "summary": "Story: Layout/Container / VerticalPadding",
       "doc": "Layout/Container VerticalPadding",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "VerticalStates",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / VerticalStates",
+      "doc": "Components/Stepper VerticalStates",
       "props": [],
       "propDocs": ""
     },
@@ -11026,6 +11852,16 @@
       "propDocs": ""
     },
     {
+      "name": "weekday",
+      "kind": "utility",
+      "file": "src/components/DatePicker/date.ts",
+      "area": "DatePicker",
+      "summary": "The day of the week, 0 = Sunday.",
+      "doc": "The day of the week, 0 = Sunday.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WhatItIsFor",
       "kind": "story",
       "file": "src/components/Callout/Callout.stories.tsx",
@@ -11066,6 +11902,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithAction",
+      "kind": "story",
+      "file": "src/components/EmptyState/EmptyState.stories.tsx",
+      "area": "EmptyState",
+      "summary": "Story: Components/EmptyState / WithAction",
+      "doc": "Components/EmptyState WithAction",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithActionButtons",
       "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
@@ -11080,8 +11926,8 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / WithActions",
-      "doc": "Components/Banner WithActions",
+      "summary": "Story: New Components/Banner / WithActions",
+      "doc": "New Components/Banner WithActions",
       "props": [],
       "propDocs": ""
     },
@@ -11246,16 +12092,6 @@
       "propDocs": ""
     },
     {
-      "name": "WithBounds",
-      "kind": "story",
-      "file": "src/components/DatePicker/DatePicker.stories.tsx",
-      "area": "DatePicker",
-      "summary": "Story: New Components/DatePicker / WithBounds",
-      "doc": "New Components/DatePicker WithBounds",
-      "props": [],
-      "propDocs": ""
-    },
-    {
       "name": "WithCaption",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -11306,22 +12142,22 @@
       "propDocs": ""
     },
     {
-      "name": "WithClear",
-      "kind": "story",
-      "file": "src/components/DatePicker/DatePicker.stories.tsx",
-      "area": "DatePicker",
-      "summary": "Story: New Components/DatePicker / WithClear",
-      "doc": "New Components/DatePicker WithClear",
-      "props": [],
-      "propDocs": ""
-    },
-    {
       "name": "WithCollapsibleSections",
       "kind": "story",
       "file": "src/components/Sidebar/Sidebar.stories.tsx",
       "area": "Sidebar",
       "summary": "Story: Deprecated/Sidebar / WithCollapsibleSections",
       "doc": "Deprecated/Sidebar WithCollapsibleSections",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithConsequences",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / WithConsequences",
+      "doc": "Components/ConfirmDialog WithConsequences",
       "props": [],
       "propDocs": ""
     },
@@ -11380,8 +12216,18 @@
       "kind": "story",
       "file": "src/components/Banner/Banner.stories.tsx",
       "area": "Banner",
-      "summary": "Story: Components/Banner / WithDescription",
-      "doc": "Components/Banner WithDescription",
+      "summary": "Story: New Components/Banner / WithDescription",
+      "doc": "New Components/Banner WithDescription",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithDescription",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / WithDescription",
+      "doc": "Components/ConfirmDialog WithDescription",
       "props": [],
       "propDocs": ""
     },
@@ -11466,6 +12312,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithEditButton",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithEditButton",
+      "doc": "New Components/Avatar WithEditButton",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithEllipsis",
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
@@ -11502,6 +12358,16 @@
       "area": "Input Old",
       "summary": "Story: Deprecated 2/Input Old / WithError",
       "doc": "Deprecated 2/Input Old WithError",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithError",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / WithError",
+      "doc": "Components/PhoneInput WithError",
       "props": [],
       "propDocs": ""
     },
@@ -11612,6 +12478,16 @@
       "area": "Input Old",
       "summary": "Story: Deprecated 2/Input Old / WithHelperText",
       "doc": "Deprecated 2/Input Old WithHelperText",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithHelperText",
+      "kind": "story",
+      "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
+      "area": "PhoneInput",
+      "summary": "Story: Components/PhoneInput / WithHelperText",
+      "doc": "Components/PhoneInput WithHelperText",
       "props": [],
       "propDocs": ""
     },
@@ -11816,6 +12692,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithLearnMore",
+      "kind": "story",
+      "file": "src/components/InfoTip/InfoTip.stories.tsx",
+      "area": "InfoTip",
+      "summary": "Story: Components/InfoTip / WithLearnMore",
+      "doc": "Components/InfoTip WithLearnMore",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithLeftIcon",
       "kind": "story",
       "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
@@ -11846,6 +12732,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithLogo",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithLogo",
+      "doc": "New Components/Avatar WithLogo",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithMarkers",
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
@@ -11862,6 +12758,16 @@
       "area": "Card",
       "summary": "Story: Components/Card / WithMedia",
       "doc": "Components/Card WithMedia",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithMinMax",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / WithMinMax",
+      "doc": "New Components/DatePicker WithMinMax",
       "props": [],
       "propDocs": ""
     },
@@ -12086,6 +12992,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithStatus",
+      "kind": "story",
+      "file": "src/components/Avatar/Avatar.stories.tsx",
+      "area": "Avatar",
+      "summary": "Story: New Components/Avatar / WithStatus",
+      "doc": "New Components/Avatar WithStatus",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithStatusColors",
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
@@ -12222,6 +13138,16 @@
       "area": "Stack",
       "summary": "Story: Layout/Stack / Wrapping",
       "doc": "Layout/Stack Wrapping",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "YearLevel",
+      "kind": "story",
+      "file": "src/components/DatePicker/DatePicker.stories.tsx",
+      "area": "DatePicker",
+      "summary": "Story: New Components/DatePicker / YearLevel",
+      "doc": "New Components/DatePicker YearLevel",
       "props": [],
       "propDocs": ""
     },

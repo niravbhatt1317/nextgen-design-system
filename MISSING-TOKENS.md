@@ -325,18 +325,22 @@ product built on this library will invent its own.
 **Priority: HIGH.** These are not gaps in the token system — they are the token rule already
 being broken, in shipped code.
 
-| Component          | Hardcoded value                | Should be                  |
-| ------------------ | ------------------------------ | -------------------------- |
-| `Textarea.tsx`     | `[80px]`, `[100px]`, `[120px]` | Size tokens                |
-| `ScrollArea.tsx`   | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens |
-| `Select.tsx`       | `[8rem]`                       | Min-width token            |
-| `DropdownMenu.tsx` | `[8rem]`                       | Min-width token            |
-| `Command.tsx`      | `[300px]`                      | Min-width token            |
-| `Combobox.tsx`     | `[300px]`                      | Min-width token            |
-| `Table.tsx`        | `[100px]`                      | Size token                 |
-| `InputGroup.tsx`   | `[60px]`                       | Size token                 |
-| `Sidebar.tsx`      | `[10px]`                       | Type-size token            |
-| `TagPill.tsx`      | `[10px]`                       | Type-size token            |
+| Component                                                                | Hardcoded value                | Should be                      |
+| ------------------------------------------------------------------------ | ------------------------------ | ------------------------------ |
+| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]` | Size tokens                    |
+| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens     |
+| `Select.tsx`                                                             | `[8rem]`                       | Min-width token                |
+| `DropdownMenu.tsx`                                                       | `[8rem]`                       | Min-width token                |
+| `Command.tsx`                                                            | `[300px]`                      | Min-width token                |
+| `Combobox.tsx`                                                           | `[300px]`                      | Min-width token                |
+| `Table.tsx`                                                              | `[100px]`                      | Size token                     |
+| `InputGroup.tsx`                                                         | `[60px]`                       | Size token                     |
+| `Sidebar.tsx`                                                            | `[10px]`                       | Type-size token                |
+| `TagPill.tsx`                                                            | `[10px]`                       | Type-size token                |
+| `Avatar.tsx`                                                             | status dot + ring tables       | A ratio, not steps — see below |
+| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps             |
+| `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens        |
+| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens        |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
@@ -344,6 +348,18 @@ shipped product.)_
 **Note:** `[10px]` in Sidebar and TagPill is a font size smaller than anything in the type
 scale. That is either a deliberate micro-label size that needs a token, or an accessibility
 problem. It needs a design decision either way.
+
+**Avatar's status dot is a ratio, not a set of magic numbers** (added 2026-10-13), and that is worth
+saying because the table reads like the latter — `3.13px`, `6.25px`, `-3.98px` and the rest. Measured
+across all five sizes: the dot is exactly `size / 6.4` and its ring exactly `size / 16`, every time.
+The corner offsets differ at `xl` only because `xl` is the one size with a 12px corner radius instead
+of 6px, so the dot meets a different arc. **It does not need five tokens — it needs two ratios**,
+which is a much smaller decision than the rest of this section.
+
+**The twelve console parts (Pranjal, 2026-10-13)** each declare their raw values in their own
+comments, which is the right half of the token rule; this table is the other half. Two of them are
+not size gaps but missing _things_: a filled info glyph (see the icon note in `COMPONENT-GAP.md`) and
+a backdrop token for the banner stack's shade, which uses `--mdt-black` with alpha for now.
 
 ---
 
