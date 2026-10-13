@@ -1,15 +1,53 @@
 {
   "generatedFrom": "src/components (CVA definitions)",
-  "componentCount": 47,
-  "variantGroupCount": 166,
-  "variantValueCount": 519,
+  "componentCount": 55,
+  "variantGroupCount": 189,
+  "variantValueCount": 578,
   "components": [
+    {
+      "component": "ActionCard",
+      "file": "src/components/ActionCard/ActionCard.tsx",
+      "definitions": [
+        {
+          "name": "actionCardVariants",
+          "variants": {
+            "variant": ["default", "add", "edit"],
+            "interactive": ["true", "false"]
+          },
+          "defaults": {
+            "variant": "default",
+            "interactive": "false"
+          }
+        }
+      ]
+    },
     {
       "component": "Avatar",
       "file": "src/components/Avatar/Avatar.tsx",
       "definitions": [
         {
           "name": "avatarVariants",
+          "variants": {
+            "tone": ["slate", "blue", "green", "amber", "rose", "purple"],
+            "size": ["xs", "sm", "md", "lg", "xl"],
+            "shape": ["circle", "rounded"],
+            "ring": ["true", "false"]
+          },
+          "defaults": {
+            "tone": "slate",
+            "size": "md",
+            "shape": "circle",
+            "ring": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "AvatarOld2",
+      "file": "src/components/AvatarOld2/AvatarOld2.tsx",
+      "definitions": [
+        {
+          "name": "avatarOld2Variants",
           "variants": {
             "tone": ["slate", "blue", "green", "amber", "rose", "purple"],
             "size": ["xs", "sm", "md", "lg", "xl"],
@@ -91,6 +129,21 @@
       ]
     },
     {
+      "component": "Breadcrumb",
+      "file": "src/components/Breadcrumb/Breadcrumb.tsx",
+      "definitions": [
+        {
+          "name": "breadcrumbVariants",
+          "variants": {
+            "variant": ["page", "drawer"]
+          },
+          "defaults": {
+            "variant": "page"
+          }
+        }
+      ]
+    },
+    {
       "component": "Button",
       "file": "src/components/Button/Button.tsx",
       "definitions": [
@@ -103,6 +156,8 @@
               "outline",
               "ghost",
               "destructive",
+              "fixed",
+              "dashed",
               "destructiveGhost",
               "link"
             ],
@@ -471,6 +526,23 @@
             "hasError": ["true", "false"]
           },
           "defaults": {
+            "size": "sm",
+            "hasError": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "InputOld2",
+      "file": "src/components/InputOld2/InputOld2.tsx",
+      "definitions": [
+        {
+          "name": "inputOld2Variants",
+          "variants": {
+            "size": ["sm", "md", "lg"],
+            "hasError": ["true", "false"]
+          },
+          "defaults": {
             "size": "md",
             "hasError": "false"
           }
@@ -618,6 +690,25 @@
           },
           "defaults": {
             "variant": "default",
+            "size": "sm",
+            "hasError": "false"
+          }
+        }
+      ]
+    },
+    {
+      "component": "SelectOld2",
+      "file": "src/components/SelectOld2/SelectOld2.tsx",
+      "definitions": [
+        {
+          "name": "selectOld2TriggerVariants",
+          "variants": {
+            "variant": ["default", "borderless"],
+            "size": ["sm", "md", "lg"],
+            "hasError": ["true", "false"]
+          },
+          "defaults": {
+            "variant": "default",
             "size": "md",
             "hasError": "false"
           }
@@ -741,7 +832,7 @@
         {
           "name": "stepperVariants",
           "variants": {
-            "layout": ["stacked", "inline", "underline"]
+            "layout": ["stacked", "inline", "underline", "vertical"]
           },
           "defaults": {
             "layout": "stacked"
@@ -764,6 +855,30 @@
         },
         {
           "name": "motadataSwitchThumbVariants",
+          "variants": {
+            "size": ["sm", "md", "lg"]
+          },
+          "defaults": {
+            "size": "md"
+          }
+        }
+      ]
+    },
+    {
+      "component": "SwitchOld2",
+      "file": "src/components/SwitchOld2/SwitchOld2.tsx",
+      "definitions": [
+        {
+          "name": "motadataSwitchOld2RootVariants",
+          "variants": {
+            "size": ["sm", "md", "lg"]
+          },
+          "defaults": {
+            "size": "md"
+          }
+        },
+        {
+          "name": "motadataSwitchOld2ThumbVariants",
           "variants": {
             "size": ["sm", "md", "lg"]
           },
@@ -856,6 +971,43 @@
       ]
     },
     {
+      "component": "TableOld2",
+      "file": "src/components/TableOld2/TableOld2.tsx",
+      "definitions": [
+        {
+          "name": "tableCellOld2Variants",
+          "variants": {
+            "frozen": ["true", "false"],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
+          "name": "tableHeadOld2Variants",
+          "variants": {
+            "frozen": ["true", "false"],
+            "align": []
+          },
+          "defaults": {
+            "frozen": "false",
+            "align": "left"
+          }
+        },
+        {
+          "name": "tableRowOld2Variants",
+          "variants": {
+            "inert": ["true", "false"]
+          },
+          "defaults": {
+            "inert": "false"
+          }
+        }
+      ]
+    },
+    {
       "component": "TagPill",
       "file": "src/components/TagPill/TagPill.tsx",
       "definitions": [
@@ -913,6 +1065,27 @@
       "definitions": [
         {
           "name": "textareaVariants",
+          "variants": {
+            "size": ["sm", "md", "lg"],
+            "variant": ["default", "filled"],
+            "hasError": ["true", "false"],
+            "resize": ["none", "vertical", "both"]
+          },
+          "defaults": {
+            "size": "sm",
+            "variant": "default",
+            "hasError": "false",
+            "resize": "vertical"
+          }
+        }
+      ]
+    },
+    {
+      "component": "TextareaOld2",
+      "file": "src/components/TextareaOld2/TextareaOld2.tsx",
+      "definitions": [
+        {
+          "name": "textareaOld2Variants",
           "variants": {
             "size": ["sm", "md", "lg"],
             "variant": ["default", "filled"],

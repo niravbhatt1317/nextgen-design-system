@@ -8,6 +8,8 @@ const VARIANTS: ButtonVariant[] = [
   'primary',
   'secondary',
   'outline',
+  'fixed',
+  'dashed',
   'ghost',
   'destructive',
   'destructiveGhost',
@@ -45,7 +47,7 @@ const meta: Meta<typeof Button> = {
       description: {
         component:
           '**Behaviour reference — Claude artifacts:** [Button Variants](https://claude.ai/code/artifact/2418ec74-6852-43bf-9001-d028a8fccddf), every look, state and size on one live page, and [Button Spec](https://claude.ai/code/artifact/9e5401f0-4c01-49c5-8b1e-6072cd630e8c), the measurements drawn out. Open them to see how this component is meant to behave — they are what it was designed and approved from.\n\n' +
-          'The merged console button. Seven looks, three heights of 28, 32 and 36, one text size of 13/20 and one glyph size of 16 at a 1.5 stroke. ' +
+          'The merged console button. Nine looks, three heights of 28, 32 and 36, one text size of 13/20 and one glyph size of 16 at a 1.5 stroke. ' +
           'The height is not set directly: it comes from the 20px line the label sits on, so 6 above and 6 below make 32. ' +
           'Padding is decided by what meets each edge — 16 against a word, 12 against a glyph — which is why a button with a leading glyph is 12 on the left and 16 on the right. ' +
           'Hover and press move along the neutral ramp rather than fading the fill, because fading lightens a colour against a white page and costs the label its contrast.',
@@ -78,7 +80,7 @@ export const Playground: Story = {
 };
 
 /**
- * Seven looks. `secondary` is a quiet fill with no border, which is what keeps
+ * Nine looks. `secondary` is a quiet fill with no border, which is what keeps
  * it apart from `outline` — together with `primary` that gives three volumes a
  * reader can rank without reading the labels.
  */
@@ -277,6 +279,62 @@ export const Focus: Story = {
     await userEvent.tab();
     await expect(canvas.getByRole('button', { name: /primary/i })).toHaveFocus();
   },
+};
+
+/**
+ * `fixed` keeps the same face in both themes: white fill, the outline border and a
+ * dark label. Switch the theme in the toolbar - this row does not change.
+ */
+export const Fixed: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Row>
+      <Button variant="fixed">Cancel</Button>
+      <Button variant="fixed" leftIcon={<Icon name="filter" />}>
+        More filters
+      </Button>
+      <Button variant="fixed" active>
+        Applied
+      </Button>
+      <Button
+        variant="fixed"
+        iconOnly
+        ariaLabel="Row actions"
+        leftIcon={<Icon name="more-vertical" />}
+      />
+      <Button variant="fixed" loading>
+        Saving
+      </Button>
+      <Button variant="fixed" disabled>
+        Disabled
+      </Button>
+    </Row>
+  ),
+};
+
+/**
+ * `dashed` starts something new: a dashed blue edge and label on no fill. Under
+ * the pointer the edge goes solid over a light blue wash.
+ */
+export const Dashed: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Row>
+      <Button variant="dashed" size="sm" leftIcon={<Icon name="plus" />}>
+        Add tag
+      </Button>
+      <Button variant="dashed" leftIcon={<Icon name="plus" />}>
+        Add tag
+      </Button>
+      <Button variant="dashed" active leftIcon={<Icon name="plus" />}>
+        Held on
+      </Button>
+      <Button variant="dashed" iconOnly ariaLabel="Add tag" leftIcon={<Icon name="plus" />} />
+      <Button variant="dashed" disabled leftIcon={<Icon name="plus" />}>
+        Disabled
+      </Button>
+    </Row>
+  ),
 };
 
 /** Held on, the way a toolbar control looks once its filter is applied. */

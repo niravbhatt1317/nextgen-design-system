@@ -173,6 +173,10 @@ export type {
   CollapsibleCardOwnProps,
 } from './Card';
 
+// ActionCard
+export { ActionCard, actionCardVariants } from './ActionCard';
+export type { ActionCardProps, ActionCardVariant } from './ActionCard';
+
 // Checkbox
 export * from './Checkbox';
 

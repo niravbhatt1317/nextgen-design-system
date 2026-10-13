@@ -213,3 +213,44 @@ describe('an icon is drawn at the size it shows (2026-10-12)', () => {
     expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.5');
   });
 });
+
+describe('fixed keeps one face in both themes (2026-10-13)', () => {
+  it('paints from its own pinned tokens, not the ramp that flips', () => {
+    render(<Button variant="fixed">Cancel</Button>);
+    const el = screen.getByRole('button');
+    expect(el).toHaveClass('mdt-bg-[hsl(var(--mdt-fixed-fill))]');
+    expect(el).toHaveClass('mdt-border-[hsl(var(--mdt-fixed-border))]');
+    expect(el).toHaveClass('mdt-text-[hsl(var(--mdt-fixed-foreground))]');
+  });
+  it('holds on with its own pressed step, not neutral-20', () => {
+    render(
+      <Button variant="fixed" active>
+        Applied
+      </Button>
+    );
+    const el = screen.getByRole('button');
+    expect(el).toHaveClass('mdt-bg-[hsl(var(--mdt-fixed-fill-active))]');
+    expect(el).not.toHaveClass('mdt-bg-neutral-20');
+  });
+});
+
+describe('dashed starts something new (2026-10-13)', () => {
+  it('draws a dashed info-blue edge and goes solid over the info wash under the pointer', () => {
+    render(<Button variant="dashed">Add tag</Button>);
+    const el = screen.getByRole('button');
+    expect(el).toHaveClass('mdt-border-dashed');
+    expect(el).toHaveClass('mdt-text-[color:var(--mdt-badge-info-ink)]');
+    expect(el).toHaveClass('hover:mdt-border-solid');
+    expect(el).toHaveClass('hover:mdt-bg-[color:var(--mdt-badge-info-fill)]');
+  });
+  it('holds on with a solid edge and the wash', () => {
+    render(
+      <Button variant="dashed" active>
+        Add tag
+      </Button>
+    );
+    const el = screen.getByRole('button');
+    expect(el).toHaveClass('mdt-border-solid');
+    expect(el).not.toHaveClass('mdt-bg-neutral-20');
+  });
+});
