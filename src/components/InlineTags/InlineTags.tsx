@@ -1,17 +1,27 @@
-import { forwardRef, useEffect, useId, useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
+import { Input } from '../Input';
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../Popover';
 import { TagPill } from '../TagPill';
+import { TagPicker, useTagDraft, type TagDraft } from './TagPicker';
 import type { InlineTagsProps } from './InlineTags.types';
 
 /*
- * InlineTags - tags added in place, one at a time (Pranjal, 2026-09-29, from mocks/foundation/inline-tags.html).
+ * InlineTags - a record's tags, and the place to change them (Pranjal, 2026-09-29; reworked 2026-10-13 from the
+ * table-tag-editor mock, first built in the console's Client organizations table and organization header).
  *
- * At rest: the tags as square TagPills with a tag glyph, then a blue dashed "+ Add tag". Clicked, the button becomes a
- * 28-tall field with a ✕ beside it (outside, not inside) and the suggested tags as dashed chips on a row under it.
- * Typing drops down the earlier tags that match, with Add "…" at the end for a new word - no tick and no Enter: a tag
- * is added from the list. Escape, the ✕ or a press outside closes it. Once added, the pill joins the row and "Add tag"
- * moves along after it. Everything is 28 tall so the row never jumps between states.
+ * variant="inline" (the default - a header or a details row): the tags as square TagPills, then a blue dashed
+ * "+ Add tag" that turns into a search field IN THE SAME SPOT. Under the field, the tag picker: Selected and Suggested
+ * with ticks, Create "...", Apply / Cancel. The row holds still while the picker is open - ticks are a draft, the
+ * pills' ✕ hides - and changes once, on Apply. (Until 2026-10-13 this was dashed suggestion chips under the field and
+ * a drop-down of earlier tags; every add landed at once and moved the field along the row.)
+ *
+ * variant="popover" (a table cell): the cell shows the tags - or "Add tags" - as a button; pressed, a popover opens
+ * with the search on top and the same picker under it.
+ *
+ * Both: Apply hands back the whole new list; Cancel or Escape drops the draft. A press outside with nothing changed
+ * closes; with unapplied ticks it is swallowed and the picker wears the filter panel's one-second halo.
  */
 
 /** The keyboard ring every control in the row wears. */
@@ -27,58 +37,54 @@ const ADD_CLASSES = [
   FOCUS_RING,
 ];
 
-/** The open field: the Input's focused border and halo, at the pill's 28px. */
-const FIELD_CLASSES = [
-  'mdt-h-7 mdt-w-[200px] mdt-rounded-lg mdt-border mdt-border-primary mdt-bg-background mdt-px-3',
-  'mdt-text-xs mdt-font-medium mdt-text-neutral-130 placeholder:mdt-font-normal placeholder:mdt-text-faint',
-  'mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)] focus-visible:mdt-outline-none',
+/** The popover's surface; the halo is the AdvancedFilter's "finish or close me" light. */
+const POP_CLASSES = [
+  'mdt-w-auto mdt-p-0 mdt-transition-shadow',
+  'data-[nudge]:mdt-shadow-[0_0_0_4px_hsl(var(--mdt-nudge)/0.12),0_12px_32px_-12px_rgba(29,43,62,0.22),0_2px_8px_rgba(29,43,62,0.06)]',
 ];
 
-const CANCEL_CLASSES = [
-  'mdt-inline-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-md mdt-border-0 mdt-p-0',
-  'mdt-cursor-pointer mdt-bg-transparent mdt-text-muted-foreground hover:mdt-bg-neutral-10 hover:mdt-text-neutral-130',
+/** The popover variant's door: the tags in a row, or the quiet "Add tags". */
+const DOOR_CLASSES = [
+  'mdt-flex mdt-min-h-8 mdt-w-full mdt-cursor-pointer mdt-items-center mdt-gap-1 mdt-rounded-lg mdt-border-0',
+  'mdt-bg-transparent mdt-px-2 mdt-text-left hover:mdt-bg-neutral-10 data-[state=open]:mdt-bg-neutral-10',
+  'disabled:mdt-cursor-default disabled:hover:mdt-bg-transparent',
   FOCUS_RING,
 ];
 
-/** The drop-down wears the DropdownMenu's surface: hairline, corners 10, lg shadow, 6 inside. */
-const LIST_CLASSES = [
-  'mdt-absolute mdt-left-0 mdt-top-[calc(100%+6px)] mdt-z-50 mdt-max-h-[232px] mdt-w-60 mdt-overflow-auto',
-  'mdt-rounded-[10px] mdt-border mdt-border-neutral-30 mdt-bg-popover mdt-p-1.5 mdt-shadow-lg',
-];
-
-const OPTION_CLASSES = [
-  'mdt-flex mdt-h-8 mdt-w-full mdt-items-center mdt-gap-2 mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-px-2.5',
-  'mdt-cursor-pointer mdt-text-left mdt-text-[13px] mdt-text-neutral-130 hover:mdt-bg-neutral-10',
-  'focus-visible:mdt-bg-neutral-10 focus-visible:mdt-outline-none',
-];
-
-const SUGGESTION_CLASSES = [
-  'mdt-h-6 mdt-rounded-lg mdt-border mdt-border-dashed mdt-border-neutral-30 mdt-bg-transparent mdt-px-2',
-  'mdt-cursor-pointer mdt-text-xs mdt-font-medium mdt-text-neutral-90 hover:mdt-border-solid hover:mdt-text-neutral-130',
-  FOCUS_RING,
-];
-
-const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
-
-/** The typed part of an option in the heading ink at 600, the rest as it is. */
-function Highlight({ text, query }: { text: string; query: string }) {
-  const k = query ? text.toLowerCase().indexOf(query.toLowerCase()) : -1;
-  if (k < 0) return <span>{text}</span>;
-  return (
-    <span>
-      {text.slice(0, k)}
-      <b className="mdt-font-semibold mdt-text-foreground">{text.slice(k, k + query.length)}</b>
-      {text.slice(k + query.length)}
-    </span>
-  );
+/** A press outside with unapplied ticks: swallowed, and the picker lit for a second. */
+function useHold(d: TagDraft) {
+  const [nudge, setNudge] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  const hold = (e: { preventDefault: () => void }) => {
+    if (!d.changed) return;
+    e.preventDefault();
+    /* swallow the click that follows, so the row or button behind never reacts */
+    const eat = (ev: MouseEvent) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+    };
+    document.addEventListener('click', eat, { capture: true, once: true });
+    window.setTimeout(() => {
+      document.removeEventListener('click', eat, { capture: true });
+    }, 600);
+    if (!nudge) {
+      setNudge(true);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => {
+        setNudge(false);
+      }, 1000);
+    }
+  };
+  return { nudge, hold };
 }
 
 /**
- * InlineTags - a row of tags with an "Add tag" that opens a field in place.
+ * InlineTags - a record's tags with a picker to change them: inline in a row, or from a table cell.
  *
  * @example
  * ```tsx
- * <InlineTags value={tags} onChange={setTags} suggestions={['Pilot', 'APAC']} options={everyTagUsedBefore} />
+ * <InlineTags value={tags} onChange={setTags} options={everyTagUsedBefore} counts={usage} />
+ * <InlineTags variant="popover" value={row.tags} onChange={(t) => save(row, t)} options={everyTagUsedBefore} />
  * ```
  */
 const InlineTags = forwardRef<HTMLDivElement, InlineTagsProps>(
@@ -88,8 +94,13 @@ const InlineTags = forwardRef<HTMLDivElement, InlineTagsProps>(
       onChange,
       suggestions = [],
       options = [],
+      counts = {},
+      variant = 'inline',
+      trigger,
       addLabel = 'Add tag',
-      placeholder = 'Type a tag',
+      emptyLabel = 'Add tags',
+      placeholder = 'Search or create a tag',
+      label = 'Tags',
       disabled = false,
       className,
       ...rest
@@ -97,224 +108,165 @@ const InlineTags = forwardRef<HTMLDivElement, InlineTagsProps>(
     ref
   ) => {
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState('');
-    const rootRef = useRef<HTMLDivElement | null>(null);
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const addRef = useRef<HTMLButtonElement | null>(null);
-    const refocusAdd = useRef(false);
-    const listId = useId();
+    const d = useTagDraft({ options, suggestions, counts });
+    const { nudge, hold } = useHold(d);
+    const fieldRef = useRef<HTMLDivElement | null>(null);
 
-    const has = (t: string) => value.some((v) => same(v, t));
-    const typed = query.trim();
-    const matches = typed
-      ? options.filter((o) => !has(o) && o.toLowerCase().includes(typed.toLowerCase()))
-      : [];
-    const exact = typed !== '' && [...options, ...value].some((t) => same(t, typed));
-    const leftSuggestions = suggestions.filter((s) => !has(s));
-
-    const close = (focusAdd: boolean) => {
-      refocusAdd.current = focusAdd;
+    const openIt = () => {
+      d.start(value);
+      setOpen(true);
+    };
+    const cancel = () => {
       setOpen(false);
-      setQuery('');
     };
-
-    const add = (t: string, stayOpen: boolean) => {
-      const v = t.trim();
-      if (v && !has(v)) onChange([...value, v]);
-      if (stayOpen) inputRef.current?.focus();
-      else close(true);
+    const apply = () => {
+      if (d.changed) onChange([...d.draft]);
+      setOpen(false);
     };
-
-    // back on "Add tag" after an add or a cancel, so the keyboard keeps its place
-    useEffect(() => {
-      if (!open && refocusAdd.current) {
-        refocusAdd.current = false;
-        addRef.current?.focus();
-      }
-    }, [open]);
-
-    // a press anywhere outside closes it, as in the mock
-    useEffect(() => {
-      if (!open) return undefined;
-      const onDown = (e: MouseEvent) => {
-        if (rootRef.current && !rootRef.current.contains(e.target as Node)) close(false);
-      };
-      document.addEventListener('mousedown', onDown);
-      return () => {
-        document.removeEventListener('mousedown', onDown);
-      };
-    }, [open]);
-
-    const onOptionKey = (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') close(true);
+    const onOpenChange = (next: boolean) => {
+      if (next) openIt();
+      else if (!d.changed) setOpen(false);
     };
+    const keys = d.keyHandler({ apply, cancel });
+    const search = (
+      <Input
+        size="sm"
+        // eslint-disable-next-line jsx-a11y/no-autofocus -- the field exists only because the picker was just opened
+        autoFocus
+        value={d.query}
+        placeholder={placeholder}
+        aria-label={placeholder}
+        startAdornment={<Icon name="search" size={14} aria-hidden />}
+        {...(d.query
+          ? {
+              onClear: () => {
+                d.setQuery('');
+              },
+            }
+          : {})}
+        onChange={(e) => {
+          d.setQuery(e.target.value);
+        }}
+        onKeyDown={keys}
+      />
+    );
+    const content = (header?: React.ReactNode) => (
+      <PopoverContent
+        className={cn(POP_CLASSES)}
+        side="bottom"
+        align="start"
+        sideOffset={6}
+        collisionPadding={12}
+        data-nudge={nudge ? '' : undefined}
+        onOpenAutoFocus={(e) => {
+          if (variant === 'inline') e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+        }}
+        onFocusOutside={(e) => {
+          e.preventDefault();
+        }}
+        onPointerDownOutside={(e) => {
+          const t = e.target;
+          if (fieldRef.current && t instanceof Node && fieldRef.current.contains(t)) {
+            e.preventDefault();
+            return;
+          }
+          hold(e);
+        }}
+      >
+        <TagPicker draft={d} label={label} onApply={apply} onCancel={cancel} header={header} />
+      </PopoverContent>
+    );
+
+    if (variant === 'popover') {
+      const shown = value.slice(0, 2);
+      const more = value.length - shown.length;
+      return (
+        <div ref={ref} className={cn('mdt-flex', className)} data-slot="inline-tags" {...rest}>
+          <Popover open={open} onOpenChange={onOpenChange}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                disabled={disabled}
+                className={cn(DOOR_CLASSES)}
+                aria-label={`Edit ${label.toLowerCase()}`}
+                data-slot="inline-tags-door"
+              >
+                {trigger ??
+                  (value.length ? (
+                    <>
+                      {shown.map((t) => (
+                        <TagPill key={t} shape="square" readOnly>
+                          {t}
+                        </TagPill>
+                      ))}
+                      {more > 0 ? (
+                        <span className="mdt-pl-0.5 mdt-text-xs mdt-text-muted-foreground">{`+${String(more)}`}</span>
+                      ) : null}
+                    </>
+                  ) : (
+                    <span className="mdt-text-[13px] mdt-text-muted-foreground">{emptyLabel}</span>
+                  ))}
+              </button>
+            </PopoverTrigger>
+            {content(
+              <div className="mdt-shrink-0 mdt-border-b mdt-border-neutral-30 mdt-p-2">
+                {search}
+              </div>
+            )}
+          </Popover>
+        </div>
+      );
+    }
 
     return (
       <div
-        ref={(node) => {
-          rootRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) ref.current = node;
-        }}
+        ref={ref}
         className={cn('mdt-flex mdt-flex-col', className)}
         data-slot="inline-tags"
         {...rest}
       >
-        <div className="mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2">
-          {value.map((t) => (
-            <TagPill
-              key={t}
-              shape="square"
-              icon={<Icon name="tag" />}
-              disabled={disabled}
-              onRemove={
-                disabled
-                  ? undefined
-                  : () => {
-                      onChange(value.filter((v) => v !== t));
-                    }
-              }
-            >
-              {t}
-            </TagPill>
-          ))}
-          {disabled ? null : open ? (
-            <span className="mdt-relative mdt-inline-flex mdt-items-center mdt-gap-1.5">
-              <input
-                ref={inputRef}
-                // eslint-disable-next-line jsx-a11y/no-autofocus -- the field exists only because Add tag was just pressed
-                autoFocus
-                type="text"
-                role="combobox"
-                aria-label="New tag"
-                aria-autocomplete="list"
-                aria-expanded={typed !== ''}
-                aria-controls={typed ? listId : undefined}
-                value={query}
-                placeholder={placeholder}
-                className={cn(FIELD_CLASSES)}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    e.preventDefault();
-                    close(true);
-                  } else if (e.key === 'ArrowDown' && typed) {
-                    e.preventDefault();
-                    rootRef.current
-                      ?.querySelector<HTMLButtonElement>('[data-slot="inline-tags-option"]')
-                      ?.focus();
-                  }
-                }}
-              />
-              <button
-                type="button"
-                aria-label="Cancel"
-                className={cn(CANCEL_CLASSES)}
-                onClick={() => {
-                  close(true);
-                }}
+        <Popover open={open} onOpenChange={onOpenChange}>
+          <div className="mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-2">
+            {value.map((t) => (
+              <TagPill
+                key={t}
+                shape="square"
+                icon={<Icon name="tag" />}
+                disabled={disabled}
+                onRemove={
+                  disabled || open
+                    ? undefined
+                    : () => {
+                        onChange(value.filter((v) => v !== t));
+                      }
+                }
               >
-                <Icon name="x" size={14} aria-hidden />
-              </button>
-              {typed ? (
-                <div
-                  id={listId}
-                  role="listbox"
-                  aria-label="Earlier tags"
-                  className={cn(LIST_CLASSES)}
-                >
-                  <div className="mdt-px-2.5 mdt-pb-1 mdt-pt-2 mdt-text-[11px] mdt-font-medium mdt-uppercase mdt-tracking-[0.04em] mdt-text-faint">
-                    Earlier tags
-                  </div>
-                  {matches.length ? (
-                    matches.map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        role="option"
-                        aria-selected="false"
-                        data-slot="inline-tags-option"
-                        className={cn(OPTION_CLASSES)}
-                        onClick={() => {
-                          add(m, false);
-                        }}
-                        onKeyDown={onOptionKey}
-                      >
-                        <span
-                          className="mdt-inline-flex mdt-text-muted-foreground"
-                          aria-hidden="true"
-                        >
-                          <Icon name="tag" size={14} />
-                        </span>
-                        <Highlight text={m} query={typed} />
-                      </button>
-                    ))
-                  ) : (
-                    <div className="mdt-p-2.5 mdt-text-xs mdt-text-muted-foreground">
-                      No earlier tag matches.
-                    </div>
-                  )}
-                  {!exact ? (
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected="false"
-                      data-slot="inline-tags-option"
-                      data-new=""
-                      className={cn(OPTION_CLASSES, 'mdt-text-[color:var(--mdt-badge-info-ink)]')}
-                      onClick={() => {
-                        add(typed, false);
-                      }}
-                      onKeyDown={onOptionKey}
-                    >
-                      <Icon name="plus" size={14} aria-hidden />
-                      <span>{`Add “${typed}”`}</span>
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-            </span>
-          ) : (
-            <button
-              ref={addRef}
-              type="button"
-              className={cn(ADD_CLASSES)}
-              data-slot="inline-tags-add"
-              onClick={() => {
-                setQuery('');
-                setOpen(true);
-              }}
-            >
-              <Icon name="plus" size={14} aria-hidden />
-              {addLabel}
-            </button>
-          )}
-        </div>
-        {open && leftSuggestions.length > 0 ? (
-          <div
-            role="group"
-            aria-label="Suggested tags"
-            className="mdt-mt-2.5 mdt-flex mdt-flex-wrap mdt-items-center mdt-gap-1.5"
-          >
-            <span className="mdt-mr-0.5 mdt-text-xs mdt-font-medium mdt-text-muted-foreground">
-              Suggested
-            </span>
-            {leftSuggestions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={cn(SUGGESTION_CLASSES)}
-                onClick={() => {
-                  add(s, true);
-                }}
-              >
-                {`+ ${s}`}
-              </button>
+                {t}
+              </TagPill>
             ))}
+            {disabled ? null : open ? (
+              <PopoverAnchor asChild>
+                <div ref={fieldRef} className="mdt-w-[220px] mdt-shrink-0">
+                  {search}
+                </div>
+              </PopoverAnchor>
+            ) : (
+              <button
+                type="button"
+                className={cn(ADD_CLASSES)}
+                data-slot="inline-tags-add"
+                onClick={openIt}
+              >
+                <Icon name="plus" size={14} aria-hidden />
+                {addLabel}
+              </button>
+            )}
           </div>
-        ) : null}
+          {open ? content() : null}
+        </Popover>
       </div>
     );
   }
