@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -47,6 +48,12 @@ export function useTagDraft({ options, suggestions, counts }: TagDraftOptions) {
   const byKey = useRef(false);
   const flip = useRef<Record<string, number> | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  /* The field that drives this picker is a combobox somewhere else in the tree, so the ids that tie the two
+   * together are minted here - the list's own id, and one per row for aria-activedescendant. Without them the
+   * arrow keys move a highlight that a screen reader never hears. */
+  const uid = useId();
+  const listId = `${uid}-list`;
+  const optionId = (i: number) => `${uid}-opt-${String(i)}`;
 
   const start = useCallback((value: readonly string[]) => {
     setBase([...value]);
@@ -200,6 +207,9 @@ export function useTagDraft({ options, suggestions, counts }: TagDraftOptions) {
     listRef,
     keyHandler,
     counts,
+    listId,
+    optionId,
+    activeId: active >= 0 ? optionId(active) : undefined,
   };
 }
 
@@ -246,6 +256,7 @@ export const TagPicker = forwardRef<HTMLDivElement, TagPickerProps>(
       return (
         <div
           key={name}
+          id={d.optionId(idx)}
           data-tag={name}
           data-i={idx}
           role="option"
@@ -303,6 +314,7 @@ export const TagPicker = forwardRef<HTMLDivElement, TagPickerProps>(
           .filter(Boolean)
           .join(' · ')
       : `${String(d.draft.length)} selected`;
+    const otherLabel = d.typed ? 'Other tags' : 'Suggested';
     const createIdx = d.canCreate ? (i += 1) : -1;
     return (
       <div
@@ -313,6 +325,7 @@ export const TagPicker = forwardRef<HTMLDivElement, TagPickerProps>(
         {header}
         <div
           ref={d.listRef as RefObject<HTMLDivElement>}
+          id={d.listId}
           role="listbox"
           aria-multiselectable="true"
           aria-label={label}
@@ -320,6 +333,7 @@ export const TagPicker = forwardRef<HTMLDivElement, TagPickerProps>(
         >
           {d.canCreate ? (
             <div
+              id={d.optionId(createIdx)}
               data-i={createIdx}
               role="option"
               aria-selected="false"
@@ -354,27 +368,34 @@ export const TagPicker = forwardRef<HTMLDivElement, TagPickerProps>(
             </div>
           ) : null}
           {d.selected.length > 0 ? (
-            <div className={GROUP}>
-              <span>Selected</span>
-              <span>{d.draft.length}</span>
+            <div role="group" aria-label="Selected">
+              <div className={GROUP} role="presentation">
+                <span>Selected</span>
+                <span>{d.draft.length}</span>
+              </div>
+              {d.selected.map(row)}
             </div>
           ) : null}
-          {d.selected.map(row)}
           {d.others.length > 0 ? (
-            <div className={GROUP}>
-              <span>{d.typed ? 'Other tags' : 'Suggested'}</span>
-            </div>
-          ) : null}
-          {d.others.map(row)}
-          {d.picks.length === 0 ? (
-            <div className="mdt-px-4 mdt-pb-6 mdt-pt-5 mdt-text-center mdt-text-[13px] mdt-leading-normal mdt-text-muted-foreground">
-              <b className="mdt-mb-0.5 mdt-block mdt-text-sm mdt-font-semibold mdt-text-neutral-130">
-                No tags yet
-              </b>
-              Type a word to create the first one.
+            <div role="group" aria-label={otherLabel}>
+              <div className={GROUP} role="presentation">
+                <span>{otherLabel}</span>
+              </div>
+              {d.others.map(row)}
             </div>
           ) : null}
         </div>
+        {d.picks.length === 0 ? (
+          <div
+            data-slot="tag-picker-empty"
+            className="mdt-px-4 mdt-pb-6 mdt-pt-5 mdt-text-center mdt-text-[13px] mdt-leading-normal mdt-text-muted-foreground"
+          >
+            <b className="mdt-mb-0.5 mdt-block mdt-text-sm mdt-font-semibold mdt-text-neutral-130">
+              No tags yet
+            </b>
+            Type a word to create the first one.
+          </div>
+        ) : null}
         <div className="mdt-flex mdt-shrink-0 mdt-items-center mdt-justify-between mdt-gap-2 mdt-border-t mdt-border-neutral-30 mdt-py-2 mdt-pl-3.5 mdt-pr-2">
           <span
             className="mdt-text-xs mdt-tabular-nums mdt-text-muted-foreground"
