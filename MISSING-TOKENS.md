@@ -325,22 +325,25 @@ product built on this library will invent its own.
 **Priority: HIGH.** These are not gaps in the token system — they are the token rule already
 being broken, in shipped code.
 
-| Component                                                                | Hardcoded value                | Should be                      |
-| ------------------------------------------------------------------------ | ------------------------------ | ------------------------------ |
-| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]` | Size tokens                    |
-| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens     |
-| `Select.tsx`                                                             | `[8rem]`                       | Min-width token                |
-| `DropdownMenu.tsx`                                                       | `[8rem]`                       | Min-width token                |
-| `Command.tsx`                                                            | `[300px]`                      | Min-width token                |
-| `Combobox.tsx`                                                           | `[300px]`                      | Min-width token                |
-| `Table.tsx`                                                              | `[100px]`                      | Size token                     |
-| `InputGroup.tsx`                                                         | `[60px]`                       | Size token                     |
-| `Sidebar.tsx`                                                            | `[10px]`                       | Type-size token                |
-| `TagPill.tsx`                                                            | `[10px]`                       | Type-size token                |
-| `Avatar.tsx`                                                             | status dot + ring tables       | A ratio, not steps — see below |
-| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps             |
-| `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens        |
-| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens        |
+| Component                                                                | Hardcoded value                | Should be                   |
+| ------------------------------------------------------------------------ | ------------------------------ | --------------------------- |
+| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]` | Size tokens                 |
+| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens  |
+| `Select.tsx`                                                             | `[8rem]`                       | Min-width token             |
+| `DropdownMenu.tsx`                                                       | `[8rem]`                       | Min-width token             |
+| `Command.tsx`                                                            | `[300px]`                      | Min-width token             |
+| `Combobox.tsx`                                                           | `[300px]`                      | Min-width token             |
+| `Table.tsx`                                                              | `[100px]`                      | Size token                  |
+| `InputGroup.tsx`                                                         | `[60px]`                       | Size token                  |
+| `Sidebar.tsx`                                                            | `[10px]`                       | Type-size token             |
+| `TagPill.tsx`                                                            | `[10px]`                       | Type-size token             |
+| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`            | Size tokens                 |
+| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]` | Type-size + tracking tokens |
+| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`            | Type-size + size tokens     |
+| `Avatar.tsx`                                                             | status dot + ring tables       | A ratio, not steps — below  |
+| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps          |
+| `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens     |
+| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens     |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
@@ -348,6 +351,16 @@ shipped product.)_
 **Note:** `[10px]` in Sidebar and TagPill is a font size smaller than anything in the type
 scale. That is either a deliberate micro-label size that needs a token, or an accessibility
 problem. It needs a design decision either way.
+
+**The tag picker's six (Pranjal, 2026-10-13)** are the approved mock's values and were declared
+openly in the pull request rather than slipped in, which is the right half of the rule — the
+other half is this entry. They are a list-row height (`34px`), a list ceiling (`380px`), an
+inline field width (`220px`), a group-label size (`11px`) with its tracking (`0.05em`), and a
+quiet-text size (`13px`). **Three of the five are not new questions:** `11px` and `13px` are the
+same micro-label gap as Sidebar's and TagPill's `10px`, and `34px` is a control height, which is
+the same family as the 32px field the form ladder already settled. Worth deciding together rather
+than one component at a time — a fourth micro size arriving before the first three are ruled on
+is how a scale stops being a scale.
 
 **Avatar's status dot is a ratio, not a set of magic numbers** (added 2026-10-13), and that is worth
 saying because the table reads like the latter — `3.13px`, `6.25px`, `-3.98px` and the rest. Measured
