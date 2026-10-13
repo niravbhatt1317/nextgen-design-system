@@ -26,7 +26,7 @@ const meta: Meta<typeof Badge> = {
           '| **Fill only** | No stroke on any badge by default. `outline` is a light tinted stroke, opt-in. `solid` is for counts. |',
           '| **Two shapes** | `pill` for states; `square` (a 4px corner) for categories, sources and counts like +N. |',
           '| **Three sizes** | 20, 24 and 28px tall. |',
-          '| **Small is text or dot** | An icon handed to a small badge is dropped. Medium and large take a 14 or 16px icon. |',
+          "| **Every size takes an icon** | 12, 14 and 16px, sized by the badge. Small kept its icon on 13 October 2026, ported from the console's static chip with an icon (it used to drop it). |",
           '| **Eight tones with a meaning** | Category colours (LDAP, SCIM…) come in through `palette`, never as new tones. |',
           '| **Capital first letter** | Every label starts with a capital. A lowercase-only word sits in the lower half of the line box and reads as low, whatever the line-height. |',
           '| **Counts** | `emphasis="solid"`, and `max={99}` renders 1284 as 99+. |',
@@ -34,7 +34,7 @@ const meta: Meta<typeof Badge> = {
           '',
           '**Coming from `BadgeOld`:** `emphasis="subtle"` is now `fill` (still the default, now',
           'without a stroke); `slate` and `inverse` join the tones and `ai` stays; the 12px icon at',
-          'small is gone; `max`, `truncate` and the dot on its own work as before; `palette` is',
+          'small is back since 13 October 2026; `max`, `truncate` and the dot on its own work as before; `palette` is',
           'new. There is no ×: a label a person can remove is `TagPill`.',
           '',
           'The dot is the strong tone colour, 6px, 8px at large. Every tone colour is a token,',
@@ -107,7 +107,7 @@ const Stack = ({ children }: { children: React.ReactNode }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{children}</div>
 );
 
-/** One shape, three sizes down, every content type across. Small has no icon column. */
+/** One shape, three sizes down, every content type across. Small has carried its icon since 2026-10-13. */
 function Matrix({ shape }: { shape: BadgeShape }) {
   const sizes: BadgeSize[] = ['sm', 'md', 'lg'];
   const px: Record<BadgeSize, number> = { sm: 12, md: 14, lg: 16 };
@@ -121,35 +121,21 @@ function Matrix({ shape }: { shape: BadgeShape }) {
           <Badge shape={shape} size={size} tone="success" dot>
             Active
           </Badge>
-          {size === 'sm' ? (
-            <span
-              style={{
-                fontSize: 12,
-                color: 'hsl(var(--mdt-muted-foreground))',
-                fontStyle: 'italic',
-              }}
-            >
-              no icon at small
-            </span>
-          ) : (
-            <>
-              <Badge
-                shape={shape}
-                size={size}
-                tone="success"
-                icon={<Icon name="check" size={px[size]} />}
-              >
-                Verified
-              </Badge>
-              <Badge
-                shape={shape}
-                size={size}
-                tone="success"
-                icon={<Icon name="shield" size={px[size]} />}
-                aria-label="Protected"
-              />
-            </>
-          )}
+          <Badge
+            shape={shape}
+            size={size}
+            tone="success"
+            icon={<Icon name="check" size={px[size]} />}
+          >
+            Verified
+          </Badge>
+          <Badge
+            shape={shape}
+            size={size}
+            tone="success"
+            icon={<Icon name="shield" size={px[size]} />}
+            aria-label="Protected"
+          />
         </Row>
       ))}
     </Stack>
@@ -168,6 +154,66 @@ export const Pill: Story = {
 /** Rounded square: the 4px corner. Categories, sources and "+N" wear this shape. */
 export const RoundedSquare: Story = {
   render: () => <Matrix shape="square" />,
+};
+
+/**
+ * Small keeps its icon (ported from the console, Pranjal, 2026-10-13). The console hand-drew this chip -
+ * `Chip` with an `icon` in compat/om/atoms.jsx - because small dropped the glyph. These are its uses: a
+ * lock held, a check that verifies, a warning note, a target. The badge sizes the glyph at 12px, 4px before
+ * the label; the caller's own size is overridden.
+ */
+export const SmallWithIcon: Story = {
+  render: () => (
+    <Stack>
+      <Row label="square · console">
+        <Badge size="sm" shape="square" tone="warning" icon={<Icon name="lock" size={12} />}>
+          Config-Dispatch Lock held
+        </Badge>
+        <Badge
+          size="sm"
+          shape="square"
+          tone="success"
+          icon={<Icon name="shield-check" size={12} />}
+        >
+          Verifies before it executes
+        </Badge>
+        <Badge
+          size="sm"
+          shape="square"
+          tone="danger"
+          icon={<Icon name="alert-triangle" size={12} />}
+        >
+          Certificate expires soon
+        </Badge>
+        <Badge size="sm" shape="square" icon={<Icon name="target" size={12} />}>
+          Onboarding
+        </Badge>
+      </Row>
+      <Row label="pill">
+        <Badge size="sm" tone="success" icon={<Icon name="check" size={12} />}>
+          Verified
+        </Badge>
+        <Badge size="sm" tone="info" dot icon={<Icon name="lock" size={12} />}>
+          Locked
+        </Badge>
+      </Row>
+      <Row label="icon only">
+        <Badge
+          size="sm"
+          tone="success"
+          icon={<Icon name="shield-check" size={12} />}
+          aria-label="Protected"
+        />
+        <Badge
+          size="sm"
+          shape="square"
+          tone="warning"
+          icon={<Icon name="lock" size={12} />}
+          aria-label="Locked"
+        />
+      </Row>
+    </Stack>
+  ),
 };
 
 /**

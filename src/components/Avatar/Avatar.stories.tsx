@@ -20,6 +20,9 @@ const meta: Meta<typeof Avatar> = {
           '| `size` | xs 20 · sm 24 · md 32 · lg 40 · xl 56 |',
           '| `tone` | slate · blue · green · amber · rose · purple |',
           '| `icon` | a thing rather than a person — the glyph sizes itself: 12 · 14 · 16 · 20 · 24 |',
+          '| `logo` | a logo that fills the square edge to edge, no ground; the letter stands when there is none |',
+          '| `status` | active · suspended · offboarded — a dot on the bottom-right corner, ringed in the card colour |',
+          '| `onEdit` | a camera button on the corner; opens the file picker and hands back the chosen image |',
           '',
           'Ruled on the avatar mock (Pranjal, 2026-09-20 → 21): **one letter at every size**; the type a',
           'step smaller than the scale (11 · 11 · 12 · 16 · 18); **a person is a circle, a thing is a',
@@ -263,5 +266,97 @@ export const Stack: Story = {
         </div>
       </div>
     </Group>
+  ),
+};
+
+/* ── Ported from the console (Pranjal, 2026-10-13) ───────────────────────── */
+
+const LOGO =
+  "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23101828'/%3E%3Cpath d='M20 58 40 18 60 58Z' fill='%2336d576'/%3E%3C/svg%3E";
+
+/** An organization's logo FILLS the square edge to edge — no frame, no ground (the console's OrgMark). Without one, the letter stands. */
+export const WithLogo: Story = {
+  name: 'With a logo',
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: () => (
+    <Group>
+      <div>
+        <Label>The logo fills the box at every size; the corners round it</Label>
+        <Row>
+          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
+            <Avatar key={s} name="Acme Corp" logo={LOGO} size={s} />
+          ))}
+        </Row>
+      </div>
+      <div>
+        <Label>No logo, or a broken one — the letter on its tone, still a square</Label>
+        <Row>
+          <Avatar name="Acme Corp" size="xl" shape="rounded" />
+          <Avatar name="Acme Corp" size="xl" logo="https://example.invalid/missing.png" />
+        </Row>
+      </div>
+    </Group>
+  ),
+};
+
+/** A state on the corner — the console's presence dot on the organization mark, ringed in the card colour so it reads as a cut-out in both themes. */
+export const WithStatus: Story = {
+  name: 'With a status dot',
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: () => (
+    <Group>
+      <div>
+        <Label>active · suspended · offboarded</Label>
+        <Row>
+          <Avatar name="Acme Corp" size="xl" shape="rounded" status="active" />
+          <Avatar name="Globex" size="xl" shape="rounded" status="suspended" />
+          <Avatar name="Initech" size="xl" shape="rounded" status="offboarded" />
+          <Avatar name="Acme Corp" size="xl" logo={LOGO} status="active" />
+        </Row>
+      </div>
+      <div>
+        <Label>Rounded, at every size — the dot is 10/64 of the avatar, the ring 1/16</Label>
+        <Row>
+          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
+            <Avatar key={s} name="Acme Corp" shape="rounded" size={s} status="active" />
+          ))}
+        </Row>
+      </div>
+      <div>
+        <Label>Circle, at every size</Label>
+        <Row>
+          {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((s) => (
+            <Avatar key={s} name="Sarah Johnson" size={s} status="active" />
+          ))}
+        </Row>
+      </div>
+    </Group>
+  ),
+};
+
+/** The camera button on the corner — the console's profile drawer in edit mode. It opens the file picker; the chosen image is handed back. */
+export const WithEditButton: Story = {
+  name: 'With an edit button',
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: () => (
+    <Row>
+      <Avatar
+        name="Sarah Johnson"
+        size="xl"
+        shape="rounded"
+        onEdit={() => {
+          /* a story: the file is not kept */
+        }}
+      />
+      <Avatar
+        name="Acme Corp"
+        size="xl"
+        logo={LOGO}
+        editLabel="Change logo"
+        onEdit={() => {
+          /* a story: the file is not kept */
+        }}
+      />
+    </Row>
   ),
 };

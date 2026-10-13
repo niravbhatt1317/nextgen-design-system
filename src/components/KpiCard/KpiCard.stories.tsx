@@ -104,6 +104,24 @@ export const WithChart: Story = {
   ),
 };
 
+/**
+ * `shape="ring"`: the full health ring, ported from the console's Overview tab (Pranjal, 2026-10-13). 150 × 150 on its own,
+ * not in a card's chart area: a pale track, the fill in the success green from twelve o'clock with a rounded cap, the
+ * number with a smaller "%". At 100% the fill closes into one circle and a thin ring sits just outside it. `bad` turns
+ * the fill to the danger colour. The ring draws no caption; the caption and `label` are spoken only.
+ */
+export const GaugeRing: Story = {
+  render: () => (
+    <Row>
+      <KpiGauge shape="ring" percent={0} label="Configuration health 0%" />
+      <KpiGauge shape="ring" percent={50} label="Configuration health 50%" />
+      <KpiGauge shape="ring" percent={75} label="Configuration health 75%" />
+      <KpiGauge shape="ring" percent={100} label="Configuration health 100%" />
+      <KpiGauge shape="ring" percent={25} bad label="Configuration health 25%, failing" />
+    </Row>
+  ),
+};
+
 /** Off by default. With a click the card is a real button, whatever it holds: on hover or keyboard focus the label takes the reading ink and a dotted underline, a gear appears beside it, a soft fill sits 6px inside the edges, and the card presses to 97%. */
 export const Clickable: Story = {
   render: function ClickableStory() {

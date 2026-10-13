@@ -72,13 +72,24 @@ export interface KpiStripProps {
   style?: CSSProperties | undefined;
 }
 
+/** The gauge's outline: the half gauge for a card's chart area, or the full health ring. */
+export type KpiGaugeShape = 'half' | 'ring';
+
 export interface KpiGaugeProps {
   /** 0 to 100. */
   percent: number;
-  /** The word under the number: "capacity". */
+  /** The word under the number: "capacity". Drawn by the half gauge only; the ring only speaks it. */
   caption?: string | undefined;
   /** Spoken description; defaults to "<percent>% <caption>". */
   label?: string | undefined;
+  /**
+   * `half`: 104 × 62 in the neutral ladder, for a KpiCard's chart area.
+   * `ring`: the console Overview's health ring, 150 × 150, in the success green; a thin outer ring at 100%.
+   * @default 'half'
+   */
+  shape?: KpiGaugeShape | undefined;
+  /** Ring only: the fill in the danger colour instead of the success green. @default false */
+  bad?: boolean | undefined;
 }
 
 export interface KpiBarsProps {

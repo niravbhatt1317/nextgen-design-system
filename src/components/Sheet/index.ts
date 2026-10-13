@@ -6,10 +6,13 @@ export {
   SheetClose,
   SheetContent,
   SheetHeader,
+  SheetBand,
+  SheetBody,
   SheetFooter,
   SheetTitle,
   SheetDescription,
   sheetVariants,
+  SHEET_SIZES,
 } from './Sheet';
 export type { SheetVariants } from './Sheet';
 export type {
@@ -19,9 +22,14 @@ export type {
   SheetOverlayProps,
   SheetContentProps,
   SheetHeaderProps,
+  SheetBandProps,
+  SheetBodyProps,
   SheetFooterProps,
   SheetTitleProps,
   SheetDescriptionProps,
   SheetCloseProps,
   SheetSide,
+  SheetSize,
+  SheetLayout,
+  SheetInset,
 } from './Sheet.types';

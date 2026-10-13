@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
+import { OverflowCount } from '../OverflowCount';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
@@ -174,22 +175,8 @@ function TagList({ items, max = 2 }: TagListProps) {
           {t}
         </Badge>
       ))}
-      {rest.length > 0 && (
-        <TooltipProvider>
-          <Tooltip instant>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="mdt-inline-flex mdt-cursor-default mdt-rounded mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-xs mdt-text-muted-foreground focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-primary"
-                aria-label={`${String(rest.length)} more: ${rest.join(', ')}`}
-              >
-                <span aria-hidden="true">+{rest.length}</span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent items={rest} />
-          </Tooltip>
-        </TooltipProvider>
-      )}
+      {/* the one "+N" - OverflowCount was ported from the console's MoreCount to be exactly this */}
+      <OverflowCount items={rest} />
     </span>
   );
 }
