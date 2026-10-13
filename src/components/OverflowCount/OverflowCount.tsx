@@ -14,6 +14,14 @@ import type { OverflowCountProps } from './OverflowCount.types';
 
 const DEFAULT_LABEL = 'More assigned';
 
+/**
+ * OverflowCount - the quiet "+N" that ends a row of badges, avatars or tags, with the hidden
+ * values in its tooltip.
+ *
+ * One counter everywhere (Pranjal, 2026-10-11): the value wears the badge, the counter does not.
+ * `Table`'s TagList renders this rather than its own copy - it was drawn twice for one release and
+ * that is exactly how two of them drift.
+ */
 const OverflowCount = forwardRef<HTMLButtonElement, OverflowCountProps>(
   ({ items, count, label = DEFAULT_LABEL, className, ...props }, ref) => {
     const list = (items ?? []).filter(Boolean);
