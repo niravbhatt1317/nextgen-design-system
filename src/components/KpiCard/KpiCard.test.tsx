@@ -137,4 +137,63 @@ describe('charts', () => {
       screen.getByRole('img', { name: '34 now, base 22, 2x threshold 40' })
     ).toBeInTheDocument();
   });
+
+  it('the gauge is the half gauge by default', () => {
+    const { container } = render(<KpiGauge percent={82} caption="capacity" />);
+    const svg = screen.getByRole('img', { name: '82% capacity' });
+    expect(svg).toHaveClass('kpi-gauge');
+    expect(svg).toHaveAttribute('width', '104');
+    expect(container.querySelector('.kpi-ring')).toBeNull();
+  });
+});
+
+describe('KpiGauge shape="ring"', () => {
+  it('draws the console health ring: 150 square, radius 58, a 10px rounded fill from twelve o’clock', () => {
+    const { container } = render(
+      <KpiGauge shape="ring" percent={50} label="Configuration health 50%" />
+    );
+    const svg = screen.getByRole('img', { name: 'Configuration health 50%' });
+    expect(svg).toHaveClass('kpi-ring');
+    expect(svg).toHaveAttribute('width', '150');
+    expect(svg).toHaveAttribute('viewBox', '-5 -5 150 150');
+    expect(svg).not.toHaveAttribute('data-bad');
+    expect(svg).not.toHaveAttribute('data-done');
+    const track = container.querySelector('.kpi-ring-track');
+    expect(track).toHaveAttribute('r', '58');
+    expect(track).toHaveAttribute('stroke-width', '10');
+    const fill = container.querySelector('.kpi-ring-fill');
+    expect(fill).toHaveAttribute('stroke-linecap', 'round');
+    expect(fill).toHaveAttribute('transform', 'rotate(-90 70 70)');
+    const c = 2 * Math.PI * 58;
+    expect(fill).toHaveAttribute('stroke-dasharray', `${(c / 2).toFixed(1)} ${c.toFixed(1)}`);
+    expect(container.querySelector('.kpi-ring-halo')).toBeNull();
+    expect(container.querySelector('.kpi-ring-number')).toHaveTextContent('50%');
+  });
+
+  it('at 100% the fill is one closed circle and the thin outer ring appears', () => {
+    const { container } = render(<KpiGauge shape="ring" percent={100} />);
+    const svg = screen.getByRole('img', { name: '100%' });
+    expect(svg).toHaveAttribute('data-done', '');
+    const fill = container.querySelector('.kpi-ring-fill');
+    expect(fill).not.toHaveAttribute('stroke-dasharray');
+    expect(fill).not.toHaveAttribute('stroke-linecap');
+    const halo = container.querySelector('.kpi-ring-halo');
+    expect(halo).toHaveAttribute('r', '71');
+    expect(halo).toHaveAttribute('stroke-width', '2');
+  });
+
+  it('at 0% shows only the track; bad turns the fill to the danger colour', () => {
+    const { container, rerender } = render(<KpiGauge shape="ring" percent={0} />);
+    expect(container.querySelector('.kpi-ring-fill')).toBeNull();
+    expect(container.querySelector('.kpi-ring-track')).not.toBeNull();
+    rerender(<KpiGauge shape="ring" percent={25} bad />);
+    expect(screen.getByRole('img')).toHaveAttribute('data-bad', '');
+  });
+
+  it('speaks the rounded figure and draws no caption', () => {
+    const { container } = render(<KpiGauge shape="ring" percent={66.6} caption="health" />);
+    expect(screen.getByRole('img', { name: '67% health' })).toBeInTheDocument();
+    // the ring draws no caption; it is spoken only
+    expect(container.querySelectorAll('text')).toHaveLength(1);
+  });
 });

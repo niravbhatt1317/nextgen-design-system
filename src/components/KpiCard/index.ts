@@ -10,5 +10,6 @@ export type {
   KpiTrendTone,
   KpiStripProps,
   KpiGaugeProps,
+  KpiGaugeShape,
   KpiBarsProps,
 } from './KpiCard.types';

@@ -3,13 +3,73 @@ import './kpiCard.css';
 
 /** The two first charts for a KpiCard's chart area, both 104 × 62 or close. Drawn in the neutral ladder. */
 
-/** A half ring: a share of a limit, the percent inside, a caption under it. */
-export function KpiGauge({ percent, caption, label }: KpiGaugeProps) {
+/**
+ * The full ring, ported from the console's Overview health ring (Pranjal, 2026-10-13). 150 × 150, radius 58,
+ * a 10px stroke; the fill starts at twelve o'clock with a rounded cap; the number 30/600 with a 15/500 "%".
+ * At 100% the fill is one closed circle (a dashed stroke left a notch where its two ends met) and a thin
+ * 2px ring sits 13px outside it.
+ */
+function KpiRing({ percent, spoken, bad }: { percent: number; spoken: string; bad: boolean }) {
+  const r = 58;
+  const c = 2 * Math.PI * r;
+  const p = Math.min(100, Math.max(0, percent)) / 100;
+  return (
+    <svg
+      width="150"
+      height="150"
+      viewBox="-5 -5 150 150"
+      role="img"
+      aria-label={spoken}
+      className="kpi-ring mdt-block"
+      data-bad={bad ? '' : undefined}
+      data-done={p >= 1 ? '' : undefined}
+    >
+      {p >= 1 && (
+        <circle className="kpi-ring-halo" cx="70" cy="70" r={r + 13} fill="none" strokeWidth="2" />
+      )}
+      <circle className="kpi-ring-track" cx="70" cy="70" r={r} fill="none" strokeWidth="10" />
+      {p >= 1 ? (
+        <circle className="kpi-ring-fill" cx="70" cy="70" r={r} fill="none" strokeWidth="10" />
+      ) : (
+        p > 0 && (
+          <circle
+            className="kpi-ring-fill"
+            cx="70"
+            cy="70"
+            r={r}
+            fill="none"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={`${(c * p).toFixed(1)} ${c.toFixed(1)}`}
+            transform="rotate(-90 70 70)"
+          />
+        )
+      )}
+      <text
+        className="kpi-ring-number"
+        x="70"
+        y="81"
+        textAnchor="middle"
+        fontSize="30"
+        fontWeight="600"
+      >
+        {Math.round(percent)}
+        <tspan fontSize="15" fontWeight="500" dx="1">
+          %
+        </tspan>
+      </text>
+    </svg>
+  );
+}
+
+/** A half ring: a share of a limit, the percent inside, a caption under it. `shape="ring"` draws the full health ring. */
+export function KpiGauge({ percent, caption, label, shape = 'half', bad = false }: KpiGaugeProps) {
+  const spoken = label ?? `${String(Math.round(percent))}% ${caption ?? ''}`.trim();
+  if (shape === 'ring') return <KpiRing percent={percent} spoken={spoken} bad={bad} />;
   const p = Math.min(100, Math.max(0, percent)) / 100;
   const a = Math.PI * (1 - p);
   const x = Math.round((52 + 44 * Math.cos(a)) * 10) / 10;
   const y = Math.round((56 - 44 * Math.sin(a)) * 10) / 10;
-  const spoken = label ?? `${String(Math.round(percent))}% ${caption ?? ''}`.trim();
   return (
     <svg
       width="104"

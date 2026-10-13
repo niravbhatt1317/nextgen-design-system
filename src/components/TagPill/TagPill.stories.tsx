@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { TagPill } from './TagPill';
+import { AddPill } from './AddPill';
+import { Badge } from '../Badge';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 
@@ -281,5 +283,60 @@ export const InPlace: Story = {
         remove.
       </p>
     </div>
+  ),
+};
+
+/**
+ * `AddPill` - the dashed "+ Add" pill that ends a row of tags. Ported from the console's `AddChip`
+ * (compat/om/atoms.jsx, Pranjal, 2026-10-13): a neutral dashed capsule, 20 tall, a 10px plus, a soft
+ * neutral fill under the pointer. On an organization it opens the tag field ("Add tag"); in the Fleet
+ * tag drawer every catalogue tag not yet assigned is one, and pressing it assigns that tag.
+ */
+export const AddPillStory: Story = {
+  name: 'AddPill',
+  parameters: { controls: { disable: true }, layout: 'padded' },
+  render: (args) => (
+    <Group>
+      <div>
+        <Label>On its own · with a title · disabled</Label>
+        <Row>
+          <AddPill onClick={fn()} />
+          <AddPill onClick={fn()} title="Create or add a tag">
+            Add tag
+          </AddPill>
+          <AddPill disabled>Add tag</AddPill>
+        </Row>
+      </div>
+      <div>
+        <Label>Ending a row of tags (an organization)</Label>
+        <Row>
+          <TagPill onRemove={args.onRemove}>Production</TagPill>
+          <TagPill onRemove={args.onRemove}>EMEA</TagPill>
+          <AddPill onClick={fn()} title="Create or add a tag">
+            Add tag
+          </AddPill>
+        </Row>
+      </div>
+      <div>
+        <Label>The catalogue (Fleet): each one assigns its tag</Label>
+        <Row>
+          <AddPill onClick={fn()}>Production</AddPill>
+          <AddPill onClick={fn()}>Payments</AddPill>
+          <AddPill onClick={fn()}>region: eu-west</AddPill>
+        </Row>
+      </div>
+      <div>
+        <Label>Level with a small Badge, the box it shares</Label>
+        <Row>
+          <Badge size="sm" shape="square">
+            Manual
+          </Badge>
+          <Badge size="sm" shape="square" tone="info">
+            Platform
+          </Badge>
+          <AddPill onClick={fn()}>Add tag</AddPill>
+        </Row>
+      </div>
+    </Group>
   ),
 };

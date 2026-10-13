@@ -50,10 +50,16 @@ export const badgeVariants = cva(
        * `min-w` matching the height is what makes count badges work: "Active"
        * is wider than the minimum so nothing changes, while "3" rounds out
        * into a circle. The icon step is set here too, so the caller never has
-       * to pick a glyph size. Small sets none: it is text or dot only.
+       * to pick a glyph size: 12px at small, 14 at medium, 16 at large.
+       *
+       * Small carries its icon since 13 October 2026, ported from the console
+       * (Pranjal): the hand-built static chip with an icon in compat/om/atoms.jsx
+       * (`Chip`) drew a 10-12px glyph 4px before the label, on the chip small
+       * Badge already draws. 12px is the step its callers mostly pass and the
+       * one TagPill's icon wears; the 4px gap is small's own.
        */
       size: {
-        sm: 'mdt-h-5 mdt-min-w-5 mdt-gap-1 mdt-px-2 mdt-text-xs',
+        sm: 'mdt-h-5 mdt-min-w-5 mdt-gap-1 mdt-px-2 mdt-text-xs [&_svg]:mdt-size-3',
         md: 'mdt-h-6 mdt-min-w-6 mdt-gap-1.5 mdt-px-2.5 mdt-text-xs [&_svg]:mdt-size-3.5',
         lg: 'mdt-h-7 mdt-min-w-7 mdt-gap-1.5 mdt-px-3 mdt-text-sm [&_svg]:mdt-size-4',
       },
@@ -66,6 +72,8 @@ export const badgeVariants = cva(
     compoundVariants: [
       // An icon with no label: drop the side padding so the chip is a true
       // circle or square. Compounds apply last, so these beat the size padding.
+      // Small joined with its icon (ported from the console, Pranjal, 2026-10-13).
+      { iconOnly: true, size: 'sm', class: 'mdt-w-5 mdt-px-0' },
       { iconOnly: true, size: 'md', class: 'mdt-w-6 mdt-px-0' },
       { iconOnly: true, size: 'lg', class: 'mdt-w-7 mdt-px-0' },
     ],
@@ -147,8 +155,9 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
 ) {
   const label = capCount(children, max);
   const hasLabel = label !== undefined && label !== null && label !== '';
-  /* Small is text or dot only: an icon handed to it is dropped, not shrunk. */
-  const showIcon = size !== 'sm' && icon !== undefined && icon !== null;
+  /* Every size carries its icon. Small dropped it until 2026-10-13; it now draws it at 12px,
+   * ported from the console's static chip with an icon (Pranjal). */
+  const showIcon = icon !== undefined && icon !== null;
   const paletteStyle: CSSProperties | undefined = palette
     ? ({
         '--bdg-fill': palette.fill,

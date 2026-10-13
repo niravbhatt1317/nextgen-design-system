@@ -34,7 +34,7 @@ export type BadgeEmphasis = 'fill' | 'outline' | 'solid';
 /** `pill` for states. `square` (a 4px corner) for categories, sources and counts like +N. */
 export type BadgeShape = 'pill' | 'square';
 
-/** 20, 24 and 28px tall. Small is text or dot only. */
+/** 20, 24 and 28px tall. Each carries an icon: 12, 14 and 16px. */
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
 /**
@@ -71,9 +71,11 @@ export interface BadgeOwnProps {
   dot?: boolean;
 
   /**
-   * A 14px icon at medium, 16px at large. Small is text or dot only, so an
-   * icon handed to it is dropped rather than shrunk. With no label the badge
-   * becomes a square of its own height; give it an `aria-label` then.
+   * A 12px icon at small, 14px at medium, 16px at large; the badge sizes the
+   * glyph, so the caller never picks one. Small dropped its icon until
+   * 13 October 2026 and now carries it, ported from the console's static chip
+   * with an icon (Pranjal). With no label the badge becomes a square of its
+   * own height; give it an `aria-label` then.
    */
   icon?: ReactNode;
 
