@@ -1,29 +1,46 @@
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 export interface InlineTagsOwnProps {
-  /** The tags added so far, in the order they were added. */
+  /** The tags on the record, in the order they were added. */
   value: readonly string[];
 
-  /** Hands back the whole new list after an add or a remove. */
+  /**
+   * Hands back the whole new list - on **Apply** (the picker's ticks are a draft until then), and at once when a
+   * pill's ✕ is pressed in the inline row.
+   */
   onChange: (next: string[]) => void;
 
-  /**
-   * A handful of likely tags, shown as dashed chips under the field **only while
-   * it is open** - one tap adds one and the field stays open for the next.
-   */
+  /** Likely tags: listed first under Suggested, ahead of the rest. */
   suggestions?: readonly string[] | undefined;
 
-  /**
-   * Every tag used before (other records' tags). Searched as the person types;
-   * the matches drop down under the field with Add "…" at the end for a new one.
-   */
+  /** Every tag used before (other records' tags): listed under Suggested and searched as the person types. */
   options?: readonly string[] | undefined;
 
-  /** The dashed button's words. @default 'Add tag' */
+  /** How many records use each tag: the count on each row, and the order of Suggested (most used first). */
+  counts?: Readonly<Record<string, number>> | undefined;
+
+  /**
+   * - `inline` (default): the pills in a row and a dashed **Add tag** that turns into the search field in place; the
+   *   picker opens under it. For a header or a details row.
+   * - `popover`: a button showing the tags (or **Add tags**) that opens the picker with its own search on top. For a
+   *   table cell.
+   */
+  variant?: 'inline' | 'popover' | undefined;
+
+  /** popover: what the cell shows instead of the default pills (two, then a quiet "+N"). */
+  trigger?: ReactNode | undefined;
+
+  /** The dashed button's words (inline). @default 'Add tag' */
   addLabel?: string | undefined;
 
-  /** The open field's placeholder. @default 'Type a tag' */
+  /** The cell's words when there are no tags (popover). @default 'Add tags' */
+  emptyLabel?: string | undefined;
+
+  /** The search field's placeholder. @default 'Search or create a tag' */
   placeholder?: string | undefined;
+
+  /** The picker's accessible name. @default 'Tags' */
+  label?: string | undefined;
 
   /** Nothing can be added or removed; the pills stay, the Add button goes. */
   disabled?: boolean | undefined;
