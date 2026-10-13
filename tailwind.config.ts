@@ -312,6 +312,14 @@ const config: Config = {
         mono: ['var(--mdt-font-mono)', 'monospace'],
       },
       keyframes: {
+        // InlineTags: a ticked tag that just slid into Selected - the menu hover wash and a thin nudge-blue edge, fading.
+        'tag-landed': {
+          '0%, 35%': {
+            backgroundColor: 'hsl(var(--mdt-neutral-10))',
+            boxShadow: 'inset 2px 0 0 hsl(var(--mdt-nudge))',
+          },
+          '100%': { boxShadow: 'inset 2px 0 0 transparent' },
+        },
         'accordion-down': {
           from: { height: '0' },
           to: { height: 'var(--radix-accordion-content-height)' },
@@ -383,6 +391,7 @@ const config: Config = {
         },
       },
       animation: {
+        'tag-landed': 'tag-landed 1.1s ease-out',
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.2s ease-out',
