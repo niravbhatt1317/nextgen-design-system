@@ -143,14 +143,37 @@ describe('Badge', () => {
       expect(screen.getByTestId('badge')).toHaveClass('[&_svg]:mdt-size-4');
     });
 
-    it('drops the icon at small: small is text or dot only', () => {
+    /* Ported from the console's static chip with an icon (Pranjal, 2026-10-13): small keeps its icon, at 12px. */
+    it('keeps the icon at small, sized 12px, 4px before the label', () => {
+      render(
+        <Badge size="sm" shape="square" icon={<Glyph />}>
+          Verified
+        </Badge>
+      );
+      expect(screen.getByTestId('glyph')).toBeInTheDocument();
+      const badge = screen.getByTestId('badge');
+      expect(badge).toHaveClass('[&_svg]:mdt-size-3', 'mdt-gap-1', 'mdt-h-5');
+      expect(screen.getByTestId('badge-label')).toHaveTextContent('Verified');
+    });
+
+    it('puts the icon after the dot and before the label at small', () => {
       render(
         <Badge size="sm" icon={<Glyph />} dot>
           Verified
         </Badge>
       );
-      expect(screen.queryByTestId('glyph')).not.toBeInTheDocument();
-      expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
+      const badge = screen.getByTestId('badge');
+      const order = Array.from(badge.children).map((el) => el.getAttribute('data-testid') ?? '');
+      expect(order).toEqual(['badge-dot', 'glyph', 'badge-label']);
+    });
+
+    it.each([
+      ['sm', 'mdt-w-5'],
+      ['md', 'mdt-w-6'],
+      ['lg', 'mdt-w-7'],
+    ] as const)('is a square of its own height at %s with an icon and no label', (size, w) => {
+      render(<Badge size={size} icon={<Glyph />} aria-label="Verified" />);
+      expect(screen.getByLabelText('Verified')).toHaveClass(w, 'mdt-px-0');
     });
 
     it('becomes a square of its own height when the icon has no label', () => {
@@ -193,10 +216,12 @@ describe('Badge', () => {
       expect(screen.getByTestId('badge')).toBeInTheDocument();
     });
 
-    it('is the marker at small even with an icon, because small drops the icon', () => {
+    /* Since 2026-10-13 small keeps its icon (ported from the console, Pranjal), so a dot with an icon is a chip at
+     * every size; only a dot with nothing beside it is the marker. */
+    it('is a chip at small too when the dot has an icon beside it', () => {
       render(<Badge dot size="sm" icon={<Glyph />} aria-label="Online" />);
-      expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
-      expect(screen.getByTestId('badge-dot')).toHaveClass('bdg-mark');
+      expect(screen.getByTestId('badge')).toBeInTheDocument();
+      expect(screen.getByTestId('glyph')).toBeInTheDocument();
     });
   });
 

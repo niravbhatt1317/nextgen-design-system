@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ArgTypes } from '@storybook/react-vite';
+import { useState } from 'react';
 import {
   Sheet,
+  SheetBand,
+  SheetBody,
   SheetClose,
   SheetContent,
   SheetDescription,
@@ -9,13 +12,23 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SHEET_SIZES,
 } from './Sheet';
 import { ButtonOld as Button } from '../ButtonOld';
+import { Button as ActionButton } from '../Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
+import { Tabs, TabsList, TabsTrigger } from '../Tabs';
+import { Stepper } from '../Stepper';
 import { Input } from '../Input';
 import { Checkbox } from '../Checkbox';
 import { Select } from '../Select';
 import { Icon } from '../Icon';
-import type { SheetContentProps } from './Sheet.types';
+import type { SheetContentProps, SheetSize } from './Sheet.types';
 
 // Extended argTypes to include SheetContent props for documentation
 type SheetArgTypes = ArgTypes<React.ComponentProps<typeof Sheet> & SheetContentProps>;
@@ -122,6 +135,38 @@ const meta: Meta<typeof Sheet> & { argTypes: SheetArgTypes } = {
       table: {
         type: { summary: 'boolean' },
         defaultValue: { summary: 'true' },
+        category: 'SheetContent',
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl'],
+      description:
+        'The width from the drawer scale (left and right sheets): sm 480 · md 560 · lg 720 · xl 780. Unset keeps the original width.',
+      table: {
+        type: { summary: "'sm' | 'md' | 'lg' | 'xl'" },
+        category: 'SheetContent',
+      },
+    },
+    layout: {
+      control: 'select',
+      options: ['stack', 'drawer'],
+      description:
+        '`drawer` is the console drawer frame: a header row (title, actions, ✕), a band, a scrolling body and a pinned footer. The corner ✕ is off in it.',
+      table: {
+        type: { summary: "'stack' | 'drawer'" },
+        defaultValue: { summary: 'stack' },
+        category: 'SheetContent',
+      },
+    },
+    inset: {
+      control: 'select',
+      options: [16, 20, 24],
+      description:
+        "The drawer frame's side inset in px (20 for the Users and Organizations drawers).",
+      table: {
+        type: { summary: '16 | 20 | 24' },
+        defaultValue: { summary: '24' },
         category: 'SheetContent',
       },
     },
@@ -393,6 +438,269 @@ export const CustomWidth: Story = {
               This sheet takes up the entire screen width. Useful for complex workflows.
             </SheetDescription>
           </SheetHeader>
+        </SheetContent>
+      </Sheet>
+    </div>
+  ),
+};
+
+/* ── THE DRAWER FRAME (ported from the console, Pranjal 2026-10-13) ──────────────────────────── */
+
+const DrawerForm = () => (
+  <div className="mdt-flex mdt-flex-col mdt-gap-4">
+    <Input label="Name" defaultValue="Platform admins" />
+    <Input label="Description" placeholder="What this team is for" />
+  </div>
+);
+
+const CancelInFooter = () => (
+  <SheetClose asChild>
+    <ActionButton variant="ghost">Cancel</ActionButton>
+  </SheetClose>
+);
+
+/**
+ * The drawer width scale - the only widths a side sheet takes: sm 480 (a simple form),
+ * md 560 (the default form), lg 720 (tabs, a diff, an object drawer), xl 780 (deep inspection).
+ * `layout="drawer"` puts the ✕ in the header row, centred on the title.
+ */
+export const DrawerSizes: Story = {
+  name: 'Drawer: sizes',
+  render: () => (
+    <div className="mdt-flex mdt-flex-wrap mdt-gap-4">
+      {(Object.keys(SHEET_SIZES) as SheetSize[]).map((size) => (
+        <Sheet key={size}>
+          <SheetTrigger asChild>
+            <Button variant="outline">
+              {size} · {SHEET_SIZES[size]}
+            </Button>
+          </SheetTrigger>
+          <SheetContent layout="drawer" size={size} aria-describedby={undefined}>
+            <SheetHeader>
+              <SheetTitle>Drawer at {SHEET_SIZES[size]}</SheetTitle>
+            </SheetHeader>
+            <SheetBody>
+              <DrawerForm />
+            </SheetBody>
+            <SheetFooter start={<CancelInFooter />}>
+              <ActionButton>Save</ActionButton>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ))}
+    </div>
+  ),
+};
+
+const TABS = [
+  { key: 'details', label: 'Details' },
+  { key: 'teams', label: 'Teams', count: 3 },
+  { key: 'access', label: 'Access profiles', count: 12 },
+] as const;
+
+const TabsBandDrawer = () => {
+  const [tab, setTab] = useState<string>('details');
+  const active = TABS.find((t) => t.key === tab) ?? TABS[0];
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button>Open profile</Button>
+      </SheetTrigger>
+      <SheetContent layout="drawer" size="lg" inset={20} aria-describedby={undefined}>
+        <SheetHeader
+          actions={
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ActionButton
+                  iconOnly
+                  variant="ghost"
+                  size="sm"
+                  ariaLabel="More actions"
+                  leftIcon={<Icon name="more-vertical" size="sm" />}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="mdt-w-48">
+                <DropdownMenuItem>Reset password</DropdownMenuItem>
+                <DropdownMenuItem variant="destructive">Disable user</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+        >
+          <SheetTitle>Asha Rao</SheetTitle>
+        </SheetHeader>
+        <SheetBand>
+          {/* the console's DrawerTabs: the underline strip with its own hairline, pulled 1 down onto
+              the band's bottom edge - the band sees the hairline and draws no second line */}
+          <Tabs value={tab} onValueChange={setTab} className="-mdt-mb-px">
+            <TabsList type="underline" hairline>
+              {TABS.map((t) => (
+                <TabsTrigger
+                  key={t.key}
+                  value={t.key}
+                  {...('count' in t ? { count: t.count } : {})}
+                >
+                  {t.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </SheetBand>
+        <SheetBody>
+          <p className="mdt-text-sm mdt-text-neutral-90">The {active.label} tab&apos;s content.</p>
+        </SheetBody>
+        <SheetFooter start={<CancelInFooter />}>
+          <ActionButton>Save changes</ActionButton>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+/**
+ * Level-3 tabs in the band under the header, at the lg width (720) with the 20 inset the Users and
+ * Organizations drawers use. A ⋮ menu sits in the header's actions slot, before the ✕. The tab strip
+ * carries its own hairline, so the band draws none of its own - one line, never two.
+ */
+export const DrawerWithTabsBand: Story = {
+  name: 'Drawer: tabs band',
+  render: () => <TabsBandDrawer />,
+};
+
+const STEPS = [
+  { id: 'details', label: 'Details' },
+  { id: 'access', label: 'Access' },
+  { id: 'review', label: 'Review' },
+];
+
+const StepperBandDrawer = () => {
+  const [current, setCurrent] = useState(0);
+  const last = current === STEPS.length - 1;
+  return (
+    <Sheet
+      onOpenChange={(open) => {
+        if (!open) setCurrent(0);
+      }}
+    >
+      <SheetTrigger asChild>
+        <Button>Invite users</Button>
+      </SheetTrigger>
+      <SheetContent layout="drawer" size="md" aria-describedby={undefined}>
+        <SheetHeader>
+          <SheetTitle>Invite users</SheetTitle>
+        </SheetHeader>
+        <SheetBand>
+          {/* the console's StepsBand: the underline stepper with 12 above and below */}
+          <div className="mdt-py-3">
+            <Stepper layout="underline" current={current} steps={STEPS} aria-label="Steps" />
+          </div>
+        </SheetBand>
+        <SheetBody>
+          <p className="mdt-text-sm mdt-text-neutral-90">
+            Step {current + 1}: {STEPS[current]?.label}
+          </p>
+        </SheetBody>
+        <SheetFooter start={<CancelInFooter />}>
+          <ActionButton
+            variant="ghost"
+            disabled={current === 0}
+            onClick={() => {
+              setCurrent((c) => Math.max(0, c - 1));
+            }}
+          >
+            Back
+          </ActionButton>
+          <ActionButton
+            onClick={() => {
+              if (!last) setCurrent((c) => c + 1);
+            }}
+          >
+            {last ? 'Send invitations' : 'Next'}
+          </ActionButton>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+/**
+ * The underline stepper in the band. Its own bars are the line, so the band draws no hairline
+ * under it (Pranjal, 2026-09-25). The footer drives the steps: Cancel pinned left, Back and the
+ * concrete verb right.
+ */
+export const DrawerWithStepperBand: Story = {
+  name: 'Drawer: stepper band',
+  render: () => <StepperBandDrawer />,
+};
+
+/**
+ * The three-part footer: `start` pinned left - here a destructive action - a spacer the footer
+ * owns, then the children as the end group: the escape and the primary verb. Without `start` the
+ * children sit right-aligned, as they always have.
+ */
+export const DrawerFooterSlots: Story = {
+  name: 'Drawer: footer slots',
+  render: () => (
+    <div className="mdt-flex mdt-flex-wrap mdt-gap-4">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Start + end</Button>
+        </SheetTrigger>
+        <SheetContent layout="drawer" size="md" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>Edit team</SheetTitle>
+          </SheetHeader>
+          <SheetBody>
+            <DrawerForm />
+          </SheetBody>
+          <SheetFooter
+            start={
+              <ActionButton variant="destructiveGhost" leftIcon={<Icon name="trash" size="sm" />}>
+                Delete team
+              </ActionButton>
+            }
+          >
+            <CancelInFooter />
+            <ActionButton>Save changes</ActionButton>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Start only</Button>
+        </SheetTrigger>
+        <SheetContent layout="drawer" size="sm" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>Saved views</SheetTitle>
+          </SheetHeader>
+          <SheetBody>
+            <p className="mdt-text-sm mdt-text-neutral-90">
+              Nothing to save here - only a way out.
+            </p>
+          </SheetBody>
+          <SheetFooter
+            start={
+              <SheetClose asChild>
+                <ActionButton variant="ghost">Close</ActionButton>
+              </SheetClose>
+            }
+          />
+        </SheetContent>
+      </Sheet>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">End only</Button>
+        </SheetTrigger>
+        <SheetContent layout="drawer" size="sm" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>Rename group</SheetTitle>
+          </SheetHeader>
+          <SheetBody>
+            <Input label="Name" defaultValue="Edge collectors" />
+          </SheetBody>
+          <SheetFooter>
+            <CancelInFooter />
+            <ActionButton>Rename</ActionButton>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </div>

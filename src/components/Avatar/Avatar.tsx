@@ -1,7 +1,15 @@
 import { cva } from 'class-variance-authority';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
+import { Button } from '@/components/Button';
+import { Icon } from '@/components/Icon';
 import { cn } from '@/utils';
-import type { AvatarProps, AvatarSize, AvatarTone } from './Avatar.types';
+import type {
+  AvatarProps,
+  AvatarShape,
+  AvatarSize,
+  AvatarStatus,
+  AvatarTone,
+} from './Avatar.types';
 
 /**
  * The tones a PERSON may get from their name. Slate is not among them
@@ -90,6 +98,56 @@ const LARGE_ROUNDED: Partial<Record<AvatarSize, string>> = {
   xl: 'mdt-rounded-xl',
 };
 
+/* ── THE STATUS DOT, ported from the console (Pranjal, 2026-10-13) ──────────
+ * OrgHeader.jsx PresenceAvatar + orgHeader.css `.org-hero__mark--card
+ * .org-hero__presence`: the state in its state token, title and aria-label the
+ * state's name, a ring in the card colour so it reads as a cut-out. */
+
+/** The console's PRESENCE map: the state's token and its name. */
+const STATUS: Record<AvatarStatus, { fill: string; label: string }> = {
+  active: { fill: 'mdt-bg-success', label: 'Active' },
+  suspended: { fill: 'mdt-bg-warning', label: 'Suspended' },
+  offboarded: { fill: 'mdt-bg-feedback-neutral-icon', label: 'Offboarded' },
+};
+
+/**
+ * The dot and its ring, in the card mark's proportion: 10 with a 4 ring at 64,
+ * 7.5 with a 3 ring at 48 - so the dot is size × 10/64 and the ring size / 16.
+ * The library has no size or ring-width step for these; they are raw values.
+ */
+const STATUS_DOT: Record<AvatarSize, string> = {
+  xs: 'mdt-size-[3.13px] mdt-ring-[1.25px]',
+  sm: 'mdt-size-[3.75px] mdt-ring-[1.5px]',
+  md: 'mdt-size-[5px] mdt-ring-2',
+  lg: 'mdt-size-[6.25px] mdt-ring-[2.5px]',
+  xl: 'mdt-size-[8.75px] mdt-ring-[3.5px]',
+};
+
+/**
+ * Where the dot sits: it straddles the corner by the console's rule - its
+ * centre 3.7 out from the corner's arc along the diagonal (2.93 past the box
+ * at 64 with corners 16, 2.85 at 48 with corners 12). Worked here for this
+ * library's own corners: 6 (12 at xl) on the square, half the size on the
+ * circle - where a large circle's arc is deep enough that the dot sits inside
+ * the box, as an online dot sits on a round photo.
+ */
+const STATUS_OFFSET: Record<AvatarShape, Record<AvatarSize, string>> = {
+  rounded: {
+    xs: 'mdt-bottom-[-2.42px] mdt-right-[-2.42px]',
+    sm: 'mdt-bottom-[-2.73px] mdt-right-[-2.73px]',
+    md: 'mdt-bottom-[-3.36px] mdt-right-[-3.36px]',
+    lg: 'mdt-bottom-[-3.98px] mdt-right-[-3.98px]',
+    xl: 'mdt-bottom-[-3.48px] mdt-right-[-3.48px]',
+  },
+  circle: {
+    xs: 'mdt-bottom-[-1.25px] mdt-right-[-1.25px]',
+    sm: 'mdt-bottom-[-0.98px] mdt-right-[-0.98px]',
+    md: 'mdt-bottom-[-0.43px] mdt-right-[-0.43px]',
+    lg: 'mdt-bottom-[0.12px] mdt-right-[0.12px]',
+    xl: 'mdt-bottom-[1.21px] mdt-right-[1.21px]',
+  },
+};
+
 /**
  * Picks a tone from a name, so one person is always one colour.
  *
@@ -133,25 +191,58 @@ export const initialsForName = (name: string): string => {
  * <Avatar name="Sarah Johnson" src="/sarah.jpg" size="xl" />
  * <Avatar name="Design team" icon={<Icon name="users" />} tone="blue" />
  * <Avatar name="Sarah Johnson" shape="rounded" size="lg" />
+ * <Avatar name="Acme Corp" logo="/acme.png" size="xl" status="active" />
+ * <Avatar name="Sarah Johnson" src={photo} size="xl" shape="rounded" onEdit={setPhotoFile} />
  * ```
+ *
+ * Ported from the console (Pranjal, 2026-10-13): the logo that fills the
+ * square (ui/OrgMark.jsx), the status dot on the corner (OrgHeader.jsx
+ * PresenceAvatar) and the camera button (ProfileDrawer.jsx). With a dot or a
+ * camera button the avatar sits in a frame; `ref` and `className` stay on the
+ * avatar itself.
  */
 const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
-  ({ name = '', initials, src, icon, tone, size = 'md', shape, ring, className, ...rest }, ref) => {
+  (
+    {
+      name = '',
+      initials,
+      src,
+      logo,
+      icon,
+      tone,
+      size = 'md',
+      shape,
+      ring,
+      status,
+      statusLabel,
+      onEdit,
+      editLabel = 'Upload photo',
+      className,
+      ...rest
+    },
+    ref
+  ) => {
     const [failed, setFailed] = useState(false);
+    // the hidden file input behind the camera button (console: ProfileDrawer.jsx photoRef)
+    const fileRef = useRef<HTMLInputElement>(null);
 
+    const hasLogo = logo !== undefined && logo !== '';
+    const image = hasLogo ? logo : src;
     const resolvedTone = tone ?? (name ? toneForName(name) : 'slate');
-    /* the shape follows the content unless the caller says: a thing (an icon) is a square, a person a circle */
-    const resolvedShape = shape ?? (icon ? 'rounded' : 'circle');
+    /* the shape follows the content unless the caller says: a thing (an icon, a logo) is a square, a person a circle */
+    const resolvedShape = shape ?? (icon || hasLogo ? 'rounded' : 'circle');
     // The cap applies to a caller-supplied `initials` too: one letter.
     const text = (initials ?? initialsForName(name)).slice(0, MAX_INITIALS);
-    const showImage = src !== undefined && src !== '' && !failed;
+    const showImage = image !== undefined && image !== '' && !failed;
 
-    return (
+    const face = (
       <span
         ref={ref}
         className={cn(
           avatarVariants({ tone: resolvedTone, size, shape: resolvedShape, ring }),
           resolvedShape === 'rounded' && LARGE_ROUNDED[size],
+          // a logo fills the box with no ground behind it (console OrgMark: "cover, no frame, no ground")
+          hasLogo && showImage && 'mdt-bg-transparent',
           className
         )}
         // The initials are decorative once the name is announced, so the whole
@@ -162,9 +253,9 @@ const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
       >
         {showImage ? (
           <img
-            src={src}
+            src={image}
             alt=""
-            className="mdt-h-full mdt-w-full mdt-object-cover"
+            className="mdt-block mdt-h-full mdt-w-full mdt-object-cover"
             onError={() => {
               setFailed(true);
             }}
@@ -173,6 +264,64 @@ const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
         ) : (
           (icon ?? <span aria-hidden="true">{text}</span>)
         )}
+      </span>
+    );
+
+    // Nothing on the corner: the avatar is exactly what it always was.
+    if (!status && !onEdit) return face;
+
+    // The face clips its image, so the corner parts ride a frame around it.
+    const dot = status ? STATUS[status] : undefined;
+    const dotLabel = statusLabel ?? dot?.label;
+
+    return (
+      <span className="mdt-relative mdt-inline-flex mdt-shrink-0" data-testid="avatar-frame">
+        {face}
+        {dot ? (
+          <span
+            role="img"
+            aria-label={dotLabel}
+            title={dotLabel}
+            className={cn(
+              'mdt-absolute mdt-rounded-full mdt-ring-card',
+              dot.fill,
+              STATUS_DOT[size],
+              STATUS_OFFSET[resolvedShape][size]
+            )}
+            data-testid="avatar-status"
+          />
+        ) : null}
+        {onEdit ? (
+          <>
+            {/* the console's camera button: the outline icon button at 28, its corner 6 past the
+                avatar's (ProfileDrawer.jsx, Pranjal 2026-09-03) */}
+            <Button
+              variant="outline"
+              size="sm"
+              iconOnly
+              leftIcon={<Icon name="camera" />}
+              ariaLabel={editLabel}
+              title={editLabel}
+              onClick={() => fileRef.current?.click()}
+              className="mdt-absolute -mdt-bottom-1.5 -mdt-right-1.5"
+            />
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="mdt-hidden"
+              tabIndex={-1}
+              aria-hidden="true"
+              data-testid="avatar-edit-input"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                // cleared, so the same file can be picked again
+                e.target.value = '';
+                if (file) onEdit(file);
+              }}
+            />
+          </>
+        ) : null}
       </span>
     );
   }

@@ -70,6 +70,7 @@ export type {
   AvatarTone,
   AvatarSize,
   AvatarShape,
+  AvatarStatus,
 } from './Avatar';
 
 // Badge — the badge ported from the merged console: status pills, sources, counts,
@@ -528,10 +529,13 @@ export {
   SheetClose,
   SheetContent,
   SheetHeader,
+  SheetBand,
+  SheetBody,
   SheetFooter,
   SheetTitle,
   SheetDescription,
   sheetVariants,
+  SHEET_SIZES,
 } from './Sheet';
 export type {
   SheetProps,
@@ -540,11 +544,16 @@ export type {
   SheetOverlayProps,
   SheetContentProps,
   SheetHeaderProps,
+  SheetBandProps,
+  SheetBodyProps,
   SheetFooterProps,
   SheetTitleProps,
   SheetDescriptionProps,
   SheetCloseProps,
   SheetSide,
+  SheetSize,
+  SheetLayout,
+  SheetInset,
   SheetVariants,
 } from './Sheet';
 
@@ -855,6 +864,10 @@ export type {
   TagPillEmphasis,
 } from './TagPill';
 
+// AddPill - the dashed "+ Add" pill that ends a row of tags; ported from the console's AddChip (2026-10-13).
+export { AddPill } from './TagPill';
+export type { AddPillProps, AddPillOwnProps } from './TagPill';
+
 // InlineTags — a row of TagPills with a dashed "Add tag" that opens a field in place;
 // suggested tags under it while open, earlier tags listed as you type (2026-09-29).
 export { InlineTags } from './InlineTags';
@@ -949,6 +962,7 @@ export type {
   KpiTrendTone,
   KpiStripProps,
   KpiGaugeProps,
+  KpiGaugeShape,
   KpiBarsProps,
 } from './KpiCard';
 
@@ -1097,3 +1111,41 @@ export type {
   UseEditableTabsOld2,
   UseEditableTabsOld2Options,
 } from './TabsOld2';
+
+// ── Ported from the console, 2026-10-13 (Pranjal: the parts the console had hand-built) ───────────────
+
+// OverflowCount - the quiet "+N" whose tooltip lists the hidden values (scopes, teams, members); same look as TagList's.
+export { OverflowCount } from './OverflowCount';
+export type { OverflowCountProps, OverflowCountOwnProps } from './OverflowCount';
+
+// EmptyState - an empty state for drawers and tabs, outside a table (the table keeps TableBlank).
+export { EmptyState } from './EmptyState';
+export type { EmptyStateProps } from './EmptyState';
+
+// CopyField - one line holding a value and an icon-only copy that says "Copied"; optional mask.
+export { CopyField } from './CopyField';
+export type { CopyFieldProps } from './CopyField';
+
+// InfoTip - the filled info mark; its explainer on hover, focus and press, optional "Learn more".
+export { InfoTip } from './InfoTip';
+export type { InfoTipProps, InfoTipLearnMore } from './InfoTip';
+
+// BannerStack - several page notices folded into one fanned stack, ordered by tone, opening on hover or focus.
+export { BannerStack } from './BannerStack';
+export type { BannerStackProps, BannerStackOwnProps, BannerStackItem } from './BannerStack';
+
+// ConfirmDialog - the ready-made confirm, with an optional "type the word to confirm" and a busy action.
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps, ConfirmDialogTone, ConfirmDialogWidth } from './ConfirmDialog';
+
+// PhoneInput - a country code and the number in one field.
+export {
+  PhoneInput,
+  PHONE_COUNTRIES,
+  countryName,
+  dialOf,
+  joinPhone,
+  phonePlaceholder,
+  splitPhone,
+} from './PhoneInput';
+export type { PhoneInputProps, PhoneCountry, PhoneInputValue } from './PhoneInput';

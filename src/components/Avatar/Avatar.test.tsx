@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
+import { vi } from 'vitest';
 import { Avatar, toneForName, initialsForName } from './Avatar';
 import { AvatarStack } from './AvatarStack';
 import type { AvatarShape, AvatarSize, AvatarTone } from './Avatar.types';
@@ -247,6 +248,146 @@ describe('Avatar', () => {
     it('shows initials when src is an empty string', () => {
       render(<Avatar name={NAME} src="" />);
       expect(screen.queryByTestId(IMG)).not.toBeInTheDocument();
+    });
+  });
+
+  /* ported from the console (Pranjal, 2026-10-13) */
+  describe('logo', () => {
+    it('fills the box with the logo, with no ground behind it', () => {
+      render(<Avatar name="Acme Corp" logo="/acme.png" />);
+      const el = screen.getByRole('img', { name: 'Acme Corp' });
+      expect(screen.getByTestId(IMG)).toHaveAttribute('src', '/acme.png');
+      expect(screen.getByTestId(IMG)).toHaveClass('mdt-object-cover', 'mdt-h-full', 'mdt-w-full');
+      expect(el).toHaveClass('mdt-bg-transparent');
+    });
+
+    it('is a rounded square by default, and can be forced into a circle', () => {
+      const { rerender } = render(<Avatar name="Acme Corp" logo="/acme.png" size="xl" />);
+      expect(screen.getByRole('img', { name: 'Acme Corp' })).toHaveClass('mdt-rounded-xl');
+      rerender(<Avatar name="Acme Corp" logo="/acme.png" shape="circle" />);
+      expect(screen.getByRole('img', { name: 'Acme Corp' })).toHaveClass('mdt-rounded-full');
+    });
+
+    it('wins over src', () => {
+      render(<Avatar name="Acme Corp" logo="/acme.png" src="/photo.png" />);
+      expect(screen.getByTestId(IMG)).toHaveAttribute('src', '/acme.png');
+    });
+
+    it('falls back to the letter on its tone when the logo fails', () => {
+      render(<Avatar name="Acme Corp" logo="/broken.png" tone="blue" />);
+      fireEvent.error(screen.getByTestId(IMG));
+      const el = screen.getByRole('img', { name: 'Acme Corp' });
+      expect(el).toHaveTextContent(/^A$/);
+      expect(el).toHaveClass('mdt-bg-blue-10');
+      expect(el).toHaveClass('mdt-rounded-[6px]');
+    });
+
+    it('shows the letter when the logo is an empty string', () => {
+      render(<Avatar name="Acme Corp" logo="" />);
+      expect(screen.queryByTestId(IMG)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('status dot', () => {
+    it('is absent by default, and the avatar is not framed', () => {
+      render(<Avatar name={NAME} />);
+      expect(screen.queryByTestId('avatar-status')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('avatar-frame')).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['active', 'mdt-bg-success', 'Active'],
+      ['suspended', 'mdt-bg-warning', 'Suspended'],
+      ['offboarded', 'mdt-bg-feedback-neutral-icon', 'Offboarded'],
+    ] as const)('paints %s in its state token and names it', (status, fill, label) => {
+      render(<Avatar name={NAME} status={status} />);
+      const dot = screen.getByRole('img', { name: label });
+      expect(dot).toHaveClass(fill);
+      expect(dot).toHaveAttribute('title', label);
+    });
+
+    it('rings the dot in the card colour', () => {
+      render(<Avatar name={NAME} status="active" />);
+      expect(screen.getByTestId('avatar-status')).toHaveClass('mdt-ring-card', 'mdt-rounded-full');
+    });
+
+    it('takes a custom label', () => {
+      render(<Avatar name={NAME} status="active" statusLabel="Online" />);
+      expect(screen.getByRole('img', { name: 'Online' })).toBeInTheDocument();
+    });
+
+    it('sizes the dot to the avatar (10/64 of it, ring 1/16)', () => {
+      render(<Avatar name={NAME} status="active" size="xl" />);
+      expect(screen.getByTestId('avatar-status')).toHaveClass(
+        'mdt-size-[8.75px]',
+        'mdt-ring-[3.5px]'
+      );
+    });
+
+    it('straddles the corner by the shape', () => {
+      const { rerender } = render(<Avatar name={NAME} status="active" size="md" shape="rounded" />);
+      expect(screen.getByTestId('avatar-status')).toHaveClass('mdt-right-[-3.36px]');
+      rerender(<Avatar name={NAME} status="active" size="md" shape="circle" />);
+      expect(screen.getByTestId('avatar-status')).toHaveClass('mdt-right-[-0.43px]');
+    });
+
+    it('keeps the ref and className on the avatar itself', () => {
+      const ref = createRef<HTMLSpanElement>();
+      render(<Avatar name={NAME} status="active" className="mdt-ml-2" ref={ref} />);
+      expect(getAvatar()).toHaveClass('mdt-ml-2');
+      expect(ref.current).toBe(getAvatar());
+      expect(screen.getByTestId('avatar-frame')).not.toHaveClass('mdt-ml-2');
+    });
+  });
+
+  describe('edit button', () => {
+    const file = new File(['x'], 'me.png', { type: 'image/png' });
+
+    it('is absent by default', () => {
+      render(<Avatar name={NAME} />);
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('renders the camera button, named', () => {
+      render(<Avatar name={NAME} onEdit={() => undefined} />);
+      const btn = screen.getByRole('button', { name: 'Upload photo' });
+      expect(btn).toHaveAttribute('title', 'Upload photo');
+      expect(btn).toHaveClass('mdt-absolute', '-mdt-right-1.5', '-mdt-bottom-1.5');
+    });
+
+    it('takes a custom label', () => {
+      render(<Avatar name={NAME} onEdit={() => undefined} editLabel="Change logo" />);
+      expect(screen.getByRole('button', { name: 'Change logo' })).toBeInTheDocument();
+    });
+
+    it('opens the hidden file picker, images only', () => {
+      render(<Avatar name={NAME} onEdit={() => undefined} />);
+      const input = screen.getByTestId<HTMLInputElement>('avatar-edit-input');
+      expect(input).toHaveAttribute('type', 'file');
+      expect(input).toHaveAttribute('accept', 'image/*');
+      const click = vi.spyOn(input, 'click');
+      fireEvent.click(screen.getByRole('button', { name: 'Upload photo' }));
+      expect(click).toHaveBeenCalledTimes(1);
+    });
+
+    it('hands the chosen file to onEdit', () => {
+      const onEdit = vi.fn();
+      render(<Avatar name={NAME} onEdit={onEdit} />);
+      fireEvent.change(screen.getByTestId('avatar-edit-input'), { target: { files: [file] } });
+      expect(onEdit).toHaveBeenCalledWith(file);
+    });
+
+    it('does nothing when the picker is cancelled', () => {
+      const onEdit = vi.fn();
+      render(<Avatar name={NAME} onEdit={onEdit} />);
+      fireEvent.change(screen.getByTestId('avatar-edit-input'), { target: { files: [] } });
+      expect(onEdit).not.toHaveBeenCalled();
+    });
+
+    it('sits beside a status dot', () => {
+      render(<Avatar name={NAME} onEdit={() => undefined} status="active" />);
+      expect(screen.getByTestId('avatar-status')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Upload photo' })).toBeInTheDocument();
     });
   });
 

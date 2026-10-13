@@ -8,4 +8,5 @@ export type {
   AvatarTone,
   AvatarSize,
   AvatarShape,
+  AvatarStatus,
 } from './Avatar.types';

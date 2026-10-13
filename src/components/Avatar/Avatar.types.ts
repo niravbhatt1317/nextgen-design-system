@@ -21,6 +21,14 @@ export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
  */
 export type AvatarShape = 'circle' | 'rounded';
 
+/**
+ * The state the corner dot reports - the console's organization lifecycle
+ * (OrgHeader.jsx PRESENCE): active in the success token, suspended in the
+ * warning token, offboarded in the neutral state token. Ported from the
+ * console (Pranjal, 2026-10-13).
+ */
+export type AvatarStatus = 'active' | 'suspended' | 'offboarded';
+
 export interface AvatarOwnProps {
   /**
    * The person or thing this represents. Used for the initials, for the
@@ -38,6 +46,42 @@ export interface AvatarOwnProps {
 
   /** Photo. Falls back to the letter if it fails to load. */
   src?: string;
+
+  /**
+   * A logo that FILLS the square edge to edge - cover, no frame, no ground -
+   * the console's OrgMark (Pranjal, 2026-10-11: "it will be a fill type of
+   * logo"); the corners round it. With a logo the shape defaults to the
+   * rounded square; with none, or when it fails to load, the letter (or the
+   * icon) stands on its tone. Wins over `src` when both are given. Ported from
+   * the console (Pranjal, 2026-10-13).
+   */
+  logo?: string;
+
+  /**
+   * A dot on the bottom-right corner naming a state - the console's presence
+   * dot on the organization mark: its own ring in the card colour, so it reads
+   * as a cut-out in both themes, sized to the avatar (10 at 64, kept in that
+   * proportion) and straddling the corner by the console's rule. Ported from
+   * the console (Pranjal, 2026-10-13).
+   */
+  status?: AvatarStatus;
+
+  /** Names the dot for assistive tech and its tooltip. Defaults to the state's own name. */
+  statusLabel?: string;
+
+  /**
+   * Puts the small camera button on the bottom-right corner - the console's
+   * profile drawer in edit mode. Pressing it opens the file picker (images
+   * only); the chosen file is handed here. Ported from the console (Pranjal,
+   * 2026-10-13).
+   */
+  onEdit?: (file: File) => void;
+
+  /**
+   * The camera button's accessible name and tooltip.
+   * @default 'Upload photo'
+   */
+  editLabel?: string;
 
   /**
    * A thing rather than a person: a team, a role, a service account, an
