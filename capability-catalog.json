@@ -1,9 +1,9 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1289,
+  "capabilityCount": 1290,
   "counts": {
-    "story": 881,
+    "story": 882,
     "component": 323,
     "utility": 47,
     "hook": 38
@@ -1796,6 +1796,16 @@
         "className"
       ],
       "propDocs": "The value shown, and the text the button copies - the whole of it, even when the line cuts it short. The field's name, above the line at 13/500. It also names the copy button (\"Copy Base URL\") and the masked dots (\"Hidden Base URL\"). Something beside the label - an InfoTip, usually. Shown only with a `label`. Shows the library's SecretDots in place of the value. The button still copies the real value; pass `copyable={false}` when it must not. The value in the monospace face. Off for plain words. Shows the copy button. Off for a value there is nothing to copy from. The copy button's accessible name. Defaults to \"Copy {label}\", or \"Copy\" without a label. The word in the tooltip while the pointer rests on the button. After a press it reads \"Copied\" for 1.4 seconds. Called with the value after every copy."
+    },
+    {
+      "name": "CopyOnClick",
+      "kind": "story",
+      "file": "src/components/IconTile/IconTile.stories.tsx",
+      "area": "IconTile",
+      "summary": "Story: New Components/IconTile / CopyOnClick",
+      "doc": "New Components/IconTile CopyOnClick",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "CouldNotLoad",
@@ -5030,8 +5040,8 @@
       "kind": "component",
       "file": "src/components/IconTile/IconTile.tsx",
       "area": "IconTile",
-      "summary": "IconTile - a tinted container for a single icon.",
-      "doc": "IconTile - a tinted container for a single icon. ```tsx <IconTile icon={<Icon name=\"server\" />} tone=\"blue\" /> <IconTile icon={<Icon name=\"check\" />} tone=\"green\" shape=\"circle\" size=\"xl\" /> ```",
+      "summary": "",
+      "doc": "",
       "props": [],
       "propDocs": ""
     },

@@ -56,7 +56,60 @@ export const Tones: Story = {
       <IconTile icon={<Icon name="alert-triangle" />} tone="amber" />
       <IconTile icon={<Icon name="x-circle" />} tone="rose" />
       <IconTile icon={<Icon name="sparkles" />} tone="purple" />
+      <IconTile icon={<Icon name="mail" />} tone="outline" />
     </Row>
+  ),
+};
+
+/**
+ * The outline tile as a copy button - the console's Contact cell. Hover lifts the
+ * circle over its neighbour and shows the value with a hint; a click copies it and
+ * the bubble says "Copied!". Round tiles in a row tuck 6px under the one before.
+ */
+export const CopyOnClick: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-6 mdt-pt-16">
+      <Row>
+        <span className="mdt-inline-flex">
+          <IconTile
+            tone="outline"
+            shape="circle"
+            size="sm"
+            className="mdt-h-7 mdt-w-7"
+            icon={<Icon name="mail" size={14} />}
+            copyValue="sarah.johnson@company.com"
+            hint="Click the icon to copy the mail"
+          />
+          <IconTile
+            tone="outline"
+            shape="circle"
+            size="sm"
+            className="mdt-h-7 mdt-w-7"
+            icon={<Icon name="phone" size={14} />}
+            copyValue="+1 (555) 0110"
+            hint="Click the icon to copy the number"
+          />
+        </span>
+      </Row>
+      <Row>
+        <IconTile
+          tone="outline"
+          shape="circle"
+          icon={<Icon name="link" />}
+          copyValue="https://acme.motadata.com/invite/8F2K"
+          tooltip="Invite link"
+          hint="Click to copy the link"
+          copiedLabel="Link copied"
+        />
+        <IconTile
+          tone="blue"
+          icon={<Icon name="refresh-cw" />}
+          aria-label="Refresh"
+          onClick={() => undefined}
+        />
+      </Row>
+    </div>
   ),
 };
 

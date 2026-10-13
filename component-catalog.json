@@ -2,7 +2,7 @@
   "generatedFrom": "src/components (CVA definitions)",
   "componentCount": 55,
   "variantGroupCount": 189,
-  "variantValueCount": 578,
+  "variantValueCount": 579,
   "components": [
     {
       "component": "ActionCard",
@@ -503,7 +503,7 @@
         {
           "name": "iconTileVariants",
           "variants": {
-            "tone": ["slate", "blue", "green", "amber", "rose", "purple"],
+            "tone": ["slate", "blue", "green", "amber", "rose", "purple", "outline"],
             "size": ["sm", "md", "lg", "xl", "2xl"],
             "shape": ["square", "circle"]
           },

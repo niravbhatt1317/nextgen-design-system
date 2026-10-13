@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Icon } from '../Icon';
+import { IconTile } from '../IconTile';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 import type { IconName } from '../Icon';
 import './table.css';
@@ -76,82 +76,30 @@ export interface ContactChipsProps {
   onCopy?: (value: string, kind: 'email' | 'phone') => void;
 }
 
-const CHIP =
-  'mdt-inline-flex mdt-h-7 mdt-w-7 mdt-items-center mdt-justify-center mdt-rounded-full mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-p-0 mdt-text-neutral-90 hover:mdt-border-azure-60 hover:mdt-text-azure-60 data-[state=delayed-open]:mdt-border-azure-60 data-[state=delayed-open]:mdt-text-azure-60 data-[state=instant-open]:mdt-border-azure-60 data-[state=instant-open]:mdt-text-azure-60 [&+&]:-mdt-ml-1.5';
-
-/**
- * One chip: the value in an instant bubble with the click-to-copy hint; after a
- * click the bubble says "Copied!" until the pointer leaves. The engine closes a
- * bubble on pointer-down and on click; while the pointer is still on the chip
- * those closes are ignored, so the bubble is held open through the click.
- */
-function ContactChip({
-  kind,
-  value,
-  icon,
-  onCopy,
-}: {
-  kind: 'email' | 'phone';
-  value: string;
-  icon: IconName;
-  onCopy?: ((value: string, kind: 'email' | 'phone') => void) | undefined;
-}) {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const hovering = useRef(false);
-  return (
-    <Tooltip
-      instant
-      open={open}
-      onOpenChange={(next) => {
-        if (!next && hovering.current) return;
-        setOpen(next);
-        if (!next) setCopied(false);
-      }}
-    >
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className={CHIP}
-          aria-label={`Copy ${kind}: ${value}`}
-          onPointerEnter={() => {
-            hovering.current = true;
-          }}
-          onPointerLeave={() => {
-            hovering.current = false;
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            void navigator.clipboard.writeText(value);
-            setCopied(true);
-            setOpen(true);
-            onCopy?.(value, kind);
-          }}
-        >
-          <Icon name={icon} size={14} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent
-        {...(copied
-          ? {}
-          : { hint: `Click the icon to copy the ${kind === 'email' ? 'mail' : 'number'}` })}
-      >
-        {copied ? 'Copied!' : value}
-      </TooltipContent>
-    </Tooltip>
-  );
-}
+/** The contact circle: the outline tile at 28 with its 14 glyph, as the console's Contact cell draws it. */
+const CHIP_SIZE = 'mdt-h-7 mdt-w-7';
 
 /** The Contact cell: 28px circles that copy on click, overlapping by 6px; an em-dash when there is nothing. Each chip carries its value in a bubble. */
 function ContactChips({ email, phone, onCopy }: ContactChipsProps) {
   if (!email && !phone) return <TableEmptyValue />;
+  const chip = (kind: 'email' | 'phone', value: string, icon: IconName) => (
+    <IconTile
+      tone="outline"
+      shape="circle"
+      size="sm"
+      className={CHIP_SIZE}
+      icon={<Icon name={icon} size={14} />}
+      aria-label={`Copy ${kind}: ${value}`}
+      copyValue={value}
+      hint={`Click the icon to copy the ${kind === 'email' ? 'mail' : 'number'}`}
+      onCopy={(copied) => onCopy?.(copied, kind)}
+    />
+  );
   return (
-    <TooltipProvider>
-      <span className="mdt-inline-flex">
-        {email ? <ContactChip kind="email" value={email} icon="mail" onCopy={onCopy} /> : null}
-        {phone ? <ContactChip kind="phone" value={phone} icon="phone" onCopy={onCopy} /> : null}
-      </span>
-    </TooltipProvider>
+    <span className="mdt-inline-flex">
+      {email ? chip('email', email, 'mail') : null}
+      {phone ? chip('phone', phone, 'phone') : null}
+    </span>
   );
 }
 
