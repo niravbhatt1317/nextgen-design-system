@@ -575,7 +575,7 @@ export type {
   SheetFieldProps,
   SheetNavigationEntry,
   SheetNavigationProps,
-  SheetNavigationValue,
+  UseSheetNavigationReturn,
   SheetPageProps,
   SheetProps,
   SheetTriggerProps,

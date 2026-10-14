@@ -255,7 +255,7 @@ export interface SheetNavigationProps {
 /**
  * What useSheetNavigation returns.
  */
-export interface SheetNavigationValue {
+export interface UseSheetNavigationReturn {
   /** Every page from the first to the current. */
   stack: readonly SheetNavigationEntry[];
   /** The page showing now. */

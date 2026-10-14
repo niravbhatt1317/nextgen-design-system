@@ -45,6 +45,6 @@ export type {
   SheetFieldProps,
   SheetNavigationEntry,
   SheetNavigationProps,
-  SheetNavigationValue,
+  UseSheetNavigationReturn,
   SheetPageProps,
 } from './Sheet.types';
