@@ -31,7 +31,7 @@ const COUNTS: Record<string, number> = {
 };
 
 const meta: Meta<typeof InlineTags> = {
-  title: 'Components/InlineTags',
+  title: 'New Components/InlineTags',
   component: InlineTags,
   tags: ['autodocs'],
   parameters: {

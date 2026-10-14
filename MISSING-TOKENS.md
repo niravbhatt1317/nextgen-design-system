@@ -62,6 +62,17 @@ not something to settle in a story. Live example: Storybook → Components → T
 
 ---
 
+## Colour — the console's info border (#C9DDF7)
+
+The console mock draws the info Banner's edge in `214 75% 88%` (#C9DDF7), typed into its own
+`global.css`. No ramp step is near it: the closest owned colours are greys (neutral-40 #CAD3E2,
+neutral-30 #E3E8F2), and the nearest blue is `blue-20` #A3CDFF, which `--mdt-feedback-info-border`
+already points at. When the light tokens were matched to the console (Kevin, 2026-10-13), this one
+was left on `blue-20` rather than adding a colour. Searched the blue, azure and neutral ramps by
+distance. Whether the info edge should be a new light-blue step is the design owner's call.
+
+---
+
 ## Colour — a neutral step between 40 and 50
 
 The neutral ramp jumps from **neutral-40 `#CBD3E1`** straight to **neutral-50 `#8FA0BD`**. Measured

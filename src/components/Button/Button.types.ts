@@ -1,12 +1,18 @@
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 
 /**
- * The seven looks a button can take, loudest to quietest.
+ * The nine looks a button can take, loudest to quietest.
  *
  * `secondary` is a quiet fill with no border, which is what separates it from
  * `outline`. Together with `primary` that gives three volumes — solid, filled,
  * outlined — and a reader can rank two buttons sitting side by side without
  * reading their labels.
+ *
+ * `fixed` is the outline face that does not follow the theme: the same white
+ * fill, border and dark label on a light page and a dark one.
+ *
+ * `dashed` is the "+ Add tag" button: a dashed blue edge that goes solid over
+ * a light blue wash under the pointer.
  *
  * The success and AI families, and the soft and outlined destructive steps,
  * stay on `ButtonOld`. They were deliberately left out here.
@@ -15,6 +21,8 @@ export type ButtonVariant =
   | 'primary'
   | 'secondary'
   | 'outline'
+  | 'fixed'
+  | 'dashed'
   | 'ghost'
   | 'destructive'
   | 'destructiveGhost'

@@ -52,6 +52,19 @@ export const buttonVariants = cva(
           'mdt-bg-[hsl(var(--mdt-destructive-fill))] mdt-text-[hsl(var(--mdt-destructive-fill-foreground))]',
           'hover:mdt-bg-[hsl(var(--mdt-destructive-fill-hover))] active:mdt-bg-[hsl(var(--mdt-destructive-fill-active))]',
         ].join(' '),
+        fixed: [
+          /* the outline face held in BOTH themes (Kevin 2026-10-13): its own tokens, pinned in the dark block */
+          'mdt-border-[hsl(var(--mdt-fixed-border))] mdt-bg-[hsl(var(--mdt-fixed-fill))] mdt-text-[hsl(var(--mdt-fixed-foreground))]',
+          'hover:mdt-border-[hsl(var(--mdt-fixed-border-hover))] hover:mdt-bg-[hsl(var(--mdt-fixed-fill-hover))]',
+          'hover:mdt-text-[hsl(var(--mdt-fixed-foreground-hover))] active:mdt-bg-[hsl(var(--mdt-fixed-fill-active))]',
+        ].join(' '),
+        dashed: [
+          /* the "+ Add tag" button (Kevin 2026-10-13; the mock's .tged-add): a dashed info-blue edge and label on no fill,
+           * and under the pointer the edge goes solid over the info wash. Both are badge-info tokens, so dark follows */
+          'mdt-border-dashed mdt-border-[color:var(--mdt-badge-info-ink)] mdt-bg-transparent mdt-text-[color:var(--mdt-badge-info-ink)]',
+          'hover:mdt-border-solid hover:mdt-bg-[color:var(--mdt-badge-info-fill)]',
+          'active:mdt-border-solid active:mdt-bg-[color:var(--mdt-badge-info-fill)]',
+        ].join(' '),
         destructiveGhost: [
           'mdt-text-destructive',
           'hover:mdt-bg-red-10 hover:mdt-text-red-70 active:mdt-bg-red-20',
@@ -100,6 +113,12 @@ const FOCUS = [
   'focus-visible:mdt-border-blue-40',
   'focus-visible:mdt-shadow-[inset_0_0_0_1px_hsl(var(--mdt-blue-40))]',
 ].join(' ');
+
+/** Held on (`active`): the variants whose pressed face is not the neutral wash. */
+const HELD: Partial<Record<ButtonVariant, string>> = {
+  fixed: 'mdt-bg-[hsl(var(--mdt-fixed-fill-active))]',
+  dashed: 'mdt-border-solid mdt-bg-[color:var(--mdt-badge-info-fill)]',
+};
 
 const SPINNER = (
   <svg
@@ -165,7 +184,7 @@ const ICON_PX = 16;
 /**
  * Button — the merged console's button.
  *
- * Seven looks, three heights, one text size and one glyph size. Everything a
+ * Nine looks, three heights, one text size and one glyph size. Everything a
  * reader can see is settled by the variant and the content: the height comes
  * from the 20px line the label sits on, and the padding comes from whether a
  * word or a glyph meets each edge.
@@ -216,7 +235,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     padding,
     FOCUS,
     fullWidth && 'mdt-w-full',
-    active && !off && 'mdt-bg-neutral-20',
+    active && !off && (HELD[variant] ?? 'mdt-bg-neutral-20'),
     className
   );
 

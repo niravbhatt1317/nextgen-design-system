@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { IconTile } from './IconTile';
 import type { IconTileShape, IconTileSize, IconTileTone } from './IconTile';
@@ -19,6 +20,7 @@ describe('IconTile', () => {
       ['amber', 'mdt-bg-orange-20'],
       ['rose', 'mdt-bg-red-10'],
       ['purple', 'mdt-bg-purple-10'],
+      ['outline', 'mdt-border-neutral-30'],
     ];
 
     it.each(cases)('applies the %s tone', (tone, expected) => {
@@ -117,5 +119,76 @@ describe('IconTile', () => {
   it('keeps the circle round at 2xl', () => {
     const { container } = render(<IconTile icon={icon} size="2xl" shape="circle" />);
     expect(container.firstChild).toHaveClass('mdt-rounded-full');
+  });
+});
+
+describe('IconTile as a button', () => {
+  it('copies its value on click, says so in the bubble, and reports it', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    const onCopy = vi.fn();
+    const onRow = vi.fn();
+    render(
+      <div onClick={onRow} role="presentation">
+        <IconTile
+          icon={icon}
+          tone="outline"
+          shape="circle"
+          copyValue="sarah@company.com"
+          hint="Click the icon to copy the mail"
+          onCopy={onCopy}
+        />
+      </div>
+    );
+    const button = screen.getByRole('button', { name: 'Copy sarah@company.com' });
+    expect(button).toHaveClass('hover:mdt-bg-neutral-10', '[&+&]:-mdt-ml-1.5');
+    await user.hover(button);
+    await waitFor(() => {
+      expect(document.querySelector('.tt')).toHaveTextContent('sarah@company.com');
+    });
+    expect(document.querySelector('.tt')).toHaveTextContent('Click the icon to copy the mail');
+    await user.click(button);
+    expect(writeText).toHaveBeenCalledWith('sarah@company.com');
+    expect(onCopy).toHaveBeenCalledWith('sarah@company.com');
+    expect(onRow).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(document.querySelector('.tt')).toHaveTextContent('Copied!');
+    });
+    await user.unhover(button);
+    writeText.mockRestore();
+  });
+
+  it('shows its own words and copied label when given', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    render(
+      <IconTile
+        icon={icon}
+        copyValue="x"
+        tooltip="Invite link"
+        copiedLabel="Link copied"
+        aria-label="Copy link"
+      />
+    );
+    const button = screen.getByRole('button', { name: 'Copy link' });
+    expect(button).not.toHaveClass('hover:mdt-bg-neutral-10');
+    await user.hover(button);
+    await waitFor(() => {
+      expect(document.querySelector('.tt')).toHaveTextContent('Invite link');
+    });
+    await user.click(button);
+    await waitFor(() => {
+      expect(document.querySelector('.tt')).toHaveTextContent('Link copied');
+    });
+  });
+
+  it('is a plain button with no bubble when it only has onClick', async () => {
+    const onClick = vi.fn();
+    const ref = createRef<HTMLElement>();
+    render(<IconTile ref={ref} icon={icon} aria-label="Refresh" onClick={onClick} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    expect(document.querySelector('.tt')).toBeNull();
   });
 });

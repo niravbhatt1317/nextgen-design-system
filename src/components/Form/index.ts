@@ -4,6 +4,14 @@ export { FormLabel, formLabelVariants } from './FormLabel';
 export { FormControl } from './FormControl';
 export { FormMessage, formMessageVariants } from './FormMessage';
 export { FormDescription, formDescriptionVariants } from './FormDescription';
+export { useForm } from './useForm';
+export type {
+  UseFormOptions,
+  UseFormReturn,
+  FormRules,
+  FormFieldRule,
+  FormFieldBinding,
+} from './useForm';
 
 export type {
   FormProps,

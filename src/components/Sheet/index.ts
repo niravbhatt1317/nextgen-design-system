@@ -14,6 +14,14 @@ export {
   sheetVariants,
   SHEET_SIZES,
 } from './Sheet';
+export { SheetIdentity, SheetSection, SheetField } from './SheetParts';
+export {
+  SheetNavigation,
+  SheetPage,
+  SheetNavigationTitle,
+  useSheetNavigation,
+  useSheetLeaveGuard,
+} from './SheetNavigation';
 export type { SheetVariants } from './Sheet';
 export type {
   SheetProps,
@@ -32,4 +40,11 @@ export type {
   SheetSize,
   SheetLayout,
   SheetInset,
+  SheetIdentityProps,
+  SheetSectionProps,
+  SheetFieldProps,
+  SheetNavigationEntry,
+  SheetNavigationProps,
+  UseSheetNavigationReturn,
+  SheetPageProps,
 } from './Sheet.types';

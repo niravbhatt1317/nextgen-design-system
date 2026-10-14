@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1261,
+  "capabilityCount": 1294,
   "counts": {
-    "story": 866,
-    "component": 314,
-    "utility": 46,
-    "hook": 35
+    "story": 884,
+    "component": 324,
+    "utility": 47,
+    "hook": 39
   },
   "capabilities": [
     {
@@ -18,6 +18,30 @@
       "doc": "New Components/LeftNav AccountSwitcher",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "ActionCard",
+      "kind": "component",
+      "file": "src/components/ActionCard/ActionCard.tsx",
+      "area": "ActionCard",
+      "summary": "ActionCard - one item on a settings page, as a row: a tile, a title with its badge, a line under it, and controls on the right.",
+      "doc": "ActionCard - one item on a settings page, as a row: a tile, a title with its badge, a line under it, and controls on the right. The whole card is clickable when it has `onClick` or `href` - open a modal, a drawer, an inline edit, or go somewhere - and `clickable={false}` holds it still. The switch, buttons and menu inside keep working on their own. <ActionCard variant=\"add\" icon={<Icon name=\"plus\" />} title=\"Add domain\" onClick={startAdd} /> <ActionCard icon={<Icon name=\"globe\" />} title=\"northbridge.io\" actions={<MotadataSwitch checked aria-label=\"Enable northbridge.io\" />} menu={<Button iconOnly variant=\"ghost\" size=\"sm\" ariaLabel=\"More\" leftIcon={<Icon name=\"more-horizontal\" />} />} onClick={openDrawer} />",
+      "props": [
+        "variant",
+        "icon",
+        "title",
+        "badge",
+        "description",
+        "actions",
+        "menu",
+        "dim",
+        "onClick",
+        "href",
+        "target",
+        "clickable",
+        "children"
+      ],
+      "propDocs": " The glyph or logo in the 36px tile on the left. Leave out for no tile. The name on the first line. When the card is clickable this is also its accessible name. A Badge beside the title: Live, Off, Draft, Test failed. The second line. An array is drawn as a meta line split by hairlines: \"SAML 2.0 | 2,104 sign-ins\". Controls on the right: a Switch, a Button, an AvatarStack. They stay clickable on their own. The ⋯ button at the far right, set off from `actions` by a hairline. Fades the tile: a retired or switched-off item that is kept. Fires when the card itself is clicked: open a modal, a drawer, an inline edit, change the content. Makes the card a link: a click follows it. Where `href` opens. `_blank` adds `rel=\"noopener noreferrer\"`. Whether the card responds to a click at all. With `onClick` or `href` it does by default; pass `false` to hold it still (read-only, a busy row). The `edit` variant's body: the field being edited. Replaces title and description."
     },
     {
       "name": "ActionPlacement",
@@ -276,6 +300,16 @@
       "area": "Table Old Cell Recipes",
       "summary": "Story: Deprecated/Table Old Cell Recipes / AllTogether",
       "doc": "Deprecated/Table Old Cell Recipes AllTogether",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "AllVariants",
+      "kind": "story",
+      "file": "src/components/ActionCard/ActionCard.stories.tsx",
+      "area": "ActionCard",
+      "summary": "Story: New Components/ActionCard / AllVariants",
+      "doc": "New Components/ActionCard AllVariants",
       "props": [],
       "propDocs": ""
     },
@@ -705,7 +739,7 @@
       "file": "src/components/Button/Button.tsx",
       "area": "Button",
       "summary": "Button — the merged console's button.",
-      "doc": "Button — the merged console's button. Seven looks, three heights, one text size and one glyph size. Everything a reader can see is settled by the variant and the content: the height comes from the 20px line the label sits on, and the padding comes from whether a word or a glyph meets each edge. <Button leftIcon={<Icon name=\"plus\" />}>Invite users</Button> <Button variant=\"outline\" size=\"sm\">Cancel</Button> <Button iconOnly variant=\"ghost\" ariaLabel=\"Row actions\" leftIcon={<Icon name=\"more-vertical\" />} />",
+      "doc": "Button — the merged console's button. Nine looks, three heights, one text size and one glyph size. Everything a reader can see is settled by the variant and the content: the height comes from the 20px line the label sits on, and the padding comes from whether a word or a glyph meets each edge. <Button leftIcon={<Icon name=\"plus\" />}>Invite users</Button> <Button variant=\"outline\" size=\"sm\">Cancel</Button> <Button iconOnly variant=\"ghost\" ariaLabel=\"Row actions\" leftIcon={<Icon name=\"more-vertical\" />} />",
       "props": [
         "variant",
         "size",
@@ -997,6 +1031,16 @@
       "propDocs": "What the checkbox holds: the label of a chip, or the content of a card. Overrides the group's size for this chip alone."
     },
     {
+      "name": "CheckboxGrid",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / CheckboxGrid",
+      "doc": "New Components/SelectableCard CheckboxGrid",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "CheckboxGroup",
       "kind": "component",
       "file": "src/components/Checkbox/Checkbox.tsx",
@@ -1023,6 +1067,16 @@
       "area": "Checkbox",
       "summary": "Story: New Components/Checkbox / Chips",
       "doc": "New Components/Checkbox Chips",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Chips",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / Chips",
+      "doc": "New Components/SelectableCard Chips",
       "props": [],
       "propDocs": ""
     },
@@ -1177,12 +1231,32 @@
       "propDocs": ""
     },
     {
+      "name": "ClickBehaviours",
+      "kind": "story",
+      "file": "src/components/ActionCard/ActionCard.stories.tsx",
+      "area": "ActionCard",
+      "summary": "Story: New Components/ActionCard / ClickBehaviours",
+      "doc": "New Components/ActionCard ClickBehaviours",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Closable",
       "kind": "story",
       "file": "src/components/Tabs/Tabs.stories.tsx",
       "area": "Tabs",
       "summary": "Story: New Components/Tabs / Closable",
       "doc": "New Components/Tabs Closable",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ClosingOptions",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ClosingOptions",
+      "doc": "New Components/Drawer ClosingOptions",
       "props": [],
       "propDocs": ""
     },
@@ -1724,6 +1798,16 @@
       "propDocs": "The value shown, and the text the button copies - the whole of it, even when the line cuts it short. The field's name, above the line at 13/500. It also names the copy button (\"Copy Base URL\") and the masked dots (\"Hidden Base URL\"). Something beside the label - an InfoTip, usually. Shown only with a `label`. Shows the library's SecretDots in place of the value. The button still copies the real value; pass `copyable={false}` when it must not. The value in the monospace face. Off for plain words. Shows the copy button. Off for a value there is nothing to copy from. The copy button's accessible name. Defaults to \"Copy {label}\", or \"Copy\" without a label. The word in the tooltip while the pointer rests on the button. After a press it reads \"Copied\" for 1.4 seconds. Called with the value after every copy."
     },
     {
+      "name": "CopyOnClick",
+      "kind": "story",
+      "file": "src/components/IconTile/IconTile.stories.tsx",
+      "area": "IconTile",
+      "summary": "Story: New Components/IconTile / CopyOnClick",
+      "doc": "New Components/IconTile CopyOnClick",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "CouldNotLoad",
       "kind": "story",
       "file": "src/components/Table/DataTable.stories.tsx",
@@ -2050,6 +2134,16 @@
       "area": "Resizable",
       "summary": "Story: Components/Resizable / DashboardLayout",
       "doc": "Components/Resizable DashboardLayout",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Dashed",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: New Components/Button / Dashed",
+      "doc": "New Components/Button Dashed",
       "props": [],
       "propDocs": ""
     },
@@ -3059,6 +3153,16 @@
       "area": "Tooltip Old",
       "summary": "Story: Deprecated/Tooltip Old / Default",
       "doc": "Deprecated/Tooltip Old Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "DeleteWithReplacement",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / DeleteWithReplacement",
+      "doc": "Components/ConfirmDialog DeleteWithReplacement",
       "props": [],
       "propDocs": ""
     },
@@ -4121,6 +4225,16 @@
       "propDocs": ""
     },
     {
+      "name": "Fixed",
+      "kind": "story",
+      "file": "src/components/Button/Button.stories.tsx",
+      "area": "Button",
+      "summary": "Story: New Components/Button / Fixed",
+      "doc": "New Components/Button Fixed",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "FixedLength",
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
@@ -4269,6 +4383,16 @@
       "doc": "FormDescription component for displaying descriptive text for form fields. ```tsx // Default description <FormDescription> This is your public display name. </FormDescription> // Info description <FormDescription color=\"info\"> Your password must be at least 8 characters. </FormDescription> // Warning description <FormDescription color=\"warning\"> This action cannot be undone. </FormDescription> ```",
       "props": ["children"],
       "propDocs": "Content to display inside the description"
+    },
+    {
+      "name": "FormDialog",
+      "kind": "story",
+      "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
+      "area": "ConfirmDialog",
+      "summary": "Story: Components/ConfirmDialog / FormDialog",
+      "doc": "Components/ConfirmDialog FormDialog",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "FormExample",
@@ -4916,8 +5040,8 @@
       "kind": "component",
       "file": "src/components/IconTile/IconTile.tsx",
       "area": "IconTile",
-      "summary": "IconTile - a tinted container for a single icon.",
-      "doc": "IconTile - a tinted container for a single icon. ```tsx <IconTile icon={<Icon name=\"server\" />} tone=\"blue\" /> <IconTile icon={<Icon name=\"check\" />} tone=\"green\" shape=\"circle\" size=\"xl\" /> ```",
+      "summary": "",
+      "doc": "",
       "props": [],
       "propDocs": ""
     },
@@ -5172,12 +5296,22 @@
       "propDocs": ""
     },
     {
+      "name": "InlineEdit",
+      "kind": "story",
+      "file": "src/components/ActionCard/ActionCard.stories.tsx",
+      "area": "ActionCard",
+      "summary": "Story: New Components/ActionCard / InlineEdit",
+      "doc": "New Components/ActionCard InlineEdit",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "InlineTags",
       "kind": "component",
       "file": "src/components/InlineTags/InlineTags.tsx",
       "area": "InlineTags",
-      "summary": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place.",
-      "doc": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place. ```tsx <InlineTags value={tags} onChange={setTags} suggestions={['Pilot', 'APAC']} options={everyTagUsedBefore} /> ```",
+      "summary": "InlineTags - a record's tags with a picker to change them: inline in a row, or from a table cell.",
+      "doc": "InlineTags - a record's tags with a picker to change them: inline in a row, or from a table cell. ```tsx <InlineTags value={tags} onChange={setTags} options={everyTagUsedBefore} counts={usage} /> <InlineTags variant=\"popover\" value={row.tags} onChange={(t) => save(row, t)} options={everyTagUsedBefore} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -6335,6 +6469,16 @@
       "propDocs": ""
     },
     {
+      "name": "metaLine",
+      "kind": "utility",
+      "file": "src/components/_internal/MetaLine/metaLine.tsx",
+      "area": "_internal",
+      "summary": "metaLine - a meta line's parts split by a short hairline: \"SAML 2.0 | 2,104 sign-ins\".",
+      "doc": "metaLine - a meta line's parts split by a short hairline: \"SAML 2.0 | 2,104 sign-ins\". Shared by ActionCard and SheetIdentity so the separator is drawn one way.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Mixed",
       "kind": "story",
       "file": "src/components/KpiCard/KpiStrip.stories.tsx",
@@ -6581,6 +6725,16 @@
       "propDocs": ""
     },
     {
+      "name": "NestedPages",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / NestedPages",
+      "doc": "New Components/Drawer NestedPages",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "NestedPanels",
       "kind": "story",
       "file": "src/components/Resizable/Resizable.stories.tsx",
@@ -6777,6 +6931,16 @@
       "area": "Table Old Cell Recipes",
       "summary": "Story: Deprecated/Table Old Cell Recipes / Numeric",
       "doc": "Deprecated/Table Old Cell Recipes Numeric",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ObjectDrawer",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ObjectDrawer",
+      "doc": "New Components/Drawer ObjectDrawer",
       "props": [],
       "propDocs": ""
     },
@@ -7343,6 +7507,16 @@
     {
       "name": "Playground",
       "kind": "story",
+      "file": "src/components/ActionCard/ActionCard.stories.tsx",
+      "area": "ActionCard",
+      "summary": "Story: New Components/ActionCard / Playground",
+      "doc": "New Components/ActionCard Playground",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Playground",
+      "kind": "story",
       "file": "src/components/Badge/Badge.stories.tsx",
       "area": "Badge",
       "summary": "Story: New Components/Badge / Playground",
@@ -7401,6 +7575,16 @@
       "propDocs": "The controlled open state of the popover Callback when the open state changes The modality of the popover. When set to true, interaction with outside elements will be disabled"
     },
     {
+      "name": "Popover",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / Popover",
+      "doc": "Components/InlineTags Popover",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PopoverAnchor",
       "kind": "component",
       "file": "src/components/Popover/Popover.tsx",
@@ -7429,6 +7613,16 @@
       "doc": "The floating panel: the overlay surface, 4 under its trigger, 16 of padding, 288 wide unless told otherwise.",
       "props": ["align", "sideOffset"],
       "propDocs": "The preferred alignment against the trigger The distance in pixels from the trigger"
+    },
+    {
+      "name": "PopoverEmpty",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / PopoverEmpty",
+      "doc": "Components/InlineTags PopoverEmpty",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "PopoverOld",
@@ -7571,6 +7765,16 @@
       "propDocs": ""
     },
     {
+      "name": "ProfileDrawer",
+      "kind": "story",
+      "file": "src/components/Sheet/Drawer.stories.tsx",
+      "area": "Drawer",
+      "summary": "Story: New Components/Drawer / ProfileDrawer",
+      "doc": "New Components/Drawer ProfileDrawer",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "ProfileExample",
       "kind": "story",
       "file": "src/components/Popover/Popover.stories.tsx",
@@ -7659,6 +7863,16 @@
       "doc": "RadioGroupItem component for individual radio button items. ```tsx // Default radio <RadioGroupItem value=\"option1\" id=\"r1\" /> // Card variant <RadioGroupItem value=\"option1\" id=\"r1\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Option 1</div> <div className=\"text-sm text-muted-foreground\">Description</div> </div> </div> </RadioGroupItem> // One segment of a segmented group <RadioGroupItem value=\"low\">Low</RadioGroupItem> ```",
       "props": ["children", "size"],
       "propDocs": "What the item holds: the label of a segment, or the content of a card. Overrides the group's size for this segment alone."
+    },
+    {
+      "name": "RadioWithFollowUp",
+      "kind": "story",
+      "file": "src/components/SelectableCard/SelectableCard.stories.tsx",
+      "area": "SelectableCard",
+      "summary": "Story: New Components/SelectableCard / RadioWithFollowUp",
+      "doc": "New Components/SelectableCard RadioWithFollowUp",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "ReadOnly",
@@ -8161,6 +8375,37 @@
       "propDocs": ""
     },
     {
+      "name": "SelectableCard",
+      "kind": "component",
+      "file": "src/components/SelectableCard/SelectableCard.tsx",
+      "area": "SelectableCard",
+      "summary": "SelectableCard - one answer in a SelectableCardGroup, or a checkbox card on its own.",
+      "doc": "SelectableCard - one answer in a SelectableCardGroup, or a checkbox card on its own. Put a picker in `children` to ask the follow-up in place. <SelectableCard value=\"existing\" title=\"Replace with an existing access profile\" description=\"Every holder moves to the chosen profile.\"> {mode === 'existing' && <Select … />} </SelectableCard>",
+      "props": [
+        "value",
+        "checked",
+        "onCheckedChange",
+        "type",
+        "title",
+        "description",
+        "icon",
+        "tag",
+        "disabled",
+        "children"
+      ],
+      "propDocs": "This card's answer in a radio set. A checkbox card's state, when it is not in a radio set. Called with the new state when a checkbox card is pressed. A card outside any group is a checkbox. @default 'checkbox' The card's name: also its accessible name. The line under the title: also its accessible description. Not drawn on a chip. A bare glyph on the title's line. A hairline tag beside the title (\"Fastest\"), never filled. Holds this card. What the card holds under its words: a picker, a hint, an action. Anything interactive here keeps its press to itself and never picks the card."
+    },
+    {
+      "name": "SelectableCardGroup",
+      "kind": "component",
+      "file": "src/components/SelectableCard/SelectableCard.tsx",
+      "area": "SelectableCard",
+      "summary": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set.",
+      "doc": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set. <SelectableCardGroup value={mode} onValueChange={setMode} aria-labelledby=\"mode-label\"> <SelectableCard value=\"replace\" title=\"Replace with an existing profile\" description=\"…\" /> <SelectableCard value=\"remove\" title=\"Remove without replacement\" description=\"…\" /> </SelectableCardGroup>",
+      "props": ["type", "value", "onValueChange", "layout", "columns", "disabled"],
+      "propDocs": " The chosen card's `value` in a radio set. Called with the picked card's `value` in a radio set.  A grid of 2 or 3 columns. Unset, the grid fits as many 220px columns as it can. Holds every card in the set."
+    },
+    {
       "name": "SelectableRows",
       "kind": "story",
       "file": "src/components/TableOld/TableOld.stories.tsx",
@@ -8437,8 +8682,18 @@
       "area": "Sheet",
       "summary": "SheetContent - the main content container for the sheet.",
       "doc": "SheetContent - the main content container for the sheet. `layout=\"drawer\"` is the console's drawer frame, composed from `SheetHeader` (title, actions, ✕ in one row), `SheetBand` (tabs or a stepper), `SheetBody` (scrolls) and `SheetFooter` (start group left, end group right). `size` picks the width from the drawer scale. ```tsx <Sheet> <SheetTrigger asChild> <Button>Open Sheet</Button> </SheetTrigger> <SheetContent side=\"right\"> <SheetHeader> <SheetTitle>Sheet Title</SheetTitle> <SheetDescription>Sheet description</SheetDescription> </SheetHeader> <p>Sheet content goes here</p> <SheetFooter> <Button>Action</Button> </SheetFooter> </SheetContent> </Sheet> ``` ```tsx <SheetContent size=\"lg\" layout=\"drawer\" inset={20}> <SheetHeader actions={<RowMenu />}> <SheetTitle>Asha Rao</SheetTitle> </SheetHeader> <SheetBand> <Tabs>…</Tabs> </SheetBand> <SheetBody>…</SheetBody> <SheetFooter start={<Button variant=\"destructiveGhost\">Delete</Button>}> <SheetClose asChild><Button variant=\"ghost\">Cancel</Button></SheetClose> <Button>Save</Button> </SheetFooter> </SheetContent> ```",
-      "props": ["side", "showCloseButton", "size", "layout", "inset"],
-      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button pinned to the corner The width from the drawer scale (left and right sheets only): sm 480 · md 560 · lg 720 · xl 780. Unset keeps the original width (75% on mobile, capped at 24rem). A width class in `className` still wins. `drawer` turns the content into the console's drawer frame - compose it from `SheetHeader`, `SheetBand`, `SheetBody` and `SheetFooter`. The side inset of the drawer frame's header, band, body and footer, in px."
+      "props": [
+        "side",
+        "showCloseButton",
+        "size",
+        "width",
+        "layout",
+        "inset",
+        "closeOnOutsideClick",
+        "closeOnEscape",
+        "overlay"
+      ],
+      "propDocs": "The side of the screen the sheet slides in from Whether to show the close button pinned to the corner The width from the drawer scale (left and right sheets only): sm 480 · md 560 · lg 720 · xl 780. Unset keeps the original width (75% on mobile, capped at 24rem). A width class in `className` still wins. A free width for a left or right sheet, instead of the `size` scale: a number is pixels (`600`), a string is any CSS length (`'40%'`, `'600px'`, `'50vw'`). Wins over `size`, and never grows past the screen. `drawer` turns the content into the console's drawer frame - compose it from `SheetHeader`, `SheetBand`, `SheetBody` and `SheetFooter`. The side inset of the drawer frame's header, band, body and footer, in px. Whether a press outside the panel - on the scrim, or on the page when there is no scrim - closes it. Turn it off for a form whose draft a stray click would lose. Whether Escape closes it. A control marked `data-escape-stays` keeps the key either way. Whether the scrim dims the page behind. Without it the page still cannot be used while the panel is open; pass `modal={false}` on `Sheet` as well to keep the page live beside it."
     },
     {
       "name": "SheetDescription",
@@ -8449,6 +8704,16 @@
       "doc": "SheetDescription - secondary text below the title.",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "SheetField",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right.",
+      "doc": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right. The same row reads a record and edits it. <SheetField label=\"Email\">sarah.johnson@company.com</SheetField> <SheetField label=\"Job title\" htmlFor=\"job\"><Input id=\"job\" defaultValue=\"HR Coordinator\" /></SheetField>",
+      "props": ["label", "htmlFor", "children"],
+      "propDocs": "The label on the left, in the slate ink. Ties the label to a control on the right, so a press on the label focuses it. The value or the control on the right."
     },
     {
       "name": "SheetFooter",
@@ -8471,6 +8736,36 @@
       "propDocs": "Controls at the right end of the header row, before the close - a ⋮ menu, say. Drawer layout only. Whether the header row carries the close (✕), centred on the title. Drawer layout only."
     },
     {
+      "name": "SheetIdentity",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles).",
+      "doc": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles). <SheetIdentity mark={<IconTile icon={<Icon name=\"key-round\" />} tone=\"blue\" size=\"xl\" />} name=\"Helpdesk Access\" status={<Badge tone=\"success\" dot>Active</Badge>} lines={[['IT Support, Security Team', 'Teams'], ['Created by Natasha Manglore', '12 Aug 2026']]} actions={<Button variant=\"outline\" size=\"sm\">Edit</Button>} />",
+      "props": ["mark", "name", "status", "lines", "actions", "children"],
+      "propDocs": "The mark on the left: an IconTile, an Avatar, a logo. The object's name, 16/600, truncated on one line. A Badge beside the name: Active, Tenant owner. The lines under the name, in the quiet ink. A line given as an array is split by short hairlines: `['IT Support, Security Team', 'Teams']`. Controls at the top right: Edit, the ⋯ menu. What sits under the identity row: a strip of key facts, say."
+    },
+    {
+      "name": "SheetNavigation",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back.",
+      "doc": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back. Generic: any page can push any other, as deep as it needs. Put it inside `SheetContent`; it starts over at `root` every time the drawer opens, because the content unmounts when it closes. <SheetContent layout=\"drawer\"> <SheetNavigation root={{ id: 'view', title: 'User management' }}> <SheetHeader><SheetTitle><SheetNavigationTitle /></SheetTitle></SheetHeader> <SheetPage id=\"view\"><ProfileView /></SheetPage> <SheetPage id=\"edit\"><EditForm /></SheetPage> </SheetNavigation> </SheetContent> // anywhere inside: const { push, back } = useSheetNavigation(); // push({ id: 'edit', title: 'Edit details' })",
+      "props": ["root", "onPageChange", "children"],
+      "propDocs": "The page the drawer opens on. Called with the new current page and the whole stack after every push, back and reset."
+    },
+    {
+      "name": "SheetNavigationTitle",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetNavigationTitle - the header's words: the first page's title on its own, and on any page after it the trail with a back button (the Breadcrumb's drawer form).",
+      "doc": "SheetNavigationTitle - the header's words: the first page's title on its own, and on any page after it the trail with a back button (the Breadcrumb's drawer form). Put it inside SheetTitle, so the drawer is named by its place. Focus follows the page: after a push it lands on back, after the last back on the title - the button that was pressed has gone with its page.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "SheetOverlay",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
@@ -8481,6 +8776,16 @@
       "propDocs": ""
     },
     {
+      "name": "SheetPage",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page.",
+      "doc": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page. A page brings its own SheetBand, SheetBody and SheetFooter.",
+      "props": ["id", "children"],
+      "propDocs": "Matches a SheetNavigationEntry's id."
+    },
+    {
       "name": "SheetPortal",
       "kind": "component",
       "file": "src/components/Sheet/Sheet.tsx",
@@ -8489,6 +8794,16 @@
       "doc": "SheetPortal - renders sheet content in a portal.",
       "props": [],
       "propDocs": ""
+    },
+    {
+      "name": "SheetSection",
+      "kind": "component",
+      "file": "src/components/Sheet/SheetParts.tsx",
+      "area": "Sheet",
+      "summary": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content.",
+      "doc": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content. Sections that follow one another are split by a hairline, never by a card inside a drawer. <SheetSection title=\"Access details\" hint=\"Set how long guest users can access your organization\"> <SheetField label=\"Access started\">Apr 1, 2026</SheetField> </SheetSection>",
+      "props": ["title", "hint", "action", "children"],
+      "propDocs": "The heading, 14/600. One quiet line under the heading. A control at the right end of the heading row: Add, Edit."
     },
     {
       "name": "SheetTitle",
@@ -10474,6 +10789,16 @@
       "propDocs": ""
     },
     {
+      "name": "TagPicker",
+      "kind": "component",
+      "file": "src/components/InlineTags/TagPicker.tsx",
+      "area": "InlineTags",
+      "summary": "The list, its groups, and the Apply / Cancel footer.",
+      "doc": "The list, its groups, and the Apply / Cancel footer. The surface around it is the caller's.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TagPill",
       "kind": "component",
       "file": "src/components/TagPill/TagPill.tsx",
@@ -11382,6 +11707,16 @@
       "propDocs": ""
     },
     {
+      "name": "useForm",
+      "kind": "hook",
+      "file": "src/components/Form/useForm.ts",
+      "area": "Form",
+      "summary": "useForm - one form's values, checks and Save rule, for every form in the library.",
+      "doc": "useForm - one form's values, checks and Save rule, for every form in the library. Save waits until something has changed and every required field is filled; a wrong format shows when the field is left or Save is pressed, not while typing; a submit with a problem focuses the first field that has one. const form = useForm({ initialValues: { name: 'Helpdesk Access', email: '' }, rules: { name: { required: 'Enter a name' }, email: { required: true, validate: (v) => (/@/.test(v) ? undefined : 'Enter a valid email') }, }, onSubmit: save, }); <Form id=\"edit\" onSubmit={form.handleSubmit}> <Input label=\"Name\" {...form.field('name')} /> </Form> <Button type=\"submit\" form=\"edit\" disabled={!form.canSubmit}>Save changes</Button>",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "useInfiniteScrollOld",
       "kind": "hook",
       "file": "src/components/TableOld/useInfiniteScroll.ts",
@@ -11448,6 +11783,26 @@
       "area": "TableOld",
       "summary": "Holds a table's saved views.",
       "doc": "Holds a table's saved views. A view is a name for a table you have set up - the columns you kept, the sort you chose, the filters you applied - so you can get back to it tomorrow without doing it again. It is the payoff for everything in 5a to 5f: each of those controls already reports its state, and this is what makes that state worth something. Like the rest of TableOld, **it holds state and never touches your rows**, and it does not persist anything either. Pass `initial` in and write `onChange` out; where they go is the product's decision, and the interesting ones - views shared with a team, views in a URL - are impossible for a hook that assumed `localStorage`. ```tsx const current = useMemo(() => ({ columns: cols.state, sort: sort.rules }), [cols.state, sort.rules]); const views = useSavedViewsOld({ current, initial: stored }); // Applying one: const next = views.apply(id); if (next) { cols.restore(next.columns); sort.restore(next.sort); } ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSheetLeaveGuard",
+      "kind": "hook",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "useSheetLeaveGuard - lets a page stop back from leaving it: return `false` to stay (open \"Discard unsaved changes?\", say), then call `back({ force: true })` once the answer is yes.",
+      "doc": "useSheetLeaveGuard - lets a page stop back from leaving it: return `false` to stay (open \"Discard unsaved changes?\", say), then call `back({ force: true })` once the answer is yes. It guards the page it is used in, and only while that page is mounted. useSheetLeaveGuard(() => { if (!dirty) return true; setAsking(true); return false; });",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useSheetNavigation",
+      "kind": "hook",
+      "file": "src/components/Sheet/SheetNavigation.tsx",
+      "area": "Sheet",
+      "summary": "useSheetNavigation - the drawer's page stack, from anywhere inside a SheetNavigation: `push` a page, go `back`, `reset` to the first, and read where you are (`current`, `depth`, `stack`).",
+      "doc": "useSheetNavigation - the drawer's page stack, from anywhere inside a SheetNavigation: `push` a page, go `back`, `reset` to the first, and read where you are (`current`, `depth`, `stack`).",
       "props": [],
       "propDocs": ""
     },
@@ -11608,6 +11963,16 @@
       "area": "TableOld2",
       "summary": "One sort at a time, as on the console.",
       "doc": "One sort at a time, as on the console. The heading and the toolbar Sort menu share it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTagDraft",
+      "kind": "hook",
+      "file": "src/components/InlineTags/TagPicker.tsx",
+      "area": "InlineTags",
+      "summary": "The picker's state: the draft, the search, the highlighted row, and the slide that follows a tick.",
+      "doc": "The picker's state: the draft, the search, the highlighted row, and the slide that follows a tick.",
       "props": [],
       "propDocs": ""
     },

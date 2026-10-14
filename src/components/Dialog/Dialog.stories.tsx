@@ -316,12 +316,8 @@ export const Sizes: Story = {
 
     return (
       <div className="mdt-flex mdt-flex-wrap mdt-gap-2">
-        {(
-          [
-            'sm',
-            'md',
-          ] /* the console's MODAL_WIDTHS: sm 448 and md 512; lg, xl and full have no console twin */ as const
-        ).map((option) => (
+        {/* the console's MODAL_WIDTHS: sm 448 and md 512; lg, xl and full have no console twin */}
+        {(['sm', 'md'] as const).map((option) => (
           <Button
             key={option}
             variant="outline"
