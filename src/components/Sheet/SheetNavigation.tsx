@@ -12,11 +12,11 @@ import { Breadcrumb } from '../Breadcrumb';
 import type {
   SheetNavigationEntry,
   SheetNavigationProps,
-  SheetNavigationValue,
+  UseSheetNavigationReturn,
   SheetPageProps,
 } from './Sheet.types';
 
-const NavigationContext = createContext<SheetNavigationValue | null>(null);
+const NavigationContext = createContext<UseSheetNavigationReturn | null>(null);
 /** The pages' leave guards by depth - private to useSheetLeaveGuard. */
 const GuardContext = createContext<Map<number, () => boolean>>(new Map());
 
@@ -80,7 +80,7 @@ const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps)
     change([root]);
   }, [change, root]);
 
-  const value = useMemo<SheetNavigationValue>(
+  const value = useMemo<UseSheetNavigationReturn>(
     () => ({
       stack,
       current: stack[stack.length - 1] ?? root,
@@ -104,7 +104,7 @@ const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps)
  * SheetNavigation: `push` a page, go `back`, `reset` to the first, and read
  * where you are (`current`, `depth`, `stack`).
  */
-const useSheetNavigation = (): SheetNavigationValue => {
+const useSheetNavigation = (): UseSheetNavigationReturn => {
   const value = useContext(NavigationContext);
   if (value === null) throw new Error('useSheetNavigation must be used inside a SheetNavigation.');
   return value;
