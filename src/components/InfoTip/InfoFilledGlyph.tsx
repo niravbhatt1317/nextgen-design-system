@@ -2,6 +2,15 @@
  * 2026-10-13). The console's one info icon since 2026-10-11 ("we will be using the filled info icon everywhere"); the
  * library's Icon registry carries only the outline info-circle, so the glyph travels with InfoTip until the registry
  * takes it. Drawn in currentColor, sized by its class. */
+/**
+ * InfoFilledGlyph - the filled ⓘ mark, drawn in currentColor and sized by its class.
+ *
+ * **A third inline `<svg>` in shipped code, which the icon rule does not allow** - only `Icon.tsx`
+ * and `Spinner.tsx` may carry one. It is here because the registry has the outline `info-circle`
+ * and not Tabler's filled one, and adding an icon name is a decision for the design owner. The
+ * fix is `tabler-info-circle-filled` hand-added to the set, the way the other nine Tabler icons
+ * were, after which this file goes.
+ */
 export const InfoFilledGlyph = ({ className }: { className?: string | undefined }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

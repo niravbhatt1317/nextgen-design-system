@@ -31,7 +31,7 @@ import type { ConfirmDialogProps } from './ConfirmDialog.types';
  * Delete, Remove or Permanently delete (Pranjal, 2026-10-11 design picks).
  */
 const meta: Meta<typeof ConfirmDialog> = {
-  title: 'Components/ConfirmDialog',
+  title: 'New Components/ConfirmDialog',
   component: ConfirmDialog,
   tags: ['autodocs'],
   parameters: {

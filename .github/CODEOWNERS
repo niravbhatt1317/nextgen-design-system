@@ -1,0 +1,15 @@
+# Every file in this repository is owned by the design owner.
+#
+# With `require_code_owner_reviews` on `main`, a pull request cannot merge until
+# @niravbhatt1317 approves it. One approval from any other collaborator is no
+# longer enough - that was the gap this file closes. Five people have write
+# access, so "one approval" previously meant any two of them could clear a
+# change between themselves.
+#
+# Worth knowing before this puzzles someone: GitHub does not let anyone approve
+# their own pull request, so a pull request opened by @niravbhatt1317 can never
+# collect a code-owner approval. Those merge through the admin bypass, which
+# stays available because `enforce_admins` is off. That is deliberate, not an
+# oversight - it is what keeps the owner able to land their own work.
+
+* @niravbhatt1317

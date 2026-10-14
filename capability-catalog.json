@@ -1,12 +1,12 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1290,
+  "capabilityCount": 1294,
   "counts": {
-    "story": 882,
-    "component": 323,
+    "story": 884,
+    "component": 324,
     "utility": 47,
-    "hook": 38
+    "hook": 39
   },
   "capabilities": [
     {
@@ -5250,8 +5250,8 @@
       "kind": "component",
       "file": "src/components/InfoTip/InfoFilledGlyph.tsx",
       "area": "InfoTip",
-      "summary": "",
-      "doc": "",
+      "summary": "InfoFilledGlyph - the filled ⓘ mark, drawn in currentColor and sized by its class.",
+      "doc": "InfoFilledGlyph - the filled ⓘ mark, drawn in currentColor and sized by its class. **A third inline `<svg>` in shipped code, which the icon rule does not allow** - only `Icon.tsx` and `Spinner.tsx` may carry one. It is here because the registry has the outline `info-circle` and not Tabler's filled one, and adding an icon name is a decision for the design owner. The fix is `tabler-info-circle-filled` hand-added to the set, the way the other nine Tabler icons were, after which this file goes.",
       "props": [],
       "propDocs": ""
     },
@@ -5310,8 +5310,8 @@
       "kind": "component",
       "file": "src/components/InlineTags/InlineTags.tsx",
       "area": "InlineTags",
-      "summary": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place.",
-      "doc": "InlineTags - a row of tags with an \"Add tag\" that opens a field in place. ```tsx <InlineTags value={tags} onChange={setTags} suggestions={['Pilot', 'APAC']} options={everyTagUsedBefore} /> ```",
+      "summary": "InlineTags - a record's tags with a picker to change them: inline in a row, or from a table cell.",
+      "doc": "InlineTags - a record's tags with a picker to change them: inline in a row, or from a table cell. ```tsx <InlineTags value={tags} onChange={setTags} options={everyTagUsedBefore} counts={usage} /> <InlineTags variant=\"popover\" value={row.tags} onChange={(t) => save(row, t)} options={everyTagUsedBefore} /> ```",
       "props": [],
       "propDocs": ""
     },
@@ -7089,8 +7089,8 @@
       "kind": "component",
       "file": "src/components/OverflowCount/OverflowCount.tsx",
       "area": "OverflowCount",
-      "summary": "",
-      "doc": "",
+      "summary": "OverflowCount - the quiet \"+N\" that ends a row of badges, avatars or tags, with the hidden values in its tooltip.",
+      "doc": "OverflowCount - the quiet \"+N\" that ends a row of badges, avatars or tags, with the hidden values in its tooltip. One counter everywhere (Pranjal, 2026-10-11): the value wears the badge, the counter does not. `Table`'s TagList renders this rather than its own copy - it was drawn twice for one release and that is exactly how two of them drift.",
       "props": [],
       "propDocs": ""
     },
@@ -7575,6 +7575,16 @@
       "propDocs": "The controlled open state of the popover Callback when the open state changes The modality of the popover. When set to true, interaction with outside elements will be disabled"
     },
     {
+      "name": "Popover",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / Popover",
+      "doc": "Components/InlineTags Popover",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "PopoverAnchor",
       "kind": "component",
       "file": "src/components/Popover/Popover.tsx",
@@ -7603,6 +7613,16 @@
       "doc": "The floating panel: the overlay surface, 4 under its trigger, 16 of padding, 288 wide unless told otherwise.",
       "props": ["align", "sideOffset"],
       "propDocs": "The preferred alignment against the trigger The distance in pixels from the trigger"
+    },
+    {
+      "name": "PopoverEmpty",
+      "kind": "story",
+      "file": "src/components/InlineTags/InlineTags.stories.tsx",
+      "area": "InlineTags",
+      "summary": "Story: Components/InlineTags / PopoverEmpty",
+      "doc": "Components/InlineTags PopoverEmpty",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "PopoverOld",
@@ -10769,6 +10789,16 @@
       "propDocs": ""
     },
     {
+      "name": "TagPicker",
+      "kind": "component",
+      "file": "src/components/InlineTags/TagPicker.tsx",
+      "area": "InlineTags",
+      "summary": "The list, its groups, and the Apply / Cancel footer.",
+      "doc": "The list, its groups, and the Apply / Cancel footer. The surface around it is the caller's.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TagPill",
       "kind": "component",
       "file": "src/components/TagPill/TagPill.tsx",
@@ -11933,6 +11963,16 @@
       "area": "TableOld2",
       "summary": "One sort at a time, as on the console.",
       "doc": "One sort at a time, as on the console. The heading and the toolbar Sort menu share it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "useTagDraft",
+      "kind": "hook",
+      "file": "src/components/InlineTags/TagPicker.tsx",
+      "area": "InlineTags",
+      "summary": "The picker's state: the draft, the search, the highlighted row, and the slide that follows a tick.",
+      "doc": "The picker's state: the draft, the search, the highlighted row, and the slide that follows a tick.",
       "props": [],
       "propDocs": ""
     },

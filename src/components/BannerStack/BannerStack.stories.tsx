@@ -8,7 +8,7 @@ import type { BannerStackItem } from './BannerStack.types';
  * OrgDetail.jsx feed it - the state notice, the import results and the profile nudge, each with its priority. */
 
 const meta: Meta<typeof BannerStack> = {
-  title: 'Components/BannerStack',
+  title: 'New Components/BannerStack',
   component: BannerStack,
   tags: ['autodocs'],
   parameters: {
