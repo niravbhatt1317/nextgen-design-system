@@ -1,5 +1,120 @@
 # Changelog
 
+## 2.3.0
+
+### Minor Changes
+
+- 9d6f8f5: `ActionCard` - the settings row card the console hand-built as `MethodCard` / `.st-method`, now in the library
+  (Kevin, 2026-10-13).
+
+  Three faces - `default`, a dashed `add` and an inline `edit` - plus `dim`, a badge and a meta line, and the full title in
+  a tooltip when it is cut off. Right-side slots take a switch, a button or a ⋯ menu. The whole card is clickable through
+  `onClick` or `href` (`clickable={false}` turns that off) while the controls inside it keep working on their own, so a
+  switch in the corner does not also open the card.
+
+- 9d6f8f5: Button gains two looks, taking it from seven to nine (Kevin, 2026-10-13).
+
+  `variant="fixed"` is the outline face that does **not** follow the theme: the same white fill, light border and dark
+  label on a light page and a dark one. It runs on seven new `--mdt-fixed-*` tokens - in light they point at the steps
+  `outline` already uses, and the dark block repeats those light values rather than inverting them. No new colours.
+
+  `variant="dashed"` is the "+ Add tag" action: a dashed blue edge and label on no fill, going solid over a light blue
+  wash under the pointer. It adds no tokens, reusing `--mdt-badge-info-ink` and `-fill`, so dark follows on its own.
+
+  Every existing variant is untouched, including its held-on face.
+
+- 36e1a0e: Twelve parts the console had hand-built, now in the library - ported from their console sources with the same
+  look and behaviour, nothing redesigned (Pranjal, 2026-10-13).
+
+  **New:** `OverflowCount` (the quiet "+N" with its hidden values in a tooltip), `AddPill` (the dashed "+ Add" that
+  ends a row of tags), `CopyField`, `InfoTip`, `EmptyState`, `BannerStack`, `ConfirmDialog`, `PhoneInput`.
+
+  **Changed, every existing prop still working:** `Badge` (a small badge keeps its 12px icon; icon-only small is a
+  20px square), `Avatar` (`status` corner dot, `logo`, `onEdit`), `KpiGauge` (`shape="ring"`, and `bad` turns it
+  red), `Sheet` (`size`, `layout="drawer"`, `SheetBand`, `SheetBody`, footer `start`, header `actions`).
+
+  **One "+N" everywhere.** `Table`'s TagList now renders `OverflowCount` instead of its own copy of the same
+  markup - the two were drawn identically in one release, which is how a pair starts to drift.
+
+  42 new public names, none dropped.
+
+- 9d6f8f5: **Every dialog in the library changes.** `DialogTitle` drops from 18px to **16/24**, and `DialogHeader` gains a rule
+  under it with 14 below the words - except when the header carries tabs, which bring their own underline (Kevin,
+  2026-10-13; approved Nirav, 2026-10-14).
+
+  This is a default, not a variant, so nothing opts out. A dialog title and a drawer title are the same thing at the same
+  level and now read at the same size, which is how the console draws both.
+
+  `ConfirmDialog` drops its own copy of that styling and inherits it, so the two stop being able to drift apart.
+
+- 9d6f8f5: The drawer grows the parts and the navigation the console's drawers were hand-building (Kevin, 2026-10-13).
+
+  `SheetContent` gains `closeOnOutsideClick`, `closeOnEscape` and `overlay`, and a `width` that takes pixels (`600`) or
+  any CSS length (`'40%'`, `'50vw'`); it wins over `size` and never grows past the screen. `modal={false}` on `Sheet`
+  keeps the page live beside the panel.
+
+  New parts: `SheetIdentity` (mark, name, status, meta lines, actions), `SheetSection` (heading, hint, action, a hairline
+  between sections) and `SheetField` (a 50/50 label - value row that both reads a record and edits it).
+
+  New in-drawer navigation: `SheetNavigation`, `SheetPage`, `SheetNavigationTitle` and `useSheetNavigation()` with
+  `push`, `back`, `reset`, `current` and `depth`. Edit swaps the drawer's content in place and the header becomes the
+  trail with a back button - "User management › Edit details" - to any depth. `useSheetLeaveGuard` lets a page stop
+  back from leaving it, so an unsaved form can ask first.
+
+- 9d6f8f5: `IconTile` gains a `tone="outline"` and a copy behaviour (Kevin, 2026-10-13).
+
+  Give a tile `copyValue` (or an `onClick`) and it becomes a real button: hovering lifts it above the tile it overlaps,
+  a bubble shows the value or a `tooltip` with `hint` under it, and a click copies and says `copiedLabel`. Round tiles in
+  a row overlap by 6px - only when they are pressable (Nirav, 2026-10-14).
+
+  The table's `ContactChips` is built on this now instead of carrying its own copy of the same chip.
+
+- 9d6f8f5: `SelectableCard` and `SelectableCardGroup` - the console's option card (its `ui/SelectableCard.jsx`), now in the
+  library (Kevin, 2026-10-13).
+
+  A radio or a checkbox sits at the top right and the whole card is the control. Arrow keys move through a radio set, and
+  a picker inside the body keeps its own presses rather than selecting the card under it. Lays out as a stack, a grid or
+  chips.
+
+- 52ab946: InlineTags: the tag picker, and a `popover` variant for table cells.
+
+  **Selected / Suggested, and ticks are a draft.** The picker lists the record's tags under Selected and
+  everything else under Suggested - `suggestions` first, then by how many records use each (`counts`).
+  Ticking slides a tag between the groups; typing narrows both and offers Create "…" for a word nothing
+  matches. The footer counts the draft ("1 to add · 1 to remove") with Cancel and Apply.
+
+  **`onChange` now fires on Apply**, not on every tick - and still at once when a pill's ✕ is pressed with
+  the picker closed. Nothing is removed from the API, so a caller that saved on every change still works;
+  it is simply called once per Apply instead of once per tag.
+
+  **New props:** `variant` (`inline` | `popover`), `counts`, `trigger`, `emptyLabel`, `label`.
+  `suggestions` and `options` keep their names and meanings; suggestions now head the Suggested list
+  rather than appearing as dashed chips.
+
+  **The search field is a `combobox`.** It drives a listbox that lives in a popover, so it carries
+  `aria-controls` and `aria-activedescendant` - without those the arrow keys move a highlight that only a
+  sighted person can follow. A test querying it by the `textbox` role should ask for `combobox` instead;
+  it is the same element with the role the pattern requires.
+
+- 9d6f8f5: `useForm` - one form's values, checks and Save rule, for every form in the library (Kevin, 2026-10-13).
+
+  `field(name)` binds an Input or a Select. Save turns on only once something has changed, every required field holds a
+  value, and no submit is running; typed back to the start it goes off again. A message waits until the field is left or
+  Save is pressed, rather than appearing while someone is still typing, and a submit with a problem puts focus on the
+  first field that has one. `required` can be a function of the other values. `reset(values)` makes what was just saved
+  the new starting point.
+
+  Five stories, each isolating one of those rules.
+
+### Patch Changes
+
+- b8fd57e: Button and ToolbarButton give an Icon handed in without a size the size they draw it at (16 / 14px), so the stroke
+  ladder picks the small-icon line instead of the 20px default the button then squeezed down. DataTable's row actions and
+  LeftNav's more button stop pinning a 1.5 line.
+
+  The rule is one shared helper rather than a copy per control, so the next control that squeezes its icon gets it too.
+  An icon handed in with an explicit size, or an explicit `strokeWidth`, is left exactly as the caller asked.
+
 ## 2.2.0
 
 ### Minor Changes
