@@ -2,6 +2,34 @@
 
 **On session start:** If `HANDOFF.md` exists in this directory, read it before anything else for the latest state of the work.
 
+**Rulings already made are in [DECISIONS.md](DECISIONS.md).** Read it before arguing with a number
+or a name — the question has often been settled already, with a reason. Add to it when a new one is
+made.
+
+---
+
+## ⏱ Before you open a pull request — the five-line version
+
+Everything below this section is the rulebook. This is the part that gets skipped, so it is first.
+
+1. **`npm run find -- <words>` before you build anything.** Then write what you reused and what you
+   built new **in the pull request body**. A rule that can be skipped in silence is skipped; a
+   written list is either there or visibly missing.
+2. **`npx changeset`** whenever `src/` changes. The published package comes out different, so it
+   needs a line. If it genuinely ships nothing, label the pull request `no changeset` — the label is
+   the record of that decision, which is why it is a label and not a silent pass.
+3. **Name any default you changed.** A variant is opt-in; a default reaches every consumer whether
+   they wanted it or not. It gets its own changeset saying so plainly.
+4. **Name any token or public name you added.** `check:api` is a one-way ratchet — a published name
+   never leaves by accident, so it is permanent from the day it ships.
+5. **Cut the branch fresh from current `main`, and keep it up to date.** `main` requires it. A
+   branch left to drift for a day lands as ten conflicting files instead of one.
+
+**If CI has not run on your branch, you have no evidence of anything.** A conflicted branch gets no
+checks at all — GitHub cannot build the merge it would test, so nothing is dispatched, and the pull
+request page looks the same as one that passed. Resolve the conflict first; it is what buys the
+first real signal.
+
 # CLAUDE.md - AI Assistant Instructions
 
 This file provides context and guidelines for AI assistants working on the Motadata React Library codebase.
