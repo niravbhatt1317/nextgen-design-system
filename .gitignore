@@ -134,3 +134,7 @@ scripts/parity/.local.json
 
 # The built gallery the reviewer reads on :4196 is an output, never committed.
 storybook-badge/
+
+# Agent tool state. A session wrote `.omc/state/...` inside a component folder and it was
+# committed with the component; ignoring it here stops the next one landing the same way.
+.omc/
