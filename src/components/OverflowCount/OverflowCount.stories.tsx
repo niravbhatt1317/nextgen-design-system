@@ -3,7 +3,7 @@ import { OverflowCount } from './OverflowCount';
 import { Badge } from '../Badge';
 
 const meta: Meta<typeof OverflowCount> = {
-  title: 'Components/OverflowCount',
+  title: 'New Components/OverflowCount',
   component: OverflowCount,
   tags: ['autodocs'],
   parameters: {

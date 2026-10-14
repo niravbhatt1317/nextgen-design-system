@@ -10,7 +10,7 @@ import type { PhoneInputProps, PhoneInputValue } from './PhoneInput.types';
  * Ported from the console's PhoneField (Pranjal, 2026-10-13): the site, contact and profile drawers' phone.
  */
 const meta: Meta<typeof PhoneInput> = {
-  title: 'Components/PhoneInput',
+  title: 'New Components/PhoneInput',
   component: PhoneInput,
   tags: ['autodocs'],
   parameters: {

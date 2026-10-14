@@ -3,7 +3,7 @@ import { Icon } from '../Icon';
 import { InfoTip } from './InfoTip';
 
 const meta: Meta<typeof InfoTip> = {
-  title: 'Components/InfoTip',
+  title: 'New Components/InfoTip',
   component: InfoTip,
   tags: ['autodocs'],
   parameters: {

@@ -11,7 +11,7 @@ import { EmptyState } from './EmptyState';
  * Inside a table, the table draws its own blank; this is everywhere else.
  */
 const meta: Meta<typeof EmptyState> = {
-  title: 'Components/EmptyState',
+  title: 'New Components/EmptyState',
   component: EmptyState,
   tags: ['autodocs'],
   parameters: {

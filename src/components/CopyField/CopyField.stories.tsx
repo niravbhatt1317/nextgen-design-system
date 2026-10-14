@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { CopyField } from './CopyField';
 
 const meta: Meta<typeof CopyField> = {
-  title: 'Components/CopyField',
+  title: 'New Components/CopyField',
   component: CopyField,
   tags: ['autodocs'],
   parameters: {
