@@ -45,6 +45,53 @@ Every token exists in two forms:
 All Tailwind classes in this system carry the **`mdt-`** prefix. A class without that prefix
 is not part of this design system.
 
+### ⚠ The CSS-variable form is not one shape
+
+**Read this before writing any `var(--mdt-…)` by hand.** Most colour tokens hold a bare HSL
+triplet, not a colour. `--mdt-primary` resolves to `218 63% 7%` — three numbers. Written as
+`color: var(--mdt-primary)` that is not a colour, so the browser paints **nothing**: no error, no
+warning, no clue. It has to be wrapped —
+`color: hsl(var(--mdt-primary))`. Storing the triplet rather than the colour is what buys the
+`/ 0.12` alpha syntax the components rely on.
+
+**But 46 of the 286 tokens are not triplets**, and wrapping one of those breaks it just as
+silently. What a token holds decides how you write it:
+
+| What it holds             | Count | Write it as                                                            | Which tokens                                                                                                                                              |
+| ------------------------- | ----- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **An HSL triplet**        | 240   | `hsl(var(--mdt-border))`<br>`hsl(var(--mdt-border) / 0.12)` with alpha | every ramp step, every semantic pair, and every alias of one                                                                                              |
+| **A finished colour**     | 24    | `var(--mdt-badge-success-fill)` — **never** wrapped                    | all `--mdt-badge-*` (`-fill`, `-ink`, `-dot` × 8 tones). Several carry an alpha or a `color-mix`, so they cannot be triplets — see [Theming](#5--theming) |
+| **A z-index or an alpha** | 11    | `var(--mdt-z-modal)`                                                   | `--mdt-z-*`, `--mdt-nav-rest-alpha`                                                                                                                       |
+| **A shadow**              | 6     | `box-shadow: var(--mdt-shadow-md)`                                     | `--mdt-shadow-*`                                                                                                                                          |
+| **A length**              | 2     | `var(--mdt-radius)`                                                    | `--mdt-radius`, `--mdt-toast-width`                                                                                                                       |
+| **A font stack**          | 2     | `var(--mdt-font-sans)`                                                 | `--mdt-font-sans`, `--mdt-font-mono`                                                                                                                      |
+| **A percentage**          | 1     | `var(--mdt-ai-gradient-via-position)`                                  | —                                                                                                                                                         |
+
+```css
+/* ✅ a triplet, wrapped */
+border-color: hsl(var(--mdt-border));
+box-shadow: 0 0 0 4px hsl(var(--mdt-nudge) / 0.12);
+
+/* ❌ a triplet, bare — paints nothing, silently */
+border-color: var(--mdt-border);
+
+/* ✅ a finished colour, bare */
+background: var(--mdt-badge-success-fill);
+
+/* ❌ a finished colour, wrapped — invalid, paints nothing */
+background: hsl(var(--mdt-badge-success-fill));
+```
+
+**Why this is written here (2026-10-15).** The console hit it: `--mdt-nudge` is a triplet
+(`→ --mdt-azure-60`, `214 98% 44%`), was used bare, and the halo simply never rendered. The rule
+existed only in § 5 Theming, four hundred lines below — beside the badge tokens, which follow the
+**opposite** rule. Reading the table above was enough to get it wrong, so the shapes now sit with
+the table that introduces them.
+
+**None of this applies to the Tailwind-class form.** `mdt-bg-primary` does the wrapping itself, in
+both themes. **If a class can do the job, use the class** — reach for `var()` only in raw CSS or an
+inline style, where no class can.
+
 ---
 
 ## 1 · Semantic colours
@@ -455,7 +502,8 @@ storybook and the product read one dark theme.
 **The badge tones are tokens too** (since 2026-09-26): `--mdt-badge-<tone>-fill`, `-ink` and `-dot` for
 the eight tones (`neutral`, `slate`, `success`, `warning`, `danger`, `info`, `ai`, `inverse`), 24 in all.
 Unlike the rest of the palette they are **full colours, read with `var(--mdt-badge-success-fill)`**, never
-`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill). Light is
+`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill) — they are
+the 24 exceptions in [the shape table](#-the-css-variable-form-is-not-one-shape). Light is
 declared in `:root`, copied value for value from the badge as Pranjal ruled it on 3 September 2026 (its six
 values without a palette name are still flagged there); dark is written into the generated block from the
 map's badge tier, and `ai`, which the map's badge table does not name yet, rides the purple ramp as before,
