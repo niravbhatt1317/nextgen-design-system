@@ -59,6 +59,15 @@ import { useTableSort } from './useTableSort';
 import type { DataTableFilterGroup, DataTableProps, DataTableQuickFilter } from './DataTable.types';
 import type { TableColumnDef, TableSortDirection } from './Table.types';
 
+/**
+ * A menu heading's own rules - 11px, 600, uppercase, loosely tracked, in the muted
+ * grey. Pranjal set these on the Sort menu (2026-09-11: "users ... other modules
+ * sort should look the same"); the quick-filter menus now read them from here, so
+ * the two cannot drift apart.
+ */
+const MENU_HEADING =
+  'mdt-px-2.5 mdt-pb-1 mdt-pt-1.5 mdt-text-[11px] mdt-font-semibold mdt-uppercase mdt-tracking-[0.04em] mdt-text-neutral-50';
+
 const ACTION_WIDTH = 100;
 const NAME_KEY = '__name';
 /** The Name column's floor when the page declares none: room for a tile and a name. */
@@ -855,6 +864,8 @@ function DataTable<Row>({
           held shut while the square is free, so nothing remounts. */}
       {quickFilters.map((qf) => {
         const set = quick[qf.columnKey] ?? new Set<string>();
+        /* omitted -> the label, which already reads "Filter by status"; null -> no heading */
+        const heading = qf.heading === undefined ? qf.label : qf.heading;
         return (
           <TooltipProvider key={qf.columnKey}>
             <Tooltip {...(quickHeld ? {} : { open: false })}>
@@ -905,6 +916,13 @@ function DataTable<Row>({
                         qf.searchable ? 'mdt-min-w-[240px]' : 'mdt-min-w-48'
                       )}
                     >
+                      {/* THE MENU SAYS WHICH COLUMN IT FILTERS (the console, 2026-10-09): the Sort
+                 menu is headed and this one was not, so a column of ticks had nothing
+                 naming it. `label` already reads "Filter by status", so the default is
+                 just that; `heading: null` restores the old bare menu. */}
+                      {heading !== null && (
+                        <DropdownMenuLabel className={MENU_HEADING}>{heading}</DropdownMenuLabel>
+                      )}
                       {qf.searchable && (
                         /* the search box (Pranjal, 2026-09-17: "it will contain search box as
                    well"): keys stay in the box - the menu's own type-ahead and arrow
@@ -1000,9 +1018,7 @@ function DataTable<Row>({
            * one row per field with the active one in the reading ink carrying ↑ or ↓, the rest in neutral-90, a
            * hairline, and Clear sort always there in the muted grey - live only while a sort is on. */}
           <DropdownMenuContent align="end" className="mdt-w-[220px]">
-            <DropdownMenuLabel className="mdt-px-2.5 mdt-pb-1 mdt-pt-1.5 mdt-text-[11px] mdt-font-semibold mdt-uppercase mdt-tracking-[0.04em] mdt-text-neutral-50">
-              Sort by
-            </DropdownMenuLabel>
+            <DropdownMenuLabel className={MENU_HEADING}>Sort by</DropdownMenuLabel>
             {sortKeys.map((k) => (
               <DropdownMenuItem
                 key={k}
