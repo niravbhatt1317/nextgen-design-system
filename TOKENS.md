@@ -45,6 +45,53 @@ Every token exists in two forms:
 All Tailwind classes in this system carry the **`mdt-`** prefix. A class without that prefix
 is not part of this design system.
 
+### ⚠ The CSS-variable form is not one shape
+
+**Read this before writing any `var(--mdt-…)` by hand.** Most colour tokens hold a bare HSL
+triplet, not a colour. `--mdt-primary` resolves to `218 63% 7%` — three numbers. Written as
+`color: var(--mdt-primary)` that is not a colour, so the browser paints **nothing**: no error, no
+warning, no clue. It has to be wrapped —
+`color: hsl(var(--mdt-primary))`. Storing the triplet rather than the colour is what buys the
+`/ 0.12` alpha syntax the components rely on.
+
+**But 46 of the 286 tokens are not triplets**, and wrapping one of those breaks it just as
+silently. What a token holds decides how you write it:
+
+| What it holds             | Count | Write it as                                                            | Which tokens                                                                                                                                              |
+| ------------------------- | ----- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **An HSL triplet**        | 240   | `hsl(var(--mdt-border))`<br>`hsl(var(--mdt-border) / 0.12)` with alpha | every ramp step, every semantic pair, and every alias of one                                                                                              |
+| **A finished colour**     | 24    | `var(--mdt-badge-success-fill)` — **never** wrapped                    | all `--mdt-badge-*` (`-fill`, `-ink`, `-dot` × 8 tones). Several carry an alpha or a `color-mix`, so they cannot be triplets — see [Theming](#5--theming) |
+| **A z-index or an alpha** | 11    | `var(--mdt-z-modal)`                                                   | `--mdt-z-*`, `--mdt-nav-rest-alpha`                                                                                                                       |
+| **A shadow**              | 6     | `box-shadow: var(--mdt-shadow-md)`                                     | `--mdt-shadow-*`                                                                                                                                          |
+| **A length**              | 2     | `var(--mdt-radius)`                                                    | `--mdt-radius`, `--mdt-toast-width`                                                                                                                       |
+| **A font stack**          | 2     | `var(--mdt-font-sans)`                                                 | `--mdt-font-sans`, `--mdt-font-mono`                                                                                                                      |
+| **A percentage**          | 1     | `var(--mdt-ai-gradient-via-position)`                                  | —                                                                                                                                                         |
+
+```css
+/* ✅ a triplet, wrapped */
+border-color: hsl(var(--mdt-border));
+box-shadow: 0 0 0 4px hsl(var(--mdt-nudge) / 0.12);
+
+/* ❌ a triplet, bare — paints nothing, silently */
+border-color: var(--mdt-border);
+
+/* ✅ a finished colour, bare */
+background: var(--mdt-badge-success-fill);
+
+/* ❌ a finished colour, wrapped — invalid, paints nothing */
+background: hsl(var(--mdt-badge-success-fill));
+```
+
+**Why this is written here (2026-10-15).** The console hit it: `--mdt-nudge` is a triplet
+(`→ --mdt-azure-60`, `214 98% 44%`), was used bare, and the halo simply never rendered. The rule
+existed only in § 5 Theming, four hundred lines below — beside the badge tokens, which follow the
+**opposite** rule. Reading the table above was enough to get it wrong, so the shapes now sit with
+the table that introduces them.
+
+**None of this applies to the Tailwind-class form.** `mdt-bg-primary` does the wrapping itself, in
+both themes. **If a class can do the job, use the class** — reach for `var()` only in raw CSS or an
+inline style, where no class can.
+
 ---
 
 ## 1 · Semantic colours
@@ -336,6 +383,38 @@ The backbone of the system. Surfaces, borders, and text.
 | `--mdt-purple-90`  | `mdt-bg-purple-90`  | `#442299` |
 | `--mdt-purple-100` | `mdt-bg-purple-100` | `#221166` |
 
+### Category colours — five families that carry no meaning (added 2026-09-10)
+
+**`indigo` · `teal` · `magenta` · `cyan` · `lime`** — 11 steps each (`05` … `100`), **55 tokens**,
+light and dark, same ladder shape as every ramp above.
+
+**These exist so a source chip or a letter avatar can be coloured without saying anything.** Reach
+for a status hue and a thing accidentally reads as success, warning or danger; these hues mean
+nothing, which is the point. Before them, chip colours were typed by hand into the chip code because
+the palette had nothing to point at.
+
+| Family    | Anchor                       | Where it came from   | Text shade |
+| --------- | ---------------------------- | -------------------- | ---------- |
+| `indigo`  | `--mdt-indigo-60` `#4f5bc4`  | the LDAP source chip | `-70`      |
+| `teal`    | `--mdt-teal-60` `#31bfb0`    | the SCIM source chip | `-80`      |
+| `magenta` | `--mdt-magenta-60` `#e02495` | a third source       | `-80`      |
+| `cyan`    | `--mdt-cyan-60` `#0f91bd`    | —                    | `-80`      |
+| `lime`    | `--mdt-lime-60` `#659d25`    | —                    | `-80`      |
+
+**The anchor shades are exactly the values those chips already painted**, so nothing on screen moved
+when they landed. Purely additive — not one existing shade was touched.
+
+**Each family publishes a text shade: the lightest step that still reads 4.5:1 on its own `-10`
+tint.** It is not the same step for every family, because a bright hue cannot carry text at a middle
+shade — indigo manages `-70`, the other four need `-80`. Use the family's own number; do not assume
+`-70`.
+
+For a toned **letter avatar**, prefer `Avatar`'s own `tone` prop (`slate` `blue` `green` `amber`
+`rose` `purple`, hashed stable per identity) and the 12 `--mdt-avatar-<tone>-fill` / `-ink` tokens
+behind it. These five families are for **chips and tags**, where the set of categories is open-ended.
+
+---
+
 ### Console foundation colours (added 2026-09-03, names provisional)
 
 The merged console's text and accent colours, added as new steps with their values untouched so the
@@ -455,7 +534,8 @@ storybook and the product read one dark theme.
 **The badge tones are tokens too** (since 2026-09-26): `--mdt-badge-<tone>-fill`, `-ink` and `-dot` for
 the eight tones (`neutral`, `slate`, `success`, `warning`, `danger`, `info`, `ai`, `inverse`), 24 in all.
 Unlike the rest of the palette they are **full colours, read with `var(--mdt-badge-success-fill)`**, never
-`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill). Light is
+`hsl(var(…))`, because several carry an alpha (the inverse dot) or a `color-mix` (the info fill) — they are
+the 24 exceptions in [the shape table](#-the-css-variable-form-is-not-one-shape). Light is
 declared in `:root`, copied value for value from the badge as Pranjal ruled it on 3 September 2026 (its six
 values without a palette name are still flagged there); dark is written into the generated block from the
 map's badge tier, and `ai`, which the map's badge table does not name yet, rides the purple ramp as before,
@@ -479,21 +559,50 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 
 ## Token count
 
-| Group               | Count  |
-| ------------------- | ------ |
-| Core                | 2      |
-| Neutral             | 16     |
-| Red                 | 12     |
-| Orange              | 12     |
-| Yellow              | 11     |
-| Green               | 11     |
-| Blue                | 13     |
-| Purple              | 11     |
-| Ink (console)       | 2      |
-| Azure (console)     | 1      |
-| Emerald (console)   | 1      |
-| **Primitive total** | **92** |
-| Semantic            | 25     |
-| Badge tones         | 24     |
-| Radius              | 1      |
-| Typography          | 2      |
+**286 tokens.** `globals.css` is the source — this table is maintained by hand and a hand-kept count
+drifts, so re-derive it rather than quote it. It read "92 primitive, 25 semantic" until 2026-10-15,
+when the five category families, the avatar tones and the `--mdt-fixed-*` set had already landed and
+gone uncounted: **74 tokens absent from a reference whose job is to list them.**
+
+| Primitives          | Count   |
+| ------------------- | ------- |
+| Core                | 2       |
+| Neutral             | 16      |
+| Red                 | 12      |
+| Orange              | 12      |
+| Yellow              | 11      |
+| Green               | 11      |
+| Blue                | 13      |
+| Purple              | 11      |
+| Indigo (category)   | 11      |
+| Teal (category)     | 11      |
+| Magenta (category)  | 11      |
+| Cyan (category)     | 11      |
+| Lime (category)     | 11      |
+| Ink (console)       | 2       |
+| Azure (console)     | 1       |
+| Emerald (console)   | 1       |
+| **Primitive total** | **147** |
+
+| Semantic and per-component | Count   |
+| -------------------------- | ------- |
+| Semantic                   | 37      |
+| Badge tones                | 24      |
+| Feedback surface           | 20      |
+| Avatar tones               | 12      |
+| Nav                        | 11      |
+| Fixed (theme-invariant)    | 7       |
+| Destructive fill           | 4       |
+| **Subtotal**               | **115** |
+
+| Scales and other | Count  |
+| ---------------- | ------ |
+| Layering (`z`)   | 10     |
+| Elevation        | 6      |
+| AI gradient      | 4      |
+| Typography       | 2      |
+| Radius           | 1      |
+| Sizes            | 1      |
+| **Subtotal**     | **24** |
+
+**147 + 115 + 24 = 286.**
