@@ -8,6 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './DropdownMenu';
@@ -151,7 +153,9 @@ export const WithAHeading: Story = {
 };
 
 /**
- * The quick-filter menu's shape: a checkbox per row, several at once.
+ * Several at once. A ticked row sits on the pale blue-10 ground with its tick on the RIGHT in the reading ink; the
+ * row under the pointer takes only the grey ground and no tick (Pranjal, 2026-10-21: every selection looks the same).
+ * The quick-filter menu swaps the tick for a checkbox square and keeps the pale ground.
  */
 export const WithCheckboxes: Story = {
   play: openTheMenu,
@@ -180,6 +184,34 @@ export const WithCheckboxes: Story = {
               {v}
             </DropdownMenuCheckboxItem>
           ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  },
+};
+
+/**
+ * One of several, as a module switcher picks one: the chosen row looks exactly like a ticked checkbox row - the pale
+ * ground, the tick on the right (Pranjal, 2026-10-21; a dot on the left until then).
+ */
+export const WithRadioItems: Story = {
+  play: openTheMenu,
+  render: function WithRadioItemsStory() {
+    const [module, setModule] = useState('Users');
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <RowActionsButton />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="mdt-w-48">
+          <DropdownMenuLabel>Switch to</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={module} onValueChange={setModule}>
+            {['Users', 'Teams', 'Roles', 'Access profiles'].map((v) => (
+              <DropdownMenuRadioItem key={v} value={v}>
+                {v}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     );

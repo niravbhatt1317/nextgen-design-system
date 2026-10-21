@@ -1722,3 +1722,31 @@ describe('SelectOld2', () => {
     });
   });
 });
+
+/* ONE SELECTION LOOK (Pranjal, 2026-10-21), carried by the deprecated twin too. */
+describe('SelectOld2 - the one selection look', () => {
+  it('multi: the picked row wears the pale ground, an unpicked row shows no tick', async () => {
+    const user = userEvent.setup();
+    render(<SelectOld2 mode="multiple" options={simpleOptions} value={['2']} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+    const unpicked = screen.getByText('Option 1').closest('button');
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+    expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
+    // one tick, and it stays a tick under the pointer - no X swap here either (Nirav, 2026-10-21)
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('single: the picked item keeps one tick and the pale ground, the rest show nothing', async () => {
+    const user = userEvent.setup();
+    render(<SelectOld2 options={simpleOptions} value="2" />);
+    await user.click(screen.getByRole('combobox'));
+    const picked = await screen.findByRole('option', { name: 'Option 2' });
+    const unpicked = screen.getByRole('option', { name: 'Option 1' });
+    expect(picked).toHaveClass('data-[state=checked]:data-[highlighted]:mdt-bg-blue-10');
+    expect(unpicked).toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+    expect(picked.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked.querySelectorAll('svg')).toHaveLength(0);
+  });
+});

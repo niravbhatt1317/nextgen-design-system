@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { Icon } from '../Icon';
 import { Select } from './Select';
 import type { SelectOption, SelectProps } from './Select.types';
 import { cn } from '@/utils';
@@ -1054,7 +1055,9 @@ export const CustomTrigger: Story = {
 };
 
 /**
- * Custom item renderer for rich option display.
+ * Custom item renderer for rich option display. A hand-drawn row still follows the one selection rule (Pranjal,
+ * 2026-10-21): the picked row on the pale blue-10 ground with the tick on the RIGHT in the reading ink; the row under
+ * the pointer takes only the grey ground and no tick.
  */
 export const CustomItem: Story = {
   render: function RenderCustomItem() {
@@ -1071,10 +1074,9 @@ export const CustomItem: Story = {
         renderItem={({ option, selected, disabled }) => (
           <div
             className={cn(
-              'mdt-flex mdt-items-center mdt-gap-3 mdt-rounded-md mdt-p-3',
+              'mdt-flex mdt-items-center mdt-gap-3 mdt-rounded-sm mdt-p-3',
               'mdt-transition-colors',
-              selected && 'mdt-border mdt-border-primary mdt-bg-primary/10',
-              !selected && 'mdt-hover:bg-accent',
+              selected ? 'mdt-bg-blue-10' : 'hover:mdt-bg-neutral-10',
               disabled && 'mdt-cursor-not-allowed mdt-opacity-50'
             )}
           >
@@ -1091,21 +1093,9 @@ export const CustomItem: Story = {
                 <div className="mdt-text-xs mdt-text-muted-foreground">{option.description}</div>
               )}
             </div>
-            {selected && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="mdt-text-primary"
-                aria-hidden="true"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            )}
+            <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center">
+              {selected && <Icon name="check" size={16} aria-hidden />}
+            </span>
           </div>
         )}
       />

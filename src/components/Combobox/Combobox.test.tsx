@@ -755,4 +755,26 @@ describe('Combobox', () => {
     const trigger = screen.getByRole('button', { name: /framework|select/i });
     expect(trigger).toHaveAttribute('aria-describedby', 'custom-desc');
   });
+
+  /* ONE SELECTION LOOK (Pranjal, 2026-10-21): the picked option on the pale ground with the tick on the RIGHT; the
+   * highlighted one only grey, no tick. */
+  it('puts the picked option on the pale ground with its tick on the right', async () => {
+    const user = userEvent.setup();
+    render(<Combobox options={mockOptions} value="vue" aria-label="Framework selection" />);
+    await user.click(screen.getByRole('button', { name: /framework|select/i }));
+    const picked = await screen.findByRole('option', { name: /Vue/ });
+    const unpicked = screen.getByRole('option', { name: /Angular/ });
+    expect(picked).toHaveClass(
+      'mdt-bg-blue-10',
+      'aria-selected:mdt-bg-blue-10',
+      'hover:mdt-bg-blue-10'
+    );
+    expect(picked).not.toHaveClass('aria-selected:mdt-bg-neutral-10');
+    expect(unpicked).toHaveClass('aria-selected:mdt-bg-neutral-10');
+    expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
+    // the tick is the row's LAST child - after the label - shown only on the picked row
+    expect(picked.lastElementChild?.tagName.toLowerCase()).toBe('svg');
+    expect(picked.lastElementChild).toHaveClass('mdt-opacity-100');
+    expect(unpicked.lastElementChild).toHaveClass('mdt-opacity-0');
+  });
 });

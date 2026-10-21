@@ -1763,11 +1763,87 @@ describe('Select - single mode with search', () => {
   it('shows the empty message when nothing matches', async () => {
     const user = userEvent.setup();
     render(
-      <Select mode="single" searchable searchPlaceholder="Search members" emptyMessage="No members match" options={people} placeholder="Select an owner" aria-label="Owner" />
+      <Select
+        mode="single"
+        searchable
+        searchPlaceholder="Search members"
+        emptyMessage="No members match"
+        options={people}
+        placeholder="Select an owner"
+        aria-label="Owner"
+      />
     );
     expect(screen.getByRole('combobox', { name: 'Owner' })).toHaveTextContent('Select an owner');
     await user.click(screen.getByRole('combobox', { name: 'Owner' }));
     await user.type(await screen.findByPlaceholderText('Search members'), 'zzzz');
     expect(await screen.findByText('No members match')).toBeInTheDocument();
+  });
+});
+
+/* ONE SELECTION LOOK (Pranjal, 2026-10-21): the picked option sits on the pale blue-10 ground with the tick on the
+ * right; the option under the pointer or the keys takes only the grey ground and no tick; a picked row keeps its pale
+ * ground under the pointer. */
+describe('Select - the one selection look', () => {
+  it('multi: the picked row wears the pale ground in every state, an unpicked row shows no tick', async () => {
+    const user = userEvent.setup();
+    render(<Select mode="multiple" options={simpleOptions} value={['2']} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+    const unpicked = screen.getByText('Option 1').closest('button');
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+    expect(picked).not.toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
+    // one mark, not two: the tick, and it does not become an X under the pointer; an unpicked row shows nothing
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('multi: a picked row keeps its one tick while the pointer is on it, and still deselects on click', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Select mode="multiple" options={simpleOptions} value={['2']} onChange={onChange} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+
+    /* The X used to replace the tick here, which blanked the "picked" mark on whichever row the mouse was over.
+     * Hovering must change the glyph count by nothing at all. */
+    await user.hover(picked as HTMLElement);
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+
+    // the row is still the toggle it was - losing the X cost the cue, not the behaviour
+    await user.click(picked as HTMLElement);
+    expect(onChange).toHaveBeenCalledWith([]);
+  });
+
+  it('single with search: the picked row keeps its tick under the pointer', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select mode="single" searchable options={simpleOptions} defaultValue="3" aria-label="Pick" />
+    );
+    await user.click(screen.getByRole('combobox', { name: 'Pick' }));
+    await screen.findByPlaceholderText('Search...');
+    const rows = screen.getAllByText('Option 3').map((el) => el.closest('button'));
+    const picked = rows.find((b) => b?.getAttribute('role') !== 'combobox');
+    expect(picked).toHaveClass('mdt-bg-blue-10');
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByText('Option 1').closest('button')?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('single: the picked item holds the pale ground over the keyboard highlight, the rest go grey', async () => {
+    const user = userEvent.setup();
+    render(<Select options={simpleOptions} value="2" />);
+    await user.click(screen.getByRole('combobox'));
+    const picked = await screen.findByRole('option', { name: 'Option 2' });
+    const unpicked = screen.getByRole('option', { name: 'Option 1' });
+    expect(picked).toHaveAttribute('data-state', 'checked');
+    expect(picked).toHaveClass(
+      'data-[state=checked]:mdt-bg-blue-10',
+      'data-[state=checked]:data-[highlighted]:mdt-bg-blue-10'
+    );
+    expect(unpicked).toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+    expect(picked.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked.querySelectorAll('svg')).toHaveLength(0);
   });
 });

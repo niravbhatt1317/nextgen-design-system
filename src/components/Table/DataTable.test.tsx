@@ -396,6 +396,36 @@ describe('DataTable', { timeout: 20000 }, () => {
     ).toHaveAttribute('data-state', 'checked');
   });
 
+  /* the one selection look (Pranjal, 2026-10-21): a ticked quick-filter row takes the pale ground too, and the menu's
+   * own tick stays hidden behind the checkbox square - it is still the row's first child */
+  it('puts a ticked quick-filter row on the pale ground and keeps the menu tick hidden', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    await userEvent.click(await screen.findByRole('menuitemcheckbox', { name: 'Active' }));
+    const row = screen.getByRole('menuitemcheckbox', { name: 'Active' });
+    expect(row).toHaveAttribute('data-state', 'checked');
+    expect(row).toHaveClass(
+      'data-[state=checked]:mdt-bg-blue-10',
+      '[&>span:first-child]:mdt-hidden'
+    );
+    expect(row.firstElementChild?.tagName.toLowerCase()).toBe('span');
+    expect(row.firstElementChild).toHaveClass('mdt-right-2.5');
+  });
+
+  /* the Sort menu's active field on the pale ground, its arrow kept on the right (Pranjal, 2026-10-21) */
+  it('puts the active sort field on the pale ground with its arrow, the rest plain', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByRole('button', { name: 'Sort by Name' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Sort' }));
+    const active = await screen.findByRole('menuitem', { name: /^Name/ });
+    const other = screen.getByRole('menuitem', { name: /^Email/ });
+    expect(active).toHaveClass('mdt-bg-blue-10', 'data-[highlighted]:mdt-bg-blue-10');
+    expect(active).not.toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+    expect(within(active).getByLabelText('ascending')).toHaveTextContent('\u2191');
+    expect(other).not.toHaveClass('mdt-bg-blue-10');
+    expect(other).toHaveClass('mdt-text-neutral-90');
+  });
+
   /* Pranjal, 2026-09-11: "26 entries will create a second page. Then only
    * pagination should be visible." */
   it('shows no pager while everything fits on one page', () => {

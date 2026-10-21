@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/utils';
+import { CHECKED_ROW_CLASSES, PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
 import type {
@@ -65,32 +66,22 @@ function OptionPrefix({ option }: Readonly<{ option: SelectOption }>) {
 }
 
 /**
- * Renders the selection indicator (check/x icons).
- * `deselectable` (2026-09-25): in the multi list a selected row swaps its tick for an X under the pointer because a
- * click there deselects it. A single pick does no such thing - clicking the picked option keeps it picked - so the
- * tick stays (Pranjal: "why does it show x icon when hovered on selected one. It should just reselect it again").
+ * Renders the selection indicator in a fixed 16 slot on the right, so labels never shift.
+ *
+ * A picked row keeps its tick in every state, the pointer included (Nirav, 2026-10-21). An unpicked row shows
+ * nothing, under the pointer too (Pranjal, 2026-10-21): the grey ground says "here", the tick says "picked", and a
+ * faint tick on hover said both at once.
+ *
+ * The multi list used to swap a picked row's tick for an X under the pointer, to advertise that a click there
+ * deselects. That is the same defect one step along: it took the "picked" mark away exactly when you pointed at the
+ * row, so running the mouse down a list of picks blanked each one in turn. The pale blue-10 ground already says
+ * "picked" and the row is still a toggle - the X only cost the tick. Removed with `deselectable`, the flag that
+ * existed solely to switch it (Pranjal, 2026-09-25: "why does it show x icon when hovered on selected one").
  */
-function SelectionIndicator({
-  isSelected,
-  deselectable = true,
-}: Readonly<{ isSelected: boolean; deselectable?: boolean }>) {
+function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
   return (
     <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-flex-shrink-0 mdt-items-center mdt-justify-center">
-      {isSelected && !deselectable ? (
-        <Icon name="check" size={16} aria-hidden />
-      ) : isSelected ? (
-        <>
-          <Icon name="check" size={16} className="group-hover:mdt-hidden" aria-hidden />
-          <Icon name="x" size={12} className="mdt-hidden group-hover:mdt-block" aria-hidden />
-        </>
-      ) : (
-        <Icon
-          name="check"
-          size={16}
-          className="mdt-hidden mdt-text-neutral-50 group-hover:mdt-block"
-          aria-hidden
-        />
-      )}
+      {isSelected && <Icon name="check" size={16} aria-hidden />}
     </span>
   );
 }
@@ -141,7 +132,8 @@ interface MultiSelectOptionButtonProps {
 }
 
 /**
- * Renders a multi-select option as a button
+ * Renders a multi-select option as a button. The picked row wears the pale blue-10 ground in every state, the pointer
+ * included (Pranjal, 2026-10-21) - the merger drops the grey hover ground because the picked classes come last.
  */
 function MultiSelectOptionButton({
   option,
@@ -155,7 +147,12 @@ function MultiSelectOptionButton({
         onToggle(option.value.toString());
       }}
       disabled={option.disabled}
-      className={cn(OPTION_ITEM_BASE_CLASSES, OPTION_ITEM_STYLE_CLASSES, OPTION_ITEM_STATE_CLASSES)}
+      className={cn(
+        OPTION_ITEM_BASE_CLASSES,
+        OPTION_ITEM_STYLE_CLASSES,
+        OPTION_ITEM_STATE_CLASSES,
+        isSelected && PICKED_ROW_CLASSES
+      )}
     >
       <div className="mdt-flex mdt-items-center mdt-gap-2">
         <OptionPrefix option={option} />
@@ -427,10 +424,12 @@ function renderSingleSelectMode(props: {
                       className={cn(
                         OPTION_ITEM_BASE_CLASSES,
                         OPTION_ITEM_STYLE_CLASSES,
-                        'mdt-text-foreground hover:mdt-bg-neutral-10',
+                        /* the keyboard highlight takes the same grey ground as the pointer (Pranjal, 2026-10-21) */
+                        'mdt-text-foreground hover:mdt-bg-neutral-10 data-[highlighted]:mdt-bg-neutral-10',
                         /* the picked option wears blue-10 - the ground a selected row wears everywhere else (Pranjal,
-                         * 2026-09-25: "give some bg color to selected option otherwise its not visible properly") */
-                        'data-[state=checked]:mdt-bg-blue-10',
+                         * 2026-09-25: "give some bg color to selected option otherwise its not visible properly"),
+                         * and keeps it under the pointer and the keyboard (2026-10-21) */
+                        CHECKED_ROW_CLASSES,
                         OPTION_ITEM_DATA_STATE_CLASSES
                       )}
                     >
@@ -440,7 +439,7 @@ function renderSingleSelectMode(props: {
                           <OptionContent option={option} />
                         </SelectPrimitive.ItemText>
                       </div>
-                      <SelectionIndicator isSelected={isSelected} deselectable={false} />
+                      <SelectionIndicator isSelected={isSelected} />
                     </SelectPrimitive.Item>
                     <OptionSeparator show={showSeparator} />
                   </div>
