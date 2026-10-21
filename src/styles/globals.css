@@ -844,7 +844,7 @@
     --mdt-avatar-slate-ink: 0 0% 100%; /* #FFFFFF */
     /* the badge tier by tone - full colours read with var(), the light values sit in :root; the map's dark tier, each wash on the raised surface */
     --mdt-badge-neutral-fill: #2a3546;
-    --mdt-badge-neutral-ink: #8e9fbc;
+    --mdt-badge-neutral-ink: #cad3e2;
     --mdt-badge-neutral-dot: #6a7fa0;
     --mdt-badge-slate-fill: #2b394f;
     --mdt-badge-slate-ink: #a6b0c0;

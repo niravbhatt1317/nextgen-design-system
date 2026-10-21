@@ -95,7 +95,7 @@ const semantic = [
 
 /* Badge tones as pairs - the six tones the console paints (C-83/C-84) and their dark twins by the tinted-chip rule. */
 const badges = [
-  { tone: 'neutral', light: { fill: '#F7FAFC', ink: '#1D2B3E', dot: '#8FA0BD' }, dark: { fill: 'rgba(255, 255, 255, 0.08)', ink: '#8E9FBC', dot: '#6A7FA0' }, from: '--detail-tag-neutral-bg / -text dark · dot --neutral-regular dark' },
+  { tone: 'neutral', light: { fill: '#F7FAFC', ink: '#1D2B3E', dot: '#8FA0BD' }, dark: { fill: 'rgba(255, 255, 255, 0.08)', ink: '#CAD3E2', dot: '#6A7FA0' }, from: '--detail-tag-neutral-bg dark · ink color.text dark (Pranjal 2026-10-17: "color still looks dull in badge" - light reads neutral-130, so dark takes its own reading ink, 8.2:1 on the fill; was --detail-tag-neutral-text dark #8E9FBC, 4.6:1, which read as switched off) · dot --neutral-regular dark' },
   { tone: 'slate', light: { fill: '#ECF1F9', ink: '#1D2B3E', dot: '#516281' }, dark: { fill: '#2B394F', ink: 'rgba(202, 211, 226, 0.8)', dot: '#8E9FBC' }, from: '--default-tag-bg / -text-color dark (ServiceOps; ObservOps\' bg disagrees) · dot --neutral-light dark' },
   { tone: 'success', light: { fill: '#DCF4E4', ink: '#21823A', dot: '#34A853' }, dark: { fill: 'rgba(16, 185, 129, 0.24)', ink: '#5ED6A8', dot: '#36D576' }, from: '--detail-tag-success-bg / -text dark · dot --severity-clear dark' },
   { tone: 'warning', light: { fill: '#FFF3DB', ink: '#9F6404', dot: '#FDB13F' }, dark: { fill: 'rgba(180, 105, 14, 0.26)', ink: '#E3A44A', dot: '#FAD100' }, from: '--detail-tag-warning-bg / -text dark · dot --severity-warning dark' },
