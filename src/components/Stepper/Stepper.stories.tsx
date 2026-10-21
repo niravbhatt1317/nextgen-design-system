@@ -44,8 +44,18 @@ const meta: Meta<typeof Stepper> = {
           '**The one-line test:** if you can do them in any order, it is Tabs. It is not',
           '`Progress` either — that is one number with no names, and nobody is doing anything.',
           '',
-          'Horizontal only. Vertical is a different component with different rules, not a third',
-          'value on the layout switch.',
+          'Four layouts on one switch — `stacked`, `inline`, `underline` and `vertical` — and the',
+          'same rules in every one (Pranjal, 2026-10-19):',
+          '',
+          '- **Hover marks the disc and the name, never the whole step** — a soft halo on the disc,',
+          '  a dashed underline under the name. Keyboard focus rings the disc.',
+          '- **Nothing moves when a step becomes clickable.** A clickable step is exactly the same',
+          '  box as a plain one, so the strip never changes height.',
+          '- **A finished step reads as finished** — its name in full ink. Only the steps ahead stay',
+          '  quiet.',
+          '- **Going back keeps your progress.** Pass `reached`, the furthest step got to: every',
+          '  step before it keeps its tick and its line, it shows as where you left off, and the',
+          '  step you went back to keeps its tick inside a "you are here" ring.',
         ].join('\n'),
       },
     },
@@ -140,6 +150,10 @@ export const States: Story = {
         <Label>inline</Label>
         <Stepper steps={ALL_STATES} current={1} layout="inline" aria-label="Every state" />
       </div>
+      <div>
+        <Label>underline</Label>
+        <Stepper steps={ALL_STATES} current={1} layout="underline" aria-label="Every state" />
+      </div>
     </Stack>
   ),
 };
@@ -206,8 +220,13 @@ export const WithDescriptions: Story = {
  * wizard that acts as it goes, because you cannot return to step 1 once step 2
  * has used it.
  *
- * Give it, and **only finished steps** become buttons. The one you are on is
- * already here, and one you have not reached is not a place.
+ * Give it, and **every step you have got to** becomes a button - without
+ * `reached`, that is the finished ones. The one you are on is already here,
+ * and one you have not reached is not a place.
+ *
+ * **A clickable step is the same box as a plain one**, so nothing moves when
+ * this is turned on. Under the pointer only the disc (a soft halo) and the name
+ * (a dashed underline) react; keyboard focus rings the disc.
  */
 export const Clickable: Story = {
   parameters: { controls: { disable: true } },
@@ -322,12 +341,17 @@ export const HowManySteps: Story = {
 /**
  * The shape it was built for: a step strip above a panel, with Back and Next
  * beneath it. `Dialog` names this as the place a wizard belongs.
+ *
+ * It keeps `reached`, so clicking back to fix an earlier step loses nothing:
+ * the steps after it keep their ticks, the furthest one shows as where you left
+ * off, and you can click straight forward to it again.
  */
 export const InAWizard: Story = {
   name: 'In a wizard',
   parameters: { controls: { disable: true } },
   render: function Render() {
     const [at, setAt] = useState(1);
+    const [reached, setReached] = useState(1);
     const last = IMPORT.length - 1;
 
     return (
@@ -336,6 +360,7 @@ export const InAWizard: Story = {
           aria-label="Import assets"
           steps={IMPORT}
           current={at}
+          reached={reached}
           onStepSelect={(index) => {
             setAt(index);
           }}
@@ -365,7 +390,9 @@ export const InAWizard: Story = {
             size="sm"
             disabled={at === last}
             onClick={() => {
-              setAt((n) => Math.min(last, n + 1));
+              const next = Math.min(last, at + 1);
+              setAt(next);
+              setReached((r) => Math.max(r, next));
             }}
           >
             {at === last - 1 ? 'Publish' : 'Next'}
@@ -390,9 +417,10 @@ const CREATE_ORG: StepperStep[] = [
  * **`layout="vertical"`** - the journey set down a rail, as the navigation of a two-column flow (the console's
  * Create organization): the rail on the left, the panel beside it showing one step at a time.
  *
- * It reads a second counter, `reached` - the furthest step unlocked so far - so somebody can go back to step 2 and
- * forward again to step 4 without redoing 3. Every unlocked step but the current one is clickable; everything past
- * `reached` is locked, faint, and titled "Opens after ...". On step 3 here, with step 4 already unlocked.
+ * It reads the second counter every layout reads, `reached` - the furthest step got to so far - so somebody can go back
+ * to step 2 and forward again to step 4 without redoing 3. Every step up to `reached` but the current one is
+ * clickable; everything past it is locked, quiet, and titled "Opens after ...". On step 3 here, with step 4 where
+ * you left off.
  */
 export const Vertical: Story = {
   args: {
@@ -424,12 +452,12 @@ export const Vertical: Story = {
 const RAIL_STATES: StepperStep[] = [
   { label: 'Complete', description: 'Behind you' },
   { label: 'Current', description: 'The one in the panel' },
-  { label: 'Complete, ahead', description: 'Reached, then went back' },
+  { label: 'Where you left off', description: 'Reached, then went back' },
   { label: 'Disabled', description: 'Set by hand', state: 'disabled' },
   { label: 'Locked', description: 'Opens after Disabled' },
 ];
 
-/** Every vertical state, readable without colour - a tick for done, a number everywhere else, the ink dropping as the step gets further away. */
+/** Every vertical state, readable without colour - a tick for done, a number everywhere else, the ink going quiet past where you got to. */
 export const VerticalStates: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
@@ -460,5 +488,94 @@ export const VerticalStates: Story = {
         />
       </div>
     </div>
+  ),
+};
+
+/** One strip of the revisit story: it opens back on step 1, having got as far as step 4. */
+const Revisiting = ({ layout }: { layout: 'stacked' | 'inline' | 'underline' | 'vertical' }) => {
+  const [current, setCurrent] = useState(0);
+  const [reached, setReached] = useState(3);
+  return (
+    <Stepper
+      layout={layout}
+      steps={layout === 'vertical' ? CREATE_ORG.slice(0, 5) : IMPORT}
+      current={current}
+      reached={reached}
+      onStepSelect={(index) => {
+        setCurrent(index);
+        setReached((r) => Math.max(r, index));
+      }}
+      aria-label={layout === 'vertical' ? 'Create organization' : 'Import assets'}
+    />
+  );
+};
+
+/**
+ * **Going back keeps your progress.** Each strip opens mid-revisit: somebody got as far as step 4, then went back to
+ * step 1 to fix something. Nothing is undone -
+ *
+ * - **the step you went back to** keeps its tick, inside a "you are here" ring;
+ * - **the steps in between** keep their ticks, and the line or bar stays filled;
+ * - **step 4 shows as where you left off** - outlined in primary, its name in full ink;
+ * - **every one of them is clickable**, so you can jump straight back to where you were.
+ *
+ * `reached` is the furthest step got to (`current` when left out). Keep it as the larger of itself and wherever the
+ * person goes, as these strips do. A screen reader hears "done", "done, you are here" and "where you left off".
+ */
+export const GoingBack: Story = {
+  name: 'Going back keeps your progress',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Stack>
+      <div data-testid="revisit-stacked">
+        <Label>stacked — current 0, reached 3</Label>
+        <Revisiting layout="stacked" />
+      </div>
+      <div data-testid="revisit-inline">
+        <Label>inline — current 0, reached 3</Label>
+        <Revisiting layout="inline" />
+      </div>
+      <div data-testid="revisit-underline">
+        <Label>underline — current 0, reached 3</Label>
+        <Revisiting layout="underline" />
+      </div>
+      <div data-testid="revisit-vertical" className="mdt-w-[280px]">
+        <Label>vertical — current 0, reached 3</Label>
+        <Revisiting layout="vertical" />
+      </div>
+    </Stack>
+  ),
+};
+
+/**
+ * **Nothing moves when a step becomes clickable.** Each layout twice, on step 3: read-only, then with
+ * `onStepSelect`. A clickable step is exactly the same box as a plain one, so the two strips are the same height and
+ * every disc sits in the same place. Point at a finished step in the second strip: only its disc (a soft halo) and its
+ * name (a dashed underline) react - no wash behind the step. Tab to it and the focus ring sits on the disc.
+ */
+export const ClickableOrNot: Story = {
+  name: 'Clickable or not, the same box',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Stack>
+      {(['stacked', 'inline', 'underline'] as const).map((layout) => (
+        <div key={layout} className="mdt-flex mdt-flex-col mdt-gap-4">
+          <div data-testid={`plain-${layout}`}>
+            <Label>{layout} — read only</Label>
+            <Stepper steps={IMPORT} current={2} layout={layout} aria-label="Import assets" />
+          </div>
+          <div data-testid={`clickable-${layout}`}>
+            <Label>{layout} — clickable</Label>
+            <Stepper
+              steps={IMPORT}
+              current={2}
+              layout={layout}
+              onStepSelect={() => undefined}
+              aria-label="Import assets"
+            />
+          </div>
+        </div>
+      ))}
+    </Stack>
   ),
 };

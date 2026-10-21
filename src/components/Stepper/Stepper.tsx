@@ -1,9 +1,23 @@
 import { cva } from 'class-variance-authority';
+import type { ClassValue } from 'clsx';
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
 import { StepperRail } from './StepperRail';
-import type { StepState, StepperLayout, StepperProps, StepperStep } from './Stepper.types';
+import { StepDisc, StepLabel } from './StepParts';
+import {
+  DESCRIPTION_LOOK,
+  HIT_BOX,
+  QUIET,
+  SETTLES,
+  TRIGGER,
+  lights,
+  resolveCounters,
+  resolveStep,
+  type StepLook,
+  type StepModel,
+} from './stepperState';
+import type { StepperLayout, StepperProps, StepperStep } from './Stepper.types';
 
 /** The three layouts drawn across the page; `vertical` is the rail, drawn by StepperRail. */
 type AcrossLayout = Exclude<StepperLayout, 'vertical'>;
@@ -20,7 +34,8 @@ export const stepperVariants = cva('mdt-flex mdt-w-full mdt-list-none mdt-p-0', 
     layout: {
       stacked: 'mdt-items-start',
       // Wraps rather than clipping. Nothing is hidden; the strip gets taller.
-      inline: 'mdt-flex-wrap mdt-items-center mdt-gap-x-1 mdt-gap-y-1',
+      // 12 between a label and the next chevron, 8 between rows.
+      inline: 'mdt-flex-wrap mdt-items-center mdt-gap-x-3 mdt-gap-y-2',
       // Equal columns, so the bars read as one track cut into parts rather than
       // as labels that happen to be underlined.
       underline: 'mdt-items-stretch mdt-gap-3',
@@ -30,66 +45,21 @@ export const stepperVariants = cva('mdt-flex mdt-w-full mdt-list-none mdt-p-0', 
   defaultVariants: { layout: 'stacked' },
 });
 
-/** Nothing behind it. Four of the five states share this exactly. */
-const HOLLOW = 'mdt-bg-transparent';
-
-/** The quiet ink, worn by every state that is not the one you are on. */
-const QUIET = 'mdt-text-muted-foreground';
-
 /**
- * One rule carries the whole component: **a filled disc is settled, an outlined
- * disc is live.**
- *
- * That is why the number stays visible on the step you are standing on and only
- * turns into a tick once it is behind you.
- *
- * There is no red disc here, on purpose. A coloured ring says *where* a problem
- * is and never what it is, so it always needs a message beside it - and once the
- * message is there, the ring is only repeating itself. A broken step stays
- * `current`, with a `Banner` under the strip.
+ * The label's ink and weight. A finished step reads as finished - full ink,
+ * regular weight - and only the steps you have not got to stay quiet. The one
+ * you are on is the heaviest.
  */
-const DISC_STATE: Record<StepState, string> = {
-  complete: `mdt-border-primary mdt-bg-primary mdt-text-primary-foreground`,
-  current: `mdt-border-primary ${HOLLOW} mdt-text-foreground`,
-  upcoming: `mdt-border-border ${HOLLOW} ${QUIET}`,
-  // Passed over, not finished, so it never earns a fill.
-  skipped: `mdt-border-border ${HOLLOW} ${QUIET}`,
-  disabled: `mdt-border-border ${HOLLOW} ${QUIET}`,
+const SETTLED_LABEL = 'mdt-font-normal mdt-text-foreground';
+const QUIET_LABEL = `mdt-font-normal ${QUIET}`;
+const LABEL_INK: Record<StepLook, string> = {
+  complete: SETTLED_LABEL,
+  current: 'mdt-font-semibold mdt-text-foreground',
+  reached: SETTLED_LABEL,
+  upcoming: QUIET_LABEL,
+  skipped: QUIET_LABEL,
+  disabled: QUIET_LABEL,
 };
-
-const LABEL_STATE: Record<StepState, string> = {
-  complete: QUIET,
-  current: 'mdt-text-foreground mdt-font-semibold',
-  upcoming: QUIET,
-  skipped: QUIET,
-  disabled: QUIET,
-};
-
-/**
- * What goes inside the disc.
- *
- * The shape says it as well as the colour does, which is what makes this legible
- * to someone who cannot tell one hue from another: a tick for done, a dash for
- * passed over, and the number everywhere else.
- */
-const MARK: Partial<Record<StepState, 'check' | 'minus'>> = {
-  complete: 'check',
-  skipped: 'minus',
-};
-
-/**
- * Every part that changes colour does it over the same 150ms.
- *
- * The disc, the connector and the bar all move together when `current` changes,
- * and three different durations would make one strip look like three.
- */
-const SETTLES = 'mdt-transition-colors mdt-duration-150';
-
-const DISC_BASE = [
-  'mdt-flex mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full',
-  'mdt-box-border mdt-font-semibold mdt-tabular-nums',
-  SETTLES,
-];
 
 const DISC_SIZE: Record<AcrossLayout, string> = {
   stacked: 'mdt-h-8 mdt-w-8 mdt-border-2 mdt-text-[13px]',
@@ -104,50 +74,60 @@ const MARK_SIZE: Record<AcrossLayout, 'sm' | 'xs'> = {
 };
 
 /**
- * The bar under one step.
+ * The bar under one step, and the stacked connector.
  *
- * 2px so it reads as a track rather than as a border on the label above it, and
- * filled by the same rule the stacked connector uses - `primary` once the step
- * is settled, `muted` while it is not. The state vocabulary is the one the rest
- * of this component already speaks; only the drawing is new.
+ * 2px so it reads as a track rather than as a border on the label above it -
+ * `primary` up to the furthest step you have got to, `muted` after it.
  */
-const BAR_REACHED = 'mdt-bg-primary';
-const BAR_AHEAD = 'mdt-bg-muted';
+const TRACK_ON = 'mdt-bg-primary';
+const TRACK_OFF = 'mdt-bg-muted';
 
-const BAR_STATE: Record<StepState, string> = {
-  complete: BAR_REACHED,
-  current: BAR_REACHED,
-  upcoming: BAR_AHEAD,
-  skipped: BAR_AHEAD,
-  disabled: BAR_AHEAD,
-};
+/**
+ * Every label keeps the room its bold version needs, so the step you are on
+ * turning semibold never pushes the steps after it along the row. A copy of the
+ * words at 600 sits under the label at no height, invisible, and holds the
+ * width; `/ ''` gives it no text for a screen reader.
+ */
+const KEEPS_BOLD_ROOM = [
+  'mdt-inline-flex mdt-flex-col',
+  "after:mdt-content-[attr(data-text)_/_'']",
+  'after:mdt-invisible after:mdt-h-0 after:mdt-overflow-hidden after:mdt-font-semibold',
+  'after:mdt-pointer-events-none after:mdt-select-none',
+];
 
 /** How one step's label sits beside its disc, per layout. */
-const LABEL_FLOW: Record<AcrossLayout, string> = {
+const LABEL_FLOW: Record<AcrossLayout, ClassValue> = {
   stacked: 'mdt-text-[13px]',
   // Must not wrap - its steps sit on one row and a broken word breaks the row.
-  inline: 'mdt-whitespace-nowrap mdt-text-sm',
+  inline: ['mdt-whitespace-nowrap mdt-text-sm', ...KEEPS_BOLD_ROOM],
   // Owns a column, so it truncates rather than pushing its neighbours around.
-  underline: 'mdt-truncate mdt-text-sm',
+  // Truncating clips to the label's box, and the hover's dashed line sits 4px
+  // under the words - below the 20px line. 6px of room under the words to paint
+  // in, handed straight back as a negative margin, so the line shows and
+  // nothing in the row moves.
+  underline: 'mdt-truncate mdt-text-sm mdt-pb-1.5 -mdt-mb-1.5',
 };
 
-/** What a clickable step's button holds, per layout. */
-const TRIGGER_FLOW: Record<AcrossLayout, string> = {
-  // No padding above, on purpose. The connector is pinned to the disc's own
-  // centre line, so anything that pushes the disc down leaves the line hanging.
-  stacked:
-    'mdt-flex mdt-w-full mdt-flex-col mdt-items-center mdt-gap-2 mdt-px-1 mdt-pb-1 mdt-pt-0 mdt-text-center',
-  inline: 'mdt-flex mdt-items-center mdt-gap-2 mdt-px-1 mdt-py-1',
-  // No horizontal padding: the label has to start where the bar under it
-  // starts, or the two read as unrelated.
-  underline: 'mdt-flex mdt-w-full mdt-items-center mdt-gap-2 mdt-py-0.5 mdt-text-left',
+/**
+ * The step's own box, per layout - the same whether it is a button or not, so
+ * nothing moves when a strip becomes clickable. No padding on purpose: the
+ * stacked connector is pinned to the disc's centre line, and the underline
+ * label has to start where the bar under it starts.
+ */
+const HIT_FLOW: Record<AcrossLayout, string> = {
+  stacked: 'mdt-flex-col mdt-items-center mdt-gap-2 mdt-text-center',
+  inline: 'mdt-items-center mdt-gap-2 mdt-text-left',
+  // Only as wide as its disc and label, so the hover marks those and not the
+  // empty end of the column.
+  underline: 'mdt-items-center mdt-gap-2 mdt-self-start mdt-text-left',
 };
 
-/** How one step's own box behaves in the row, per layout. */
+/** How one step's own column or cell behaves in the row, per layout. */
 const STEP_FLOW: Record<AcrossLayout, string> = {
   stacked:
-    'mdt-relative mdt-min-w-[92px] mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-items-center mdt-gap-2 mdt-text-center',
-  inline: 'mdt-items-center mdt-gap-2',
+    'mdt-relative mdt-min-w-[92px] mdt-flex-1 mdt-basis-0 mdt-flex-col mdt-items-center mdt-text-center',
+  // 12 between the chevron and the disc after it.
+  inline: 'mdt-items-center mdt-gap-3',
   // Equal columns, so the bars read as one track cut into parts. `min-w-0`
   // lets a long label truncate instead of widening its column past its
   // neighbours.
@@ -163,14 +143,6 @@ const STEP_FLOW: Record<AcrossLayout, string> = {
  * component that came from looking rather than from a token.
  */
 const STACKED_STEP_WIDTH = 112;
-
-/** Works out a step's state from the counter, unless it was told one. */
-const resolveState = (step: StepperStep, index: number, current: number): StepState => {
-  if (step.state !== undefined) return step.state;
-  if (index < current) return 'complete';
-  if (index === current) return 'current';
-  return 'upcoming';
-};
 
 /**
  * Reports the container's width, so `stacked` can drop to `inline` when there is
@@ -225,6 +197,129 @@ const useDescriptionFits = (steps: readonly StepperStep[], layout: AcrossLayout)
   }, [steps, layout]);
 };
 
+interface AcrossStepProps {
+  step: StepperStep;
+  index: number;
+  model: StepModel;
+  shown: AcrossLayout;
+  /** Stacked: whether the line arriving at this step is filled. Underline: whether its bar is. */
+  lit: boolean;
+  onStepSelect: StepperProps['onStepSelect'];
+}
+
+/** The disc, the label and (stacked) the description - the same parts whether or not the step is a button. */
+const stepBody = ({ step, index, model, shown }: AcrossStepProps): ReactNode => (
+  <>
+    <StepDisc
+      index={index}
+      model={model}
+      className={DISC_SIZE[shown]}
+      markSize={MARK_SIZE[shown]}
+    />
+    <StepLabel
+      label={step.label}
+      model={model}
+      // `leading-snug` first: a later text size replaces it, as it always has here.
+      className={['mdt-leading-snug', LABEL_FLOW[shown]]}
+      ink={LABEL_INK}
+      dataText={shown === 'inline' && typeof step.label === 'string' ? step.label : undefined}
+    />
+    {shown === 'stacked' && step.description !== undefined && step.description !== '' ? (
+      <span
+        data-slot="stepper-description"
+        className={cn('mdt-text-xs mdt-leading-snug', SETTLES, DESCRIPTION_LOOK[model.look])}
+      >
+        {step.description}
+      </span>
+    ) : null}
+  </>
+);
+
+/** One step of an across layout: its piece of the track, and its box. */
+const AcrossStep = (props: AcrossStepProps) => {
+  const { step, index, model, shown, lit } = props;
+  const box = cn(HIT_BOX, HIT_FLOW[shown]);
+  const select = model.selectable ? props.onStepSelect : undefined;
+
+  const hit = select ? (
+    <button
+      type="button"
+      data-slot="stepper-trigger"
+      onClick={() => {
+        select(index, step);
+      }}
+      className={cn(box, TRIGGER)}
+    >
+      {stepBody(props)}
+    </button>
+  ) : (
+    <div className={box}>{stepBody(props)}</div>
+  );
+
+  return (
+    <li
+      data-slot="stepper-step"
+      data-state={model.state}
+      // Exactly one step carries this, and it is what a screen reader
+      // uses to say "current step" rather than reading five equal items.
+      {...(model.state === 'current' ? { 'aria-current': 'step' as const } : {})}
+      className={cn('mdt-flex', STEP_FLOW[shown], model.state === 'disabled' && 'mdt-opacity-45')}
+    >
+      {/*
+        A connector cannot be a sibling of a list item - an `ol` may hold
+        nothing but `li`. So each step carries the piece that arrives at it:
+        stacked gets the line running back to the disc behind it, inline
+        gets the chevron that sits in front of its own disc.
+      */}
+      {shown === 'stacked' && index > 0 ? (
+        // Pinned to the centre line of the discs and stopped clear of both,
+        // so it reads as the gap between two steps rather than as part of
+        // either. Filled up to the furthest step you have got to, which makes
+        // it a report on the journey - going back does not empty it.
+        <span
+          aria-hidden="true"
+          data-slot="stepper-connector"
+          data-joined={lit}
+          className={cn(
+            'mdt-absolute mdt-top-[15px] mdt-h-0.5 mdt-rounded-full',
+            'mdt-left-[calc(-50%+24px)] mdt-right-[calc(50%+24px)]',
+            SETTLES,
+            lit ? TRACK_ON : TRACK_OFF
+          )}
+        />
+      ) : null}
+
+      {shown === 'inline' && index > 0 ? (
+        <Icon
+          name="chevron-right"
+          size="sm"
+          aria-hidden
+          data-slot="stepper-connector"
+          className="mdt-shrink-0 mdt-text-muted-foreground/60"
+        />
+      ) : null}
+
+      {hit}
+
+      {shown === 'underline' ? (
+        // Under this step's own label, not between two discs. Every step
+        // owns one, which is what makes the row read as a track cut into
+        // parts rather than as a line joining stations.
+        <span
+          aria-hidden="true"
+          data-slot="stepper-bar"
+          data-joined={lit}
+          className={cn(
+            'mdt-h-0.5 mdt-w-full mdt-rounded-full',
+            SETTLES,
+            lit ? TRACK_ON : TRACK_OFF
+          )}
+        />
+      ) : null}
+    </li>
+  );
+};
+
 /**
  * Stepper - a named, ordered journey with a place you are now.
  *
@@ -239,6 +334,11 @@ const useDescriptionFits = (steps: readonly StepperStep[], layout: AcrossLayout)
  * text and not focusable unless `onStepSelect` is given - a step is not a button
  * unless you can actually go there, and a strip of five stops that do nothing is
  * worse than no stops at all.
+ *
+ * **Going back keeps your progress.** Pass `reached` - the furthest step got to -
+ * and stepping back to fix something leaves every step up to it ticked, lined and
+ * clickable: the furthest one shows as where you left off, and the one you went
+ * back to keeps its tick inside a "you are here" ring.
  *
  * @example
  * ```tsx
@@ -277,7 +377,7 @@ export const Stepper = ({
 
   useDescriptionFits(steps, shown);
 
-  /* the rail: its own rules (the second counter, any unlocked step clickable), after every hook above has run */
+  /* the rail: its own drawing (locked steps, the rail line), after every hook above has run */
   if (layout === 'vertical') {
     return (
       <StepperRail
@@ -291,19 +391,20 @@ export const Stepper = ({
     );
   }
 
-  const at = Math.min(Math.max(current, 0), Math.max(steps.length - 1, 0));
+  const counters = resolveCounters(steps.length, current, reached);
+  const rows = steps.map((step, index) => ({
+    step,
+    model: resolveStep(step, index, counters, onStepSelect !== undefined),
+  }));
 
-  const renderDisc = (state: StepState, index: number): ReactNode => {
-    const mark = MARK[state];
-    return (
-      <span
-        data-slot="stepper-disc"
-        className={cn(DISC_BASE, DISC_SIZE[shown], DISC_STATE[state])}
-        aria-hidden="true"
-      >
-        {mark ? <Icon name={mark} size={MARK_SIZE[shown]} aria-hidden /> : index + 1}
-      </span>
-    );
+  /**
+   * Stacked: the line arriving at a step lights once the step behind it is
+   * settled. Underline: a step's own bar lights up to and including the
+   * furthest step. Neither lights for a step passed over or not available.
+   */
+  const litAt = (index: number): boolean => {
+    const owner = rows[shown === 'stacked' ? index - 1 : index];
+    return index <= counters.far && owner !== undefined && lights(owner.model.state);
   };
 
   return (
@@ -313,125 +414,17 @@ export const Stepper = ({
         data-slot="stepper"
         data-layout={shown}
       >
-        {steps.map((step, index) => {
-          const state = resolveState(step, index, at);
-          const key = step.id ?? index;
-
-          // Only a finished step is somewhere you can return to. A step you have
-          // not reached is not a place, and the one you are on is already here.
-          const selectable = onStepSelect !== undefined && state === 'complete';
-
-          const label = (
-            <>
-              {renderDisc(state, index)}
-              <span
-                data-slot="stepper-label"
-                className={cn('mdt-leading-snug', LABEL_FLOW[shown], LABEL_STATE[state])}
-              >
-                {step.label}
-              </span>
-              {shown === 'stacked' && step.description !== undefined && step.description !== '' ? (
-                <span
-                  data-slot="stepper-description"
-                  className="mdt-text-xs mdt-leading-snug mdt-text-muted-foreground"
-                >
-                  {step.description}
-                </span>
-              ) : null}
-            </>
-          );
-
-          const inner = selectable ? (
-            <button
-              type="button"
-              data-slot="stepper-trigger"
-              onClick={() => {
-                onStepSelect(index, step);
-              }}
-              className={cn(
-                'mdt-rounded-md mdt-transition-colors',
-                'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-2 focus-visible:mdt-ring-offset-background',
-                'hover:mdt-bg-muted',
-                TRIGGER_FLOW[shown]
-              )}
-            >
-              {label}
-            </button>
-          ) : (
-            label
-          );
-
-          // A connector cannot be a sibling of a list item - an `ol` may hold
-          // nothing but `li`. So each step carries the piece that arrives at it:
-          // stacked gets the line running back to the disc behind it, inline
-          // gets the chevron that sits in front of its own disc.
-          const behind = index > 0 ? steps[index - 1] : undefined;
-          const joined = behind !== undefined && resolveState(behind, index - 1, at) === 'complete';
-
-          return (
-            <li
-              key={key}
-              data-slot="stepper-step"
-              data-state={state}
-              // Exactly one step carries this, and it is what a screen reader
-              // uses to say "current step" rather than reading five equal items.
-              {...(state === 'current' ? { 'aria-current': 'step' as const } : {})}
-              className={cn('mdt-flex', STEP_FLOW[shown], state === 'disabled' && 'mdt-opacity-45')}
-            >
-              {shown === 'stacked' && index > 0 ? (
-                // Pinned to the centre line of the discs and stopped clear of
-                // both, so it reads as the gap between two steps rather than as
-                // part of either. It fills only once the step behind it is
-                // finished, which makes it a report on the journey.
-                <span
-                  aria-hidden="true"
-                  data-slot="stepper-connector"
-                  data-joined={joined}
-                  className={cn(
-                    'mdt-absolute mdt-top-[15px] mdt-h-0.5 mdt-rounded-full',
-                    'mdt-left-[calc(-50%+24px)] mdt-right-[calc(50%+24px)]',
-                    SETTLES,
-                    joined ? 'mdt-bg-primary' : 'mdt-bg-muted'
-                  )}
-                />
-              ) : null}
-
-              {shown === 'inline' && index > 0 ? (
-                <Icon
-                  name="chevron-right"
-                  size="sm"
-                  aria-hidden
-                  data-slot="stepper-connector"
-                  className="mdt-shrink-0 mdt-text-muted-foreground/60"
-                />
-              ) : null}
-
-              {/*
-                `underline` stacks a row over a bar, so the disc and its label
-                need a row of their own inside the column. `stacked` is already
-                a column and `inline` is already a row, which is why neither
-                needs this.
-              */}
-              {shown === 'underline' ? (
-                <span className="mdt-flex mdt-min-w-0 mdt-items-center mdt-gap-2">{inner}</span>
-              ) : (
-                inner
-              )}
-
-              {shown === 'underline' ? (
-                // Under this step's own label, not between two discs. Every
-                // step owns one, which is what makes the row read as a track
-                // cut into parts rather than as a line joining stations.
-                <span
-                  aria-hidden="true"
-                  data-slot="stepper-bar"
-                  data-joined={state === 'complete' || state === 'current'}
-                  className={cn('mdt-h-0.5 mdt-w-full mdt-rounded-full', SETTLES, BAR_STATE[state])}
-                />
-              ) : null}
-            </li>
-          );
-        })}
+        {rows.map(({ step, model }, index) => (
+          <AcrossStep
+            key={step.id ?? index}
+            step={step}
+            index={index}
+            model={model}
+            shown={shown}
+            lit={litAt(index)}
+            onStepSelect={onStepSelect}
+          />
+        ))}
       </ol>
     </nav>
   );
