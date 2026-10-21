@@ -16,6 +16,27 @@ one in `MISSING-TOKENS.md`, a capability in `CAPABILITIES.md`. This file is for 
 
 ---
 
+## 2026-10-21
+
+### Underline tabs: every label on the content edge, the line the label's width (option B)
+
+**Pranjal**, 2026-10-14, on the Agent Fleet tab mock: "b is the only valid solution ... keep it for agent fleet
+first I will get it approved than we will move it to library". Sent to the library 2026-10-21 as the underline
+default.
+
+The first tab steps 12 into the margin, so every label starts on the edge the text under the strip starts on; the
+2px line is drawn 12 in from each side of the tab, under the label, not across the tab. It supersedes two console
+rulings from 2026-09-17: K-Tabs-06 (the line spanning "the label plus 12 at both sides") and the half of K-Tabs-08
+that put the first label 12 in.
+
+**This is not the pulled strip K-Tabs-08 ruled out.** That moved the whole strip, hairline and all, 12 into the
+margin. Here the strip and its hairline stay on the content edge; only the first tab's invisible click area goes
+past it. Anyone reading K-Tabs-08 and thinking this was settled the other way: it was, for a different thing.
+
+**A default with no opt-out**, so it has its own changeset (`tabs-labels-on-the-edge`).
+
+---
+
 ## 2026-10-14
 
 ### The console's light palette is not adopted — the ramp keeps its steps
