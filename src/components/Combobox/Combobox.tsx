@@ -1,13 +1,14 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
-import { forwardRef, useCallback, useEffect, useId, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useState, type Ref } from 'react';
 import { cn } from '@/utils';
 import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import type { ComboboxProps } from './Combobox.types';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Icon } from '../Icon';
+import { ComboboxFieldSearch } from './ComboboxFieldSearch';
 
 /**
  * Combobox trigger variants using Class Variance Authority (CVA)
@@ -73,7 +74,7 @@ export const comboboxTriggerVariants = cva(
  * />
  * ```
  */
-const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
+const ComboboxInList = forwardRef<HTMLButtonElement, ComboboxProps>(
   (
     {
       // Core props
@@ -330,7 +331,7 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                 <CommandPrimitive.List className="mdt-max-h-[300px] mdt-overflow-y-auto mdt-overflow-x-hidden mdt-p-1">
                   {filteredOptions.length === 0 && (
                     <CommandPrimitive.Empty className="mdt-py-6 mdt-text-center mdt-text-sm mdt-text-muted-foreground">
-                      {emptyMessage}
+                      {typeof emptyMessage === 'function' ? emptyMessage(search.trim()) : emptyMessage}
                     </CommandPrimitive.Empty>
                   )}
                   {filteredOptions.map((option) => {
@@ -410,6 +411,21 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       </div>
     );
   }
+);
+
+ComboboxInList.displayName = 'ComboboxInList';
+
+/**
+ * `search="list"` (the default) is the field as a button with its own search box at the top of the open list.
+ * `search="field"` is the type-in picker: the field itself is the search box and the list only shows results - see
+ * ComboboxFieldSearch. In that mode the forwarded ref is the field's input.
+ */
+const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(({ search = 'list', ...props }, ref) =>
+  search === 'field' ? (
+    <ComboboxFieldSearch {...props} ref={ref as unknown as Ref<HTMLInputElement>} />
+  ) : (
+    <ComboboxInList {...props} ref={ref} />
+  )
 );
 
 Combobox.displayName = 'Combobox';
