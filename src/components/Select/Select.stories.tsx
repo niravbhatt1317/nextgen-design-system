@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { Icon } from '../Icon';
 import { Select } from './Select';
 import type { SelectOption, SelectProps } from './Select.types';
 import { cn } from '@/utils';
@@ -715,6 +716,86 @@ export const WithDescriptions: Story = {
   },
 };
 
+/* EVERY FIELD IS ONE LINE (Pranjal, 2026-10-16/17: "we really need to set some standard which you cannot break") */
+const approvalPolicies: SelectOption[] = [
+  {
+    value: 'auto',
+    label: 'Runs at once, without waiting for anyone to approve the change',
+    description: 'Default · nobody is asked before the change goes out to the fleet',
+  },
+  {
+    value: 'one',
+    label: 'One approver from the platform operations team',
+    description: '6 people can approve',
+  },
+  {
+    value: 'two',
+    label: 'Two approvers, one of them from security and compliance',
+    description: '11 people can approve',
+  },
+  { value: 'owner', label: 'The agent owner' },
+];
+
+const fleetSites: SelectOption[] = [
+  { value: 'mum', label: 'Mumbai data centre, rack row C (primary production)' },
+  { value: 'blr', label: 'Bengaluru disaster-recovery site' },
+  { value: 'fra', label: 'Frankfurt edge collectors' },
+  { value: 'sgp', label: 'Singapore' },
+  { value: 'nyc', label: 'New York branch office' },
+];
+
+/**
+ * **One line, always.** A closed field shows the chosen label only - never its description - on one line, from the
+ * left, ending in "…" when it does not fit. Open, the list is at least as wide as the field and grows to fit its
+ * longest option up to 320; every option reads from the left on one line, its name 14/500 in the reading ink and its
+ * description one step lighter, 2 below it.
+ */
+export const OneLineSingle: Story = {
+  render: function RenderOneLineSingle() {
+    const [value, setValue] = useState<string | null>('auto');
+    return (
+      <div style={{ width: '240px' }}>
+        <Select
+          options={approvalPolicies}
+          value={value}
+          onChange={(val) => {
+            setValue(val as string);
+          }}
+          label="Approval"
+          placeholder="Pick who approves"
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * **A multi-pick never grows past its height.** One pick shows (`maxPills` is 1 by default), then "+N"; the pill
+ * shrinks to "…" and the "+N" never does. The open list follows the single list's width rule.
+ */
+export const OneLineMulti: Story = {
+  render: function RenderOneLineMulti() {
+    const [value, setValue] = useState<string[]>(['mum', 'blr', 'fra', 'nyc']);
+    return (
+      <div style={{ width: '260px' }}>
+        <Select
+          mode="multiple"
+          options={fleetSites}
+          value={value}
+          onChange={(val) => {
+            setValue(val as string[]);
+          }}
+          label="Where it applies"
+          placeholder="Pick sites"
+          showPills
+          maxPills={1}
+          clearable
+        />
+      </div>
+    );
+  },
+};
+
 /**
  * Multi-select with select all checkbox.
  */
@@ -1054,7 +1135,9 @@ export const CustomTrigger: Story = {
 };
 
 /**
- * Custom item renderer for rich option display.
+ * Custom item renderer for rich option display. A hand-drawn row still follows the one selection rule (Pranjal,
+ * 2026-10-21): the picked row on the pale blue-10 ground with the tick on the RIGHT in the reading ink; the row under
+ * the pointer takes only the grey ground and no tick.
  */
 export const CustomItem: Story = {
   render: function RenderCustomItem() {
@@ -1071,10 +1154,9 @@ export const CustomItem: Story = {
         renderItem={({ option, selected, disabled }) => (
           <div
             className={cn(
-              'mdt-flex mdt-items-center mdt-gap-3 mdt-rounded-md mdt-p-3',
+              'mdt-flex mdt-items-center mdt-gap-3 mdt-rounded-sm mdt-p-3',
               'mdt-transition-colors',
-              selected && 'mdt-border mdt-border-primary mdt-bg-primary/10',
-              !selected && 'mdt-hover:bg-accent',
+              selected ? 'mdt-bg-blue-10' : 'hover:mdt-bg-neutral-10',
               disabled && 'mdt-cursor-not-allowed mdt-opacity-50'
             )}
           >
@@ -1091,21 +1173,9 @@ export const CustomItem: Story = {
                 <div className="mdt-text-xs mdt-text-muted-foreground">{option.description}</div>
               )}
             </div>
-            {selected && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="mdt-text-primary"
-                aria-hidden="true"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            )}
+            <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center">
+              {selected && <Icon name="check" size={16} aria-hidden />}
+            </span>
           </div>
         )}
       />

@@ -217,4 +217,21 @@ describe('TableViewSwitcherOld', () => {
       expect(screen.queryByText(/Unsaved changes to/)).not.toBeInTheDocument();
     });
   });
+
+  /* the one selection look (Pranjal, 2026-10-21): the active view on the pale ground, its tick on the RIGHT */
+  describe('the active view', () => {
+    it('sits on the pale ground with its tick last in the row; other rows keep the slot empty', async () => {
+      const user = userEvent.setup();
+      render(<TableViewSwitcherOld views={views} activeId="b" onApply={noop} onSaveAs={noop} />);
+      await open(user);
+      const active = screen.getByRole('option', { name: 'Mine' });
+      const other = screen.getByRole('option', { name: 'Open tickets' });
+      expect(active).toHaveClass('mdt-bg-blue-10');
+      expect(other).not.toHaveClass('mdt-bg-blue-10');
+      expect(active.lastElementChild?.tagName.toLowerCase()).toBe('svg');
+      expect(active.lastElementChild).not.toHaveClass('mdt-invisible');
+      expect(other.lastElementChild).toHaveClass('mdt-invisible');
+      expect(active.firstElementChild).toHaveTextContent('Mine');
+    });
+  });
 });
