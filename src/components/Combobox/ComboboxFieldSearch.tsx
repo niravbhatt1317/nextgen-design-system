@@ -313,11 +313,14 @@ export const ComboboxFieldSearch = forwardRef<HTMLInputElement, ComboboxProps>(
                           {selectedOption.icon}
                         </span>
                       )}
-                      <span className="mdt-min-w-0 mdt-truncate">{selectedOption.label}</span>
+                      <span className="mdt-max-w-[70%] mdt-shrink-0 mdt-truncate">
+                        {selectedOption.label}
+                      </span>
                       {selectedOption.description && (
                         <>
                           <span className="mdt-h-3 mdt-w-px mdt-shrink-0 mdt-bg-neutral-40" />
-                          <span className="mdt-shrink-0 mdt-whitespace-nowrap mdt-font-normal mdt-text-neutral-90">
+                          {/* a long second line gives way first and ends in "…"; the name keeps up to 70% */}
+                          <span className="mdt-min-w-0 mdt-truncate mdt-font-normal mdt-text-neutral-90">
                             {selectedOption.description}
                           </span>
                         </>
