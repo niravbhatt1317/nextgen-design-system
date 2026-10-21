@@ -1,0 +1,2 @@
+import{r as t}from"./iframe-fA3SzngA.js";var e=t.createContext(void 0);function i(r){const o=t.useContext(e);return r||o||"ltr"}export{i as u};
+//# sourceMappingURL=index-L5HWR9rX.js.map
