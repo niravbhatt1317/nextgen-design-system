@@ -62,6 +62,32 @@ not something to settle in a story. Live example: Storybook → Components → T
 
 ---
 
+## Colour — the console's `blue-10` (#F0F6FE), the picked-row ground
+
+The console overrides `--mdt-blue-10` to `214 90% 97%` (#F0F6FE) in its own
+`src/styles/global.css:121`, and `--mdt-feedback-info-bg` to the same value on line 155. The library
+holds `213 100% 96%` (#EBF4FF). Both are the ground under a picked row since the one selection look
+(#180), so the two repositories paint that row slightly differently today.
+
+**What shifts if adopted: nothing measurable.** The per-channel delta is **5, 2, −1** — relative
+luminance 0.8958 against 0.9159 — and the row's own label ink #1D2B3E reads **12.89:1** on ours
+against **13.17:1** on theirs. Both are far above AA either way, and no component distinguishes the
+two.
+
+This is logged rather than taken because of the **2026-10-14 ruling** (DECISIONS.md), which rejected
+a submission re-pointing eight light tokens at the console's values. `blue-10` was in that bundle,
+but it was not what the ruling was about: the grounds given were `neutral-110/-130/-150` collapsing
+into one value and `muted-foreground` falling to 2.65:1. Neither applies here. So this one is the
+**safe member of a rejected bundle**, and separating it out is the point of this entry.
+
+It stays unadopted for a different reason: there is nothing to gain. The override costs the console
+nothing, re-pointing a ramp step costs a published value change for every consumer, and a difference
+of 5/255 in one channel is not worth that. **Not a defect, and not a drift to chase** — a consumer
+overriding a token is the theming mechanism working as designed. If the two should ever be
+reconciled, it is the console dropping its override, not the library moving its step.
+
+---
+
 ## Colour — the console's info border (#C9DDF7)
 
 The console mock draws the info Banner's edge in `214 75% 88%` (#C9DDF7), typed into its own

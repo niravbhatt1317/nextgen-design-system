@@ -65,24 +65,15 @@ function OptionPrefix({ option }: Readonly<{ option: SelectOld2Option }>) {
 }
 
 /**
- * Renders the selection indicator (check/x icons) in a fixed 16 slot on the right, so labels never shift. The same
- * rule as `Select` (Pranjal, 2026-10-21): an unpicked row shows nothing, under the pointer too; a single pick keeps
- * its tick under the pointer (`deselectable={false}`); a multi pick still swaps it for an X, since a click there
- * deselects.
+ * Renders the selection indicator in a fixed 16 slot on the right, so labels never shift. The same rule as `Select`
+ * (Pranjal, 2026-10-21): an unpicked row shows nothing, under the pointer too. A picked row keeps its tick in every
+ * state, the pointer included - no X swap in the multi list either (Nirav, 2026-10-21), since taking the tick away
+ * under the pointer blanks the "picked" mark on whichever row you happen to be on.
  */
-function SelectionIndicator({
-  isSelected,
-  deselectable = true,
-}: Readonly<{ isSelected: boolean; deselectable?: boolean }>) {
+function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
   return (
     <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-flex-shrink-0 mdt-items-center mdt-justify-center">
-      {isSelected && !deselectable && <Icon name="check" size={16} aria-hidden />}
-      {isSelected && deselectable && (
-        <>
-          <Icon name="check" size={16} className="group-hover:mdt-hidden" aria-hidden />
-          <Icon name="x" size={12} className="mdt-hidden group-hover:mdt-block" aria-hidden />
-        </>
-      )}
+      {isSelected && <Icon name="check" size={16} aria-hidden />}
     </span>
   );
 }
@@ -430,7 +421,7 @@ function renderSingleSelectMode(props: {
                           <OptionContent option={option} />
                         </SelectPrimitive.ItemText>
                       </div>
-                      <SelectionIndicator isSelected={isSelected} deselectable={false} />
+                      <SelectionIndicator isSelected={isSelected} />
                     </SelectPrimitive.Item>
                     <OptionSeparator show={showSeparator} />
                   </div>
