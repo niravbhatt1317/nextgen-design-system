@@ -200,6 +200,7 @@ export { Combobox, comboboxTriggerVariants } from './Combobox';
 export type {
   ComboboxProps,
   ComboboxOption,
+  ComboboxSearch,
   ComboboxTriggerVariants,
   RenderOptionProps,
   RenderTriggerProps,

@@ -248,6 +248,9 @@ const explicit = {
   'neutral-30': D('color.border.bold'),
   'neutral-40': D('color.background.neutral.bold'),
   'neutral-60': '#7186A8',
+  /* an option's description in an open list: dark neutral-60, one step under the name (Pranjal 2026-10-16); the dark
+   * neutral-80 below is its neutral-90, too close to the name to read as the second line */
+  'option-subtext': '#7186A8',
   'neutral-80': D('color.text.subtle'),
   'neutral-90': D('color.text.subtle'),
   'neutral-100': D('color.text.subtle'),

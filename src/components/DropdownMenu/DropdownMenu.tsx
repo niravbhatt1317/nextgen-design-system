@@ -3,6 +3,7 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import { CHECKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '@/components/Icon';
 import type {
   DropdownMenuCheckboxItemProps,
@@ -36,6 +37,21 @@ const MENU_ITEM_DESTRUCTIVE_CLASSES =
   'mdt-text-red-60 data-[highlighted]:mdt-bg-feedback-danger-bg focus:mdt-bg-feedback-danger-bg';
 const MENU_ITEM_DISABLED_CLASSES =
   'data-[disabled]:mdt-pointer-events-none data-[disabled]:mdt-opacity-50';
+/* A PICKED ROW LOOKS THE SAME IN EVERY MENU (Pranjal, 2026-10-21): the checked row - a checkbox item or a radio
+ * item - sits on the pale blue-10 ground in every state, the tick on the RIGHT in the reading ink; the row under the
+ * pointer or the keys takes only the grey ground and no tick. The 32 the left once reserved for the mark is now kept
+ * on the right. The mark stays the row's FIRST child in the DOM and is only placed on the right, so a consumer that
+ * swaps it for a checkbox square (`[&>span:first-child]:mdt-hidden`, as DataTable's quick filters do) still hides it. */
+const MENU_CHOICE_ITEM_CLASSES = cn(
+  MENU_ITEM_BASE_CLASSES,
+  'mdt-pr-8',
+  MENU_ITEM_TRANSITION_CLASSES,
+  MENU_ITEM_FOCUS_CLASSES,
+  MENU_ITEM_DISABLED_CLASSES,
+  CHECKED_ROW_CLASSES
+);
+const MENU_CHOICE_MARK_CLASSES =
+  'mdt-pointer-events-none mdt-absolute mdt-right-2.5 mdt-flex mdt-h-4 mdt-w-4 mdt-items-center mdt-justify-center';
 
 /**
  * DropdownMenu root component
@@ -173,7 +189,19 @@ const DropdownMenuItem = forwardRef<
 DropdownMenuItem.displayName = 'DropdownMenuItem';
 
 /**
- * DropdownMenuCheckboxItem - menu item with checkbox
+ * The tick a checkbox or radio item shows once picked: on the right, in the row's own ink, only while checked.
+ */
+const ChoiceMark = () => (
+  <span className={MENU_CHOICE_MARK_CLASSES}>
+    <DropdownMenuPrimitive.ItemIndicator>
+      <Icon name="check" size="sm" aria-hidden />
+    </DropdownMenuPrimitive.ItemIndicator>
+  </span>
+);
+
+/**
+ * DropdownMenuCheckboxItem - menu item that can be ticked; several at once. A ticked row wears the pale ground and
+ * the tick on the right.
  */
 const DropdownMenuCheckboxItem = forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
@@ -181,29 +209,19 @@ const DropdownMenuCheckboxItem = forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(
-      MENU_ITEM_BASE_CLASSES,
-      'mdt-pl-8',
-      MENU_ITEM_TRANSITION_CLASSES,
-      MENU_ITEM_FOCUS_CLASSES,
-      MENU_ITEM_DISABLED_CLASSES,
-      className
-    )}
+    className={cn(MENU_CHOICE_ITEM_CLASSES, className)}
     {...(checked !== undefined && { checked })}
     {...props}
   >
-    <span className="mdt-absolute mdt-left-2.5 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Icon name="check" size="sm" aria-hidden />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+    <ChoiceMark />
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
 ));
 DropdownMenuCheckboxItem.displayName = 'DropdownMenuCheckboxItem';
 
 /**
- * DropdownMenuRadioItem - menu item with radio selection
+ * DropdownMenuRadioItem - menu item for one choice among several. The chosen row wears the pale ground and the tick
+ * on the right, as every picked option does (Pranjal, 2026-10-21; it carried a dot on the left until then).
  */
 const DropdownMenuRadioItem = forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
@@ -211,21 +229,10 @@ const DropdownMenuRadioItem = forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={cn(
-      MENU_ITEM_BASE_CLASSES,
-      'mdt-pl-8',
-      MENU_ITEM_TRANSITION_CLASSES,
-      MENU_ITEM_FOCUS_CLASSES,
-      MENU_ITEM_DISABLED_CLASSES,
-      className
-    )}
+    className={cn(MENU_CHOICE_ITEM_CLASSES, className)}
     {...props}
   >
-    <span className="mdt-absolute mdt-left-2.5 mdt-flex mdt-h-3.5 mdt-w-3.5 mdt-items-center mdt-justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Icon name="circle" size="xs" aria-hidden />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+    <ChoiceMark />
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ));

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,8 @@ function TablePager({
             {pageSizes.map((s) => (
               <DropdownMenuItem
                 key={s}
+                /* the current size on the pale ground, its tick on the right (Pranjal, 2026-10-21: every selection looks the same) */
+                className={s === pageSize ? PICKED_ROW_CLASSES : undefined}
                 onSelect={() => {
                   onPageSize(s);
                 }}

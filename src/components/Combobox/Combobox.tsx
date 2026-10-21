@@ -1,12 +1,14 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
-import { forwardRef, useCallback, useEffect, useId, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useState, type Ref } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import type { ComboboxProps } from './Combobox.types';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Icon } from '../Icon';
+import { ComboboxFieldSearch } from './ComboboxFieldSearch';
 
 /**
  * Combobox trigger variants using Class Variance Authority (CVA)
@@ -72,7 +74,7 @@ export const comboboxTriggerVariants = cva(
  * />
  * ```
  */
-const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
+const ComboboxInList = forwardRef<HTMLButtonElement, ComboboxProps>(
   (
     {
       // Core props
@@ -329,7 +331,7 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                 <CommandPrimitive.List className="mdt-max-h-[300px] mdt-overflow-y-auto mdt-overflow-x-hidden mdt-p-1">
                   {filteredOptions.length === 0 && (
                     <CommandPrimitive.Empty className="mdt-py-6 mdt-text-center mdt-text-sm mdt-text-muted-foreground">
-                      {emptyMessage}
+                      {typeof emptyMessage === 'function' ? emptyMessage(search.trim()) : emptyMessage}
                     </CommandPrimitive.Empty>
                   )}
                   {filteredOptions.map((option) => {
@@ -357,22 +359,15 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                           'hover:mdt-bg-neutral-10',
                           "data-[disabled='true']:mdt-pointer-events-none data-[disabled='true']:mdt-opacity-50",
                           'aria-selected:mdt-bg-neutral-10',
-                          isSelected && 'mdt-bg-neutral-10'
+                          /* the picked option on the pale ground in every state, the highlight under the pointer
+                           * or the keys stays grey (Pranjal, 2026-10-21: every selection looks the same) */
+                          isSelected && PICKED_ROW_CLASSES
                         )}
                       >
                         {renderOption ? (
                           renderOption({ option, selected: isSelected })
                         ) : (
                           <>
-                            <Icon
-                              name="check"
-                              size="sm"
-                              className={cn(
-                                'mdt-mr-2',
-                                isSelected ? 'mdt-opacity-100' : 'mdt-opacity-0'
-                              )}
-                              aria-hidden
-                            />
                             <div className="mdt-flex mdt-flex-1 mdt-flex-col">
                               <span>{option.label}</span>
                               {option.description && (
@@ -381,6 +376,17 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                                 </span>
                               )}
                             </div>
+                            {/* the tick on the RIGHT in the reading ink; an unpicked row keeps the 16 slot
+                             * empty so the labels never shift (2026-10-21) */}
+                            <Icon
+                              name="check"
+                              size="sm"
+                              className={cn(
+                                'mdt-ml-2 mdt-shrink-0',
+                                isSelected ? 'mdt-opacity-100' : 'mdt-opacity-0'
+                              )}
+                              aria-hidden
+                            />
                           </>
                         )}
                       </CommandPrimitive.Item>
@@ -405,6 +411,21 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       </div>
     );
   }
+);
+
+ComboboxInList.displayName = 'ComboboxInList';
+
+/**
+ * `search="list"` (the default) is the field as a button with its own search box at the top of the open list.
+ * `search="field"` is the type-in picker: the field itself is the search box and the list only shows results - see
+ * ComboboxFieldSearch. In that mode the forwarded ref is the field's input.
+ */
+const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(({ search = 'list', ...props }, ref) =>
+  search === 'field' ? (
+    <ComboboxFieldSearch {...props} ref={ref as unknown as Ref<HTMLInputElement>} />
+  ) : (
+    <ComboboxInList {...props} ref={ref} />
+  )
 );
 
 Combobox.displayName = 'Combobox';

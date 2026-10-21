@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Button } from '../Button';
 import { Checkbox } from '../Checkbox';
 import {
@@ -136,8 +137,10 @@ const TableViewMenuOld = ({
               <CommandList>
                 <CommandEmpty>No columns match.</CommandEmpty>
                 <CommandGroup>
+                  {/* the picked grouping on the pale ground, its tick on the right (Pranjal, 2026-10-21) */}
                   <CommandItem
                     value="None"
+                    className={groupBy === null ? PICKED_ROW_CLASSES : undefined}
                     onSelect={() => {
                       onGroupBy(null);
                       close();
@@ -157,6 +160,7 @@ const TableViewMenuOld = ({
                       <CommandItem
                         key={column.key}
                         value={column.label}
+                        className={groupBy === column.key ? PICKED_ROW_CLASSES : undefined}
                         onSelect={() => {
                           onGroupBy(column.key);
                           close();

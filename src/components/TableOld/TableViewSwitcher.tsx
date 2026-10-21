@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Button } from '../Button';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '../Command';
 import { Icon } from '../Icon';
@@ -190,18 +191,15 @@ const TableViewSwitcherOld = ({
                     <CommandItem
                       key={view.id}
                       value={view.name}
-                      className="mdt-group/view mdt-gap-2"
+                      className={cn(
+                        'mdt-group/view mdt-gap-2',
+                        view.id === activeId && PICKED_ROW_CLASSES
+                      )}
                       onSelect={() => {
                         onApply(view.id);
                         close(false);
                       }}
                     >
-                      <Icon
-                        name="check"
-                        size="sm"
-                        aria-hidden
-                        className={cn(view.id !== activeId && 'mdt-invisible')}
-                      />
                       <span className="mdt-flex-1 mdt-truncate">{view.name}</span>
                       {/*
                         Revealed on hover and on focus. Always-on rename and
@@ -240,6 +238,18 @@ const TableViewSwitcherOld = ({
                           </Button>
                         )}
                       </span>
+                      {/*
+                        The active view on the pale ground with its tick on the
+                        RIGHT, after the row's actions (Pranjal, 2026-10-21:
+                        every selection looks the same). Other rows keep the 16
+                        slot empty so every tick lines up.
+                      */}
+                      <Icon
+                        name="check"
+                        size="sm"
+                        aria-hidden
+                        className={cn('mdt-shrink-0', view.id !== activeId && 'mdt-invisible')}
+                      />
                     </CommandItem>
                   ))}
                 </CommandGroup>

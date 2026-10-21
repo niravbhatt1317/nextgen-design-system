@@ -560,3 +560,77 @@ describe('DropdownMenu', () => {
     });
   });
 });
+
+/* ONE SELECTION LOOK (Pranjal, 2026-10-21): a checked checkbox or radio row sits on the pale ground with its tick on
+ * the RIGHT; the mark stays the row's first child, so a consumer hiding `[&>span:first-child]` still hides it. */
+describe('DropdownMenu - the one selection look', () => {
+  it('a checked checkbox row holds the pale ground and carries its tick on the right', async () => {
+    const user = userEvent.setup();
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open Menu</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuCheckboxItem checked>Ticked</DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem checked={false}>Not ticked</DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await user.click(screen.getByRole('button', { name: 'Open Menu' }));
+    const ticked = screen.getByRole('menuitemcheckbox', { name: 'Ticked' });
+    const plain = screen.getByRole('menuitemcheckbox', { name: 'Not ticked' });
+    expect(ticked).toHaveClass(
+      'mdt-pr-8',
+      'data-[state=checked]:mdt-bg-blue-10',
+      'data-[state=checked]:data-[highlighted]:mdt-bg-blue-10',
+      'data-[highlighted]:mdt-bg-neutral-10'
+    );
+    expect(ticked).not.toHaveClass('mdt-pl-8');
+    const mark = ticked.firstElementChild;
+    expect(mark?.tagName.toLowerCase()).toBe('span');
+    expect(mark).toHaveClass('mdt-absolute', 'mdt-right-2.5');
+    expect(mark?.querySelector('svg')).toBeInTheDocument();
+    expect(plain.querySelector('svg')).not.toBeInTheDocument();
+  });
+
+  it('a chosen radio row carries a tick on the right, not a dot on the left', async () => {
+    const user = userEvent.setup();
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open Menu</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuRadioGroup value="teams">
+            <DropdownMenuRadioItem value="users">Users</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="teams">Teams</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await user.click(screen.getByRole('button', { name: 'Open Menu' }));
+    const chosen = screen.getByRole('menuitemradio', { name: 'Teams' });
+    const other = screen.getByRole('menuitemradio', { name: 'Users' });
+    expect(chosen).toHaveAttribute('data-state', 'checked');
+    expect(chosen).toHaveClass('mdt-pr-8', 'data-[state=checked]:mdt-bg-blue-10');
+    expect(chosen).not.toHaveClass('mdt-pl-8');
+    expect(chosen.firstElementChild).toHaveClass('mdt-right-2.5');
+    expect(chosen.querySelectorAll('svg')).toHaveLength(1);
+    expect(other.querySelector('svg')).not.toBeInTheDocument();
+  });
+
+  it('a consumer class still wins over the reserved right padding', async () => {
+    const user = userEvent.setup();
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open Menu</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuCheckboxItem checked className="mdt-pr-2 [&>span:first-child]:mdt-hidden">
+            Square instead
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await user.click(screen.getByRole('button', { name: 'Open Menu' }));
+    const row = screen.getByRole('menuitemcheckbox', { name: 'Square instead' });
+    expect(row).toHaveClass('mdt-pr-2', '[&>span:first-child]:mdt-hidden');
+    expect(row).not.toHaveClass('mdt-pr-8');
+  });
+});
