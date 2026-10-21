@@ -1771,3 +1771,53 @@ describe('Select - single mode with search', () => {
     expect(await screen.findByText('No members match')).toBeInTheDocument();
   });
 });
+
+/* ONE SELECTION LOOK (Pranjal, 2026-10-21): the picked option sits on the pale blue-10 ground with the tick on the
+ * right; the option under the pointer or the keys takes only the grey ground and no tick; a picked row keeps its pale
+ * ground under the pointer. */
+describe('Select - the one selection look', () => {
+  it('multi: the picked row wears the pale ground in every state, an unpicked row shows no tick', async () => {
+    const user = userEvent.setup();
+    render(<Select mode="multiple" options={simpleOptions} value={['2']} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+    const unpicked = screen.getByText('Option 1').closest('button');
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+    expect(picked).not.toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
+    // the picked row still swaps its tick for an X under the pointer (a click there deselects); unpicked: nothing
+    expect(picked?.querySelectorAll('svg')).toHaveLength(2);
+    expect(unpicked?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('single with search: the picked row keeps its tick under the pointer, never an X', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select mode="single" searchable options={simpleOptions} defaultValue="3" aria-label="Pick" />
+    );
+    await user.click(screen.getByRole('combobox', { name: 'Pick' }));
+    await screen.findByPlaceholderText('Search...');
+    const rows = screen.getAllByText('Option 3').map((el) => el.closest('button'));
+    const picked = rows.find((b) => b?.getAttribute('role') !== 'combobox');
+    expect(picked).toHaveClass('mdt-bg-blue-10');
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByText('Option 1').closest('button')?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('single: the picked item holds the pale ground over the keyboard highlight, the rest go grey', async () => {
+    const user = userEvent.setup();
+    render(<Select options={simpleOptions} value="2" />);
+    await user.click(screen.getByRole('combobox'));
+    const picked = await screen.findByRole('option', { name: 'Option 2' });
+    const unpicked = screen.getByRole('option', { name: 'Option 1' });
+    expect(picked).toHaveAttribute('data-state', 'checked');
+    expect(picked).toHaveClass(
+      'data-[state=checked]:mdt-bg-blue-10',
+      'data-[state=checked]:data-[highlighted]:mdt-bg-blue-10'
+    );
+    expect(unpicked).toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+    expect(picked.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked.querySelectorAll('svg')).toHaveLength(0);
+  });
+});

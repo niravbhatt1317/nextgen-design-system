@@ -3,6 +3,7 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef, useCallback, useEffect, useId, useState } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import type { ComboboxProps } from './Combobox.types';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { Command as CommandPrimitive } from 'cmdk';
@@ -357,22 +358,15 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                           'hover:mdt-bg-neutral-10',
                           "data-[disabled='true']:mdt-pointer-events-none data-[disabled='true']:mdt-opacity-50",
                           'aria-selected:mdt-bg-neutral-10',
-                          isSelected && 'mdt-bg-neutral-10'
+                          /* the picked option on the pale ground in every state, the highlight under the pointer
+                           * or the keys stays grey (Pranjal, 2026-10-21: every selection looks the same) */
+                          isSelected && PICKED_ROW_CLASSES
                         )}
                       >
                         {renderOption ? (
                           renderOption({ option, selected: isSelected })
                         ) : (
                           <>
-                            <Icon
-                              name="check"
-                              size="sm"
-                              className={cn(
-                                'mdt-mr-2',
-                                isSelected ? 'mdt-opacity-100' : 'mdt-opacity-0'
-                              )}
-                              aria-hidden
-                            />
                             <div className="mdt-flex mdt-flex-1 mdt-flex-col">
                               <span>{option.label}</span>
                               {option.description && (
@@ -381,6 +375,17 @@ const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                                 </span>
                               )}
                             </div>
+                            {/* the tick on the RIGHT in the reading ink; an unpicked row keeps the 16 slot
+                             * empty so the labels never shift (2026-10-21) */}
+                            <Icon
+                              name="check"
+                              size="sm"
+                              className={cn(
+                                'mdt-ml-2 mdt-shrink-0',
+                                isSelected ? 'mdt-opacity-100' : 'mdt-opacity-0'
+                              )}
+                              aria-hidden
+                            />
                           </>
                         )}
                       </CommandPrimitive.Item>

@@ -16,6 +16,24 @@ one in `MISSING-TOKENS.md`, a capability in `CAPABILITIES.md`. This file is for 
 
 ---
 
+## 2026-10-21
+
+### A picked option looks the same in every list
+
+**Pranjal.** Every dropdown, list and menu marks a pick one way: the picked row on the pale
+`blue-10` ground with the tick on the right in the row's own ink; the row under the pointer or the
+keyboard on the grey `neutral-10` ground with no tick; a picked row keeps its pale ground under the
+pointer. No tick on the left anywhere, and no picked row without the ground.
+
+The ground is one pair of constants in `src/utils/picked-row.ts`: `PICKED_ROW_CLASSES` for a row
+whose state is known in code (it goes last in `cn()`, so the merger drops the row's own grey
+grounds), `CHECKED_ROW_CLASSES` for a Radix row that stamps `data-state="checked"` (every state is
+doubled with the checked selector, so it outranks the grey whatever order the stylesheet prints).
+
+**Still open:** a picked row in the multi-select swaps its tick for an X under the pointer, because a
+click there removes it. Whether that stays is his call. A row that carries a checkbox square
+instead of a tick (the quick filters) takes the pale ground too, by the same rule.
+
 ## 2026-10-14
 
 ### The console's light palette is not adopted — the ramp keeps its steps

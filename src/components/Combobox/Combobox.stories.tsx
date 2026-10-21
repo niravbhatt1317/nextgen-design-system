@@ -392,7 +392,9 @@ export const Controlled: Story = {
 };
 
 /**
- * Custom render function for options with colored indicator.
+ * Custom render function for options: a bolder label over its description. The row around it still wears the one
+ * selection look (Pranjal, 2026-10-21) - the pale ground when picked, the grey one under the pointer - so the custom
+ * part draws only the tick, on the RIGHT in the reading ink, in a slot that stays empty on unpicked rows.
  */
 export const CustomRenderOption: Story = {
   render: (args) => {
@@ -406,18 +408,15 @@ export const CustomRenderOption: Story = {
     searchPlaceholder: 'Search frameworks...',
     renderOption: ({ option, selected }) => (
       <div className="mdt-flex mdt-w-full mdt-items-center mdt-gap-3">
-        <div
-          className={`mdt-h-2 mdt-w-2 mdt-shrink-0 mdt-rounded-full ${
-            selected ? 'mdt-bg-primary' : 'mdt-bg-muted'
-          }`}
-        />
         <div className="mdt-flex mdt-flex-1 mdt-flex-col">
           <span className="mdt-font-medium">{option.label}</span>
           {option.description && (
             <span className="mdt-text-xs mdt-text-muted-foreground">{option.description}</span>
           )}
         </div>
-        {selected && <Icon name="check" size="sm" color="primary" aria-hidden />}
+        <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-shrink-0 mdt-items-center mdt-justify-center">
+          {selected && <Icon name="check" size="sm" aria-hidden />}
+        </span>
       </div>
     ),
   },

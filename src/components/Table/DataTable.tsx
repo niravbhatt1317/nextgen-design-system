@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import {
   AdvancedFilter,
   EMPTY_FILTER,
@@ -1016,13 +1017,15 @@ function DataTable<Row>({
           {/* THE USERS TABLE'S SORT MENU, to the number (Pranjal, 2026-09-17: "keep the sorting design element same as
            * users … other modules sort should look the same"): 220 wide, a SORT BY heading at 11/600 in the muted grey,
            * one row per field with the active one in the reading ink carrying ↑ or ↓, the rest in neutral-90, a
-           * hairline, and Clear sort always there in the muted grey - live only while a sort is on. */}
+           * hairline, and Clear sort always there in the muted grey - live only while a sort is on. The active field
+           * sits on the pale ground every picked option wears, its arrow kept on the right since the arrow carries the
+           * direction (Pranjal, 2026-10-21: every selection looks the same). */}
           <DropdownMenuContent align="end" className="mdt-w-[220px]">
             <DropdownMenuLabel className={MENU_HEADING}>Sort by</DropdownMenuLabel>
             {sortKeys.map((k) => (
               <DropdownMenuItem
                 key={k}
-                className={sortDir(k) ? undefined : 'mdt-text-neutral-90'}
+                className={sortDir(k) ? PICKED_ROW_CLASSES : 'mdt-text-neutral-90'}
                 onSelect={() => {
                   sort.set(k, sortDir(k) === 'asc' ? 'desc' : 'asc');
                 }}
