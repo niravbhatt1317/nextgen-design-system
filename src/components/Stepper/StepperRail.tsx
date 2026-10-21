@@ -1,7 +1,19 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/utils';
-import { Icon } from '../Icon';
-import type { StepState, StepperProps, StepperStep } from './Stepper.types';
+import { StepDisc, StepLabel } from './StepParts';
+import {
+  DESCRIPTION_LOOK,
+  HIT_BOX,
+  QUIET,
+  SETTLES,
+  TRIGGER,
+  lights,
+  resolveCounters,
+  resolveStep,
+  type StepLook,
+  type StepModel,
+} from './stepperState';
+import type { StepperProps, StepperStep } from './Stepper.types';
 
 /*
  * THE VERTICAL LAYOUT (`layout="vertical"`) - the same journey set down a rail, as the navigation of a two-column
@@ -9,68 +21,72 @@ import type { StepState, StepperProps, StepperStep } from './Stepper.types';
  * variant not a new component" - it was VerticalStepper in the console's local copy (2026-09-28).
  *
  * The horizontal layouts report progress above a form; this one IS the navigation: it sits in the left rail and the
- * panel beside it shows one step at a time. That is why it reads a second counter, `reached` - the furthest step
- * unlocked so far - so somebody can go back to step 2 and forward again to step 4 without redoing 3.
+ * panel beside it shows one step at a time. It reads the same two counters as every layout - `current` and `reached`
+ * - and adds what only a rail needs: a step past `reached` is locked, and says what opens it.
  */
-
-/** The same rule as the other layouts: a filled disc is settled, an outlined disc is live. */
-/** A disc not reached yet: the hairline edge, hollow, the faint ink. */
-const DISC_AHEAD = 'mdt-border-border mdt-bg-transparent mdt-text-faint';
-const DISC_STATE: Record<StepState, string> = {
-  complete: 'mdt-border-primary mdt-bg-primary mdt-text-primary-foreground',
-  current: 'mdt-border-primary mdt-bg-transparent mdt-text-foreground',
-  upcoming: DISC_AHEAD,
-  skipped: DISC_AHEAD,
-  disabled: DISC_AHEAD,
-};
 
 /**
- * One ink per distance from where you are: the step you are on is the heaviest, a finished one is full ink, a
- * reachable one waits in the secondary ink, and a locked one drops to the faint ink so it reads as not-yet.
+ * One ink per distance from where you are: the step you are on is the heaviest, a finished one and the one you left
+ * off at are full ink, and anything you have not got to waits in the quiet ink.
  */
-const LABEL_STATE: Record<StepState, string> = {
-  complete: 'mdt-font-medium mdt-text-foreground',
+const SETTLED_LABEL = 'mdt-font-medium mdt-text-foreground';
+const QUIET_LABEL = `mdt-font-medium ${QUIET}`;
+const LABEL_INK: Record<StepLook, string> = {
+  complete: SETTLED_LABEL,
   current: 'mdt-font-semibold mdt-text-foreground',
-  upcoming: 'mdt-font-medium mdt-text-muted-foreground',
-  skipped: 'mdt-font-medium mdt-text-muted-foreground',
-  disabled: 'mdt-font-medium mdt-text-faint',
+  reached: SETTLED_LABEL,
+  upcoming: QUIET_LABEL,
+  skipped: QUIET_LABEL,
+  disabled: QUIET_LABEL,
 };
 
-/** A locked step's label, whatever state it was given. */
-const LOCKED_LABEL = 'mdt-font-medium mdt-text-faint';
+/** The rail's disc: 24 across, a 1.5px edge, a 12px number. */
+const DISC_SIZE = 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs';
 
-/** Every part that changes colour does it over the same 150ms, as in the other layouts. */
-const SETTLES = 'mdt-transition-colors mdt-duration-150';
+/** The rail draws its tick heavier, so it holds up beside the 14px labels. */
+const TICK_STROKE = 2.5;
 
-const DISC_BASE = [
-  'mdt-flex mdt-h-6 mdt-w-6 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-full',
-  'mdt-box-border mdt-border-[1.5px] mdt-text-xs mdt-font-semibold mdt-tabular-nums',
-  SETTLES,
-];
-
-/** The row: disc, then the text, 12px apart. */
-const ROW = 'mdt-flex mdt-w-full mdt-items-start mdt-gap-3 mdt-text-left';
-
-/** Works out a step's state from the two counters, unless it was told one. */
-const resolveRailState = (
-  step: StepperStep,
-  index: number,
-  current: number,
-  reached: number
-): StepState => {
-  if (step.state !== undefined) return step.state;
-  if (index === current) return 'current';
-  // Behind you, or ahead of you but already finished once - you came back to fix something, and the steps after it
-  // are still done.
-  if (index < current || index <= reached) return 'complete';
-  return 'upcoming';
-};
+/** The row: disc, then the text, 12px apart - the same box whether or not it is a button. */
+const ROW = 'mdt-w-full mdt-items-start mdt-gap-3 mdt-text-left';
 
 type StepperRailProps = Omit<StepperProps, 'layout' | 'responsive'>;
 
+/** The disc, then the label over its description. */
+const railBody = (step: StepperStep, index: number, model: StepModel): ReactNode => (
+  <>
+    <StepDisc
+      index={index}
+      model={model}
+      className={DISC_SIZE}
+      markSize="xs"
+      tickStroke={TICK_STROKE}
+    />
+    <span className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col mdt-gap-0.5 mdt-pt-0.5">
+      <StepLabel
+        label={step.label}
+        model={model}
+        className="mdt-text-sm mdt-leading-[1.3]"
+        ink={LABEL_INK}
+      />
+      {step.description !== undefined && step.description !== '' ? (
+        <span
+          data-slot="stepper-description"
+          className={cn(
+            'mdt-truncate mdt-text-xs mdt-leading-[1.4]',
+            SETTLES,
+            DESCRIPTION_LOOK[model.look]
+          )}
+        >
+          {step.description}
+        </span>
+      ) : null}
+    </span>
+  </>
+);
+
 /**
- * The rail. A step is a button only when you can actually go there: `onStepSelect` is given, it is unlocked, and it
- * is not the one you are on. A locked step is plain text, marked disabled, and says what opens it.
+ * The rail. A step is a button only when you can actually go there: `onStepSelect` is given, you have got that far,
+ * and it is not the one you are on. A locked step is plain text, marked disabled, and says what opens it.
  */
 export const StepperRail = ({
   steps,
@@ -80,22 +96,7 @@ export const StepperRail = ({
   className,
   ...props
 }: StepperRailProps) => {
-  const last = Math.max(steps.length - 1, 0);
-  const at = Math.min(Math.max(current, 0), last);
-  // Never behind where you are standing: you cannot be on a step you have not reached.
-  const furthest = Math.min(Math.max(reached ?? at, at), last);
-
-  const renderDisc = (state: StepState, index: number): ReactNode => (
-    <span data-slot="stepper-disc" className={cn(DISC_BASE, DISC_STATE[state])} aria-hidden="true">
-      {state === 'complete' ? (
-        <Icon name="check" size="xs" strokeWidth={2.5} aria-hidden />
-      ) : state === 'skipped' ? (
-        <Icon name="minus" size="xs" aria-hidden />
-      ) : (
-        index + 1
-      )}
-    </span>
-  );
+  const counters = resolveCounters(steps.length, current, reached);
 
   return (
     <nav className={cn('mdt-w-full', className)} {...props}>
@@ -105,82 +106,50 @@ export const StepperRail = ({
         data-layout="vertical"
       >
         {steps.map((step, index) => {
-          const state = resolveRailState(step, index, at, furthest);
+          const model = resolveStep(step, index, counters, onStepSelect !== undefined);
           const key = step.id ?? index;
-          const locked = index > furthest;
-          const selectable =
-            onStepSelect !== undefined && !locked && index !== at && state !== 'disabled';
+          const locked = index > counters.far;
+          const select = model.selectable ? onStepSelect : undefined;
 
           // Only says what opens it when that can be said in words.
           const behind = index > 0 ? steps[index - 1] : undefined;
           const lockedTitle =
             locked && typeof behind?.label === 'string' ? `Opens after ${behind.label}` : undefined;
 
-          const content = (
-            <>
-              {renderDisc(state, index)}
-              <span className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col mdt-gap-0.5 mdt-pt-0.5">
-                <span
-                  data-slot="stepper-label"
-                  className={cn(
-                    'mdt-text-sm mdt-leading-[1.3]',
-                    SETTLES,
-                    locked ? LOCKED_LABEL : LABEL_STATE[state],
-                    selectable && 'group-hover:mdt-text-foreground'
-                  )}
-                >
-                  {step.label}
-                </span>
-                {step.description !== undefined && step.description !== '' ? (
-                  <span
-                    data-slot="stepper-description"
-                    className="mdt-truncate mdt-text-xs mdt-leading-[1.4] mdt-text-faint"
-                  >
-                    {step.description}
-                  </span>
-                ) : null}
-              </span>
-            </>
-          );
-
-          const row = selectable ? (
+          const row = select ? (
             <button
               type="button"
               data-slot="stepper-trigger"
               onClick={() => {
-                onStepSelect(index, step);
+                select(index, step);
               }}
-              className={cn(
-                'mdt-group mdt-rounded-md',
-                'focus-visible:mdt-outline-none focus-visible:mdt-ring-2 focus-visible:mdt-ring-ring focus-visible:mdt-ring-offset-2 focus-visible:mdt-ring-offset-background',
-                ROW
-              )}
+              className={cn(HIT_BOX, ROW, TRIGGER)}
             >
-              {content}
+              {railBody(step, index, model)}
             </button>
           ) : (
-            <div className={ROW}>{content}</div>
+            <div className={cn(HIT_BOX, ROW)}>{railBody(step, index, model)}</div>
           );
 
-          // The line runs down from this disc to the next one, and fills once this step is finished - a report on
-          // the journey, as in the stacked layout.
-          const joined = state === 'complete';
+          // The line runs down from this disc to the next one, and fills once you have got past this step - a report
+          // on the journey, as in the stacked layout. Going back does not empty it.
+          const joined = index < counters.far && lights(model.state);
 
           return (
             <li
               key={key}
               data-slot="stepper-step"
-              data-state={state}
+              data-state={model.state}
               data-locked={locked || undefined}
               // Exactly one step carries this, so a screen reader says "current step" rather than reading seven
               // equal items.
-              {...(index === at ? { 'aria-current': 'step' as const } : {})}
-              {...(locked || state === 'disabled' ? { 'aria-disabled': true } : {})}
+              {...(index === counters.at ? { 'aria-current': 'step' as const } : {})}
+              {...(locked || model.state === 'disabled' ? { 'aria-disabled': true } : {})}
               title={lockedTitle}
               className={cn(
                 'mdt-relative',
                 index < steps.length - 1 && 'mdt-pb-5',
-                state === 'disabled' && 'mdt-opacity-45'
+                model.state === 'disabled' && 'mdt-opacity-45'
               )}
             >
               {index < steps.length - 1 ? (

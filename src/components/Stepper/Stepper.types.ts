@@ -23,11 +23,14 @@ export type StepperVariantsType = VariantProps<typeof stepperVariants>;
  * `vertical` sets the journey down a rail, as the navigation of a two-column
  * flow: the rail on the left, the panel beside it showing one step at a time.
  * It is the one layout that IS the navigation rather than a report above a
- * form, so it reads one more counter, `reached`, and lets you click back to
- * any unlocked step - not only finished ones. (Until 2026-10-11 this comment
- * said vertical was a different component; Pranjal ruled it a variant: "we
- * already have steppers so it should be sent as a variant not a new
- * component".)
+ * form, so a step past `reached` is locked there and says what opens it. (Until
+ * 2026-10-11 this comment said vertical was a different component; Pranjal
+ * ruled it a variant: "we already have steppers so it should be sent as a
+ * variant not a new component".)
+ *
+ * Every layout reads the same two counters, `current` and `reached`, and draws
+ * a step the same way: hover marks only the disc and the name, a clickable step
+ * is exactly the same box as a plain one, and a finished step reads in full ink.
  */
 export type StepperLayout = 'stacked' | 'inline' | 'underline' | 'vertical';
 
@@ -44,6 +47,11 @@ export type StepperLayout = 'stacked' | 'inline' | 'underline' | 'vertical';
  * and never what it is, so it always needs a message beside it - and once the
  * message is there, the disc is repeating itself. Leave the step as `current`
  * and put a `Banner` under the strip.
+ *
+ * Each step writes its state to `data-state`. One more value appears there that
+ * is never set by hand: `reached`, on the furthest step got to once you have
+ * gone back from it (see `reached` on the Stepper) - outlined, because it is
+ * not finished, and where you left off.
  */
 export type StepState = 'complete' | 'current' | 'upcoming' | 'skipped' | 'disabled';
 
@@ -85,14 +93,21 @@ export interface StepperOwnProps {
   layout?: StepperLayout | undefined;
 
   /**
-   * `vertical` only: the furthest step unlocked so far. Never less than
-   * `current`.
+   * The furthest step got to so far. Never less than `current`. Every layout
+   * reads it (until 2.4.0, only `vertical` did).
    *
    * This is what lets somebody go **back** without losing their place: step 4
-   * was reached, they returned to step 2 to fix a field, and steps 3 and 4 are
-   * still open to them - shown finished, and clickable. Everything past it is
-   * locked: plain text, faint, titled "Opens after <the step before>".
-   * Ignored by the horizontal layouts.
+   * was reached, they returned to step 2 to fix a field, and nothing is undone.
+   * Step 3 keeps its tick, step 4 shows as where you left off (outlined, its
+   * name in full ink), the line or bar stays filled up to step 4, and step 2 -
+   * the one they are on - keeps its tick inside a "you are here" ring. With
+   * `onStepSelect`, steps 1, 3 and 4 are all clickable.
+   *
+   * Everything past it is not somewhere you can go. On `vertical` it is locked:
+   * plain text, quiet, titled "Opens after <the step before>".
+   *
+   * Leave it out and it is `current`, which draws exactly what a strip without
+   * it always drew.
    *
    * @default current
    */
@@ -110,8 +125,13 @@ export interface StepperOwnProps {
   responsive?: boolean | undefined;
 
   /**
-   * Makes finished steps clickable, and only finished ones. On `vertical`,
-   * every unlocked step except the one you are on (see `reached`).
+   * Makes every step you have got to clickable - each one up to `reached` -
+   * except the one you are on, and never a step set to `skipped` or
+   * `disabled`. Without `reached` that is exactly the finished steps.
+   *
+   * A clickable step is the same box as a plain one, so nothing moves when this
+   * is given. Hover marks only its disc (a soft halo) and its name (a dashed
+   * underline); keyboard focus rings the disc.
    *
    * Leave it out and no step is focusable at all, which is right for a wizard
    * that acts as it goes - you cannot return to step 1 because step 2 already
