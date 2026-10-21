@@ -105,6 +105,63 @@ describe('KpiCard', () => {
   });
 });
 
+/* Pranjal, 2026-10-15, on the two-column settings pages: "use smaller text so that it doesnt get that much
+ * attention just enough to show its there". */
+describe('KpiCard size', () => {
+  const card = (container: HTMLElement) => container.firstElementChild as HTMLElement;
+
+  it('draws the 24px figure by default', () => {
+    const { container } = render(<KpiCard label="Total users" value={8200} />);
+    expect(card(container)).toHaveAttribute('data-size', 'md');
+    expect(screen.getByText('8.2k')).toHaveClass('mdt-text-2xl', 'mdt-font-medium');
+    expect(screen.getByText('8.2k')).not.toHaveClass('mdt-text-base', 'mdt-font-semibold');
+  });
+
+  it('sm steps the number down to 16/24 at 600 and leaves the label and hint alone', () => {
+    const { container } = render(
+      <KpiCard size="sm" label="Sites" value={12} hint="across three regions" />
+    );
+    expect(card(container)).toHaveAttribute('data-size', 'sm');
+    const value = screen.getByText('12');
+    expect(value).toHaveClass('kpi-value', 'mdt-text-base', 'mdt-leading-6', 'mdt-font-semibold');
+    expect(value).not.toHaveClass('mdt-text-2xl', 'mdt-font-medium');
+    expect(screen.getByText('Sites')).toHaveClass('mdt-text-xs');
+    expect(screen.getByText('across three regions')).toHaveClass('mdt-text-xs');
+  });
+
+  it('sm reaches every segment of a group', () => {
+    render(
+      <KpiCard
+        size="sm"
+        label="Structure"
+        items={[
+          { label: 'Sites', value: 12 },
+          { label: 'Departments', value: 48 },
+        ]}
+      />
+    );
+    expect(screen.getByRole('group', { name: 'Structure' })).toHaveAttribute('data-size', 'sm');
+    expect(screen.getByText('12')).toHaveClass('mdt-text-base');
+    expect(screen.getByText('48')).toHaveClass('mdt-text-base');
+  });
+
+  it('a card holding a chart keeps the 24px figure, on every segment', () => {
+    const { container } = render(
+      <KpiCard
+        size="sm"
+        label="Capacity"
+        items={[
+          { label: 'Active users', value: 7640 },
+          { label: 'Licensed', value: 8200, chart: <KpiGauge percent={82} caption="capacity" /> },
+        ]}
+      />
+    );
+    expect(card(container)).toHaveAttribute('data-size', 'md');
+    expect(screen.getByText('7.6k')).toHaveClass('mdt-text-2xl');
+    expect(screen.getByText('8.2k')).toHaveClass('mdt-text-2xl');
+  });
+});
+
 describe('KpiStrip', () => {
   it('is a named, keyboard-reachable row that bleeds through the page inset', () => {
     render(

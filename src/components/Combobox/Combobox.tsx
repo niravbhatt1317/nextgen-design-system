@@ -331,9 +331,7 @@ const ComboboxInList = forwardRef<HTMLButtonElement, ComboboxProps>(
                 <CommandPrimitive.List className="mdt-max-h-[300px] mdt-overflow-y-auto mdt-overflow-x-hidden mdt-p-1">
                   {filteredOptions.length === 0 && (
                     <CommandPrimitive.Empty className="mdt-py-6 mdt-text-center mdt-text-sm mdt-text-muted-foreground">
-                      {typeof emptyMessage === 'function'
-                        ? emptyMessage(search.trim())
-                        : emptyMessage}
+                      {typeof emptyMessage === 'function' ? emptyMessage(search.trim()) : emptyMessage}
                     </CommandPrimitive.Empty>
                   )}
                   {filteredOptions.map((option) => {
@@ -422,13 +420,12 @@ ComboboxInList.displayName = 'ComboboxInList';
  * `search="field"` is the type-in picker: the field itself is the search box and the list only shows results - see
  * ComboboxFieldSearch. In that mode the forwarded ref is the field's input.
  */
-const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
-  ({ search = 'list', ...props }, ref) =>
-    search === 'field' ? (
-      <ComboboxFieldSearch {...props} ref={ref as unknown as Ref<HTMLInputElement>} />
-    ) : (
-      <ComboboxInList {...props} ref={ref} />
-    )
+const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(({ search = 'list', ...props }, ref) =>
+  search === 'field' ? (
+    <ComboboxFieldSearch {...props} ref={ref as unknown as Ref<HTMLInputElement>} />
+  ) : (
+    <ComboboxInList {...props} ref={ref} />
+  )
 );
 
 Combobox.displayName = 'Combobox';

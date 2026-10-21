@@ -109,7 +109,7 @@ function TablePager({
           className={cn(
             CONTROL,
             /* the typed page wears the reading ink at 14, as every field's value (Pranjal, 2026-09-27) */
-            'mdt-w-11 mdt-text-center mdt-text-sm mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
+            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-sm mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
           )}
           value={typed}
           inputMode="numeric"

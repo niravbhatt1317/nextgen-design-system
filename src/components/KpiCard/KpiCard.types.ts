@@ -38,7 +38,18 @@ export interface KpiMetricProps {
   maxWidth?: number | undefined;
 }
 
+/** How loud the number is: `md` the 24px figure, `sm` a quieter 16px one. */
+export type KpiCardSize = 'md' | 'sm';
+
 interface KpiCardCommonProps {
+  /**
+   * `sm` steps the number down from 24 to 16/24 at 600, so a card that sits beside a section's content registers
+   * without competing with it (Pranjal, 2026-10-15, on the two-column settings pages: "use smaller text so that it
+   * doesnt get that much attention just enough to show its there"). A card holding a chart keeps the 24 figure,
+   * because the gauge beside it is drawn to that size. Only the number changes; the label, hint and chip do not.
+   * @default 'md'
+   */
+  size?: KpiCardSize | undefined;
   className?: string | undefined;
   style?: CSSProperties | undefined;
 }

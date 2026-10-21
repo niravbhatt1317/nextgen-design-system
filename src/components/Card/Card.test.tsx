@@ -322,6 +322,41 @@ describe('CollapsibleCard', () => {
     expect(screen.getByTestId(HEADER)).not.toHaveClass('last:mdt-border-b-0');
   });
 
+  /* Shut, the header is the whole card: 20 top / 0 bottom sat its words on the card's lower edge. The console's
+   * enrol summary cards evened it to 16 / 16 by hand (2026-10-21); it is the card's own rule now. */
+  it('keeps its header even top and bottom, shut and open, so the title does not move', async () => {
+    render(
+      <CollapsibleCard header={header}>
+        <p>CHG-0912</p>
+      </CollapsibleCard>
+    );
+    const shut = screen.getByTestId(HEADER);
+    expect(shut).toHaveClass('mdt-py-4', 'mdt-px-5');
+    expect(shut.className).not.toMatch(/mdt-p[tb]-/);
+    await userEvent.click(screen.getByTestId('card-toggle'));
+    const open = screen.getByTestId(HEADER);
+    expect(open).toHaveClass('mdt-py-4', 'mdt-px-5', 'mdt-border-b');
+    expect(open.className).not.toMatch(/mdt-p[tb]-/);
+  });
+
+  it('evens the header at the compact inset, and at none', () => {
+    const { unmount } = render(
+      <CollapsibleCard header={header} padding="compact">
+        <p>CHG-0912</p>
+      </CollapsibleCard>
+    );
+    expect(screen.getByTestId(HEADER)).toHaveClass('mdt-py-3.5', 'mdt-px-3.5');
+    expect(screen.getByTestId(HEADER).className).not.toMatch(/mdt-p[tb]-/);
+    unmount();
+    render(
+      <CollapsibleCard header={header} padding="none" defaultOpen>
+        <p>CHG-0912</p>
+      </CollapsibleCard>
+    );
+    expect(screen.getByTestId(HEADER)).toHaveClass('mdt-py-0', 'mdt-px-0');
+    expect(screen.getByTestId(HEADER).className).not.toMatch(/mdt-p[tb]-/);
+  });
+
   it('honours defaultOpen', () => {
     render(
       <CollapsibleCard header={header} defaultOpen>
