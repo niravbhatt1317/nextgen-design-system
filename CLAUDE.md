@@ -1,4 +1,6 @@
-**READ FIRST: the design rulebook lives in the product repo** - `Functional/next-gen-ui/DESIGN-LANGUAGE.md` on Azure DevOps (Motadata/NextGen/platform-documentation). Every number a part in this library carries is a rule there, with its status and who decided it; the parts keep their numbers in their own comments and stories, the book is where they are ruled. A rule changes only when the person running the session says so, recorded there with the date and their words. Console pages ride this library through a packed copy in the console's `vendor/`; a capability the library lacks is built here first, with a story, then the console rides it.
+**READ FIRST: the design rulebook lives in the product repo** - `Functional/next-gen-ui/DESIGN-LANGUAGE.md` on Azure DevOps (Motadata/NextGen/platform-documentation). Every number a part in this library carries is a rule there, with its status and who decided it; the parts keep their numbers in their own comments and stories, the book is where they are ruled. A rule changes only when the person running the session says so, recorded there with the date and their words. Console pages ride this library as a normal npm dependency — `@mtdt/nextgen-design-system` pinned in the console's `package.json`, resolved from the registry (the tarballs still in its `vendor/` are pre-2.0 leftovers and are not what builds). A capability the library lacks is built here first, with a story, then the console upgrades to it.
+
+**Both repositories are on this machine, side by side** — see [Where the console lives](#-where-the-console-lives-and-the-one-rule-about-it). The rulebook is a file you can open, not a thing to ask about.
 
 **On session start:** If `HANDOFF.md` exists in this directory, read it before anything else for the latest state of the work.
 
@@ -29,6 +31,63 @@ Everything below this section is the rulebook. This is the part that gets skippe
 checks at all — GitHub cannot build the merge it would test, so nothing is dispatched, and the pull
 request page looks the same as one that passed. Resolve the conflict first; it is what buys the
 first real signal.
+
+---
+
+## 🗂 Where the console lives, and the one rule about it
+
+Both halves of this work are on this machine, under one parent:
+
+```
+~/Claude-Projects/Next-Gen/
+├── AI Ready Design System/            ← this repo. GitHub. Design-team owned.
+└── platform-documentation/            ← Azure DevOps. Developer owned.
+    └── Functional/next-gen-ui/        ← the console: the product that consumes us
+        ├── DESIGN-LANGUAGE.md         the rulebook (the authority named at the top of this file)
+        ├── DESIGN-SYSTEM-GAPS.md      what the console needed and we did not have — READ THIS
+        ├── rulebook/                  the generated source of the book
+        └── src/                       the pages
+```
+
+A session only sees the second tree if it has been added as a working directory
+(`/add-dir ~/Claude-Projects/Next-Gen/platform-documentation`); it is saved in local settings, so
+normally it is already there. If `DESIGN-LANGUAGE.md` cannot be read, that is the reason.
+
+### The rule: read it, run it, do not write it
+
+**That repository belongs to the developers, and it sits on their branches.** Read it freely. Run it.
+**Never commit, push, branch, or stage there**, and never resolve a conflict in it. Anything the
+console needs changed goes through _their_ pull request — the same rule as "merges into someone
+else's branch go through their own pull request", for the same reason.
+
+The one exception is `DESIGN-LANGUAGE.md`, where a ruling has to be recorded. Draft the line, show
+it, and **leave the commit to the person running the session** — the rulebook records their words
+with their date, so it is signed by them or it is worth nothing.
+
+### The two documents are too large to read — use the generated source
+
+`CLAUDE.md` there is ≈155k tokens and `DESIGN-LANGUAGE.md` ≈194k. Loading either is not an option,
+and loading both is impossible. **The book is generated**, so query the source instead:
+
+```bash
+C=~/Claude-Projects/Next-Gen/platform-documentation/Functional/next-gen-ui
+node -e "const j=require('$C/rulebook/design-language.json');
+         console.log(j.counts, j.rules.length+' rules', j.open.length+' open')"
+ls $C/rulebook/sections/          # 25 files: 2-2-colour, 2-6-icons, 7-open-register, …
+```
+
+`design-language.json` holds **1,908 rules, 158 checks and 94 open items**, machine-readable.
+Read the one section that matters, never the book.
+
+### What to check there before arguing here
+
+- **`DESIGN-SYSTEM-GAPS.md`** is the console's own gap log, in the same shape as our
+  `COMPONENT-GAP.md` — "Searched for", "What we did instead", "What would remove our workaround".
+  It is the only backlog written by the consumer, which makes it the only one that is evidence.
+- **`rulebook` → `open`** is their register of undecided questions. Check it before adding a ruling
+  to `DECISIONS.md`, so the two do not contradict each other.
+- **Which version the console is actually on** — `grep nextgen-design-system $C/package.json`.
+  An upgrade note written without checking this is a guess.
 
 # CLAUDE.md - AI Assistant Instructions
 
@@ -795,8 +854,17 @@ before this rule existed, so blocking on them would stop every push. Switch CI t
 for both, and that is logged in `MISSING-TOKENS.md` as two of the missing categories. So `px-3` is
 not a violation; it is what every component does. A raw `p-[13px]` is.
 
-**Do not add colours.** The palette is 88 primitives and 25 semantic pairs, and it stays that size
-unless the design owner decides otherwise. If a borrowed design needs a colour we do not have, map
+**Do not add colours.** **286 tokens today — 147 primitive steps and 37 semantic names**
+(`TOKENS.md` carries the full census; `globals.css` is the source). Do not quote a palette size from
+memory, this line included: it said "88 primitives and 25 semantic pairs" until 2026-10-15, by which
+point it was wrong by 59, and the console's rulebook caught the drift before we did (open item O-83).
+
+**The size was never the rule. The rule is that the palette grows only when the design owner says
+so** — and it has, twice: the five category families on 2026-09-10 (`indigo`, `teal`, `magenta`,
+`cyan`, `lime`, 55 tokens) and the `--mdt-fixed-*` set in 2.3.0. Both were ruled, both are recorded.
+A count going up is not evidence the rule was broken; a count going up _silently_ is.
+
+If a borrowed design needs a colour we do not have, map
 it to the nearest step we own and say what shifted - a second green makes "which green" a live
 question on every component after it. The `--mdt-feedback-*` set is the model: its own names for a
 tinted surface, every value pointing at a ramp that already existed.
