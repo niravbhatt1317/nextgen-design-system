@@ -11,14 +11,9 @@ picked row keeps its pale ground under the pointer.
 
 - `Select` — the faint grey tick that appeared on an unpicked row under the pointer is gone (the
   16px slot stays, so labels do not move). Multi-select picked rows gain the pale ground. The
-  keyboard highlight in the plain single select now takes the grey ground.
-- `Select`, every mode — **a picked row keeps its tick while the pointer is on it.** The multi-select
-  used to replace that tick with a 12px X, to say that a click there removes the pick. It no longer
-  does (Nirav, 2026-10-21): taking the tick away under the pointer blanked the "picked" mark on
-  whichever row the mouse was on, which is the same fault as the faint tick this release removed from
-  unpicked rows. The pale ground still says "picked" and the row is still a toggle — **only the cue
-  is gone, not the behaviour.** If a flow taught people to look for that X, this is the line to read.
-- `SelectOld2` (deprecated) — the same changes, including the X.
+  keyboard highlight in the plain single select now takes the grey ground. (A picked row keeps its
+  tick under the pointer in every mode — see the entry below.)
+- `SelectOld2` (deprecated) — the same three changes.
 - `Combobox` — the tick moves from the left of the label to the right, and the picked row is pale
   blue instead of the grey it shared with the highlight.
 - `DropdownMenuCheckboxItem` — the tick moves from the left to the right (the 32px reserved on the
