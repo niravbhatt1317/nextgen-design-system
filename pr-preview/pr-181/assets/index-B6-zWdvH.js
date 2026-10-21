@@ -1,2 +1,0 @@
-import{r as i,j as t}from"./iframe-B8E0WCEE.js";import{P as o}from"./index-DWm8ojYn.js";var s=Object.freeze({position:"absolute",border:0,width:1,height:1,padding:0,margin:-1,overflow:"hidden",clip:"rect(0, 0, 0, 0)",whiteSpace:"nowrap",wordWrap:"normal"}),d="VisuallyHidden",e=i.forwardRef((r,a)=>t.jsx(o.span,{...r,ref:a,style:{...s,...r.style}}));e.displayName=d;var p=e;export{p as R,s as V};
-//# sourceMappingURL=index-B6-zWdvH.js.map
