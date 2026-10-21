@@ -79,26 +79,22 @@ function OptionPrefix({ option }: Readonly<{ option: SelectOption }>) {
 }
 
 /**
- * Renders the selection indicator (check/x icons) in a fixed 16 slot on the right, so labels never shift.
- * `deselectable` (2026-09-25): in the multi list a selected row swaps its tick for an X under the pointer because a
- * click there deselects it. A single pick does no such thing - clicking the picked option keeps it picked - so the
- * tick stays (Pranjal: "why does it show x icon when hovered on selected one. It should just reselect it again").
- * An unpicked row shows nothing, under the pointer too (Pranjal, 2026-10-21): the grey ground says "here", the tick
- * says "picked", and a faint tick on hover said both at once.
+ * Renders the selection indicator in a fixed 16 slot on the right, so labels never shift.
+ *
+ * A picked row keeps its tick in every state, the pointer included (Nirav, 2026-10-21). An unpicked row shows
+ * nothing, under the pointer too (Pranjal, 2026-10-21): the grey ground says "here", the tick says "picked", and a
+ * faint tick on hover said both at once.
+ *
+ * The multi list used to swap a picked row's tick for an X under the pointer, to advertise that a click there
+ * deselects. That is the same defect one step along: it took the "picked" mark away exactly when you pointed at the
+ * row, so running the mouse down a list of picks blanked each one in turn. The pale blue-10 ground already says
+ * "picked" and the row is still a toggle - the X only cost the tick. Removed with `deselectable`, the flag that
+ * existed solely to switch it (Pranjal, 2026-09-25: "why does it show x icon when hovered on selected one").
  */
-function SelectionIndicator({
-  isSelected,
-  deselectable = true,
-}: Readonly<{ isSelected: boolean; deselectable?: boolean }>) {
+function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
   return (
     <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-flex-shrink-0 mdt-items-center mdt-justify-center">
-      {isSelected && !deselectable && <Icon name="check" size={16} aria-hidden />}
-      {isSelected && deselectable && (
-        <>
-          <Icon name="check" size={16} className="group-hover:mdt-hidden" aria-hidden />
-          <Icon name="x" size={12} className="mdt-hidden group-hover:mdt-block" aria-hidden />
-        </>
-      )}
+      {isSelected && <Icon name="check" size={16} aria-hidden />}
     </span>
   );
 }
@@ -157,8 +153,6 @@ interface MultiSelectOptionButtonProps {
   option: SelectOption;
   isSelected: boolean;
   onToggle: (value: string) => void;
-  /** false in the searchable single select: a click on the picked row keeps it picked, so it keeps its tick */
-  deselectable: boolean;
 }
 
 /**
@@ -169,7 +163,6 @@ function MultiSelectOptionButton({
   option,
   isSelected,
   onToggle,
-  deselectable,
 }: Readonly<MultiSelectOptionButtonProps>) {
   return (
     <button
@@ -189,7 +182,7 @@ function MultiSelectOptionButton({
         <OptionPrefix option={option} />
         <OptionContent option={option} asColumn />
       </div>
-      <SelectionIndicator isSelected={isSelected} deselectable={deselectable} />
+      <SelectionIndicator isSelected={isSelected} />
     </button>
   );
 }
@@ -490,7 +483,7 @@ function renderSingleSelectMode(props: {
                           descriptionId={descriptionId}
                         />
                       </div>
-                      <SelectionIndicator isSelected={isSelected} deselectable={false} />
+                      <SelectionIndicator isSelected={isSelected} />
                     </SelectPrimitive.Item>
                     <OptionSeparator show={showSeparator} />
                   </div>
@@ -1041,7 +1034,6 @@ function renderPopoverDropdownContent(props: {
     disabled: boolean;
   }) => ReactNode;
   handleMultiSelectToggle: (value: string) => void;
-  deselectable: boolean;
   _virtual: boolean;
   itemsToRender:
     | SelectOption[]
@@ -1072,7 +1064,6 @@ function renderPopoverDropdownContent(props: {
     multiValue,
     _renderItem,
     handleMultiSelectToggle,
-    deselectable,
     _virtual,
     itemsToRender,
     virtualizer,
@@ -1109,7 +1100,6 @@ function renderPopoverDropdownContent(props: {
           multiValue,
           ...(_renderItem && { _renderItem }),
           handleMultiSelectToggle,
-          deselectable,
           _virtual,
           itemsToRender,
           virtualizer,
@@ -1140,7 +1130,6 @@ function renderMultiSelectOptionsContent(props: {
     disabled: boolean;
   }) => ReactNode;
   handleMultiSelectToggle: (value: string) => void;
-  deselectable: boolean;
   _virtual: boolean;
   itemsToRender:
     | SelectOption[]
@@ -1159,7 +1148,6 @@ function renderMultiSelectOptionsContent(props: {
     multiValue,
     _renderItem,
     handleMultiSelectToggle,
-    deselectable,
     _virtual,
     itemsToRender,
     virtualizer,
@@ -1212,7 +1200,6 @@ function renderMultiSelectOptionsContent(props: {
                   option={option}
                   isSelected={isSelected}
                   onToggle={handleMultiSelectToggle}
-                  deselectable={deselectable}
                 />
               );
             })}
@@ -1261,7 +1248,6 @@ function renderMultiSelectOptionsContent(props: {
                   option={option}
                   isSelected={isSelected}
                   onToggle={handleMultiSelectToggle}
-                  deselectable={deselectable}
                 />
               )}
             </div>
@@ -1302,7 +1288,6 @@ function renderMultiSelectOptionsContent(props: {
               option={option}
               isSelected={isSelected}
               onToggle={handleMultiSelectToggle}
-              deselectable={deselectable}
             />
             <OptionSeparator show={showSeparator} />
           </div>
@@ -1796,7 +1781,6 @@ function buildMultiSelectModeProps(params: {
     | ((props: { option: SelectOption; selected: boolean; disabled: boolean }) => ReactNode)
     | undefined;
   handleMultiSelectToggle: (value: string) => void;
-  deselectable: boolean;
   _virtual: boolean;
   itemsToRender:
     | SelectOption[]
@@ -1834,7 +1818,6 @@ function buildMultiSelectModeProps(params: {
     groupedOptions: params.groupedOptions,
     multiValue: params.multiValue,
     handleMultiSelectToggle: params.handleMultiSelectToggle,
-    deselectable: params.deselectable,
     _virtual: params._virtual,
     itemsToRender: params.itemsToRender,
     virtualizer: params.virtualizer,
@@ -1896,7 +1879,6 @@ interface MultiSelectModeProps {
     disabled: boolean;
   }) => ReactNode;
   handleMultiSelectToggle: (value: string) => void;
-  deselectable: boolean;
   _virtual: boolean;
   itemsToRender:
     | SelectOption[]
@@ -1944,7 +1926,6 @@ function renderMultiSelectMode(props: MultiSelectModeProps): ReactNode {
     multiValue,
     _renderItem,
     handleMultiSelectToggle,
-    deselectable,
     _virtual,
     itemsToRender,
     virtualizer,
@@ -2004,7 +1985,6 @@ function renderMultiSelectMode(props: MultiSelectModeProps): ReactNode {
               multiValue,
               ...(_renderItem && { _renderItem }),
               handleMultiSelectToggle,
-              deselectable,
               _virtual,
               itemsToRender,
               virtualizer,
@@ -2405,7 +2385,6 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
         multiValue: picked ? [String(picked.value)] : [],
         _renderItem,
         handleMultiSelectToggle: pickOne,
-        deselectable: false,
         _virtual: false,
         itemsToRender: sortedOptions,
         virtualizer,
@@ -2533,7 +2512,6 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
       multiValue,
       _renderItem,
       handleMultiSelectToggle,
-      deselectable: true,
       _virtual,
       itemsToRender,
       virtualizer,
