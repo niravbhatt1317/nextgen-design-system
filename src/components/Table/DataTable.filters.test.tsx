@@ -282,3 +282,71 @@ describe(
     });
   }
 );
+
+describe('the quick-filter menu says which column it filters', () => {
+  /** The heading is a label, not a tickable row - so it is read by text, not by role. */
+  const openStatusMenu = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(square() as HTMLElement);
+    return screen.findByRole('menu');
+  };
+
+  it('heads the menu with the label when nothing is passed', async () => {
+    const user = userEvent.setup();
+    render(<Users />);
+    const menu = await openStatusMenu(user);
+    /* the label already reads "Filter by status", so the default needs no prop */
+    expect(within(menu).getByText('Filter by status')).toBeInTheDocument();
+  });
+
+  it('takes a heading of its own over the label', async () => {
+    const user = userEvent.setup();
+    render(
+      <Users
+        quickFilter={{
+          columnKey: 'status',
+          label: 'Filter by status',
+          heading: 'Lifecycle',
+          options: STATUS,
+          value: (u) => u.status,
+        }}
+      />
+    );
+    /* the square keeps its spoken name - the heading does not rename the control.
+       Checked before opening: Radix aria-hides the page behind an open menu. */
+    expect(square()).toBeInTheDocument();
+    const menu = await openStatusMenu(user);
+    expect(within(menu).getByText('Lifecycle')).toBeInTheDocument();
+    expect(within(menu).queryByText('Filter by status')).not.toBeInTheDocument();
+  });
+
+  it('draws no heading when the page passes null', async () => {
+    const user = userEvent.setup();
+    render(
+      <Users
+        quickFilter={{
+          columnKey: 'status',
+          label: 'Filter by status',
+          heading: null,
+          options: STATUS,
+          value: (u) => u.status,
+        }}
+      />
+    );
+    const menu = await openStatusMenu(user);
+    expect(within(menu).queryByText('Filter by status')).not.toBeInTheDocument();
+  });
+
+  it('leaves the tickable rows alone - a heading is not an option', async () => {
+    const user = userEvent.setup();
+    render(<Users />);
+    const menu = await openStatusMenu(user);
+    expect(within(menu).getAllByRole('menuitemcheckbox')).toHaveLength(STATUS.length);
+  });
+
+  it('still filters with a heading drawn above the values', async () => {
+    const user = userEvent.setup();
+    render(<Users />);
+    await tickStatus(user, 'Active');
+    expect(rowCount()).toBe(ACTIVE);
+  });
+});

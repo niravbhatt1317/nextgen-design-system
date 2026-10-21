@@ -48,6 +48,20 @@ export interface DataTableQuickFilter<Row> {
    * as well"). Left unset, none.
    */
   searchable?: boolean | undefined;
+  /**
+   * The heading over the menu's values, drawn exactly as the Sort menu draws
+   * "Sort by". **Left unset it is the `label`** - which already reads "Filter by
+   * status", so the default needs nothing passed.
+   *
+   * Pass `null` for no heading. Before 2.4.0 the menu had none, and a page that
+   * wants that back says so explicitly.
+   *
+   * Asked for by the console (`DESIGN-SYSTEM-GAPS.md`, 2026-10-09): the Sort
+   * menu is headed and the quick-filter menu was not, so a page could not say
+   * which column a column of ticks belonged to. It had reverse-engineered the
+   * name off the square's `aria-label` and redrawn it with a `::before`.
+   */
+  heading?: ReactNode | null | undefined;
 }
 
 /** One group in the Filters panel: a label and the values a person can tick. */
