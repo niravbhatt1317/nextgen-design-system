@@ -245,6 +245,54 @@ export const GroupWithCharts: Story = {
   ),
 };
 
+/**
+ * `size="sm"`: the quieter figure, 16/24 at 600 instead of 24 at 500, for a card that sits beside a section's
+ * content - the two-column settings pages (Pranjal, 2026-10-15: "use smaller text so that it doesnt get that much
+ * attention just enough to show its there"). Only the number changes. The last card holds a chart, so it keeps the
+ * 24 figure whatever it is given: the gauge beside it is drawn to that size.
+ */
+export const Small: Story = {
+  render: () => (
+    <div className="mdt-flex mdt-flex-col mdt-gap-6">
+      <Row>
+        <KpiCard label="Total users" value={8200} hint="across all organisations" />
+        <KpiCard size="sm" label="Total users" value={8200} hint="across all organisations" />
+      </Row>
+      <Row>
+        <KpiCard
+          label="Structure"
+          items={[
+            { label: 'Sites', value: 12, hint: 'across three regions' },
+            { label: 'Departments', value: 48, hint: '6 without a head' },
+          ]}
+        />
+        <KpiCard
+          size="sm"
+          label="Structure"
+          items={[
+            { label: 'Sites', value: 12, hint: 'across three regions' },
+            {
+              label: 'Departments',
+              value: 48,
+              hint: '6 without a head',
+              delta: { label: '2', direction: 'up', tone: 'flat' },
+            },
+          ]}
+        />
+      </Row>
+      <Row>
+        <KpiCard
+          size="sm"
+          label="Licensed users limit"
+          value={8200}
+          hint="10k allowed"
+          chart={<KpiGauge percent={82} caption="capacity" />}
+        />
+      </Row>
+    </div>
+  ),
+};
+
 /** Each segment has its own switch. A clickable segment shows the cue on its own; its neighbours do not react and the outer card never lifts. */
 export const GroupClickable: Story = {
   render: function GroupClickableStory() {

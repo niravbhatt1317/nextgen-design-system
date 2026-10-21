@@ -4,7 +4,7 @@ import { cn } from '@/utils';
 import { Badge } from '../Badge';
 import type { BadgeTone } from '../Badge';
 import { Icon } from '../Icon';
-import type { KpiCardProps, KpiMetricProps, KpiTrendTone } from './KpiCard.types';
+import type { KpiCardProps, KpiCardSize, KpiMetricProps, KpiTrendTone } from './KpiCard.types';
 import './kpiCard.css';
 
 /** A plain card's floor: the Figma card's own width. */
@@ -36,6 +36,16 @@ export function formatKpiValue(n: number): string {
   return text + suffix;
 }
 
+/**
+ * The number's type by size: 24/1.2 at 500, or 16/24 at 600 for `size="sm"` (Pranjal, 2026-10-15: the two-column
+ * pages' figures were "too much highlighted ... use smaller text"). The smaller step takes the heavier weight so it
+ * still reads as the figure, not as body text.
+ */
+const VALUE_TYPE: Record<KpiCardSize, string> = {
+  md: 'mdt-text-2xl mdt-font-medium mdt-leading-[1.2]',
+  sm: 'mdt-text-base mdt-font-semibold mdt-leading-6',
+};
+
 const SETTINGS_GEAR = (
   <span className="kpi-gear mdt-hidden mdt-shrink-0 mdt-text-neutral-50" aria-hidden="true">
     <Icon name="external-link" size={14} />{' '}
@@ -51,7 +61,8 @@ function KpiBody({
   delta,
   icon,
   clickable,
-}: KpiMetricProps & { clickable: boolean }) {
+  valueSize,
+}: KpiMetricProps & { clickable: boolean; valueSize: KpiCardSize }) {
   const tone = delta?.tone ?? 'flat';
   // A drawn arrow, not the ↗ character: on Windows that character renders as an emoji.
   const arrow =
@@ -82,7 +93,12 @@ function KpiBody({
         ) : null}
       </div>
       <div className="mdt-mt-2 mdt-flex mdt-items-baseline mdt-gap-2">
-        <span className="kpi-value mdt-text-2xl mdt-font-medium mdt-tabular-nums mdt-leading-[1.2] mdt-tracking-[-0.01em] mdt-text-neutral-130">
+        <span
+          className={cn(
+            'kpi-value mdt-tabular-nums mdt-tracking-[-0.01em] mdt-text-neutral-130',
+            VALUE_TYPE[valueSize]
+          )}
+        >
           {typeof value === 'number' ? formatKpiValue(value) : value}
         </span>
         {delta && (
@@ -111,17 +127,25 @@ function basisOf(m: KpiMetricProps): number {
 }
 
 /** One segment: the body, or the body beside its chart area; a button when it has a click. */
-function KpiSegment({ metric, grouped }: { metric: KpiMetricProps; grouped: boolean }) {
+function KpiSegment({
+  metric,
+  grouped,
+  valueSize,
+}: {
+  metric: KpiMetricProps;
+  grouped: boolean;
+  valueSize: KpiCardSize;
+}) {
   const clickable = metric.onClick !== undefined;
   const content = metric.chart ? (
     <div className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-items-stretch mdt-gap-3">
       <div className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col">
-        <KpiBody {...metric} clickable={clickable} />
+        <KpiBody {...metric} clickable={clickable} valueSize={valueSize} />
       </div>
       <div className="kpi-chart mdt-flex mdt-shrink-0 mdt-items-end">{metric.chart}</div>
     </div>
   ) : (
-    <KpiBody {...metric} clickable={clickable} />
+    <KpiBody {...metric} clickable={clickable} valueSize={valueSize} />
   );
   const style: CSSProperties | undefined = grouped
     ? { flex: `1 1 ${String(basisOf(metric))}px`, minWidth: `${String(floorOf(metric))}px` }
@@ -163,12 +187,18 @@ function KpiSegment({ metric, grouped }: { metric: KpiMetricProps; grouped: bool
  * ```tsx
  * <KpiCard label="Total users" value={8200} hint="across all organisations" />
  * <KpiCard items={[{ label: 'Pending invites', value: 11, onClick: openInvites }, { label: 'Active links', value: 4 }]} label="Invitations" />
+ * <KpiCard size="sm" items={[{ label: 'Sites', value: 12 }, { label: 'Departments', value: 48 }]} label="Structure" />
  * ```
+ *
+ * `size="sm"` is the quieter figure for a card that sits beside a section's content. A card holding a chart keeps
+ * the 24px number whatever it is given, because the chart beside it is drawn to that size.
  */
 const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props, ref) {
-  const { className, style } = props;
+  const { className, style, size = 'md' } = props;
   const metrics: KpiMetricProps[] = props.items ?? [props as KpiMetricProps];
   const grouped = props.items !== undefined;
+  // One size for the whole card: a chart anywhere on it keeps every number at 24, so a group never mixes the two.
+  const valueSize: KpiCardSize = metrics.some((m) => m.chart) ? 'md' : size;
   const floor = metrics.reduce((a, m) => a + floorOf(m), 0);
   const basis = metrics.reduce((a, m) => a + basisOf(m), 0);
   const ceiling = grouped
@@ -183,6 +213,7 @@ const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props,
       role={grouped ? 'group' : undefined}
       aria-label={groupLabel}
       data-kpi={grouped ? 'group' : 'card'}
+      data-size={valueSize}
       className={cn(
         'kpi-card mdt-flex mdt-items-stretch mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-card mdt-font-sans',
         className
@@ -199,7 +230,12 @@ const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props,
       }
     >
       {metrics.map((m, i) => (
-        <KpiSegment key={`${m.label}-${String(i)}`} metric={m} grouped={grouped} />
+        <KpiSegment
+          key={`${m.label}-${String(i)}`}
+          metric={m}
+          grouped={grouped}
+          valueSize={valueSize}
+        />
       ))}
     </div>
   );

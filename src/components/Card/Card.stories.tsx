@@ -326,12 +326,14 @@ export const Clickable: Story = {
 
 /**
  * The header **is** the control. Collapsed, the header is the whole card, and its
- * line drops because there is nothing left underneath for it to divide.
+ * line drops because there is nothing left underneath for it to divide. The header
+ * is 16 top and bottom in both states, so a shut card's words sit in its middle and
+ * the title does not move when it opens.
  */
 export const Collapsible: Story = {
   args: { onOpenChange: fn() } as never,
   render: (args) => (
-    // Stacked, not side by side: a shut card is 67px and an open one is 207px,
+    // Stacked, not side by side: a shut card is 79px and an open one is 199px,
     // so putting them in a row leaves a dead strip beside the shut one.
     <Grid cols={1}>
       <CollapsibleCard
