@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
@@ -793,7 +795,12 @@ export const EditableStatusTag: Story = {
                         {TICKET_ORDER.map((status) => (
                           <DropdownMenuItem
                             key={status}
-                            className="mdt-flex mdt-items-center mdt-gap-6"
+                            /* the current status on the pale ground, its tick on the right
+                               (Pranjal, 2026-10-21: every selection looks the same) */
+                            className={cn(
+                              'mdt-flex mdt-items-center mdt-gap-6',
+                              status === current && PICKED_ROW_CLASSES
+                            )}
                             onSelect={() => {
                               setStatuses((prev) => ({ ...prev, [ticket.id]: status }));
                             }}

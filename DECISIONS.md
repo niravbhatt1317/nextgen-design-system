@@ -18,6 +18,71 @@ one in `MISSING-TOKENS.md`, a capability in `CAPABILITIES.md`. This file is for 
 
 ## 2026-10-21
 
+### Every field is one line
+
+**Pranjal**, ruled in the console on 2026-10-16/17 and moved into `Select` on 2026-10-21: "we
+really need to set some standard which you cannot break". A closed field shows the chosen label
+only - never its description - on one line from the left, ending in "…". A multi-pick never grows
+past its height: one pick, then "+N"; the pill shrinks, the "+N" never does. An open list is at
+least the field's width and grows to fit its longest option, up to 320; every option reads from the
+left on one line. The option's name is 14/500 in the reading ink; its description one step lighter
+(`--mdt-option-subtext`: `neutral-80` light, the dark `neutral-60` in dark), 2 below it, never the
+faint grey. Showing the full name on hover stays the page's job (the console's `OverflowTip`).
+
+### A picked option looks the same in every list
+
+**Pranjal.** Every dropdown, list and menu marks a pick one way: the picked row on the pale
+`blue-10` ground with the tick on the right in the row's own ink; the row under the pointer or the
+keyboard on the grey `neutral-10` ground with no tick; a picked row keeps its pale ground under the
+pointer. No tick on the left anywhere, and no picked row without the ground.
+
+The ground is one pair of constants in `src/utils/picked-row.ts`: `PICKED_ROW_CLASSES` for a row
+whose state is known in code (it goes last in `cn()`, so the merger drops the row's own grey
+grounds), `CHECKED_ROW_CLASSES` for a Radix row that stamps `data-state="checked"` (every state is
+doubled with the checked selector, so it outranks the grey whatever order the stylesheet prints).
+
+A row that carries a checkbox square instead of a tick (the quick filters) takes the pale ground
+too, by the same rule.
+
+### The picked row keeps its tick under the pointer — the X is gone
+
+**Nirav**, closing the question left open above. The multi-select used to swap a picked row's tick
+for a 12px X while the pointer was on it, to advertise that a click there removes the pick. It no
+longer does: a picked row shows its tick in every state, in every list.
+
+**The reason is the ruling above applied one step further.** That ruling took the faint tick off
+unpicked rows because "the grey ground says _here_, the tick says _picked_, and a faint tick on
+hover said both at once". The X is the same fault with the roles swapped — it takes the _picked_
+mark away precisely when you point at the row, so running the mouse down a list of five picks blanks
+each tick in turn. The pale ground already says "picked" and the row is still a toggle, so the X
+only ever cost the tick.
+
+It also matches what Pranjal asked for in the first place. His 2026-09-25 words were "why does it
+show x icon when hovered on selected one. It should just reselect it again"; keeping the X in the
+multi list while removing it from the single list was an inference drawn from that, not part of it.
+The console draws no X-on-hover anywhere, so nothing live depended on it.
+
+`deselectable`, the internal flag that existed only to switch the X, is removed with it — fifteen
+pass-through lines through `Select.tsx` and its twin. It was never exported and is not in
+`scripts/api-baseline.json`, so no published name changes.
+
+### The console's `blue-10` stays overridden, and that is not a drift
+
+**Nirav.** The console paints `--mdt-blue-10` as `214 90% 97%` (#F0F6FE) in its own
+`src/styles/global.css:121`; the library holds `213 100% 96%` (#EBF4FF). Since the picked row now
+uses that token, the same row is a shade apart in the two repositories. **It stays that way.**
+
+A consumer overriding a token is the theming mechanism working, not a defect to reconcile — which is
+worth stating plainly, because it was raised as a mismatch. The measured difference is 5, 2, −1 per
+channel and the row's label ink reads 12.89:1 against 13.17:1, so there is nothing to win either
+direction.
+
+`blue-10` was named in the submission the **2026-10-14** ruling rejected, but it was not what that
+ruling was about — the grounds were the collapsed `neutral-110/-130/-150` and `muted-foreground`
+at 2.65:1. So it is the safe member of a rejected bundle, and it is now written up on its own in
+`MISSING-TOKENS.md` with what shifts if adopted, which is what that ruling said to do with a console
+value we do not take. If the two are ever reconciled it is the console dropping its override.
+
 ### Underline tabs: every label on the content edge, the line the label's width (option B)
 
 **Pranjal**, 2026-10-14, on the Agent Fleet tab mock: "b is the only valid solution ... keep it for agent fleet
@@ -34,8 +99,6 @@ margin. Here the strip and its hairline stay on the content edge; only the first
 past it. Anyone reading K-Tabs-08 and thinking this was settled the other way: it was, for a different thing.
 
 **A default with no opt-out**, so it has its own changeset (`tabs-labels-on-the-edge`).
-
----
 
 ## 2026-10-14
 

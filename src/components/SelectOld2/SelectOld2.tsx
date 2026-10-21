@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/utils';
+import { CHECKED_ROW_CLASSES, PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '../Icon';
 import type {
   SelectOld2Option,
@@ -64,24 +65,15 @@ function OptionPrefix({ option }: Readonly<{ option: SelectOld2Option }>) {
 }
 
 /**
- * Renders the selection indicator (check/x icons)
+ * Renders the selection indicator in a fixed 16 slot on the right, so labels never shift. The same rule as `Select`
+ * (Pranjal, 2026-10-21): an unpicked row shows nothing, under the pointer too. A picked row keeps its tick in every
+ * state, the pointer included - no X swap in the multi list either (Nirav, 2026-10-21), since taking the tick away
+ * under the pointer blanks the "picked" mark on whichever row you happen to be on.
  */
 function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
   return (
     <span className="mdt-flex mdt-h-4 mdt-w-4 mdt-flex-shrink-0 mdt-items-center mdt-justify-center">
-      {isSelected ? (
-        <>
-          <Icon name="check" size={16} className="group-hover:mdt-hidden" aria-hidden />
-          <Icon name="x" size={12} className="mdt-hidden group-hover:mdt-block" aria-hidden />
-        </>
-      ) : (
-        <Icon
-          name="check"
-          size={16}
-          className="mdt-hidden mdt-text-neutral-50 group-hover:mdt-block"
-          aria-hidden
-        />
-      )}
+      {isSelected && <Icon name="check" size={16} aria-hidden />}
     </span>
   );
 }
@@ -132,7 +124,7 @@ interface MultiSelectOptionButtonProps {
 }
 
 /**
- * Renders a multi-select option as a button
+ * Renders a multi-select option as a button; the picked row wears the pale blue-10 ground in every state (2026-10-21)
  */
 function MultiSelectOptionButton({
   option,
@@ -146,7 +138,12 @@ function MultiSelectOptionButton({
         onToggle(option.value.toString());
       }}
       disabled={option.disabled}
-      className={cn(OPTION_ITEM_BASE_CLASSES, OPTION_ITEM_STYLE_CLASSES, OPTION_ITEM_STATE_CLASSES)}
+      className={cn(
+        OPTION_ITEM_BASE_CLASSES,
+        OPTION_ITEM_STYLE_CLASSES,
+        OPTION_ITEM_STATE_CLASSES,
+        isSelected && PICKED_ROW_CLASSES
+      )}
     >
       <div className="mdt-flex mdt-items-center mdt-gap-2">
         <OptionPrefix option={option} />
@@ -412,7 +409,9 @@ function renderSingleSelectMode(props: {
                       className={cn(
                         OPTION_ITEM_BASE_CLASSES,
                         OPTION_ITEM_STYLE_CLASSES,
-                        'mdt-text-foreground hover:mdt-bg-neutral-10',
+                        'mdt-text-foreground hover:mdt-bg-neutral-10 data-[highlighted]:mdt-bg-neutral-10',
+                        /* the picked option on the pale ground, in every state (Pranjal, 2026-10-21) */
+                        CHECKED_ROW_CLASSES,
                         OPTION_ITEM_DATA_STATE_CLASSES
                       )}
                     >

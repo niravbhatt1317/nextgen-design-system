@@ -1763,11 +1763,229 @@ describe('Select - single mode with search', () => {
   it('shows the empty message when nothing matches', async () => {
     const user = userEvent.setup();
     render(
-      <Select mode="single" searchable searchPlaceholder="Search members" emptyMessage="No members match" options={people} placeholder="Select an owner" aria-label="Owner" />
+      <Select
+        mode="single"
+        searchable
+        searchPlaceholder="Search members"
+        emptyMessage="No members match"
+        options={people}
+        placeholder="Select an owner"
+        aria-label="Owner"
+      />
     );
     expect(screen.getByRole('combobox', { name: 'Owner' })).toHaveTextContent('Select an owner');
     await user.click(screen.getByRole('combobox', { name: 'Owner' }));
     await user.type(await screen.findByPlaceholderText('Search members'), 'zzzz');
     expect(await screen.findByText('No members match')).toBeInTheDocument();
+  });
+});
+
+/* ONE SELECTION LOOK (Pranjal, 2026-10-21): the picked option sits on the pale blue-10 ground with the tick on the
+ * right; the option under the pointer or the keys takes only the grey ground and no tick; a picked row keeps its pale
+ * ground under the pointer. */
+describe('Select - the one selection look', () => {
+  it('multi: the picked row wears the pale ground in every state, an unpicked row shows no tick', async () => {
+    const user = userEvent.setup();
+    render(<Select mode="multiple" options={simpleOptions} value={['2']} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+    const unpicked = screen.getByText('Option 1').closest('button');
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+    expect(picked).not.toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).toHaveClass('hover:mdt-bg-neutral-10');
+    expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
+    // one mark, not two: the tick, and it does not become an X under the pointer; an unpicked row shows nothing
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('multi: a picked row keeps its one tick while the pointer is on it, and still deselects on click', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Select mode="multiple" options={simpleOptions} value={['2']} onChange={onChange} />);
+    await user.click(screen.getByRole('button'));
+    const picked = (await screen.findByText('Option 2')).closest('button');
+
+    /* The X used to replace the tick here, which blanked the "picked" mark on whichever row the mouse was over.
+     * Hovering must change the glyph count by nothing at all. */
+    await user.hover(picked as HTMLElement);
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
+
+    // the row is still the toggle it was - losing the X cost the cue, not the behaviour
+    await user.click(picked as HTMLElement);
+    expect(onChange).toHaveBeenCalledWith([]);
+  });
+
+  it('single with search: the picked row keeps its tick under the pointer', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select mode="single" searchable options={simpleOptions} defaultValue="3" aria-label="Pick" />
+    );
+    await user.click(screen.getByRole('combobox', { name: 'Pick' }));
+    await screen.findByPlaceholderText('Search...');
+    const rows = screen.getAllByText('Option 3').map((el) => el.closest('button'));
+    const picked = rows.find((b) => b?.getAttribute('role') !== 'combobox');
+    expect(picked).toHaveClass('mdt-bg-blue-10');
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByText('Option 1').closest('button')?.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('single: the picked item holds the pale ground over the keyboard highlight, the rest go grey', async () => {
+    const user = userEvent.setup();
+    render(<Select options={simpleOptions} value="2" />);
+    await user.click(screen.getByRole('combobox'));
+    const picked = await screen.findByRole('option', { name: 'Option 2' });
+    const unpicked = screen.getByRole('option', { name: 'Option 1' });
+    expect(picked).toHaveAttribute('data-state', 'checked');
+    expect(picked).toHaveClass(
+      'data-[state=checked]:mdt-bg-blue-10',
+      'data-[state=checked]:data-[highlighted]:mdt-bg-blue-10'
+    );
+    expect(unpicked).toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+    expect(picked.querySelectorAll('svg')).toHaveLength(1);
+    expect(unpicked.querySelectorAll('svg')).toHaveLength(0);
+  });
+});
+
+/* EVERY FIELD IS ONE LINE (Pranjal, 2026-10-16/17: "we really need to set some standard which you cannot break"): a
+ * closed field shows the chosen label only, on one line from the left; a multi-pick never grows past its height; an open
+ * list is at least the field's width, grows to fit up to 320, and every option reads left on one line. */
+describe('Select - every field is one line', () => {
+  const LIST_FLOOR_SINGLE = 'mdt-min-w-[max(8rem,var(--radix-select-trigger-width,0px))]';
+  const LIST_CEILING = 'mdt-max-w-[min(320px,calc(100vw_-_32px))]';
+  const sites: SelectOption[] = [
+    { value: 'mum', label: 'Mumbai data centre, rack row C (primary production)' },
+    { value: 'blr', label: 'Bengaluru disaster-recovery site' },
+    { value: 'fra', label: 'Frankfurt edge collectors' },
+  ];
+
+  it('single, closed: the chosen label only - never its description - on one line from the left', () => {
+    render(<Select options={optionsWithDescriptions} value="1" aria-label="Role" />);
+    const trigger = screen.getByRole('combobox', { name: 'Role' });
+    expect(trigger).toHaveTextContent('Admin');
+    expect(trigger).not.toHaveTextContent('Full access to all resources');
+    // Radix drops a className on its Value, so the rule sits on the span around it
+    const value = trigger.querySelector('span[style*="pointer-events"]');
+    expect(value).toHaveTextContent(/^Admin$/);
+    expect(value?.parentElement).toBe(trigger.firstElementChild);
+    expect(value?.parentElement).toHaveClass(
+      'mdt-min-w-0',
+      'mdt-flex-1',
+      'mdt-truncate',
+      'mdt-text-left'
+    );
+  });
+
+  it('single, open: the list is at least the field and at most 320; options read left on one line', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select options={[...optionsWithDescriptions, { value: '4', label: 'Guest' }]} value="1" />
+    );
+    await user.click(screen.getByRole('combobox'));
+    const list = await screen.findByRole('listbox');
+    expect(list).toHaveClass(LIST_FLOOR_SINGLE, LIST_CEILING);
+
+    // the name is the option's name; the description is its description, not part of it
+    const admin = screen.getByRole('option', { name: 'Admin' });
+    expect(admin).toHaveClass('mdt-text-left', 'mdt-justify-between', 'mdt-gap-2');
+    const description = screen.getByText('Full access to all resources');
+    expect(admin).toHaveAttribute('aria-describedby', description.id);
+    expect(description).toHaveClass(
+      'mdt-truncate',
+      'mdt-max-w-full',
+      'mdt-mt-0.5',
+      'mdt-text-xs',
+      'mdt-text-[hsl(var(--mdt-option-subtext))]'
+    );
+    expect(description).not.toHaveClass('mdt-text-muted-foreground');
+    const name = admin.querySelector('.mdt-flex-col > span:first-child');
+    expect(name).toHaveTextContent(/^Admin$/);
+    expect(name).toHaveClass(
+      'mdt-truncate',
+      'mdt-max-w-full',
+      'mdt-font-medium',
+      'mdt-text-neutral-130'
+    );
+    // the words may shrink beside the tick slot
+    expect(name?.closest('.mdt-flex-1')).toHaveClass('mdt-min-w-0');
+
+    // every option takes 8 above and below, one line or two
+    expect(admin).toHaveClass('mdt-py-2');
+    expect(admin).not.toHaveClass('mdt-py-1.5');
+    const guest = screen.getByRole('option', { name: 'Guest' });
+    expect(guest).toHaveClass('mdt-py-2');
+    expect(guest).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('single with search: the closed field shows the label only', () => {
+    render(
+      <Select
+        mode="single"
+        searchable
+        options={optionsWithDescriptions}
+        defaultValue="2"
+        aria-label="Role"
+      />
+    );
+    const trigger = screen.getByRole('combobox', { name: 'Role' });
+    expect(trigger).toHaveTextContent(/^Editor$/);
+    expect(trigger.querySelector('span')).toHaveClass(
+      'mdt-truncate',
+      'mdt-text-left',
+      'mdt-min-w-0'
+    );
+  });
+
+  it('multiple, closed: one pick then "+N" on one line; the pill shrinks, the "+N" never does', () => {
+    render(<Select mode="multiple" showPills options={sites} value={['mum', 'blr', 'fra']} />);
+    const trigger = screen.getByRole('button', { expanded: false });
+    const row = trigger.querySelector('.mdt-select-picks');
+    expect(row).toHaveClass('mdt-flex-nowrap', 'mdt-min-w-0', 'mdt-flex-1', 'mdt-overflow-hidden');
+    expect(row).not.toHaveClass('mdt-flex-wrap');
+    // maxPills is 1 unless a page asks otherwise
+    const pills = trigger.querySelectorAll('.mdt-select-pill');
+    expect(pills).toHaveLength(1);
+    // the pill takes whatever room the "+N" leaves - no 64 held back for a "+N" that can no longer wrap
+    expect(pills[0]).toHaveClass('mdt-min-w-0', 'mdt-shrink', 'mdt-max-w-full');
+    expect(pills[0]).not.toHaveClass('mdt-max-w-[calc(100%-64px)]');
+    expect(pills[0]?.querySelector('span')).toHaveClass('mdt-truncate');
+    const count = trigger.querySelector('.mdt-select-overflow');
+    expect(count).toHaveTextContent('+2');
+    expect(count).toHaveClass('mdt-shrink-0', 'mdt-whitespace-nowrap');
+  });
+
+  it('multiple, closed: a lone pick may take the whole width; the placeholder ends in "…"', () => {
+    const { rerender } = render(
+      <Select mode="multiple" showPills options={sites} value={['mum']} />
+    );
+    const pill = document.querySelector('.mdt-select-pill');
+    expect(pill).toHaveClass('mdt-max-w-full');
+    expect(document.querySelector('.mdt-select-overflow')).toBeNull();
+
+    rerender(
+      <Select mode="multiple" showPills options={sites} value={[]} placeholder="Pick sites" />
+    );
+    expect(screen.getByText('Pick sites')).toHaveClass('mdt-truncate', 'mdt-text-faint');
+  });
+
+  it('multiple, open: the list is at least the field, grows to fit up to 320; options read left on one line', async () => {
+    const user = userEvent.setup();
+    render(<Select mode="multiple" options={optionsWithDescriptions} value={['1']} />);
+    await user.click(screen.getByRole('button'));
+    const option = (await screen.findByText('Editor')).closest('button');
+    const list = option?.closest('[role="dialog"]');
+    expect(list).toHaveClass(
+      'mdt-w-max',
+      'mdt-min-w-[var(--radix-popover-trigger-width)]',
+      LIST_CEILING
+    );
+    expect(list).not.toHaveClass('mdt-w-[var(--radix-popover-trigger-width)]');
+    expect(option).toHaveClass('mdt-text-left', 'mdt-gap-2', 'mdt-py-2');
+    expect(screen.getByText('Editor')).toHaveClass('mdt-truncate', 'mdt-max-w-full');
+    expect(screen.getByText('Can edit content')).toHaveClass(
+      'mdt-truncate',
+      'mdt-text-[hsl(var(--mdt-option-subtext))]'
+    );
   });
 });

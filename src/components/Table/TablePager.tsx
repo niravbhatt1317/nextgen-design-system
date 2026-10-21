@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { cn } from '@/utils';
+import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,8 @@ function TablePager({
             {pageSizes.map((s) => (
               <DropdownMenuItem
                 key={s}
+                /* the current size on the pale ground, its tick on the right (Pranjal, 2026-10-21: every selection looks the same) */
+                className={s === pageSize ? PICKED_ROW_CLASSES : undefined}
                 onSelect={() => {
                   onPageSize(s);
                 }}
@@ -106,7 +109,7 @@ function TablePager({
           className={cn(
             CONTROL,
             /* the typed page wears the reading ink at 14, as every field's value (Pranjal, 2026-09-27) */
-            'mdt-w-11 mdt-text-center mdt-tabular-nums mdt-text-sm mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
+            'mdt-w-11 mdt-text-center mdt-text-sm mdt-tabular-nums mdt-text-neutral-130 mdt-outline-none focus:mdt-border-neutral-90'
           )}
           value={typed}
           inputMode="numeric"

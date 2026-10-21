@@ -192,6 +192,19 @@ describe('TablePager', () => {
       expect(await screen.findByRole('menuitem', { name: /10 rows\/page/ })).toBeInTheDocument();
       expect(screen.queryByRole('menuitem', { name: /100 rows\/page/ })).not.toBeInTheDocument();
     });
+
+    /* the one selection look (Pranjal, 2026-10-21): the current size on the pale ground, its tick on the right */
+    it('puts the current size on the pale ground with its tick, the others plain', async () => {
+      const { user } = pager();
+      await user.click(button('Rows per page'));
+      const current = await screen.findByRole('menuitem', { name: /25 rows\/page/ });
+      const other = screen.getByRole('menuitem', { name: /50 rows\/page/ });
+      expect(current).toHaveClass('mdt-bg-blue-10', 'data-[highlighted]:mdt-bg-blue-10');
+      expect(current).not.toHaveClass('data-[highlighted]:mdt-bg-neutral-10');
+      expect(current.querySelector('svg')).toBeInTheDocument();
+      expect(other).not.toHaveClass('mdt-bg-blue-10');
+      expect(other.querySelector('svg')).not.toBeInTheDocument();
+    });
   });
 });
 

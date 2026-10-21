@@ -1,5 +1,6 @@
 export { Combobox, comboboxTriggerVariants } from './Combobox';
 export type {
+  ComboboxSearch,
   ComboboxProps,
   ComboboxOption,
   ComboboxTriggerVariants,

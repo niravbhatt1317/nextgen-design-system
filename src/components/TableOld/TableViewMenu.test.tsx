@@ -190,4 +190,27 @@ describe('TableViewMenuOld', () => {
       expect(screen.getByRole('button', { name: 'Ticket view settings' })).toHaveClass('custom');
     });
   });
+
+  /* the one selection look (Pranjal, 2026-10-21): the picked grouping on the pale ground, its tick on the right */
+  describe('the picked grouping', () => {
+    it('sits on the pale ground with its tick, the rest plain', async () => {
+      render(<TableViewMenuOld columns={columns} groupBy="status" {...handlers()} />);
+      await open();
+      await userEvent.click(screen.getByRole('button', { name: /^Group by/ }));
+      const picked = screen.getByRole('option', { name: 'Status' });
+      const none = screen.getByRole('option', { name: 'None' });
+      expect(picked).toHaveClass('mdt-bg-blue-10', 'aria-selected:mdt-bg-blue-10');
+      expect(picked.lastElementChild?.tagName.toLowerCase()).toBe('svg');
+      expect(none).not.toHaveClass('mdt-bg-blue-10');
+      expect(none.querySelector('svg')).not.toBeInTheDocument();
+    });
+
+    it('puts None on the pale ground while nothing is grouped', async () => {
+      render(<TableViewMenuOld columns={columns} {...handlers()} />);
+      await open();
+      await userEvent.click(screen.getByRole('button', { name: /^Group by/ }));
+      expect(screen.getByRole('option', { name: 'None' })).toHaveClass('mdt-bg-blue-10');
+      expect(screen.getByRole('option', { name: 'Status' })).not.toHaveClass('mdt-bg-blue-10');
+    });
+  });
 });
