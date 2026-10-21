@@ -30,10 +30,23 @@ import { HoverCard, HoverCardTrigger, HoverCardContent } from '../HoverCard';
 // ============================================================================
 // Shared CSS class constants to reduce duplication (SonarJS: no-duplicate-string)
 // ============================================================================
+/* EVERY OPTION READS LEFT, ON ONE LINE (Pranjal, 2026-10-17: "we really need to set some standard which you cannot
+ * break"): a multi option is a <button>, which centres its text by default, so the row says left itself; the 8 gap keeps
+ * a long name's "…" off the tick slot. */
 const OPTION_ITEM_BASE_CLASSES =
-  'mdt-group mdt-relative mdt-flex mdt-w-full mdt-cursor-default mdt-select-none mdt-items-center mdt-justify-between';
+  'mdt-group mdt-relative mdt-flex mdt-w-full mdt-cursor-default mdt-select-none mdt-items-center mdt-justify-between mdt-gap-2 mdt-text-left';
+/* every option takes 8 above and below, one line or two (Pranjal, 2026-10-16: "8 of padding top and bottom per option" -
+ * what the console has drawn since) */
 const OPTION_ITEM_STYLE_CLASSES =
-  'mdt-rounded-sm mdt-py-1.5 mdt-pl-2 mdt-pr-2 mdt-text-sm mdt-outline-none';
+  'mdt-rounded-sm mdt-py-2 mdt-pl-2 mdt-pr-2 mdt-text-sm mdt-outline-none';
+/* the option's prefix and words: they take the room the tick slot leaves and may shrink, so the words can end in "…" */
+const OPTION_LEAD_CLASSES = 'mdt-flex mdt-min-w-0 mdt-flex-1 mdt-items-center mdt-gap-2';
+/* THE CLOSED FIELD'S VALUE (Pranjal, 2026-10-16: "only show the selection" + "and truncate it"): the chosen label alone,
+ * left, on one line, ending in "…" - it fills the room between the prefix and the chevron and may shrink */
+const TRIGGER_VALUE_CLASSES = 'mdt-min-w-0 mdt-flex-1 mdt-truncate mdt-text-left';
+/* THE OPEN LIST'S WIDTH (Pranjal, 2026-10-17): at least the field, growing to fit its longest option, never past 320 -
+ * or the window less 16 a side on a narrow screen. Past that an option ends in "…". */
+const LIST_MAX_WIDTH_CLASSES = 'mdt-max-w-[min(320px,calc(100vw_-_32px))]';
 const OPTION_ITEM_STATE_CLASSES =
   'mdt-text-foreground hover:mdt-bg-neutral-10 disabled:mdt-pointer-events-none disabled:mdt-opacity-50';
 const OPTION_ITEM_DATA_STATE_CLASSES =
@@ -87,28 +100,39 @@ function SelectionIndicator({ isSelected }: Readonly<{ isSelected: boolean }>) {
 }
 
 /**
- * Renders option content with label and description
+ * Renders option content with label and description, each on one line ending in "…" when it does not fit.
+ *
+ * The name reads like the chosen value in the closed field - 14/500 in the reading ink, neutral-130 (Pranjal,
+ * 2026-10-16: "SELECTED TEXT AND THE TEXT INSIDE DROPDOWN LOOKS DIFFERENT"). The description sits 2 below it, one step
+ * lighter but still readable: --mdt-option-subtext, neutral-80 in light (5.25:1 on white) and neutral-60 in dark (4.9:1
+ * on the dark list) - never the faint grey (2.6:1).
+ *
+ * `label` replaces the name's content: the single list passes Radix's ItemText there, so that only the name - never
+ * the description - is what the closed field mirrors.
  */
 function OptionContent({
   option,
   asColumn = false,
-}: Readonly<{ option: SelectOption; asColumn?: boolean }>) {
-  if (asColumn) {
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-items-start">
-        <span>{option.label}</span>
-        {option.description && (
-          <span className="mdt-text-xs mdt-text-muted-foreground">{option.description}</span>
-        )}
-      </div>
-    );
-  }
-
+  label,
+  descriptionId,
+}: Readonly<{
+  option: SelectOption;
+  asColumn?: boolean;
+  label?: ReactNode;
+  descriptionId?: string | undefined;
+}>) {
   return (
-    <div className="mdt-flex mdt-flex-col">
-      <span>{option.label}</span>
+    <div className={cn('mdt-flex mdt-min-w-0 mdt-flex-col', asColumn && 'mdt-items-start')}>
+      <span className="mdt-max-w-full mdt-truncate mdt-font-medium mdt-text-neutral-130">
+        {label ?? option.label}
+      </span>
       {option.description && (
-        <span className="mdt-text-xs mdt-text-muted-foreground">{option.description}</span>
+        <span
+          id={descriptionId}
+          className="mdt-mt-0.5 mdt-max-w-full mdt-truncate mdt-text-xs mdt-text-[hsl(var(--mdt-option-subtext))]"
+        >
+          {option.description}
+        </span>
       )}
     </div>
   );
@@ -154,7 +178,7 @@ function MultiSelectOptionButton({
         isSelected && PICKED_ROW_CLASSES
       )}
     >
-      <div className="mdt-flex mdt-items-center mdt-gap-2">
+      <div className={OPTION_LEAD_CLASSES}>
         <OptionPrefix option={option} />
         <OptionContent option={option} asColumn />
       </div>
@@ -376,7 +400,11 @@ function renderSingleSelectMode(props: {
               {prefixIcon}
             </span>
           )}
-          <SelectPrimitive.Value placeholder={placeholder} className="mdt-truncate" />
+          {/* Radix drops any className given to Value (it is not meant to be styled), so the one-line rule sits on a
+           * span around it - the `mdt-truncate` the Value carried before never reached the page */}
+          <span className={TRIGGER_VALUE_CLASSES}>
+            <SelectPrimitive.Value placeholder={placeholder} />
+          </span>
           {renderSingleSelectIcons({ _clearable, singleValue, handleValueChange, variant, locked })}
         </SelectPrimitive.Trigger>
 
@@ -386,7 +414,11 @@ function renderSingleSelectMode(props: {
             side="bottom"
             align="start"
             className={cn(
-              'mdt-relative mdt-z-50 mdt-min-w-[8rem] mdt-overflow-hidden',
+              /* the list's floor and ceiling sit on the same box, so a field wider than 320 still gets a list as wide
+               * as itself (a floor beats a ceiling); 8rem stays the floor under a very narrow field */
+              'mdt-relative mdt-z-50 mdt-overflow-hidden',
+              'mdt-min-w-[max(8rem,var(--radix-select-trigger-width,0px))]',
+              LIST_MAX_WIDTH_CLASSES,
               'mdt-rounded-md mdt-border mdt-bg-popover mdt-text-popover-foreground mdt-shadow-md',
               'data-[state=open]:mdt-animate-in data-[state=closed]:mdt-animate-out',
               'data-[state=closed]:mdt-fade-out-0 data-[state=open]:mdt-fade-in-0',
@@ -415,12 +447,18 @@ function renderSingleSelectMode(props: {
                 const showSeparator =
                   showSelectedOnTop && selectedCount > 0 && index === selectedCount - 1;
                 const isSelected = currentValue === option.value.toString();
+                /* the description is not part of the option's name any more (only the name is ItemText), so it is
+                 * announced as the option's description instead */
+                const descriptionId = option.description
+                  ? `${selectId}-option-${String(index)}-description`
+                  : undefined;
 
                 return (
                   <div key={option.value}>
                     <SelectPrimitive.Item
                       value={option.value.toString()}
                       {...(option.disabled && { disabled: option.disabled })}
+                      {...(descriptionId && { 'aria-describedby': descriptionId })}
                       className={cn(
                         OPTION_ITEM_BASE_CLASSES,
                         OPTION_ITEM_STYLE_CLASSES,
@@ -433,11 +471,17 @@ function renderSingleSelectMode(props: {
                         OPTION_ITEM_DATA_STATE_CLASSES
                       )}
                     >
-                      <div className="mdt-flex mdt-items-center mdt-gap-2">
+                      <div className={OPTION_LEAD_CLASSES}>
                         <OptionPrefix option={option} />
-                        <SelectPrimitive.ItemText>
-                          <OptionContent option={option} />
-                        </SelectPrimitive.ItemText>
+                        {/* ONLY THE NAME IS ItemText (Pranjal, 2026-10-16): Radix mirrors ItemText into the closed
+                         * field whole, so the description and its line used to show under the chosen value there */}
+                        <OptionContent
+                          option={option}
+                          label={
+                            <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
+                          }
+                          descriptionId={descriptionId}
+                        />
                       </div>
                       <SelectionIndicator isSelected={isSelected} />
                     </SelectPrimitive.Item>
@@ -559,7 +603,9 @@ function renderSingleSelectIcons(props: {
 // ============================================================================
 
 /**
- * Renders a single pill in the multi-select trigger
+ * Renders a single pill in the multi-select trigger. A pill shrinks before the field grows: its name ends in "…". It
+ * takes whatever room the "+N" leaves - it used to stop 64 short of the row's end to keep a "+N" off a second line,
+ * which a row that never wraps does not need, and which left a gap beside the "+N" or cut a lone pick early.
  */
 function renderPill(
   option: SelectOption,
@@ -570,7 +616,7 @@ function renderPill(
   const pillContent = (
     <span
       key={option.value}
-      className="mdt-select-pill mdt-inline-flex mdt-h-[22px] mdt-min-w-0 mdt-max-w-[calc(100%-64px)] mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-neutral-20 mdt-py-0 mdt-pl-2 mdt-pr-1 mdt-text-xs mdt-font-medium mdt-text-neutral-90"
+      className="mdt-select-pill mdt-inline-flex mdt-h-[22px] mdt-min-w-0 mdt-max-w-full mdt-shrink mdt-items-center mdt-gap-1 mdt-rounded-md mdt-bg-neutral-20 mdt-py-0 mdt-pl-2 mdt-pr-1 mdt-text-xs mdt-font-medium mdt-text-neutral-90"
     >
       {option.avatar && (
         <img src={option.avatar} alt={option.label} className="mdt-h-4 mdt-w-4 mdt-rounded-full" />
@@ -640,8 +686,9 @@ function renderSelectedValueDisplay(props: {
           .map((option) =>
             renderPill(option, handlePillRemove, _pillHoverCard, _renderPillHoverCard)
           )}
+        {/* the "+N" never shrinks: a pill gives way to it */}
         {selectedOptions.length > _maxPills && (
-          <span className="mdt-select-overflow mdt-inline-flex mdt-h-[22px] mdt-shrink-0 mdt-items-center mdt-rounded-md mdt-bg-neutral-20 mdt-px-1.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90">
+          <span className="mdt-select-overflow mdt-inline-flex mdt-h-[22px] mdt-shrink-0 mdt-items-center mdt-whitespace-nowrap mdt-rounded-md mdt-bg-neutral-20 mdt-px-1.5 mdt-text-xs mdt-font-medium mdt-text-neutral-90">
             {_overflowLabel(selectedOptions.length - _maxPills)}
           </span>
         )}
@@ -651,13 +698,13 @@ function renderSelectedValueDisplay(props: {
 
   // Show count if there are selected options
   if (selectedOptions.length > 0) {
-    return <span>{selectedOptions.length} selected</span>;
+    return <span className="mdt-truncate">{selectedOptions.length} selected</span>;
   }
 
   // Show placeholder when no selection
   /* the placeholder at the trigger's own size in the faint ink #8FA0BD (K-Field-02, K-Field-03) - it read 14 in the
-   * muted grey before (measured 2026-09-22 against the mock) */
-  return <span className="mdt-text-faint">{placeholder}</span>;
+   * muted grey before (measured 2026-09-22 against the mock); one line, "…" when long, like every value */
+  return <span className="mdt-truncate mdt-text-faint">{placeholder}</span>;
 }
 
 /**
@@ -686,8 +733,12 @@ function renderMultiSelectTriggerContent(props: {
     placeholder,
   } = props;
 
+  /* A MULTI-PICK FIELD NEVER GROWS PAST ITS HEIGHT (Pranjal, 2026-10-17, on picks stacked three lines out of their
+   * field: "we really need to set some standard which you cannot break"): its picks stay on one line - they used to
+   * wrap - a pill shrinks to "…", and the row clips rather than spilling over the chevron. `mdt-select-picks` names the
+   * row for a page's own checks. */
   return (
-    <div className="mdt-flex mdt-flex-1 mdt-flex-wrap mdt-items-center mdt-gap-1">
+    <div className="mdt-select-picks mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-nowrap mdt-items-center mdt-gap-1 mdt-overflow-hidden">
       {prefixIcon && (
         <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-muted-foreground">
           {prefixIcon}
@@ -1902,7 +1953,10 @@ function renderMultiSelectMode(props: MultiSelectModeProps): ReactNode {
             sideOffset={popoverSideOffset}
             alignOffset={0}
             className={cn(
-              'mdt-z-50 mdt-w-[var(--radix-popover-trigger-width)] mdt-rounded-md',
+              /* at least the field, as wide as its longest option, never past 320 (Pranjal, 2026-10-17) - it was held
+               * to the field's width, so long names wrapped */
+              'mdt-z-50 mdt-w-max mdt-min-w-[var(--radix-popover-trigger-width)] mdt-rounded-md',
+              LIST_MAX_WIDTH_CLASSES,
               'mdt-border mdt-bg-popover mdt-text-popover-foreground mdt-shadow-md',
               'data-[state=open]:mdt-animate-in data-[state=closed]:mdt-animate-out',
               'data-[state=closed]:mdt-fade-out-0 data-[state=open]:mdt-fade-in-0',
@@ -2284,9 +2338,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
               {prefixIcon}
             </span>
           )}
-          <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate mdt-text-left">
-            {picked ? picked.label : placeholder}
-          </span>
+          <span className={TRIGGER_VALUE_CLASSES}>{picked ? picked.label : placeholder}</span>
           {locked ? (
             <span className="mdt-flex mdt-shrink-0 mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />

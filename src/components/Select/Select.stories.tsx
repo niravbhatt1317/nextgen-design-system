@@ -716,6 +716,86 @@ export const WithDescriptions: Story = {
   },
 };
 
+/* EVERY FIELD IS ONE LINE (Pranjal, 2026-10-16/17: "we really need to set some standard which you cannot break") */
+const approvalPolicies: SelectOption[] = [
+  {
+    value: 'auto',
+    label: 'Runs at once, without waiting for anyone to approve the change',
+    description: 'Default · nobody is asked before the change goes out to the fleet',
+  },
+  {
+    value: 'one',
+    label: 'One approver from the platform operations team',
+    description: '6 people can approve',
+  },
+  {
+    value: 'two',
+    label: 'Two approvers, one of them from security and compliance',
+    description: '11 people can approve',
+  },
+  { value: 'owner', label: 'The agent owner' },
+];
+
+const fleetSites: SelectOption[] = [
+  { value: 'mum', label: 'Mumbai data centre, rack row C (primary production)' },
+  { value: 'blr', label: 'Bengaluru disaster-recovery site' },
+  { value: 'fra', label: 'Frankfurt edge collectors' },
+  { value: 'sgp', label: 'Singapore' },
+  { value: 'nyc', label: 'New York branch office' },
+];
+
+/**
+ * **One line, always.** A closed field shows the chosen label only - never its description - on one line, from the
+ * left, ending in "…" when it does not fit. Open, the list is at least as wide as the field and grows to fit its
+ * longest option up to 320; every option reads from the left on one line, its name 14/500 in the reading ink and its
+ * description one step lighter, 2 below it.
+ */
+export const OneLineSingle: Story = {
+  render: function RenderOneLineSingle() {
+    const [value, setValue] = useState<string | null>('auto');
+    return (
+      <div style={{ width: '240px' }}>
+        <Select
+          options={approvalPolicies}
+          value={value}
+          onChange={(val) => {
+            setValue(val as string);
+          }}
+          label="Approval"
+          placeholder="Pick who approves"
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * **A multi-pick never grows past its height.** One pick shows (`maxPills` is 1 by default), then "+N"; the pill
+ * shrinks to "…" and the "+N" never does. The open list follows the single list's width rule.
+ */
+export const OneLineMulti: Story = {
+  render: function RenderOneLineMulti() {
+    const [value, setValue] = useState<string[]>(['mum', 'blr', 'fra', 'nyc']);
+    return (
+      <div style={{ width: '260px' }}>
+        <Select
+          mode="multiple"
+          options={fleetSites}
+          value={value}
+          onChange={(val) => {
+            setValue(val as string[]);
+          }}
+          label="Where it applies"
+          placeholder="Pick sites"
+          showPills
+          maxPills={1}
+          clearable
+        />
+      </div>
+    );
+  },
+};
+
 /**
  * Multi-select with select all checkbox.
  */

@@ -125,19 +125,24 @@ softer than the label" is therefore a different direction on each side, which is
 
 ### Actions
 
-| Token                             | Tailwind                               | Light         | Dark          |
-| --------------------------------- | -------------------------------------- | ------------- | ------------- |
-| `--mdt-primary`                   | `mdt-bg-primary`                       | `black`       | `white`       |
-| `--mdt-primary-foreground`        | `mdt-text-primary-foreground`          | `white`       | `black`       |
-| `--mdt-primary-foreground-muted`  | `mdt-text-primary-foreground-muted`    | `neutral-30`  | `neutral-130` |
-| `--mdt-primary-foreground-subtle` | `mdt-border-primary-foreground-subtle` | `neutral-100` | `neutral-50`  |
-| `--mdt-secondary`                 | `mdt-bg-secondary`                     | `neutral-20`  | `neutral-130` |
-| `--mdt-secondary-foreground`      | `mdt-text-secondary-foreground`        | `black`       | `neutral-10`  |
-| `--mdt-accent`                    | `mdt-bg-accent`                        | `blue-10`     | `blue-90`     |
-| `--mdt-accent-foreground`         | `mdt-text-accent-foreground`           | `blue-50`     | `blue-20`     |
-| `--mdt-muted`                     | `mdt-bg-muted`                         | `neutral-30`  | `neutral-120` |
-| `--mdt-muted-foreground`          | `mdt-text-muted-foreground`            | `ink-500`     | `neutral-40`  |
-| `--mdt-muted-foreground-subtle`   | `mdt-text-muted-foreground-subtle`     | `ink-400`     | `neutral-50`  |
+| Token                             | Tailwind                                    | Light         | Dark                              |
+| --------------------------------- | ------------------------------------------- | ------------- | --------------------------------- |
+| `--mdt-primary`                   | `mdt-bg-primary`                            | `black`       | `white`                           |
+| `--mdt-primary-foreground`        | `mdt-text-primary-foreground`               | `white`       | `black`                           |
+| `--mdt-primary-foreground-muted`  | `mdt-text-primary-foreground-muted`         | `neutral-30`  | `neutral-130`                     |
+| `--mdt-primary-foreground-subtle` | `mdt-border-primary-foreground-subtle`      | `neutral-100` | `neutral-50`                      |
+| `--mdt-secondary`                 | `mdt-bg-secondary`                          | `neutral-20`  | `neutral-130`                     |
+| `--mdt-secondary-foreground`      | `mdt-text-secondary-foreground`             | `black`       | `neutral-10`                      |
+| `--mdt-accent`                    | `mdt-bg-accent`                             | `blue-10`     | `blue-90`                         |
+| `--mdt-accent-foreground`         | `mdt-text-accent-foreground`                | `blue-50`     | `blue-20`                         |
+| `--mdt-muted`                     | `mdt-bg-muted`                              | `neutral-30`  | `neutral-120`                     |
+| `--mdt-muted-foreground`          | `mdt-text-muted-foreground`                 | `ink-500`     | `neutral-40`                      |
+| `--mdt-muted-foreground-subtle`   | `mdt-text-muted-foreground-subtle`          | `ink-400`     | `neutral-50`                      |
+| `--mdt-option-subtext`            | `mdt-text-[hsl(var(--mdt-option-subtext))]` | `neutral-80`  | `#7186A8` (the dark `neutral-60`) |
+
+`--mdt-option-subtext` (2026-10-21) is the description line under an option's name in an open
+`Select` list: one step lighter than the name, 4.5:1 or better in both themes. Dark takes its own
+step because the dark `neutral-80` is the same hex as the dark `neutral-90`.
 
 ### Status
 
