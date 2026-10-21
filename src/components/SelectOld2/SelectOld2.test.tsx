@@ -1733,7 +1733,8 @@ describe('SelectOld2 - the one selection look', () => {
     const unpicked = screen.getByText('Option 1').closest('button');
     expect(picked).toHaveClass('mdt-bg-blue-10', 'hover:mdt-bg-blue-10');
     expect(unpicked).not.toHaveClass('mdt-bg-blue-10');
-    expect(picked?.querySelectorAll('svg')).toHaveLength(2);
+    // one tick, and it stays a tick under the pointer - no X swap here either (Nirav, 2026-10-21)
+    expect(picked?.querySelectorAll('svg')).toHaveLength(1);
     expect(unpicked?.querySelectorAll('svg')).toHaveLength(0);
   });
 
