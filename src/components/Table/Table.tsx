@@ -714,7 +714,9 @@ function TableSelectionCell({
       style={{ left: frozen }}
     >
       <span className="tbl-rowsel mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
-        <span className="tbl-num mdt-font-medium mdt-text-faint" aria-hidden={!inert}>
+        {/* The cell's own ink, like every other column (Pranjal, 2026-10-15: "serial number ... should have a dark
+            color atleast" and "all columns should have same color text"); it was the faint grey, 2.65:1 on white. */}
+        <span className="tbl-num mdt-font-medium" aria-hidden={!inert}>
           {index}
         </span>
         {!inert && (
@@ -736,7 +738,7 @@ function TableSelectionCell({
 }
 
 /** A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel. */
-function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellProps) {
+function TableNumberCell({ index, frozen = 0 }: TableNumberCellProps) {
   return (
     <td
       className={cn(
@@ -746,9 +748,8 @@ function TableNumberCell({ index, inert = false, frozen = 0 }: TableNumberCellPr
       style={{ left: frozen }}
     >
       <span className="tbl-rownum mdt-inline-flex mdt-h-5 mdt-w-full mdt-items-center mdt-justify-center">
-        <span className={cn('tbl-num mdt-font-medium mdt-text-faint', inert && 'mdt-opacity-60')}>
-          {index}
-        </span>
+        {/* The cell's own ink at full strength - an inert row's too, whose other columns are not dimmed either. */}
+        <span className="tbl-num mdt-font-medium">{index}</span>
       </span>
     </td>
   );

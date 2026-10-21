@@ -147,9 +147,9 @@
 .tbl-table[data-has-selection='true'] .tbl-row:not([data-inert]) .tbl-cb {
   display: inline-flex;
 }
+/* an inert row keeps its number on hover, at full strength: one ink for every column (Pranjal, 2026-10-15) */
 .tbl-row[data-inert] .tbl-num {
   display: inline;
-  opacity: 0.6;
 }
 
 /* headings: 16px inset, grip, 8px, label, 8px, arrow; the "⋯" at the right edge. All of it on hover or focus. */

@@ -214,9 +214,52 @@ describe('TableNumberCell', () => {
       </Table>
     );
     expect(screen.getByRole('columnheader', { name: 'Row number' })).toBeInTheDocument();
-    expect(screen.getByText('7')).toHaveClass('tbl-num', 'mdt-opacity-60');
+    expect(screen.getByText('7')).toHaveClass('tbl-num');
     expect(screen.queryByRole('checkbox', { hidden: true })).not.toBeInTheDocument();
     expect(document.querySelector('.tbl-rowsel')).toBeNull();
+  });
+
+  /* Pranjal, 2026-10-15: "serial number ... should have a dark color atleast" and "all columns should have same
+   * color text". The number carries no ink of its own, so it reads in its cell's - the ink every other column has. */
+  it('reads in the cell ink like every other column, an inert row included', () => {
+    render(
+      <Table label="People">
+        <TableViewport tableWidth={260}>
+          <TableColGroup widths={[60, 200]} />
+          <TableBody>
+            <TableRow inert>
+              <TableNumberCell index={7} inert />
+              <TableCell>Priya Natarajan</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableNumberCell index={8} />
+              <TableCell>Anita Raghavan</TableCell>
+            </TableRow>
+          </TableBody>
+        </TableViewport>
+      </Table>
+    );
+    const nameCell = screen.getByText('Priya Natarajan').closest('td') as HTMLElement;
+    const cellInk = /mdt-text-neutral-\d+/.exec(nameCell.className)?.[0] ?? 'missing';
+    expect(cellInk).toBe('mdt-text-neutral-130');
+    for (const n of ['7', '8']) {
+      const num = screen.getByText(n);
+      expect(num.className).not.toMatch(/mdt-text-|mdt-opacity-/);
+      expect(num.closest('td')).toHaveClass(cellInk);
+    }
+  });
+});
+
+describe('TableSelectionCell row number', () => {
+  it('reads in the cell ink at rest, picked or inert', () => {
+    const { unmount } = render(<Grid />);
+    const num = screen.getByText('1');
+    expect(num).toHaveClass('tbl-num');
+    expect(num.className).not.toMatch(/mdt-text-|mdt-opacity-/);
+    expect(num.closest('td')).toHaveClass('mdt-text-neutral-130');
+    unmount();
+    render(<Grid inert />);
+    expect(screen.getByText('1').className).not.toMatch(/mdt-text-|mdt-opacity-/);
   });
 });
 

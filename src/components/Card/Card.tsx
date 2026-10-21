@@ -78,6 +78,18 @@ const PAD: Record<CardPadding, { x: string; top: string; bottom: string }> = {
   none: { x: 'mdt-px-0', top: 'mdt-pt-0', bottom: 'mdt-pb-0' },
 };
 
+/**
+ * A collapsible card's header, top and bottom: even, open or shut. Shut, the header is the whole card, so the
+ * default header's 20 top / 0 bottom (`plain`) sat its words on the card's lower edge. It is 16 on `normal`
+ * (the console's enrol summary cards, 2026-10-21), the inset itself on `compact`, and the same in both states
+ * so the title does not move when the card opens. The sides keep the inset.
+ */
+const COLLAPSIBLE_HEADER_Y: Record<CardPadding, string> = {
+  normal: 'mdt-py-4',
+  compact: 'mdt-py-3.5',
+  none: 'mdt-py-0',
+};
+
 interface CardContextValue {
   padding: CardPadding;
   /** Inside a clickable or collapsible card, where a heading may not sit. */
@@ -418,7 +430,7 @@ const CollapsibleCard = forwardRef<HTMLDivElement, CollapsibleCardProps>(
                 // line even when the panel is open below. Both states are
                 // therefore stated outright rather than left to the sibling.
                 plain={!isOpen}
-                className={isOpen ? 'last:mdt-border-b' : undefined}
+                className={cn(COLLAPSIBLE_HEADER_Y[padding], isOpen && 'last:mdt-border-b')}
                 trailing={
                   <Icon
                     name="chevron-down"

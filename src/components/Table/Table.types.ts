@@ -186,7 +186,11 @@ export interface TableSelectionCellProps {
 /** A plain row number for a table without selection: it stays a number on hover. */
 export interface TableNumberCellProps {
   index: number;
-  /** An invited person: the number is dimmed. */
+  /**
+   * An invited person. Accepted and ignored: the number reads in the cell's own ink on every row, an inert
+   * one included, because its other columns are not dimmed either (Pranjal, 2026-10-15: "all columns should
+   * have same color text"). It used to dim the number to 60%.
+   */
   inert?: boolean | undefined;
   frozen?: number | undefined;
 }

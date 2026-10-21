@@ -3,6 +3,7 @@ export { KpiStrip } from './KpiStrip';
 export { KpiGauge, KpiBars } from './KpiCharts';
 export type {
   KpiCardProps,
+  KpiCardSize,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,

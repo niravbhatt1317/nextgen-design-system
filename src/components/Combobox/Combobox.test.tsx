@@ -999,15 +999,16 @@ describe('Combobox', () => {
       await waitFor(() => {
         expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
       });
-      const atRest = within(box('Time zone')).getByText('Europe/London')
-        .parentElement as HTMLElement;
+      const atRest = within(box('Time zone')).getByText('Europe/London').parentElement as HTMLElement;
       expect(atRest.children).toHaveLength(1);
       expect(atRest).toHaveTextContent(/^Europe\/London$/);
       expect(box('Time zone').querySelector('.mdt-w-px')).toBeNull();
     });
 
     it('draws the pick with renderValue when given', () => {
-      render(<TagPicker initial="role:web" renderValue={(option) => <b>Tag {option.label}</b>} />);
+      render(
+        <TagPicker initial="role:web" renderValue={(option) => <b>Tag {option.label}</b>} />
+      );
       expect(within(box()).getByText('Tag role:web')).toBeInTheDocument();
       expect(within(box()).queryByText('358 agents')).not.toBeInTheDocument();
     });
@@ -1105,7 +1106,9 @@ describe('Combobox', () => {
     it('skips a disabled option with the arrow keys, and will not pick it', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      render(<TagPicker options={withDisabled} label="Call sign" onChange={onChange} />);
+      render(
+        <TagPicker options={withDisabled} label="Call sign" onChange={onChange} />
+      );
 
       await user.tab();
       await user.keyboard('{ArrowDown}');
@@ -1226,7 +1229,9 @@ describe('Combobox', () => {
 
     it('uncontrolled: starts on defaultValue and keeps its own pick', async () => {
       const user = userEvent.setup();
-      render(<Combobox search="field" options={tags} label={TAG_LABEL} defaultValue="env:prod" />);
+      render(
+        <Combobox search="field" options={tags} label={TAG_LABEL} defaultValue="env:prod" />
+      );
       expect(within(box()).getByText('env:prod')).toBeInTheDocument();
 
       await user.click(field());

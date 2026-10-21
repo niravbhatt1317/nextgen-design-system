@@ -995,6 +995,7 @@ export {
 } from './KpiCard';
 export type {
   KpiCardProps,
+  KpiCardSize,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,
