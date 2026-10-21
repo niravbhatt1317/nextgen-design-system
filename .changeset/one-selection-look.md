@@ -11,8 +11,8 @@ picked row keeps its pale ground under the pointer.
 
 - `Select` — the faint grey tick that appeared on an unpicked row under the pointer is gone (the
   16px slot stays, so labels do not move). Multi-select picked rows gain the pale ground. The
-  searchable single select keeps its tick on the picked row under the pointer instead of swapping it
-  for an X. The keyboard highlight in the plain single select now takes the grey ground.
+  keyboard highlight in the plain single select now takes the grey ground. (A picked row keeps its
+  tick under the pointer in every mode — see the entry below.)
 - `SelectOld2` (deprecated) — the same three changes.
 - `Combobox` — the tick moves from the left of the label to the right, and the picked row is pale
   blue instead of the grey it shared with the highlight.
