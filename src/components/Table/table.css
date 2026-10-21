@@ -167,11 +167,17 @@
 .tbl-sortmark {
   flex: 0 0 auto;
 }
+/* THE NAME HOLDS STILL (Pranjal, 2026-10-21: "only in those theres a updown jiggle on text whenever i hover on it"): the
+ * heading box lines up by its baseline, and the first part in it gave that baseline. On a quick-filter column that was
+ * the glyph (an icon has no text baseline, so its bottom edge served), and under the pointer the glyph steps aside for
+ * the grip - the name then gave the baseline and the whole name dropped 1.6 px. The name now always gives it, so a
+ * quick-filter heading sits on the same line as every other heading, at rest and under the pointer. */
 .tbl-label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  align-self: baseline;
 }
 .tbl-head[data-movable='true']:hover,
 .tbl-head[data-movable='true']:focus-within,
