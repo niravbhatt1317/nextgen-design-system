@@ -25,7 +25,25 @@ export interface ComboboxOption {
    * Whether the option is disabled
    */
   disabled?: boolean;
+
+  /**
+   * A mark before the label - a flag, or the plus on a "New ..." row. Drawn by search="field", in the list and in the
+   * picked field.
+   */
+  icon?: ReactNode;
+
+  /**
+   * A heading the option sits under. With search="field", options of one group sit under its heading, in the order
+   * given - keep a group's options together.
+   */
+  group?: string;
 }
+
+/**
+ * Where the typing happens: 'list' - a search box at the top of the open list; 'field' - the field itself
+ * (the type-in picker, Pranjal 2026-10-21: "input field itself will act as search").
+ */
+export type ComboboxSearch = 'list' | 'field';
 
 /**
  * Combobox trigger variants derived from CVA configuration
@@ -117,10 +135,20 @@ export interface ComboboxProps
   searchPlaceholder?: string;
 
   /**
-   * Message shown when no results are found
+   * Message shown when no results are found. A function is handed what was typed, so it can say
+   * No tag matches "prod-eu".
    * @default "No results found."
    */
-  emptyMessage?: string;
+  emptyMessage?: string | ((query: string) => string);
+
+  /**
+   * Where the typing happens. 'list' (the default): the field is a button and the open list carries its own search
+   * box. 'field': the field itself is the search box - a click opens every option, typing narrows them, Enter picks
+   * the lit one, Escape keeps the last pick - and the list only shows results. Picked, the field reads the label, a
+   * hairline and the description ("env:staging | 353 agents"), or the label alone for a one-line option.
+   * @default 'list'
+   */
+  search?: ComboboxSearch;
 
   /**
    * Label for the combobox

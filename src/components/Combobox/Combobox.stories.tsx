@@ -39,6 +39,15 @@ const meta: Meta<typeof Combobox> = {
         defaultValue: { summary: 'md' },
       },
     },
+    search: {
+      control: 'inline-radio',
+      options: ['list', 'field'],
+      description:
+        "Where the typing happens: 'list' - a search box at the top of the open list; 'field' - the field itself (the type-in picker)",
+      table: {
+        defaultValue: { summary: 'list' },
+      },
+    },
     clearable: {
       control: 'boolean',
       description: 'Show clear button when value is selected',
@@ -731,5 +740,114 @@ export const WithSearchCallback: Story = {
     label: 'Framework',
     placeholder: 'Select framework...',
     searchPlaceholder: 'Type to search...',
+  },
+};
+
+/* THE TYPE-IN PICKER (search="field", Pranjal 2026-10-21) - sample data for the three stories below. */
+
+/** Agent tags with how many agents carry each: a two-line option, the count as its second line. */
+const agentTags: ComboboxOption[] = [
+  { value: 'env:prod', label: 'env:prod', description: '1,781 agents' },
+  { value: 'env:staging', label: 'env:staging', description: '353 agents' },
+  { value: 'owner:platform', label: 'owner:platform', description: '245 agents' },
+  { value: 'pci:in-scope', label: 'pci:in-scope', description: '484 agents' },
+  { value: 'role:databases', label: 'role:databases', description: '352 agents' },
+  { value: 'role:edge', label: 'role:edge', description: '383 agents' },
+  { value: 'role:kubernetes', label: 'role:kubernetes', description: '329 agents' },
+  { value: 'role:production', label: 'role:production', description: '359 agents' },
+  { value: 'role:staging', label: 'role:staging', description: '353 agents' },
+  { value: 'role:web', label: 'role:web', description: '358 agents' },
+];
+
+/** IANA time zone names: a one-line option, the label alone. */
+const timeZones: ComboboxOption[] = [
+  'Asia/Kolkata',
+  'Asia/Dubai',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Asia/Jakarta',
+  'Australia/Sydney',
+  'Pacific/Auckland',
+  'Europe/London',
+  'Europe/Berlin',
+  'Europe/Paris',
+  'Europe/Madrid',
+  'Europe/Istanbul',
+  'Africa/Johannesburg',
+  'Africa/Lagos',
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Sao_Paulo',
+].map((zone) => ({ value: zone, label: zone }));
+
+/** 400 hosts, a hundred to a subnet (edge-32-0012 at 10.32.0.14): a long list to type into. */
+const agentHosts: ComboboxOption[] = ['edge', 'web', 'db', 'kube'].flatMap((role, block) => {
+  const subnet = 32 + block;
+  return Array.from({ length: 100 }, (_, i) => {
+    const host = `${role}-${subnet}-${String(i + 1).padStart(4, '0')}`;
+    return { value: host, label: host, description: `10.${subnet}.0.${i + 3}` };
+  });
+});
+
+/**
+ * The type-in picker, two-line options: `search="field"` makes the field itself the search box, so there is one input,
+ * not a field plus a second search box inside the list, and the list only shows results. A click or ArrowDown opens
+ * every option; typing narrows them (label, value or second line) and lights the first match, so Enter picks it;
+ * Escape, Tab or a click elsewhere keeps the last pick. Picked, the field reads the name and the detail with a hairline
+ * between - "env:staging | 353 agents". `emptyMessage` can be a function of what was typed.
+ */
+export const TypeInTwoLine: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<string | null>(null);
+    return <Combobox {...args} value={value} onValueChange={setValue} />;
+  },
+  args: {
+    search: 'field',
+    size: 'sm',
+    options: agentTags,
+    label: 'Which tag',
+    placeholder: 'Type to find a tag',
+    emptyMessage: (q) => `No tag matches "${q}"`,
+  },
+};
+
+/**
+ * The type-in picker, one-line options: an option with no `description` is the name alone, in the list and in the
+ * field once picked ("Asia/Kolkata", no hairline). Reopening shows the whole list again with the pick ticked, its
+ * name selected in the field so typing replaces it.
+ */
+export const TypeInOneLine: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<string | null>(null);
+    return <Combobox {...args} value={value} onValueChange={setValue} />;
+  },
+  args: {
+    search: 'field',
+    size: 'sm',
+    options: timeZones,
+    label: 'Time zone',
+    placeholder: 'Type to find a time zone',
+  },
+};
+
+/**
+ * The type-in picker on a long list: 400 hosts, each with its address as the second line. Typing a few characters of
+ * the name or the address ("0012", "10.34") narrows the list to a handful; the arrow keys keep the lit row in view.
+ * Picked, the field reads "edge-32-0012 | 10.32.0.14".
+ */
+export const TypeInLongList: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<string | null>(null);
+    return <Combobox {...args} value={value} onValueChange={setValue} />;
+  },
+  args: {
+    search: 'field',
+    size: 'sm',
+    options: agentHosts,
+    label: 'Which agent',
+    placeholder: 'Type a host name',
   },
 };
