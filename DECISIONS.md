@@ -18,6 +18,17 @@ one in `MISSING-TOKENS.md`, a capability in `CAPABILITIES.md`. This file is for 
 
 ## 2026-10-21
 
+### Every field is one line
+
+**Pranjal**, ruled in the console on 2026-10-16/17 and moved into `Select` on 2026-10-21: "we
+really need to set some standard which you cannot break". A closed field shows the chosen label
+only - never its description - on one line from the left, ending in "…". A multi-pick never grows
+past its height: one pick, then "+N"; the pill shrinks, the "+N" never does. An open list is at
+least the field's width and grows to fit its longest option, up to 320; every option reads from the
+left on one line. The option's name is 14/500 in the reading ink; its description one step lighter
+(`--mdt-option-subtext`: `neutral-80` light, the dark `neutral-60` in dark), 2 below it, never the
+faint grey. Showing the full name on hover stays the page's job (the console's `OverflowTip`).
+
 ### A picked option looks the same in every list
 
 **Pranjal.** Every dropdown, list and menu marks a pick one way: the picked row on the pale
