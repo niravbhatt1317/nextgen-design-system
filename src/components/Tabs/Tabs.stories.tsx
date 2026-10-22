@@ -21,7 +21,7 @@ const meta: Meta<typeof Tabs> = {
           '',
           '| Type | For | Looks |',
           '| --- | --- | --- |',
-          "| `underline` (the default) | A drawer band or a page band. | The label 13/500 in neutral-70, the active one 600 in the primary colour, over a 2px line that sits ON the strip's hairline and spans the label plus 12 at both sides; the tabs flush, so labels read 24 apart; 9 above the label, 11 below. |",
+          "| `underline` (the default) | A drawer band or a page band. | The label 13/500 in the faint ink, the active one 600 in the primary colour, over a 2px line with round ends that sits ON the strip's hairline and is the label's width (12 in from each side of the tab); the tabs flush, so labels read 24 apart; 9 above the label, 11 below; the first label on the content edge. |",
           "| `filled` | A switch inside a body — a view toggle, a form's mode — where a track reads better than a line. | A 32 track, corners 8, neutral-20, 3 in, holding 26 chips with corners 5, 10 at the sides and 2 between; the active chip white with the label at 500 in the primary colour under a hairline shadow. |",
           '',
           '**Not Tabs.** A sequence is a `Stepper`; a view preference is a `ToggleGroup`; "one of',
@@ -35,7 +35,8 @@ const meta: Meta<typeof Tabs> = {
           '| **Icon** | `icon`, drawn at 14 with 6 before the label (K-Tabs-13). |',
           '| **Count** | `count`, an 18-high pill at 11/600, muted, inverted on the active tab; `countMax` caps it at 99+ (K-Tabs-14). A tab carries a count and never a button. |',
           '| **The active tab ignores a click** | Re-selecting the selected tab does nothing — `onValueChange` is not called (K-Tabs-12). |',
-          '| **The strip starts on the content edge** | So the active line lines up with the text under it; the first label sits 12 in (K-Tabs-08). |',
+          '| **Every label starts on the content edge** | Option B (Pranjal, 2026-10-14): the first tab steps 12 into the margin — only its click area goes there — so the first label, and the active line under it, start where the text under the strip starts. The strip and its hairline stay put. |',
+          '| **The line is the label’s width** | 12 in from each side of the tab, under the label and its icon and count, never the whole tab; on a closable tab it ends 36 in, before the cross. |',
           '| **Keyboard** | Tab reaches the selected tab; the arrow keys move between tabs and select as they go; Home and End jump. |',
           '| **Set the type once** | On the `TabsList`; every tab inside inherits it. |',
           '',
@@ -115,8 +116,8 @@ const DrawerPanels = ({ className }: { className?: string }) => (
         {...(className !== undefined ? { className } : {})}
       >
         <Text>
-          {tab.label}: the text under the band starts on the same edge as the strip, so the active
-          line lines up with it (K-Tabs-08).
+          {tab.label}: the text under the band starts on the same edge as the first label and its
+          line (option B).
         </Text>
       </TabsContent>
     ))}
@@ -126,17 +127,18 @@ const DrawerPanels = ({ className }: { className?: string }) => (
 /* ── the two types ─────────────────────────────────────────────────────── */
 
 /**
- * The default. The label 13/500 in neutral-70, the active one 600 in the primary
- * colour; a 2px primary line on the strip's hairline, the tab's full width (the
- * label plus 12 at both sides); the tabs flush so labels read 24 apart; 9 above
- * the label, 11 below (K-Tabs-02, 03, 06, 07).
+ * The default. The label 13/500 in the faint ink, the active one 600 in the
+ * primary colour; a 2px primary line on the strip's hairline, the label's width
+ * (12 in from each side of the tab); the tabs flush so labels read 24 apart; 9
+ * above the label, 11 below; the first label on the content edge (K-Tabs-02,
+ * 03, 06, 07; option B).
  */
 export const Underline: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          'The default, for a drawer band or a page band. Label 13/500 in neutral-70, the active one 600 in the primary colour (K-Tabs-02, 03, 07); a 2px primary line ON the strip’s hairline, spanning the label plus 12 at both sides; the tabs flush, so labels read 24 apart; 9 above the label, 11 below (K-Tabs-06). The content sits 8 under the strip (K-Tabs-23).',
+          'The default, for a drawer band or a page band. Label 13/500 in the faint ink, the active one 600 in the primary colour (K-Tabs-02, 03, 07); a 2px primary line with round ends ON the strip’s hairline, the label’s width — 12 in from each side of the tab, not the whole tab (option B, Pranjal 2026-10-14); the tabs flush, so labels read 24 apart; 9 above the label, 11 below (K-Tabs-06). The first label starts on the content edge, the same edge as the text under the strip. Each label already holds its bold width, so choosing a tab moves nothing.',
       },
     },
   },
@@ -262,7 +264,7 @@ export const States: Story = {
   render: () => (
     <div className="mdt-p-8">
       <div
-        className="mdt-grid mdt-w-max mdt-overflow-hidden mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-white"
+        className="mdt-grid mdt-w-max mdt-overflow-hidden mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-background"
         style={{ gridTemplateColumns: '150px repeat(4, 236px) 300px 390px' }}
       >
         <div className={HEAD}>Type</div>
@@ -297,21 +299,21 @@ export const States: Story = {
 /* ── in context ────────────────────────────────────────────────────────── */
 
 /**
- * The drawer band: 720 wide, 48 high, the strip starting on the content edge
- * (the band's 20), so the active line lines up with the text under it and the
- * first label sits 12 in (K-Tabs-08, K-Tabs-15).
+ * The drawer band: 720 wide, 48 high, the strip on the band's 20 and the first
+ * label on that same edge, so the label and its line line up with the text
+ * under them (option B, K-Tabs-15).
  */
 export const InADrawerBand: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          'A drawer band 720 wide and 48 high — the Users drawer’s five tabs (K-Tabs-15). The strip starts on the content edge, the band’s 20, so the active line lines up with the text under it and the first label sits 12 in; the pulled strip (−12) was drawn and ruled out (K-Tabs-08). The tabs are bottom-aligned, so in a 48 band the line still lands on the band’s own divider (K-Tabs-06).',
+          'A drawer band 720 wide and 48 high — the Users drawer’s five tabs (K-Tabs-15). The strip and its hairline start on the band’s 20; the first tab steps 12 into the margin, so the first label and its line start on that same 20, lined up with the text under them (option B, Pranjal 2026-10-14). This is not the pulled strip ruled out on 2026-09-17 (K-Tabs-08): the strip and its hairline do not move, only the first tab’s click area does. The tabs are bottom-aligned, so in a 48 band the line still lands on the band’s own divider (K-Tabs-06).',
       },
     },
   },
   render: () => (
-    <div className="mdt-w-[720px] mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-white">
+    <div className="mdt-w-[720px] mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-background">
       <Tabs defaultValue="about">
         <div className="mdt-px-5">
           <TabsList className="mdt-h-12">
@@ -328,7 +330,8 @@ export const InADrawerBand: Story = {
 
 /**
  * The page band: 60 high, full width, the strip on the band's 24 like the
- * surface under it, which insets 16 top and bottom (K-Tabs-08, K-Tabs-23).
+ * surface under it, the first label on that same 24 (option B), the surface
+ * inset 16 top and bottom (K-Tabs-23).
  */
 export const InAPageBand: Story = {
   parameters: {
@@ -336,14 +339,14 @@ export const InAPageBand: Story = {
     docs: {
       description: {
         story:
-          'The page band under a hero: 60 high, full width, the strip starting on the band’s 24 like the content under it, so the active line lines up with the text below and the first label sits 12 in (K-Tabs-08). The band ends in the active tab’s 2px line, so the surface under it is inset 16 top and bottom rather than 6 and 20 — at 6 that line and a table’s top edge read as one (K-Tabs-23). A page’s tabs carry a count and never a button (K-Tabs-14).',
+          'The page band under a hero: 60 high, full width, the strip starting on the band’s 24 like the content under it, and the first label on that same 24, so the label and its line line up with the table below (option B, Pranjal 2026-10-14). The band ends in the active tab’s 2px line, so the surface under it is inset 16 top and bottom rather than 6 and 20 — at 6 that line and a table’s top edge read as one (K-Tabs-23). A page’s tabs carry a count and never a button (K-Tabs-14).',
       },
     },
   },
   render: () => (
     <div className="mdt-min-h-[320px] mdt-bg-neutral-10">
       <Tabs defaultValue="users">
-        <div className="mdt-flex mdt-h-[60px] mdt-items-stretch mdt-bg-white mdt-px-6">
+        <div className="mdt-flex mdt-h-[60px] mdt-items-stretch mdt-bg-background mdt-px-6">
           <TabsList>
             <TabsTrigger value="users" count={1284}>
               Users
@@ -360,7 +363,7 @@ export const InAPageBand: Story = {
         <div className="mdt-px-6 mdt-py-4">
           {['users', 'teams', 'roles', 'grants'].map((value) => (
             <TabsContent key={value} value={value} className="mdt-mt-0">
-              <div className="mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-white mdt-p-4">
+              <div className="mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-background mdt-p-4">
                 <Text>
                   The {value} table starts here, on the same 24 as the strip; 16 above it so the
                   active line and the table’s top edge never read as one line.
@@ -370,6 +373,75 @@ export const InAPageBand: Story = {
           ))}
         </div>
       </Tabs>
+    </div>
+  ),
+};
+
+/* ── option B ──────────────────────────────────────────────────────────── */
+
+/** A long and a short label beside two ordinary ones, so the line visibly follows the label. */
+const EDGE_TABS: { value: string; label: string }[] = [
+  { value: 'about', label: 'About' },
+  { value: 'permissions', label: 'Effective permissions' },
+  { value: 'sso', label: 'SSO' },
+  { value: 'sessions', label: 'Sessions' },
+];
+
+const EDGE_ROWS: { active: string; caption: string }[] = [
+  { active: 'about', caption: 'The first tab chosen: its label and its line start on the edge' },
+  { active: 'permissions', caption: 'A long label chosen: the line is as long as the label' },
+  { active: 'sso', caption: 'A short label chosen: the line is as short as the label' },
+];
+
+/** One strip of the option B story, with the text under it on the same edge. */
+const EdgeRow = ({ active, caption }: { active: string; caption: string }) => (
+  <div className="mdt-flex mdt-flex-col mdt-gap-2">
+    <p className="mdt-m-0 mdt-text-xs mdt-text-neutral-90">{caption}</p>
+    <Tabs defaultValue={active}>
+      <TabsList>
+        {EDGE_TABS.map((tab) => (
+          <TabsTrigger key={tab.value} value={tab.value}>
+            {tab.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {EDGE_TABS.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value} className="mdt-pt-3">
+          <Text>{tab.label}: this text starts on the same edge as the first label.</Text>
+        </TabsContent>
+      ))}
+    </Tabs>
+  </div>
+);
+
+/**
+ * Option B (Pranjal, 2026-10-14): every label on the content edge - the first
+ * tab steps 12 into the margin, the strip and its hairline stay put - and the
+ * 2px line the label's width, 12 in from each side of the tab. The blue rule
+ * marks the content edge; it is not part of the tabs.
+ */
+export const LabelsOnTheContentEdge: Story = {
+  name: 'Labels on the content edge',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Option B, approved by Pranjal for Agent Fleet on 2026-10-14 ("b is the only valid solution") and moved into the library as the underline default on 2026-10-21. **Every label sits on the content edge**, whichever tab is chosen: the first tab steps 12 into the margin — only its invisible click area goes there — so the labels start where the text under the strip starts, while the strip and its hairline stay put. **The 2px line is the label’s width**, 12 in from each side of the tab, round-ended, under the label and never the whole tab. Each label already holds its bold width, so choosing a tab moves nothing. The blue rule marks the content edge (the card’s 20) and is not part of the tabs.',
+      },
+    },
+  },
+  render: () => (
+    <div className="mdt-w-[640px] mdt-rounded-xl mdt-border mdt-border-neutral-20 mdt-bg-background mdt-px-5 mdt-py-5">
+      <div className="mdt-relative mdt-flex mdt-flex-col mdt-gap-6">
+        <span
+          aria-hidden="true"
+          data-testid="content-edge"
+          className="mdt-pointer-events-none mdt-absolute mdt-inset-y-0 -mdt-left-px mdt-w-px mdt-bg-blue-40"
+        />
+        {EDGE_ROWS.map((row) => (
+          <EdgeRow key={row.active} active={row.active} caption={row.caption} />
+        ))}
+      </div>
     </div>
   ),
 };

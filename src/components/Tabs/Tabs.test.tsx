@@ -200,10 +200,10 @@ describe('underline geometry (K-Tabs-06, 08)', () => {
     expect(tab('Grants')).toHaveClass('mdt-px-3', 'mdt-pt-[9px]', 'mdt-pb-[11px]');
   });
 
-  it('draws the 2px line as the tab’s own bottom border, primary when active', () => {
+  it('keeps a clear 2px bottom border, so the tab is as tall as it was, and never paints it', () => {
     render(three());
     expect(tab('Grants')).toHaveClass('mdt-border-b-2', 'mdt-border-transparent');
-    expect(tab('About')).toHaveClass('data-[state=active]:mdt-border-primary');
+    expect(tab('About')).not.toHaveClass('data-[state=active]:mdt-border-primary');
   });
 
   it('pulls the line 1 down so it sits on the strip’s hairline, not above it', () => {
@@ -240,6 +240,138 @@ describe('underline geometry (K-Tabs-06, 08)', () => {
   it('runs the strip the full width of the content, starting on its edge', () => {
     render(three());
     expect(list()).toHaveClass('mdt-w-full');
+  });
+});
+
+describe('option B: labels on the content edge, the line under the label (Pranjal 2026-10-14)', () => {
+  const FIRST_TAB = '[&>[role=tab]:first-child]:-mdt-ms-3';
+  const FIRST_WRAPPED_TAB = '[&>:first-child:has(>[role=tab])]:-mdt-ms-3';
+
+  it('steps the first tab 12 into the margin - its own padding - so its label starts on the edge', () => {
+    render(three());
+    expect(list()).toHaveClass(FIRST_TAB);
+    // the same 12 as the tab's own padding, so the label lands exactly on the edge
+    expect(tab('About')).toHaveClass('mdt-px-3');
+    // the selector reaches the first tab and only the first tab
+    expect(list().querySelectorAll(':scope > [role=tab]:first-child')).toHaveLength(1);
+    expect(list().querySelector(':scope > [role=tab]:first-child')).toBe(tab('About'));
+  });
+
+  it('leaves the strip and its hairline where they are - only the first tab steps out', () => {
+    render(three());
+    expect(list()).toHaveClass('mdt-w-full', 'mdt-border-b');
+    expect(list()).not.toHaveClass('-mdt-ms-3');
+    expect(list()).not.toHaveClass('-mdt-ml-3');
+  });
+
+  it('steps a closable first tab out together with its close control', () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a" closable onClose={vi.fn()}>
+            One
+          </TabsTrigger>
+          <TabsTrigger value="b">Two</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    expect(list()).toHaveClass(FIRST_WRAPPED_TAB);
+    const first = list().firstElementChild;
+    expect(first).not.toHaveAttribute('role', 'tab');
+    expect(first?.firstElementChild).toBe(tab('One'));
+    expect(first).toContainElement(screen.getByTestId('tab-close'));
+  });
+
+  it('puts the first label on the edge on the page band too', () => {
+    render(
+      <Tabs defaultValue="about">
+        <TabsList hairline={false}>
+          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="teams">Teams</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    expect(list()).toHaveClass(FIRST_TAB, FIRST_WRAPPED_TAB);
+  });
+
+  it('leaves the filled track alone - its chips sit inside the track', () => {
+    render(three('filled'));
+    expect(list()).not.toHaveClass(FIRST_TAB);
+    expect(list()).not.toHaveClass(FIRST_WRAPPED_TAB);
+  });
+
+  it('draws the line 12 in from each side of the tab - the label’s width, not the tab’s', () => {
+    render(three());
+    const t = tab('Grants');
+    expect(t).toHaveClass('mdt-relative');
+    expect(t).toHaveClass(
+      'after:mdt-absolute',
+      "after:mdt-content-['']",
+      // the inset matches the padding (px-3), so the line spans exactly the label
+      'after:mdt-left-3',
+      'after:mdt-right-3',
+      'mdt-px-3'
+    );
+  });
+
+  it('lays the 2px line, with round ends, over the clear border - on the hairline', () => {
+    render(three());
+    expect(tab('Grants')).toHaveClass(
+      'after:-mdt-bottom-0.5',
+      'after:mdt-h-0.5',
+      'after:mdt-rounded-full',
+      'mdt-border-b-2'
+    );
+  });
+
+  it('paints the line primary on the active tab only, and it never takes a click', () => {
+    render(three());
+    expect(tab('About')).toHaveAttribute('data-state', 'active');
+    expect(tab('About')).toHaveClass('data-[state=active]:after:mdt-bg-primary');
+    expect(tab('Grants')).toHaveAttribute('data-state', 'inactive');
+    expect(tab('Grants')).not.toHaveClass('after:mdt-bg-primary');
+    expect(tab('Grants')).toHaveClass('after:mdt-pointer-events-none');
+  });
+
+  it('fades the line in 120ms, as the border did (K-Tabs-23)', () => {
+    render(three());
+    expect(tab('Grants')).toHaveClass(
+      'after:mdt-transition-colors',
+      'after:mdt-duration-[120ms]',
+      'after:mdt-ease-[ease]'
+    );
+  });
+
+  it('ends a closable tab’s line 36 in, under the label and never under the cross', () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a" closable onClose={vi.fn()}>
+            One
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    expect(tab('One')).toHaveClass('mdt-pr-9', 'after:mdt-right-9', 'after:mdt-left-3');
+    expect(tab('One')).not.toHaveClass('after:mdt-right-3');
+  });
+
+  it('draws no line on a chip, closable or not', () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList type="filled">
+          <TabsTrigger value="a" closable onClose={vi.fn()}>
+            One
+          </TabsTrigger>
+          <TabsTrigger value="b">Two</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    for (const name of ['One', 'Two']) {
+      expect(tab(name)).not.toHaveClass('after:mdt-absolute');
+      expect(tab(name)).not.toHaveClass('data-[state=active]:after:mdt-bg-primary');
+      expect(tab(name)).not.toHaveClass('after:mdt-right-9');
+    }
   });
 });
 

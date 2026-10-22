@@ -20,13 +20,17 @@ import type {
  * before is TabsOld2, under Deprecated 2.
  *
  * UNDERLINE - the default, every drawer band and page band: the label 13/500 in
- * the faint ink (#8FA0BD), the active one 600 in the primary colour; a 2px primary line ON
- * the strip's hairline spanning the label plus 12 at both sides; the tabs flush,
- * so labels read 24 apart; 9 above the label, 11 below; the strip starts on the
- * content edge so the active line lines up with the text under it. The drawer
- * band's hairline is neutral-30 (every console drawer closes with that line,
- * B-06); the page band has none (B-23, `hairline={false}`) and its tabs
- * stretch to the band (Pranjal, 2026-10-10: keep the version-8 tabs).
+ * the faint ink (#8FA0BD), the active one 600 in the primary colour; the tabs
+ * flush, so labels read 24 apart; 9 above the label, 11 below. OPTION B
+ * (Pranjal, 2026-10-14: "b is the only valid solution"; built in Agent Fleet
+ * first, into the library 2026-10-21): every label sits ON the content edge -
+ * the first tab steps 12 into the margin, only its click area goes there, while
+ * the strip and its hairline stay put - and the 2px primary line ON the
+ * strip's hairline is the LABEL's width (12 in from each side of the tab, round
+ * ends), not the tab's. The drawer band's hairline is neutral-30 (every console
+ * drawer closes with that line, B-06); the page band has none (B-23,
+ * `hairline={false}`) and its tabs stretch to the band (Pranjal, 2026-10-10:
+ * keep the version-8 tabs).
  *
  * FILLED - a switch inside a body: a 32 track, corners 8, neutral-20, 3.5 in at
  * the sides; the chip 25 high, corners 5, 10 at the sides, 2 between, centred in
@@ -52,20 +56,35 @@ interface TabsListContextValue {
 /** The type and the hairline, set once on the TabsList, read by every trigger inside it. */
 const TabsListContext = createContext<TabsListContextValue>({ type: 'underline', hairline: true });
 
+/* THE FIRST LABEL ON THE CONTENT EDGE (option B, 2026-10-14). The first tab
+ * steps 12 into the margin - its own 12 of padding - so its label, and so every
+ * label after it, starts on the edge the text under the strip starts on. Only
+ * the tab's click area goes into the margin; the strip and its hairline stay
+ * where they are. A closable tab sits in a wrapper beside its close control, so
+ * when it comes first the wrapper is what steps out. Inline-start, so a
+ * right-to-left strip steps out on its own first side. */
+const FIRST_TAB_ON_EDGE = cn(
+  '[&>[role=tab]:first-child]:-mdt-ms-3',
+  '[&>:first-child:has(>[role=tab])]:-mdt-ms-3'
+);
+
 /* THE STRIP. Underline with a hairline: the drawer band's own line (neutral-30),
- * full width, starting on the content edge (K-Tabs-06, K-Tabs-08); the tabs
- * end-aligned so a taller band (the drawer's 48) still lands the line on the
- * divider. Without: the page band - no line, the tabs stretched to the band so
- * the 2px line is its last 2px. Filled: the 32 track (K-Tabs-09), 3.5 in at the
- * sides so the 25 chip sits centred with 3.5 above and below (K-Tabs-10), 2
+ * full width (K-Tabs-06); the tabs end-aligned so a taller band (the drawer's
+ * 48) still lands the line on the divider. Without: the page band - no line,
+ * the tabs stretched to the band so the 2px line is its last 2px. Both put the
+ * first label on the content edge. Filled: the 32 track (K-Tabs-09), 3.5 in at
+ * the sides so the 25 chip sits centred with 3.5 above and below (K-Tabs-10), 2
  * between chips. */
 const listClass = (type: TabsType, hairline: boolean): string => {
   if (type === 'filled') {
     return 'mdt-inline-flex mdt-h-8 mdt-items-center mdt-gap-0.5 mdt-rounded-[8px] mdt-bg-neutral-20 mdt-px-[3.5px] mdt-py-0';
   }
-  return hairline
-    ? 'mdt-flex mdt-w-full mdt-items-end mdt-gap-0 mdt-border-b mdt-border-neutral-30'
-    : 'mdt-flex mdt-w-full mdt-items-stretch mdt-gap-0';
+  return cn(
+    hairline
+      ? 'mdt-flex mdt-w-full mdt-items-end mdt-gap-0 mdt-border-b mdt-border-neutral-30'
+      : 'mdt-flex mdt-w-full mdt-items-stretch mdt-gap-0',
+    FIRST_TAB_ON_EDGE
+  );
 };
 
 /* THE LABEL, both types (K-Tabs-02 to K-Tabs-05): 13/500 on an 18 line in
@@ -81,6 +100,21 @@ const TRIGGER_BASE = cn(
   'data-[state=active]:mdt-text-primary data-[state=active]:hover:mdt-text-primary',
   'disabled:mdt-cursor-not-allowed disabled:mdt-text-neutral-40',
   'focus-visible:mdt-outline-none focus-visible:mdt-ring-1 focus-visible:mdt-ring-inset focus-visible:mdt-ring-blue-40'
+);
+
+/* THE ACTIVE LINE IS THE LABEL'S WIDTH (option B, Pranjal 2026-10-14). Drawn
+ * by the tab's `::after` over the clear 2px border, so it lands in exactly the
+ * place the border did - ON the hairline - but 12 in from each side, under the
+ * label (and its icon and count) rather than under the whole tab. Round ends
+ * (a full radius on a 2px line is 1). Primary on the active tab, nothing on
+ * the rest; it never takes a click. The colour moves in 120ms, as the border's
+ * did (K-Tabs-23). A closable tab ends it 36 in instead, where its label ends
+ * (see TabsTrigger). */
+const ACTIVE_LINE = cn(
+  "after:mdt-pointer-events-none after:mdt-absolute after:mdt-content-['']",
+  'after:-mdt-bottom-0.5 after:mdt-left-3 after:mdt-right-3 after:mdt-h-0.5 after:mdt-rounded-full',
+  'after:mdt-transition-colors after:mdt-duration-[120ms] after:mdt-ease-[ease]',
+  'data-[state=active]:after:mdt-bg-primary'
 );
 
 const triggerClass = (type: TabsType, hairline: boolean): string => {
@@ -99,16 +133,18 @@ const triggerClass = (type: TabsType, hairline: boolean): string => {
       'disabled:mdt-bg-transparent'
     );
   }
-  /* 12 at both sides; 9 above the label, 11 below; the 2px line is the tab's
-   * own bottom border. On a strip with a hairline it is pulled 1 down (-mb-px)
-   * so it sits ON the hairline rather than above it (K-Tabs-06); on the page
-   * band there is no hairline and nothing to pull onto. The active label is
-   * 600 (K-Tabs-07, the console's value). */
+  /* 12 at both sides; 9 above the label, 11 below. The tab keeps a clear 2px
+   * bottom border so its box is the same height as before; on a strip with a
+   * hairline it is pulled 1 down (-mb-px) so that border sits ON the hairline
+   * rather than above it (K-Tabs-06); on the page band there is no hairline and
+   * nothing to pull onto. The active label is 600 (K-Tabs-07, the console's
+   * value). */
   return cn(
     hairline ? '-mdt-mb-px' : 'mdt-mb-0',
-    'mdt-px-3 mdt-pb-[11px] mdt-pt-[9px]',
+    'mdt-relative mdt-px-3 mdt-pb-[11px] mdt-pt-[9px]',
     'mdt-border-b-2 mdt-border-transparent mdt-bg-transparent',
-    'data-[state=active]:mdt-border-primary data-[state=active]:mdt-font-semibold'
+    'data-[state=active]:mdt-font-semibold',
+    ACTIVE_LINE
   );
 };
 
@@ -270,8 +306,10 @@ const TabsTrigger = forwardRef<ElementRef<typeof TabsPrimitive.Trigger>, TabsTri
           // rather than inside it. After the type's own padding, so it wins:
           // 36 against a 20 cross at 4 from the edge leaves 12 between the
           // label and the cross, held whether or not the cross is showing so
-          // the tab never changes width (K-Tabs-21).
+          // the tab never changes width (K-Tabs-21). On underline the active
+          // line ends there too, under the label and never under the cross.
           closable && 'mdt-pr-9',
+          closable && type === 'underline' && 'after:mdt-right-9',
           className
         )}
         onMouseDown={(event) => {
