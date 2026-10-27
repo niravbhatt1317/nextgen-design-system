@@ -1,11 +1,11 @@
 {
   "generatedFrom": "src/components and src/utils (exports + JSDoc)",
   "generatedBy": "scripts/extract-capabilities.mjs",
-  "capabilityCount": 1294,
+  "capabilityCount": 1341,
   "counts": {
-    "story": 884,
-    "component": 324,
-    "utility": 47,
+    "story": 917,
+    "component": 334,
+    "utility": 51,
     "hook": 39
   },
   "capabilities": [
@@ -41,7 +41,7 @@
         "clickable",
         "children"
       ],
-      "propDocs": " The glyph or logo in the 36px tile on the left. Leave out for no tile. The name on the first line. When the card is clickable this is also its accessible name. A Badge beside the title: Live, Off, Draft, Test failed. The second line. An array is drawn as a meta line split by hairlines: \"SAML 2.0 | 2,104 sign-ins\". Controls on the right: a Switch, a Button, an AvatarStack. They stay clickable on their own. The ⋯ button at the far right, set off from `actions` by a hairline. Fades the tile: a retired or switched-off item that is kept. Fires when the card itself is clicked: open a modal, a drawer, an inline edit, change the content. Makes the card a link: a click follows it. Where `href` opens. `_blank` adds `rel=\"noopener noreferrer\"`. Whether the card responds to a click at all. With `onClick` or `href` it does by default; pass `false` to hold it still (read-only, a busy row). The `edit` variant's body: the field being edited. Replaces title and description."
+      "propDocs": " The glyph or logo in the 36px tile on the left (`compact`: a bare 14 glyph by the title). Leave out for no tile. The name on the first line. When the card is clickable this is also its accessible name. A Badge beside the title: Live, Off, Draft, Test failed. The second line. An array is drawn as a meta line split by hairlines: \"SAML 2.0 | 2,104 sign-ins\". Controls on the right: a Switch, a Button, an AvatarStack. They stay clickable on their own. The ⋯ button at the far right, set off from `actions` by a hairline. Fades the tile: a retired or switched-off item that is kept. Fires when the card itself is clicked: open a modal, a drawer, an inline edit, change the content. Makes the card a link: a click follows it. Where `href` opens. `_blank` adds `rel=\"noopener noreferrer\"`. Whether the card responds to a click at all. With `onClick` or `href` it does by default; pass `false` to hold it still (read-only, a busy row). The `edit` variant's body: the field being edited. Replaces title and description."
     },
     {
       "name": "ActionPlacement",
@@ -128,8 +128,8 @@
       "kind": "story",
       "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
       "area": "OverflowCount",
-      "summary": "Story: Components/OverflowCount / AfterBadges",
-      "doc": "Components/OverflowCount AfterBadges",
+      "summary": "Story: New Components/OverflowCount / AfterBadges",
+      "doc": "New Components/OverflowCount AfterBadges",
       "props": [],
       "propDocs": ""
     },
@@ -728,8 +728,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / Busy",
-      "doc": "Components/ConfirmDialog Busy",
+      "summary": "Story: New Components/ConfirmDialog / Busy",
+      "doc": "New Components/ConfirmDialog Busy",
       "props": [],
       "propDocs": ""
     },
@@ -1061,12 +1061,51 @@
       "propDocs": ""
     },
     {
+      "name": "ChecksAndWarnings",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / ChecksAndWarnings",
+      "doc": "New Components/TargetBuilder ChecksAndWarnings",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "ChipInput",
+      "kind": "component",
+      "file": "src/components/Input/ChipInput.tsx",
+      "area": "Input",
+      "summary": "ChipInput - a field that turns typed values into chips: Enter, a comma or a space adds what is typed, a pasted list adds every value in it, Backspace on an empty field takes the last chip back, and a duplicate is dropped.",
+      "doc": "ChipInput - a field that turns typed values into chips: Enter, a comma or a space adds what is typed, a pasted list adds every value in it, Backspace on an empty field takes the last chip back, and a duplicate is dropped. A value that fails `validate` stays in the field with the red edge and its message, so nothing typed is lost. ```tsx <ChipInput aria-label=\"Recipients\" values={emails} onValuesChange={setEmails} /> ```",
+      "props": [
+        "values",
+        "onValuesChange",
+        "validate",
+        "placeholder",
+        "aria-label",
+        "mono",
+        "disabled",
+        "className"
+      ],
+      "propDocs": "The values so far, drawn as chips before the typing space. Called with the whole new list after a value is added or removed. What is wrong with one typed value, or null when it is fine. A value that fails stays in the field with its red edge and this message under it, until it is changed. Left unset, every value is accepted. The placeholder while the field holds no value. @default 'Type a value, press Enter' The field's accessible name - required, since a chip field has no visible label of its own. Draws the values and the typing in mono - for ports, addresses, codes. Turns the field and its chips off. Extra classes on the wrapper."
+    },
+    {
       "name": "Chips",
       "kind": "story",
       "file": "src/components/Checkbox/Checkbox.stories.tsx",
       "area": "Checkbox",
       "summary": "Story: New Components/Checkbox / Chips",
       "doc": "New Components/Checkbox Chips",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Chips",
+      "kind": "story",
+      "file": "src/components/Input/Input.stories.tsx",
+      "area": "Input",
+      "summary": "Story: New Components/Input / Chips",
+      "doc": "New Components/Input Chips",
       "props": [],
       "propDocs": ""
     },
@@ -1231,6 +1270,16 @@
       "propDocs": ""
     },
     {
+      "name": "ClickableOrNot",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / ClickableOrNot",
+      "doc": "Components/Stepper ClickableOrNot",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "ClickBehaviours",
       "kind": "story",
       "file": "src/components/ActionCard/ActionCard.stories.tsx",
@@ -1355,8 +1404,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / ColorVariants",
-      "doc": "Components/Form ColorVariants",
+      "summary": "Story: New Components/Form / ColorVariants",
+      "doc": "New Components/Form ColorVariants",
       "props": [],
       "propDocs": ""
     },
@@ -1395,8 +1444,8 @@
       "kind": "component",
       "file": "src/components/Combobox/Combobox.tsx",
       "area": "Combobox",
-      "summary": "Combobox component with search and keyboard navigation.",
-      "doc": "Combobox component with search and keyboard navigation. ```tsx // Basic usage <Combobox options={[ { value: 'react', label: 'React' }, { value: 'vue', label: 'Vue' }, { value: 'angular', label: 'Angular' }, ]} value={value} onValueChange={setValue} placeholder=\"Select framework...\" /> // With search <Combobox options={frameworks} value={value} onValueChange={setValue} searchPlaceholder=\"Search frameworks...\" emptyMessage=\"No framework found.\" /> ```",
+      "summary": "`search=\"list\"` (the default) is the field as a button with its own search box at the top of the open list.",
+      "doc": "`search=\"list\"` (the default) is the field as a button with its own search box at the top of the open list. `search=\"field\"` is the type-in picker: the field itself is the search box and the list only shows results - see ComboboxFieldSearch. In that mode the forwarded ref is the field's input.",
       "props": [
         "options",
         "value",
@@ -1405,6 +1454,7 @@
         "placeholder",
         "searchPlaceholder",
         "emptyMessage",
+        "search",
         "label",
         "helperText",
         "error",
@@ -1417,7 +1467,17 @@
         "onSearch",
         "onOpenChange"
       ],
-      "propDocs": "Available options for selection Controlled value (option value) Default value for uncontrolled usage Callback when value changes Placeholder text shown when no option is selected Placeholder for the search input Message shown when no results are found Label for the combobox Helper text shown below the combobox Error message Whether the field is required Whether to show a clear button when value is selected Custom class name for the wrapper Custom render function for options Custom render function for the selected value Custom render function for the trigger button Callback when search query changes Callback when popover open state changes"
+      "propDocs": "Available options for selection Controlled value (option value) Default value for uncontrolled usage Callback when value changes Placeholder text shown when no option is selected Placeholder for the search input Message shown when no results are found. A function is handed what was typed, so it can say No tag matches \"prod-eu\". Where the typing happens. 'list' (the default): the field is a button and the open list carries its own search box. 'field': the field itself is the search box - a click opens every option, typing narrows them, Enter picks the lit one, Escape keeps the last pick - and the list only shows results. Picked, the field reads the label, a hairline and the description (\"env:staging | 353 agents\"), or the label alone for a one-line option. Label for the combobox Helper text shown below the combobox Error message Whether the field is required Whether to show a clear button when value is selected Custom class name for the wrapper Custom render function for options Custom render function for the selected value Custom render function for the trigger button Callback when search query changes Callback when popover open state changes"
+    },
+    {
+      "name": "ComboboxFieldSearch",
+      "kind": "component",
+      "file": "src/components/Combobox/ComboboxFieldSearch.tsx",
+      "area": "Combobox",
+      "summary": "THE TYPE-IN PICKER - `<Combobox search=\"field\">` (Pranjal, 2026-10-21: \"in type to search drop down input field itself will act as search ...",
+      "doc": "THE TYPE-IN PICKER - `<Combobox search=\"field\">` (Pranjal, 2026-10-21: \"in type to search drop down input field itself will act as search ... there should not be two different input field for search and shown results\"). The field IS the search box. A click (or ArrowDown) opens every option; typing narrows them and lights the first match grey, so Enter picks it. Picked, the list closes and the field reads the label, a hairline and the second line (\"env:staging | 353 agents\") - or the label alone for a one-line option. Reopening shows the whole list again with the pick on the pale ground and its tick at the right, its name selected so typing replaces it. Escape, Tab or a click elsewhere closes the list and keeps the last pick: nothing changes until something is picked. The field wears the Select's own box (selectTriggerVariants), so the two read as one family.",
+      "props": [],
+      "propDocs": ""
     },
     {
       "name": "Command",
@@ -1544,8 +1604,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / CompleteForm",
-      "doc": "Components/Form CompleteForm",
+      "summary": "Story: New Components/Form / CompleteForm",
+      "doc": "New Components/Form CompleteForm",
       "props": [],
       "propDocs": ""
     },
@@ -1661,8 +1721,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / Controlled",
-      "doc": "Components/PhoneInput Controlled",
+      "summary": "Story: New Components/PhoneInput / Controlled",
+      "doc": "New Components/PhoneInput Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1842,8 +1902,8 @@
       "kind": "story",
       "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
       "area": "OverflowCount",
-      "summary": "Story: Components/OverflowCount / CountOnly",
-      "doc": "Components/OverflowCount CountOnly",
+      "summary": "Story: New Components/OverflowCount / CountOnly",
+      "doc": "New Components/OverflowCount CountOnly",
       "props": [],
       "propDocs": ""
     },
@@ -1922,8 +1982,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / CustomIcon",
-      "doc": "Components/EmptyState CustomIcon",
+      "summary": "Story: New Components/EmptyState / CustomIcon",
+      "doc": "New Components/EmptyState CustomIcon",
       "props": [],
       "propDocs": ""
     },
@@ -1932,8 +1992,8 @@
       "kind": "story",
       "file": "src/components/InfoTip/InfoTip.stories.tsx",
       "area": "InfoTip",
-      "summary": "Story: Components/InfoTip / CustomIcon",
-      "doc": "Components/InfoTip CustomIcon",
+      "summary": "Story: New Components/InfoTip / CustomIcon",
+      "doc": "New Components/InfoTip CustomIcon",
       "props": [],
       "propDocs": ""
     },
@@ -1974,6 +2034,36 @@
       "area": "OTPInput",
       "summary": "Story: Deprecated/OTPInput / CustomPlaceholder",
       "doc": "Deprecated/OTPInput CustomPlaceholder",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomPorts",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / CustomPorts",
+      "doc": "New Components/TargetBuilder CustomPorts",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomPortsCheck",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / CustomPortsCheck",
+      "doc": "New Components/TargetBuilder CustomPortsCheck",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "CustomPortsFilled",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / CustomPortsFilled",
+      "doc": "New Components/TargetBuilder CustomPortsFilled",
       "props": [],
       "propDocs": ""
     },
@@ -2457,6 +2547,16 @@
       "propDocs": ""
     },
     {
+      "name": "DeepTree",
+      "kind": "story",
+      "file": "src/components/TreeView/TreeView.stories.tsx",
+      "area": "TreeView",
+      "summary": "Story: New Components/TreeView / DeepTree",
+      "doc": "New Components/TreeView DeepTree",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Default",
       "kind": "story",
       "file": "src/components/AiMark/AiMark.stories.tsx",
@@ -2521,8 +2621,8 @@
       "kind": "story",
       "file": "src/components/BannerStack/BannerStack.stories.tsx",
       "area": "BannerStack",
-      "summary": "Story: Components/BannerStack / Default",
-      "doc": "Components/BannerStack Default",
+      "summary": "Story: New Components/BannerStack / Default",
+      "doc": "New Components/BannerStack Default",
       "props": [],
       "propDocs": ""
     },
@@ -2601,8 +2701,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / Default",
-      "doc": "Components/ConfirmDialog Default",
+      "summary": "Story: New Components/ConfirmDialog / Default",
+      "doc": "New Components/ConfirmDialog Default",
       "props": [],
       "propDocs": ""
     },
@@ -2621,8 +2721,8 @@
       "kind": "story",
       "file": "src/components/CopyField/CopyField.stories.tsx",
       "area": "CopyField",
-      "summary": "Story: Components/CopyField / Default",
-      "doc": "Components/CopyField Default",
+      "summary": "Story: New Components/CopyField / Default",
+      "doc": "New Components/CopyField Default",
       "props": [],
       "propDocs": ""
     },
@@ -2651,8 +2751,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / Default",
-      "doc": "Components/EmptyState Default",
+      "summary": "Story: New Components/EmptyState / Default",
+      "doc": "New Components/EmptyState Default",
       "props": [],
       "propDocs": ""
     },
@@ -2671,8 +2771,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / Default",
-      "doc": "Components/Form Default",
+      "summary": "Story: New Components/Form / Default",
+      "doc": "New Components/Form Default",
       "props": [],
       "propDocs": ""
     },
@@ -2721,8 +2821,8 @@
       "kind": "story",
       "file": "src/components/InfoTip/InfoTip.stories.tsx",
       "area": "InfoTip",
-      "summary": "Story: Components/InfoTip / Default",
-      "doc": "Components/InfoTip Default",
+      "summary": "Story: New Components/InfoTip / Default",
+      "doc": "New Components/InfoTip Default",
       "props": [],
       "propDocs": ""
     },
@@ -2731,8 +2831,18 @@
       "kind": "story",
       "file": "src/components/InlineTags/InlineTags.stories.tsx",
       "area": "InlineTags",
-      "summary": "Story: Components/InlineTags / Default",
-      "doc": "Components/InlineTags Default",
+      "summary": "Story: New Components/InlineTags / Default",
+      "doc": "New Components/InlineTags Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/InputAction/InputAction.stories.tsx",
+      "area": "InputAction",
+      "summary": "Story: New Components/InputAction / Default",
+      "doc": "New Components/InputAction Default",
       "props": [],
       "propDocs": ""
     },
@@ -2811,8 +2921,8 @@
       "kind": "story",
       "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
       "area": "OverflowCount",
-      "summary": "Story: Components/OverflowCount / Default",
-      "doc": "Components/OverflowCount Default",
+      "summary": "Story: New Components/OverflowCount / Default",
+      "doc": "New Components/OverflowCount Default",
       "props": [],
       "propDocs": ""
     },
@@ -2831,8 +2941,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / Default",
-      "doc": "Components/PhoneInput Default",
+      "summary": "Story: New Components/PhoneInput / Default",
+      "doc": "New Components/PhoneInput Default",
       "props": [],
       "propDocs": ""
     },
@@ -3059,6 +3169,16 @@
     {
       "name": "Default",
       "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / Default",
+      "doc": "New Components/TargetBuilder Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Default",
+      "kind": "story",
       "file": "src/components/Textarea/Textarea.stories.tsx",
       "area": "Textarea",
       "summary": "Story: New Components/Textarea / Default",
@@ -3157,12 +3277,22 @@
       "propDocs": ""
     },
     {
+      "name": "Default",
+      "kind": "story",
+      "file": "src/components/TreeView/TreeView.stories.tsx",
+      "area": "TreeView",
+      "summary": "Story: New Components/TreeView / Default",
+      "doc": "New Components/TreeView Default",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "DeleteWithReplacement",
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / DeleteWithReplacement",
-      "doc": "Components/ConfirmDialog DeleteWithReplacement",
+      "summary": "Story: New Components/ConfirmDialog / DeleteWithReplacement",
+      "doc": "New Components/ConfirmDialog DeleteWithReplacement",
       "props": [],
       "propDocs": ""
     },
@@ -3509,8 +3639,18 @@
       "kind": "story",
       "file": "src/components/InlineTags/InlineTags.stories.tsx",
       "area": "InlineTags",
-      "summary": "Story: Components/InlineTags / Disabled",
-      "doc": "Components/InlineTags Disabled",
+      "summary": "Story: New Components/InlineTags / Disabled",
+      "doc": "New Components/InlineTags Disabled",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Disabled",
+      "kind": "story",
+      "file": "src/components/InputAction/InputAction.stories.tsx",
+      "area": "InputAction",
+      "summary": "Story: New Components/InputAction / Disabled",
+      "doc": "New Components/InputAction Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -3569,8 +3709,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / Disabled",
-      "doc": "Components/PhoneInput Disabled",
+      "summary": "Story: New Components/PhoneInput / Disabled",
+      "doc": "New Components/PhoneInput Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -3789,8 +3929,8 @@
       "kind": "component",
       "file": "src/components/DropdownMenu/DropdownMenu.tsx",
       "area": "DropdownMenu",
-      "summary": "DropdownMenuCheckboxItem - menu item with checkbox",
-      "doc": "DropdownMenuCheckboxItem - menu item with checkbox",
+      "summary": "DropdownMenuCheckboxItem - menu item that can be ticked; several at once.",
+      "doc": "DropdownMenuCheckboxItem - menu item that can be ticked; several at once. A ticked row wears the pale ground and the tick on the right.",
       "props": [],
       "propDocs": ""
     },
@@ -3859,8 +3999,8 @@
       "kind": "component",
       "file": "src/components/DropdownMenu/DropdownMenu.tsx",
       "area": "DropdownMenu",
-      "summary": "DropdownMenuRadioItem - menu item with radio selection",
-      "doc": "DropdownMenuRadioItem - menu item with radio selection",
+      "summary": "DropdownMenuRadioItem - menu item for one choice among several.",
+      "doc": "DropdownMenuRadioItem - menu item for one choice among several. The chosen row wears the pale ground and the tick on the right, as every picked option does (Pranjal, 2026-10-21; it carried a dot on the left until then).",
       "props": [],
       "propDocs": ""
     },
@@ -4019,8 +4159,8 @@
       "kind": "story",
       "file": "src/components/InlineTags/InlineTags.stories.tsx",
       "area": "InlineTags",
-      "summary": "Story: Components/InlineTags / Empty",
-      "doc": "Components/InlineTags Empty",
+      "summary": "Story: New Components/InlineTags / Empty",
+      "doc": "New Components/InlineTags Empty",
       "props": [],
       "propDocs": ""
     },
@@ -4111,6 +4251,16 @@
       "area": "Upload",
       "summary": "Story: Components/Upload / EveryFailure",
       "doc": "Components/Upload EveryFailure",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Exclusions",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / Exclusions",
+      "doc": "New Components/TargetBuilder Exclusions",
       "props": [],
       "propDocs": ""
     },
@@ -4389,8 +4539,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / FormDialog",
-      "doc": "Components/ConfirmDialog FormDialog",
+      "summary": "Story: New Components/ConfirmDialog / FormDialog",
+      "doc": "New Components/ConfirmDialog FormDialog",
       "props": [],
       "propDocs": ""
     },
@@ -4439,8 +4589,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / FormFieldSizes",
-      "doc": "Components/Form FormFieldSizes",
+      "summary": "Story: New Components/Form / FormFieldSizes",
+      "doc": "New Components/Form FormFieldSizes",
       "props": [],
       "propDocs": ""
     },
@@ -4529,8 +4679,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / FromString",
-      "doc": "Components/PhoneInput FromString",
+      "summary": "Story: New Components/PhoneInput / FromString",
+      "doc": "New Components/PhoneInput FromString",
       "props": [],
       "propDocs": ""
     },
@@ -4681,6 +4831,16 @@
       "area": "Button Old",
       "summary": "Story: Deprecated/Button Old / Ghost",
       "doc": "Deprecated/Button Old Ghost",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "GoingBack",
+      "kind": "story",
+      "file": "src/components/Stepper/Stepper.stories.tsx",
+      "area": "Stepper",
+      "summary": "Story: Components/Stepper / GoingBack",
+      "doc": "Components/Stepper GoingBack",
       "props": [],
       "propDocs": ""
     },
@@ -5100,8 +5260,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / InADrawerSection",
-      "doc": "Components/EmptyState InADrawerSection",
+      "summary": "Story: New Components/EmptyState / InADrawerSection",
+      "doc": "New Components/EmptyState InADrawerSection",
       "props": [],
       "propDocs": ""
     },
@@ -5210,8 +5370,8 @@
       "kind": "story",
       "file": "src/components/InfoTip/InfoTip.stories.tsx",
       "area": "InfoTip",
-      "summary": "Story: Components/InfoTip / InContext",
-      "doc": "Components/InfoTip InContext",
+      "summary": "Story: New Components/InfoTip / InContext",
+      "doc": "New Components/InfoTip InContext",
       "props": [],
       "propDocs": ""
     },
@@ -5404,6 +5564,25 @@
         "wrapperClassName"
       ],
       "propDocs": "Error message to display below the input Label text for the input Helper text displayed below the input Icon or element to display at the start of the input Icon or element to display at the end of the input A held field (Pranjal, 2026-09-17): disabled, with a lock inside at the right - 14 like the search glyph, 12 from the edge, in the disabled text colour - and the value truncating before it. For a value something else owns (a directory, a fixed identity); the label above stays plain. A clear button (Pranjal, 2026-09-28, on the table search: \"we need to provide a cross icon on the right so that i can clear all at once instead of backspacing each time\"). Given, a ghost ✕ sits inside at the right while the field holds text; pressing it calls this and puts the caret back in the field. Every search box sets it. The clear button's spoken name. \"Clear\" unless the field says otherwise (\"Clear search\"). Wrapper className for the container div"
+    },
+    {
+      "name": "InputAction",
+      "kind": "component",
+      "file": "src/components/InputAction/InputAction.tsx",
+      "area": "InputAction",
+      "summary": "InputAction - an action that rides inside a field, at its right end, behind a hairline that runs border to border: a glyph and a word (\"Browse\", \"Replace\", \"Copy\") on a quiet ghost control.",
+      "doc": "InputAction - an action that rides inside a field, at its right end, behind a hairline that runs border to border: a glyph and a word (\"Browse\", \"Replace\", \"Copy\") on a quiet ghost control. Give it to the Input's `endAdornment` and keep the field's text clear of it with a right padding as wide as the control. ```tsx <Input label=\"Reference path\" placeholder=\"secret/data/<path>\" style={{ paddingRight: 116 }} endAdornment={ <InputAction icon=\"folder\" onClick={openBrowser} disabled={!store} disabledReason=\"Pick a store first\"> Browse </InputAction> } /> ```",
+      "props": [
+        "children",
+        "icon",
+        "disabled",
+        "disabledReason",
+        "copyText",
+        "copiedLabel",
+        "copiedDuration",
+        "wrapperClassName"
+      ],
+      "propDocs": "The word on the control - \"Browse\", \"Replace\", \"Copy\". The 14 glyph before the word, from the library Icon set. Left unset, the word stands alone. Turns the control off: the word goes faint and the pointer shows not-allowed. A disabled button takes no hover, so say why with `disabledReason`. Why the control is off, shown on hover over it (\"No path-list API on this store\"). Read only while `disabled`. Makes the control a copy action: a click copies this text to the clipboard, then the control reads `copiedLabel` with a check in the success ink for `copiedDuration`, and goes back. `onClick` still runs. The word shown after a copy. @default 'Copied' How long the copied state shows, in milliseconds. @default 1500 Extra classes for the wrapper that holds the hairline and the control."
     },
     {
       "name": "InputGroup",
@@ -5607,8 +5786,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / InteractiveForm",
-      "doc": "Components/Form InteractiveForm",
+      "summary": "Story: New Components/Form / InteractiveForm",
+      "doc": "New Components/Form InteractiveForm",
       "props": [],
       "propDocs": ""
     },
@@ -5734,6 +5913,30 @@
       "propDocs": ""
     },
     {
+      "name": "KeyValuesBuilder",
+      "kind": "component",
+      "file": "src/components/TargetBuilder/KeyValuesBuilder.tsx",
+      "area": "TargetBuilder",
+      "summary": "KeyValuesBuilder - rows of a picked key and the values typed for it: pick a key, type its values (each becomes a chip), and add a row per key - custom ports by protocol, tags by category, addresses by site.",
+      "doc": "KeyValuesBuilder - rows of a picked key and the values typed for it: pick a key, type its values (each becomes a chip), and add a row per key - custom ports by protocol, tags by category, addresses by site. A key another row holds is left out of the picker, and a row's values field stays off until it has a key. ```tsx <KeyValuesBuilder label=\"Custom ports\" options={[{ value: 'ssh', label: 'SSH', hint: '22' }]} rows={rows} onRowsChange={setRows} addLabel=\"Add protocol\" /> ```",
+      "props": [
+        "options",
+        "rows",
+        "onRowsChange",
+        "label",
+        "info",
+        "validateValue",
+        "keyPlaceholder",
+        "valuePlaceholder",
+        "addLabel",
+        "keyLabel",
+        "valuesLabel",
+        "mono",
+        "disabled"
+      ],
+      "propDocs": "The keys offered in each row's picker, in order. A key another row holds is left out of the list. The rows so far. Empty, the group still shows one blank row to type into. Called with the whole new list after any change - a key picked, a value added or removed, a row added or removed. The field's label over the group - \"Custom ports\". The explainer behind the ⓘ after the label. Needs `label`. Checks each typed value - see the values field's `validate` (ChipInput). Left unset, every value is accepted. The key picker's placeholder. @default 'Choose…' The values field's placeholder while it holds no value. @default 'Type a value, press Enter' The add button's words - \"Add protocol\". @default 'Add' The key picker's accessible name - \"Protocol\". @default 'Key' The values field's accessible name, before the picked key's name - \"Ports\" reads \"Ports for SSH\". @default 'Values' Draws the values in mono - for ports, addresses, codes. Turns every control in the group off."
+    },
+    {
       "name": "Kinds",
       "kind": "story",
       "file": "src/components/Input/Input.stories.tsx",
@@ -5759,7 +5962,7 @@
       "file": "src/components/KpiCard/KpiCard.tsx",
       "area": "KpiCard",
       "summary": "KpiCard - one metric on one card, or a group of related metrics sharing a card.",
-      "doc": "KpiCard - one metric on one card, or a group of related metrics sharing a card. A plain card has a 174px floor and no ceiling; a chart card no floor and 270 natural; a group is the sum of its segments. In a KpiStrip the cards grow evenly until the row is full and the strip scrolls past the fit. ```tsx <KpiCard label=\"Total users\" value={8200} hint=\"across all organisations\" /> <KpiCard items={[{ label: 'Pending invites', value: 11, onClick: openInvites }, { label: 'Active links', value: 4 }]} label=\"Invitations\" /> ```",
+      "doc": "KpiCard - one metric on one card, or a group of related metrics sharing a card. A plain card has a 174px floor and no ceiling; a chart card no floor and 270 natural; a group is the sum of its segments. In a KpiStrip the cards grow evenly until the row is full and the strip scrolls past the fit. ```tsx <KpiCard label=\"Total users\" value={8200} hint=\"across all organisations\" /> <KpiCard items={[{ label: 'Pending invites', value: 11, onClick: openInvites }, { label: 'Active links', value: 4 }]} label=\"Invitations\" /> <KpiCard size=\"sm\" items={[{ label: 'Sites', value: 12 }, { label: 'Departments', value: 48 }]} label=\"Structure\" /> ``` `size=\"sm\"` is the quieter figure for a card that sits beside a section's content. A card holding a chart keeps the 24px number whatever it is given, because the chart beside it is drawn to that size.",
       "props": [],
       "propDocs": ""
     },
@@ -5804,6 +6007,16 @@
       "propDocs": ""
     },
     {
+      "name": "labelKey",
+      "kind": "utility",
+      "file": "src/components/Stepper/stepperState.ts",
+      "area": "Stepper",
+      "summary": "Which ink a label wears: the step you are on reads heaviest, even when it was finished before.",
+      "doc": "Which ink a label wears: the step you are on reads heaviest, even when it was finished before.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LabelPositions",
       "kind": "story",
       "file": "src/components/Separator/Separator.stories.tsx",
@@ -5814,12 +6027,22 @@
       "propDocs": ""
     },
     {
+      "name": "LabelsOnTheContentEdge",
+      "kind": "story",
+      "file": "src/components/Tabs/Tabs.stories.tsx",
+      "area": "Tabs",
+      "summary": "Story: New Components/Tabs / LabelsOnTheContentEdge",
+      "doc": "New Components/Tabs LabelsOnTheContentEdge",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "LabelWeights",
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / LabelWeights",
-      "doc": "Components/Form LabelWeights",
+      "summary": "Story: New Components/Form / LabelWeights",
+      "doc": "New Components/Form LabelWeights",
       "props": [],
       "propDocs": ""
     },
@@ -6069,6 +6292,16 @@
       "propDocs": ""
     },
     {
+      "name": "lights",
+      "kind": "utility",
+      "file": "src/components/Stepper/stepperState.ts",
+      "area": "Stepper",
+      "summary": "Whether a step's piece of the track can light up.",
+      "doc": "Whether a step's piece of the track can light up. Passed over or not available is not progress, so a skipped or a disabled step never earns a fill - the same rule its disc follows.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Link",
       "kind": "story",
       "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
@@ -6223,8 +6456,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / Locked",
-      "doc": "Components/PhoneInput Locked",
+      "summary": "Story: New Components/PhoneInput / Locked",
+      "doc": "New Components/PhoneInput Locked",
       "props": [],
       "propDocs": ""
     },
@@ -6313,8 +6546,8 @@
       "kind": "story",
       "file": "src/components/OverflowCount/OverflowCount.stories.tsx",
       "area": "OverflowCount",
-      "summary": "Story: Components/OverflowCount / LongList",
-      "doc": "Components/OverflowCount LongList",
+      "summary": "Story: New Components/OverflowCount / LongList",
+      "doc": "New Components/OverflowCount LongList",
       "props": [],
       "propDocs": ""
     },
@@ -6333,8 +6566,8 @@
       "kind": "story",
       "file": "src/components/CopyField/CopyField.stories.tsx",
       "area": "CopyField",
-      "summary": "Story: Components/CopyField / LongValue",
-      "doc": "Components/CopyField LongValue",
+      "summary": "Story: New Components/CopyField / LongValue",
+      "doc": "New Components/CopyField LongValue",
       "props": [],
       "propDocs": ""
     },
@@ -6343,8 +6576,8 @@
       "kind": "story",
       "file": "src/components/BannerStack/BannerStack.stories.tsx",
       "area": "BannerStack",
-      "summary": "Story: Components/BannerStack / Many",
-      "doc": "Components/BannerStack Many",
+      "summary": "Story: New Components/BannerStack / Many",
+      "doc": "New Components/BannerStack Many",
       "props": [],
       "propDocs": ""
     },
@@ -6393,8 +6626,8 @@
       "kind": "story",
       "file": "src/components/CopyField/CopyField.stories.tsx",
       "area": "CopyField",
-      "summary": "Story: Components/CopyField / Masked",
-      "doc": "Components/CopyField Masked",
+      "summary": "Story: New Components/CopyField / Masked",
+      "doc": "New Components/CopyField Masked",
       "props": [],
       "propDocs": ""
     },
@@ -6469,6 +6702,16 @@
       "propDocs": ""
     },
     {
+      "name": "MessagesWaitForBlur",
+      "kind": "story",
+      "file": "src/components/Form/useForm.stories.tsx",
+      "area": "useForm",
+      "summary": "Story: New Components/Form/useForm / MessagesWaitForBlur",
+      "doc": "New Components/Form/useForm MessagesWaitForBlur",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "metaLine",
       "kind": "utility",
       "file": "src/components/_internal/MetaLine/metaLine.tsx",
@@ -6493,8 +6736,8 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / MixedStates",
-      "doc": "Components/Form MixedStates",
+      "summary": "Story: New Components/Form / MixedStates",
+      "doc": "New Components/Form MixedStates",
       "props": [],
       "propDocs": ""
     },
@@ -6779,8 +7022,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / NoCountry",
-      "doc": "Components/PhoneInput NoCountry",
+      "summary": "Story: New Components/PhoneInput / NoCountry",
+      "doc": "New Components/PhoneInput NoCountry",
       "props": [],
       "propDocs": ""
     },
@@ -6849,8 +7092,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / NotFound",
-      "doc": "Components/EmptyState NotFound",
+      "summary": "Story: New Components/EmptyState / NotFound",
+      "doc": "New Components/EmptyState NotFound",
       "props": [],
       "propDocs": ""
     },
@@ -6879,8 +7122,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / NoticeOnly",
-      "doc": "Components/ConfirmDialog NoticeOnly",
+      "summary": "Story: New Components/ConfirmDialog / NoticeOnly",
+      "doc": "New Components/ConfirmDialog NoticeOnly",
       "props": [],
       "propDocs": ""
     },
@@ -6921,6 +7164,16 @@
       "area": "NumberInput",
       "summary": "",
       "doc": "",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "NumberWithUnit",
+      "kind": "story",
+      "file": "src/components/Input/Input.stories.tsx",
+      "area": "Input",
+      "summary": "Story: New Components/Input / NumberWithUnit",
+      "doc": "New Components/Input NumberWithUnit",
       "props": [],
       "propDocs": ""
     },
@@ -6969,8 +7222,8 @@
       "kind": "story",
       "file": "src/components/BannerStack/BannerStack.stories.tsx",
       "area": "BannerStack",
-      "summary": "Story: Components/BannerStack / One",
-      "doc": "Components/BannerStack One",
+      "summary": "Story: New Components/BannerStack / One",
+      "doc": "New Components/BannerStack One",
       "props": [],
       "propDocs": ""
     },
@@ -7015,12 +7268,32 @@
       "propDocs": ""
     },
     {
+      "name": "OneLineMulti",
+      "kind": "story",
+      "file": "src/components/Select/Select.stories.tsx",
+      "area": "Select",
+      "summary": "Story: New Components/Select / OneLineMulti",
+      "doc": "New Components/Select OneLineMulti",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "OneLineSingle",
+      "kind": "story",
+      "file": "src/components/Select/Select.stories.tsx",
+      "area": "Select",
+      "summary": "Story: New Components/Select / OneLineSingle",
+      "doc": "New Components/Select OneLineSingle",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Open",
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / Open",
-      "doc": "Components/ConfirmDialog Open",
+      "summary": "Story: New Components/ConfirmDialog / Open",
+      "doc": "New Components/ConfirmDialog Open",
       "props": [],
       "propDocs": ""
     },
@@ -7029,8 +7302,8 @@
       "kind": "story",
       "file": "src/components/BannerStack/BannerStack.stories.tsx",
       "area": "BannerStack",
-      "summary": "Story: Components/BannerStack / OrderedByTone",
-      "doc": "Components/BannerStack OrderedByTone",
+      "summary": "Story: New Components/BannerStack / OrderedByTone",
+      "doc": "New Components/BannerStack OrderedByTone",
       "props": [],
       "propDocs": ""
     },
@@ -7405,6 +7678,31 @@
       "propDocs": ""
     },
     {
+      "name": "PathBrowserDialog",
+      "kind": "component",
+      "file": "src/components/InputAction/PathBrowserDialog.tsx",
+      "area": "InputAction",
+      "summary": "PathBrowserDialog - a centred dialog that browses a store's paths as a tree - folders that open, keys that are picked - under the store's endpoint card with Sync now, and hands the picked path back on Use this path.",
+      "doc": "PathBrowserDialog - a centred dialog that browses a store's paths as a tree - folders that open, keys that are picked - under the store's endpoint card with Sync now, and hands the picked path back on Use this path. What an InputAction \"Browse\" opens. ```tsx <PathBrowserDialog open={open} onOpenChange={setOpen} subtitle=\"platform-vault-prod · HashiCorp Vault\" source={{ url: store.pathApi, syncedLabel: 'Synced moments ago · auto every 10 min' }} onSync={sync} tree={paths} value={refPath} onPick={(path) => { setRefPath(path); setOpen(false); }} /> ```",
+      "props": [
+        "open",
+        "onOpenChange",
+        "title",
+        "subtitle",
+        "tree",
+        "value",
+        "onPick",
+        "defaultExpanded",
+        "source",
+        "onSync",
+        "syncing",
+        "unavailable",
+        "pickLabel",
+        "emptyHint"
+      ],
+      "propDocs": "Whether the dialog is open. Called when the dialog asks to open or close - Escape, the ✕, a click outside, Cancel. The heading. @default 'Browse vault paths' The line under the heading - the store and its type (\"platform-vault-prod · HashiCorp Vault\"). The entries at the top of the tree. The path already in the field. The dialog opens with it picked, and Use this path stays off until one is. Called with the picked key's path on Use this path. The dialog does not close itself - close it here. The folders open when the dialog opens, by their labels from the top (\"secret/\", \"secret/data/\"). The endpoint card above the tree. Left unset, the card is not drawn. Shows Sync now on the card; called when it is pressed. While true, Sync now is off and reads \"Syncing…\". The store cannot list its paths. A warning leads the body with this text, Sync now is off and no tree is drawn - the path is typed in the field instead. The words on the pick button. @default 'Use this path' What the selected-path line says before a key is picked. @default '— pick a key, or type one in the field —'"
+    },
+    {
       "name": "PersonCell",
       "kind": "component",
       "file": "src/components/Table/TableCells.tsx",
@@ -7451,6 +7749,16 @@
       "area": "PhoneInput",
       "summary": "The national format the number field hints with for a country.",
       "doc": "The national format the number field hints with for a country.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "PicksAValue",
+      "kind": "story",
+      "file": "src/components/InputAction/InputAction.stories.tsx",
+      "area": "InputAction",
+      "summary": "Story: New Components/InputAction / PicksAValue",
+      "doc": "New Components/InputAction PicksAValue",
       "props": [],
       "propDocs": ""
     },
@@ -7579,8 +7887,8 @@
       "kind": "story",
       "file": "src/components/InlineTags/InlineTags.stories.tsx",
       "area": "InlineTags",
-      "summary": "Story: Components/InlineTags / Popover",
-      "doc": "Components/InlineTags Popover",
+      "summary": "Story: New Components/InlineTags / Popover",
+      "doc": "New Components/InlineTags Popover",
       "props": [],
       "propDocs": ""
     },
@@ -7619,8 +7927,8 @@
       "kind": "story",
       "file": "src/components/InlineTags/InlineTags.stories.tsx",
       "area": "InlineTags",
-      "summary": "Story: Components/InlineTags / PopoverEmpty",
-      "doc": "Components/InlineTags PopoverEmpty",
+      "summary": "Story: New Components/InlineTags / PopoverEmpty",
+      "doc": "New Components/InlineTags PopoverEmpty",
       "props": [],
       "propDocs": ""
     },
@@ -8009,8 +8317,18 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / RequiredField",
-      "doc": "Components/Form RequiredField",
+      "summary": "Story: New Components/Form / RequiredField",
+      "doc": "New Components/Form RequiredField",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "RequiredThatDepends",
+      "kind": "story",
+      "file": "src/components/Form/useForm.stories.tsx",
+      "area": "useForm",
+      "summary": "Story: New Components/Form/useForm / RequiredThatDepends",
+      "doc": "New Components/Form/useForm RequiredThatDepends",
       "props": [],
       "propDocs": ""
     },
@@ -8085,12 +8403,32 @@
       "propDocs": ""
     },
     {
+      "name": "resolveCounters",
+      "kind": "utility",
+      "file": "src/components/Stepper/stepperState.ts",
+      "area": "Stepper",
+      "summary": "Where you are, and the furthest you have got - both clamped to the list, the second never behind the first.",
+      "doc": "Where you are, and the furthest you have got - both clamped to the list, the second never behind the first.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "resolveKey",
       "kind": "utility",
       "file": "src/components/Kbd/keys.ts",
       "area": "Kbd",
       "summary": "One key, as a glyph to draw and a name to announce.",
       "doc": "One key, as a glyph to draw and a name to announce. Anything not in the table is drawn as itself and announced as itself, upper cased - so `'e'`, `'/'` and `'F5'` all work without needing an entry. A registry that refuses unknown keys would mean a pull request every time somebody adds a shortcut.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "resolveStep",
+      "kind": "utility",
+      "file": "src/components/Stepper/stepperState.ts",
+      "area": "Stepper",
+      "summary": "Works out one step.",
+      "doc": "Works out one step. A step set to `skipped` or `disabled` keeps that whatever the counters say, and is never a place to go. Any step up to `far` that is finished or where you left off is - except the one you are on, which is already here.",
       "props": [],
       "propDocs": ""
     },
@@ -9140,8 +9478,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / Sizes",
-      "doc": "Components/PhoneInput Sizes",
+      "summary": "Story: New Components/PhoneInput / Sizes",
+      "doc": "New Components/PhoneInput Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -9262,6 +9600,16 @@
       "area": "Pieces",
       "summary": "Story: New Components/Table/Pieces / Skeleton",
       "doc": "New Components/Table/Pieces Skeleton",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Small",
+      "kind": "story",
+      "file": "src/components/KpiCard/KpiCard.stories.tsx",
+      "area": "KPI Card",
+      "summary": "Story: New Components/KPI Card / Small",
+      "doc": "New Components/KPI Card Small",
       "props": [],
       "propDocs": ""
     },
@@ -9496,12 +9844,32 @@
       "propDocs": ""
     },
     {
+      "name": "StepDisc",
+      "kind": "component",
+      "file": "src/components/Stepper/StepParts.tsx",
+      "area": "Stepper",
+      "summary": "The disc: a tick for done, a dash for passed over, the number everywhere else.",
+      "doc": "The disc: a tick for done, a dash for passed over, the number everywhere else.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "StepLabel",
+      "kind": "component",
+      "file": "src/components/Stepper/StepParts.tsx",
+      "area": "Stepper",
+      "summary": "The label, with the dashed line hover draws under it and the words a screen reader hears after it.",
+      "doc": "The label, with the dashed line hover draws under it and the words a screen reader hears after it.",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "Stepper",
       "kind": "component",
       "file": "src/components/Stepper/Stepper.tsx",
       "area": "Stepper",
       "summary": "Stepper - a named, ordered journey with a place you are now.",
-      "doc": "Stepper - a named, ordered journey with a place you are now. **It is not Tabs.** Tabs are four doors into the same room: no order, nothing to finish, and everything behind them already exists. A stepper is a sequence where the steps ahead of you have not happened yet. *The one-line test: if you can do them in any order, it is Tabs.* It is not `Progress` either, which is one number with no names and nobody doing anything; nor a breadcrumb, which is depth rather than sequence. Announced as a list with one item marked as the current step. Steps are plain text and not focusable unless `onStepSelect` is given - a step is not a button unless you can actually go there, and a strip of five stops that do nothing is worse than no stops at all. ```tsx <Stepper aria-label=\"Import assets\" current={2} steps={[ { label: 'Choose a source' }, { label: 'Connect' }, { label: 'Map fields' }, { label: 'Review' }, ]} /> ```",
+      "doc": "Stepper - a named, ordered journey with a place you are now. **It is not Tabs.** Tabs are four doors into the same room: no order, nothing to finish, and everything behind them already exists. A stepper is a sequence where the steps ahead of you have not happened yet. *The one-line test: if you can do them in any order, it is Tabs.* It is not `Progress` either, which is one number with no names and nobody doing anything; nor a breadcrumb, which is depth rather than sequence. Announced as a list with one item marked as the current step. Steps are plain text and not focusable unless `onStepSelect` is given - a step is not a button unless you can actually go there, and a strip of five stops that do nothing is worse than no stops at all. **Going back keeps your progress.** Pass `reached` - the furthest step got to - and stepping back to fix something leaves every step up to it ticked, lined and clickable: the furthest one shows as where you left off, and the one you went back to keeps its tick inside a \"you are here\" ring. ```tsx <Stepper aria-label=\"Import assets\" current={2} steps={[ { label: 'Choose a source' }, { label: 'Connect' }, { label: 'Map fields' }, { label: 'Review' }, ]} ",
       "props": [],
       "propDocs": ""
     },
@@ -9511,7 +9879,7 @@
       "file": "src/components/Stepper/StepperRail.tsx",
       "area": "Stepper",
       "summary": "The rail.",
-      "doc": "The rail. A step is a button only when you can actually go there: `onStepSelect` is given, it is unlocked, and it is not the one you are on. A locked step is plain text, marked disabled, and says what opens it.",
+      "doc": "The rail. A step is a button only when you can actually go there: `onStepSelect` is given, you have got that far, and it is not the one you are on. A locked step is plain text, marked disabled, and says what opens it.",
       "props": [],
       "propDocs": ""
     },
@@ -9572,6 +9940,26 @@
       "area": "Icon",
       "summary": "Story: Components/Icon / StrokeWidth",
       "doc": "Components/Icon StrokeWidth",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SubmitFocusesTheFirstProblem",
+      "kind": "story",
+      "file": "src/components/Form/useForm.stories.tsx",
+      "area": "useForm",
+      "summary": "Story: New Components/Form/useForm / SubmitFocusesTheFirstProblem",
+      "doc": "New Components/Form/useForm SubmitFocusesTheFirstProblem",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "SubmittingThenReset",
+      "kind": "story",
+      "file": "src/components/Form/useForm.stories.tsx",
+      "area": "useForm",
+      "summary": "Story: New Components/Form/useForm / SubmittingThenReset",
+      "doc": "New Components/Form/useForm SubmittingThenReset",
       "props": [],
       "propDocs": ""
     },
@@ -10011,6 +10399,16 @@
       "propDocs": ""
     },
     {
+      "name": "TableGroupRow",
+      "kind": "component",
+      "file": "src/components/Table/Table.tsx",
+      "area": "Table",
+      "summary": "A title row between a table's rows, naming the group under it: the name 12/600 in the label ink, then its details in the faint ink (neutral-50, #8FA0BD - the console's, not the library's muted grey) after a \" · \", on the sunken ground, 36 tall, one cell across every column.",
+      "doc": "A title row between a table's rows, naming the group under it: the name 12/600 in the label ink, then its details in the faint ink (neutral-50, #8FA0BD - the console's, not the library's muted grey) after a \" · \", on the sunken ground, 36 tall, one cell across every column. A plain row - it never hovers, picks, opens or takes focus; the rows of its group keep their own numbers, counted through the groups. Ported from the console (Ronak, 2026-10-14): the discovery profile's Credentials step groups its credentials by type - \"you can add the separator one row with title between the rows. so user can understood this is for this types\". ```tsx <TableGroupRow colSpan={3} title=\"SSH Credentials\" meta={['SSH', 3]} /> ```",
+      "props": ["colSpan", "title", "meta"],
+      "propDocs": "How many columns the row spans - every column the table draws, the lead included. The group's name - \"SSH Credentials\" - 12/600 in the label ink. What follows the name in the faint ink, each part after a \" · \" - the family and the count: `['SSH', 3]` reads \"SSH Credentials · SSH · 3\"."
+    },
+    {
       "name": "TableGroupRowOld",
       "kind": "component",
       "file": "src/components/TableOld/TableOld.tsx",
@@ -10268,7 +10666,7 @@
       "summary": "A plain row number, for a table without selection: it never becomes a checkbox.",
       "doc": "A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel.",
       "props": ["index", "inert", "frozen"],
-      "propDocs": "An invited person: the number is dimmed."
+      "propDocs": "An invited person. Accepted and ignored: the number reads in the cell's own ink on every row, an inert one included, because its other columns are not dimmed either (Pranjal, 2026-10-15: \"all columns should have same color text\"). It used to dim the number to 60%."
     },
     {
       "name": "TableNumberCellOld2",
@@ -10819,6 +11217,37 @@
       "propDocs": ""
     },
     {
+      "name": "TagsByCategory",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / TagsByCategory",
+      "doc": "New Components/TargetBuilder TagsByCategory",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TargetBuilder",
+      "kind": "component",
+      "file": "src/components/TargetBuilder/TargetBuilder.tsx",
+      "area": "TargetBuilder",
+      "summary": "TargetBuilder - a list of targets built one at a time: pick a type, type the value, Add.",
+      "doc": "TargetBuilder - a list of targets built one at a time: pick a type, type the value, Add. The added targets sit above the add row, one row each with the type's badge, the value in mono, an edit pencil and a remove bin. ```tsx <TargetBuilder label=\"Include targets\" kinds={[{ value: 'host', label: 'Specific IP / host', field: 'single', placeholder: '10.20.4.14' }]} defaultKind=\"host\" entries={targets} onEntriesChange={setTargets} /> ```",
+      "props": [
+        "kinds",
+        "entries",
+        "onEntriesChange",
+        "label",
+        "defaultKind",
+        "onKindChange",
+        "placeholder",
+        "tone",
+        "onUpload",
+        "fileHint"
+      ],
+      "propDocs": "The types offered in the picker, in order. The targets added so far, drawn as rows above the add row. Called with the whole new list after an Add, a Save on a row, or a Remove. The field's label over the builder - \"Include targets\", \"Exclusions\". The type the picker opens on, and returns to after each Add. Left empty, the picker shows `placeholder` until a type is chosen. Called when the picked type changes - by hand, or back to `defaultKind` after an Add. The picker's placeholder while no type is picked. @default 'Add a target - choose a type…' The badge tone on every row: `info` for targets that are included, `danger` for exclusions. A `file` kind's Upload: return the chosen file's name to add it as an entry, or nothing to add none. Left unset, Upload adds `<kind>.csv`. The line beside Upload for a `file` kind. @default 'Single-column CSV - one entry per row, no header.'"
+    },
+    {
       "name": "TextAddons",
       "kind": "story",
       "file": "src/components/InputGroup/InputGroup.stories.tsx",
@@ -10959,6 +11388,16 @@
       "propDocs": ""
     },
     {
+      "name": "TheSaveRule",
+      "kind": "story",
+      "file": "src/components/Form/useForm.stories.tsx",
+      "area": "useForm",
+      "summary": "Story: New Components/Form/useForm / TheSaveRule",
+      "doc": "New Components/Form/useForm TheSaveRule",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "TheSurface",
       "kind": "story",
       "file": "src/components/Popover/Popover.stories.tsx",
@@ -11023,8 +11462,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / TitleOnly",
-      "doc": "Components/EmptyState TitleOnly",
+      "summary": "Story: New Components/EmptyState / TitleOnly",
+      "doc": "New Components/EmptyState TitleOnly",
       "props": [],
       "propDocs": ""
     },
@@ -11457,6 +11896,25 @@
       "propDocs": ""
     },
     {
+      "name": "TreeView",
+      "kind": "component",
+      "file": "src/components/TreeView/TreeView.tsx",
+      "area": "TreeView",
+      "summary": "TreeView - a bordered box of folders that open and shut and items that are picked, each level indented under its folder.",
+      "doc": "TreeView - a bordered box of folders that open and shut and items that are picked, each level indented under its folder. At most 320 tall, then it scrolls - and across, for a tree deeper than the box is wide. ```tsx <TreeView aria-label=\"Vault paths\" nodes={paths} itemIcon=\"key\" showValues value={picked} onSelect={setPicked} /> ```",
+      "props": [
+        "nodes",
+        "value",
+        "onSelect",
+        "defaultExpanded",
+        "expanded",
+        "onExpandedChange",
+        "itemIcon",
+        "showValues"
+      ],
+      "propDocs": "The entries at the top of the tree. The picked item's value. Its folders open on mount. Called with an item's value when it is clicked, or pressed with Enter or Space. The folders open on mount, by their ids - their labels from the top, joined with \"/\" (\"secret/\", \"secret//data/\"). The open folders, controlled - pair it with `onExpandedChange`. Called with the open folders' ids when a folder opens or shuts. The glyph on every item that names none of its own. @default 'file' Draws each item's value at the row's end in small mono - the full path beside its name."
+    },
+    {
       "name": "TriggerVariants",
       "kind": "story",
       "file": "src/components/Select/Select.stories.tsx",
@@ -11501,8 +11959,8 @@
       "kind": "story",
       "file": "src/components/BannerStack/BannerStack.stories.tsx",
       "area": "BannerStack",
-      "summary": "Story: Components/BannerStack / Two",
-      "doc": "Components/BannerStack Two",
+      "summary": "Story: New Components/BannerStack / Two",
+      "doc": "New Components/BannerStack Two",
       "props": [],
       "propDocs": ""
     },
@@ -11531,8 +11989,38 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / TypedDelete",
-      "doc": "Components/ConfirmDialog TypedDelete",
+      "summary": "Story: New Components/ConfirmDialog / TypedDelete",
+      "doc": "New Components/ConfirmDialog TypedDelete",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TypeInLongList",
+      "kind": "story",
+      "file": "src/components/Combobox/Combobox.stories.tsx",
+      "area": "Combobox",
+      "summary": "Story: Components/Combobox / TypeInLongList",
+      "doc": "Components/Combobox TypeInLongList",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TypeInOneLine",
+      "kind": "story",
+      "file": "src/components/Combobox/Combobox.stories.tsx",
+      "area": "Combobox",
+      "summary": "Story: Components/Combobox / TypeInOneLine",
+      "doc": "Components/Combobox TypeInOneLine",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "TypeInTwoLine",
+      "kind": "story",
+      "file": "src/components/Combobox/Combobox.stories.tsx",
+      "area": "Combobox",
+      "summary": "Story: Components/Combobox / TypeInTwoLine",
+      "doc": "Components/Combobox TypeInTwoLine",
       "props": [],
       "propDocs": ""
     },
@@ -12071,8 +12559,18 @@
       "kind": "story",
       "file": "src/components/CopyField/CopyField.stories.tsx",
       "area": "CopyField",
-      "summary": "Story: Components/CopyField / Variations",
-      "doc": "Components/CopyField Variations",
+      "summary": "Story: New Components/CopyField / Variations",
+      "doc": "New Components/CopyField Variations",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "Variations",
+      "kind": "story",
+      "file": "src/components/InputAction/InputAction.stories.tsx",
+      "area": "InputAction",
+      "summary": "Story: New Components/InputAction / Variations",
+      "doc": "New Components/InputAction Variations",
       "props": [],
       "propDocs": ""
     },
@@ -12271,8 +12769,8 @@
       "kind": "story",
       "file": "src/components/EmptyState/EmptyState.stories.tsx",
       "area": "EmptyState",
-      "summary": "Story: Components/EmptyState / WithAction",
-      "doc": "Components/EmptyState WithAction",
+      "summary": "Story: New Components/EmptyState / WithAction",
+      "doc": "New Components/EmptyState WithAction",
       "props": [],
       "propDocs": ""
     },
@@ -12521,8 +13019,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / WithConsequences",
-      "doc": "Components/ConfirmDialog WithConsequences",
+      "summary": "Story: New Components/ConfirmDialog / WithConsequences",
+      "doc": "New Components/ConfirmDialog WithConsequences",
       "props": [],
       "propDocs": ""
     },
@@ -12591,8 +13089,8 @@
       "kind": "story",
       "file": "src/components/ConfirmDialog/ConfirmDialog.stories.tsx",
       "area": "ConfirmDialog",
-      "summary": "Story: Components/ConfirmDialog / WithDescription",
-      "doc": "Components/ConfirmDialog WithDescription",
+      "summary": "Story: New Components/ConfirmDialog / WithDescription",
+      "doc": "New Components/ConfirmDialog WithDescription",
       "props": [],
       "propDocs": ""
     },
@@ -12711,8 +13209,18 @@
       "kind": "story",
       "file": "src/components/Form/Form.stories.tsx",
       "area": "Form",
-      "summary": "Story: Components/Form / WithError",
-      "doc": "Components/Form WithError",
+      "summary": "Story: New Components/Form / WithError",
+      "doc": "New Components/Form WithError",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithError",
+      "kind": "story",
+      "file": "src/components/InputAction/InputAction.stories.tsx",
+      "area": "InputAction",
+      "summary": "Story: New Components/InputAction / WithError",
+      "doc": "New Components/InputAction WithError",
       "props": [],
       "propDocs": ""
     },
@@ -12731,8 +13239,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / WithError",
-      "doc": "Components/PhoneInput WithError",
+      "summary": "Story: New Components/PhoneInput / WithError",
+      "doc": "New Components/PhoneInput WithError",
       "props": [],
       "propDocs": ""
     },
@@ -12827,6 +13335,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithGroupRows",
+      "kind": "story",
+      "file": "src/components/Table/DataTable.stories.tsx",
+      "area": "Table",
+      "summary": "Story: New Components/Table / WithGroupRows",
+      "doc": "New Components/Table WithGroupRows",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithHandle",
       "kind": "story",
       "file": "src/components/Resizable/Resizable.stories.tsx",
@@ -12851,8 +13369,8 @@
       "kind": "story",
       "file": "src/components/PhoneInput/PhoneInput.stories.tsx",
       "area": "PhoneInput",
-      "summary": "Story: Components/PhoneInput / WithHelperText",
-      "doc": "Components/PhoneInput WithHelperText",
+      "summary": "Story: New Components/PhoneInput / WithHelperText",
+      "doc": "New Components/PhoneInput WithHelperText",
       "props": [],
       "propDocs": ""
     },
@@ -13061,8 +13579,8 @@
       "kind": "story",
       "file": "src/components/InfoTip/InfoTip.stories.tsx",
       "area": "InfoTip",
-      "summary": "Story: Components/InfoTip / WithLearnMore",
-      "doc": "Components/InfoTip WithLearnMore",
+      "summary": "Story: New Components/InfoTip / WithLearnMore",
+      "doc": "New Components/InfoTip WithLearnMore",
       "props": [],
       "propDocs": ""
     },
@@ -13287,6 +13805,16 @@
       "propDocs": ""
     },
     {
+      "name": "WithRadioItems",
+      "kind": "story",
+      "file": "src/components/DropdownMenu/DropdownMenu.stories.tsx",
+      "area": "DropdownMenu",
+      "summary": "Story: New Components/DropdownMenu / WithRadioItems",
+      "doc": "New Components/DropdownMenu WithRadioItems",
+      "props": [],
+      "propDocs": ""
+    },
+    {
       "name": "WithRightIcon",
       "kind": "story",
       "file": "src/components/ButtonOld/ButtonOld.stories.tsx",
@@ -13373,6 +13901,16 @@
       "area": "Icon",
       "summary": "Story: Components/Icon / WithStatusColors",
       "doc": "Components/Icon WithStatusColors",
+      "props": [],
+      "propDocs": ""
+    },
+    {
+      "name": "WithTargets",
+      "kind": "story",
+      "file": "src/components/TargetBuilder/TargetBuilder.stories.tsx",
+      "area": "TargetBuilder",
+      "summary": "Story: New Components/TargetBuilder / WithTargets",
+      "doc": "New Components/TargetBuilder WithTargets",
       "props": [],
       "propDocs": ""
     },

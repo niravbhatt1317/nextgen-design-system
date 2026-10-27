@@ -35,6 +35,12 @@ export interface NumberInputProps extends Omit<
   wrapperClassName?: string | undefined;
   /** A held field (Pranjal, 2026-09-17): disabled, the lock inside in place of the stepper */
   locked?: boolean | undefined;
+  /**
+   * The unit the number counts - "Seconds", "Minutes", "Hours", "Days", "Months". Drawn inside the field at its end,
+   * behind a hairline that runs border to border, in place of the stepper; the arrow keys still step. Keep the field
+   * short (`wrapperClassName="mdt-w-40"`) - the box holds a few digits and the word.
+   */
+  unit?: ReactNode;
 }
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
@@ -51,6 +57,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       max,
       disabled,
       locked,
+      unit,
       className,
       wrapperClassName,
       id: idProp,
@@ -59,6 +66,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     ref
   ) => {
     const held = Boolean(locked);
+    const hasUnit = unit !== undefined && unit !== null && unit !== '' && !held;
     const off = Boolean(disabled) || held;
     const generatedId = useId();
     const id = idProp ?? generatedId;
@@ -108,6 +116,8 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               'mdt-pr-[30px] mdt-tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:mdt-appearance-none [&::-webkit-outer-spin-button]:mdt-appearance-none',
               /* held: the lock takes the stepper's place - 34 at the right, the value ends in an ellipsis */
               held && 'mdt-text-ellipsis mdt-pr-[34px]',
+              /* with a unit: the digits stop 84 short of the edge, clear of the word ("30  Seconds") */
+              hasUnit && 'mdt-pr-[84px]',
               className
             )}
             aria-invalid={hasError}
@@ -117,6 +127,14 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           {held ? (
             <span className="mdt-absolute mdt-right-3 mdt-flex mdt-items-center mdt-text-faint">
               <Icon name="lock" size={14} aria-hidden />
+            </span>
+          ) : hasUnit ? (
+            /* THE UNIT INSIDE (ported from the console's NumberField, Ronak 2026-10-09: "remove the Seconds text at
+             * right side of the label and add that in the input field at right side", "the vertical full separator
+             * line like we did in the browse field"): a hairline from the field's top border to its bottom one, 11
+             * to the word, 13 in the faint ink, 12 from the edge. Clicks pass through to the field. */
+            <span className="mdt-pointer-events-none mdt-absolute mdt-inset-y-px mdt-right-3 mdt-flex mdt-items-center mdt-whitespace-nowrap mdt-border-l mdt-border-neutral-30 mdt-pl-[11px] mdt-text-[13px] mdt-leading-none mdt-text-faint">
+              {unit}
             </span>
           ) : (
             <span className="mdt-absolute mdt-right-1 mdt-top-1/2 mdt-flex -mdt-translate-y-1/2 mdt-flex-col mdt-gap-px">
@@ -150,11 +168,11 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {error && (
           <p
             id={errorId}
-            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
             role="alert"
           >
             {/* the alert mark, 12, before the message (K-Field-10) */}
-            <Icon name="alert-circle" size={12} aria-hidden />
+            <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
             {error}
           </p>
         )}

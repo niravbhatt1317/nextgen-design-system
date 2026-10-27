@@ -503,11 +503,11 @@ function renderSingleSelectMode(props: {
       {error && (
         <p
           id={errorId}
-          className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+          className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
           role="alert"
         >
           {/* the alert mark, 12, before the message (K-Field-10) */}
-          <Icon name="alert-circle" size={12} aria-hidden />
+          <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
           {error}
         </p>
       )}
@@ -966,11 +966,11 @@ function renderHelperOrError(props: {
     return (
       <p
         id={errorId}
-        className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+        className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
         role="alert"
       >
         {/* the alert mark, 12, before the message (K-Field-10) */}
-        <Icon name="alert-circle" size={12} aria-hidden />
+        <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
         {error}
       </p>
     );

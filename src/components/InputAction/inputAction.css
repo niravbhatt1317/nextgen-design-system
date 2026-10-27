@@ -1,0 +1,68 @@
+/* InputAction - ported from the console (Ronak, 2026-10-09): next-gen-ui credentialProfiles.css .cp-browse-wrap and
+ * .cp-browse, the same rules under the library's names.
+ *
+ * The wrapper sits in the Input's end slot (12 from the field's right edge, centred on it). A hairline stands 11
+ * before the control - 1 wide in the field's own edge colour - and runs border to border: the slot centres the 24
+ * control on the 32 field, so the line starts 3 above the control and stands the field's inner 30 (Ronak,
+ * 2026-10-09: "vertical line should touch the top and bottom border"). The control: the glyph and the word at 13/500
+ * in the reading ink (the value's own, never the near-black), 24 tall, 8 in a side, 6 between, in a 6-cornered well
+ * that takes the lightest tint under the pointer; faint with the not-allowed pointer while off. */
+
+.mdt-inaction {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 11px;
+}
+.mdt-inaction::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -3px;
+  width: 1px;
+  height: 30px;
+  background: hsl(var(--mdt-neutral-30));
+}
+
+.mdt-inaction__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  /* the field value's own ink - the Input's mdt-text-neutral-130. The console wrote neutral-150 here, which its
+   * tokens map to this same value; the library's neutral-150 is a step darker, so the library names the step it means */
+  color: hsl(var(--mdt-neutral-130));
+}
+.mdt-inaction__btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.mdt-inaction__btn:hover:not(:disabled) {
+  background: hsl(var(--mdt-neutral-10));
+}
+.mdt-inaction__btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px hsl(var(--mdt-primary)),
+    0 0 0 4px hsl(var(--mdt-primary) / 0.08);
+}
+.mdt-inaction__btn:disabled {
+  color: hsl(var(--mdt-faint));
+  cursor: not-allowed;
+}
+
+/* copied: "Copied" and a check in the success ink for a moment after a copy (the console's ReadOnlyCopy, storeDialogs.jsx) */
+.mdt-inaction__btn--done {
+  color: hsl(var(--mdt-success));
+}
