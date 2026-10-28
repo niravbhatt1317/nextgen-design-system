@@ -83,24 +83,57 @@ export interface KpiStripProps {
   style?: CSSProperties | undefined;
 }
 
-/** The gauge's outline: the half gauge for a card's chart area, or the full health ring. */
-export type KpiGaugeShape = 'half' | 'ring';
+/** The gauge's outline: the half gauge for a card's chart area, the zones half ring, or the full health ring. */
+export type KpiGaugeShape = 'half' | 'zones' | 'ring';
+
+/** A status colour from the chart palette: green, amber, red, or the neutral blue. */
+export type KpiGaugeTone = 'good' | 'warn' | 'crit' | 'info';
+
+/** One zone of the zones gauge: a stretch of the scale, its status colour and the word it reads as. */
+export interface KpiGaugeZone {
+  /** Where the zone starts, on the gauge's own scale (`min` to `max`). */
+  from: number;
+  /** Where it ends. A value on a shared edge belongs to the first zone that holds it. */
+  to: number;
+  tone: KpiGaugeTone;
+  /** What a value in this zone reads as, drawn under the number: "On target", "Below target", "Low". */
+  word: string;
+}
 
 export interface KpiGaugeProps {
-  /** 0 to 100. */
+  /** 0 to 100. For `shape="zones"`, the value on the `min` to `max` scale. */
   percent: number;
-  /** The word under the number: "capacity". Drawn by the half gauge only; the ring only speaks it. */
+  /**
+   * The word under the number: "capacity". Drawn by the half gauge only; the ring only speaks it, and the zones gauge
+   * speaks it as what the number counts ("98.5% sending data: On target").
+   */
   caption?: string | undefined;
   /** Spoken description; defaults to "<percent>% <caption>". */
   label?: string | undefined;
   /**
    * `half`: 104 × 62 in the neutral ladder, for a KpiCard's chart area.
+   * `zones`: the console Health's headline gauge, drawn on 120 × 76 and shown at 104 × 62 - the half ring split into
+   * its `zones`, each faint in its status colour, a dot in the full colour where the value sits, the value and its
+   * zone's word in the middle, the two ends labelled. The target is the green zone, so no "good at" line is needed.
    * `ring`: the console Overview's health ring, 150 × 150, in the success green; a thin outer ring at 100%.
    * @default 'half'
    */
   shape?: KpiGaugeShape | undefined;
   /** Ring only: the fill in the danger colour instead of the success green. @default false */
   bad?: boolean | undefined;
+  /**
+   * Half only: the fill in a status colour from the chart palette instead of the neutral ladder (the console's status
+   * gauge). A toned gauge reads a status, so its number keeps one decimal (96.4%) and its dot shows even at 0%.
+   */
+  tone?: KpiGaugeTone | undefined;
+  /** Half only: a tick on the ring at this percent, in the ink colour - the "good at" line. */
+  target?: number | undefined;
+  /** Zones only: the zones, in order along the scale. */
+  zones?: KpiGaugeZone[] | undefined;
+  /** Zones only: where the scale starts, labelled at its left end. Health's figures start at 90. @default 0 */
+  min?: number | undefined;
+  /** Zones only: where the scale ends, labelled at its right end. @default 100 */
+  max?: number | undefined;
 }
 
 export interface KpiBarsProps {
