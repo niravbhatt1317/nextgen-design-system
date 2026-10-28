@@ -54,7 +54,7 @@ warning, no clue. It has to be wrapped —
 `color: hsl(var(--mdt-primary))`. Storing the triplet rather than the colour is what buys the
 `/ 0.12` alpha syntax the components rely on.
 
-**But 46 of the 286 tokens are not triplets**, and wrapping one of those breaks it just as
+**But 46 of the 296 tokens are not triplets**, and wrapping one of those breaks it just as
 silently. What a token holds decides how you write it:
 
 | What it holds             | Count | Write it as                                                            | Which tokens                                                                                                                                              |
@@ -230,6 +230,37 @@ Tailwind classes follow the same shape: `mdt-bg-feedback-success-bg`,
 
 **Dark mode** uses the deep end of the same ramps, at the steps `Badge` already uses — so a dark
 toast and a dark badge belong to each other.
+
+---
+
+## Chart palette — the marks on a chart (added 2026-10-28)
+
+**Ten new colours, and the design owner asked for them.** Pranjal, 2026-10-15, on Agent Fleet Health:
+_"why are you not using the colors which were given in artifact"_ — the Health mock's palette,
+checked for colour-blind readers in both themes, with the light amber two steps lighter than the
+mock's (_"i think yellow we can go 1-2 lower"_). The console carried them in its own token file
+until the charts that wear them moved here (`Chart`, `KpiGauge` `tone` and `shape="zones"`). No ramp
+step carries any of them — the nearest sit 12 to 54 apart in RGB — so, like the AI gradient, they are
+their own small set rather than names pointing at a ramp.
+
+**Marks only.** A bar, a column, a block, a line, a gauge's fill or zone, a heat cell. Never a page
+surface, a border or a run of text — those keep the semantic tokens.
+
+| Token                   | Light                 | Dark                  | Job                                                    |
+| ----------------------- | --------------------- | --------------------- | ------------------------------------------------------ |
+| `--mdt-chart-good`      | `#14804A`             | `#34A88A`             | a mark's status: good                                  |
+| `--mdt-chart-warn`      | `#DDA41E`             | `#C2862C`             | a mark's status: caution (2.18:1 on white — see below) |
+| `--mdt-chart-crit`      | `#C42B3A`             | `#E14C72`             | a mark's status: critical                              |
+| `--mdt-chart-info`      | `#2B74D6`             | `#4C8FE6`             | a neutral magnitude line                               |
+| `--mdt-chart-bar`       | `#5F91E4`             | `#4C8FE6`             | a count bar                                            |
+| `--mdt-chart-s1` … `s5` | `#F1F6FE` → `#5F91E4` | `#0F1D33` → `#2F62AA` | how far from the whole, lighter is better              |
+
+**The amber is under 3:1 on white**, so a chart that uses it always carries a legend or a one-line
+hover with the numbers — the colour is never the only way to read the mark. Dark keeps the mock's
+amber; any lighter one fails the colour-blind check on the dark ground.
+
+All ten are HSL triplets (`hsl(var(--mdt-chart-good))`). Light is in `:root`; dark is the explicit
+map in `scripts/theme-dark.cjs`, generated into the dark block like every other colour.
 
 ---
 
@@ -564,7 +595,7 @@ A hardcoded value is invisible debt. A missing token is a five-minute conversati
 
 ## Token count
 
-**286 tokens.** `globals.css` is the source — this table is maintained by hand and a hand-kept count
+**296 tokens.** `globals.css` is the source — this table is maintained by hand and a hand-kept count
 drifts, so re-derive it rather than quote it. It read "92 primitive, 25 semantic" until 2026-10-15,
 when the five category families, the avatar tones and the `--mdt-fixed-*` set had already landed and
 gone uncounted: **74 tokens absent from a reference whose job is to list them.**
@@ -598,7 +629,8 @@ gone uncounted: **74 tokens absent from a reference whose job is to list them.**
 | Nav                        | 11      |
 | Fixed (theme-invariant)    | 7       |
 | Destructive fill           | 4       |
-| **Subtotal**               | **115** |
+| Chart palette              | 10      |
+| **Subtotal**               | **125** |
 
 | Scales and other | Count  |
 | ---------------- | ------ |
@@ -610,4 +642,4 @@ gone uncounted: **74 tokens absent from a reference whose job is to list them.**
 | Sizes            | 1      |
 | **Subtotal**     | **24** |
 
-**147 + 115 + 24 = 286.**
+**147 + 125 + 24 = 296.** (286 until 2026-10-28, when the chart palette's ten arrived.)

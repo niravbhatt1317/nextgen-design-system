@@ -67,11 +67,10 @@ describe('Breadcrumb', () => {
       expect(ancestor.className).not.toContain('mdt-truncate');
     });
 
-    it('reads the faint ink, the nick neutral-30 and the drawer step the soft ink - the console’s rendered values', () => {
+    it('reads the faint ink and the drawer step the soft ink - the console’s rendered values', () => {
       render(<Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} />);
       expect(nav().className).toContain('mdt-text-faint');
       expect(nav().className).not.toContain('mdt-text-muted-foreground');
-      expect(nav().querySelector('[data-slot="breadcrumb-nick"]')).toHaveClass('mdt-bg-neutral-30');
       expect(labelOf(items()[1] as HTMLElement)).toHaveClass(
         'mdt-font-semibold',
         'mdt-text-neutral-130'
@@ -116,19 +115,150 @@ describe('Breadcrumb', () => {
   });
 
   describe('the drawer form', () => {
-    it('renders the back button named after the parent, and fires onBack', async () => {
+    it('wears the drawer title’s 14 on a 20 line, its boxes 7 apart (12 to the eye)', () => {
+      render(<Breadcrumb variant="drawer" items={DRAWER} />);
+      expect(nav()).toHaveClass('mdt-text-sm', 'mdt-leading-5', 'mdt-gap-[7px]');
+      expect(nav()).not.toHaveClass('mdt-text-base');
+      expect(nav().querySelector('ol')).toHaveClass('mdt-gap-[7px]');
+      items().forEach((li) => {
+        expect(li).toHaveClass('mdt-gap-[7px]');
+      });
+    });
+
+    it('draws no back button and no nick, ever', () => {
+      render(<Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} />);
+      expect(nav().querySelector('[data-slot="breadcrumb-back"]')).toBeNull();
+      expect(nav().querySelector('[data-slot="breadcrumb-nick"]')).toBeNull();
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+    });
+
+    it('makes an earlier step with onSelect the way back, named after it', async () => {
+      const user = userEvent.setup();
+      const onSelect = vi.fn();
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'Needs attention', onSelect }, { label: 'Crashing modules' }]}
+        />
+      );
+      const step = screen.getByRole('button', { name: 'Back to Needs attention' });
+      expect(step).toHaveTextContent('Needs attention');
+      expect(step).toHaveAttribute('type', 'button');
+      expect(step).toHaveAttribute('data-slot', 'breadcrumb-label');
+      await user.click(step);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    it('underlines the way back in the foreground under the pointer, and rings it on keyboard focus', () => {
+      render(<Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} />);
+      const step = screen.getByRole('button', { name: 'Back to User management' });
+      expect(step).toHaveClass(
+        'mdt-font-normal',
+        'mdt-whitespace-nowrap',
+        'mdt-cursor-pointer',
+        'mdt-rounded-sm',
+        'hover:mdt-text-foreground',
+        'hover:mdt-underline',
+        'hover:mdt-decoration-neutral-60',
+        'hover:mdt-underline-offset-[3px]',
+        'focus-visible:mdt-outline-2',
+        'focus-visible:mdt-outline-offset-2',
+        'focus-visible:mdt-outline-ring'
+      );
+    });
+
+    it('lets every earlier step go back, three steps deep', async () => {
+      const user = userEvent.setup();
+      const toRoot = vi.fn();
+      const toModules = vi.fn();
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[
+            { label: 'Agent details', onSelect: toRoot },
+            { label: 'Modules', onSelect: toModules },
+            { label: 'Metrics' },
+          ]}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Back to Agent details' }));
+      await user.click(screen.getByRole('button', { name: 'Back to Modules' }));
+      expect(toRoot).toHaveBeenCalledTimes(1);
+      expect(toModules).toHaveBeenCalledTimes(1);
+    });
+
+    it('never follows the last step - it is where you are', () => {
+      const onSelect = vi.fn();
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'Teams' }, { label: 'Edit details', onSelect, href: '/edit' }]}
+        />
+      );
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
+
+    it('follows an earlier step with an href as a link, named as the way back', () => {
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'Teams', href: '/teams' }, { label: 'Edit' }]}
+        />
+      );
+      expect(screen.getByRole('link', { name: 'Back to Teams' })).toHaveAttribute('href', '/teams');
+    });
+
+    it('hands onBack to the step before the last when it has nowhere of its own to go', async () => {
       const user = userEvent.setup();
       const onBack = vi.fn();
-      render(<Breadcrumb variant="drawer" items={DRAWER} onBack={onBack} />);
-      const back = screen.getByRole('button', { name: 'Back to User management' });
-      expect(back).toHaveAttribute('title', 'Back to User management');
-      await user.click(back);
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'User management' }, { label: 'Edit details' }]}
+          onBack={onBack}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Back to User management' }));
       expect(onBack).toHaveBeenCalledTimes(1);
     });
 
-    it('takes a given backLabel over the one it would have made', () => {
+    it('keeps an earlier step’s own onSelect over onBack', async () => {
+      const user = userEvent.setup();
+      const onBack = vi.fn();
+      const onSelect = vi.fn();
       render(
-        <Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} backLabel="Back to the team" />
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'Teams', onSelect }, { label: 'Edit details' }]}
+          onBack={onBack}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Back to Teams' }));
+      expect(onSelect).toHaveBeenCalledTimes(1);
+      expect(onBack).not.toHaveBeenCalled();
+    });
+
+    it('gives onBack only to the step before the last, not to the root of a deeper trail', () => {
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'Teams' }, { label: 'Members' }, { label: 'Permissions' }]}
+          onBack={vi.fn()}
+        />
+      );
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+      expect(screen.getByRole('button', { name: 'Back to Members' })).toBeInTheDocument();
+    });
+
+    it('takes a given backLabel for the step before the last', () => {
+      render(
+        <Breadcrumb
+          variant="drawer"
+          items={[{ label: 'User management' }, { label: 'Edit details' }]}
+          onBack={vi.fn()}
+          backLabel="Back to the team"
+        />
       );
       expect(screen.getByRole('button', { name: 'Back to the team' })).toBeInTheDocument();
       expect(
@@ -136,29 +266,22 @@ describe('Breadcrumb', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('draws the nick beside the back button, hidden from assistive tech', () => {
-      render(<Breadcrumb variant="drawer" items={DRAWER} onBack={vi.fn()} />);
-      const nick = nav().querySelector('[data-slot="breadcrumb-nick"]');
-      expect(nick).toHaveAttribute('aria-hidden', 'true');
-    });
-
-    it('draws no back button and no nick without onBack', () => {
-      render(<Breadcrumb variant="drawer" items={DRAWER} />);
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(nav().querySelector('[data-slot="breadcrumb-nick"]')).toBeNull();
-    });
-
-    it('lets only the back button navigate - an item href or onSelect is ignored', () => {
+    it('names a step drawn as something other than words by what it shows', () => {
       render(
         <Breadcrumb
           variant="drawer"
-          items={[{ label: 'Teams', href: '/teams', onSelect: vi.fn() }, { label: 'Edit details' }]}
-          onBack={vi.fn()}
+          items={[{ label: <b>Rich step</b>, onSelect: vi.fn() }, { label: 'Edit' }]}
         />
       );
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
-      expect(screen.getAllByRole('button')).toHaveLength(1);
-      expect(screen.getByRole('button', { name: 'Back to Teams' })).toBeInTheDocument();
+      const step = screen.getByRole('button', { name: 'Rich step' });
+      expect(step).not.toHaveAttribute('aria-label');
+    });
+
+    it('draws a step with nowhere to go as plain text, with no page-form cursor', () => {
+      render(<Breadcrumb variant="drawer" items={[{ label: 'Teams' }, { label: 'Edit' }]} />);
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(labelOf(items()[0] as HTMLElement).tagName).toBe('SPAN');
+      expect(labelOf(items()[0] as HTMLElement)).not.toHaveClass('mdt-cursor-default');
     });
 
     it('still marks the step as the current page', () => {
