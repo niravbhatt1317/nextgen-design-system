@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
@@ -132,5 +132,19 @@ describe('Popover', () => {
     await user.click(screen.getByText('Custom Button'));
 
     expect(screen.getByText('Content')).toBeInTheDocument();
+  });
+
+  it('keeps wheel scrolling inside the popover, away from a dialog scroll lock', () => {
+    const onDocWheel = vi.fn();
+    document.addEventListener('wheel', onDocWheel);
+    render(
+      <Popover open>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>Content</PopoverContent>
+      </Popover>
+    );
+    fireEvent.wheel(screen.getByText('Content'), { deltaY: 100 });
+    document.removeEventListener('wheel', onDocWheel);
+    expect(onDocWheel).not.toHaveBeenCalled();
   });
 });

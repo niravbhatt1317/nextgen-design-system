@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 import type { CSSProperties, ReactNode } from 'react';
 
 /* ────────────────────────────────────────────────────────────────
@@ -277,13 +279,47 @@ const Note = ({ children }: { children: ReactNode }): ReactNode => (
   </div>
 );
 
-const copy = (value: string): void => {
-  if (typeof navigator !== 'undefined' && (navigator.clipboard as unknown) !== undefined) {
-    void navigator.clipboard.writeText(value);
+/* Pranjal, 2026-09-29: "when i click any color it should be copied. It was there but now its not there". The copy was
+ * silent and relied on the async clipboard alone, which a browser withholds outside a secure address (the gallery opened
+ * by its network address, not localhost) - then nothing happened and nothing said so. Now it falls back to the old
+ * select-and-copy, and the swatch says "Copied" for a second. */
+const copyFallback = (value: string): boolean => {
+  const area = document.createElement('textarea');
+  area.value = value;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- the only copy a browser allows outside a secure address
+    ok = document.execCommand('copy');
+  } catch {
+    ok = false;
   }
+  area.remove();
+  return ok;
 };
 
-/** One rung. Click it to copy the token name. */
+const copy = async (value: string): Promise<boolean> => {
+  if (
+    typeof navigator !== 'undefined' &&
+    (navigator.clipboard as unknown) !== undefined &&
+    window.isSecureContext
+  ) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch {
+      return copyFallback(value);
+    }
+  }
+  return copyFallback(value);
+};
+
+/** One rung. Click it to copy its hex (Pranjal, 2026-09-29: "not the token name but copy the hex code, and copied should be
+ * in a tooltip just above the pallete") - the library Tooltip says "Copied" above the swatch for a second. */
 const Rung = ({
   family,
   step,
@@ -295,55 +331,71 @@ const Rung = ({
 }): ReactNode => {
   const hex = shadeHex(family, step);
   const token = `--mdt-${family}-${stepName(step)}`;
+  const [copied, setCopied] = useState(false);
   return (
-    <button
-      type="button"
-      onClick={() => {
-        copy(token);
-      }}
-      title={`${token} — ${hex === '' ? 'MISSING' : hex}`}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        borderRadius: 8,
-        overflow: 'hidden',
-        border: '1px solid hsl(var(--mdt-border))',
-        background: 'hsl(var(--mdt-card))',
-      }}
-    >
-      <span
-        style={{
-          display: 'block',
-          height: 46,
-          background:
-            hex === ''
-              ? 'repeating-linear-gradient(45deg, hsl(var(--mdt-red-60)) 0 6px, hsl(var(--mdt-card)) 6px 12px)'
-              : hex,
-        }}
-      />
-      <span style={{ display: 'block', padding: '5px 4px 6px', textAlign: 'center' }}>
-        <span
-          style={{
-            display: 'block',
-            fontSize: 11,
-            fontWeight: 600,
-            color: isInk ? 'hsl(var(--mdt-blue-60))' : 'hsl(var(--mdt-muted-foreground))',
-          }}
-        >
-          {stepName(step)}
-        </span>
-        <span
-          style={{
-            ...mono,
-            display: 'block',
-            fontSize: 9,
-            color: 'hsl(var(--mdt-muted-foreground))',
-          }}
-        >
-          {hex === '' ? 'missing' : hex}
-        </span>
-      </span>
-    </button>
+    <TooltipProvider>
+      <Tooltip open={copied}>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            data-copied={copied ? 'true' : undefined}
+            disabled={hex === ''}
+            onClick={() => {
+              void copy(hex).then((ok) => {
+                if (!ok) return;
+                setCopied(true);
+                window.setTimeout(() => {
+                  setCopied(false);
+                }, 1200);
+              });
+            }}
+            title={`${token} — ${hex === '' ? 'MISSING' : hex}`}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              borderRadius: 8,
+              overflow: 'hidden',
+              border: '1px solid hsl(var(--mdt-border))',
+              background: 'hsl(var(--mdt-card))',
+            }}
+          >
+            <span
+              style={{
+                display: 'block',
+                height: 46,
+                background:
+                  hex === ''
+                    ? 'repeating-linear-gradient(45deg, hsl(var(--mdt-red-60)) 0 6px, hsl(var(--mdt-card)) 6px 12px)'
+                    : hex,
+              }}
+            />
+            <span style={{ display: 'block', padding: '5px 4px 6px', textAlign: 'center' }}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: isInk ? 'hsl(var(--mdt-blue-60))' : 'hsl(var(--mdt-muted-foreground))',
+                }}
+              >
+                {stepName(step)}
+              </span>
+              <span
+                style={{
+                  ...mono,
+                  display: 'block',
+                  fontSize: 9,
+                  color: 'hsl(var(--mdt-muted-foreground))',
+                }}
+              >
+                {hex === '' ? 'missing' : hex}
+              </span>
+            </span>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Copied</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -408,7 +460,7 @@ const meta = {
           '',
           'Twelve families, 141 shades. **Every swatch is read live from the running stylesheet**,',
           'so this page cannot drift from the tokens it describes — which is how the page it',
-          'replaces went wrong. Click any swatch to copy its token name.',
+          'replaces went wrong. Click any swatch to copy its hex.',
           '',
           'Reach for a token, never a hex code: `hsl(var(--mdt-blue-60))`.',
         ].join('\n'),
@@ -426,12 +478,12 @@ type Story = StoryObj<typeof meta>;
  * meaning, and there was nothing to reach for — so they had been written by
  * hand into the chip code instead.
  *
- * Click any swatch to copy its token name.
+ * Click any swatch to copy its hex.
  */
 export const Palette: Story = {
   render: () => (
     <div style={page}>
-      <Title lead="Twelve families, 141 shades. Read live from the stylesheet, so nothing here can go stale. Click a swatch to copy its token name.">
+      <Title lead="Twelve families, 141 shades. Read live from the stylesheet, so nothing here can go stale. Click a swatch to copy its hex.">
         Colour palette
       </Title>
       {FAMILIES.map((family) => (
