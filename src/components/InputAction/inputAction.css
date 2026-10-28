@@ -8,17 +8,24 @@
  * in the reading ink (the value's own, never the near-black), 24 tall, 8 in a side, 6 between, in a 6-cornered well
  * that takes the lightest tint under the pointer; faint with the not-allowed pointer while off. */
 
+/* THE ACTION FILLS ITS SEGMENT (Ronak, 2026-10-28: "when we hover on the browse, copy, upload there will be cover the
+ * hover background in the whole block we dont need the spacing around it"): the wrapper is the field's inner 30 tall
+ * and runs out to the border's inner edge (the slot sits 12 in, so it reaches 11 past it), the hairline on its left
+ * edge border to border; the control is the whole segment - 30 tall, the glyph 19 past the hairline and the word
+ * ending 19 before the border - 20 before the field's edge - exactly where they stood in the 24 well, the field's own corners on its right
+ * (8 less the border) - and the lightest tint covers all of it under the pointer; the focus ring sits inside it. */
 .mdt-inaction {
   position: relative;
   display: inline-flex;
-  align-items: center;
-  padding-left: 11px;
+  align-items: stretch;
+  height: 30px;
+  margin-right: -11px;
 }
 .mdt-inaction::before {
   content: '';
   position: absolute;
   left: 0;
-  top: -3px;
+  top: 0;
   width: 1px;
   height: 30px;
   background: hsl(var(--mdt-neutral-30));
@@ -27,11 +34,11 @@
 .mdt-inaction__btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 24px;
-  padding: 0 8px;
+  overflow: hidden; /* while the width eases, the longer words are clipped at the segment's end, never spilling */
+  height: 30px;
+  padding: 0 19px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 0 7px 7px 0;
   background: transparent;
   cursor: pointer;
   font: inherit;
@@ -54,12 +61,47 @@
 .mdt-inaction__btn:focus-visible {
   outline: none;
   box-shadow:
-    0 0 0 1px hsl(var(--mdt-primary)),
-    0 0 0 4px hsl(var(--mdt-primary) / 0.08);
+    inset 0 0 0 1px hsl(var(--mdt-primary)),
+    inset 0 0 0 4px hsl(var(--mdt-primary) / 0.08);
 }
 .mdt-inaction__btn:disabled {
   color: hsl(var(--mdt-faint));
   cursor: not-allowed;
+}
+
+/* THE WIDTH EASES (Ronak, 2026-10-28, "we need to smooth transition ... instead of the instant"): the button carries
+ * the width its words need (set by the component, measured from .mdt-inaction__label) and eases between two of them
+ * over 180 ms; the new words fade in over 160 ms as it moves. Neither runs for someone who asked for less motion. */
+.mdt-inaction__btn {
+  transition:
+    background-color 100ms ease-out,
+    width 180ms ease-out;
+}
+.mdt-inaction__label,
+.mdt-inaction__words {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.mdt-inaction__words[data-swap] {
+  animation: mdt-inaction-in 160ms ease-out;
+}
+@keyframes mdt-inaction-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mdt-inaction__btn {
+    transition: none;
+  }
+  .mdt-inaction__words[data-swap] {
+    animation: none;
+  }
 }
 
 /* copied: "Copied" and a check in the success ink for a moment after a copy (the console's ReadOnlyCopy, storeDialogs.jsx) */

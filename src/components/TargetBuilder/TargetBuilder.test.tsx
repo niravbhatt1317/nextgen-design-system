@@ -201,6 +201,12 @@ describe('TargetBuilder', () => {
       const spy = vi.fn();
       const { unmount } = render(<Live spy={spy} defaultKind="csv" />);
       expect(screen.getByText(/Single-column CSV/)).toBeInTheDocument();
+      // on the field's 32 line, centred with the select and Upload (Ronak, 2026-10-28)
+      expect(screen.getByText(/Single-column CSV/)).toHaveClass(
+        'mdt-flex',
+        'mdt-min-h-8',
+        'mdt-items-center'
+      );
       await userEvent.click(screen.getByRole('button', { name: 'Upload' }));
       expect(spy).toHaveBeenLastCalledWith([{ kind: 'csv', file: 'csv.csv' }]);
       unmount();

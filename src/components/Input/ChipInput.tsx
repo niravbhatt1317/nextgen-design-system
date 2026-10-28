@@ -16,9 +16,11 @@ const splitValues = (raw: string) =>
     .map((x) => x.trim())
     .filter(Boolean);
 
-/* the library field's edge (Input), on a box: the focus it draws is the box's focus-within, since the input inside is bare */
+/* the library field's edge (Input), on a box: the focus it draws is the box's focus-within, since the input inside is bare.
+ * 2 on every side: a chip sits as close to the left edge as to the top and bottom (Ronak, 2026-10-28: "reduce the spacing
+ * the left side and make the same spacing ... which we have used top and bottom") */
 const BOX =
-  'mdt-h-auto mdt-min-h-8 mdt-cursor-text mdt-flex-wrap mdt-items-center mdt-gap-1.5 mdt-px-2 mdt-py-0.5';
+  'mdt-h-auto mdt-min-h-8 mdt-cursor-text mdt-flex-wrap mdt-items-center mdt-gap-1.5 mdt-p-0.5';
 const BOX_FOCUS =
   'focus-within:mdt-border-primary focus-within:mdt-shadow-[0_0_0_3px_hsl(var(--mdt-primary)/0.08)]';
 const BOX_ERROR_FOCUS =
@@ -93,9 +95,9 @@ export const ChipInput = ({
         onClick={() => input.current?.focus()}
       >
         {values.map((v) => (
+          /* the pill shape, as the TagPill story draws it (Ronak, 2026-10-28: "same color, font-size, border-radius, height") */
           <TagPill
             key={v}
-            shape="square"
             disabled={disabled}
             onRemove={() => {
               onValuesChange(values.filter((x) => x !== v));
@@ -112,7 +114,9 @@ export const ChipInput = ({
           aria-invalid={error ? true : undefined}
           placeholder={values.length ? '' : placeholder}
           className={cn(
-            'mdt-h-6 mdt-min-w-0 mdt-shrink-0 mdt-grow mdt-basis-32 mdt-border-none mdt-bg-transparent mdt-px-1 mdt-text-sm mdt-text-neutral-130 mdt-outline-none placeholder:mdt-font-normal placeholder:mdt-text-faint disabled:mdt-cursor-not-allowed',
+            'mdt-h-6 mdt-min-w-0 mdt-shrink-0 mdt-grow mdt-basis-32 mdt-border-none mdt-bg-transparent mdt-text-sm mdt-text-neutral-130 mdt-outline-none placeholder:mdt-font-normal placeholder:mdt-text-faint disabled:mdt-cursor-not-allowed',
+            /* after a chip the caret sits 4 past it; in an empty box the placeholder sits 12 in, a field's own inset */
+            values.length ? 'mdt-px-1' : 'mdt-px-2.5',
             mono && 'mdt-font-mono'
           )}
           onChange={(e) => {

@@ -325,7 +325,9 @@ const TargetBuilder = forwardRef<HTMLDivElement, TargetBuilderProps>(function Ta
             </div>
           )}
           {def?.field === 'file' && (
-            <div className="mdt-flex-1 mdt-text-xs mdt-leading-normal mdt-text-muted-foreground">
+            /* on the field's 32 line, centred with the select and Upload beside it - the row starts at the top so a
+             * field's error line can grow under it (Ronak, 2026-10-28: "align vertical center with dropdown") */
+            <div className="mdt-flex mdt-min-h-8 mdt-min-w-0 mdt-flex-1 mdt-items-center mdt-text-xs mdt-leading-normal mdt-text-muted-foreground">
               {fileHint}
             </div>
           )}
