@@ -44,6 +44,12 @@ export const bannerVariants = cva(['mdt-flex mdt-w-full mdt-text-sm mdt-leading-
       // rounded against. A touch more room at the sides, since the banner is
       // now as wide as the view.
       page: 'mdt-gap-2.5 mdt-rounded-none mdt-py-3 mdt-pl-5 mdt-pr-4',
+      // THE PAGE'S NOTICE STRIP (ported from the console, Pranjal 2026-10-28: organizations/Strip.jsx +
+      // strip.css, the Collector Fleet and Organization detail notices). Edge to edge across the top of a page,
+      // square, a hairline under it in the tone's own border; at least 44 tall; the glyph starts 22 in, where the
+      // header band's sidebar-collapse icon starts, and the actions end 24 in, on the header band's inset.
+      strip:
+        'mdt-box-border mdt-min-h-11 mdt-gap-2.5 mdt-rounded-none mdt-border-0 mdt-border-b mdt-border-solid mdt-py-3 mdt-pl-[22px] mdt-pr-6',
     },
     /**
      * A single row of content - everything centres on it together. Once the
@@ -62,6 +68,15 @@ export const bannerVariants = cva(['mdt-flex mdt-w-full mdt-text-sm mdt-leading-
       false: 'mdt-items-center',
     },
   },
+  /* the strip's hairline is its tone's feedback border, the edge the BannerStack bar draws */
+  compoundVariants: [
+    { placement: 'strip', tone: 'info', class: 'mdt-border-feedback-info-border' },
+    { placement: 'strip', tone: 'warning', class: 'mdt-border-feedback-warning-border' },
+    { placement: 'strip', tone: 'danger', class: 'mdt-border-feedback-danger-border' },
+    { placement: 'strip', tone: 'success', class: 'mdt-border-feedback-success-border' },
+    { placement: 'strip', tone: 'ai', class: 'mdt-border-feedback-ai-border' },
+    { placement: 'strip', tone: 'neutral', class: 'mdt-border-feedback-neutral-border' },
+  ],
   defaultVariants: { tone: 'neutral', placement: 'inline', stacked: false },
 });
 
@@ -194,13 +209,15 @@ export const Banner = ({
   description,
   icon,
   actions,
-  actionPlacement = 'auto',
+  actionPlacement: actionPlacementProp,
   onDismiss,
   dismissLabel = 'Dismiss',
   className,
   ...props
 }: BannerProps) => {
   const titleId = useId();
+  // a strip keeps one row, whatever it carries (the console's Strip always passed "inline")
+  const actionPlacement = actionPlacementProp ?? (placement === 'strip' ? 'inline' : 'auto');
   const flat = useMemo(() => flattenActions(actions), [actions]);
   useGhostActions(flat);
 

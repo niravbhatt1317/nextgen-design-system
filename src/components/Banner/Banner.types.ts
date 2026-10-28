@@ -18,9 +18,17 @@ export type BannerTone = 'info' | 'warning' | 'danger' | 'success' | 'ai' | 'neu
  *
  * `inline` is the ordinary one: rounded, a tint with no edge, living inside a
  * panel or a form. `page` runs edge to edge across the top of a view - no
- * rounding, because there is nothing beside it to be rounded against.
+ * rounding, because there is nothing beside it to be rounded against - and is
+ * the state banner pinned under a drawer's header.
+ *
+ * `strip` is the page's notice strip: edge to edge across the top of a page,
+ * under the breadcrumb, with a hairline under it in the tone's own border, at
+ * least 44 tall, the glyph 22 in and the actions ending 24 in - on the header
+ * band's own insets. Its actions stay on its one row. Several strips stack one
+ * under another, each with its own line; to fold them into one, use
+ * `BannerStack`. Ported from the console (Pranjal, 2026-10-28).
  */
-export type BannerPlacement = 'inline' | 'page';
+export type BannerPlacement = 'inline' | 'page' | 'strip';
 
 /**
  * Where the actions sit.
@@ -66,7 +74,7 @@ export interface BannerOwnProps {
    */
   actions?: ReactNode | undefined;
 
-  /** @default 'auto' */
+  /** @default 'auto', and 'inline' on a `strip` */
   actionPlacement?: BannerActionPlacement | undefined;
 
   /**

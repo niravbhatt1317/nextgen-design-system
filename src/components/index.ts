@@ -103,7 +103,7 @@ export type {
 // Banner — a message that sits in the page and stays there. Shares Toast's six
 // tones and palette on purpose; shares nothing about how it behaves. If you
 // would still need the message after a refresh, it is a Banner.
-export { Banner, bannerVariants } from './Banner';
+export { Banner, bannerVariants, useDismissUntilNew } from './Banner';
 export type {
   BannerProps,
   BannerOwnProps,
@@ -111,6 +111,9 @@ export type {
   BannerTone,
   BannerPlacement,
   BannerActionPlacement,
+  DismissStorage,
+  DismissUntilNewOptions,
+  DismissUntilNewState,
 } from './Banner';
 
 // Breadcrumb — says where you are and offers the way back. Depth, not sequence:
@@ -174,13 +177,15 @@ export type {
   CollapsibleCardOwnProps,
 } from './Card';
 
-// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right
-export { SelectableCard, SelectableCardGroup } from './SelectableCard';
+// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right.
+// PickCard - the made choice folded into one of those cards, with a Change door (Pranjal, 2026-10-19).
+export { SelectableCard, SelectableCardGroup, PickCard } from './SelectableCard';
 export type {
   SelectableCardProps,
   SelectableCardGroupProps,
   SelectableCardType,
   SelectableCardLayout,
+  PickCardProps,
 } from './SelectableCard';
 
 // ActionCard
@@ -1166,6 +1171,15 @@ export type { EmptyStateProps } from './EmptyState';
 // CopyField - one line holding a value and an icon-only copy that says "Copied"; optional mask.
 export { CopyField } from './CopyField';
 export type { CopyFieldProps } from './CopyField';
+
+// OrgCard - the card that says which organization a thing belongs to (ported from the console, 2026-10-28).
+export { OrgCard } from './OrgCard';
+export type { OrgCardProps } from './OrgCard';
+
+// ProblemRow - one problem in a "Needs attention" list, the whole row the button; ProblemList stacks them
+// (ported from the console's Health tab, 2026-10-28).
+export { ProblemRow, ProblemList } from './ProblemRow';
+export type { ProblemRowProps, ProblemListProps, ProblemSeverity } from './ProblemRow';
 
 // InfoTip - the filled info mark; its explainer on hover, focus and press, optional "Learn more".
 export { InfoTip } from './InfoTip';

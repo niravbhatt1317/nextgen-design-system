@@ -381,6 +381,10 @@ being broken, in shipped code.
 | `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps          |
 | `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens     |
 | `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens     |
+| `OrgCard.tsx`                                                            | `[10px]` radius, `[13px]`      | Radius + type-size tokens   |
+| `ProblemRow.tsx`                                                         | `[18px]`, `[13px]`, `[3px]`    | Spacing, type-size, offset  |
+| `PickCard.tsx`                                                           | `[13px]`, `[3px]`, `[120ms]`   | Type-size, offset, motion   |
+| `Banner.tsx` (`strip`)                                                   | `[22px]`                       | Spacing token               |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
@@ -405,6 +409,13 @@ across all five sizes: the dot is exactly `size / 6.4` and its ring exactly `siz
 The corner offsets differ at `xl` only because `xl` is the one size with a 12px corner radius instead
 of 6px, so the dot meets a different arc. **It does not need five tokens — it needs two ratios**,
 which is a much smaller decision than the rest of this section.
+
+**The four console cards (Pranjal, 2026-10-28)** - `OrgCard`, `PickCard`, `ProblemRow` and the `Banner` strip - carry
+the console's own numbers, declared in each file's header comment. None is a new kind of question: `13px` is the same
+micro type gap as the tag picker's; the `3px` underline offset (Tailwind steps 1 / 2 / 4) is the console's for every
+underlined quiet link ("View", "Change"); `10px` is the organization card's corner, between the scale's 8 and 12; `18px`
+and `22px` are a row's right inset and the strip's gutter, which line up with the header band's icons; `120ms` is the
+Pick card's fade. No colour was invented - the organization tile reads the existing `--mdt-avatar-blue-fill` / `-ink`.
 
 **The twelve console parts (Pranjal, 2026-10-13)** each declare their raw values in their own
 comments, which is the right half of the token rule; this table is the other half. Two of them are

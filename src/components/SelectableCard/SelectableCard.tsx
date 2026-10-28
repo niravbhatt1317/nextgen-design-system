@@ -2,6 +2,7 @@ import { createContext, forwardRef, useContext, useId, useMemo, useRef } from 'r
 import type { KeyboardEvent, MouseEvent } from 'react';
 import { cn } from '../../utils/cn';
 import { Icon } from '../Icon';
+import { SELECTABLE_CARD_EDGE } from './selectableCardEdge';
 import type {
   SelectableCardGroupProps,
   SelectableCardLayout,
@@ -46,11 +47,7 @@ const LAYOUT: Record<SelectableCardLayout, string> = {
 const COLUMNS = { 2: 'mdt-grid-cols-2', 3: 'mdt-grid-cols-3' } as const;
 
 /** The three edges, each a 1px border plus a 0.5px inset ring of the same colour. */
-const EDGE = {
-  rest: 'mdt-border-neutral-20 mdt-shadow-[inset_0_0_0_0.5px_hsl(var(--mdt-neutral-20))]',
-  hover: 'hover:mdt-border-input hover:mdt-shadow-[inset_0_0_0_0.5px_hsl(var(--mdt-input))]',
-  chosen: 'mdt-border-foreground mdt-shadow-[inset_0_0_0_0.5px_hsl(var(--mdt-foreground))]',
-};
+const EDGE = SELECTABLE_CARD_EDGE;
 
 /** Whether the press landed on something interactive inside the card. */
 const innerPress = (event: MouseEvent<HTMLElement>): boolean => {

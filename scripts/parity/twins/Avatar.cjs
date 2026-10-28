@@ -80,5 +80,23 @@ module.exports = {
       console: null /* no photo avatar on the console yet */,
       mock: { file: MOCK, select: '.av.circle.s40:has(use)' },
     },
+    /* THE ORGANIZATION MARK (2026-10-28): the console's ui/OrgMark.jsx is this Avatar with `logo` (ported in #162) -
+     * the Branding logo filling the square, the letter on its tint where there is none. The organizations list draws a
+     * logo as <OrgMark size={32} radius={8}> (.org-mark); the story's With a logo row has the md (32) logo. The letter
+     * beside it is the plain md circle the first frame already measures. */
+    {
+      name: 'md · logo · the organizations list (32, fills the square)',
+      props: ['width', 'height', 'borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius', 'backgroundColor', 'boxShadow', 'opacity'],
+      story: { id: 'new-components-avatar--with-logo', select: '[role="img"].mdt-h-8:has(img)' },
+      console: { path: '/organizations', select: 'tbody .org-mark' },
+      mock: null,
+    },
+    {
+      name: 'md · logo · the image (cover)',
+      props: ['width', 'height', 'objectFit', 'display'],
+      story: { id: 'new-components-avatar--with-logo', select: '[role="img"].mdt-h-8 img' },
+      console: { path: '/organizations', select: 'tbody .org-mark img' },
+      mock: null,
+    },
   ],
 };
