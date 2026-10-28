@@ -72,6 +72,9 @@ const BAND = 'new-components-table--with-the-pages-toolbar';
 const ADV = 'new-components-table--with-the-advanced-filter';
 const NOTHING = 'new-components-table--nothing-found';
 const ON = '/users';
+/** the fleets' agent list (2026-10-28): a two-line name cell and a figure column, beside Agent Fleet's own list */
+const AGENTS = 'new-components-table--two-line-cells';
+const FLEET = '/agent-fleet';
 
 const STRIP = '[role="toolbar"]';
 /** the console's left nav has a "Search settings" box: the table's is the one in the strip */
@@ -143,6 +146,14 @@ const searchNothing = async (page) => {
   await page.fill(SEARCH, 'zzqx');
   await page.waitForSelector(STATUS, { timeout: 4000 }).catch(() => {});
   await settle(page, 200);
+};
+
+/** Agent Fleet may open on its customer list first: take Northwind Retail when it shows, then wait for the table. */
+const pickCustomer = async (page) => {
+  const customer = page.getByText('Northwind Retail').first();
+  if (await customer.count()) await customer.click().catch(() => {});
+  await page.waitForSelector(`${ROW} td:nth-child(2)`, { timeout: 8000 }).catch(() => {});
+  await settle(page, 300);
 };
 
 /** the same selector on both sides; `open`, `state` and `note` ride along when given; the pointer is parked first */
@@ -217,7 +228,9 @@ module.exports = {
     same('Action button · hover', ['width', 'height', 'backgroundColor', 'color'], ACTIONS, { state: 'hover' }),
     same('Action glyph', GLYPH, `${ACTIONS} svg`),
     same('content cell (Email)', ['height', 'paddingLeft', 'paddingRight', 'paddingTop', 'paddingBottom', 'fontSize', 'lineHeight', ...CELL_LINE], `${ROW} td:nth-child(4)`),
-    same('muted cell text (Email)', TEXT, `${ROW} td:nth-child(4) > span`),
+    /* one ink per column (the console's rule since 2026-10-15): /users draws the address in the cell's own ink with no
+       muted class; the story's faint span went on 2026-10-28, so this frame reads the value's text on both sides, in full */
+    same('cell text (Email)', TEXT, `${ROW} td:nth-child(4) > span`),
     same('contact chip', ['width', 'height', 'borderTopWidth', 'borderTopColor', 'backgroundColor', 'color'], `${ROW} button[aria-label^="Copy email"]`,
       { note: 'the story\'s ContactChips beside the page\'s own .contact-chip; the corner is 9999 there and 999 here — both a full circle on 28, so not compared' }),
     same('contact chip glyph', GLYPH, `${ROW} button[aria-label^="Copy email"] svg`),
@@ -280,11 +293,31 @@ module.exports = {
     same('bulk bar · Delete', ['color'], `${BULK} > button:nth-last-child(2)`, { open: pickRow }),
     same('bulk bar · clear', ['width', 'height', 'color', 'backgroundColor', 'borderTopLeftRadius'], 'button[aria-label="Clear selection"]', { open: pickRow }),
     /* ── blank state: nothing found (the console reaches it by searching; first-run and error have no console twin) ── */
-    { name: 'nothing found', props: ['height', 'fontSize', 'fontWeight', 'color'],
+    /* NO HEIGHT (2026-10-28): the blank takes the card's whole body (TableStates, 2026-09-28: centred in the visible
+       table), so its height is the room it is given - 300 in the story's free-standing card, 740 in /users' page-filling
+       card at 1440x900. That figure measures the frame, not the part. The sizing RULE both sides share is read instead:
+       the 300 floor (minHeight) and taking the body (flexGrow 1). */
+    { name: 'nothing found', props: ['minHeight', 'flexGrow', 'fontSize', 'fontWeight', 'color'],
       story: { id: NOTHING, select: STATUS, open: parked() }, console: { path: ON, select: STATUS, open: parked(searchNothing) }, mock: null },
     { name: 'nothing found · title', props: TEXT,
       story: { id: NOTHING, select: `${STATUS} > span:nth-child(2)`, open: parked() }, console: { path: ON, select: `${STATUS} > span:nth-child(2)`, open: parked(searchNothing) }, mock: null },
     { name: 'nothing found · Clear filters', props: ['height', 'paddingLeft', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'borderTopColor', 'borderTopLeftRadius'],
       story: { id: NOTHING, select: `${STATUS} button`, open: parked() }, console: { path: ON, select: `${STATUS} button`, open: parked(searchNothing) }, mock: null },
+    /* ── 2026-10-28: a cell's second line, and a figure column (the console's own list is Agent Fleet's, /agent-fleet) ──
+       The console paints the second line from its global.css (td { --cell-sub: neutral-60 }) over the library 2.2.0 table;
+       the story paints it from the table's own table.css now. On both sides the line is the second child of the name
+       cell's flex column, in the cell's neutral-90 class that the rule repaints. */
+    { name: 'a cell\'s second line (the middle grey)', props: ['color', 'fontSize', 'fontWeight'],
+      story: { id: AGENTS, select: `${ROW} td:nth-child(2) .mdt-flex-col > * + .mdt-text-neutral-90`, open: parked() },
+      console: { path: FLEET, select: `${ROW} td:nth-child(2) .mdt-flex-col > * + .mdt-text-neutral-90`, open: parked(pickCustomer) }, mock: null,
+      note: 'the address and system under the host in the story, the version under the host on Agent Fleet' },
+    /* a figure sits on the left like every column (rulebook item 65, 2026-09-12): Restarts in the story, Health (the
+       fitness %, a figure) on Agent Fleet - the sixth cell on both sides */
+    { name: 'a figure column · cell', props: ['textAlign', 'paddingLeft'],
+      story: { id: AGENTS, select: `${ROW} td:nth-child(6)`, open: parked() },
+      console: { path: FLEET, select: `${ROW} td:nth-child(6)`, open: parked(pickCustomer) }, mock: null },
+    { name: 'a figure column · heading', props: ['textAlign', 'paddingLeft'],
+      story: { id: AGENTS, select: TH('restarts'), open: parked() },
+      console: { path: FLEET, select: TH('fitness'), open: parked(pickCustomer) }, mock: null },
   ],
 };

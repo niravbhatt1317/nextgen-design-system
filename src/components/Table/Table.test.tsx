@@ -1,4 +1,5 @@
 import { createRef } from 'react';
+import { createPortal } from 'react-dom';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -171,6 +172,72 @@ describe('Table', () => {
     expect(onToggle).toHaveBeenLastCalledWith(true);
     await userEvent.click(screen.getByText('sarah@company.com'));
     expect(onOpen).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens on a body click when the whole table sits inside a dialog or a side panel', async () => {
+    /* the 2.2.0 bug (the console, 2026-10-26): the test walked past the row and matched the panel itself */
+    const onOpen = vi.fn();
+    render(
+      <div role="dialog" aria-label="Agents running Log shipper">
+        <Grid onOpen={onOpen} />
+      </div>
+    );
+    await userEvent.click(screen.getByText('sarah@company.com'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a click on a control inside the row, or a layer inside it, to that control', async () => {
+    const onOpen = vi.fn();
+    render(
+      <Table label="People">
+        <TableViewport tableWidth={400}>
+          <TableBody>
+            <TableRow onOpen={onOpen}>
+              <TableCell>
+                <button type="button">Copy</button>
+              </TableCell>
+              <TableCell>
+                <span data-no-open>Kept</span>
+              </TableCell>
+              <TableCell>
+                <div role="dialog" aria-label="Inline confirm">
+                  <span>Inside the confirm</span>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </TableViewport>
+      </Table>
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    await userEvent.click(screen.getByText('Kept'));
+    await userEvent.click(screen.getByText('Inside the confirm'));
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it('leaves a click inside a layer the row opened elsewhere in the page (a portal) to that layer', async () => {
+    const onOpen = vi.fn();
+    const layer = document.createElement('div');
+    document.body.appendChild(layer);
+    render(
+      <Table label="People">
+        <TableViewport tableWidth={400}>
+          <TableBody>
+            <TableRow onOpen={onOpen}>
+              <TableCell>
+                Sarah Johnson
+                {createPortal(<span>Inside the portaled menu</span>, layer)}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </TableViewport>
+      </Table>
+    );
+    await userEvent.click(screen.getByText('Inside the portaled menu'));
+    expect(onOpen).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByText('Sarah Johnson'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    layer.remove();
   });
 
   it('names the header checkbox and draws no scope chevron beside it', () => {
@@ -976,5 +1043,15 @@ describe('The lead column — one slot with two occupants', () => {
     render(<Lead head={{ selectable: true, onToggle: () => undefined }} cell={{ index: 6 }} />);
     expect(selectAll()).toBeInTheDocument();
     expect(hash()).not.toBeInTheDocument();
+  });
+});
+
+describe('the heading ⋯', () => {
+  it('opens a menu at least 224 wide (Pranjal, 2026-10-27), the floor and not the width', async () => {
+    render(<Grid />);
+    await userEvent.click(screen.getByLabelText('Options for Email'));
+    const menu = await screen.findByRole('menu');
+    expect(menu).toHaveClass('mdt-min-w-56');
+    expect(menu).not.toHaveClass('mdt-min-w-48');
   });
 });
