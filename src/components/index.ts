@@ -1004,6 +1004,8 @@ export type {
   KpiStripProps,
   KpiGaugeProps,
   KpiGaugeShape,
+  KpiGaugeTone,
+  KpiGaugeZone,
   KpiBarsProps,
 } from './KpiCard';
 
@@ -1190,3 +1192,39 @@ export {
   splitPhone,
 } from './PhoneInput';
 export type { PhoneInputProps, PhoneCountry, PhoneInputValue } from './PhoneInput';
+
+// ── Ported from the console, 2026-10-28 (Pranjal: "push everything in storybook now. Dont leave anything") ──────────
+
+// Chart - the console Health's hand-drawn charts, each with the one-line hover (ChartTip): columns, a bar list, a
+// status history, a trend line, a histogram against a budget, a heat table and the stacked bars of Module health.
+export {
+  ChartTip,
+  ColumnChart,
+  BarList,
+  StatusBlocks,
+  TrendLine,
+  Histogram,
+  HeatTable,
+  StackedBars,
+} from './Chart';
+export type {
+  ChartTipProps,
+  ChartCountTone,
+  ColumnChartColumn,
+  ColumnChartProps,
+  BarListRow,
+  BarListProps,
+  StatusBlock,
+  StatusBlocksProps,
+  TrendPoint,
+  TrendLineProps,
+  HistogramProps,
+  HeatCell,
+  HeatRow,
+  HeatTableProps,
+  StackedBarsTone,
+  StackedBarsSeries,
+  StackedBarsRow,
+  StackedBarsSide,
+  StackedBarsProps,
+} from './Chart';
