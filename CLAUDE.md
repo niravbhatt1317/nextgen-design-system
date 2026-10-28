@@ -854,7 +854,7 @@ before this rule existed, so blocking on them would stop every push. Switch CI t
 for both, and that is logged in `MISSING-TOKENS.md` as two of the missing categories. So `px-3` is
 not a violation; it is what every component does. A raw `p-[13px]` is.
 
-**Do not add colours.** **286 tokens today — 147 primitive steps and 37 semantic names**
+**Do not add colours.** **296 tokens today — 147 primitive steps and 37 semantic names**
 (`TOKENS.md` carries the full census; `globals.css` is the source). Do not quote a palette size from
 memory, this line included: it said "88 primitives and 25 semantic pairs" until 2026-10-15, by which
 point it was wrong by 59, and the console's rulebook caught the drift before we did (open item O-83).
@@ -862,6 +862,9 @@ point it was wrong by 59, and the console's rulebook caught the drift before we 
 **The size was never the rule. The rule is that the palette grows only when the design owner says
 so** — and it has, twice: the five category families on 2026-09-10 (`indigo`, `teal`, `magenta`,
 `cyan`, `lime`, 55 tokens) and the `--mdt-fixed-*` set in 2.3.0. Both were ruled, both are recorded.
+A third set is proposed on the 2026-10-28 charts branch: the ten `--mdt-chart-*` colours Pranjal picked
+for the console's Health charts on 2026-10-15, moved here with the charts (`TOKENS.md`, "Chart
+palette") — named in its changeset so the growth is not silent, and his to confirm for the library.
 A count going up is not evidence the rule was broken; a count going up _silently_ is.
 
 If a borrowed design needs a colour we do not have, map

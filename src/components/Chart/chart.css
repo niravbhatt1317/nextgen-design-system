@@ -1,0 +1,926 @@
+/* THE CHARTS - ported from the console's Health (afm/screens/health/health.css and moduleHealth.css, 2026-10-15 to
+ * 2026-10-28), measurement for measurement. Marks wear the chart palette (--mdt-chart-good / warn / crit / info / bar
+ * and the s1-s5 ramp, globals.css); ink and rules wear the neutral ladder. Sizes sit on the foundations: 12 for chart
+ * text, 13 for reading text, gaps 8 / 12 / 16. Two rules below key off the theme switch, as the console's did; every
+ * other colour comes from the tokens. */
+
+/* the quiet second line: a share, a note, "current" */
+.mdt-chart-note {
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+/* the one-line hover's text (ChartTip) */
+.mdt-chart-tip {
+  display: block;
+  white-space: pre-line;
+  text-align: left;
+}
+/* the labels under a chart, spread from end to end */
+.mdt-chart-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.mdt-chart-axis--inset,
+.mdt-chart-axis--histo {
+  padding-left: 40px;
+}
+
+/* ── ColumnChart ── */
+.mdt-chart-cols {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 8px;
+  align-items: end;
+  height: 132px;
+  padding-top: 20px;
+  border-bottom: 1px solid hsl(var(--mdt-border));
+}
+.mdt-chart-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.mdt-chart-col:disabled {
+  cursor: default;
+}
+.mdt-chart-col__b {
+  display: block;
+  border-radius: 4px 4px 0 0;
+}
+.mdt-chart-col__b[data-tone='crit'] {
+  background: hsl(var(--mdt-chart-crit));
+}
+.mdt-chart-col__b[data-tone='bar'] {
+  background: hsl(var(--mdt-chart-bar));
+}
+.mdt-chart-col__b[data-tone='quiet'] {
+  background: hsl(var(--mdt-neutral-40));
+}
+.mdt-chart-col:not(:disabled):hover .mdt-chart-col__b {
+  opacity: 0.8;
+}
+.mdt-chart-col__n {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: hsl(var(--mdt-foreground));
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.mdt-chart-col__n[data-zero] {
+  color: hsl(var(--mdt-muted-foreground));
+  font-weight: 500;
+}
+.mdt-chart-cols-x {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 8px;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+/* fill (Pranjal 2026-10-26): the columns fill the card, the count on each, at most 64 wide; the marker's dashed line */
+.mdt-chart-cols-wrap--fill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-cols {
+  position: relative;
+  flex: 1;
+  height: auto;
+  min-height: 170px;
+  gap: 12px;
+  padding-top: 26px;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-cols-x {
+  gap: 12px;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-col {
+  align-items: center;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-col__b {
+  width: 100%;
+  max-width: 64px;
+  min-height: 2px;
+  border-radius: 6px 6px 0 0;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-col__n {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.mdt-chart-cols-wrap--fill .mdt-chart-col__n[data-zero] {
+  font-weight: 500;
+}
+.mdt-chart-cols__mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--mdt-chart-mark-at) * (100% + 12px) / var(--mdt-chart-cols-n) - 6px);
+  border-left: 1px dashed hsl(var(--mdt-muted-foreground));
+  pointer-events: none;
+}
+.mdt-chart-cols__mark span {
+  position: absolute;
+  top: 0;
+  left: 6px;
+  font-size: 11px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+  white-space: nowrap;
+}
+
+/* ── BarList ── */
+.mdt-chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mdt-chart-bar {
+  display: grid;
+  grid-template-columns: minmax(64px, 34%) minmax(48px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  line-height: 20px;
+  color: hsl(var(--mdt-foreground));
+  cursor: pointer;
+}
+.mdt-chart-bar:hover {
+  background: hsl(var(--mdt-accent));
+}
+.mdt-chart-bar__l {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mdt-chart-bar__track {
+  display: block;
+}
+.mdt-chart-bar__b {
+  display: block;
+  height: 8px;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: hsl(var(--mdt-chart-bar));
+}
+.mdt-chart-bar__b[data-current] {
+  background: hsl(var(--mdt-chart-good));
+}
+.mdt-chart-bar__b[data-tone='crit'] {
+  background: hsl(var(--mdt-chart-crit));
+}
+.mdt-chart-bar__b[data-tone='quiet'] {
+  background: hsl(var(--mdt-neutral-40));
+}
+.mdt-chart-bars--track {
+  gap: 6px;
+}
+.mdt-chart-bars--track .mdt-chart-bar__track {
+  border-radius: 4px;
+  background: hsl(var(--mdt-neutral-20));
+  overflow: hidden;
+}
+.mdt-chart-bars--track .mdt-chart-bar__b {
+  height: 12px;
+  border-radius: 4px;
+}
+.mdt-chart-bars--track .mdt-chart-bar__b[data-zero] {
+  min-width: 0;
+}
+.mdt-chart-bar__v {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.mdt-chart-bar__v .mdt-chart-note {
+  margin-left: 6px;
+}
+
+/* ── StatusBlocks ── */
+.mdt-chart-blocks-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+.mdt-chart-legend {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.mdt-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mdt-chart-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+}
+.mdt-chart-blocks {
+  display: flex;
+  gap: 4px;
+  height: 36px;
+}
+.mdt-chart-blocks--dense {
+  gap: 2px;
+}
+.mdt-chart-block {
+  flex: 1;
+  min-width: 0;
+  border-radius: 4px;
+  cursor: default;
+}
+.mdt-chart-block:hover,
+.mdt-chart-block:focus-visible {
+  outline: 2px solid hsl(var(--mdt-foreground));
+  outline-offset: 1px;
+}
+.mdt-chart-block[data-tone='good'],
+.mdt-chart-legend i[data-tone='good'] {
+  background: hsl(var(--mdt-chart-good));
+}
+.mdt-chart-block[data-tone='warn'],
+.mdt-chart-legend i[data-tone='warn'] {
+  background: hsl(var(--mdt-chart-warn));
+}
+.mdt-chart-block[data-tone='crit'],
+.mdt-chart-legend i[data-tone='crit'] {
+  background: hsl(var(--mdt-chart-crit));
+}
+
+/* ── TrendLine ── */
+.mdt-chart-trend-wrap {
+  padding-left: 40px;
+}
+.mdt-chart-trend {
+  position: relative;
+  height: 150px;
+}
+.mdt-chart-trend svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.mdt-chart-trend__y {
+  position: absolute;
+  left: -40px;
+  width: 34px;
+  text-align: right;
+  transform: translateY(-50%);
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+.mdt-chart-grid {
+  stroke: hsl(var(--mdt-border));
+  stroke-width: 1;
+}
+.mdt-chart-trend svg[data-tone='good'] {
+  color: hsl(var(--mdt-chart-good));
+}
+.mdt-chart-trend svg[data-tone='info'] {
+  color: hsl(var(--mdt-chart-info));
+}
+.mdt-chart-area {
+  fill: currentColor;
+  fill-opacity: 0.12;
+}
+.mdt-chart-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.mdt-chart-trend__hits {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+.mdt-chart-trend__hit {
+  position: relative;
+  flex: 1;
+  height: 100%;
+}
+.mdt-chart-trend__x {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: hsl(var(--mdt-muted-foreground));
+  opacity: 0;
+}
+.mdt-chart-trend__dot {
+  position: absolute;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 0 2px hsl(var(--mdt-background));
+}
+.mdt-chart-trend__dot[data-tone='good'] {
+  background: hsl(var(--mdt-chart-good));
+}
+.mdt-chart-trend__dot[data-tone='info'] {
+  background: hsl(var(--mdt-chart-info));
+}
+.mdt-chart-trend__hit:hover .mdt-chart-trend__x,
+.mdt-chart-trend__hit:focus-visible .mdt-chart-trend__x,
+.mdt-chart-trend__hit:hover .mdt-chart-trend__dot,
+.mdt-chart-trend__hit:focus-visible .mdt-chart-trend__dot {
+  opacity: 1;
+}
+.mdt-chart-trend__hit:focus-visible {
+  outline: none;
+}
+
+/* ── Histogram (Host cost, version C: 120 high, room above for the budget's name on its dashed line) ── */
+.mdt-chart-histo-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.mdt-chart-histo {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 120px;
+  margin-top: 20px;
+  margin-left: 40px;
+  border-bottom: 1px solid hsl(var(--mdt-border));
+}
+.mdt-chart-histo__y {
+  position: absolute;
+  left: -40px;
+  width: 32px;
+  text-align: right;
+  transform: translateY(-50%);
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+.mdt-chart-histo__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: hsl(var(--mdt-border));
+}
+.mdt-chart-histo__budget {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed hsl(var(--mdt-chart-crit));
+  z-index: 1;
+}
+.mdt-chart-histo__budget-l {
+  position: absolute;
+  top: -20px;
+  z-index: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: hsl(var(--mdt-chart-crit));
+}
+.mdt-chart-histo__bin {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.mdt-chart-histo__bin:hover {
+  background: hsl(var(--mdt-accent));
+}
+/* a bar that opens its members: a plain button, the same hover, the focus ring of the other charts */
+button.mdt-chart-histo__bin {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+button.mdt-chart-histo__bin:hover {
+  background: hsl(var(--mdt-accent));
+}
+button.mdt-chart-histo__bin:disabled {
+  cursor: default;
+}
+button.mdt-chart-histo__bin:disabled:hover {
+  background: none;
+}
+button.mdt-chart-histo__bin:focus-visible {
+  outline: 2px solid hsl(var(--mdt-foreground));
+  outline-offset: 1px;
+}
+/* a bar with anyone in it never draws thinner than 3px, a red one 4px (the console's max(3px, h) / max(4px, h)) */
+.mdt-chart-histo__b {
+  display: block;
+  width: 100%;
+  min-height: 3px;
+  border-radius: 4px 4px 0 0;
+  background: hsl(var(--mdt-chart-bar));
+}
+.mdt-chart-histo__b[data-over] {
+  min-height: 4px;
+  background: hsl(var(--mdt-chart-crit));
+}
+
+/* ── HeatTable ── */
+.mdt-chart-heat-wrap {
+  overflow-x: auto;
+}
+.mdt-chart-heat {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 2px;
+  table-layout: fixed;
+}
+.mdt-chart-heat th {
+  padding: 4px 8px;
+  text-align: right;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.mdt-chart-heat th:first-child {
+  width: 22%;
+  text-align: left;
+}
+.mdt-chart-heat td {
+  height: 40px;
+  padding: 0 8px;
+  font-size: 13px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.mdt-chart-heat td:first-child {
+  font-weight: 500;
+}
+.mdt-chart-heat__n {
+  text-align: right;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.mdt-chart-heat td.mdt-chart-heat__c {
+  padding: 0;
+  border-radius: 4px;
+}
+.mdt-chart-heat__c button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: hsl(var(--mdt-foreground));
+  font: inherit;
+  cursor: pointer;
+}
+.mdt-chart-heat__c button:disabled {
+  cursor: default;
+}
+/* hover darkens the cell's own shade (lifts it a step in dark) - no ring; keyboard focus keeps one */
+.mdt-chart-heat__c button:not(:disabled):hover {
+  background: color-mix(in srgb, hsl(var(--mdt-foreground)) 8%, transparent);
+}
+.mdt-chart-heat__c button:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: -2px;
+}
+.mdt-chart-heat__c button span {
+  font-size: 12px;
+  line-height: 14px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+/* on the two darkest shades the quiet grey loses its contrast - the share reads in the full ink there */
+.mdt-chart-heat__c[data-level='4'] button span,
+.mdt-chart-heat__c[data-level='5'] button span {
+  color: hsl(var(--mdt-foreground));
+}
+.mdt-chart-heat__c[data-level='0'] {
+  background: hsl(var(--mdt-muted));
+}
+.mdt-chart-heat__c[data-level='1'],
+.mdt-chart-ramp i[data-level='1'] {
+  background: hsl(var(--mdt-chart-s1));
+}
+.mdt-chart-heat__c[data-level='2'],
+.mdt-chart-ramp i[data-level='2'] {
+  background: hsl(var(--mdt-chart-s2));
+}
+.mdt-chart-heat__c[data-level='3'],
+.mdt-chart-ramp i[data-level='3'] {
+  background: hsl(var(--mdt-chart-s3));
+}
+.mdt-chart-heat__c[data-level='4'],
+.mdt-chart-ramp i[data-level='4'] {
+  background: hsl(var(--mdt-chart-s4));
+}
+.mdt-chart-heat__c[data-level='5'],
+.mdt-chart-ramp i[data-level='5'] {
+  background: hsl(var(--mdt-chart-s5));
+}
+.mdt-chart-ramp {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+.mdt-chart-ramp i {
+  width: 14px;
+  height: 10px;
+  border-radius: 4px;
+}
+
+/* ── StackedBars (the console's Module health) ── */
+.mdt-chart-stack {
+  --mdt-chart-stack-name: 150px;
+  --mdt-chart-stack-gap: 16px;
+  container: mdt-chart-stack / inline-size;
+}
+/* the card's title row: the heading on the left, the legend switch on the right */
+.mdt-chart-stack-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  width: 100%;
+}
+/* the swatch */
+.mdt-chart-stack-key {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+}
+.mdt-chart-stack-key[data-tone='crit'] {
+  background: hsl(var(--mdt-chart-crit));
+}
+.mdt-chart-stack-key[data-tone='warn'] {
+  background: hsl(var(--mdt-chart-warn));
+}
+.mdt-chart-stack-key[data-tone='quiet'] {
+  background: hsl(var(--mdt-neutral-50));
+}
+.mdt-chart-stack-key[data-tone='good'] {
+  background: hsl(var(--mdt-chart-good));
+}
+/* the legend: each colour a pill-shaped switch - under the pointer a filled pill with an edge; off, the swatch is
+ * hollow and the word struck through */
+.mdt-chart-stack-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.mdt-chart-stack-legend__b {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: hsl(var(--mdt-neutral-90));
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+}
+.mdt-chart-stack-legend__b:hover {
+  background: hsl(var(--mdt-neutral-20));
+  border-color: hsl(var(--mdt-neutral-30));
+  color: hsl(var(--mdt-foreground));
+}
+/* in dark the two steps swap, so the pill still lifts off the card (the console's rule, kept) */
+[data-theme='dark'] .mdt-chart-stack-legend__b:hover {
+  background: hsl(var(--mdt-neutral-30));
+  border-color: hsl(var(--mdt-neutral-20));
+}
+.mdt-chart-stack-legend__b:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: 1px;
+}
+.mdt-chart-stack-legend__b[aria-pressed='false'] {
+  color: hsl(var(--mdt-muted-foreground));
+  text-decoration: line-through;
+}
+.mdt-chart-stack-legend__b[aria-pressed='false'] .mdt-chart-stack-key {
+  background: transparent;
+  border-color: hsl(var(--mdt-muted-foreground));
+}
+/* two columns: the chart (about three quarters) and, apart from it, each row's figures - 16 either side of the
+ * hairline. Second lines wear neutral-90 (AA in both themes); the axis keeps the charts' muted ink */
+.mdt-chart-stack-split {
+  display: grid;
+  grid-template-columns: minmax(0, 74fr) minmax(190px, 26fr);
+}
+.mdt-chart-stack-left {
+  min-width: 0;
+  padding-right: 16px;
+  border-right: 1px solid hsl(var(--mdt-border));
+}
+.mdt-chart-stack-right {
+  min-width: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+}
+/* no column beside: the chart takes the card's width */
+.mdt-chart-stack-split--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mdt-chart-stack-split--solo .mdt-chart-stack-left {
+  padding-right: 0;
+  border-right: 0;
+}
+/* the chart: a row's hover fill reaches 12 past the column on each side, so the names stay on the heading's edge and
+ * the bars start on the 0 tick whatever the pointer does */
+.mdt-chart-stack-chart {
+  position: relative;
+  margin: 0 -12px;
+}
+.mdt-chart-stack-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--mdt-chart-stack-name) + var(--mdt-chart-stack-gap) + 12px);
+  right: 12px;
+  pointer-events: none;
+}
+.mdt-chart-stack-grid i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: hsl(var(--mdt-border));
+  opacity: 0.5;
+}
+.mdt-chart-stack-row {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 54px;
+  display: grid;
+  grid-template-columns: var(--mdt-chart-stack-name) minmax(0, 1fr);
+  gap: var(--mdt-chart-stack-gap);
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.mdt-chart-stack-row:hover {
+  background: hsl(var(--mdt-secondary));
+}
+.mdt-chart-stack-row:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: -2px;
+}
+.mdt-chart-stack-nm {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.mdt-chart-stack-nm__t {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: hsl(var(--mdt-foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mdt-chart-stack-nm__s {
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-neutral-90));
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the bar: one segment per colour shown; the 2 between segments is the segment's own padding (the row shows through
+ * it), so the bar's length stays exactly its count on the scale */
+.mdt-chart-stack-track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 22px;
+}
+.mdt-chart-stack-seg {
+  flex: none;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 2px;
+  display: grid;
+  place-items: center;
+  background-clip: content-box;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mdt-chart-stack-seg + .mdt-chart-stack-seg {
+  padding-left: 2px;
+  min-width: 4px;
+}
+.mdt-chart-stack-seg:last-child {
+  border-radius: 0 4px 4px 0;
+}
+/* the number on a segment: the ground's colour on the dark marks and the text colour on the light ones in light; the
+ * ground's colour on every mark in dark, where the marks are the light ones */
+.mdt-chart-stack-seg[data-tone='crit'] {
+  background-color: hsl(var(--mdt-chart-crit));
+  color: hsl(var(--mdt-background));
+}
+.mdt-chart-stack-seg[data-tone='warn'] {
+  background-color: hsl(var(--mdt-chart-warn));
+  color: hsl(var(--mdt-foreground));
+}
+.mdt-chart-stack-seg[data-tone='quiet'] {
+  background-color: hsl(var(--mdt-neutral-50));
+  color: hsl(var(--mdt-foreground));
+}
+.mdt-chart-stack-seg[data-tone='good'] {
+  background-color: hsl(var(--mdt-chart-good));
+  color: hsl(var(--mdt-background));
+}
+[data-theme='dark'] .mdt-chart-stack-seg {
+  color: hsl(var(--mdt-background));
+}
+.mdt-chart-stack-seg[data-tiny] {
+  color: transparent !important;
+}
+/* the number line under the bars: the first number starts on 0, the last ends on the bar's end, the unit centred */
+.mdt-chart-stack-axis {
+  position: relative;
+  height: 16px;
+  margin: 4px 0 0 calc(var(--mdt-chart-stack-name) + var(--mdt-chart-stack-gap));
+}
+.mdt-chart-stack-axis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.mdt-chart-stack-axis span[data-edge='first'] {
+  transform: none;
+}
+.mdt-chart-stack-axis span[data-edge='last'] {
+  transform: translateX(-100%);
+}
+.mdt-chart-stack-cap {
+  margin: 2px 0 0 calc(var(--mdt-chart-stack-name) + var(--mdt-chart-stack-gap));
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-muted-foreground));
+}
+/* the column beside: the row named again, then "40 crashing · 1.9% · 184 restarts" on one line */
+.mdt-chart-stack-side-row {
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.mdt-chart-stack-side-name {
+  max-width: 100%;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: hsl(var(--mdt-foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mdt-chart-stack-side-fig {
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 16px;
+  color: hsl(var(--mdt-neutral-90));
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mdt-chart-stack-lead[data-bad] {
+  color: hsl(var(--mdt-chart-crit));
+  font-weight: 500;
+}
+.mdt-chart-stack-lead[data-bad]::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 5px;
+  vertical-align: 1px;
+}
+/* narrow: the column goes under the chart, the name over its bar, no grid or axis */
+@container mdt-chart-stack (max-width: 640px) {
+  .mdt-chart-stack-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mdt-chart-stack-left {
+    padding-right: 0;
+    border-right: 0;
+  }
+  .mdt-chart-stack-right {
+    padding-left: 0;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid hsl(var(--mdt-border));
+  }
+  .mdt-chart-stack-side-row {
+    height: auto;
+    padding: 6px 0;
+  }
+  .mdt-chart-stack-grid,
+  .mdt-chart-stack-axis,
+  .mdt-chart-stack-cap {
+    display: none;
+  }
+  .mdt-chart-stack-row {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdt-chart-trend__x,
+  .mdt-chart-trend__dot,
+  .mdt-chart-stack-legend__b {
+    transition: none;
+  }
+}

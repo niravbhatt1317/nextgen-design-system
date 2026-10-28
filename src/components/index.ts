@@ -595,6 +595,7 @@ export type {
   SheetLayout,
   SheetInset,
   SheetVariants,
+  SheetLeaveGuard,
 } from './Sheet';
 
 // LeftNavOld — the previous settings-only navigation. DEPRECATED 2026-09-03: use LeftNav.
@@ -1004,6 +1005,8 @@ export type {
   KpiStripProps,
   KpiGaugeProps,
   KpiGaugeShape,
+  KpiGaugeTone,
+  KpiGaugeZone,
   KpiBarsProps,
 } from './KpiCard';
 
@@ -1207,3 +1210,36 @@ export { OverflowTip } from './OverflowTip';
 // Slider - one number between two limits: the value on the handle, a ruler, the saved value and a reset, typeable.
 export { Slider } from './Slider';
 export type { SliderProps } from './Slider';
+// Chart - the console Health's hand-drawn charts, each with the one-line hover (ChartTip): columns, a bar list, a
+// status history, a trend line, a histogram against a budget, a heat table and the stacked bars of Module health.
+export {
+  ChartTip,
+  ColumnChart,
+  BarList,
+  StatusBlocks,
+  TrendLine,
+  Histogram,
+  HeatTable,
+  StackedBars,
+} from './Chart';
+export type {
+  ChartTipProps,
+  ChartCountTone,
+  ColumnChartColumn,
+  ColumnChartProps,
+  BarListRow,
+  BarListProps,
+  StatusBlock,
+  StatusBlocksProps,
+  TrendPoint,
+  TrendLineProps,
+  HistogramProps,
+  HeatCell,
+  HeatRow,
+  HeatTableProps,
+  StackedBarsTone,
+  StackedBarsSeries,
+  StackedBarsRow,
+  StackedBarsSide,
+  StackedBarsProps,
+} from './Chart';
