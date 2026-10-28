@@ -47,4 +47,5 @@ export type {
   SheetNavigationProps,
   UseSheetNavigationReturn,
   SheetPageProps,
+  SheetLeaveGuard,
 } from './Sheet.types';

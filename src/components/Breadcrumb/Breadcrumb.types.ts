@@ -8,11 +8,12 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react';
  * somewhere to go.
  *
  * `drawer` replaces a drawer's title while a page is open inside it. It wears
- * the title's own 16: the parent at 400 in the faint ink, the step at 600 in
- * the foreground, and a back button with a nick before the trail. **Only the
- * back button navigates** - an item's `href` and `onSelect` are ignored here,
- * because the crumb's job in a drawer is to name where a page will return to,
- * and one way back is enough.
+ * the title's own 14 on a 20 line: the earlier steps at 400 in the faint ink,
+ * the step at 600 in the soft ink, every visible gap 12. **It is a real
+ * breadcrumb with no back button** (Pranjal, 2026-10-26): every step before the
+ * last that is given an `href` or an `onSelect` is a way back - underlined in
+ * the foreground under the pointer, named "Back to <step>". The last step is
+ * where you are and is never followed.
  */
 export type BreadcrumbVariant = 'page' | 'drawer';
 
@@ -20,12 +21,13 @@ export interface BreadcrumbItem {
   /** What the place is called. Stays on one line and is never shortened, as the console has it. */
   label: ReactNode;
 
-  /** A real address. Renders an anchor. Ignored by the drawer form. */
+  /** A real address. Renders an anchor. In the drawer form only an earlier step follows it. */
   href?: string | undefined;
 
   /**
    * Something to do rather than somewhere to go - a router push, a view
-   * switch. Renders a button. Ignored by the drawer form.
+   * switch, a drawer page going back. Renders a button. In the drawer form
+   * only an earlier step does it, as a way back.
    */
   onSelect?: (() => void) | undefined;
 
@@ -41,15 +43,18 @@ export interface BreadcrumbOwnProps {
   variant?: BreadcrumbVariant | undefined;
 
   /**
-   * Drawer form only: what the back button does. It takes the caller's path,
-   * so a dirty draft still gets its discard question first. Without it no
-   * button is drawn.
+   * Drawer form only: what the step before the last does when it was given no
+   * `href` or `onSelect` of its own - the way back one page. It takes the
+   * caller's path, so a dirty draft still gets its discard question first.
+   * There is no separate back button (Pranjal, 2026-10-26); this is the
+   * two-step crumb's short form, `{ parent, step, onBack }`.
    */
   onBack?: (() => void) | undefined;
 
   /**
-   * Drawer form only: the back button's accessible name.
-   * @default "Back to <the first item>"
+   * Drawer form only: the accessible name of the step before the last, as the
+   * way back.
+   * @default "Back to <that step>"
    */
   backLabel?: string | undefined;
 

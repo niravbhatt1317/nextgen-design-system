@@ -595,6 +595,7 @@ export type {
   SheetLayout,
   SheetInset,
   SheetVariants,
+  SheetLeaveGuard,
 } from './Sheet';
 
 // LeftNavOld — the previous settings-only navigation. DEPRECATED 2026-09-03: use LeftNav.
