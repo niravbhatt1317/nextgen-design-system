@@ -14,14 +14,19 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Too
  * some sites reference tokens that do not exist at all.
  *
  * Tones match Avatar's palette, so a tile and an avatar sitting next to each
- * other agree on what green means.
+ * other agree on what green means - all but slate, which is a step lighter
+ * than the slate avatar since 2026-10-28 (below).
  */
 export const iconTileVariants = cva(
   'mdt-inline-flex mdt-shrink-0 mdt-items-center mdt-justify-center [&_svg]:mdt-shrink-0',
   {
     variants: {
       tone: {
-        slate: 'mdt-bg-neutral-30 mdt-text-neutral-110',
+        /* THE GREY TILE IS A STEP LIGHTER (Pranjal, 2026-10-23, on the fleets' Approvals trays: "it is very dark ... use
+         * a lighter bg tone for it"): the neutral-20 fill with the secondary ink neutral-90, in both themes - the
+         * console's tray value (afm/cfm shell/approvals.css), into the library 2026-10-28. It was neutral-30 under
+         * neutral-110. */
+        slate: 'mdt-bg-neutral-20 mdt-text-neutral-90',
         /* THE BLUE INK IS BLUE-60 (Pranjal, 2026-09-12: "use a better blue color this looks really bad" - K-IconTile-07): every Name tile on the console draws its glyph in the accent blue, not the avatar's navy. */
         /* 2026-09-28: the glyph reads --mdt-tile-blue-ink - blue-60 in light, the info badge's #7FB2E0 in dark (Pranjal: the dark tile's icon was not visible enough) */
         blue: 'mdt-bg-blue-10 mdt-text-[hsl(var(--mdt-tile-blue-ink))]',

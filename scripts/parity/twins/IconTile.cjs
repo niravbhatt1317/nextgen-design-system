@@ -13,6 +13,22 @@ const openFirstRow = async (page) => {
   await page.waitForTimeout(600);
 };
 /* the lead tile in a table: the tinted square that leads the Name cell (aria-hidden, 32 wide) */
+/* A FLEET'S APPROVALS TRAY (2026-10-28): each request is led by the library IconTile lg in slate; the console's tray
+ * bridge drew it a step lighter (neutral-20 under neutral-90, Pranjal 2026-10-23: "it is very dark ... use a lighter bg
+ * tone for it"), which the library's slate now is. A customer list may come first (the MSP view): step into Northwind
+ * Retail, then the header's Approvals button. A request you sent yourself wears blue ([data-mine]) - not this frame. */
+const openApprovals = async (page) => {
+  const customer = page.getByText('Northwind Retail').first();
+  if (await customer.count()) {
+    await customer.click().catch(() => {});
+    await page.waitForTimeout(1500);
+  }
+  await page.getByRole('button', { name: /^Approvals/ }).first().click();
+  await page.waitForSelector(`${D} [class$="apv__tile"]`, { timeout: 10000 });
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(500);
+};
+const TRAY_PROPS = PROPS.filter((p) => !p.startsWith('glyph'));
 const LEAD = 'tbody tr:nth-child(1) span[aria-hidden="true"].mdt-w-8';
 
 module.exports = {
@@ -55,6 +71,27 @@ module.exports = {
       props: ['width', 'height', 'borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius', 'glyphW', 'glyphH', 'glyphStrokeWidth', 'opacity', 'boxShadow'],
       story: { id: 'new-components-icontile--sizes', select: 'span.mdt-w-10' },
       console: { path: '/access-profiles', open: openFirstRow, select: `${D} span[aria-hidden="true"].mdt-w-10.mdt-bg-neutral-30` },
+      mock: null,
+    },
+    {
+      name: 'lg · slate · the Approvals tray tile, Agent Fleet (neutral-20 under neutral-90)',
+      props: TRAY_PROPS,
+      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"]' },
+      console: { path: '/agent-fleet', open: openApprovals, select: `${D} .afm-apv__tile:not([data-mine]) > span` },
+      mock: null,
+    },
+    {
+      name: 'lg · slate · the tray tile glyph, Agent Fleet (20)',
+      props: ['width', 'height', 'color', 'stroke', 'strokeWidth'],
+      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"] > svg' },
+      console: { path: '/agent-fleet', open: openApprovals, select: `${D} .afm-apv__tile:not([data-mine]) > span > svg` },
+      mock: null,
+    },
+    {
+      name: 'lg · slate · the Approvals tray tile, Collector Fleet',
+      props: TRAY_PROPS,
+      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"]' },
+      console: { path: '/collectors', open: openApprovals, select: `${D} .cfm-apv__tile:not([data-mine]) > span` },
       mock: null,
     },
   ],

@@ -37,8 +37,10 @@ module.exports = {
   component: 'DropdownMenu',
   frames: [
     {
-      name: 'the box',
-      props: ['borderTopLeftRadius', 'paddingTop', 'paddingLeft', 'borderTopWidth', 'borderTopColor', 'boxShadow', 'backgroundColor', 'rectWidth'],
+      /* minWidth: every ⋯ action menu is at least 224 (Pranjal, 2026-10-27) - the console's global.css floor on its row
+       * menus, the library's mdt-min-w-56 on the story */
+      name: 'the box (an action menu, 224 at least)',
+      props: ['borderTopLeftRadius', 'paddingTop', 'paddingLeft', 'borderTopWidth', 'borderTopColor', 'boxShadow', 'backgroundColor', 'rectWidth', 'minWidth'],
       story: { id: STORY, open: openStoryMenu, select: MENU },
       console: { path: '/users', open: openUsersMenu, select: MENU },
       mock: null,
@@ -63,6 +65,14 @@ module.exports = {
       state: 'hover',
       story: { id: STORY, open: openStoryMenu, select: ITEM },
       console: { path: '/users', open: openUsersMenu, select: ITEM },
+      mock: null,
+    },
+    {
+      /* the destructive item comes last, after a divider (the action-menu rule, 2026-10-14; Users' rowActions) */
+      name: 'the divider before the destructive row',
+      props: ['rectHeight', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight', 'backgroundColor'],
+      story: { id: STORY, open: openStoryMenu, select: `${MENU} [role="separator"]` },
+      console: { path: '/users', open: openUsersMenu, select: `${MENU} [role="separator"]` },
       mock: null,
     },
     {

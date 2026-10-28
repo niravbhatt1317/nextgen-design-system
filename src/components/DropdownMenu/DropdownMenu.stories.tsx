@@ -18,7 +18,7 @@ import {
  * THE ONE DROPDOWN. The console's Users row menu, ruled 2026-09-16 ("the drop down which is in users is
  * good - proper text color, text sizes, icon sizes and everything. Use that drop down everywhere") and
  * carried at the root of this part since 2026-09-22. The box: corners 10, 6 inside, a neutral-30 hairline,
- * the lg shadow, 192 wide for an action menu. An item: 34 tall, 0 10 inside, corners 7, 13/500 in the
+ * the lg shadow, at least 224 wide for an action menu (a longer item widens it). An item: 34 tall, 0 10 inside, corners 7, 13/500 in the
  * reading ink, 10 to its 16 glyph; neutral-10 under the pointer and the text keeps its colour. A
  * destructive item (`variant="destructive"`) is red-60 with a red glyph and takes the danger wash under
  * the pointer - it never goes dark.
@@ -68,7 +68,10 @@ const RowActionsButton = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<
 );
 
 /**
- * The row menu as the Users table draws it: Edit details · Disable user · Delete user, 192 wide.
+ * The row menu as the Users table draws it: Edit details · Disable user, a hairline, then Delete user in red.
+ * Every ⋯ action menu follows it (Pranjal, 2026-10-14 and 2026-10-27): an icon on every item, never a "…" on a
+ * label, the destructive item last and red after a divider, and the menu at least 224 wide - `mdt-min-w-56`, a
+ * floor and not a width, so a longer item widens it.
  */
 export const TheMenu: Story = {
   play: openTheMenu,
@@ -77,7 +80,7 @@ export const TheMenu: Story = {
       <DropdownMenuTrigger asChild>
         <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="mdt-w-48">
+      <DropdownMenuContent align="start" className="mdt-min-w-56">
         <DropdownMenuItem>
           <Icon name="pencil" size={16} />
           Edit details
@@ -86,6 +89,7 @@ export const TheMenu: Story = {
           <Icon name="toggle-left" size={16} />
           Disable user
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
           <Icon name="trash-2" size={16} />
           Delete user
@@ -106,11 +110,12 @@ export const Destructive: Story = {
       <DropdownMenuTrigger asChild>
         <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="mdt-w-48">
+      <DropdownMenuContent align="start" className="mdt-min-w-56">
         <DropdownMenuItem>
           <Icon name="pencil" size={16} />
           Edit team details
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive">
           <Icon name="trash-2" size={16} />
           Delete team
@@ -118,6 +123,40 @@ export const Destructive: Story = {
         <DropdownMenuItem variant="destructive">
           <Icon name="x-circle" size={16} />
           Revoke access
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};
+
+/**
+ * 224 is a floor, not a width: an item longer than the floor widens the menu instead of being cut off or touching
+ * its edge (Pranjal, 2026-10-09 and 2026-10-27, on a fleet row menu: "increase the width by a little bit").
+ */
+export const ALongItemWidensIt: Story = {
+  play: openTheMenu,
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <RowActionsButton />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="mdt-min-w-56">
+        <DropdownMenuItem>
+          <Icon name="activity" size={16} />
+          Diagnose
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icon name="power" size={16} />
+          Restart or stop collector
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icon name="pause-circle" size={16} />
+          Hold work on every module it runs
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive">
+          <Icon name="trash-2" size={16} />
+          Retire collector
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -228,7 +267,7 @@ export const Disabled: Story = {
       <DropdownMenuTrigger asChild>
         <RowActionsButton />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="mdt-w-48">
+      <DropdownMenuContent align="start" className="mdt-min-w-56">
         <DropdownMenuItem disabled>
           <Icon name="lock" size={16} />
           Read-only
