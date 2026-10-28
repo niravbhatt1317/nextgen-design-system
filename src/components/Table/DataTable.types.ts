@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { FilterKey } from '../AdvancedFilter';
+import type { FilterKey, FilterValue } from '../AdvancedFilter';
 import type { TableBlankKind, TableColumnDef, TablePagingMode } from './Table.types';
 
 /**
@@ -18,6 +18,25 @@ export interface DataTableAdvancedFilter<Row> {
   title?: string | undefined;
   /** The panel's width. 656 unless the page says otherwise. */
   width?: number | undefined;
+  /**
+   * What the list opens already filtered by, in the same rows of key · operator ·
+   * value the panel builds. **Read once, when the table first appears** - the same
+   * rule as `initialQuery`. To start over, the page gives the table a new `key`.
+   *
+   * It lands exactly as if the person had applied it: the door reads "1 applied",
+   * the quick filters are held, and the person can edit or clear it like their own.
+   *
+   * Asked for by the console (2026-10-28): the fleets' Change log has a View button
+   * that opens Agents or Collectors narrowed to one tag or one network zone, as a
+   * real filter rather than words in the search box (Pranjal's pick).
+   *
+   * ```ts
+   * initial: { join: 'and', rows: [{ key: 'zone', op: 'is', value: ['Retail core'] }] }
+   * ```
+   *
+   * A pick key's value is a list of options; a text key's value is the typed string.
+   */
+  initial?: FilterValue | undefined;
 }
 
 /** The toolbar's quick filter: one column, a few values, the square button with the dot. */

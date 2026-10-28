@@ -398,7 +398,8 @@ function DataTable<Row>({
   };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   /* the advanced filter's applied rows, and whether its panel is open (the door toggles it) */
-  const [advanced, setAdvanced] = useState<FilterValue>(EMPTY_FILTER);
+  /* seeded once from the page, like the search box's initialQuery; a new key starts over */
+  const [advanced, setAdvanced] = useState<FilterValue>(() => advancedFilter?.initial ?? EMPTY_FILTER);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const advancedCount = advancedFilter ? countConditions(advanced) : 0;
   /* the quick filters are held - disabled, not hidden - while an advanced filter is applied (Pranjal, 2026-09-27; the rule is in the header) */

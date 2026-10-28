@@ -409,6 +409,39 @@ export const QuickFiltersDisabledUnderAnAdvancedFilter: Story = {
 };
 
 /**
+ * **The list opens already filtered** (2026-10-28). `advancedFilter.initial` hands the table a filter to start with,
+ * in the same rows the panel builds - here "Role is Admin" and "Source is LDAP". It lands exactly as if the
+ * person had applied it: the door reads "2 applied", the Status square is held, and opening the door shows both rows
+ * ready to edit or clear. Read once, when the table first appears, like `initialQuery`; to start over the page gives
+ * the table a new `key`.
+ *
+ * Asked for by the console: the fleets' Change log has a View button that opens Agents or Collectors narrowed to one
+ * tag or one network zone, as a real filter rather than words in the search box (Pranjal's pick).
+ */
+export const OpensAlreadyFiltered: Story = {
+  name: 'Opens already filtered',
+  args: {
+    filters: undefined,
+    advancedFilter: {
+      keys: [
+        { id: 'name', label: 'Name', type: 'text' },
+        { id: 'email', label: 'Email', type: 'text' },
+        { id: 'status', label: 'Status', type: 'pick', options: ['Active', 'Inactive', 'Invited'] },
+        { id: 'role', label: 'Role', type: 'pick', options: SAMPLE_ROLES },
+        { id: 'source', label: 'Source', type: 'pick', options: ['Manual', 'LDAP', 'SCIM'] },
+      ],
+      initial: {
+        join: 'and',
+        rows: [
+          { key: 'role', op: 'is', value: ['Admin'] },
+          { key: 'source', op: 'is', value: ['LDAP'] },
+        ],
+      },
+    },
+  },
+};
+
+/**
  * **The bar follows the window, not the card** (2026-09-26). This is the table on a page like the console's: a
  * scrolling frame the height of the window, a 60px band pinned at its top, a title and a strip of counts, and the
  * card filling the room under the band - so at rest the card's last rows and its pager sit below the fold, exactly as

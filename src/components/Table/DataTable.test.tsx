@@ -648,3 +648,88 @@ describe('putting a hidden column back in place', { timeout: 20000 }, () => {
     });
   });
 });
+
+/* The console, 2026-10-28: the fleets' Change log has a View button that opens a
+ * list already narrowed to one tag or network zone, as a real filter the person
+ * can edit or clear (Pranjal's pick over filling the search box). */
+describe('an advanced filter the page starts with', { timeout: 20000 }, () => {
+  const ROLES = ['Admin', 'Member', 'Viewer', 'Billing'];
+  const roleKey = { id: 'role', label: 'Role', type: 'pick' as const, options: ROLES };
+  const emailKey = { id: 'email', label: 'Email', type: 'text' as const };
+  const roleIs = (role: string) => ({
+    join: 'and' as const,
+    rows: [{ key: 'role', op: 'is', value: [role] }],
+  });
+  const shownRoles = () =>
+    screen
+      .getAllByRole('cell')
+      .map((c) => c.textContent ?? '')
+      .filter((t) => ROLES.includes(t));
+
+  it('opens narrowed, with the door counting it as applied', () => {
+    render(
+      <Users
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey, emailKey], initial: roleIs('Admin') }}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'More filters, 1 applied' })).toBeInTheDocument();
+    const roles = shownRoles();
+    expect(roles.length).toBeGreaterThan(0);
+    expect(new Set(roles)).toEqual(new Set(['Admin']));
+  });
+
+  it('holds the quick filters, exactly as when a person applies one', () => {
+    render(
+      <Users filters={undefined} advancedFilter={{ keys: [roleKey], initial: roleIs('Admin') }} />
+    );
+    expect(document.querySelector('[data-quick-held="true"]')).not.toBeNull();
+  });
+
+  it('seeds a text key too', () => {
+    const someone = USERS[0]!;
+    render(
+      <Users
+        filters={undefined}
+        advancedFilter={{
+          keys: [roleKey, emailKey],
+          initial: { join: 'and', rows: [{ key: 'email', op: 'contains', value: someone.email }] },
+        }}
+      />
+    );
+    expect(screen.getByText(someone.email)).toBeInTheDocument();
+    expect(screen.getAllByRole('cell').filter((c) => c.textContent?.includes('@'))).toHaveLength(1);
+  });
+
+  it('reads the starting filter once, and starts over only with a new key', () => {
+    const { rerender } = render(
+      <Users
+        key="a"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Admin') }}
+      />
+    );
+    rerender(
+      <Users
+        key="a"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Member') }}
+      />
+    );
+    expect(new Set(shownRoles())).toEqual(new Set(['Admin']));
+    rerender(
+      <Users
+        key="b"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Member') }}
+      />
+    );
+    expect(new Set(shownRoles())).toEqual(new Set(['Member']));
+  });
+
+  it('starts empty when the page gives no starting filter', () => {
+    render(<Users filters={undefined} advancedFilter={{ keys: [roleKey] }} />);
+    expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
+    expect(document.querySelector('[data-quick-held="true"]')).toBeNull();
+  });
+});
