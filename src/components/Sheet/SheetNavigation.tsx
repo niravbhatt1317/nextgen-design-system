@@ -10,6 +10,7 @@ import {
 import type { ReactNode } from 'react';
 import { Breadcrumb } from '../Breadcrumb';
 import type {
+  SheetLeaveGuard,
   SheetNavigationEntry,
   SheetNavigationProps,
   UseSheetNavigationReturn,
@@ -18,32 +19,39 @@ import type {
 
 const NavigationContext = createContext<UseSheetNavigationReturn | null>(null);
 /** The pages' leave guards by depth - private to useSheetLeaveGuard. */
-const GuardContext = createContext<Map<number, () => boolean>>(new Map());
+const GuardContext = createContext<Map<number, SheetLeaveGuard>>(new Map());
 
-/** Plain words for a title, for the accessible names the trail and its back button need. */
+/** Plain words for a title, for the accessible name the trail needs. */
 const words = (node: ReactNode): string =>
   typeof node === 'string' || typeof node === 'number' ? String(node) : '';
 
 /**
- * SheetNavigation - pages inside one drawer: press Edit and the drawer's content
- * becomes the edit page, its header shows the path ("User management › Edit
- * details"), and back brings the previous page back. Generic: any page can push
- * any other, as deep as it needs.
+ * SheetNavigation - pages inside one drawer: a side panel turns into its next
+ * page in place, at the same width, under a breadcrumb of the way it came.
+ * Press Edit (or a row of a list) and the drawer's content becomes that page,
+ * its header shows the path ("Needs attention › Crashing modules"), and any
+ * earlier step of that path goes back to it - there is no back button (Pranjal,
+ * 2026-10-26, for every side drawer). Generic: any page can push any other, as
+ * deep as it needs.
  *
  * Put it inside `SheetContent`; it starts over at `root` every time the drawer
- * opens, because the content unmounts when it closes.
+ * opens, because the content unmounts when it closes. A page brings its own
+ * band, body and footer; a footer every page shares (Close) can sit after the
+ * pages instead. A panel written as its own drawer becomes a page of another by
+ * moving its band, body and footer into a `SheetPage` - its title becomes the
+ * last step of the trail.
  *
  * @example
- * <SheetContent layout="drawer">
- *   <SheetNavigation root={{ id: 'view', title: 'User management' }}>
+ * <SheetContent layout="drawer" size="lg">
+ *   <SheetNavigation root={{ id: 'list', title: 'Needs attention' }}>
  *     <SheetHeader><SheetTitle><SheetNavigationTitle /></SheetTitle></SheetHeader>
- *     <SheetPage id="view"><ProfileView /></SheetPage>
- *     <SheetPage id="edit"><EditForm /></SheetPage>
+ *     <SheetPage id="list"><ProblemList /></SheetPage>
+ *     <SheetPage id="problem"><ProblemAgents /></SheetPage>
  *   </SheetNavigation>
  * </SheetContent>
  *
- * // anywhere inside: const { push, back } = useSheetNavigation();
- * // push({ id: 'edit', title: 'Edit details' })
+ * // anywhere inside: const { push, back, backTo } = useSheetNavigation();
+ * // push({ id: 'problem', title: 'Crashing modules' })
  */
 const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps) => {
   const [stack, setStack] = useState<readonly SheetNavigationEntry[]>([root]);
@@ -63,17 +71,27 @@ const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps)
     [change, stack]
   );
 
-  // what each page asks before back leaves it, by its place in the stack
-  const guards = useRef(new Map<number, () => boolean>());
+  // what each page asks before it is left, by its place in the stack
+  const guards = useRef(new Map<number, SheetLeaveGuard>());
+
+  const backTo = useCallback(
+    (depth: number, options?: { force?: boolean }) => {
+      const top = stack.length - 1;
+      if (depth < 0 || depth >= top) return;
+      const leave = () => {
+        change(stack.slice(0, depth + 1));
+      };
+      if (!options?.force && guards.current.get(top)?.(leave) === false) return;
+      leave();
+    },
+    [change, stack]
+  );
 
   const back = useCallback(
     (options?: { force?: boolean }) => {
-      const top = stack.length - 1;
-      if (top < 1) return;
-      if (!options?.force && guards.current.get(top)?.() === false) return;
-      change(stack.slice(0, -1));
+      backTo(stack.length - 2, options);
     },
-    [change, stack]
+    [backTo, stack.length]
   );
 
   const reset = useCallback(() => {
@@ -87,9 +105,10 @@ const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps)
       depth: stack.length - 1,
       push,
       back,
+      backTo,
       reset,
     }),
-    [stack, root, push, back, reset]
+    [stack, root, push, back, backTo, reset]
   );
 
   return (
@@ -101,8 +120,8 @@ const SheetNavigation = ({ root, onPageChange, children }: SheetNavigationProps)
 
 /**
  * useSheetNavigation - the drawer's page stack, from anywhere inside a
- * SheetNavigation: `push` a page, go `back`, `reset` to the first, and read
- * where you are (`current`, `depth`, `stack`).
+ * SheetNavigation: `push` a page, go `back` one, `backTo` an earlier one,
+ * `reset` to the first, and read where you are (`current`, `depth`, `stack`).
  */
 const useSheetNavigation = (): UseSheetNavigationReturn => {
   const value = useContext(NavigationContext);
@@ -111,25 +130,26 @@ const useSheetNavigation = (): UseSheetNavigationReturn => {
 };
 
 /**
- * useSheetLeaveGuard - lets a page stop back from leaving it: return `false` to
- * stay (open "Discard unsaved changes?", say), then call `back({ force: true })`
- * once the answer is yes. It guards the page it is used in, and only while that
- * page is mounted.
+ * useSheetLeaveGuard - lets a page stop the trail or back from leaving it:
+ * return `false` to stay (open "Discard unsaved changes?", say), and call the
+ * `leave` it is handed once the answer is yes - it goes where the person asked,
+ * one step back or straight to the first page. It guards the page it is used in,
+ * and only while that page is mounted.
  *
  * @example
- * useSheetLeaveGuard(() => {
+ * useSheetLeaveGuard((leave) => {
  *   if (!dirty) return true;
- *   setAsking(true);
+ *   setAsking(() => leave);
  *   return false;
  * });
  */
-const useSheetLeaveGuard = (canLeave: () => boolean) => {
+const useSheetLeaveGuard = (canLeave: SheetLeaveGuard) => {
   const { depth } = useSheetNavigation();
   const guards = useContext(GuardContext);
   const latest = useRef(canLeave);
   latest.current = canLeave;
   useEffect(() => {
-    guards.set(depth, () => latest.current());
+    guards.set(depth, (leave) => latest.current(leave));
     return () => {
       guards.delete(depth);
     };
@@ -147,14 +167,16 @@ const SheetPage = ({ id, children }: SheetPageProps) => {
 
 /**
  * SheetNavigationTitle - the header's words: the first page's title on its own,
- * and on any page after it the trail with a back button (the Breadcrumb's
- * drawer form). Put it inside SheetTitle, so the drawer is named by its place.
+ * and on any page after it the trail (the Breadcrumb's drawer form), every
+ * earlier step a way back to that page. Put it inside SheetTitle, so the drawer
+ * is named by its place ("Needs attention › Crashing modules").
  *
- * Focus follows the page: after a push it lands on back, after the last back on
- * the title - the button that was pressed has gone with its page.
+ * Focus follows the page: after a push it lands on the step before the last -
+ * the way back one page - and on the first page again, on the title; the button
+ * that was pressed has gone with its page.
  */
 const SheetNavigationTitle = () => {
-  const { stack, depth, back } = useSheetNavigation();
+  const { stack, depth, backTo } = useSheetNavigation();
   const holder = useRef<HTMLSpanElement | null>(null);
   const first = useRef(true);
 
@@ -163,12 +185,12 @@ const SheetNavigationTitle = () => {
       first.current = false;
       return;
     }
-    const target = holder.current?.querySelector<HTMLElement>('button') ?? holder.current;
+    const steps = Array.from(holder.current?.querySelectorAll<HTMLElement>('button') ?? []);
+    const target = steps[steps.length - 1] ?? holder.current;
     target?.focus();
   }, [depth]);
 
   const root = stack[0];
-  const previous = stack[stack.length - 2];
   const place = stack
     .map((entry) => words(entry.title))
     .filter(Boolean)
@@ -181,9 +203,13 @@ const SheetNavigationTitle = () => {
       ) : (
         <Breadcrumb
           variant="drawer"
-          items={stack.map((entry) => ({ id: entry.id, label: entry.title }))}
-          onBack={back}
-          {...(words(previous?.title) ? { backLabel: `Back to ${words(previous?.title)}` } : {})}
+          items={stack.map((entry, index) => ({
+            id: entry.id,
+            label: entry.title,
+            onSelect: () => {
+              backTo(index);
+            },
+          }))}
           {...(place ? { 'aria-label': place } : {})}
         />
       )}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { ActionCard } from '../ActionCard';
 import { Avatar } from '../Avatar';
 import { Badge } from '../Badge';
@@ -56,9 +57,11 @@ const meta: Meta<DrawerArgs> = {
         component:
           'The console drawer: `Sheet` with `layout="drawer"`, composed from `SheetHeader`, `SheetBand` (an identity and tabs), ' +
           '`SheetBody` (with `SheetSection` and `SheetField`) and `SheetFooter` (Cancel pinned left, the verb right). ' +
-          '**Pages inside one drawer:** wrap the content in `SheetNavigation` and each page in `SheetPage`; `push` a page ' +
-          '(Edit) and its content replaces the current one while `SheetNavigationTitle` turns the title into the path with back. ' +
-          '`useSheetLeaveGuard` lets a page ask about an unsaved draft before back leaves it. ' +
+          '**Pages inside one drawer:** a side panel turns into its next page in place, at the same width. Wrap the content ' +
+          'in `SheetNavigation` and each page in `SheetPage`; `push` a page (Edit, a row of a list) and its content replaces ' +
+          'the current one while `SheetNavigationTitle` turns the 14/600 title into the path - a real breadcrumb with no back ' +
+          'button, every earlier step a way back to that page, underlined under the pointer (Pranjal, 2026-10-26). ' +
+          '`useSheetLeaveGuard` lets a page ask about an unsaved draft before the trail leaves it. ' +
           '**Props to configure it** sit on `SheetContent`: `size` (sm 480 · md 560 · lg 720 · xl 780) or a free `width` ' +
           "(a number of pixels, or a CSS length such as '40%'), `side`, `inset`, " +
           '`closeOnOutsideClick`, `closeOnEscape` and `overlay`; `modal={false}` on `Sheet` keeps the page usable beside it.',
@@ -172,7 +175,7 @@ const ROLES = [
 ];
 const ORGS = ['Acme Technologies', 'Beta Innovations'];
 
-/** The header of a navigable drawer: the first page's title, or the path with back. */
+/** The header of a navigable drawer: the first page's title, or the path - every earlier step a way back. */
 const NavHeader = () => (
   <SheetHeader>
     <SheetTitle>
@@ -213,10 +216,11 @@ const EditPage = <T extends Record<string, unknown>>({
   children: ReactNode;
 }) => {
   const { back } = useSheetNavigation();
-  const [asking, setAsking] = useState(false);
-  useSheetLeaveGuard(() => {
+  // the leave the person asked for (one step back, or a step of the trail), held while the drawer asks
+  const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  useSheetLeaveGuard((leave) => {
     if (!form.dirty) return true;
-    setAsking(true);
+    setLeaving(() => leave);
     return false;
   });
   return (
@@ -244,14 +248,16 @@ const EditPage = <T extends Record<string, unknown>>({
         </Button>
       </SheetFooter>
       <ConfirmDialog
-        open={asking}
-        onOpenChange={setAsking}
+        open={leaving !== null}
+        onOpenChange={(open) => {
+          if (!open) setLeaving(null);
+        }}
         title="Discard unsaved changes?"
         confirmLabel="Discard"
         tone="destructive"
         confirmIcon={null}
         onConfirm={() => {
-          back({ force: true });
+          leaving?.();
         }}
       >
         The changes on this page have not been saved.
@@ -324,7 +330,7 @@ const AccessProfileEdit = () => {
 
 /**
  * An object drawer whose Edit opens the edit page in place: the header turns into
- * "Access profiles › Edit access profile", and back brings the record back.
+ * "Access profiles › Edit access profile", and "Access profiles" brings the record back.
  */
 export const ObjectDrawer: Story = {
   render: (args) => (
@@ -477,8 +483,8 @@ const UserEdit = () => {
  * Reading a record, and editing it in the same drawer: Edit turns the header into
  * "User management › Edit details". Save stays off until something changes; clear
  * the full name and it goes off again; type a bad recovery email and Save shows the
- * message and focuses the field. Change anything and press back - the drawer asks
- * before the draft is lost.
+ * message and focuses the field. Change anything and press "User management" in the
+ * trail - the drawer asks before the draft is lost.
  */
 export const ProfileDrawer: Story = {
   render: (args) => (
@@ -555,7 +561,7 @@ export const ProfileDrawer: Story = {
   ),
 };
 
-/** A page that opens another page: the path grows one step at a time, and back walks it home. */
+/** A page that opens another page: the path grows one step at a time, and any step of it goes back there. */
 const Step = ({ id, next }: { id: string; next?: string }) => {
   const { push, depth, reset } = useSheetNavigation();
   return (
@@ -581,7 +587,11 @@ const Step = ({ id, next }: { id: string; next?: string }) => {
   );
 };
 
-/** Pages are not limited to two: any page can push another, and back walks the path home. */
+/**
+ * Pages are not limited to two: any page can push another, and the trail grows with them -
+ * "Teams › Members › Permissions". Press "Teams" from the third page and the drawer goes
+ * straight back to the first.
+ */
 export const NestedPages: Story = {
   args: { size: 'md' },
   render: (args) => (
@@ -600,6 +610,147 @@ export const NestedPages: Story = {
       </SheetNavigation>
     </Opener>
   ),
+};
+
+interface Problem {
+  id: string;
+  title: string;
+  line: string;
+  detail: string[];
+  agents: [string, string][];
+}
+
+/* the Agent Fleet Health "Needs attention" drawer's content (the console's Overview.tsx), cut down */
+const PROBLEMS: Problem[] = [
+  {
+    id: 'crashing',
+    title: 'Crashing modules',
+    line: '125 hosts with a crashing module',
+    detail: ['Metrics on 40', 'Logs on 30', 'Patch on 19'],
+    agents: [
+      ['node-32-0029', 'Retail core'],
+      ['edge-36-0071', 'Retail stores'],
+      ['svc-36-0223', 'Retail stores'],
+    ],
+  },
+  {
+    id: 'silent',
+    title: 'Silent agents',
+    line: '32 agents silent',
+    detail: ['18 silent for more than a day', 'the longest for 47h'],
+    agents: [
+      ['edge-32-0030', 'Retail core'],
+      ['db-36-0237', 'Retail stores'],
+    ],
+  },
+  {
+    id: 'holding',
+    title: 'Holding data',
+    line: '26 agents holding data',
+    detail: ['Cannot reach the platform', '348,117 events waiting on the hosts'],
+    agents: [['web-32-0617', 'Retail core']],
+  },
+];
+
+/** The list page: one card a problem, the whole card the way into its page. */
+const ProblemList = ({ onPick }: { onPick: (problem: Problem) => void }) => {
+  const { push } = useSheetNavigation();
+  return (
+    <SheetBody>
+      <div className="mdt-flex mdt-flex-col mdt-gap-3">
+        {PROBLEMS.map((p) => (
+          <ActionCard
+            key={p.id}
+            icon={<Icon name="tabler-alert-triangle" />}
+            title={p.line}
+            description={p.detail}
+            onClick={() => {
+              onPick(p);
+              push({ id: 'problem', title: p.title });
+            }}
+          />
+        ))}
+      </div>
+    </SheetBody>
+  );
+};
+
+/** A problem's page: why it is here, and the agents it touches. */
+const ProblemPage = ({ problem }: { problem: Problem | null }) => (
+  <SheetBody>
+    <SheetSection title="Why it is here" hint={problem?.detail.join(' · ')}>
+      {problem?.agents.map(([name, zone]) => (
+        <SheetField key={name} label={name}>
+          {zone}
+        </SheetField>
+      ))}
+    </SheetSection>
+  </SheetBody>
+);
+
+/** The Needs attention drawer: the list, and each problem a page of it under the trail. */
+const NeedsAttention = () => {
+  const [problem, setProblem] = useState<Problem | null>(null);
+  return (
+    <SheetNavigation root={{ id: 'list', title: 'Needs attention' }}>
+      <NavHeader />
+      <SheetPage id="list">
+        <ProblemList onPick={setProblem} />
+      </SheetPage>
+      <SheetPage id="problem">
+        <ProblemPage problem={problem} />
+      </SheetPage>
+      {/* one footer every page shares, after the pages */}
+      <SheetFooter
+        start={
+          <SheetClose asChild>
+            <Button variant="ghost">Close</Button>
+          </SheetClose>
+        }
+      />
+    </SheetNavigation>
+  );
+};
+
+/**
+ * A list whose rows open as pages of the same drawer (the console's Agent Fleet Health
+ * "Needs attention", Pranjal 2026-10-26: "whenever i open the need attention ... it should be
+ * in breadcrumb so that i can come back to view all"): press a problem and the drawer turns
+ * into its page in place, at the same 720, titled "Needs attention › Crashing modules". There
+ * is no back button - "Needs attention" is the way back, underlined under the pointer. Close
+ * stays in the footer on every page. The console's drawer keeps the default 24 inset.
+ */
+export const ListToPage: Story = {
+  args: { size: 'lg', inset: 24 },
+  render: (args) => (
+    <Opener label="Open Needs attention" args={args}>
+      <NeedsAttention />
+    </Opener>
+  ),
+};
+
+/**
+ * The same drawer, opened and on a problem's page by a real click each - the trail as it
+ * stands while a page shows. Press "Needs attention" to go back to the list.
+ */
+export const ListToPageOpen: Story = {
+  name: 'List to page · on the page',
+  args: { size: 'lg', inset: 24 },
+  render: (args) => (
+    <Opener label="Open Needs attention" args={args}>
+      <NeedsAttention />
+    </Opener>
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Open Needs attention' })
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(await body.findByRole('button', { name: /125 hosts/ }));
+    await expect(
+      await body.findByRole('button', { name: 'Back to Needs attention' })
+    ).toBeInTheDocument();
+  },
 };
 
 /**

@@ -287,6 +287,13 @@ export interface SheetNavigationProps {
 }
 
 /**
+ * What a page's useSheetLeaveGuard is asked before the page is left: `true` lets it go,
+ * `false` keeps it. `leave` completes the leave that was asked for - one step back, or to
+ * the trail step that was pressed - once the person agrees.
+ */
+export type SheetLeaveGuard = (leave: () => void) => boolean;
+
+/**
  * What useSheetNavigation returns.
  */
 export interface UseSheetNavigationReturn {
@@ -300,6 +307,12 @@ export interface UseSheetNavigationReturn {
   push: (entry: SheetNavigationEntry) => void;
   /** Back to the page before - unless the page's useSheetLeaveGuard says no; `force` skips the guard. */
   back: (options?: { force?: boolean }) => void;
+  /**
+   * Back to an earlier page by its depth (0 is the first) - what a step of the trail does.
+   * Asks the current page's useSheetLeaveGuard first; `force` skips it. A depth that is not
+   * behind the current page does nothing.
+   */
+  backTo: (depth: number, options?: { force?: boolean }) => void;
   /** Straight back to the first page. */
   reset: () => void;
 }
