@@ -63,3 +63,81 @@ module.exports = {
     },
   ],
 };
+
+/* The zones gauge (KpiGauge shape="zones", 2026-10-28) beside the console Health's headline gauge (charts.tsx
+ * ZonesGauge, .hl-zg): Agent Fleet → Health → Overview, the first card ("Agents sending data", 98.5%, On target). */
+const ZG_STORY = 'new-components-kpi-card--gauge-zones';
+const toHealth = async (page) => {
+  const customer = page.getByText('Northwind Retail', { exact: true }).first();
+  if ((await customer.count()) && !(await page.getByRole('tab', { name: 'Health' }).count())) {
+    await customer.click().catch(() => {});
+    await page.waitForTimeout(1500);
+  }
+  await page.getByRole('tab', { name: 'Health' }).first().click();
+  await page.waitForTimeout(1500);
+};
+const zg = (name, props, storySel, consoleSel) => ({
+  name,
+  props,
+  story: { id: ZG_STORY, select: storySel },
+  console: { path: '/agent-fleet', select: consoleSel, open: toHealth },
+  mock: null,
+});
+module.exports.frames.push(
+  zg(
+    'zones · the drawing, 104 × 62',
+    ['rectWidth', 'rectHeight', 'display'],
+    '.kpi-zones',
+    '.hl-zg'
+  ),
+  zg(
+    'zones · the red zone, faint',
+    ['stroke', 'strokeOpacity', 'strokeWidth', 'fill'],
+    '.kpi-zones .kpi-zones-zone[data-tone="crit"]',
+    '.hl-zg .hl-zg__zone[data-tone="crit"]'
+  ),
+  zg(
+    'zones · the amber zone',
+    ['stroke', 'strokeOpacity'],
+    '.kpi-zones .kpi-zones-zone[data-tone="warn"]',
+    '.hl-zg .hl-zg__zone[data-tone="warn"]'
+  ),
+  zg(
+    'zones · the green zone',
+    ['stroke', 'strokeOpacity'],
+    '.kpi-zones .kpi-zones-zone[data-tone="good"]',
+    '.hl-zg .hl-zg__zone[data-tone="good"]'
+  ),
+  zg(
+    'zones · the dot, full colour, ringed in the ground',
+    ['fill', 'stroke', 'strokeWidth', 'rectWidth'],
+    '.kpi-zones .kpi-zones-dot',
+    '.hl-zg .hl-zg__dot'
+  ),
+  zg(
+    'zones · the value',
+    ['fill', 'fontSize', 'fontWeight', 'fontVariantNumeric'],
+    '.kpi-zones .kpi-zones-number',
+    '.hl-zg .hl-zg__n'
+  ),
+  zg(
+    'zones · the zone word, in its ink',
+    ['fill', 'fontSize', 'fontWeight'],
+    '.kpi-zones .kpi-zones-word',
+    '.hl-zg .hl-zg__w'
+  ),
+  zg(
+    'zones · an end label',
+    ['fill', 'fontSize'],
+    '.kpi-zones .kpi-zones-end',
+    '.hl-zg .hl-zg__end'
+  ),
+  {
+    ...zg(
+      'zones · the version card, rolling out (info)',
+      ['stroke', 'strokeOpacity'],
+      '.kpi-card:nth-child(3) .kpi-zones-zone[data-tone="info"]',
+      '.hl-zg__zone[data-tone="info"]'
+    ),
+  }
+);

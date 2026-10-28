@@ -11,7 +11,10 @@ const PAGE: BreadcrumbItem[] = [
   { label: 'Users' },
 ];
 
-const DRAWER: BreadcrumbItem[] = [{ label: 'User management' }, { label: 'Edit details' }];
+const DRAWER: BreadcrumbItem[] = [
+  { label: 'User management', onSelect: () => undefined },
+  { label: 'Edit details' },
+];
 
 const meta: Meta<typeof Breadcrumb> = {
   title: 'New Components/Breadcrumb',
@@ -31,21 +34,21 @@ const meta: Meta<typeof Breadcrumb> = {
           '**Two forms.** The `page` form sits in the header band after the panel icon: 12/500',
           'in the faint ink (`--mdt-faint`), the place you are on in the foreground (`--mdt-foreground`), and any ancestor given an',
           "`href` or an `onSelect` can be followed. The `drawer` form replaces a drawer's title",
-          'while a page is open inside it — a back button, a 1 × 16 nick in neutral-30, the parent at 400 in the faint ink,',
-          "a chevron 14, the step in the title's own 16/600 in the soft ink (neutral-130) — so the way back is visible before",
-          'anyone commits.',
+          "while a page is open inside it — the drawer title's own 14 on a 20 line, the earlier steps at 400 in the faint ink,",
+          'a chevron 14, the step at 600 in the soft ink (neutral-130), every visible gap 12.',
           '',
-          "**In the drawer form only the back button navigates.** An item's `href` and",
-          "`onSelect` are ignored there. The crumb's job in a drawer is to name where a page",
-          "will return to, and one way back is enough; the back button takes the caller's",
-          'path, so a dirty draft still gets its discard question first.',
+          '**The drawer form is a real breadcrumb with no back button** (Pranjal, 2026-10-26: "Where first or other',
+          'options will be clickable so no need for back button. Update it in all the sidedrawers"). Every step before the',
+          'last that is given an `onSelect` (or an `href`) is a way back: the faint ink at rest, the foreground and an',
+          'underline under the pointer, named "Back to <step>". `onBack` is the short form for the step before the last,',
+          "and takes the caller's path, so a dirty draft still gets its discard question first.",
           '',
           'Every name stays on one line and is never shortened — the console’s crumb is nowrap throughout.',
           '',
           'Announced as a navigation landmark named "Breadcrumb" holding a list, with the last',
           'item marked as the current page. The chevrons are drawing only.',
           '',
-          'Measured against the console 2026-09-22: /fields for the page form, the Users drawer’s Edit for the drawer form.',
+          'Measured against the console 2026-09-22 (/fields, the page form) and 2026-10-28 (Agent Fleet › Health, Needs attention, the drawer form).',
         ].join('\n'),
       },
     },
@@ -106,28 +109,52 @@ const DrawerDemo = () => {
     <div>
       <Breadcrumb
         variant="drawer"
-        items={DRAWER}
-        onBack={() => {
-          setBack((n) => n + 1);
-        }}
+        items={[
+          {
+            label: 'Needs attention',
+            onSelect: () => {
+              setBack((n) => n + 1);
+            },
+          },
+          { label: 'Crashing modules' },
+        ]}
       />
       <Note>
         {back > 0
-          ? `Back pressed ${String(back)} ${back === 1 ? 'time' : 'times'}.`
-          : 'Press the arrow. Its name is "Back to User management".'}
+          ? `Went back ${String(back)} ${back === 1 ? 'time' : 'times'}.`
+          : 'Press "Needs attention" - it is the way back. Its name is "Back to Needs attention".'}
       </Note>
     </div>
   );
 };
 
 /**
- * The drawer's crumb, standing in the title's place. Back arrow, nick, the
- * parent in the faint ink at 400, a chevron, the step at the title's 600 in the soft ink.
- * **Only the arrow navigates.**
+ * The drawer's crumb, standing in the title's place: the earlier step in the faint
+ * ink at 400, a chevron, the step at the title's 600 in the soft ink, 14 on a 20 line.
+ * **No back button** - the earlier step is the way back, underlined under the pointer.
  */
 export const Drawer: Story = {
   parameters: { controls: { disable: true } },
   render: () => <DrawerDemo />,
+};
+
+/**
+ * Three steps deep: both earlier steps go back - "Agent details" straight to the
+ * drawer's first page, "Modules" one page back.
+ */
+export const DrawerThreeSteps: Story = {
+  name: 'Drawer · three steps',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Breadcrumb
+      variant="drawer"
+      items={[
+        { label: 'Agent details', onSelect: () => undefined },
+        { label: 'Modules', onSelect: () => undefined },
+        { label: 'Metrics' },
+      ]}
+    />
+  ),
 };
 
 /**
@@ -154,13 +181,13 @@ export const InAHeaderBand: Story = {
 /**
  * Where the drawer form lives: a 720 drawer's head, 60 tall, padded 6 · 20, a neutral-20
  * hairline under it, the crumb where the title was and the close at the right. The ✕ closes the whole
- * drawer; the arrow steps back one page.
+ * drawer; "User management" goes back one page.
  */
 export const InADrawerHead: Story = {
   parameters: { controls: { disable: true }, layout: 'fullscreen' },
   render: () => (
     <div className="mdt-flex mdt-min-h-[60px] mdt-w-[720px] mdt-max-w-full mdt-items-center mdt-justify-between mdt-gap-3 mdt-border-b mdt-border-neutral-20 mdt-bg-card mdt-px-5 mdt-py-1.5">
-      <Breadcrumb variant="drawer" items={DRAWER} onBack={() => undefined} />
+      <Breadcrumb variant="drawer" items={DRAWER} />
       <Button
         variant="ghost"
         iconOnly

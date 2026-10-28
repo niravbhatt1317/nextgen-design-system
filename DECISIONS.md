@@ -46,6 +46,32 @@ A menu of ticks or choices (a quick filter, Sort) is not an action menu and keep
 
 All four are **defaults with no opt-out**, named in their changeset (`small-parts-1028`).
 
+### Drawer headings are 14/20, and the drawer crumb has no back button
+
+**Pranjal**, ruled in the console on 2026-10-26 and moved into `SheetTitle` (drawer layout) and the
+`Breadcrumb`'s drawer form on 2026-10-28: "make all breadcrumbs in sidedrawer like this only ... Where
+first or other options will be clickable so no need for back button. Update it in all the
+sidedrawers", then "actually make the sidedrawer heading to be 14px" (it was 16, and 18 before
+that). Every drawer heading, its breadcrumb and a heading that opens a menu read 14 on a 20 line.
+The crumb is a real breadcrumb: every step before the last is a way back to that page, underlined
+under the pointer; the visible gaps are an even 12. A side panel's next page opens in place, at the
+same width, under that crumb - never a second drawer over the first.
+
+**This reopens one line of the 2026-10-14 dialog ruling below** ("a dialog title and a drawer title
+are the same thing at the same level and should read at the same size"): dialog titles stay 16/24,
+in the library and in the console alike, so the two no longer match. Whether dialog titles follow
+to 14 is the design owner's call, not settled here.
+
+### A drawer's sections stand 32 apart, with no line between them
+
+**Nikhil**, in the console's fleet drawers on 2026-10-13 (step 309: "remove the dividers, and follow the
+text herirchy following the design system / storybook"), moved into `SheetSection` on 2026-10-28: a
+heading row 24 high, the hint 4 under it, the content 16 under them, sections 32 apart and nothing drawn
+between. **Open:** the console's IAM Users drawer still splits its sections with a hairline 22 above and
+below. The two modules disagree, and which one every drawer follows is the design owner's call.
+
+---
+
 ## 2026-10-21
 
 ### Every field is one line

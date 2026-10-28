@@ -132,3 +132,74 @@
 .kpi-ring-number {
   fill: hsl(var(--mdt-foreground));
 }
+
+/* the status gauge (the console Health's StatusGauge, 2026-10-15): the half gauge's fill in a status colour from the
+ * chart palette, and the "good at" line as a tick in the ink colour */
+.kpi-gauge[data-tone='good'] .kpi-gauge-fill {
+  stroke: hsl(var(--mdt-chart-good));
+}
+.kpi-gauge[data-tone='warn'] .kpi-gauge-fill {
+  stroke: hsl(var(--mdt-chart-warn));
+}
+.kpi-gauge[data-tone='crit'] .kpi-gauge-fill {
+  stroke: hsl(var(--mdt-chart-crit));
+}
+.kpi-gauge[data-tone='info'] .kpi-gauge-fill {
+  stroke: hsl(var(--mdt-chart-info));
+}
+.kpi-gauge-tick {
+  stroke: hsl(var(--mdt-foreground));
+}
+
+/* the zones gauge (the console Health's ZonesGauge, Pranjal 2026-10-26): each zone faint in its status colour, the dot
+ * full and ringed in the ground colour, the word in the zone's ink (its colour mixed toward the text colour so it
+ * reads), the ends in the muted ink */
+.kpi-zones-zone {
+  stroke-opacity: 0.3;
+}
+.kpi-zones-zone[data-tone='good'] {
+  stroke: hsl(var(--mdt-chart-good));
+}
+.kpi-zones-zone[data-tone='warn'] {
+  stroke: hsl(var(--mdt-chart-warn));
+}
+.kpi-zones-zone[data-tone='crit'] {
+  stroke: hsl(var(--mdt-chart-crit));
+}
+.kpi-zones-zone[data-tone='info'] {
+  stroke: hsl(var(--mdt-chart-info));
+}
+.kpi-zones-dot {
+  stroke: hsl(var(--mdt-background));
+}
+.kpi-zones-dot[data-tone='good'] {
+  fill: hsl(var(--mdt-chart-good));
+}
+.kpi-zones-dot[data-tone='warn'] {
+  fill: hsl(var(--mdt-chart-warn));
+}
+.kpi-zones-dot[data-tone='crit'] {
+  fill: hsl(var(--mdt-chart-crit));
+}
+.kpi-zones-dot[data-tone='info'] {
+  fill: hsl(var(--mdt-chart-info));
+}
+.kpi-zones-number {
+  fill: hsl(var(--mdt-foreground));
+  font-variant-numeric: tabular-nums;
+}
+.kpi-zones-end {
+  fill: hsl(var(--mdt-muted-foreground));
+}
+.kpi-zones-word[data-tone='good'] {
+  fill: color-mix(in srgb, hsl(var(--mdt-chart-good)) 75%, hsl(var(--mdt-foreground)));
+}
+.kpi-zones-word[data-tone='warn'] {
+  fill: color-mix(in srgb, hsl(var(--mdt-chart-warn)) 70%, hsl(var(--mdt-foreground)));
+}
+.kpi-zones-word[data-tone='crit'] {
+  fill: color-mix(in srgb, hsl(var(--mdt-chart-crit)) 80%, hsl(var(--mdt-foreground)));
+}
+.kpi-zones-word[data-tone='info'] {
+  fill: color-mix(in srgb, hsl(var(--mdt-chart-info)) 80%, hsl(var(--mdt-foreground)));
+}

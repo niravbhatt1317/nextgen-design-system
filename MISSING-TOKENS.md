@@ -362,28 +362,36 @@ product built on this library will invent its own.
 **Priority: HIGH.** These are not gaps in the token system — they are the token rule already
 being broken, in shipped code.
 
-| Component                                                                | Hardcoded value                | Should be                   |
-| ------------------------------------------------------------------------ | ------------------------------ | --------------------------- |
-| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]` | Size tokens                 |
-| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens  |
-| `Select.tsx`                                                             | `[8rem]`                       | Min-width token             |
-| `DropdownMenu.tsx`                                                       | `[8rem]`                       | Min-width token             |
-| `Command.tsx`                                                            | `[300px]`                      | Min-width token             |
-| `Combobox.tsx`                                                           | `[300px]`                      | Min-width token             |
-| `Table.tsx`                                                              | `[100px]`                      | Size token                  |
-| `InputGroup.tsx`                                                         | `[60px]`                       | Size token                  |
-| `Sidebar.tsx`                                                            | `[10px]`                       | Type-size token             |
-| `TagPill.tsx`                                                            | `[10px]`                       | Type-size token             |
-| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`            | Size tokens                 |
-| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]` | Type-size + tracking tokens |
-| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`            | Type-size + size tokens     |
-| `Avatar.tsx`                                                             | status dot + ring tables       | A ratio, not steps — below  |
-| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps          |
-| `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens     |
-| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens     |
+| Component                                                                | Hardcoded value                       | Should be                   |
+| ------------------------------------------------------------------------ | ------------------------------------- | --------------------------- |
+| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]`        | Size tokens                 |
+| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`         | Size + border-width tokens  |
+| `Select.tsx`                                                             | `[8rem]`                              | Min-width token             |
+| `DropdownMenu.tsx`                                                       | `[8rem]`                              | Min-width token             |
+| `Command.tsx`                                                            | `[300px]`                             | Min-width token             |
+| `Combobox.tsx`                                                           | `[300px]`                             | Min-width token             |
+| `Table.tsx`                                                              | `[100px]`                             | Size token                  |
+| `InputGroup.tsx`                                                         | `[60px]`                              | Size token                  |
+| `Sidebar.tsx`                                                            | `[10px]`                              | Type-size token             |
+| `TagPill.tsx`                                                            | `[10px]`                              | Type-size token             |
+| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`                   | Size tokens                 |
+| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]`        | Type-size + tracking tokens |
+| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`                   | Type-size + size tokens     |
+| `Avatar.tsx`                                                             | status dot + ring tables              | A ratio, not steps — below  |
+| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780                 | Drawer width steps          |
+| `BannerStack.tsx`                                                        | stack spacing and timing              | Spacing + motion tokens     |
+| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                       | Size + type-size tokens     |
+| `Breadcrumb.tsx` (drawer form)                                           | `gap-[7px]`, `underline-offset-[3px]` | Spacing + offset tokens     |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
+
+**The drawer crumb's two (Pranjal, 2026-10-26; ported 2026-10-28)** are the console's own
+`global.css` values. The `7` is not a spacing decision of its own: the ruling is "even 12px gaps"
+between the words and the chevron, and the 14px chevron draws its stroke about 5 in from each edge of
+its box, so boxes 7 apart read 12 to the eye. A spacing scale that measured visible gaps instead of
+box gaps would not need it. The `3` is the underline's distance below the way-back step's words under
+the pointer - Tailwind's steps are 2 and 4.
 
 **Note:** `[10px]` in Sidebar and TagPill is a font size smaller than anything in the type
 scale. That is either a deliberate micro-label size that needs a token, or an accessibility
