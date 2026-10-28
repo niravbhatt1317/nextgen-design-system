@@ -362,25 +362,27 @@ product built on this library will invent its own.
 **Priority: HIGH.** These are not gaps in the token system — they are the token rule already
 being broken, in shipped code.
 
-| Component                                                                | Hardcoded value                | Should be                   |
-| ------------------------------------------------------------------------ | ------------------------------ | --------------------------- |
-| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]` | Size tokens                 |
-| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`  | Size + border-width tokens  |
-| `Select.tsx`                                                             | `[8rem]`                       | Min-width token             |
-| `DropdownMenu.tsx`                                                       | `[8rem]`                       | Min-width token             |
-| `Command.tsx`                                                            | `[300px]`                      | Min-width token             |
-| `Combobox.tsx`                                                           | `[300px]`                      | Min-width token             |
-| `Table.tsx`                                                              | `[100px]`                      | Size token                  |
-| `InputGroup.tsx`                                                         | `[60px]`                       | Size token                  |
-| `Sidebar.tsx`                                                            | `[10px]`                       | Type-size token             |
-| `TagPill.tsx`                                                            | `[10px]`                       | Type-size token             |
-| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`            | Size tokens                 |
-| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]` | Type-size + tracking tokens |
-| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`            | Type-size + size tokens     |
-| `Avatar.tsx`                                                             | status dot + ring tables       | A ratio, not steps — below  |
-| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780          | Drawer width steps          |
-| `BannerStack.tsx`                                                        | stack spacing and timing       | Spacing + motion tokens     |
-| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                | Size + type-size tokens     |
+| Component                                                                | Hardcoded value                 | Should be                   |
+| ------------------------------------------------------------------------ | ------------------------------- | --------------------------- |
+| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]`  | Size tokens                 |
+| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`   | Size + border-width tokens  |
+| `Select.tsx`                                                             | `[8rem]`                        | Min-width token             |
+| `DropdownMenu.tsx`                                                       | `[8rem]`                        | Min-width token             |
+| `Command.tsx`                                                            | `[300px]`                       | Min-width token             |
+| `Combobox.tsx`                                                           | `[300px]`                       | Min-width token             |
+| `Table.tsx`                                                              | `[100px]`                       | Size token                  |
+| `InputGroup.tsx`                                                         | `[60px]`                        | Size token                  |
+| `Sidebar.tsx`                                                            | `[10px]`                        | Type-size token             |
+| `TagPill.tsx`                                                            | `[10px]`                        | Type-size token             |
+| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`             | Size tokens                 |
+| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]`  | Type-size + tracking tokens |
+| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`             | Type-size + size tokens     |
+| `Avatar.tsx`                                                             | status dot + ring tables        | A ratio, not steps — below  |
+| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780           | Drawer width steps          |
+| `BannerStack.tsx`                                                        | stack spacing and timing        | Spacing + motion tokens     |
+| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                 | Size + type-size tokens     |
+| `Slider.tsx`, `slider.css`                                               | track, handle, tag, chip, ruler | Size + type-size + radius   |
+| `RequiredMark.tsx`                                                       | `[3px]` (the star's gap)        | Spacing token               |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
@@ -410,6 +412,15 @@ which is a much smaller decision than the rest of this section.
 comments, which is the right half of the token rule; this table is the other half. Two of them are
 not size gaps but missing _things_: a filled info glyph (see the icon note in `COMPONENT-GAP.md`) and
 a backdrop token for the banner stack's shade, which uses `--mdt-black` with alpha for now.
+
+**The four console parts of 2026-10-28** (RequiredMark, CopyTip, OverflowTip, Slider) carry the console's own numbers,
+declared here as #162's were. RequiredMark's `3px` gap is the Input's and Textarea's, already in the library (K-Field-05).
+The Slider's live in `slider.css`, read off the console's policy slider: an `8px` track with `4px` corners, a
+`12px` handle with a `2px` ring (16 in all - the ruler's arithmetic depends on it), a value tag of `12px`/600 on
+`1.5` with `2px 8px` padding and `6px` corners, an `18px` reset chip of `11px`/600 with `4px` corners, ruler
+ticks of `5px` and `8px` and numbers at `11px`, and the name row's `1.4` line height (`mdt-leading-[1.4]`, between
+Tailwind's `snug` 1.375 and `normal` 1.5). The tick inks are the foreground at 16%, 34% and 72% (`hsl(var(--mdt-foreground) / n)`),
+the same opacity gap as section 6. Nothing new in colour: every colour is an existing token.
 
 ---
 

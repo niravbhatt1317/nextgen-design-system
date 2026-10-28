@@ -14,6 +14,7 @@ import { cn } from '@/utils';
 import { PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '../Icon';
 import { Popover, PopoverAnchor, PopoverContent } from '../Popover';
+import { RequiredMark } from '../RequiredMark';
 import { selectTriggerVariants } from '../Select/Select';
 import type { ComboboxOption, ComboboxProps } from './Combobox.types';
 
@@ -218,7 +219,8 @@ export const ComboboxFieldSearch = forwardRef<HTMLInputElement, ComboboxProps>(
             className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90"
           >
             {label}
-            {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
+            {/* the field carries aria-required itself, so the mark stays quiet */}
+            {required && <RequiredMark announce={false} />}
           </label>
         )}
 

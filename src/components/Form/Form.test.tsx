@@ -102,7 +102,9 @@ describe('FormLabel', () => {
   it('shows asterisk when required is true', () => {
     render(<FormLabel required>Email</FormLabel>);
     expect(screen.getByText('*')).toBeInTheDocument();
-    expect(screen.getByLabelText('required')).toBeInTheDocument();
+    // the one RequiredMark: the star is for the eye, the hidden word is what a screen reader says
+    expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('required')).toHaveClass('mdt-sr-only');
   });
 
   it('does not show asterisk when required is false', () => {
@@ -243,7 +245,9 @@ describe('FormDescription', () => {
   it('applies correct styling', () => {
     render(<FormDescription>Description</FormDescription>);
     const description = screen.getByText('Description');
-    expect(description).toHaveClass('mdt-text-sm');
+    // the line under a field: 12 in the muted ink, as the console and the library's helper line draw it
+    expect(description).toHaveClass('mdt-text-xs');
+    expect(description).not.toHaveClass('mdt-text-sm');
     expect(description).toHaveClass('mdt-text-muted-foreground');
   });
 
@@ -251,7 +255,7 @@ describe('FormDescription', () => {
     render(<FormDescription className="custom-desc">Description</FormDescription>);
     const description = screen.getByText('Description');
     expect(description).toHaveClass('custom-desc');
-    expect(description).toHaveClass('mdt-text-sm');
+    expect(description).toHaveClass('mdt-text-xs');
   });
 
   it('forwards ref correctly', () => {
