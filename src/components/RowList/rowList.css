@@ -1,0 +1,208 @@
+/* RowList - ported from the console (Pranjal, 2026-10-28): next-gen-ui src/ui/RowList.jsx and its `.kit-row-list`,
+ * `.kit-kv-*` and `.kit-timeline*` layer in src/styles/global.css, the same rules under the library's names. The
+ * rulebook records them as S-71, S-86, B-09, K-RowList-01..04, K-KeyValue-01 and K-Timeline-01.
+ *
+ * ONE container (8 corners, a 1px neutral-20 edge, clipped), ONE separator (a 1px neutral-20 line under every row
+ * but the last, drawn from the container, never from the row), ONE hover (CSS only, and only on a pressable row),
+ * ONE density scale (the table's: 54 / content / 36). The components carry structure; every value is here, so a
+ * call site cannot drift. Colours are tokens only, so dark follows on its own. */
+
+.mdt-rowlist {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: hsl(var(--mdt-card));
+}
+.mdt-rowlist[data-bordered] {
+  border: 1px solid hsl(var(--mdt-neutral-20));
+  border-radius: var(--mdt-radius);
+  overflow: hidden;
+}
+.mdt-rowlist > *:not(:last-child) {
+  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+}
+
+.mdt-rowlist__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 12px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+}
+.mdt-rowlist[data-density='default'] > .mdt-rowlist__row {
+  min-height: 54px;
+  padding-block: 5px;
+}
+.mdt-rowlist[data-density='two-line'] > .mdt-rowlist__row {
+  padding-block: 0.5rem;
+}
+.mdt-rowlist[data-density='compact'] > .mdt-rowlist__row {
+  min-height: 36px;
+  padding-block: 4px;
+  padding-inline: 8px;
+}
+.mdt-rowlist__leading,
+.mdt-rowlist__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.mdt-rowlist__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* the same tint as the table's row hover */
+.mdt-rowlist__row[data-interactive] {
+  cursor: pointer;
+}
+.mdt-rowlist__row[data-interactive]:hover {
+  background: hsl(var(--mdt-neutral-10));
+}
+.mdt-rowlist__row[data-selected] {
+  background: hsl(var(--mdt-blue-10));
+}
+.mdt-rowlist__row[data-row-state='dimmed'] {
+  opacity: 0.65;
+}
+.mdt-rowlist__row[data-row-state='disabled'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* the ring is drawn inside the row, so the list's frame never clips it (rulebook B-86) */
+.mdt-rowlist__row:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: -2px;
+}
+
+/* A row's own words, on the table cell's type roles: primary 12/500, secondary 11/400 in the secondary ink, mono 12/500
+ * in the monospace face. One line with "…" unless the part says it wraps. */
+.mdt-rowlist__text {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: hsl(var(--mdt-neutral-150));
+}
+.mdt-rowlist__text[data-role='secondary'] {
+  font-size: 11px;
+  font-weight: 400;
+  color: hsl(var(--mdt-neutral-90));
+}
+.mdt-rowlist__text[data-role='mono'] {
+  font-family: var(--mdt-font-mono), monospace;
+}
+.mdt-rowlist__text[data-truncate] {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mdt-rowlist__title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.mdt-rowlist__title-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Key / value - a description list, not a data table: one label width per list, top-aligned, 8 above and below. */
+.mdt-kvlist {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+}
+.mdt-kvlist__row {
+  display: grid;
+  grid-template-columns: var(--mdt-kv-label, 150px) 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 8px 0;
+  min-width: 0;
+}
+.mdt-kvlist[data-separated] > .mdt-kvlist__row:not(:last-child) {
+  border-bottom: 1px solid hsl(var(--mdt-neutral-20));
+}
+.mdt-kvlist__label,
+.mdt-kvlist__value {
+  margin: 0;
+  min-width: 0;
+}
+.mdt-kvlist__value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Timeline - events in time, one column: a 7 dot, a 1px rail to the next event, the words, the time at the right. */
+.mdt-timeline {
+  display: flex;
+  flex-direction: column;
+}
+.mdt-timeline__item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 0 14px 0;
+}
+.mdt-timeline__item:last-child,
+.mdt-timeline__item[data-last] {
+  padding-bottom: 0;
+}
+.mdt-timeline__dot {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: hsl(var(--mdt-neutral-50));
+}
+.mdt-timeline__item[data-tone='success'] .mdt-timeline__dot {
+  background: hsl(var(--mdt-success));
+}
+.mdt-timeline__item[data-tone='warning'] .mdt-timeline__dot {
+  background: hsl(var(--mdt-warning));
+}
+.mdt-timeline__item[data-tone='danger'] .mdt-timeline__dot {
+  background: hsl(var(--mdt-destructive));
+}
+.mdt-timeline__item:not(:last-child):not([data-last])::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 12px;
+  bottom: 0;
+  width: 1px;
+  background: hsl(var(--mdt-neutral-20));
+}
+.mdt-timeline__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.mdt-timeline__time {
+  flex-shrink: 0;
+}

@@ -31,7 +31,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from './Sheet';
-import { SheetField, SheetIdentity, SheetSection } from './SheetParts';
+import { SheetField, SheetFields, SheetIdentity, SheetSection } from './SheetParts';
 import {
   SheetNavigation,
   SheetNavigationTitle,
@@ -514,18 +514,22 @@ export const ProfileDrawer: Story = {
           </SheetBand>
           <SheetBody>
             <SheetSection title="User details">
-              <SheetField label="Source of truth">
-                <Badge size="sm">Manual</Badge>
-              </SheetField>
-              <SheetField label="Email">sarah.johnson@company.com</SheetField>
-              <SheetField label="Phone number">+1 (555) 0110</SheetField>
-              <SheetField label="Access until">Permanent</SheetField>
-              <SheetField label="VIP user" />
+              <SheetFields>
+                <SheetField label="Source of truth">
+                  <Badge size="sm">Manual</Badge>
+                </SheetField>
+                <SheetField label="Email">sarah.johnson@company.com</SheetField>
+                <SheetField label="Phone number">+1 (555) 0110</SheetField>
+                <SheetField label="Access until">Permanent</SheetField>
+                <SheetField label="VIP user" />
+              </SheetFields>
             </SheetSection>
             <SheetSection title="Additional attributes">
-              <SheetField label="Bio" />
-              <SheetField label="Location Area" />
-              <SheetField label="Blood Group" />
+              <SheetFields>
+                <SheetField label="Bio" />
+                <SheetField label="Location Area" />
+                <SheetField label="Blood Group" />
+              </SheetFields>
             </SheetSection>
             <SheetSection title="Organization access">
               <div className="mdt-flex mdt-flex-wrap mdt-gap-2">

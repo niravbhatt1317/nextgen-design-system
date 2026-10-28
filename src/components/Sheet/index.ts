@@ -14,7 +14,7 @@ export {
   sheetVariants,
   SHEET_SIZES,
 } from './Sheet';
-export { SheetIdentity, SheetSection, SheetField } from './SheetParts';
+export { SheetIdentity, SheetSection, SheetField, SheetFields } from './SheetParts';
 export {
   SheetNavigation,
   SheetPage,
@@ -43,6 +43,8 @@ export type {
   SheetIdentityProps,
   SheetSectionProps,
   SheetFieldProps,
+  SheetFieldRatio,
+  SheetFieldsProps,
   SheetNavigationEntry,
   SheetNavigationProps,
   UseSheetNavigationReturn,

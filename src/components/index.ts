@@ -517,6 +517,36 @@ export type {
   ResizableHandleProps,
 } from './Resizable';
 
+// RowList — the console's row family (Pranjal, 2026-10-28): the frame a list of rows sits in and its rows - a plain or
+// pressable Row, a pick list's SelectableRow (tick box or radio), a LogRow - plus the compact KeyValueList and the
+// Timeline. A drawer's label · value fact row is SheetField, in a SheetFields stack.
+export {
+  RowList,
+  Row,
+  RowTitle,
+  SelectableRow,
+  LogRow,
+  KeyValueList,
+  KeyValueItem,
+  Timeline,
+  TimelineItem,
+} from './RowList';
+export type {
+  RowListProps,
+  RowListDensity,
+  RowProps,
+  RowState,
+  RowTitleProps,
+  SelectableRowProps,
+  SelectableRowControl,
+  LogRowProps,
+  KeyValueListProps,
+  KeyValueItemProps,
+  TimelineProps,
+  TimelineItemProps,
+  TimelineTone,
+} from './RowList';
+
 // ScrollArea
 export { ScrollArea, ScrollAreaViewport, ScrollBar, ScrollAreaCorner } from './ScrollArea';
 export type {
@@ -564,6 +594,7 @@ export {
   SheetIdentity,
   SheetSection,
   SheetField,
+  SheetFields,
   SheetNavigation,
   SheetPage,
   SheetNavigationTitle,
@@ -574,6 +605,8 @@ export type {
   SheetIdentityProps,
   SheetSectionProps,
   SheetFieldProps,
+  SheetFieldRatio,
+  SheetFieldsProps,
   SheetNavigationEntry,
   SheetNavigationProps,
   UseSheetNavigationReturn,

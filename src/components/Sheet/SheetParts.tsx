@@ -1,7 +1,13 @@
 import { forwardRef } from 'react';
 import { cn } from '../../utils/cn';
 import { metaLine } from '../_internal/MetaLine/metaLine';
-import type { SheetFieldProps, SheetIdentityProps, SheetSectionProps } from './Sheet.types';
+import { InfoTip } from '../InfoTip';
+import type {
+  SheetFieldProps,
+  SheetFieldsProps,
+  SheetIdentityProps,
+  SheetSectionProps,
+} from './Sheet.types';
 
 /**
  * SheetIdentity - the identity block an object drawer opens with: the mark, the
@@ -94,33 +100,73 @@ const SheetSection = forwardRef<HTMLElement, SheetSectionProps>(
 );
 SheetSection.displayName = 'SheetSection';
 
+/* THE FACT ROW (Pranjal, 2026-10-28: the row family's most used part). The console draws a record's label · value rows
+ * by hand in every About tab and profile - the Users drawer's ROW / L / V (ProfileDrawer.jsx), copied value for value
+ * into Agent Fleet's drawer parts (afm/screens/drawer/parts.tsx Row / Rows) and from there into Collector Fleet's. Its
+ * numbers, measured in the console at :4191 (the agent drawer's About tab and a user's profile):
+ *
+ *   row     a grid, the label and the value in two halves (rulebook S-98, "rows split 50/50", 2026-09-10) or 3 : 7 (the
+ *           agent's About, 2026-10-13), 12 between, centred; a value that is a list of chips can top-align
+ *   label   13 / 1.5 in the secondary ink (neutral-90), an ⓘ 4 after it when it needs explaining
+ *   value   13 / 500 / 1.5 in the reading ink (neutral-150); text, badges and a control sit in it on one line, 6 apart,
+ *           wrapping when they must
+ *   stack   18 between two rows (S-98) - SheetFields
+ *
+ * No floor on the height: a row is as tall as its words (19.5), so a record reads at the console's pitch; a row that
+ * holds a 32 field is 32 because the field is. */
+const RATIO_COLUMNS = {
+  '1:1': 'mdt-grid-cols-2',
+  '3:7': 'mdt-grid-cols-[minmax(0,3fr)_minmax(0,7fr)]',
+} as const;
+
 /**
- * SheetField - one label · value row of a drawer, half and half: the label in
- * the slate ink on the left, the value (13/500) or its control on the right.
- * The same row reads a record and edits it.
+ * SheetField - one label · value row of a drawer (the fact row of every About
+ * tab and profile): the label in the secondary ink with an optional ⓘ, the
+ * value (13/500) or its control beside it, in halves or 3 : 7. The same row
+ * reads a record and edits it.
  *
  * @example
  * <SheetField label="Email">sarah.johnson@company.com</SheetField>
+ * <SheetField label="Network zone" info="Taken from the agent's address." ratio="3:7">Retail core</SheetField>
  * <SheetField label="Job title" htmlFor="job"><Input id="job" defaultValue="HR Coordinator" /></SheetField>
  */
 const SheetField = forwardRef<HTMLDivElement, SheetFieldProps>(
-  ({ label, htmlFor, children, className, ...props }, ref) => {
-    const labelClass = 'mdt-text-[13px] mdt-leading-5 mdt-text-neutral-90';
+  (
+    {
+      label,
+      htmlFor,
+      info,
+      infoLabel,
+      ratio = '1:1',
+      align = 'center',
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const named = typeof label === 'string' ? `About ${label.toLowerCase()}` : 'About this';
     return (
       <div
         ref={ref}
         data-slot="sheet-field"
-        className={cn('mdt-grid mdt-min-h-8 mdt-grid-cols-2 mdt-items-center mdt-gap-3', className)}
+        className={cn(
+          /* no gap between the label and the value: the Users profile's rows (Pranjal, 2026-10-28: "Users'"), not
+           * Agent Fleet's 12 - both fleets' About rows follow Users' too */
+          'mdt-grid mdt-gap-0',
+          RATIO_COLUMNS[ratio],
+          align === 'top' ? 'mdt-items-start' : 'mdt-items-center',
+          className
+        )}
         {...props}
       >
-        {htmlFor === undefined ? (
-          <span className={labelClass}>{label}</span>
-        ) : (
-          <label htmlFor={htmlFor} className={labelClass}>
-            {label}
-          </label>
-        )}
-        <div className="mdt-min-w-0 mdt-text-[13px] mdt-font-medium mdt-leading-5 mdt-text-foreground">
+        <span className="mdt-inline-flex mdt-min-w-0 mdt-items-center mdt-gap-1 mdt-text-[13px] mdt-leading-normal mdt-text-neutral-90">
+          {htmlFor === undefined ? label : <label htmlFor={htmlFor}>{label}</label>}
+          {info !== undefined && info !== null ? (
+            <InfoTip label={infoLabel ?? named}>{info}</InfoTip>
+          ) : null}
+        </span>
+        <div className="mdt-flex mdt-min-w-0 mdt-flex-wrap mdt-items-center mdt-gap-1.5 mdt-text-[13px] mdt-font-medium mdt-leading-normal mdt-text-neutral-150">
           {children ?? '-'}
         </div>
       </div>
@@ -129,4 +175,30 @@ const SheetField = forwardRef<HTMLDivElement, SheetFieldProps>(
 );
 SheetField.displayName = 'SheetField';
 
-export { SheetIdentity, SheetSection, SheetField };
+/**
+ * SheetFields - the stack a drawer's fact rows sit in: SheetField rows 18
+ * apart, the console's About-tab pitch (rulebook S-98).
+ *
+ * @example
+ * <SheetSection title="Overview">
+ *   <SheetFields>
+ *     <SheetField label="Agent version">7.4.0</SheetField>
+ *     <SheetField label="Address">10.32.0.14</SheetField>
+ *   </SheetFields>
+ * </SheetSection>
+ */
+const SheetFields = forwardRef<HTMLDivElement, SheetFieldsProps>(
+  ({ children, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="sheet-fields"
+      className={cn('mdt-flex mdt-flex-col mdt-gap-[18px]', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+SheetFields.displayName = 'SheetFields';
+
+export { SheetIdentity, SheetSection, SheetField, SheetFields };
