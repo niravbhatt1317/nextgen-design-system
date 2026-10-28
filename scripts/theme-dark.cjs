@@ -240,6 +240,19 @@ const explicit = {
   'fixed-border-hover': '#CAD3E2',
   'fixed-foreground': '#516381',
   'fixed-foreground-hover': '#1D2A3E',
+  /* the chart palette (Pranjal 2026-10-15, the Health mock's dark values, moved from the console's tokens.css on
+   * 2026-10-28): dark keeps the mock's amber - any lighter one fails the colour-blind check on the dark ground - and the
+   * s1-s5 ramp runs up from the dark ground, so lighter still means better */
+  'chart-good': '#34A88A',
+  'chart-warn': '#C2862C',
+  'chart-crit': '#E14C72',
+  'chart-info': '#4C8FE6',
+  'chart-bar': '#4C8FE6',
+  'chart-s1': '#0F1D33',
+  'chart-s2': '#15294A',
+  'chart-s3': '#1C3966',
+  'chart-s4': '#254C86',
+  'chart-s5': '#2F62AA',
   'info-foreground': D('color.text.inverse'),
   'success-foreground': D('color.text.inverse'),
   'warning-foreground': D('color.text.inverse'),
