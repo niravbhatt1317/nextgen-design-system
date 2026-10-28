@@ -548,6 +548,16 @@ export type {
   SelectSize,
 } from './Select';
 
+// TreeSelect - a pick from a tree in a dropdown: groups that fold, items, and what sits under each item, every level a checkbox
+export { TreeSelect } from './TreeSelect';
+export type {
+  TreeSelectProps,
+  TreeSelectGroup,
+  TreeSelectItem,
+  TreeSelectLeaf,
+  TreeSelectNouns,
+} from './TreeSelect';
+
 // Separator
 export { Separator, separatorVariants } from './Separator';
 export type { SeparatorProps, SeparatorVariants } from './Separator';
@@ -1009,6 +1019,7 @@ export {
 export type {
   KpiCardProps,
   KpiCardSize,
+  KpiCardVariant,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,
