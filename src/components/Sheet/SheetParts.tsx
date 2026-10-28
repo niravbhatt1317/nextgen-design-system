@@ -59,11 +59,20 @@ SheetIdentity.displayName = 'SheetIdentity';
 /**
  * SheetSection - a titled section of a drawer's body: a 14/600 heading with an
  * action at its right end, an optional hint, then the content. Sections that
- * follow one another are split by a hairline, never by a card inside a drawer.
+ * follow one another stand 32 apart with nothing drawn between them, never a
+ * card inside a drawer.
+ *
+ * The console's drawer section (the fleets' agent and collector drawers,
+ * `SectionHead` / `Note` / `Rows` / `SectionGap`, Nikhil 2026-10-13, step 309:
+ * "remove the dividers, and follow the text herirchy following the design
+ * system"): the heading row 24 high at least, the heading 14/600 in the title
+ * ink on its 1.5 line, 12 to the action; the hint 12 on a 1.5 line in the quiet
+ * ink, 4 under the heading; the content 16 under them; sections the library's
+ * section margin (32) apart.
  *
  * @example
- * <SheetSection title="Access details" hint="Set how long guest users can access your organization">
- *   <SheetField label="Access started">Apr 1, 2026</SheetField>
+ * <SheetSection title="Health" hint="The last 24 hours.">
+ *   <SheetField label="Uptime">99.2%</SheetField>
  * </SheetSection>
  */
 const SheetSection = forwardRef<HTMLElement, SheetSectionProps>(
@@ -73,21 +82,26 @@ const SheetSection = forwardRef<HTMLElement, SheetSectionProps>(
       data-slot="sheet-section"
       className={cn(
         'mdt-flex mdt-flex-col',
-        // the hairline between sections, 20 above and below it
-        '[&+&]:mdt-mt-5 [&+&]:mdt-border-t [&+&]:mdt-border-border [&+&]:mdt-pt-5',
+        // sections stand 32 apart, nothing drawn between them
+        '[&+&]:mdt-mt-8',
         className
       )}
       {...props}
     >
-      <div className="mdt-flex mdt-min-h-8 mdt-items-center mdt-justify-between mdt-gap-2.5">
-        <h3 className="mdt-text-sm mdt-font-semibold mdt-leading-5 mdt-text-foreground">{title}</h3>
+      <div
+        data-slot="sheet-section-head"
+        className="mdt-flex mdt-min-h-6 mdt-items-center mdt-justify-between mdt-gap-3"
+      >
+        <h3 className="mdt-text-sm mdt-font-semibold mdt-leading-normal mdt-text-neutral-150">
+          {title}
+        </h3>
         {action}
       </div>
       {hint !== undefined && (
-        <p className="mdt-text-[13px] mdt-leading-5 mdt-text-muted-foreground">{hint}</p>
+        <p className="mdt-mt-1 mdt-text-xs mdt-leading-normal mdt-text-neutral-70">{hint}</p>
       )}
       {children !== undefined && (
-        <div className="mdt-mt-3 mdt-flex mdt-flex-col mdt-gap-3">{children}</div>
+        <div className="mdt-mt-4 mdt-flex mdt-flex-col mdt-gap-3">{children}</div>
       )}
     </section>
   )

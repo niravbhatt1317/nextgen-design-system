@@ -524,8 +524,12 @@ SheetFooter.displayName = 'SheetFooter';
 /**
  * SheetTitle - the title of the sheet.
  *
- * In the drawer frame: 16/600 in the heading ink (18 was off the type scale - Pranjal
- * 2026-08-24), taking the row's free width so the actions and the ✕ stay at the right end.
+ * In the drawer frame: 14/600 on a 20 line in the heading ink, taking the row's free width so
+ * the actions and the ✕ stay at the right end. Every drawer heading is 14 - its breadcrumb
+ * (the Breadcrumb's drawer form) and a heading that opens a menu too (Pranjal 2026-10-26: "all
+ * sidebar header should have 13px heading size even the breadcrumb should be the same. Even for
+ * the dropdown version of heading", then "actually make the sidedrawer heading to be 14px"; it
+ * was 16, and 18 before that).
  */
 const SheetTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, SheetTitleProps>(
   ({ className, ...props }, ref) => {
@@ -535,7 +539,7 @@ const SheetTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, Sh
         ref={ref}
         className={cn(
           layout === 'drawer'
-            ? 'mdt-min-w-0 mdt-flex-1 mdt-text-base mdt-font-semibold mdt-text-neutral-150'
+            ? 'mdt-min-w-0 mdt-flex-1 mdt-text-sm mdt-font-semibold mdt-leading-5 mdt-text-neutral-150'
             : 'mdt-text-lg mdt-font-semibold mdt-text-foreground',
           className
         )}

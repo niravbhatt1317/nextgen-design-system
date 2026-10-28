@@ -955,6 +955,15 @@
     box-shadow: none;
   }
 
+  /* EVERY BUTTON CORNER IS 8 (Pranjal, 2026-10-28: "8, library follows"). The console has drawn every library
+   * button at 8 since 2026-09 through one rule of its own (global.css: button.mdt-rounded-md { border-radius: 8px }),
+   * so the product already shows 8 while the library drew 6. This is that rule, moved to its source: a <button> that
+   * asks for the medium corner gets the full radius - triggers, icon buttons, a banner's close, pager and table
+   * buttons - while fields, menus, popovers and cards keep their own radii and round buttons stay round. */
+  button.mdt-rounded-md {
+    border-radius: var(--mdt-radius);
+  }
+
   /* Remove Radix UI default focus-visible outline */
   [data-radix-focus-guard] {
     outline: none !important;
