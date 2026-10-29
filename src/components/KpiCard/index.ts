@@ -13,5 +13,7 @@ export type {
   KpiStripProps,
   KpiGaugeProps,
   KpiGaugeShape,
+  KpiGaugeTone,
+  KpiGaugeZone,
   KpiBarsProps,
 } from './KpiCard.types';

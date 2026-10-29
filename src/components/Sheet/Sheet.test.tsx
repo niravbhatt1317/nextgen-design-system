@@ -664,15 +664,18 @@ describe('Sheet', () => {
       expect(order).toEqual(['Edit team', 'More actions', 'Close']);
     });
 
-    it('sets the title at 16/600 in the heading ink, taking the free width', () => {
+    it('sets the title at 14/600 on a 20 line in the heading ink, taking the free width', () => {
       renderDrawer();
-      expect(screen.getByText('Edit team')).toHaveClass(
-        'mdt-text-base',
+      const title = screen.getByText('Edit team');
+      expect(title).toHaveClass(
+        'mdt-text-sm',
+        'mdt-leading-5',
         'mdt-font-semibold',
         'mdt-text-neutral-150',
         'mdt-flex-1',
         'mdt-min-w-0'
       );
+      expect(title).not.toHaveClass('mdt-text-base');
     });
 
     it('gives header, band, body and footer the 24 inset by default', () => {

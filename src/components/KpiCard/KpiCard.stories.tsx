@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { cn } from '@/utils';
 import { Badge } from '../Badge';
 import { KpiCard } from './KpiCard';
-import type { KpiMetricProps } from './KpiCard.types';
+import type { KpiGaugeZone, KpiMetricProps } from './KpiCard.types';
 import { KpiBars, KpiGauge } from './KpiCharts';
 
 // The card's props are a union (one metric, or `items`); the controls table follows the single-metric shape.
@@ -121,6 +121,106 @@ export const GaugeRing: Story = {
       <KpiGauge shape="ring" percent={75} label="Configuration health 75%" />
       <KpiGauge shape="ring" percent={100} label="Configuration health 100%" />
       <KpiGauge shape="ring" percent={25} bad label="Configuration health 25%, failing" />
+    </Row>
+  ),
+};
+
+/* the zones of the console Health's three headline figures (Agent Fleet, 2026-10-26): the two health figures zoomed to
+ * 90-100 so 96 and 98.5 read apart; the version figure on the whole scale */
+const ZONES_SENDING: KpiGaugeZone[] = [
+  { from: 90, to: 96, tone: 'crit', word: 'Low' },
+  { from: 96, to: 98, tone: 'warn', word: 'Below target' },
+  { from: 98, to: 100, tone: 'good', word: 'On target' },
+];
+const ZONES_NORMAL: KpiGaugeZone[] = [
+  { from: 90, to: 95, tone: 'crit', word: 'Low' },
+  { from: 95, to: 98, tone: 'warn', word: 'Below target' },
+  { from: 98, to: 100, tone: 'good', word: 'On target' },
+];
+const ZONES_VERSION: KpiGaugeZone[] = [
+  { from: 0, to: 80, tone: 'info', word: 'Rolling out' },
+  { from: 80, to: 100, tone: 'good', word: 'On target' },
+];
+/* three cards a row, each as wide as its share: the console's KpiRow columns={3} */
+const Three = ({ children }: { children: React.ReactNode }) => (
+  <div className="mdt-grid mdt-max-w-[884px] mdt-grid-cols-3 mdt-gap-3">{children}</div>
+);
+
+/**
+ * `shape="zones"`: the console Health's headline gauge (Pranjal, 2026-10-26: "the chart makes less sense so improve the
+ * chart"), in a card's chart area. The half ring is split into its `zones`, each faint in its status colour; a dot in
+ * the full colour sits where the value is; the value and its zone's word are in the middle; the ends say where the
+ * scale starts and stops (`min`, `max`). The target is the green zone, so the card needs no "good at" line. These are
+ * Agent Fleet's three figures, as the Health Overview shows them.
+ */
+export const GaugeZones: Story = {
+  render: () => (
+    <Three>
+      <KpiCard
+        label="Agents sending data"
+        value="2,102"
+        hint="of 2,134"
+        style={{ width: '100%' }}
+        chart={
+          <KpiGauge
+            shape="zones"
+            percent={98.5}
+            min={90}
+            zones={ZONES_SENDING}
+            caption="sending data"
+          />
+        }
+      />
+      <KpiCard
+        label="Working normally"
+        value="2,052"
+        hint="of 2,134"
+        style={{ width: '100%' }}
+        chart={
+          <KpiGauge
+            shape="zones"
+            percent={96.2}
+            min={90}
+            zones={ZONES_NORMAL}
+            caption="working normally"
+          />
+        }
+      />
+      <KpiCard
+        label="On the current version"
+        value="1,086"
+        hint="of 2,134"
+        style={{ width: '100%' }}
+        chart={<KpiGauge shape="zones" percent={50.9} zones={ZONES_VERSION} caption="on 7.4.0" />}
+      />
+    </Three>
+  ),
+};
+
+/** Every zone tone, and a value in each zone: red, amber, green, and the neutral blue of a figure still rolling out. */
+export const GaugeZonesTones: Story = {
+  render: () => (
+    <Row>
+      <KpiGauge shape="zones" percent={92.9} min={90} zones={ZONES_SENDING} caption="reporting" />
+      <KpiGauge shape="zones" percent={97} min={90} zones={ZONES_SENDING} caption="reporting" />
+      <KpiGauge shape="zones" percent={100} min={90} zones={ZONES_SENDING} caption="reporting" />
+      <KpiGauge shape="zones" percent={12} zones={ZONES_VERSION} caption="on 7.4.0" />
+    </Row>
+  ),
+};
+
+/**
+ * `tone` and `target` on the half gauge: the console Health's status gauge. The fill wears a status colour from the
+ * chart palette (`good`, `warn`, `crit`, `info`) instead of the neutral ladder, the number keeps one decimal, and the
+ * target is a tick across the ring in the ink colour, spoken as "good at 98% or more".
+ */
+export const GaugeStatus: Story = {
+  render: () => (
+    <Row>
+      <KpiGauge percent={98.5} caption="sending data" tone="good" target={98} />
+      <KpiGauge percent={96.2} caption="normal" tone="warn" target={98} />
+      <KpiGauge percent={88.4} caption="reporting" tone="crit" target={95} />
+      <KpiGauge percent={50.9} caption="on 7.4.0" tone="info" target={80} />
     </Row>
   ),
 };

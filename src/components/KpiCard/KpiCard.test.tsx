@@ -348,3 +348,111 @@ describe('KpiGauge shape="ring"', () => {
     expect(container.querySelectorAll('text')).toHaveLength(1);
   });
 });
+
+describe('KpiGauge tone and target (the console status gauge)', () => {
+  it('a tone paints the half gauge in its status colour and keeps one decimal', () => {
+    const { container } = render(<KpiGauge percent={96.44} caption="sending data" tone="warn" />);
+    const svg = screen.getByRole('img', { name: '96.4% sending data' });
+    expect(svg).toHaveAttribute('data-tone', 'warn');
+    expect(container.querySelector('.kpi-gauge-number')).toHaveTextContent('96.4%');
+    expect(container.querySelector('.kpi-gauge-tick')).toBeNull();
+  });
+
+  it('a toned gauge keeps its dot at 0% and never closes the arc at 100%', () => {
+    const { container, rerender } = render(<KpiGauge percent={0} tone="crit" caption="up" />);
+    const fill = () => container.querySelector('.kpi-gauge-fill');
+    expect(fill()).not.toBeNull();
+    expect(fill()?.getAttribute('d')).not.toBe('M8 56 A44 44 0 0 1 8.00 56.00');
+    rerender(<KpiGauge percent={100} tone="good" caption="up" />);
+    expect(fill()?.getAttribute('d')).not.toBe('M8 56 A44 44 0 0 1 96.00 56.00');
+    rerender(<KpiGauge percent={0} caption="up" />);
+    expect(fill()).toBeNull();
+  });
+
+  it('a target draws the "good at" tick across the band and says it', () => {
+    const { container } = render(
+      <KpiGauge percent={82} caption="capacity" tone="good" target={50} />
+    );
+    expect(
+      screen.getByRole('img', { name: '82% capacity, good at 50% or more' })
+    ).toBeInTheDocument();
+    const tick = container.querySelector('.kpi-gauge-tick');
+    expect(tick).toHaveAttribute('x1', '52.00');
+    expect(tick).toHaveAttribute('y1', '19.00');
+    expect(tick).toHaveAttribute('y2', '5.00');
+    expect(tick).toHaveAttribute('stroke-width', '2');
+  });
+
+  it('a neutral gauge can carry a target too; a label overrides what is said', () => {
+    render(<KpiGauge percent={40} target={80} label="Licences in use" />);
+    expect(screen.getByRole('img', { name: 'Licences in use' })).not.toHaveAttribute('data-tone');
+  });
+
+  it('the ring ignores a tone and keeps its rounded figure', () => {
+    render(<KpiGauge shape="ring" percent={66.6} tone="good" caption="health" />);
+    expect(screen.getByRole('img', { name: '67% health' })).toBeInTheDocument();
+  });
+});
+
+describe('KpiGauge shape="zones" (the console Health headline gauge)', () => {
+  const ZONES = [
+    { from: 90, to: 96, tone: 'crit' as const, word: 'Low' },
+    { from: 96, to: 98, tone: 'warn' as const, word: 'Below target' },
+    { from: 98, to: 100, tone: 'good' as const, word: 'On target' },
+  ];
+
+  it('draws on 120 × 76 shown at 104 × 62: the zones, the dot, the value, its word and the ends', () => {
+    const { container } = render(
+      <KpiGauge shape="zones" percent={98.46} min={90} zones={ZONES} caption="sending data" />
+    );
+    const svg = screen.getByRole('img', { name: '98.5% sending data: On target' });
+    expect(svg).toHaveClass('kpi-zones');
+    expect(svg).toHaveAttribute('width', '104');
+    expect(svg).toHaveAttribute('height', '62');
+    expect(svg).toHaveAttribute('viewBox', '0 6 120 71.5');
+    const zones = container.querySelectorAll('.kpi-zones-zone');
+    expect([...zones].map((z) => z.getAttribute('data-tone'))).toEqual(['crit', 'warn', 'good']);
+    expect(zones[0]).toHaveAttribute('stroke-width', '9');
+    expect(zones[0]).toHaveAttribute('d', 'M16.00 56.00 A44 44 0 0 1 73.60 14.15');
+    const dot = container.querySelector('.kpi-zones-dot');
+    expect(dot).toHaveAttribute('data-tone', 'good');
+    expect(dot).toHaveAttribute('r', '6.5');
+    expect(container.querySelector('.kpi-zones-number')).toHaveTextContent('98.5%');
+    const word = container.querySelector('.kpi-zones-word');
+    expect(word).toHaveTextContent('On target');
+    expect(word).toHaveAttribute('data-tone', 'good');
+    expect([...container.querySelectorAll('.kpi-zones-end')].map((e) => e.textContent)).toEqual([
+      '90%',
+      '100%',
+    ]);
+  });
+
+  it('a value on a shared edge reads as the first zone that holds it; off the scale it sits at the end', () => {
+    const { container, rerender } = render(
+      <KpiGauge shape="zones" percent={96} min={90} zones={ZONES} caption="working normally" />
+    );
+    expect(screen.getByRole('img', { name: '96% working normally: Low' })).toBeInTheDocument();
+    rerender(<KpiGauge shape="zones" percent={40} min={90} zones={ZONES} caption="x" />);
+    expect(screen.getByRole('img', { name: '40% x: Low' })).toBeInTheDocument();
+    expect(container.querySelector('.kpi-zones-dot')).toHaveAttribute('cx', '16.00');
+  });
+
+  it('starts at 0 and ends at 100 by default; without zones it is the bare dot and number', () => {
+    const { container } = render(<KpiGauge shape="zones" percent={50.94} caption="on 7.4.0" />);
+    expect(screen.getByRole('img', { name: '50.9% on 7.4.0' })).toBeInTheDocument();
+    expect(container.querySelectorAll('.kpi-zones-zone')).toHaveLength(0);
+    expect(container.querySelector('.kpi-zones-dot')).not.toHaveAttribute('data-tone');
+    expect([...container.querySelectorAll('.kpi-zones-end')].map((e) => e.textContent)).toEqual([
+      '0%',
+      '100%',
+    ]);
+  });
+
+  it('a label overrides what it says; a flat scale does not divide by zero', () => {
+    const { container } = render(
+      <KpiGauge shape="zones" percent={5} min={5} max={5} zones={ZONES} label="Flat" />
+    );
+    expect(screen.getByRole('img', { name: 'Flat' })).toBeInTheDocument();
+    expect(container.querySelector('.kpi-zones-dot')).toHaveAttribute('cx', '16.00');
+  });
+});
