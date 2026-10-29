@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority';
 import { forwardRef, useEffect, useId, useRef } from 'react';
 import { cn } from '@/utils';
 import { Icon } from '../Icon';
+import { RequiredMark } from '../RequiredMark';
 import type { InputProps } from './Input.types';
 
 /**
@@ -157,8 +158,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={id} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
             {label}
-            {/* the asterisk in the danger red (K-Field-05), 3 after the label as the console draws it (measured 2026-09-22) */}
-            {required && <span className="mdt-ml-[3px] mdt-text-destructive">*</span>}
+            {/* the asterisk in the danger red (K-Field-05), 3 after the label as the console draws it (measured 2026-09-22);
+             * the input's own `required` tells a screen reader, so the mark stays quiet */}
+            {required && <RequiredMark announce={false} />}
           </label>
         )}
         <div className="mdt-group mdt-relative mdt-flex mdt-items-center">

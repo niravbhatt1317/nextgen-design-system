@@ -1263,6 +1263,20 @@ export type { KeyValuesBuilderProps, KeyValuesOption, KeyValuesRow } from './Tar
 
 // ── Ported from the console, 2026-10-28 (Pranjal: "push everything in storybook now. Dont leave anything") ──────────
 
+// RequiredMark - the red asterisk after the label of a field that must be filled in; every library field draws it.
+export { RequiredMark } from './RequiredMark';
+export type { RequiredMarkProps } from './RequiredMark';
+
+// CopyTip - wraps a copy control: "Copy" under the pointer, "Copied" for 1.4 s after a press (CopyField's button too).
+export { CopyTip } from './CopyField';
+export type { CopyTipProps, CopyTipControl } from './CopyField';
+
+// OverflowTip - mounted once: anything cut with "…" or a line clamp shows its full text in the tooltip on hover.
+export { OverflowTip } from './OverflowTip';
+
+// Slider - one number between two limits: the value on the handle, a ruler, the saved value and a reset, typeable.
+export { Slider } from './Slider';
+export type { SliderProps } from './Slider';
 // Chart - the console Health's hand-drawn charts, each with the one-line hover (ChartTip): columns, a bar list, a
 // status history, a trend line, a histogram against a budget, a heat table and the stacked bars of Module health.
 export {

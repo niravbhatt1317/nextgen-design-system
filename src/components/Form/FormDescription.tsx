@@ -6,7 +6,7 @@ import type { FormDescriptionProps } from './Form.types';
 /**
  * FormDescription variants using Class Variance Authority (CVA)
  */
-export const formDescriptionVariants = cva(['mdt-text-sm'], {
+export const formDescriptionVariants = cva(['mdt-text-xs'], {
   variants: {
     /**
      * Text color of the description

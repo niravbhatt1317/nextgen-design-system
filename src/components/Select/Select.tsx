@@ -15,6 +15,7 @@ import { cn } from '@/utils';
 import { CHECKED_ROW_CLASSES, PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
+import { RequiredMark } from '../RequiredMark';
 import type {
   SelectOption,
   SelectProps,
@@ -372,7 +373,8 @@ function renderSingleSelectMode(props: {
       {label && (
         <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
           {label}
-          {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
+          {/* Radix puts aria-required on the trigger, so the mark stays quiet */}
+          {required && <RequiredMark announce={false} />}
         </label>
       )}
 
@@ -1006,7 +1008,8 @@ function renderSelectLabel(props: {
   return (
     <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
       {label}
-      {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
+      {/* the multi trigger is a plain button with no required state of its own, so the mark says it */}
+      {required && <RequiredMark />}
     </label>
   );
 }
