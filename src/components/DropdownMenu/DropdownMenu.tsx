@@ -131,22 +131,15 @@ DropdownMenuSubContent.displayName = 'DropdownMenuSubContent';
 /**
  * DropdownMenuContent - main content container for the menu
  *
- * An action menu (a row's or a header's ⋯) is at least 224 wide - pass
- * `className="mdt-min-w-56"`, a floor and not a width, so a longer item widens
- * it (Pranjal, 2026-10-27). Every item carries an icon, no label ends in "…",
- * and the destructive item comes last, red, after a `DropdownMenuSeparator`.
- * A menu of ticks or choices (a quick filter, Sort) keeps its own width.
- *
  * @example
  * ```tsx
  * <DropdownMenu>
  *   <DropdownMenuTrigger asChild>
  *     <Button>Open Menu</Button>
  *   </DropdownMenuTrigger>
- *   <DropdownMenuContent className="mdt-min-w-56">
- *     <DropdownMenuItem><Icon name="pencil" size={16} />Edit details</DropdownMenuItem>
- *     <DropdownMenuSeparator />
- *     <DropdownMenuItem variant="destructive"><Icon name="trash-2" size={16} />Delete user</DropdownMenuItem>
+ *   <DropdownMenuContent>
+ *     <DropdownMenuItem>Item 1</DropdownMenuItem>
+ *     <DropdownMenuItem>Item 2</DropdownMenuItem>
  *   </DropdownMenuContent>
  * </DropdownMenu>
  * ```

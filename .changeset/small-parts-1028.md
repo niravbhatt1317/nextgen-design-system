@@ -30,9 +30,9 @@ defaults** - no opt-out, every consumer gets them.
   today, so no console page changes.
 - The table's own ⋯ menus reach 224 in the table request (pranjal/library-2026-10-28-table), not here.
 
-No new public names, no new tokens. `DropdownMenuContent`'s documentation now states the action-menu rules (224 floor
-with `mdt-min-w-56`, an icon on every item, the destructive item last and red after a separator), and its stories
-follow them.
+No new public names, no new tokens. (The action-menu rules - the one red action last under its divider, an icon on
+every item, the 224 floor - are not written onto `DropdownMenu` here: they are built into the new `Popover`'s
+action-menu variant, pranjal/library-2026-10-29-popover; Pranjal, 2026-10-29.)
 
 The console bridges these replace, deletable once the console takes this release:
 `THE KIND TILE` bridge in `afm/shell/approvals.css` and `cfm/shell/approvals.css`, the
