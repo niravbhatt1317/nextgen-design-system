@@ -377,7 +377,11 @@ function renderSingleSelectMode(props: {
       )}
 
       <SelectPrimitive.Root
-        {...(singleValue && { value: singleValue })}
+        /* Radix is driven by this wrapper in both modes - `currentValue` is authoritative either way (see
+         * `isControlled` below), so the value is always handed over, and "nothing picked" is the empty string.
+         * It was a `&&` spread, which dropped the prop for null and "" alike: a controlled field cleared to null
+         * left Radix uncontrolled holding its last pick, so re-picking that same option fired nothing. */
+        value={typeof singleValue === 'string' ? singleValue : ''}
         onValueChange={(val) => {
           handleValueChange(val || null);
         }}
