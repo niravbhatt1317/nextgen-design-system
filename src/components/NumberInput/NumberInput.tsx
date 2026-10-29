@@ -72,7 +72,12 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     const id = idProp ?? generatedId;
     const errorId = `${id}-error`;
     const helperId = `${id}-helper`;
+    const unitId = `${id}-unit`;
     const hasError = Boolean(error);
+    /* the unit is part of what the field says, so a reader hears "30, Seconds", not a bare number (Nirav's review of
+       #188); then the error, or else the helper */
+    const lineId = error ? errorId : helperText ? helperId : undefined;
+    const describedBy = [hasUnit ? unitId : undefined, lineId].filter(Boolean).join(' ') || undefined;
     const inner = useRef<HTMLInputElement | null>(null);
 
     const setRef = (el: HTMLInputElement | null) => {
@@ -121,7 +126,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               className
             )}
             aria-invalid={hasError}
-            aria-describedby={error ? errorId : helperText ? helperId : undefined}
+            aria-describedby={describedBy}
             {...props}
           />
           {held ? (
@@ -133,7 +138,10 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
              * right side of the label and add that in the input field at right side", "the vertical full separator
              * line like we did in the browse field"): a hairline from the field's top border to its bottom one, 11
              * to the word, 13 in the faint ink, 12 from the edge. Clicks pass through to the field. */
-            <span className="mdt-pointer-events-none mdt-absolute mdt-inset-y-px mdt-right-3 mdt-flex mdt-items-center mdt-whitespace-nowrap mdt-border-l mdt-border-neutral-30 mdt-pl-[11px] mdt-text-[13px] mdt-leading-none mdt-text-faint">
+            <span
+              id={unitId}
+              className="mdt-pointer-events-none mdt-absolute mdt-inset-y-px mdt-right-3 mdt-flex mdt-items-center mdt-whitespace-nowrap mdt-border-l mdt-border-neutral-30 mdt-pl-[11px] mdt-text-[13px] mdt-leading-none mdt-text-faint"
+            >
               {unit}
             </span>
           ) : (

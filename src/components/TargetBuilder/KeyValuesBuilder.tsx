@@ -110,9 +110,11 @@ const KeyValuesBuilder = forwardRef<HTMLDivElement, KeyValuesBuilderProps>(
             const blankAlone = shown.length === 1 && !r.key && !r.values.length;
             const name = r.key ? nameOf(r.key) : '';
             return (
-              /* items-start: a value's error line grows under its field, the picker and the bin stay on the field's row */
-              // eslint-disable-next-line react/no-array-index-key -- a row has no identity beyond its place until a key is picked
-              <div key={i} className="mdt-flex mdt-items-start mdt-gap-2">
+              /* items-start: a value's error line grows under its field, the picker and the bin stay on the field's row.
+                 Keyed by the picked key - unique across rows, since the picker leaves a held key out - so a removed
+                 row takes its half-typed value and error line with it; only a row with no key yet goes by its place
+                 (Nirav's review of #188) */
+              <div key={r.key || `blank-${String(i)}`} className="mdt-flex mdt-items-start mdt-gap-2">
                 <div className="mdt-w-56 mdt-shrink-0">
                   <Select
                     mode="single"
@@ -123,7 +125,10 @@ const KeyValuesBuilder = forwardRef<HTMLDivElement, KeyValuesBuilderProps>(
                     placeholder={keyPlaceholder}
                     disabled={disabled}
                     onChange={(v) => {
-                      update(i, { key: typeof v === 'string' ? v : '' });
+                      const key = typeof v === 'string' ? v : '';
+                      /* a new key starts with no values: a port typed for SSH never silently becomes a WMI port
+                         (Nirav's review of #188) */
+                      if (key !== r.key) update(i, { key, values: [] });
                     }}
                   />
                 </div>

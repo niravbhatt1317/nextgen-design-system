@@ -450,7 +450,7 @@ export { NumberInput } from './NumberInput';
 export type { NumberInputProps } from './NumberInput';
 
 // DurationInput - days, hours and minutes in one box, each number with its unit word, a hairline between (Max runtime).
-export { DurationInput, formatDuration, parseDuration } from './DurationInput';
+export { DurationInput, formatDuration, parseDuration, NO_LIMIT } from './DurationInput';
 export type { DurationInputProps } from './DurationInput';
 
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;

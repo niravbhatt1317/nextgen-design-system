@@ -34,16 +34,23 @@ import type { DurationInputProps } from './DurationInput.types';
 const DAY = 1440;
 const HOUR = 60;
 
-/** "5 days 4 hours 45 minutes" (day / hour / hr / minute / min, singular or plural, any order) to minutes. */
-export const parseDuration = (text: string): number => {
-  let total = 0;
+/**
+ * "5 days 4 hours 45 minutes" (day / hour / hr / minute / min, singular or plural, any order) to minutes. Text that
+ * names no duration at all - the profiles' "No limit", or nothing - is `null`, never 0: no limit is not zero minutes
+ * (Nirav's review of #188, 2026-10-29; the console models unlimited as `null` too, EnrollFlow.jsx).
+ */
+export const parseDuration = (text: string): number | null => {
+  let total: number | null = null;
   for (const m of text.matchAll(/(\d+)\s*(day|hour|hr|minute|min)s?/gi)) {
     const n = Number(m[1]);
     const unit = (m[2] ?? '').toLowerCase();
-    total += unit.startsWith('d') ? n * DAY : unit.startsWith('h') ? n * HOUR : n;
+    total = (total ?? 0) + (unit.startsWith('d') ? n * DAY : unit.startsWith('h') ? n * HOUR : n);
   }
   return total;
 };
+
+/** What `formatDuration` writes for `null` - the duration with no limit. */
+export const NO_LIMIT = 'No limit';
 
 /** Minutes laid out as days · hours (0-23) · minutes (0-59). */
 const layOut = (minutes: number) => {
@@ -51,8 +58,9 @@ const layOut = (minutes: number) => {
   return { d: Math.floor(total / DAY), h: Math.floor((total % DAY) / HOUR), m: total % HOUR };
 };
 
-/** Minutes to the words the profile carries: 90 -> "1 hour 30 minutes", 0 -> "". */
-export const formatDuration = (minutes: number): string => {
+/** Minutes to the words the profile carries: 90 -> "1 hour 30 minutes", 0 -> "", null -> "No limit". */
+export const formatDuration = (minutes: number | null): string => {
+  if (minutes === null) return NO_LIMIT;
   const { d, h, m } = layOut(minutes);
   return (
     [
@@ -221,9 +229,11 @@ export const DurationInput = forwardRef<HTMLDivElement, DurationInputProps>(func
     onChange?.(next);
   };
 
-  /* days stop at maxDays as typed; hours and minutes may run over, to carry on commit */
+  /* days are CLAMPED at maxDays as typed - every digit kept, then held at the cap, so 1500 reads 999 and never a cut
+     150 (Nirav's review of #188); hours and minutes may run over, to carry on commit */
   const type = (k: Seg, text: string) => {
-    const digits = text.replace(/\D/g, '').slice(0, k === 'd' ? String(maxDays).length : 5);
+    const all = text.replace(/\D/g, '');
+    const digits = k === 'd' ? all : all.slice(0, 5);
     setCarried('');
     setDraft({
       ...cur,
@@ -240,7 +250,9 @@ export const DurationInput = forwardRef<HTMLDivElement, DurationInputProps>(func
     if (raw.m > 59) setCarried(`${String(raw.m)} minutes → ${formatDuration(raw.m)}`);
     else if (raw.h > 23) setCarried(`${String(raw.h)} hours → ${formatDuration(raw.h * HOUR)}`);
     if (next !== minutes) put(next);
-    else setDraft(null);
+    /* the draft goes on both paths, so the box shows `minutes` - a parent that clamps or refuses is what is drawn,
+       not the typing it refused (Nirav's review of #188) */
+    setDraft(null);
   };
 
   const show = (k: Seg, how: 'input' | 'keys') => {

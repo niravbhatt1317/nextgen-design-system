@@ -156,8 +156,14 @@ const TreeSelect = forwardRef<HTMLButtonElement, TreeSelectProps>(function TreeS
   const leafTotal = picked.reduce((n, item) => n + pickedOf(item, value).leaves.length, 0);
 
   const ql = q.trim().toLowerCase();
+  /* a leaf is what people search for most - a zone under its region - so a leaf's name finds its item too, and that
+     item opens while the search stands (Nirav's review of #188) */
+  const leafHit = (item: TreeSelectItem) =>
+    Boolean(ql) && leavesOf(item).some((k) => k.label.toLowerCase().includes(ql));
   const matches = (item: TreeSelectItem) =>
-    !ql || [item.label, item.description, item.code].some((s) => s?.toLowerCase().includes(ql));
+    !ql ||
+    [item.label, item.description, item.code].some((s) => s?.toLowerCase().includes(ql)) ||
+    leafHit(item);
   const shown = groups
     .map((g) => ({ ...g, items: g.items.filter(matches) }))
     .filter((g) => g.items.length > 0);
@@ -254,7 +260,7 @@ const TreeSelect = forwardRef<HTMLButtonElement, TreeSelectProps>(function TreeS
     const kids = leavesOf(item);
     const p = pickedOf(item, value);
     const has = kids.length > 0;
-    const isOpen = has && Boolean(expanded[item.id]);
+    const isOpen = has && (leafHit(item) || Boolean(expanded[item.id]));
     let countText = `no ${childNoun[1]}`;
     if (has) {
       countText = p.narrowed

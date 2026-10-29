@@ -184,5 +184,16 @@ describe('NumberInput', () => {
       rerender(<NumberInput aria-label="n" unit="Days" locked />);
       expect(screen.queryByText('Days')).toBeNull();
     });
+
+    it('tells a screen reader the unit, before the error or helper line', () => {
+      const { rerender } = render(<NumberInput aria-label="Timeout" unit="Seconds" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds');
+      rerender(<NumberInput aria-label="Timeout" unit="Seconds" helperText="Between 5 and 300" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds Between 5 and 300');
+      rerender(<NumberInput aria-label="Timeout" unit="Seconds" error="Too long" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds Too long');
+      rerender(<NumberInput aria-label="Timeout" />);
+      expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-describedby');
+    });
   });
 });

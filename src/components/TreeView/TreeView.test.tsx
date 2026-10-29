@@ -63,6 +63,34 @@ describe('TreeView', () => {
       expect(row('postgres-prod-ro')).toHaveAttribute('aria-selected', 'false');
     });
 
+    it('opens a fetched tree on its pick when the nodes arrive after mount', () => {
+      const { rerender } = render(<TreeView nodes={[]} value="secret/data/db/mysql-billing" />);
+      rerender(<TreeView nodes={TREE} value="secret/data/db/mysql-billing" />);
+      expect(row('db/')).toHaveAttribute('aria-expanded', 'true');
+      expect(row('mysql-billing')).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('opens a fetched tree’s lone folders when nothing is picked', () => {
+      const { rerender } = render(<TreeView nodes={[]} />);
+      rerender(<TreeView nodes={TREE} />);
+      expect(row('data/')).toHaveAttribute('aria-expanded', 'true');
+      expect(row('db/')).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('opens the way to a new pick and keeps open what was opened by hand', async () => {
+      const { rerender } = render(<TreeView nodes={TREE} />);
+      await userEvent.click(row('network/'));
+      rerender(<TreeView nodes={TREE} value="secret/data/db/postgres-prod-ro" />);
+      expect(row('db/')).toHaveAttribute('aria-expanded', 'true');
+      expect(row('network/')).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('leaves a controlled tree to its caller when the nodes change', () => {
+      const { rerender } = render(<TreeView nodes={[]} value="secret/data/db/mysql-billing" expanded={[]} />);
+      rerender(<TreeView nodes={TREE} value="secret/data/db/mysql-billing" expanded={[]} />);
+      expect(row('secret/')).toHaveAttribute('aria-expanded', 'false');
+    });
+
     it('opens the folders given', () => {
       render(<TreeView nodes={TREE} defaultExpanded={['secret/']} />);
       expect(row('secret/')).toHaveAttribute('aria-expanded', 'true');

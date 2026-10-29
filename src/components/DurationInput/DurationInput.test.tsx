@@ -1,7 +1,7 @@
 import { createRef } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DurationInput, formatDuration, parseDuration } from './DurationInput';
+import { DurationInput, NO_LIMIT, formatDuration, parseDuration } from './DurationInput';
 
 const days = () => screen.getByRole('spinbutton', { name: /^Days/ });
 const hours = () => screen.getByRole('spinbutton', { name: /^Hours/ });
@@ -132,11 +132,29 @@ describe('DurationInput', () => {
       const user = userEvent.setup();
       const { rerender } = render(<DurationInput aria-label="Max runtime" defaultValue={0} />);
       await user.type(days(), '5000');
-      expect(days()).toHaveValue(500); // a fourth digit does not land
+      expect(days()).toHaveValue(999); // clamped at the cap, never cut to 500
       rerender(<DurationInput aria-label="Max runtime" defaultValue={0} maxDays={30} />);
       await user.clear(days());
       await user.type(days(), '45');
       expect(days()).toHaveValue(30); // a larger count is held at the top
+    });
+
+    it('clamps a count past the cap instead of cutting its digits', async () => {
+      const user = userEvent.setup();
+      render(<DurationInput aria-label="Max runtime" defaultValue={0} />);
+      await user.type(days(), '1500');
+      expect(days()).toHaveValue(999);
+    });
+
+    it('shows what a controlled parent keeps, when it refuses the commit', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn(); // the parent never takes the new value
+      render(<DurationInput aria-label="Max runtime" value={240} onChange={onChange} />);
+      await user.clear(hours());
+      await user.type(hours(), '9');
+      await user.tab();
+      expect(onChange).toHaveBeenCalledWith(540);
+      expect(hours()).toHaveValue(4); // the typing is dropped, the box draws the parent's 4 hours
     });
 
     it('keeps the typed number while it is typed, and drops a letter', async () => {
@@ -178,7 +196,11 @@ describe('DurationInput', () => {
     it('reads and writes the words the profile carries', () => {
       expect(parseDuration('5 days 4 hours 45 minutes')).toBe(5 * 1440 + 4 * 60 + 45);
       expect(parseDuration('1 day 30 min')).toBe(1470);
-      expect(parseDuration('')).toBe(0);
+      expect(parseDuration('No limit')).toBeNull(); // no limit is not zero minutes
+      expect(parseDuration('')).toBeNull();
+      expect(parseDuration('0 minutes')).toBe(0);
+      expect(formatDuration(null)).toBe(NO_LIMIT);
+      expect(NO_LIMIT).toBe('No limit');
       expect(formatDuration(5 * 1440 + 4 * 60 + 45)).toBe('5 days 4 hours 45 minutes');
       expect(formatDuration(1 * 1440 + 1 * 60 + 1)).toBe('1 day 1 hour 1 minute');
       expect(formatDuration(0)).toBe('');

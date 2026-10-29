@@ -178,6 +178,31 @@ describe('KeyValuesBuilder', () => {
   });
 
   describe('rows', () => {
+    it('clears a row’s values when its key changes, so they never move to another key', async () => {
+      const onChange = vi.fn();
+      render(<Live start={[{ key: 'ssh', values: ['2222'] }]} onChange={onChange} />);
+      await userEvent.click(screen.getByRole('combobox', { name: 'Protocol' }));
+      await userEvent.click(screen.getByText('WMI'));
+      expect(onChange).toHaveBeenLastCalledWith([{ key: 'wmi', values: [] }]);
+      expect(screen.queryByText('2222')).not.toBeInTheDocument();
+    });
+
+    it('keeps a refused value and its error with its own row when a row above is removed', async () => {
+      render(
+        <Live
+          start={[
+            { key: 'ssh', values: ['2222'] },
+            { key: 'wmi', values: [] },
+          ]}
+        />
+      );
+      /* a refused value stays typed in its field (leaving the field does not take it), its error line under it */
+      await userEvent.type(field('Ports for WMI'), '70000{Enter}');
+      await userEvent.click(screen.getByRole('button', { name: 'Remove SSH' }));
+      expect(field('Ports for WMI')).toHaveValue('70000');
+      expect(screen.getByRole('alert')).toHaveTextContent('A port is a number from 1 to 65535');
+    });
+
     it('adds a row, and leaves a held key out of the next picker', async () => {
       const onChange = vi.fn();
       render(<Live start={[{ key: 'ssh', values: ['2222'] }]} onChange={onChange} />);

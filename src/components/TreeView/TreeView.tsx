@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { forwardRef, useEffect, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { cn } from '@/utils';
 import { Icon, type IconName } from '../Icon';
 import type { TreeViewNode, TreeViewProps } from './TreeView.types';
@@ -189,6 +189,20 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(
       () => defaultExpanded ?? (value ? trailTo(nodes, value) : null) ?? loneTrail(nodes)
     );
     const open = new Set(expanded ?? own);
+
+    /* A FETCHED TREE OPENS TOO (Nirav's review of #188): the nodes usually arrive after mount, so whenever the nodes or
+       the picked value change, the folders on the way to the pick are opened - added to what is open, never closing
+       what someone opened. With nothing picked, a tree that arrives into an empty box opens its lone folders, as on
+       mount. Uncontrolled only: a controlled `expanded` is the caller's. */
+    useEffect(() => {
+      if (expanded !== undefined) return;
+      const trail = value ? trailTo(nodes, value) : null;
+      setOwn((prev) => {
+        const add = trail ?? (prev.length || defaultExpanded ? [] : loneTrail(nodes));
+        const fresh = add.filter((id) => !prev.includes(id));
+        return fresh.length ? [...prev, ...fresh] : prev;
+      });
+    }, [nodes, value, expanded, defaultExpanded]);
 
     const toggle = (id: string): void => {
       const next = new Set(open);

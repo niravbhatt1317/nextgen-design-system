@@ -244,6 +244,13 @@ describe('TreeSelect', () => {
     expect(screen.getByText('US West (N. California)')).toBeInTheDocument();
     expect(screen.queryByText('US East (N. Virginia)')).not.toBeInTheDocument();
 
+    /* a leaf's own name finds its item, and opens it so the leaf shows */
+    await user.clear(search);
+    await user.type(search, 'us-east-1b');
+    expect(screen.getByText('US East (N. Virginia)')).toBeInTheDocument();
+    expect(screen.queryByText('US West (N. California)')).not.toBeInTheDocument();
+    expect(screen.getByText('us-east-1b')).toBeInTheDocument();
+
     await user.clear(search);
     await user.type(search, 'zzz');
     expect(screen.getByText('No regions match “zzz”.')).toBeInTheDocument();
