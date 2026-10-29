@@ -217,15 +217,49 @@ export interface SheetSectionProps extends Omit<ComponentPropsWithoutRef<'sectio
   children?: ReactNode;
 }
 
+/** How a fact row splits its width: two halves, or a narrow label beside a wide value. */
+export type SheetFieldRatio = '1:1' | '3:7';
+
 /**
- * Props for SheetField - one label · value row, half and half.
+ * Props for SheetField - one label · value row, half and half or 3 : 7.
  */
 export interface SheetFieldProps extends ComponentPropsWithoutRef<'div'> {
-  /** The label on the left, in the slate ink. */
+  /** The label on the left, in the secondary ink. */
   label: ReactNode;
   /** Ties the label to a control on the right, so a press on the label focuses it. */
   htmlFor?: string;
-  /** The value or the control on the right. */
+  /**
+   * An explanation behind an ⓘ beside the label (the library InfoTip), for a
+   * value that needs one: "Taken from the agent's address."
+   */
+  info?: ReactNode;
+  /** The ⓘ's name for a screen reader. @default `About <label>` when the label is a string */
+  infoLabel?: string;
+  /**
+   * `1:1` - two halves, every profile's rows (rulebook S-98). `3:7` - a narrow
+   * label beside a wide value, for rows whose value is a list of chips with a
+   * control at its end (the agent's About).
+   * @default '1:1'
+   */
+  ratio?: SheetFieldRatio;
+  /**
+   * `center` lines the label up with the middle of the value; `top` with its first
+   * line, for a value that runs to several lines.
+   * @default 'center'
+   */
+  align?: 'center' | 'top';
+  /**
+   * The value or the control on the right. Text, badges and controls sit on one
+   * line 6 apart and wrap when they must. Left out, the row reads "-".
+   */
+  children?: ReactNode;
+}
+
+/**
+ * Props for SheetFields - the stack a drawer's fact rows sit in.
+ */
+export interface SheetFieldsProps extends ComponentPropsWithoutRef<'div'> {
+  /** SheetField rows. */
   children?: ReactNode;
 }
 
