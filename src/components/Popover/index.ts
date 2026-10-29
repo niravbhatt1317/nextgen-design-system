@@ -4,6 +4,8 @@ export {
   PopoverContent,
   PopoverAnchor,
   PopoverClose,
+  PopoverActionMenu,
+  PopoverQuickFilter,
   popoverSurface,
 } from './Popover';
 export type {
@@ -12,4 +14,9 @@ export type {
   PopoverTriggerProps,
   PopoverCloseProps,
   PopoverAnchorProps,
+  PopoverVariant,
+  PopoverAction,
+  PopoverActionMenuProps,
+  PopoverQuickFilterOption,
+  PopoverQuickFilterProps,
 } from './Popover.types';

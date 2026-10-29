@@ -477,13 +477,16 @@ export type {
   PaginationEllipsisProps,
 } from './Pagination';
 
-// Popover
+// Popover - one popover, three variants (2026-10-29): the empty card (PopoverContent), the action menu
+// (PopoverActionMenu, its rules built in) and the quick filter (PopoverQuickFilter).
 export {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
   PopoverClose,
+  PopoverActionMenu,
+  PopoverQuickFilter,
   popoverSurface,
 } from './Popover';
 // PopoverOld — the previous popover. DEPRECATED 2026-09-26: use Popover (the overlay surface, no private dark rule).
@@ -501,7 +504,16 @@ export type {
   PopoverOldCloseProps,
   PopoverOldAnchorProps,
 } from './PopoverOld';
-export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
+export type {
+  PopoverProps,
+  PopoverTriggerProps,
+  PopoverContentProps,
+  PopoverVariant,
+  PopoverAction,
+  PopoverActionMenuProps,
+  PopoverQuickFilterOption,
+  PopoverQuickFilterProps,
+} from './Popover';
 
 // Progress — value fill with optional baseline and floor markers
 export { Progress, progressVariants } from './Progress';
@@ -1105,6 +1117,22 @@ export type { InputOld2Props, InputOld2VariantsType } from './InputOld2';
 // TextareaOld2 — the Textarea before 2026-09-17. DEPRECATED 2026-09-22: use Textarea.
 export { TextareaOld2, textareaOld2Variants } from './TextareaOld2';
 export type { TextareaOld2Props, TextareaOld2Variants } from './TextareaOld2';
+// PopoverOld2 — the Popover before 2026-10-29 (the overlay surface only). DEPRECATED 2026-10-29: use Popover.
+export {
+  PopoverOld2,
+  PopoverOld2Trigger,
+  PopoverOld2Content,
+  PopoverOld2Anchor,
+  PopoverOld2Close,
+  popoverOld2Surface,
+} from './PopoverOld2';
+export type {
+  PopoverOld2Props,
+  PopoverOld2ContentProps,
+  PopoverOld2TriggerProps,
+  PopoverOld2CloseProps,
+  PopoverOld2AnchorProps,
+} from './PopoverOld2';
 // SelectOld2 — the Select before 2026-09-17. DEPRECATED 2026-09-22: use Select.
 export { SelectOld2, selectOld2TriggerVariants } from './SelectOld2';
 export type {
