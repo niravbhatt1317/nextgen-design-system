@@ -2,9 +2,11 @@ import { cva } from 'class-variance-authority';
 import {
   createContext,
   forwardRef,
+  Fragment,
   useCallback,
   useContext,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -23,6 +25,8 @@ import type {
   TableAlign,
   TableCellProps,
   TableColGroupProps,
+  TableGroupRowProps,
+  TableCheckCellProps,
   TableHeadProps,
   TableNumberCellProps,
   TableNumberHeadProps,
@@ -506,6 +510,98 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(function Tabl
 TableCell.displayName = 'TableCell';
 
 /**
+ * A title row between a table's rows, naming the group under it: the name 12/600 in the label ink, then its details
+ * in the faint ink (neutral-50, #8FA0BD - the console's, not the library's muted grey) after a " · ", on the sunken ground, 36 tall, one cell across every column. A plain row - it never
+ * hovers, picks, opens or takes focus; the rows of its group keep their own numbers, counted through the groups.
+ *
+ * Ported from the console (Ronak, 2026-10-14): the discovery profile's Credentials step groups its credentials by type -
+ * "you can add the separator one row with title between the rows. so user can understood this is for this types".
+ *
+ * @example
+ * ```tsx
+ * <TableGroupRow colSpan={3} title="SSH Credentials" meta={['SSH', 3]} />
+ * ```
+ */
+const TableGroupRow = forwardRef<HTMLTableRowElement, TableGroupRowProps>(function TableGroupRow(
+  { colSpan, title, meta, className, ...props },
+  ref
+) {
+  const parts = meta === undefined || meta === null ? [] : Array.isArray(meta) ? meta : [meta];
+  return (
+    <tr ref={ref} data-slot="table-group-row" className={cn('tbl-group', className)} {...props}>
+      <td
+        colSpan={colSpan}
+        className={cn(
+          tableCellVariants({}),
+          'mdt-h-9 mdt-bg-secondary mdt-py-0 mdt-text-xs mdt-leading-[1.4]'
+        )}
+      >
+        <span className="mdt-font-semibold mdt-text-neutral-90">{title}</span>
+        {parts.length > 0 && (
+          <span className="mdt-font-normal mdt-text-neutral-50">
+            {parts.map((part, i) => (
+              // eslint-disable-next-line react/no-array-index-key -- the details are a fixed sequence, read in order
+              <Fragment key={i}> · {part}</Fragment>
+            ))}
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+});
+TableGroupRow.displayName = 'TableGroupRow';
+
+/**
+ * A checkbox as a cell's value - one of a row's channels, a permission, a yes - centred in the cell inside a 28 square
+ * that takes the whole click, named for the reader by row and column ("Run failure · Email"). Held (`disabled`) it
+ * keeps its tick and refuses the pointer. Ported from the console's Notify matrix (the discovery profile's Schedule &
+ * Notify step, NotifyGrid.jsx, 2026-10-15).
+ *
+ * @example
+ * ```tsx
+ * <TableCheckCell checked={on} label="Run failure · Email" onCheckedChange={setOn} />
+ * ```
+ */
+const TableCheckCell = forwardRef<HTMLTableCellElement, TableCheckCellProps>(
+  function TableCheckCell(
+    { checked, label, onCheckedChange, disabled = false, className, ...props },
+    ref
+  ) {
+    const id = useId();
+    return (
+      <td
+        ref={ref}
+        data-slot="table-check-cell"
+        className={cn(tableCellVariants({ align: 'center' }), className)}
+        {...props}
+      >
+        {/* the square: 28, so a press anywhere near the box lands on it; the label hands the click to the box */}
+        <label
+          htmlFor={id}
+          className={cn(
+            'mdt-inline-flex mdt-h-7 mdt-w-7 mdt-cursor-pointer mdt-items-center mdt-justify-center mdt-align-middle',
+            disabled && 'mdt-cursor-not-allowed'
+          )}
+        >
+          <Checkbox
+            id={id}
+            /* the light edge while empty, as the row-selection box wears it (TableSelectionCell) */
+            className="data-[state=unchecked]:mdt-border-neutral-40"
+            checked={checked}
+            disabled={disabled}
+            aria-label={label}
+            onCheckedChange={(next) => {
+              if (!disabled) onCheckedChange?.(next === true);
+            }}
+          />
+        </label>
+      </td>
+    );
+  }
+);
+TableCheckCell.displayName = 'TableCheckCell';
+
+/**
  * A heading. Sortable ones sort on click. Movable ones show a grip and a "⋯"
  * menu on hover; resizable ones carry a handle on their right boundary that
  * drags, or moves 16px per arrow key.
@@ -906,6 +1002,8 @@ export {
   TableBody,
   TableRow,
   TableCell,
+  TableGroupRow,
+  TableCheckCell,
   TableHead,
   TableSelectionCell,
   TableLeadHead,

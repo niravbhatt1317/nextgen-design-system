@@ -207,3 +207,30 @@ describe('IconTile as a button', () => {
     expect(document.querySelector('.tt')).toBeNull();
   });
 });
+
+describe('IconTile brand tone', () => {
+  it('is the white plate with its hairline, the mark 32 inside at xl with corners 10', () => {
+    render(
+      <IconTile
+        tone="brand"
+        size="xl"
+        shape="square"
+        icon={<img src="/aws.svg" alt="" />}
+        data-testid="plate"
+      />
+    );
+    const plate = screen.getByTestId('plate');
+    expect(plate.className).toContain('--mdt-fixed-fill');
+    expect(plate).toHaveClass('mdt-border-neutral-20');
+    expect(plate).toHaveClass('mdt-h-12', 'mdt-w-12', 'mdt-rounded-[10px]', '[&_img]:mdt-size-8');
+    expect(plate.querySelector('img')).toHaveAttribute('alt', '');
+  });
+
+  it('holds a monogram in black, 12/600', () => {
+    render(<IconTile tone="brand" size="xl" shape="square" icon={<>OCI</>} data-testid="plate" />);
+    const plate = screen.getByTestId('plate');
+    expect(plate).toHaveTextContent('OCI');
+    expect(plate).toHaveClass('mdt-text-xs', 'mdt-font-semibold');
+    expect(plate.className).toContain('--mdt-black');
+  });
+});

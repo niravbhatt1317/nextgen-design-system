@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Too
  * than the slate avatar since 2026-10-28 (below).
  */
 export const iconTileVariants = cva(
-  'mdt-inline-flex mdt-shrink-0 mdt-items-center mdt-justify-center [&_svg]:mdt-shrink-0',
+  'mdt-inline-flex mdt-shrink-0 mdt-items-center mdt-justify-center [&_svg]:mdt-shrink-0 [&_img]:mdt-object-contain',
   {
     variants: {
       tone: {
@@ -38,6 +38,13 @@ export const iconTileVariants = cva(
          * ink - the circle that sits in a table's Contact cell */
         outline:
           'mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-background mdt-text-neutral-90',
+        /* THE BRAND PLATE (Ronak 2026-10-15, the console's cloud Provider tiles): a vendor's mark is drawn in its own
+         * colours and reads on white (the AWS wordmark is near-black), so the plate is a FIXED face - white in BOTH
+         * themes (the fixed button's fill) under the neutral-20 hairline the console draws (providerPicker.css
+         * .dp-pmark). A vendor with no mark that reads small wears a monogram ("OCI", "VMW") in black - the ink
+         * that stays black in dark, as the plate stays white - 12/600, tracked 0.02em. */
+        brand:
+          'mdt-border mdt-border-solid mdt-border-neutral-20 mdt-bg-[hsl(var(--mdt-fixed-fill))] mdt-text-xs mdt-font-semibold mdt-leading-none mdt-tracking-[0.02em] mdt-text-[hsl(var(--mdt-black))]',
       },
       /* THE TILE SIZES ITS ICON (Pranjal, 2026-09-12: "icon size is too big" - a
        * 20px glyph in a 24px tile). The glyph is a little over half the tile at
@@ -50,24 +57,28 @@ export const iconTileVariants = cva(
        * (a bot at 24 in 56 reads as a mark, not a button), and a square 2xl tile
        * rounds to 12, the radius the console's own identity tiles used. */
       size: {
-        sm: 'mdt-h-6 mdt-w-6 [&_svg]:mdt-size-3.5',
-        md: 'mdt-h-8 mdt-w-8 [&_svg]:mdt-size-4',
-        lg: 'mdt-h-10 mdt-w-10 [&_svg]:mdt-size-5',
-        xl: 'mdt-h-12 mdt-w-12 [&_svg]:mdt-size-6',
-        '2xl': 'mdt-h-14 mdt-w-14 [&_svg]:mdt-size-6',
+        sm: 'mdt-h-6 mdt-w-6 [&_svg]:mdt-size-3.5 [&_img]:mdt-size-4',
+        md: 'mdt-h-8 mdt-w-8 [&_svg]:mdt-size-4 [&_img]:mdt-size-5',
+        lg: 'mdt-h-10 mdt-w-10 [&_svg]:mdt-size-5 [&_img]:mdt-size-6',
+        xl: 'mdt-h-12 mdt-w-12 [&_svg]:mdt-size-6 [&_img]:mdt-size-8',
+        '2xl': 'mdt-h-14 mdt-w-14 [&_svg]:mdt-size-6 [&_img]:mdt-size-10',
       },
       shape: {
         square: 'mdt-rounded-md',
         circle: 'mdt-rounded-full',
       },
     },
-    compoundVariants: [{ size: '2xl', shape: 'square', class: 'mdt-rounded-xl' }],
+    compoundVariants: [
+      { size: '2xl', shape: 'square', class: 'mdt-rounded-xl' },
+      /* the brand plate at 48 rounds to 10, as the console draws it (providerPicker.css .dp-pmark) */
+      { tone: 'brand', size: 'xl', shape: 'square', class: 'mdt-rounded-[10px]' },
+    ],
     defaultVariants: { tone: 'slate', size: 'md', shape: 'square' },
   }
 );
 
 export type IconTileVariantsType = VariantProps<typeof iconTileVariants>;
-export type IconTileTone = 'slate' | 'blue' | 'green' | 'amber' | 'rose' | 'purple' | 'outline';
+export type IconTileTone = 'slate' | 'blue' | 'green' | 'amber' | 'rose' | 'purple' | 'outline' | 'brand';
 export type IconTileSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type IconTileShape = 'square' | 'circle';
 
@@ -75,7 +86,7 @@ export interface IconTileProps extends Omit<
   ComponentPropsWithoutRef<'span'>,
   'className' | 'children' | 'color' | 'onCopy' | 'onClick'
 > {
-  /** The icon to hold. */
+  /** The icon to hold - or, in the `brand` tone, a vendor's mark (an `<img alt="">`) or its monogram. */
   icon: ReactNode;
   /** @default 'slate' */
   tone?: IconTileTone;
