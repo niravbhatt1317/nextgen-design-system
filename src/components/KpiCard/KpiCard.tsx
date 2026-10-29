@@ -1,10 +1,16 @@
-import { forwardRef } from 'react';
+import { forwardRef, isValidElement } from 'react';
 import type { CSSProperties } from 'react';
 import { cn } from '@/utils';
 import { Badge } from '../Badge';
 import type { BadgeTone } from '../Badge';
 import { Icon } from '../Icon';
-import type { KpiCardProps, KpiCardSize, KpiMetricProps, KpiTrendTone } from './KpiCard.types';
+import type {
+  KpiCardProps,
+  KpiCardSize,
+  KpiCardVariant,
+  KpiMetricProps,
+  KpiTrendTone,
+} from './KpiCard.types';
 import './kpiCard.css';
 
 /** A plain card's floor: the Figma card's own width. */
@@ -119,8 +125,32 @@ function KpiBody({
   );
 }
 
+/**
+ * The surface by variant: the page card inside its hairline, or the drawer's grey card with no edge. The filled
+ * ground is neutral-10, one step under the hover wash (neutral-20), so a clickable segment still shows its cue.
+ */
+const SURFACE: Record<KpiCardVariant, string> = {
+  outlined: 'mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-card',
+  filled: 'mdt-border-0 mdt-bg-neutral-10',
+};
+
+/**
+ * A text segment: a node for a value and nothing else - no hint, chip or chart. The drawers' facts cards (a 13px line
+ * under each label) have no use for the 98 floor meant for a 24 number with a hint line, nor for the 174 width floor
+ * that stood four of them 696 wide in a 680 drawer (Pranjal 2026-09-30; Ronak 2026-10-17, "is this our scrollbar
+ * design"). A number, a string, or any hint keeps both floors, so KPI rows still line up.
+ */
+function isText(m: KpiMetricProps): boolean {
+  return (
+    isValidElement(m.value) &&
+    (m.hint === undefined || m.hint === null) &&
+    m.delta === undefined &&
+    m.chart === undefined
+  );
+}
+
 function floorOf(m: KpiMetricProps): number {
-  return m.minWidth ?? (m.chart ? 0 : KPI_FLOOR);
+  return m.minWidth ?? (m.chart || isText(m) ? 0 : KPI_FLOOR);
 }
 function basisOf(m: KpiMetricProps): number {
   return Math.max(floorOf(m), m.chart ? KPI_CHART_WIDTH : KPI_FLOOR);
@@ -151,7 +181,8 @@ function KpiSegment({
     ? { flex: `1 1 ${String(basisOf(metric))}px`, minWidth: `${String(floorOf(metric))}px` }
     : undefined;
   const base = cn(
-    'kpi-seg mdt-relative mdt-flex mdt-min-h-[98px] mdt-min-w-0 mdt-flex-col mdt-px-4 mdt-py-3 mdt-text-left',
+    'kpi-seg mdt-relative mdt-flex mdt-min-w-0 mdt-flex-col mdt-px-4 mdt-py-3 mdt-text-left',
+    !isText(metric) && 'mdt-min-h-[98px]',
     !grouped && 'mdt-flex-1'
   );
   if (clickable) {
@@ -192,9 +223,12 @@ function KpiSegment({
  *
  * `size="sm"` is the quieter figure for a card that sits beside a section's content. A card holding a chart keeps
  * the 24px number whatever it is given, because the chart beside it is drawn to that size.
+ *
+ * `variant="filled"` is the drawer's card: the neutral-10 ground and no edge. A segment whose value is a node with
+ * nothing else beside it is a line of text and sizes to it, with no floor in height or width.
  */
 const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props, ref) {
-  const { className, style, size = 'md' } = props;
+  const { className, style, size = 'md', variant = 'outlined' } = props;
   const metrics: KpiMetricProps[] = props.items ?? [props as KpiMetricProps];
   const grouped = props.items !== undefined;
   // One size for the whole card: a chart anywhere on it keeps every number at 24, so a group never mixes the two.
@@ -214,8 +248,10 @@ const KpiCard = forwardRef<HTMLDivElement, KpiCardProps>(function KpiCard(props,
       aria-label={groupLabel}
       data-kpi={grouped ? 'group' : 'card'}
       data-size={valueSize}
+      data-variant={variant}
       className={cn(
-        'kpi-card mdt-flex mdt-items-stretch mdt-rounded-xl mdt-border mdt-border-solid mdt-border-neutral-30 mdt-bg-card mdt-font-sans',
+        'kpi-card mdt-flex mdt-items-stretch mdt-rounded-xl mdt-font-sans',
+        SURFACE[variant],
         className
       )}
       style={

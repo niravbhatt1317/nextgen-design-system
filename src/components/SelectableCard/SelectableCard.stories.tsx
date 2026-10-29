@@ -5,7 +5,15 @@ import { SelectableCard, SelectableCardGroup } from './SelectableCard';
 import { PickCard } from './PickCard';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
+import { IconTile } from '../IconTile';
 import { Select } from '../Select';
+import alibaba from './marks/alibaba.svg';
+import aws from './marks/aws.svg';
+import azure from './marks/azure.svg';
+import gcp from './marks/gcp.svg';
+import ibm from './marks/ibm.svg';
+import kubernetes from './marks/kubernetes.svg';
+import openstack from './marks/openstack.svg';
 
 const meta: Meta<typeof SelectableCard> = {
   title: 'New Components/SelectableCard',
@@ -86,6 +94,72 @@ export const RadioWithFollowUp: Story = {
     );
     await userEvent.click(
       canvas.getByRole('radio', { name: 'Replace with an existing access profile' })
+    );
+  },
+};
+
+/* THE PROVIDERS - the console's own list (discovery-profiles data.js PROVIDERS: the order, the names, the kind under
+ * each) and marks (./marks - each the vendor's own drawing from a CC0 set, the file's first line names it; three
+ * vendors publish no mark that reads at 32 and wear a monogram on the same plate). */
+const MARKS: Record<string, string> = { aws, azure, gcp, alibaba, ibm, openstack, kubernetes };
+const MONOGRAM: Record<string, string> = { oci: 'OCI', ovirt: 'oVirt', vmware: 'VMW' };
+const PROVIDERS = [
+  { id: 'aws', name: 'AWS', kind: 'Public cloud' },
+  { id: 'azure', name: 'Azure', kind: 'Public cloud' },
+  { id: 'gcp', name: 'GCP', kind: 'Public cloud' },
+  { id: 'alibaba', name: 'Alibaba Cloud', kind: 'Public cloud' },
+  { id: 'ibm', name: 'IBM Cloud', kind: 'Public cloud' },
+  { id: 'oci', name: 'OCI', kind: 'Public cloud' },
+  { id: 'openstack', name: 'OpenStack', kind: 'Private cloud' },
+  { id: 'ovirt', name: 'oVirt', kind: 'Virtualization' },
+  { id: 'vmware', name: 'VMware vCenter', kind: 'Virtualization' },
+  { id: 'kubernetes', name: 'Kubernetes', kind: 'Agentless pull' },
+];
+
+/** The plate: the vendor's mark 32 on the 48 white plate (IconTile's `brand` tone), or its monogram. */
+const Mark = ({ id, name }: { id: string; name: string }) => {
+  const src = MARKS[id];
+  return (
+    <IconTile
+      tone="brand"
+      size="xl"
+      shape="square"
+      icon={
+        src === undefined ? (
+          <>{MONOGRAM[id] ?? name.slice(0, 3).toUpperCase()}</>
+        ) : (
+          <img src={src} alt="" draggable={false} />
+        )
+      }
+    />
+  );
+};
+
+/**
+ * Logo tiles: a pick among many named things - providers, engines, platforms - as a radio set five to a row, each
+ * card re-flowed around its mark: a logo on a white plate (white in both themes, so a mark drawn in its own colours
+ * reads), the name and one faint word under it, the dot in the top-right corner. A thing with no logo that reads small
+ * wears a monogram on the same plate. Shown here with the cloud providers it was ported from (the cloud discovery
+ * profile's Provider & connection step).
+ */
+export const LogoTiles: Story = {
+  name: 'Logo Tiles',
+  render: function TilesStory() {
+    const [provider, setProvider] = useState('aws');
+    return (
+      <Box width={710}>
+        <SelectableCardGroup layout="tiles" aria-label="Provider" value={provider} onValueChange={setProvider}>
+          {PROVIDERS.map((p) => (
+            <SelectableCard
+              key={p.id}
+              value={p.id}
+              title={p.name}
+              description={p.kind}
+              icon={<Mark id={p.id} name={p.name} />}
+            />
+          ))}
+        </SelectableCardGroup>
+      </Box>
     );
   },
 };

@@ -106,4 +106,30 @@ describe('ActionCard', () => {
       expect(document.querySelector('.tt')).toHaveTextContent('northbridge.io');
     });
   });
+
+  it('draws the compact face: the tinted card, a bare glyph by the title, no tile, the control on the right', () => {
+    const { container } = render(
+      <ActionCard
+        variant="compact"
+        icon={<svg data-testid="glyph" />}
+        title="https://vault.acme.io/v1/secret/metadata"
+        description="Synced moments ago"
+        actions={<button type="button">Sync now</button>}
+      />
+    );
+    const card = container.querySelector('[data-slot=action-card]');
+    expect(card).toHaveClass('mdt-bg-neutral-10', 'mdt-rounded-lg', 'mdt-px-3', 'mdt-py-2.5');
+    expect(card).not.toHaveClass('mdt-rounded-xl');
+    expect(container.querySelector('.mdt-size-9')).toBeNull();
+    expect(screen.getByText('https://vault.acme.io/v1/secret/metadata').parentElement).toHaveClass(
+      'mdt-text-xs'
+    );
+    expect(screen.getByText('Synced moments ago')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sync now' })).toBeInTheDocument();
+  });
+
+  it('draws the compact face without a glyph', () => {
+    render(<ActionCard variant="compact" title="Endpoint" />);
+    expect(screen.getByText('Endpoint')).toBeInTheDocument();
+  });
 });

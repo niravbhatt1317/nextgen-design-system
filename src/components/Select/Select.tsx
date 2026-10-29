@@ -15,6 +15,7 @@ import { cn } from '@/utils';
 import { CHECKED_ROW_CLASSES, PICKED_ROW_CLASSES } from '@/utils/picked-row';
 import { Icon } from '../Icon';
 import { Input } from '../Input';
+import { RequiredMark } from '../RequiredMark';
 import type {
   SelectOption,
   SelectProps,
@@ -372,7 +373,8 @@ function renderSingleSelectMode(props: {
       {label && (
         <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
           {label}
-          {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
+          {/* Radix puts aria-required on the trigger, so the mark stays quiet */}
+          {required && <RequiredMark announce={false} />}
         </label>
       )}
 
@@ -507,11 +509,11 @@ function renderSingleSelectMode(props: {
       {error && (
         <p
           id={errorId}
-          className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+          className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
           role="alert"
         >
           {/* the alert mark, 12, before the message (K-Field-10) */}
-          <Icon name="alert-circle" size={12} aria-hidden />
+          <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
           {error}
         </p>
       )}
@@ -970,11 +972,11 @@ function renderHelperOrError(props: {
     return (
       <p
         id={errorId}
-        className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+        className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
         role="alert"
       >
         {/* the alert mark, 12, before the message (K-Field-10) */}
-        <Icon name="alert-circle" size={12} aria-hidden />
+        <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
         {error}
       </p>
     );
@@ -1006,7 +1008,8 @@ function renderSelectLabel(props: {
   return (
     <label htmlFor={selectId} className="mdt-text-[13px] mdt-font-medium mdt-text-neutral-90">
       {label}
-      {required && <span className="mdt-ml-1 mdt-text-destructive">*</span>}
+      {/* the multi trigger is a plain button with no required state of its own, so the mark says it */}
+      {required && <RequiredMark />}
     </label>
   );
 }
