@@ -32,6 +32,36 @@ describe('InfoTip', () => {
       expect(bubble()).toBeNull();
     });
 
+    /* Pranjal, 2026-10-27: "only icon should have hover" - a ground behind the glyph read as a white box on a tinted card */
+    it('answers hover, focus and open with its glyph ink alone - no ground behind it', async () => {
+      render(<InfoTip label="About Security policy">{TEXT}</InfoTip>);
+      const button = trigger();
+      expect(button).toHaveClass(
+        'mdt-bg-transparent',
+        'hover:mdt-text-neutral-60',
+        'focus-visible:mdt-text-neutral-60',
+        'data-[state=delayed-open]:mdt-text-neutral-60',
+        'data-[state=instant-open]:mdt-text-neutral-60'
+      );
+      const grounds = (): string[] =>
+        Array.from(button.classList).filter(
+          (c) => /(^|:)mdt-bg-/.test(c) && c !== 'mdt-bg-transparent'
+        );
+      expect(grounds()).toEqual([]);
+      await openByHover();
+      expect(button.dataset.state).toMatch(/open/);
+      expect(grounds()).toEqual([]);
+      /* the keyboard still gets its ring */
+      expect(button).toHaveClass('focus-visible:mdt-outline-ring');
+    });
+
+    it('shows the help cursor, as every ⓘ does (Pranjal, 2026-10-28)', () => {
+      render(<InfoTip label="What this means">Explained.</InfoTip>);
+      const mark = screen.getByRole('button', { name: 'What this means' });
+      expect(mark.className).toContain('mdt-cursor-help');
+      expect(mark.className).not.toContain('mdt-cursor-pointer');
+    });
+
     it('takes another glyph and a className', () => {
       render(
         <InfoTip label="About Security policy" icon={<span data-testid="glyph" />} className="x">

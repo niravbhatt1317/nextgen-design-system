@@ -1,6 +1,7 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
+import { useState } from 'react';
 import { Select } from './Select';
 import { SelectOption } from './Select.types';
 
@@ -1987,5 +1988,73 @@ describe('Select - every field is one line', () => {
       'mdt-truncate',
       'mdt-text-[hsl(var(--mdt-option-subtext))]'
     );
+  });
+});
+
+describe('a controlled value cleared back to nothing', () => {
+  /* Radix was left uncontrolled whenever the value went falsy, so it kept its last pick and
+     suppressed a re-pick of that same option as a no-op. TargetBuilder met this as "you cannot
+     add two targets of the same kind". */
+  it('fires onChange again when the same option is picked after a clear', async () => {
+    const user = userEvent.setup();
+    const onPick = vi.fn();
+
+    const Harness = () => {
+      const [kind, setKind] = useState<string | null>(null);
+      return (
+        <>
+          <Select
+            mode="single"
+            options={simpleOptions}
+            value={kind}
+            placeholder="Pick one"
+            onChange={(value) => {
+              const next = typeof value === 'string' ? value : null;
+              setKind(next);
+              if (next) onPick(next);
+            }}
+          />
+          <button type="button" onClick={() => setKind(null)}>
+            Clear
+          </button>
+        </>
+      );
+    };
+
+    render(<Harness />);
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(await screen.findByRole('option', { name: 'Option 1' }));
+    expect(onPick).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(await screen.findByRole('option', { name: 'Option 1' }));
+    expect(onPick).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the placeholder once the controlled value is null', () => {
+    const { rerender } = render(
+      <Select
+        mode="single"
+        options={simpleOptions}
+        value="1"
+        onChange={() => {}}
+        placeholder="Pick one"
+      />
+    );
+    expect(screen.getByRole('combobox')).toHaveTextContent('Option 1');
+
+    rerender(
+      <Select
+        mode="single"
+        options={simpleOptions}
+        value={null}
+        onChange={() => {}}
+        placeholder="Pick one"
+      />
+    );
+    expect(screen.getByRole('combobox')).toHaveTextContent('Pick one');
   });
 });

@@ -1,0 +1,7 @@
+---
+'@mtdt/nextgen-design-system': minor
+---
+
+KpiCard `variant="filled"` - the drawer's card: the neutral-10 ground and no edge, where `outlined` (the default, unchanged) is the card ground inside the neutral-30 hairline. Everything else is the same on both: the 12px corners, the segments at 12/16, the label 12/500 in neutral-90, the figure, the hairlines between segments 12 clear of the edges in neutral-30, and the click cue (the neutral-20 wash sits one step above the filled ground, so it still shows). A single card or a group takes it alike. Ported from the facts card every drawer draws under its identity band - Users, Service accounts, Teams, Roles, Credential profiles, Secret stores, Discovery profiles and Discovery runs (Ronak, 2026-10-27) - which the console drew by hand on the library card (`background: t.fill; border: none`).
+
+A text segment sizes to its line: a segment whose value is a node with nothing else on it - no hint, chip or chart - is a line of text, not a figure, so it drops the 98 floor (Pranjal, 2026-09-30, "why is there this empty space in the kpi card in the bottom") and the 174 width floor (Ronak, 2026-10-17, "is this our scrollbar design": four text segments stood 696 wide in a 680 drawer). The console's adapter did both from outside (`.kpi-fit`, `.dp-kpi-tight`, `.cp-kpi-tight`); the card does it now. A number, a string, or any hint keeps both floors, so KPI rows still line up. Stories: KPI Card → Filled, Filled Group.

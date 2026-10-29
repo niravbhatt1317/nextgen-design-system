@@ -224,11 +224,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p
             id={errorId}
-            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
             role="alert"
           >
-            {/* the alert mark, 12, before the message (K-Field-10) */}
-            <Icon name="alert-circle" size={12} aria-hidden />
+            {/* the alert mark, 12, before the message (K-Field-10); on the first line when the message wraps - 2 down centres it on the 16 line (Ronak, 2026-10-26) */}
+            <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
             {error}
           </p>
         )}

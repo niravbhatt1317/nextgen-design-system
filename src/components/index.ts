@@ -399,6 +399,9 @@ export type {
 // Input
 export { Input, InputVariants } from './Input';
 export type { InputProps, InputVariantsType } from './Input';
+// ChipInput - a field that turns typed values into chips: Enter, comma, space or a paste adds; Backspace takes back.
+export { ChipInput } from './Input';
+export type { ChipInputProps } from './Input';
 
 // InputGroup
 export {
@@ -446,6 +449,10 @@ export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
 export { NumberInput } from './NumberInput';
 export type { NumberInputProps } from './NumberInput';
 
+// DurationInput - days, hours and minutes in one box, each number with its unit word, a hairline between (Max runtime).
+export { DurationInput, formatDuration, parseDuration, NO_LIMIT } from './DurationInput';
+export type { DurationInputProps } from './DurationInput';
+
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
 // the length, resend and expiry rules belong to the sign-in flow, not here.
 export { OTPInput } from './OTPInput';
@@ -470,13 +477,16 @@ export type {
   PaginationEllipsisProps,
 } from './Pagination';
 
-// Popover
+// Popover - one popover, three variants (2026-10-29): the empty card (PopoverContent), the action menu
+// (PopoverActionMenu, its rules built in) and the quick filter (PopoverQuickFilter).
 export {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
   PopoverClose,
+  PopoverActionMenu,
+  PopoverQuickFilter,
   popoverSurface,
 } from './Popover';
 // PopoverOld — the previous popover. DEPRECATED 2026-09-26: use Popover (the overlay surface, no private dark rule).
@@ -494,7 +504,16 @@ export type {
   PopoverOldCloseProps,
   PopoverOldAnchorProps,
 } from './PopoverOld';
-export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
+export type {
+  PopoverProps,
+  PopoverTriggerProps,
+  PopoverContentProps,
+  PopoverVariant,
+  PopoverAction,
+  PopoverActionMenuProps,
+  PopoverQuickFilterOption,
+  PopoverQuickFilterProps,
+} from './Popover';
 
 // Progress — value fill with optional baseline and floor markers
 export { Progress, progressVariants } from './Progress';
@@ -540,6 +559,16 @@ export type {
   SelectMode,
   SelectSize,
 } from './Select';
+
+// TreeSelect - a pick from a tree in a dropdown: groups that fold, items, and what sits under each item, every level a checkbox
+export { TreeSelect } from './TreeSelect';
+export type {
+  TreeSelectProps,
+  TreeSelectGroup,
+  TreeSelectItem,
+  TreeSelectLeaf,
+  TreeSelectNouns,
+} from './TreeSelect';
 
 // Separator
 export { Separator, separatorVariants } from './Separator';
@@ -803,6 +832,10 @@ export {
   TableBody,
   TableRow,
   TableCell,
+  // TableGroupRow - a title row between the rows naming the group under it (the Credentials step's types).
+  TableGroupRow,
+  // TableCheckCell - a checkbox as a cell's value, centred in a 28 square that takes the click (the Notify matrix).
+  TableCheckCell,
   TableHead,
   TableSelectionCell,
   TableNumberCell,
@@ -851,6 +884,8 @@ export type {
   TableColGroupProps,
   TableRowProps,
   TableCellProps,
+  TableGroupRowProps,
+  TableCheckCellProps,
   TableHeadProps,
   TableSelectionCellProps,
   TableNumberCellProps,
@@ -997,6 +1032,7 @@ export {
 export type {
   KpiCardProps,
   KpiCardSize,
+  KpiCardVariant,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,
@@ -1081,6 +1117,22 @@ export type { InputOld2Props, InputOld2VariantsType } from './InputOld2';
 // TextareaOld2 — the Textarea before 2026-09-17. DEPRECATED 2026-09-22: use Textarea.
 export { TextareaOld2, textareaOld2Variants } from './TextareaOld2';
 export type { TextareaOld2Props, TextareaOld2Variants } from './TextareaOld2';
+// PopoverOld2 — the Popover before 2026-10-29 (the overlay surface only). DEPRECATED 2026-10-29: use Popover.
+export {
+  PopoverOld2,
+  PopoverOld2Trigger,
+  PopoverOld2Content,
+  PopoverOld2Anchor,
+  PopoverOld2Close,
+  popoverOld2Surface,
+} from './PopoverOld2';
+export type {
+  PopoverOld2Props,
+  PopoverOld2ContentProps,
+  PopoverOld2TriggerProps,
+  PopoverOld2CloseProps,
+  PopoverOld2AnchorProps,
+} from './PopoverOld2';
 // SelectOld2 — the Select before 2026-09-17. DEPRECATED 2026-09-22: use Select.
 export { SelectOld2, selectOld2TriggerVariants } from './SelectOld2';
 export type {
@@ -1193,6 +1245,21 @@ export {
   splitPhone,
 } from './PhoneInput';
 export type { PhoneInputProps, PhoneCountry, PhoneInputValue } from './PhoneInput';
+
+// InputAction - an action inside a field at its right end, behind a border-to-border hairline (Browse, Replace, Copy).
+export { InputAction } from './InputAction';
+// PathBrowserDialog - the centred dialog Browse opens: a store's paths as a tree, Sync now, Use this path.
+export { PathBrowserDialog } from './InputAction';
+export type { InputActionProps, PathBrowserDialogProps, PathBrowserSource } from './InputAction';
+// TreeView - a bordered box of folders that open and shut and items that are picked (the Browse popup's path tree).
+export { TreeView } from './TreeView';
+export type { TreeViewNode, TreeViewProps } from './TreeView';
+// TargetBuilder - a list of targets built one at a time: pick a type, type the value, Add; each row editable in place.
+export { TargetBuilder } from './TargetBuilder';
+export type { TargetBuilderProps, TargetEntry, TargetKind } from './TargetBuilder';
+// KeyValuesBuilder - rows of a picked key and its values typed in as chips (custom ports by protocol, tags by category).
+export { KeyValuesBuilder } from './TargetBuilder';
+export type { KeyValuesBuilderProps, KeyValuesOption, KeyValuesRow } from './TargetBuilder';
 
 // ── Ported from the console, 2026-10-28 (Pranjal: "push everything in storybook now. Dont leave anything") ──────────
 

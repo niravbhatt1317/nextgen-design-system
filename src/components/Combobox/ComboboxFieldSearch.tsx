@@ -473,11 +473,11 @@ export const ComboboxFieldSearch = forwardRef<HTMLInputElement, ComboboxProps>(
         {error && (
           <p
             id={errorId}
-            className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+            className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
             role="alert"
           >
             {/* the Select's alert mark, 12, before the message */}
-            <Icon name="alert-circle" size={12} aria-hidden />
+            <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
             {error}
           </p>
         )}

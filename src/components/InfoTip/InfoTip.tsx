@@ -10,9 +10,10 @@ import type { InfoTipProps } from './InfoTip.types';
 /* PORTED FROM THE CONSOLE (Pranjal, 2026-10-13). Three hand-made copies of one ⓘ, reconciled:
  *
  *   features/organizations/settingsKit SInfo  (what BrandingStudio's InfoPop renders) - the look, from the 2026-10-11
- *       design picks: a 20 box with the 6 radius, the filled glyph at 14, neutral-40 at rest and neutral-60 with the
- *       sunken step behind it on hover, focus or open ("keep the i icon neutral 40 and highlight neutral 60",
- *       2026-10-03); the explainer under it, from its start, 340 at most, read from the left
+ *       design picks: a 20 box with the 6 radius, the filled glyph at 14, neutral-40 at rest and neutral-60 on hover,
+ *       focus or open ("keep the i icon neutral 40 and highlight neutral 60", 2026-10-03) - the glyph alone, no ground
+ *       behind it (2026-10-27: "i button had a white bg hover? thats should not be there. only icon should have hover");
+ *       the explainer under it, from its start, 340 at most, read from the left
  *   features/organizations/LifecycleModals InfoPop - the same placement (bottom, start, 340); its own colours
  *       (neutral-70 / neutral-150) are the minority and were not taken
  *   features/iei/setupParts InfoPop (22 call sites, the most used) - the behaviour: hover or keyboard focus opens it,
@@ -21,7 +22,8 @@ import type { InfoTipProps } from './InfoTip.types';
  *       anywhere else closes it. Also its `icon` (another glyph, the same explainer) and `className`.
  *
  * Where they disagreed: the placement is SInfo's and LifecycleModals' bottom/start (setupParts opened it on top); the
- * cursor is the pointer (setupParts, LifecycleModals) because a press opens it, not SInfo's help cursor.
+ * cursor is the help cursor, the question mark, as SInfo draws it (Pranjal, 2026-10-28: every ⓘ shows the help
+ * cursor - this replaces the pointer the 2026-10-13 port took from setupParts and LifecycleModals).
  *
  * NEW, no console copy has it: `learnMore`. The bubble turns hoverable so the pointer can reach the link, and Tab on
  * the open ⓘ moves focus into it (the bubble is portalled, so it is not in the page's tab order by itself). From the
@@ -117,13 +119,13 @@ const InfoTip = forwardRef<HTMLButtonElement, InfoTipProps>(function InfoTip(
             type="button"
             aria-label={label}
             className={cn(
-              'mdt-m-0 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-shrink-0 mdt-cursor-pointer mdt-items-center mdt-justify-center',
+              'mdt-m-0 mdt-inline-flex mdt-h-5 mdt-w-5 mdt-shrink-0 mdt-cursor-help mdt-items-center mdt-justify-center',
               'mdt-rounded-md mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-neutral-40',
               'mdt-transition-colors mdt-duration-100',
-              'hover:mdt-bg-secondary hover:mdt-text-neutral-60',
-              'data-[state=delayed-open]:mdt-bg-secondary data-[state=delayed-open]:mdt-text-neutral-60',
-              'data-[state=instant-open]:mdt-bg-secondary data-[state=instant-open]:mdt-text-neutral-60',
-              'focus-visible:mdt-bg-secondary focus-visible:mdt-text-neutral-60',
+              'hover:mdt-text-neutral-60',
+              'data-[state=delayed-open]:mdt-text-neutral-60',
+              'data-[state=instant-open]:mdt-text-neutral-60',
+              'focus-visible:mdt-text-neutral-60',
               'focus-visible:mdt-outline focus-visible:mdt-outline-2 focus-visible:mdt-outline-offset-0 focus-visible:mdt-outline-ring',
               className
             )}

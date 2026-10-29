@@ -379,7 +379,11 @@ function renderSingleSelectMode(props: {
       )}
 
       <SelectPrimitive.Root
-        {...(singleValue && { value: singleValue })}
+        /* Radix is driven by this wrapper in both modes - `currentValue` is authoritative either way (see
+         * `isControlled` below), so the value is always handed over, and "nothing picked" is the empty string.
+         * It was a `&&` spread, which dropped the prop for null and "" alike: a controlled field cleared to null
+         * left Radix uncontrolled holding its last pick, so re-picking that same option fired nothing. */
+        value={typeof singleValue === 'string' ? singleValue : ''}
         onValueChange={(val) => {
           handleValueChange(val || null);
         }}
@@ -505,11 +509,11 @@ function renderSingleSelectMode(props: {
       {error && (
         <p
           id={errorId}
-          className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+          className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
           role="alert"
         >
           {/* the alert mark, 12, before the message (K-Field-10) */}
-          <Icon name="alert-circle" size={12} aria-hidden />
+          <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
           {error}
         </p>
       )}
@@ -968,11 +972,11 @@ function renderHelperOrError(props: {
     return (
       <p
         id={errorId}
-        className="mdt-flex mdt-items-center mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
+        className="mdt-flex mdt-items-start mdt-gap-1.5 mdt-text-xs mdt-text-destructive"
         role="alert"
       >
         {/* the alert mark, 12, before the message (K-Field-10) */}
-        <Icon name="alert-circle" size={12} aria-hidden />
+        <Icon name="alert-circle" size={12} className="mdt-mt-0.5 mdt-shrink-0" aria-hidden />
         {error}
       </p>
     );
