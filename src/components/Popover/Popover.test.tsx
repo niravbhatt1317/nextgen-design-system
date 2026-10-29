@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Popover, PopoverActionMenu, PopoverContent, PopoverQuickFilter, PopoverTrigger } from './Popover';
 import type { PopoverAction } from './Popover.types';
@@ -133,6 +133,22 @@ describe('Popover', () => {
     await user.click(screen.getByText('Custom Button'));
 
     expect(screen.getByText('Content')).toBeInTheDocument();
+  });
+
+  /* a popover list inside a drawer keeps its wheel scrolling, away from the dialog's scroll lock
+     (the fix is #155; this test came from the nirav-leftnav pile via #193) */
+  it('keeps wheel scrolling inside the popover, away from a dialog scroll lock', () => {
+    const onDocWheel = vi.fn();
+    document.addEventListener('wheel', onDocWheel);
+    render(
+      <Popover open>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>Content</PopoverContent>
+      </Popover>
+    );
+    fireEvent.wheel(screen.getByText('Content'), { deltaY: 100 });
+    document.removeEventListener('wheel', onDocWheel);
+    expect(onDocWheel).not.toHaveBeenCalled();
   });
 });
 
