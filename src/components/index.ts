@@ -399,6 +399,9 @@ export type {
 // Input
 export { Input, InputVariants } from './Input';
 export type { InputProps, InputVariantsType } from './Input';
+// ChipInput - a field that turns typed values into chips: Enter, comma, space or a paste adds; Backspace takes back.
+export { ChipInput } from './Input';
+export type { ChipInputProps } from './Input';
 
 // InputGroup
 export {
@@ -445,6 +448,10 @@ export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
 // (Pranjal, 2026-09-22).
 export { NumberInput } from './NumberInput';
 export type { NumberInputProps } from './NumberInput';
+
+// DurationInput - days, hours and minutes in one box, each number with its unit word, a hairline between (Max runtime).
+export { DurationInput, formatDuration, parseDuration, NO_LIMIT } from './DurationInput';
+export type { DurationInputProps } from './DurationInput';
 
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
 // the length, resend and expiry rules belong to the sign-in flow, not here.
@@ -540,6 +547,16 @@ export type {
   SelectMode,
   SelectSize,
 } from './Select';
+
+// TreeSelect - a pick from a tree in a dropdown: groups that fold, items, and what sits under each item, every level a checkbox
+export { TreeSelect } from './TreeSelect';
+export type {
+  TreeSelectProps,
+  TreeSelectGroup,
+  TreeSelectItem,
+  TreeSelectLeaf,
+  TreeSelectNouns,
+} from './TreeSelect';
 
 // Separator
 export { Separator, separatorVariants } from './Separator';
@@ -803,6 +820,10 @@ export {
   TableBody,
   TableRow,
   TableCell,
+  // TableGroupRow - a title row between the rows naming the group under it (the Credentials step's types).
+  TableGroupRow,
+  // TableCheckCell - a checkbox as a cell's value, centred in a 28 square that takes the click (the Notify matrix).
+  TableCheckCell,
   TableHead,
   TableSelectionCell,
   TableNumberCell,
@@ -851,6 +872,8 @@ export type {
   TableColGroupProps,
   TableRowProps,
   TableCellProps,
+  TableGroupRowProps,
+  TableCheckCellProps,
   TableHeadProps,
   TableSelectionCellProps,
   TableNumberCellProps,
@@ -997,6 +1020,7 @@ export {
 export type {
   KpiCardProps,
   KpiCardSize,
+  KpiCardVariant,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,
@@ -1193,6 +1217,21 @@ export {
   splitPhone,
 } from './PhoneInput';
 export type { PhoneInputProps, PhoneCountry, PhoneInputValue } from './PhoneInput';
+
+// InputAction - an action inside a field at its right end, behind a border-to-border hairline (Browse, Replace, Copy).
+export { InputAction } from './InputAction';
+// PathBrowserDialog - the centred dialog Browse opens: a store's paths as a tree, Sync now, Use this path.
+export { PathBrowserDialog } from './InputAction';
+export type { InputActionProps, PathBrowserDialogProps, PathBrowserSource } from './InputAction';
+// TreeView - a bordered box of folders that open and shut and items that are picked (the Browse popup's path tree).
+export { TreeView } from './TreeView';
+export type { TreeViewNode, TreeViewProps } from './TreeView';
+// TargetBuilder - a list of targets built one at a time: pick a type, type the value, Add; each row editable in place.
+export { TargetBuilder } from './TargetBuilder';
+export type { TargetBuilderProps, TargetEntry, TargetKind } from './TargetBuilder';
+// KeyValuesBuilder - rows of a picked key and its values typed in as chips (custom ports by protocol, tags by category).
+export { KeyValuesBuilder } from './TargetBuilder';
+export type { KeyValuesBuilderProps, KeyValuesOption, KeyValuesRow } from './TargetBuilder';
 
 // ── Ported from the console, 2026-10-28 (Pranjal: "push everything in storybook now. Dont leave anything") ──────────
 
