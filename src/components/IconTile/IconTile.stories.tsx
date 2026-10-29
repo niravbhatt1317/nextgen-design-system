@@ -52,36 +52,13 @@ export const Tones: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Row>
-      <IconTile icon={<Icon name="server" />} tone="slate" />
+      <IconTile icon={<Icon name="server" />} tone="slate" data-frame="slate-tile" />
       <IconTile icon={<Icon name="database" />} tone="blue" />
       <IconTile icon={<Icon name="check-circle" />} tone="green" />
       <IconTile icon={<Icon name="alert-triangle" />} tone="amber" />
       <IconTile icon={<Icon name="x-circle" />} tone="rose" />
       <IconTile icon={<Icon name="sparkles" />} tone="purple" />
       <IconTile icon={<Icon name="mail" />} tone="outline" />
-    </Row>
-  ),
-};
-
-/**
- * The grey tile, as a fleet's Approvals tray leads each request with it: lg (40, a 20 glyph), the neutral-20 fill
- * and the secondary ink neutral-90 - a step lighter than it was (Pranjal, 2026-10-23: "it is very dark ... use a
- * lighter bg tone for it"). The same in both themes, each with its own value for the two steps.
- */
-export const Slate: Story = {
-  parameters: { controls: { disable: true } },
-  render: () => (
-    <Row>
-      <IconTile icon={<Icon name="git-pull-request" />} tone="slate" size="sm" />
-      <IconTile icon={<Icon name="git-pull-request" />} tone="slate" size="md" />
-      <IconTile
-        icon={<Icon name="git-pull-request" />}
-        tone="slate"
-        size="lg"
-        aria-label="Change request"
-        data-frame="tray-tile"
-      />
-      <IconTile icon={<Icon name="git-pull-request" />} tone="slate" size="xl" />
     </Row>
   ),
 };

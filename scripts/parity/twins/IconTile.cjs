@@ -28,7 +28,11 @@ const openApprovals = async (page) => {
   await page.mouse.move(0, 0);
   await page.waitForTimeout(500);
 };
-const TRAY_PROPS = PROPS.filter((p) => !p.startsWith('glyph'));
+/* the tray tile against the Tones story's slate tile (Pranjal 2026-10-29: "we just needed to change the dark color
+ * there's no need to actually just create a new variant of it" - no Slate story of its own): that tile is md, the
+ * tray's lg, so the fill and the ink are measured here and the lg geometry by the Sizes twin above */
+const TRAY_PROPS = ['backgroundColor', 'color', 'opacity'];
+const SLATE = { id: 'new-components-icontile--tones', select: '[data-frame="slate-tile"]' };
 const LEAD = 'tbody tr:nth-child(1) span[aria-hidden="true"].mdt-w-8';
 
 module.exports = {
@@ -76,21 +80,21 @@ module.exports = {
     {
       name: 'lg · slate · the Approvals tray tile, Agent Fleet (neutral-20 under neutral-90)',
       props: TRAY_PROPS,
-      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"]' },
+      story: SLATE,
       console: { path: '/agent-fleet', open: openApprovals, select: `${D} .afm-apv__tile:not([data-mine]) > span` },
       mock: null,
     },
     {
-      name: 'lg · slate · the tray tile glyph, Agent Fleet (20)',
-      props: ['width', 'height', 'color', 'stroke', 'strokeWidth'],
-      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"] > svg' },
+      name: 'lg · slate · the tray tile glyph ink, Agent Fleet',
+      props: ['color', 'stroke', 'strokeWidth'],
+      story: { ...SLATE, select: `${SLATE.select} > svg` },
       console: { path: '/agent-fleet', open: openApprovals, select: `${D} .afm-apv__tile:not([data-mine]) > span > svg` },
       mock: null,
     },
     {
       name: 'lg · slate · the Approvals tray tile, Collector Fleet',
       props: TRAY_PROPS,
-      story: { id: 'new-components-icontile--slate', select: '[data-frame="tray-tile"]' },
+      story: SLATE,
       console: { path: '/collectors', open: openApprovals, select: `${D} .cfm-apv__tile:not([data-mine]) > span` },
       mock: null,
     },
