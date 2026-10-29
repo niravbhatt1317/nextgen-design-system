@@ -64,6 +64,9 @@ function main() {
     if (!m) continue;
     const name = m[1];
     if (/Old2?$/.test(name)) continue; /* the deprecated copies are frozen, not measured */
+    /* a part removed whole has nothing left to measure (2026-10-29: OrgCard and ProblemRow left the library as plain
+     * Card compositions, and the gate asked for twins of folders that no longer exist) */
+    if (!fs.existsSync(path.join(LIB, 'src/components', name))) continue;
     if (!byComponent.has(name)) byComponent.set(name, []);
     byComponent.get(name).push(f);
   }

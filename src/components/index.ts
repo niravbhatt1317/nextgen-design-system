@@ -1175,15 +1175,6 @@ export type { EmptyStateProps } from './EmptyState';
 export { CopyField } from './CopyField';
 export type { CopyFieldProps } from './CopyField';
 
-// OrgCard - the card that says which organization a thing belongs to (ported from the console, 2026-10-28).
-export { OrgCard } from './OrgCard';
-export type { OrgCardProps } from './OrgCard';
-
-// ProblemRow - one problem in a "Needs attention" list, the whole row the button; ProblemList stacks them
-// (ported from the console's Health tab, 2026-10-28).
-export { ProblemRow, ProblemList } from './ProblemRow';
-export type { ProblemRowProps, ProblemListProps, ProblemSeverity } from './ProblemRow';
-
 // InfoTip - the filled info mark; its explainer on hover, focus and press, optional "Learn more".
 export { InfoTip } from './InfoTip';
 export type { InfoTipProps, InfoTipLearnMore } from './InfoTip';
