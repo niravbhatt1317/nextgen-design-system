@@ -381,6 +381,8 @@ being broken, in shipped code.
 | `Sheet.tsx`                                                              | 480 / 560 / 720 / 780                 | Drawer width steps          |
 | `BannerStack.tsx`                                                        | stack spacing and timing              | Spacing + motion tokens     |
 | `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                       | Size + type-size tokens     |
+| `PickCard.tsx`                                                           | `[13px]`, `[3px]`, `[120ms]`          | Type-size, offset, motion   |
+| `Banner.tsx` (`strip`)                                                   | `[22px]`                              | Spacing token               |
 | `Slider.tsx`, `slider.css`                                               | track, handle, tag, chip, ruler       | Size + type-size + radius   |
 | `RequiredMark.tsx`                                                       | `[3px]` (the star's gap)              | Spacing token               |
 | Component                                                                | Hardcoded value                       | Should be                   |
@@ -434,6 +436,12 @@ across all five sizes: the dot is exactly `size / 6.4` and its ring exactly `siz
 The corner offsets differ at `xl` only because `xl` is the one size with a 12px corner radius instead
 of 6px, so the dot meets a different arc. **It does not need five tokens — it needs two ratios**,
 which is a much smaller decision than the rest of this section.
+
+**The console's cards (Pranjal, 2026-10-28)** - `PickCard` and the `Banner` strip - carry
+the console's own numbers, declared in each file's header comment. None is a new kind of question: `13px` is the same
+micro type gap as the tag picker's; the `3px` underline offset (Tailwind steps 1 / 2 / 4) is the console's for every
+underlined quiet link ("Change"); `22px` is the strip's gutter, which lines up with the header band's icons; `120ms` is
+the Pick card's fade. No colour was invented.
 
 **The twelve console parts (Pranjal, 2026-10-13)** each declare their raw values in their own
 comments, which is the right half of the token rule; this table is the other half. Two of them are

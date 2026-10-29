@@ -103,7 +103,7 @@ export type {
 // Banner — a message that sits in the page and stays there. Shares Toast's six
 // tones and palette on purpose; shares nothing about how it behaves. If you
 // would still need the message after a refresh, it is a Banner.
-export { Banner, bannerVariants } from './Banner';
+export { Banner, bannerVariants, useDismissUntilNew } from './Banner';
 export type {
   BannerProps,
   BannerOwnProps,
@@ -111,6 +111,9 @@ export type {
   BannerTone,
   BannerPlacement,
   BannerActionPlacement,
+  DismissStorage,
+  DismissUntilNewOptions,
+  DismissUntilNewState,
 } from './Banner';
 
 // Breadcrumb — says where you are and offers the way back. Depth, not sequence:
@@ -174,13 +177,15 @@ export type {
   CollapsibleCardOwnProps,
 } from './Card';
 
-// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right
-export { SelectableCard, SelectableCardGroup } from './SelectableCard';
+// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right.
+// PickCard - the made choice folded into one of those cards, with a Change door (Pranjal, 2026-10-19).
+export { SelectableCard, SelectableCardGroup, PickCard } from './SelectableCard';
 export type {
   SelectableCardProps,
   SelectableCardGroupProps,
   SelectableCardType,
   SelectableCardLayout,
+  PickCardProps,
 } from './SelectableCard';
 
 // ActionCard

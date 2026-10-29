@@ -233,6 +233,87 @@ describe('Banner', () => {
     });
   });
 
+  describe('the page strip', () => {
+    it('is square, edge to edge, at least 44 tall, on the header band insets (22 / 24)', () => {
+      render(<Banner title={TITLE} placement="strip" />);
+      const cls = surface().className;
+      for (const c of [
+        'mdt-rounded-none',
+        'mdt-min-h-11',
+        'mdt-pl-[22px]',
+        'mdt-pr-6',
+        'mdt-py-3',
+        'mdt-border-b',
+      ])
+        expect(cls).toContain(c);
+    });
+
+    it.each(TONES)("draws its hairline in the %s tone's own border", (tone) => {
+      render(<Banner title={TITLE} placement="strip" tone={tone} />);
+      expect(surface().className).toContain(`mdt-border-feedback-${tone}-border`);
+    });
+
+    it('keeps two actions on its one row, with the cross after them', () => {
+      render(
+        <Banner
+          title={TITLE}
+          placement="strip"
+          onDismiss={() => undefined}
+          actions={
+            <>
+              <Button variant="ghost" size="sm">
+                Suspend now
+              </Button>
+              <Button variant="ghost" size="sm">
+                Cancel schedule
+              </Button>
+            </>
+          }
+        />
+      );
+      const end = slot('end');
+      expect(end?.contains(slot('actions'))).toBe(true);
+      expect(end?.lastElementChild).toBe(slot('dismiss'));
+    });
+
+    it('still drops them below when told to', () => {
+      render(
+        <Banner
+          title={TITLE}
+          placement="strip"
+          actionPlacement="below"
+          actions={
+            <Button variant="ghost" size="sm">
+              Review
+            </Button>
+          }
+        />
+      );
+      expect(slot('end')).toBeNull();
+      expect(slot('actions')).not.toBeNull();
+    });
+
+    it('changes nothing about the page placement: two actions there still drop below', () => {
+      render(
+        <Banner
+          title={TITLE}
+          placement="page"
+          actions={
+            <>
+              <Button variant="ghost" size="sm">
+                Notes
+              </Button>
+              <Button variant="ghost" size="sm">
+                Update
+              </Button>
+            </>
+          }
+        />
+      );
+      expect(slot('end')).toBeNull();
+    });
+  });
+
   describe('alignment', () => {
     const one = (
       <Button variant="ghost" size="sm">

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Banner } from './Banner';
+import { useDismissUntilNew } from './useDismissUntilNew';
 import { Button } from '../Button';
 import type { BannerTone } from './Banner.types';
 
@@ -42,7 +44,7 @@ const meta: Meta<typeof Banner> = {
       control: 'select',
       options: ['neutral', 'info', 'success', 'warning', 'danger', 'ai'],
     },
-    placement: { control: 'inline-radio', options: ['inline', 'page'] },
+    placement: { control: 'inline-radio', options: ['inline', 'page', 'strip'] },
     actionPlacement: { control: 'inline-radio', options: ['auto', 'inline', 'below'] },
     title: { control: 'text' },
     description: { control: 'text' },
@@ -416,4 +418,159 @@ export const LongMessage: Story = {
       />
     </div>
   ),
+};
+
+/* ── the page's notice strip ───────────────────────────────────────────── */
+
+/** The frame a page puts its strips in: edge to edge, under the breadcrumb band, above the heading. */
+const PageTop = ({ children }: { children: React.ReactNode }) => (
+  <div className="mdt-w-full mdt-bg-background">
+    <div className="mdt-flex mdt-h-12 mdt-items-center mdt-border-0 mdt-border-b mdt-border-solid mdt-border-neutral-20 mdt-px-6 mdt-text-sm mdt-text-muted-foreground">
+      Collector Fleet
+    </div>
+    <div className="mdt-flex mdt-flex-col">{children}</div>
+    <div className="mdt-px-6 mdt-py-5 mdt-text-2xl mdt-font-semibold mdt-text-foreground">
+      Collector Fleet
+    </div>
+  </div>
+);
+
+/**
+ * **The page's notice strip** - `placement="strip"`: edge to edge across the top of a page, a hairline
+ * under it in the tone's own border, the glyph 22 in and the actions ending 24 in (the header band's
+ * insets), its actions on its one row. Collector Fleet's "A collector isn't placed in a network zone",
+ * ported from the console (Pranjal, 2026-10-28).
+ */
+export const Strip: Story = {
+  parameters: { layout: 'fullscreen', controls: { disable: true } },
+  render: () => (
+    <PageTop>
+      <Banner
+        placement="strip"
+        tone="warning"
+        title="A collector isn't placed in a network zone"
+        description="col-ams-01 takes no work until it is settled."
+        actions={
+          <Button variant="ghost" size="sm">
+            Review
+          </Button>
+        }
+        onDismiss={() => undefined}
+      />
+    </PageTop>
+  ),
+};
+
+/** Every tone as a strip, one under another - each keeps its own hairline. */
+export const StripTones: Story = {
+  parameters: { layout: 'fullscreen', controls: { disable: true } },
+  render: () => (
+    <PageTop>
+      <Banner
+        placement="strip"
+        tone="danger"
+        title="Suspended"
+        description="Members can't sign in · settings read-only"
+      />
+      <Banner
+        placement="strip"
+        tone="warning"
+        title="Read-only"
+        description="You can see everything in Northwind Retail but not change it"
+      />
+      <Banner
+        placement="strip"
+        tone="success"
+        title="Import complete"
+        description="128 sites from sites-2026-10.csv"
+        actions={
+          <Button variant="ghost" size="sm">
+            View results
+          </Button>
+        }
+        onDismiss={() => undefined}
+        dismissLabel="Dismiss import notification"
+      />
+      <Banner placement="strip" tone="info" title="Maintenance on Sunday, 02:00–04:00 UTC" />
+      <Banner
+        placement="strip"
+        tone="neutral"
+        title="Retention is set by the platform, not by this org"
+      />
+      <Banner placement="strip" tone="ai" title="Three tickets look like duplicates of INC-4471" />
+    </PageTop>
+  ),
+};
+
+/**
+ * **Dismiss until something new happens** - `useDismissUntilNew`. The ✕ hides the strip for the
+ * collectors it is about today; it comes back only when one more is unplaced. A collector placed since
+ * drops out of the set, so it counts as new if it is ever unplaced again. Remembered per key in this
+ * browser (this story keeps it for the visit only).
+ */
+export const StripDismissUntilNew: Story = {
+  name: 'Strip · dismiss until something new',
+  parameters: { layout: 'fullscreen', controls: { disable: true } },
+  render: function StripDismissStory() {
+    const [stranded, setStranded] = useState<string[]>(['col-ams-01']);
+    const notice = useDismissUntilNew('story.unplaced', stranded, { storage: null });
+    const next = `col-fra-0${String(stranded.length + 1)}`;
+    return (
+      <div className="mdt-flex mdt-flex-col mdt-gap-4">
+        <PageTop>
+          {notice.visible ? (
+            <Banner
+              placement="strip"
+              tone="warning"
+              title={
+                stranded.length === 1
+                  ? "A collector isn't placed in a network zone"
+                  : `${String(stranded.length)} collectors aren't placed in a network zone`
+              }
+              description={
+                stranded.length === 1
+                  ? `${stranded[0] ?? ''} takes no work until it is settled.`
+                  : 'They take no work until they are settled.'
+              }
+              actions={
+                <Button variant="ghost" size="sm">
+                  Review
+                </Button>
+              }
+              onDismiss={notice.dismiss}
+            />
+          ) : null}
+        </PageTop>
+        <div className="mdt-flex mdt-gap-2 mdt-px-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setStranded((s) => [...s, next]);
+            }}
+          >
+            Unplace {next}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setStranded((s) => s.slice(0, -1));
+            }}
+          >
+            Place the last one
+          </Button>
+        </div>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Dismiss' }));
+    await expect(canvas.queryByText("A collector isn't placed in a network zone")).toBeNull();
+    await userEvent.click(canvas.getByRole('button', { name: /Unplace col-fra-02/ }));
+    await expect(
+      canvas.getByText("2 collectors aren't placed in a network zone")
+    ).toBeInTheDocument();
+  },
 };
