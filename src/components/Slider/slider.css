@@ -1,0 +1,263 @@
+/* Slider - ported from the console (Pranjal, 2026-10-28): organizations/settings.css .pc-range, .pc-tag, .pc-saved and
+ * .st-ruler, the policy slider's rules under the library's names. Tokens only, so dark flips by itself.
+ *
+ * THE TRACK (2026-10-01, his word: "i dont think we need outline where the color is dull in this progress bar"): the
+ * browser's own track drew a grey outline round the unfilled part. Drawn here instead - a flat 8px track, the unfilled
+ * part a plain fill with no edge, the filled part --mdt-slider-fill up to --mdt-slider-p, a 16px handle (the ruler's
+ * arithmetic assumes 16). */
+.mdt-slider__range {
+  /* the filled part and the handle's ring: the primary ink (2026-10-01, his word: "when i slide it should be the
+   * current primary black ... That way we wont go away with our color theme too much") */
+  --mdt-slider-fill: hsl(var(--mdt-primary));
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.mdt-slider__range:disabled {
+  cursor: not-allowed; /* the panel carries the half strength */
+}
+.mdt-slider__range:focus {
+  outline: none;
+}
+.mdt-slider__range::-webkit-slider-runnable-track {
+  height: 8px;
+  border: 0;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--mdt-slider-fill) var(--mdt-slider-p),
+    hsl(var(--mdt-neutral-20)) var(--mdt-slider-p)
+  );
+}
+.mdt-slider__range::-moz-range-track {
+  height: 8px;
+  border: 0;
+  border-radius: 4px;
+  background: hsl(var(--mdt-neutral-20));
+}
+.mdt-slider__range::-moz-range-progress {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--mdt-slider-fill);
+}
+.mdt-slider__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; /* 12 + 2px border each side = 16, centred on the 8px track */
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: hsl(var(--mdt-background));
+  border: 2px solid var(--mdt-slider-fill);
+  box-shadow: var(--mdt-shadow-sm);
+  transition:
+    box-shadow 120ms,
+    transform 120ms;
+}
+.mdt-slider__range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: hsl(var(--mdt-background));
+  border: 2px solid var(--mdt-slider-fill);
+  box-shadow: var(--mdt-shadow-sm);
+  transition:
+    box-shadow 120ms,
+    transform 120ms;
+}
+.mdt-slider__range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px hsl(var(--mdt-ring) / 0.35);
+}
+.mdt-slider__range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px hsl(var(--mdt-ring) / 0.35);
+}
+
+/* HOVER (2026-10-01, his word: "provide a hover on progress bar ... so that if i hover on it by mistake they find out
+ * that this is clickable"): over the track the pointer is a hand, the handle grows a soft ring and the unfilled part
+ * darkens a step; dragging shows the grabbing hand. */
+.mdt-slider__range:not(:disabled):active {
+  cursor: grabbing;
+}
+.mdt-slider__range:not(:disabled):hover::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 5px hsl(var(--mdt-foreground) / 0.1);
+}
+.mdt-slider__range:not(:disabled):hover::-moz-range-thumb {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 5px hsl(var(--mdt-foreground) / 0.1);
+}
+.mdt-slider__range:not(:disabled):hover::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    var(--mdt-slider-fill) var(--mdt-slider-p),
+    hsl(var(--mdt-neutral-30)) var(--mdt-slider-p)
+  );
+}
+.mdt-slider__range:not(:disabled):hover::-moz-range-track {
+  background: hsl(var(--mdt-neutral-30));
+}
+
+/* THE VALUE TAG on the handle: outlined at rest, the solid ink once moved (2026-10-01). */
+.mdt-slider__tag {
+  position: absolute;
+  bottom: 6px;
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--mdt-primary));
+  background: hsl(var(--mdt-primary));
+  color: hsl(var(--mdt-primary-foreground));
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mdt-slider__tag[data-resting] {
+  border-color: hsl(var(--mdt-neutral-40));
+  background: hsl(var(--mdt-background));
+  color: hsl(var(--mdt-foreground));
+}
+/* the tag you can type into (`typeable`, 2026-10-17: "we also need to provide an option for type ... Find a unique
+ * way"): at rest the number wears the dotted underline the console uses for "this opens something", a text cursor and a
+ * soft ring on hover - no pencil (tried, then "actually remove the edit icon, go back to your previous design") */
+button.mdt-slider__tag {
+  cursor: text;
+}
+.mdt-slider__tag-n {
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+button.mdt-slider__tag:hover {
+  box-shadow: 0 0 0 3px hsl(var(--mdt-ring) / 0.18);
+}
+button.mdt-slider__tag:hover .mdt-slider__tag-n {
+  text-decoration-style: solid;
+}
+button.mdt-slider__tag:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: 2px;
+}
+/* ...and pressed it is the field, in the same place, the unit after it; a number outside the range turns the edge red */
+.mdt-slider__tag--edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-color: hsl(var(--mdt-primary));
+  background: hsl(var(--mdt-background));
+  color: hsl(var(--mdt-foreground));
+  box-shadow: 0 0 0 3px hsl(var(--mdt-ring) / 0.18);
+}
+.mdt-slider__tag--edit[data-invalid] {
+  border-color: hsl(var(--mdt-destructive));
+}
+.mdt-slider__tag-input {
+  all: unset;
+  text-align: right;
+  font-weight: 600;
+}
+.mdt-slider__tag-unit {
+  font-weight: 500;
+  color: hsl(var(--mdt-neutral-90));
+}
+
+/* THE SAVED VALUE (2026-10-01, his word: "give it a yellow color line rather than black. and not just 60 highlight any
+ * custom value in the box. Which if i click will reset it again"): a yellow upright mark on the track and, above the bar
+ * beside the value tag (2026-10-17: "in botton it kind of blends in with others"), the saved value in a chip - a neutral
+ * box with a dashed edge. Pressing the chip sets the slider back to it. */
+.mdt-slider__saved-mark {
+  position: absolute;
+  top: 2px;
+  z-index: 1;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  border-radius: 999px;
+  background: var(--mdt-badge-warning-dot);
+  pointer-events: none;
+}
+.mdt-slider__saved {
+  position: absolute;
+  top: -27px;
+  z-index: 2;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0 6px;
+  height: 18px;
+  border: 1px dashed hsl(var(--mdt-neutral-50));
+  border-radius: 4px;
+  background: hsl(var(--mdt-neutral-20));
+  color: hsl(var(--mdt-foreground));
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mdt-slider__saved:hover {
+  border-color: hsl(var(--mdt-foreground) / 0.6);
+}
+.mdt-slider__saved:focus-visible {
+  outline: 2px solid hsl(var(--mdt-ring));
+  outline-offset: 2px;
+}
+
+/* THE RULER: minor ticks light, major ticks a step stronger, numbers only under the majors the ticks picked; ink from
+ * the foreground token at two strengths so dark mode flips it by itself. The two end names hang off the first and last
+ * numbers (2026-09-28, Nikhil, Version 2) - after the floor's, subtle; before the ceiling's, a step stronger. */
+.mdt-slider__ruler {
+  position: relative;
+  height: 24px;
+  margin-top: 4px;
+}
+.mdt-slider__tick {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 5px;
+  margin-left: -0.5px;
+  background: hsl(var(--mdt-foreground) / 0.16);
+}
+.mdt-slider__tick[data-major] {
+  height: 8px;
+  background: hsl(var(--mdt-foreground) / 0.34);
+}
+.mdt-slider__num {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  transform: translateX(-50%);
+  font-size: 11px;
+  line-height: 1;
+  color: hsl(var(--mdt-muted-foreground));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mdt-slider__num[data-end='end'] {
+  font-weight: 500;
+  color: hsl(var(--mdt-foreground) / 0.72);
+}
+.mdt-slider__word {
+  position: absolute;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.mdt-slider__num[data-end='start'] .mdt-slider__word {
+  left: 100%;
+  padding-left: 0.3em;
+}
+.mdt-slider__num[data-end='end'] .mdt-slider__word {
+  right: 100%;
+  padding-right: 0.3em;
+}

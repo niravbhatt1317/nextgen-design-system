@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { cn } from '@/utils';
+import { RequiredMark } from '../RequiredMark';
 import type { FormLabelProps } from './Form.types';
 
 /**
@@ -68,11 +69,9 @@ const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
     return (
       <label ref={ref} className={cn(formLabelVariants({ weight, color }), className)} {...props}>
         {children}
-        {required && (
-          <span className="mdt-ml-1 mdt-text-destructive" aria-label="required">
-            *
-          </span>
-        )}
+        {/* the one asterisk (RequiredMark): 3 off the word, and "required" for a screen reader - the label does not
+         * know whether its control says so itself */}
+        {required && <RequiredMark />}
       </label>
     );
   }

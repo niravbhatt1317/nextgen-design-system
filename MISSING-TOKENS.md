@@ -375,7 +375,6 @@ being broken, in shipped code.
 | `Sidebar.tsx`                                                            | `[10px]`                              | Type-size token              |
 | `TagPill.tsx`                                                            | `[10px]`                              | Type-size token              |
 | `TagPicker.tsx`                                                          | `[34px]`, `[380px]`                   | Size tokens                  |
-| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]`        | Type-size + tracking tokens  |
 | `InlineTags.tsx`                                                         | `[13px]`, `[220px]`                   | Type-size + size tokens      |
 | `Avatar.tsx`                                                             | status dot + ring tables              | A ratio, not steps — below   |
 | `Sheet.tsx`                                                              | 480 / 560 / 720 / 780                 | Drawer width steps           |
@@ -383,26 +382,11 @@ being broken, in shipped code.
 | `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                       | Size + type-size tokens      |
 | `RowList/rowList.css`                                                    | row geometry, 12 / 11 type            | Size + spacing + type tokens |
 | `SheetParts.tsx` (`SheetFields`)                                         | `gap-[18px]`                          | Spacing token                |
-| Component                                                                | Hardcoded value                       | Should be                    |
-| ------------------------------------------------------------------------ | ------------------------------------- | ---------------------------  |
-| `Textarea.tsx`                                                           | `[80px]`, `[100px]`, `[120px]`        | Size tokens                  |
-| `ScrollArea.tsx`                                                         | `[200px]`, `[350px]`, `[1px]`         | Size + border-width tokens   |
-| `Select.tsx`                                                             | `[8rem]`                              | Min-width token              |
-| `DropdownMenu.tsx`                                                       | `[8rem]`                              | Min-width token              |
-| `Command.tsx`                                                            | `[300px]`                             | Min-width token              |
-| `Combobox.tsx`                                                           | `[300px]`                             | Min-width token              |
-| `Table.tsx`                                                              | `[100px]`                             | Size token                   |
-| `InputGroup.tsx`                                                         | `[60px]`                              | Size token                   |
-| `Sidebar.tsx`                                                            | `[10px]`                              | Type-size token              |
-| `TagPill.tsx`                                                            | `[10px]`                              | Type-size token              |
-| `TagPicker.tsx`                                                          | `[34px]`, `[380px]`                   | Size tokens                  |
-| `TagPicker.tsx`                                                          | `[11px]`, `[13px]`, `[0.05em]`        | Type-size + tracking tokens  |
-| `InlineTags.tsx`                                                         | `[13px]`, `[220px]`                   | Type-size + size tokens      |
-| `Avatar.tsx`                                                             | status dot + ring tables              | A ratio, not steps — below   |
-| `Sheet.tsx`                                                              | 480 / 560 / 720 / 780                 | Drawer width steps           |
-| `BannerStack.tsx`                                                        | stack spacing and timing              | Spacing + motion tokens      |
-| `ConfirmDialog.tsx`, `CopyField.tsx`, `EmptyState.tsx`, `PhoneInput.tsx` | assorted raw px                       | Size + type-size tokens      |
 | `Breadcrumb.tsx` (drawer form)                                           | `gap-[7px]`, `underline-offset-[3px]` | Spacing + offset tokens      |
+| `PickCard.tsx`                                                           | `[13px]`, `[3px]`, `[120ms]`          | Type-size, offset, motion    |
+| `Banner.tsx` (`strip`)                                                   | `[22px]`                              | Spacing token                |
+| `Slider.tsx`, `slider.css`                                               | track, handle, tag, chip, ruler       | Size + type-size + radius    |
+| `RequiredMark.tsx`                                                       | `[3px]` (the star's gap)              | Spacing token                |
 
 _(Hardcoded values inside `.stories.tsx` files are excluded — those are demo layout, not
 shipped product.)_
@@ -435,6 +419,12 @@ The corner offsets differ at `xl` only because `xl` is the one size with a 12px 
 of 6px, so the dot meets a different arc. **It does not need five tokens — it needs two ratios**,
 which is a much smaller decision than the rest of this section.
 
+**The console's cards (Pranjal, 2026-10-28)** - `PickCard` and the `Banner` strip - carry
+the console's own numbers, declared in each file's header comment. None is a new kind of question: `13px` is the same
+micro type gap as the tag picker's; the `3px` underline offset (Tailwind steps 1 / 2 / 4) is the console's for every
+underlined quiet link ("Change"); `22px` is the strip's gutter, which lines up with the header band's icons; `120ms` is
+the Pick card's fade. No colour was invented.
+
 **The twelve console parts (Pranjal, 2026-10-13)** each declare their raw values in their own
 comments, which is the right half of the token rule; this table is the other half. Two of them are
 not size gaps but missing _things_: a filled info glyph (see the icon note in `COMPONENT-GAP.md`) and
@@ -448,6 +438,14 @@ column and `8` row padding, and the timeline's `7` dot, `5` drop, `14` step and 
 tokens. The fact row's stack (`SheetFields`) is `18` apart - rulebook S-98, "rows split 50/50, gap 18" - which is not a
 Tailwind step (`4` is 16, `5` is 20). **None of these is a new question**: they are the table's own row heights and cell
 type, which the table already carries as raw values in `table.css`; a spacing and type scale would settle both at once.
+**The four console parts of 2026-10-28** (RequiredMark, CopyTip, OverflowTip, Slider) carry the console's own numbers,
+declared here as #162's were. RequiredMark's `3px` gap is the Input's and Textarea's, already in the library (K-Field-05).
+The Slider's live in `slider.css`, read off the console's policy slider: an `8px` track with `4px` corners, a
+`12px` handle with a `2px` ring (16 in all - the ruler's arithmetic depends on it), a value tag of `12px`/600 on
+`1.5` with `2px 8px` padding and `6px` corners, an `18px` reset chip of `11px`/600 with `4px` corners, ruler
+ticks of `5px` and `8px` and numbers at `11px`, and the name row's `1.4` line height (`mdt-leading-[1.4]`, between
+Tailwind's `snug` 1.375 and `normal` 1.5). The tick inks are the foreground at 16%, 34% and 72% (`hsl(var(--mdt-foreground) / n)`),
+the same opacity gap as section 6. Nothing new in colour: every colour is an existing token.
 
 ---
 

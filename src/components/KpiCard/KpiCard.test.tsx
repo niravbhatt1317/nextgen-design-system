@@ -162,6 +162,100 @@ describe('KpiCard size', () => {
   });
 });
 
+/* Ronak, 2026-10-27: the drawers' grey facts card as a variant of the library card, not a hand-styled one. */
+describe('KpiCard variant', () => {
+  const card = (container: HTMLElement) => container.firstElementChild as HTMLElement;
+
+  it('is outlined by default: the card ground inside the neutral-30 hairline', () => {
+    const { container } = render(<KpiCard label="Total users" value={8200} />);
+    expect(card(container)).toHaveAttribute('data-variant', 'outlined');
+    expect(card(container)).toHaveClass('mdt-border', 'mdt-border-neutral-30', 'mdt-bg-card');
+    expect(card(container)).not.toHaveClass('mdt-bg-neutral-10');
+  });
+
+  it('filled draws the neutral-10 ground with no edge and keeps the corners and the floor', () => {
+    const { container } = render(
+      <KpiCard variant="filled" label="Total users" value={8200} hint="across all organisations" />
+    );
+    const c = card(container);
+    expect(c).toHaveAttribute('data-variant', 'filled');
+    expect(c).toHaveClass('mdt-bg-neutral-10', 'mdt-border-0', 'mdt-rounded-xl');
+    expect(c).not.toHaveClass('mdt-border-neutral-30', 'mdt-bg-card');
+    expect(c.style.minWidth).toBe(`${String(KPI_FLOOR)}px`);
+    expect(screen.getByText('8.2k')).toHaveClass('mdt-text-2xl');
+  });
+
+  it('filled reaches a group, and a clickable segment keeps its switch', async () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <KpiCard
+        variant="filled"
+        label="Yield"
+        items={[
+          { label: 'Targets', value: 1180, onClick },
+          { label: 'Discovered', value: 402 },
+        ]}
+      />
+    );
+    expect(screen.getByRole('group', { name: 'Yield' })).toHaveAttribute('data-variant', 'filled');
+    expect(container.querySelectorAll('.kpi-seg')).toHaveLength(2);
+    await userEvent.click(screen.getByRole('button', { name: /Targets/ }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* Pranjal, 2026-09-30: "why is there this empty space in the kpi card in the bottom"; Ronak, 2026-10-17: four text
+ * segments stood 696 wide in a 680 drawer. The console's adapter sized these from outside; the card does it now. */
+describe('KpiCard text segment', () => {
+  const line = (text: string) => <span>{text}</span>;
+
+  it('a node with nothing else on the segment drops the 98 floor and the 174 width floor', () => {
+    const { container } = render(
+      <KpiCard
+        variant="filled"
+        label="Facts"
+        items={[
+          { label: 'Type', value: line('SNMP v2c') },
+          { label: 'Status', value: line('Active') },
+        ]}
+      />
+    );
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.style.minWidth).toBe('0px');
+    expect(card.style.width).toBe(`${String(KPI_FLOOR * 2)}px`);
+    const segs = [...container.querySelectorAll<HTMLElement>('.kpi-seg')];
+    expect(segs).toHaveLength(2);
+    for (const s of segs) {
+      expect(s).not.toHaveClass('mdt-min-h-[98px]');
+      expect(s.style.minWidth).toBe('0px');
+    }
+  });
+
+  it('a number, a string, or a hint keeps both floors, so rows still line up', () => {
+    const { container } = render(
+      <KpiCard
+        items={[
+          { label: 'Targets', value: 1180 },
+          { label: 'Coverage', value: '34%' },
+          { label: 'Type', value: line('SNMP v2c'), hint: 'read-only' },
+        ]}
+      />
+    );
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.style.minWidth).toBe(`${String(KPI_FLOOR * 3)}px`);
+    for (const s of container.querySelectorAll('.kpi-seg')) {
+      expect(s).toHaveClass('mdt-min-h-[98px]');
+    }
+  });
+
+  it('a single text card has no floor either', () => {
+    const { container } = render(<KpiCard label="Type" value={line('SNMP v2c')} />);
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.style.minWidth).toBe('0px');
+    expect(container.querySelector('.kpi-seg')).not.toHaveClass('mdt-min-h-[98px]');
+  });
+});
+
 describe('KpiStrip', () => {
   it('is a named, keyboard-reachable row that bleeds through the page inset', () => {
     render(

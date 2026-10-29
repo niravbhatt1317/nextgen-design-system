@@ -7,7 +7,7 @@ import type * as TabsPrimitive from '@radix-ui/react-tabs';
  * - `underline` — the default: every drawer band and page band. A 13/500 label
  *   over a 2px line that sits on the strip's hairline.
  * - `filled` — a switch inside a body (a view toggle, a form's mode), where a
- *   track reads better than a line: a 32 track holding 26 chips.
+ *   track reads better than a line: a 40 track holding 32 chips (2026-10-23).
  *
  * A sequence is a Stepper, a view preference a ToggleGroup, "one of these" a
  * Radio strip; only sections you visit in any order are Tabs (K-Tabs-25).

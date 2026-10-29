@@ -146,4 +146,54 @@ describe('NumberInput', () => {
       expect(container.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThan(0);
     });
   });
+
+  describe('unit', () => {
+    it('draws the unit inside the field in place of the stepper, the digits kept clear of it', () => {
+      render(
+        <NumberInput
+          label="Connection timeout"
+          unit="Seconds"
+          value="30"
+          onChange={() => undefined}
+        />
+      );
+      const word = screen.getByText('Seconds');
+      expect(word).toHaveClass('mdt-border-l', 'mdt-pointer-events-none', 'mdt-text-faint');
+      expect(screen.queryByRole('button', { name: 'Increase' })).toBeNull();
+      expect(field()).toHaveClass('mdt-pr-[84px]');
+      expect(field()).toHaveValue(30);
+    });
+
+    it('still takes typing', async () => {
+      const values: string[] = [];
+      render(
+        <NumberInput
+          aria-label="Minutes"
+          unit="Minutes"
+          value=""
+          onChange={(v) => values.push(v)}
+        />
+      );
+      await userEvent.type(field(), '5');
+      expect(values).toEqual(['5']);
+    });
+
+    it('draws the stepper for an empty unit, and the lock - not the unit - when held', () => {
+      const { rerender } = render(<NumberInput aria-label="n" unit="" />);
+      expect(up()).toBeInTheDocument();
+      rerender(<NumberInput aria-label="n" unit="Days" locked />);
+      expect(screen.queryByText('Days')).toBeNull();
+    });
+
+    it('tells a screen reader the unit, before the error or helper line', () => {
+      const { rerender } = render(<NumberInput aria-label="Timeout" unit="Seconds" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds');
+      rerender(<NumberInput aria-label="Timeout" unit="Seconds" helperText="Between 5 and 300" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds Between 5 and 300');
+      rerender(<NumberInput aria-label="Timeout" unit="Seconds" error="Too long" />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleDescription('Seconds Too long');
+      rerender(<NumberInput aria-label="Timeout" />);
+      expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-describedby');
+    });
+  });
 });
