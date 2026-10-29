@@ -19,6 +19,8 @@ const meta: Meta<typeof IconTile> = {
           'tokens that do not exist at all.',
           '',
           'Tones match `Avatar`, so a tile and an avatar side by side agree on what green means.',
+          'Slate is the one exception: the tile is a step lighter (neutral-20 under neutral-90, since',
+          '2026-10-28) than the slate avatar.',
           '',
           'Leave `aria-label` off and the tile is hidden from screen readers — right when the',
           'icon only decorates something already labelled beside it.',
@@ -50,7 +52,7 @@ export const Tones: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Row>
-      <IconTile icon={<Icon name="server" />} tone="slate" />
+      <IconTile icon={<Icon name="server" />} tone="slate" data-frame="slate-tile" />
       <IconTile icon={<Icon name="database" />} tone="blue" />
       <IconTile icon={<Icon name="check-circle" />} tone="green" />
       <IconTile icon={<Icon name="alert-triangle" />} tone="amber" />

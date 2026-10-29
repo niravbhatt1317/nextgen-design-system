@@ -41,7 +41,7 @@ describe('Tabs — the two types (K-Tabs-01)', () => {
   it('hands the type to every tab inside, so it is set once', () => {
     render(three('filled'));
     expect(tab('About')).toHaveAttribute('data-type', 'filled');
-    expect(tab('Teams')).toHaveClass('mdt-h-[25px]');
+    expect(tab('Teams')).toHaveClass('mdt-h-8');
     expect(tab('Teams')).not.toHaveClass('mdt-border-b-2');
   });
 
@@ -376,20 +376,25 @@ describe('option B: labels on the content edge, the line under the label (Pranja
 });
 
 describe('filled geometry (K-Tabs-09 to 11)', () => {
-  it('draws a 32 track with corners 8 on neutral-20, 3.5 in at the sides, 2 between chips', () => {
+  /* Pranjal, 2026-10-23, option C: "in secondary tabs ... it looks cramped" - the 40 track, the 32 chip, 4 above and below */
+  it('draws a 40 track with corners 8 on neutral-20, 4 in at the sides, 2 between chips', () => {
     render(three('filled'));
     expect(list()).toHaveClass(
-      'mdt-h-8',
+      'mdt-h-10',
       'mdt-rounded-[8px]',
       'mdt-bg-neutral-20',
-      'mdt-px-[3.5px]',
+      'mdt-px-1',
+      'mdt-py-0',
       'mdt-gap-0.5'
     );
+    expect(list()).not.toHaveClass('mdt-h-8');
+    expect(list()).not.toHaveClass('mdt-px-[3.5px]');
   });
 
-  it('draws a 26 chip with corners 5 and 10 at the sides', () => {
+  it('draws a 32 chip, the regular button height, with corners 5 and 10 at the sides', () => {
     render(three('filled'));
-    expect(tab('Grants')).toHaveClass('mdt-h-[25px]', 'mdt-rounded-[5px]', 'mdt-px-2.5');
+    expect(tab('Grants')).toHaveClass('mdt-h-8', 'mdt-rounded-[5px]', 'mdt-px-2.5');
+    expect(tab('Grants')).not.toHaveClass('mdt-h-[25px]');
   });
 
   it('paints the active chip white under the hairline shadow', () => {

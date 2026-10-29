@@ -6,6 +6,8 @@ import {
   TableBody,
   TableCell,
   TableColGroup,
+  TableGroupRow,
+  TableCheckCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -976,5 +978,112 @@ describe('The lead column — one slot with two occupants', () => {
     render(<Lead head={{ selectable: true, onToggle: () => undefined }} cell={{ index: 6 }} />);
     expect(selectAll()).toBeInTheDocument();
     expect(hash()).not.toBeInTheDocument();
+  });
+});
+
+describe('TableGroupRow', () => {
+  const inTable = (row: React.ReactNode) =>
+    render(
+      <table>
+        <tbody>{row}</tbody>
+      </table>
+    );
+
+  it('spans every column with the name, then the details after a dot', () => {
+    inTable(<TableGroupRow colSpan={3} title="SSH Credentials" meta={['SSH', 3]} />);
+    const cell = screen.getByRole('cell');
+    expect(cell).toHaveAttribute('colspan', '3');
+    expect(cell).toHaveTextContent('SSH Credentials · SSH · 3');
+    expect(cell).toHaveClass('mdt-h-9', 'mdt-bg-secondary', 'mdt-text-xs');
+    expect(screen.getByText('SSH Credentials')).toHaveClass(
+      'mdt-font-semibold',
+      'mdt-text-neutral-90'
+    );
+    expect(screen.getByText(/· SSH · 3/)).toHaveClass('mdt-font-normal', 'mdt-text-neutral-50');
+  });
+
+  it('takes one detail, or none', () => {
+    const { unmount } = inTable(<TableGroupRow colSpan={2} title="WMI" meta="WMI" />);
+    expect(screen.getByRole('cell')).toHaveTextContent('WMI · WMI');
+    unmount();
+    inTable(<TableGroupRow colSpan={2} title="Alone" />);
+    expect(screen.getByRole('cell')).toHaveTextContent(/^Alone$/);
+  });
+
+  it('is a plain row - no focus, no pick, the ref and class passed on', () => {
+    const ref = createRef<HTMLTableRowElement>();
+    inTable(<TableGroupRow ref={ref} className="extra" colSpan={1} title="G" />);
+    expect(ref.current).toHaveClass('tbl-group', 'extra');
+    expect(ref.current).not.toHaveAttribute('tabindex');
+    expect(ref.current).not.toHaveAttribute('aria-selected');
+    expect(ref.current).toHaveAttribute('data-slot', 'table-group-row');
+    expect(TableGroupRow.displayName).toBe('TableGroupRow');
+  });
+});
+
+describe('TableCheckCell', () => {
+  const inTable = (cells: React.ReactNode) =>
+    render(
+      <table>
+        <tbody>
+          <tr>{cells}</tr>
+        </tbody>
+      </table>
+    );
+  const square = () => {
+    const el = screen.getByRole('checkbox').closest('label');
+    if (!el) throw new Error('no square');
+    return el;
+  };
+
+  it('is a centred cell holding one checkbox, named for the reader and ticked as told', () => {
+    inTable(<TableCheckCell checked label="Run failure · Email" />);
+    const box = screen.getByRole('checkbox', { name: 'Run failure · Email' });
+    expect(box).toBeChecked();
+    expect(screen.getByRole('cell')).toHaveAttribute('data-slot', 'table-check-cell');
+    expect(square()).toHaveClass('mdt-h-7', 'mdt-w-7', 'mdt-cursor-pointer');
+  });
+
+  it('the whole square takes the click, and says what the box becomes', async () => {
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    inTable(
+      <TableCheckCell
+        checked={false}
+        label="Run failure · Email"
+        onCheckedChange={onCheckedChange}
+      />
+    );
+    await user.click(square());
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    await user.click(screen.getByRole('checkbox'));
+    expect(onCheckedChange).toHaveBeenCalledTimes(2);
+  });
+
+  it('held: ticked as given, disabled, and the square refuses the pointer', async () => {
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    inTable(
+      <TableCheckCell
+        checked
+        disabled
+        label="Auto-provision summaries · Email"
+        onCheckedChange={onCheckedChange}
+      />
+    );
+    const box = screen.getByRole('checkbox');
+    expect(box).toBeDisabled();
+    expect(box).toBeChecked();
+    expect(square()).toHaveClass('mdt-cursor-not-allowed');
+    await user.click(square());
+    expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+
+  it('passes the ref and class on to the cell', () => {
+    const ref = createRef<HTMLTableCellElement>();
+    inTable(<TableCheckCell ref={ref} className="extra" checked={false} label="A" />);
+    expect(ref.current).toBe(screen.getByRole('cell'));
+    expect(ref.current).toHaveClass('extra');
+    expect(TableCheckCell.displayName).toBe('TableCheckCell');
   });
 });

@@ -14,7 +14,7 @@ describe('IconTile', () => {
 
   describe('tone', () => {
     const cases: [IconTileTone, string][] = [
-      ['slate', 'mdt-bg-neutral-30'],
+      ['slate', 'mdt-bg-neutral-20'],
       ['blue', 'mdt-bg-blue-10'],
       ['green', 'mdt-bg-green-10'],
       ['amber', 'mdt-bg-orange-20'],
@@ -30,7 +30,15 @@ describe('IconTile', () => {
 
     it('is slate by default', () => {
       const { container } = render(<IconTile icon={icon} />);
-      expect(container.firstChild).toHaveClass('mdt-bg-neutral-30');
+      expect(container.firstChild).toHaveClass('mdt-bg-neutral-20');
+    });
+
+    /* Pranjal, 2026-10-23: the grey tile "is very dark ... use a lighter bg tone for it" */
+    it('draws slate a step lighter: the neutral-20 fill under the secondary ink', () => {
+      const { container } = render(<IconTile icon={icon} tone="slate" />);
+      expect(container.firstChild).toHaveClass('mdt-bg-neutral-20', 'mdt-text-neutral-90');
+      expect(container.firstChild).not.toHaveClass('mdt-bg-neutral-30');
+      expect(container.firstChild).not.toHaveClass('mdt-text-neutral-110');
     });
   });
 
@@ -116,6 +124,13 @@ describe('IconTile', () => {
     expect(container.firstChild).not.toHaveClass('mdt-rounded-md');
   });
 
+  /* Pranjal, 2026-09-28: the dark tile's blue glyph was hard to see - it reads the tile ink token, the info badge's ink in dark */
+  it('draws the blue glyph in the tile ink token, not a fixed ramp step', () => {
+    const { container } = render(<IconTile icon={icon} tone="blue" />);
+    expect(container.firstChild).toHaveClass('mdt-text-[hsl(var(--mdt-tile-blue-ink))]');
+    expect(container.firstChild).not.toHaveClass('mdt-text-blue-60');
+  });
+
   it('keeps the circle round at 2xl', () => {
     const { container } = render(<IconTile icon={icon} size="2xl" shape="circle" />);
     expect(container.firstChild).toHaveClass('mdt-rounded-full');
@@ -190,5 +205,32 @@ describe('IconTile as a button', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     expect(document.querySelector('.tt')).toBeNull();
+  });
+});
+
+describe('IconTile brand tone', () => {
+  it('is the white plate with its hairline, the mark 32 inside at xl with corners 10', () => {
+    render(
+      <IconTile
+        tone="brand"
+        size="xl"
+        shape="square"
+        icon={<img src="/aws.svg" alt="" />}
+        data-testid="plate"
+      />
+    );
+    const plate = screen.getByTestId('plate');
+    expect(plate.className).toContain('--mdt-fixed-fill');
+    expect(plate).toHaveClass('mdt-border-neutral-20');
+    expect(plate).toHaveClass('mdt-h-12', 'mdt-w-12', 'mdt-rounded-[10px]', '[&_img]:mdt-size-8');
+    expect(plate.querySelector('img')).toHaveAttribute('alt', '');
+  });
+
+  it('holds a monogram in black, 12/600', () => {
+    render(<IconTile tone="brand" size="xl" shape="square" icon={<>OCI</>} data-testid="plate" />);
+    const plate = screen.getByTestId('plate');
+    expect(plate).toHaveTextContent('OCI');
+    expect(plate).toHaveClass('mdt-text-xs', 'mdt-font-semibold');
+    expect(plate.className).toContain('--mdt-black');
   });
 });

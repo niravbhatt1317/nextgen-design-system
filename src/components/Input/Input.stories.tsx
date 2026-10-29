@@ -1,10 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { within } from 'storybook/test';
+import { userEvent, within } from 'storybook/test';
+import { Button } from '../Button';
 import { DateInput } from '../DateInput';
+import { DurationInput } from '../DurationInput';
+import type { DurationInputProps } from '../DurationInput';
 import { Icon } from '../Icon';
 import { NumberInput } from '../NumberInput';
+import type { NumberInputProps } from '../NumberInput';
 import { Select } from '../Select';
+import { ChipInput } from './ChipInput';
 import { Input } from './Input';
 
 /*
@@ -20,6 +26,7 @@ const RULE =
 const meta: Meta<typeof Input> = {
   title: 'New Components/Input',
   component: Input,
+  subcomponents: { ChipInput },
   tags: ['autodocs'],
   parameters: {
     layout: 'padded',
@@ -258,6 +265,121 @@ export const Kinds: Story = {
   ),
 };
 
+/** One NumberInput with a unit, holding its own value. */
+const UnitField = ({ start = '', ...props }: { start?: string } & NumberInputProps) => {
+  const [value, setValue] = useState(start);
+  return <NumberInput {...props} value={value} onChange={setValue} wrapperClassName="mdt-w-40" />;
+};
+
+/**
+ * NumberInput's `unit` puts the word the number counts - Seconds, Minutes, Hours, Days, Months - at the field's end,
+ * 13 in the faint ink behind a full-height hairline, in place of the stepper (the arrow keys still step). Keep the
+ * field 160 wide; ported from the console's secret-store form (Connection timeout).
+ */
+export const NumberWithUnit: Story = {
+  name: 'Number with unit',
+  render: () => (
+    <div className="mdt-grid mdt-max-w-[720px] mdt-grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] mdt-gap-x-6 mdt-gap-y-5">
+      <UnitField label="Connection timeout" unit="Seconds" min={1} start="30" />
+      <UnitField label="Path sync interval" unit="Minutes" min={1} start="10" />
+      <UnitField label="Session lifetime" unit="Hours" min={1} start="8" />
+      <UnitField label="Keep run history" unit="Days" min={1} start="30" />
+      <UnitField label="Retention" unit="Months" min={1} start="12" />
+      <UnitField label="Retry after" unit="Seconds" placeholder="0" error="Enter 1 or more." />
+      <UnitField label="Off" unit="Minutes" start="15" disabled />
+    </div>
+  ),
+};
+
+/** One DurationInput holding its own minutes; `required` adds the console's one rule - at least one minute. */
+const DurationField = ({
+  start = 0,
+  required,
+  error,
+  ...props
+}: { start?: number; required?: boolean } & DurationInputProps) => {
+  const [minutes, setMinutes] = useState(start);
+  const err = error ?? (required && minutes === 0 ? 'At least one minute.' : undefined);
+  return <DurationInput {...props} value={minutes} onChange={setMinutes} error={err} />;
+};
+
+/**
+ * The Max runtime box with the carry-over played on it: Play again puts the box back to 4 hours, types 80 into
+ * Minutes and leaves the box - the line "80 minutes → 1 hour 20 minutes" arrives under it - then types 36 into Hours
+ * for "36 hours → 1 day 12 hours". The story plays it once as it opens.
+ */
+const CarryDemo = () => {
+  const [minutes, setMinutes] = useState(4 * 60);
+  const [busy, setBusy] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const run = async () => {
+    if (!box.current || busy) return;
+    setBusy(true);
+    setMinutes(4 * 60);
+    const user = userEvent.setup({ delay: 160 });
+    const field = within(box.current);
+    const mins = field.getByRole('spinbutton', { name: /^Minutes/ });
+    await user.clear(mins);
+    await user.type(mins, '80');
+    await user.tab(); // leaving the box: 80 minutes → 1 hour 20 minutes
+    await new Promise<void>((done) => {
+      setTimeout(done, 2400);
+    });
+    const hrs = field.getByRole('spinbutton', { name: /^Hours/ });
+    await user.clear(hrs);
+    await user.type(hrs, '36');
+    await user.tab(); // 36 hours → 1 day 12 hours
+    setBusy(false);
+  };
+  return (
+    <div className="mdt-flex mdt-flex-col mdt-items-start mdt-gap-2">
+      <DurationInput
+        ref={box}
+        label="Max runtime"
+        value={minutes}
+        onChange={setMinutes}
+        wrapperClassName="mdt-w-full"
+        error={minutes === 0 ? 'At least one minute.' : undefined}
+      />
+      <Button
+        variant="ghost"
+        size="sm"
+        leftIcon={<Icon name="play" size={14} aria-hidden />}
+        disabled={busy}
+        onClick={() => {
+          void run();
+        }}
+      >
+        Play again
+      </Button>
+    </div>
+  );
+};
+
+/**
+ * DurationInput - three numbers with their units in ONE box, Days · Hours · Minutes, a hairline between them running
+ * border to border, the box taking the field's focus look while any segment holds the caret. Hours past 23 and minutes
+ * past 59 carry over when the box is left, a line under it saying what moved for a moment: the story types 80 into
+ * Minutes and 36 into Hours as it opens, and Play again shows it over. A press on Hours or Minutes drops a list under
+ * it, every 5 for the minutes. The value is one number of minutes; ported from the discovery profile's Schedule &
+ * Notify step (Max runtime).
+ */
+export const NumberWithUnitGroup: Story = {
+  name: 'Number with unit group',
+  render: () => (
+    <div className="mdt-grid mdt-max-w-[720px] mdt-grid-cols-[repeat(auto-fill,minmax(346px,1fr))] mdt-gap-x-6 mdt-gap-y-5">
+      <CarryDemo />
+      <DurationField label="Keep findings for" start={7 * 1440 + 12 * 60} required />
+      <DurationField label="Retry window" error="At least one minute." />
+      <DurationField label="Off" start={90} disabled />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    /* the carry-over, watched: 80 into Minutes, then 36 into Hours */
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Play again' }));
+  },
+};
+
 /**
  * The label is 13/400 in neutral-90 #516281 with 6 under it; a required field
  * carries the asterisk in the danger red #DB132A after the label (K-Field-05).
@@ -414,4 +536,33 @@ export const Playground: Story = {
       </div>
     ),
   ],
+};
+
+/** A ChipInput holding its own values: a list of recipients, each checked as an email address. */
+const ChipInputDemo = () => {
+  const [values, setValues] = useState<string[]>(['ops@acme.com']);
+  return (
+    <div className="mdt-w-[480px] mdt-max-w-full">
+      <ChipInput
+        aria-label="Recipients"
+        placeholder="Type an address, press Enter"
+        values={values}
+        onValuesChange={setValues}
+        validate={(v) =>
+          /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? null : `"${v}" is not an email address.`
+        }
+      />
+    </div>
+  );
+};
+
+/**
+ * **ChipInput** - the field for several values at once, each a chip: Enter, a comma or a space adds what is typed; a
+ * pasted list adds every value in it; Backspace on an empty field takes the last chip back; a duplicate is dropped. A
+ * value `validate` refuses stays in the field with the red edge and its message under it. `mono` draws the values in
+ * mono, for ports and addresses. KeyValuesBuilder (under TargetBuilder) uses it for each row's values.
+ */
+export const Chips: Story = {
+  name: 'ChipInput',
+  render: () => <ChipInputDemo />,
 };

@@ -32,9 +32,11 @@ import type {
  * `hairline={false}`) and its tabs stretch to the band (Pranjal, 2026-10-10:
  * keep the version-8 tabs).
  *
- * FILLED - a switch inside a body: a 32 track, corners 8, neutral-20, 3.5 in at
- * the sides; the chip 25 high, corners 5, 10 at the sides, 2 between, centred in
- * the track; the active chip the page's paper (background - white in light, the
+ * FILLED - a switch inside a body: a 40 track, corners 8, neutral-20, 4 in at
+ * the sides; the chip 32 high (the regular button's height), corners 5, 10 at
+ * the sides, 2 between, centred in the track so 4 sit above and below it
+ * (Pranjal, 2026-10-23, option C: "in secondary tabs ... it looks cramped" -
+ * K-Tabs-09; it was a 32 track with a 25 chip at 3.5 in); the active chip the page's paper (background - white in light, the
  * dark paper in dark, never a typed white) with the label at 500 in the primary
  * colour and a hairline shadow; hover tints the chip primary at 4%; the active
  * chip ignores a click.
@@ -44,8 +46,9 @@ import type {
  * 18-high pill at 11/600, muted, inverted on the active tab.
  *
  * Three calls the rulebook still lists as open are built at the console's
- * value: the active underline label at 600 (K-Tabs-07), the chip at 26 in the
- * 32 track (K-Tabs-10), the icon at 14 with 6 (K-Tabs-13).
+ * value: the active underline label at 600 (K-Tabs-07), the icon at 14 with 6
+ * (K-Tabs-13). The chip's height is settled: 32 in the 40 track (K-Tabs-09,
+ * 2026-10-23; K-Tabs-10's 26 in 32 is superseded).
  */
 
 interface TabsListContextValue {
@@ -72,12 +75,12 @@ const FIRST_TAB_ON_EDGE = cn(
  * full width (K-Tabs-06); the tabs end-aligned so a taller band (the drawer's
  * 48) still lands the line on the divider. Without: the page band - no line,
  * the tabs stretched to the band so the 2px line is its last 2px. Both put the
- * first label on the content edge. Filled: the 32 track (K-Tabs-09), 3.5 in at
- * the sides so the 25 chip sits centred with 3.5 above and below (K-Tabs-10), 2
- * between chips. */
+ * first label on the content edge. Filled: the 40 track, 4 in at the sides so
+ * the 32 chip sits centred with 4 above and below (K-Tabs-09, option C,
+ * 2026-10-23), 2 between chips. */
 const listClass = (type: TabsType, hairline: boolean): string => {
   if (type === 'filled') {
-    return 'mdt-inline-flex mdt-h-8 mdt-items-center mdt-gap-0.5 mdt-rounded-[8px] mdt-bg-neutral-20 mdt-px-[3.5px] mdt-py-0';
+    return 'mdt-inline-flex mdt-h-10 mdt-items-center mdt-gap-0.5 mdt-rounded-[8px] mdt-bg-neutral-20 mdt-px-1 mdt-py-0';
   }
   return cn(
     hairline
@@ -119,14 +122,15 @@ const ACTIVE_LINE = cn(
 
 const triggerClass = (type: TabsType, hairline: boolean): string => {
   if (type === 'filled') {
-    /* The chip: 25 high, corners 5 (concentric with the track's 8 at 3.5 in),
-     * 10 at the sides (K-Tabs-09, K-Tabs-10). Active: the page's paper (the
+    /* The chip: 32 high - the regular button's height - corners 5, 10 at the
+     * sides (K-Tabs-09, option C, 2026-10-23; the corners did not change with
+     * the height). Active: the page's paper (the
      * background token - white in light), the label at 500 - not bold, the
      * paper chip and the colour carry it - under the hairline shadow
      * (K-Tabs-11). Hover: primary at 4% (K-Tabs-04); the active chip stays
      * the paper. */
     return cn(
-      'mdt-h-[25px] mdt-rounded-[5px] mdt-bg-transparent mdt-px-2.5',
+      'mdt-h-8 mdt-rounded-[5px] mdt-bg-transparent mdt-px-2.5',
       'hover:mdt-bg-primary/[0.04]',
       'data-[state=active]:mdt-bg-background data-[state=active]:mdt-font-medium data-[state=active]:hover:mdt-bg-background',
       'data-[state=active]:mdt-shadow-[0_1px_2px_rgba(29,43,62,0.10),0_0_0_1px_rgba(29,43,62,0.04)]',

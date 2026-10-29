@@ -1,0 +1,86 @@
+/* TreeView - ported from the console (Ronak, 2026-10-09 to 2026-10-13): next-gen-ui CredentialForm.jsx
+ * PathBrowserModal, the tree in the Browse popup - its inline styles as the library classes. Measured at 560 wide.
+ *
+ * The box: the field edge (neutral-30), 8 corners, 4 in, at most 320 tall, then it
+ * scrolls - down, and across for a deep tree (Ronak, 2026-10-13: "after some level you can give the horizontal
+ * scrolling ... if there will be 8 to 10 hierarchy"): a row is as wide as its words and at least the box, never
+ * wrapping. A row: 5 above and below, 8 at the right, its own indent at the left (8, then 19 a level - the chevron
+ * and its gap - so a child's first glyph sits under its parent's folder, Ronak 2026-10-13), 6 corners, 12/500 on a
+ * 1.4 line; the lightest tint under the pointer. */
+
+.mdt-tree {
+  padding: 4px;
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid hsl(var(--mdt-neutral-30));
+  border-radius: 8px;
+}
+
+.mdt-tree__row {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  padding-top: 5px;
+  padding-right: 8px;
+  padding-bottom: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  outline: none;
+}
+.mdt-tree__row:focus-visible {
+  box-shadow: inset 0 0 0 1px hsl(var(--mdt-primary));
+}
+
+/* a folder: 7 between the 12 chevron, the 13 folder and the label, in the reading ink; the folder blue while open,
+ * faint while shut */
+.mdt-tree__row--folder {
+  gap: 7px;
+  color: hsl(var(--mdt-neutral-130));
+}
+.mdt-tree__row--folder:hover {
+  background: hsl(var(--mdt-neutral-10));
+}
+.mdt-tree__glyph--open {
+  color: hsl(var(--mdt-azure-60));
+}
+.mdt-tree__glyph--shut {
+  color: hsl(var(--mdt-neutral-50));
+}
+
+/* an item: 8 between the 12 glyph, the label and its value; the secondary ink, the value mono 10 faint at the end.
+ * Picked: the blue ink on a 6% blue wash, the value blue too. Just arrived: the success ink. */
+.mdt-tree__row--item {
+  gap: 8px;
+  color: hsl(var(--mdt-neutral-90));
+}
+.mdt-tree__row--item:hover:not([aria-selected='true']) {
+  background: hsl(var(--mdt-neutral-10));
+}
+.mdt-tree__row--item[aria-selected='true'] {
+  color: hsl(var(--mdt-azure-60));
+  background: hsl(var(--mdt-azure-60) / 0.06);
+}
+.mdt-tree__row--fresh {
+  color: hsl(var(--mdt-success));
+}
+.mdt-tree__value {
+  margin-left: auto;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mdt-font-mono), monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: hsl(var(--mdt-neutral-50));
+}
+.mdt-tree__row--item[aria-selected='true'] .mdt-tree__value {
+  color: hsl(var(--mdt-azure-60));
+}

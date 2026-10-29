@@ -45,6 +45,23 @@ const LABEL = ['height', 'paddingTop', 'paddingRight', 'paddingBottom', 'padding
 const CHIP = [...LABEL.filter((p) => p !== 'borderBottomColor'), 'borderRadius', 'boxShadow'];
 const COUNT = ['height', 'minWidth', 'paddingLeft', 'paddingRight', 'borderRadius', 'backgroundColor', 'color', 'fontSize', 'fontWeight', 'lineHeight'];
 
+/* THE LIBRARY'S OWN FILLED TABS IN THE CONSOLE (2026-10-28): a fleet's Approvals tray draws <TabsList type="filled">
+ * (Waiting on you / Sent by you / History). The console's 2.2.0 still ships the 32 track and the 25 chip, so the console
+ * bridges both to option C (Pranjal 2026-10-23: the 40 track, the 32 chip, 4 above and below - global.css "BRIDGE
+ * (2026-10-23 ..."). The library now draws that itself; these frames read the bridged result. */
+const openApprovals = async (page) => {
+  const customer = page.getByText('Northwind Retail').first();
+  if (await customer.count()) {
+    await customer.click().catch(() => {});
+    await page.waitForTimeout(1500);
+  }
+  await page.getByRole('button', { name: /^Approvals/ }).first().click();
+  await page.waitForSelector(`${D} [role="tablist"][data-type="filled"]`, { timeout: 10000 });
+  await park(page);
+  await page.waitForTimeout(400);
+};
+const TRACK = ['height', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'columnGap', 'borderRadius', 'backgroundColor', 'alignItems'];
+
 const STORY_U = 'new-components-tabs--underline';
 const STORY_F = 'new-components-tabs--filled';
 const MOCK = 'mocks/foundation/tabs.html';
@@ -189,6 +206,35 @@ module.exports = {
       story: { id: 'new-components-tabs--with-counts', select: '#storybook-root [data-type="filled"][role="tab"][data-state="inactive"] [data-testid="tab-count"]' },
       console: null,
       mock: { file: MOCK, select: `${cell(21)} .ftab:not(.on) .cnt` },
+    },
+    // ── filled: the library's own filled Tabs, in a fleet's Approvals tray (option C, 40 / 32) ──
+    {
+      name: 'filled · the track · Approvals tray (40, 4 in)',
+      props: TRACK,
+      story: { id: STORY_F, select: '#storybook-root [role="tablist"][data-type="filled"]' },
+      console: { path: '/agent-fleet', open: openApprovals, select: `${D} [role="tablist"][data-type="filled"]` },
+      mock: null,
+    },
+    {
+      name: 'filled · active chip · Approvals tray (32)',
+      props: CHIP,
+      story: { id: STORY_F, select: '#storybook-root [data-type="filled"][role="tab"][data-state="active"]' },
+      console: { path: '/agent-fleet', open: openApprovals, select: `${D} [data-type="filled"][role="tab"][data-state="active"]` },
+      mock: null,
+    },
+    {
+      name: 'filled · rest chip · Approvals tray (32)',
+      props: CHIP,
+      story: { id: STORY_F, select: '#storybook-root [data-type="filled"][role="tab"][data-state="inactive"]' },
+      console: { path: '/agent-fleet', open: openApprovals, select: `${D} [data-type="filled"][role="tab"][data-state="inactive"]` },
+      mock: null,
+    },
+    {
+      name: 'filled · the track · Collector Fleet Approvals tray',
+      props: TRACK,
+      story: { id: STORY_F, select: '#storybook-root [role="tablist"][data-type="filled"]' },
+      console: { path: '/collectors', open: openApprovals, select: `${D} [role="tablist"][data-type="filled"]` },
+      mock: null,
     },
   ],
 };

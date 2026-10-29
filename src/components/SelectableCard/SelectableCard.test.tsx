@@ -154,3 +154,51 @@ describe('SelectableCard', () => {
     expect(ref.current).toHaveAttribute('role', 'radiogroup');
   });
 });
+
+describe('tiles', () => {
+  const Tiles = () => (
+    <SelectableCardGroup layout="tiles" aria-label="Provider" value="aws">
+      <SelectableCard value="aws" title="AWS" description="Public cloud" icon={<img src="/aws.svg" alt="" />} />
+      <SelectableCard value="oci" title="OCI" description="Public cloud" icon={<span>OCI</span>} />
+    </SelectableCardGroup>
+  );
+  const dotOf = (card: HTMLElement) => {
+    const dot = card.querySelector('.mdt-absolute');
+    if (!dot) throw new Error('no dot');
+    return dot;
+  };
+
+  it('lays five to a row and re-flows each card: the mark on top, the words centred, the dot in the corner', () => {
+    render(<Tiles />);
+    const group = screen.getByRole('radiogroup', { name: 'Provider' });
+    expect(group).toHaveAttribute('data-layout', 'tiles');
+    expect(group).toHaveClass('mdt-grid-cols-5');
+    const aws = screen.getByRole('radio', { name: 'AWS' });
+    expect(aws).toHaveAttribute('aria-checked', 'true');
+    expect(aws).toHaveClass('mdt-rounded-[10px]', 'mdt-px-2.5', 'mdt-py-3');
+    expect(screen.getByText('AWS')).toHaveClass('mdt-justify-center', 'mdt-text-[13px]');
+    expect(screen.getAllByText('Public cloud')[0]).toHaveClass('mdt-truncate');
+    expect(aws).toHaveAccessibleDescription('Public cloud');
+  });
+
+  it('the dot is 15 in the corner, its ring 4.5 on the chosen tile only', () => {
+    render(<Tiles />);
+    const chosen = dotOf(screen.getByRole('radio', { name: 'AWS' }));
+    expect(chosen).toHaveClass('mdt-size-[15px]', 'mdt-right-2.5', 'mdt-top-2.5', 'mdt-border-[4.5px]');
+    const plain = dotOf(screen.getByRole('radio', { name: 'OCI' }));
+    expect(plain).toHaveClass('mdt-size-[15px]');
+    expect(plain).not.toHaveClass('mdt-border-[4.5px]');
+  });
+
+  it('leaves a card that is not a tile untouched', () => {
+    render(
+      <SelectableCardGroup aria-label="Mode" value="a">
+        <SelectableCard value="a" title="A" description="d" icon={<span>i</span>} />
+      </SelectableCardGroup>
+    );
+    const a = screen.getByRole('radio', { name: 'A' });
+    expect(a).not.toHaveClass('mdt-rounded-[10px]');
+    expect(a.querySelector('.mdt-absolute')).toBeNull();
+    expect(screen.getByText('A')).not.toHaveClass('mdt-text-[13px]');
+  });
+});
