@@ -4,6 +4,7 @@ export { KpiGauge, KpiBars } from './KpiCharts';
 export type {
   KpiCardProps,
   KpiCardSize,
+  KpiCardVariant,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,

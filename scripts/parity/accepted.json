@@ -1,4 +1,10 @@
 {
   "note": "What each part is allowed to differ from the console by today. The gate blocks anything ABOVE these numbers. Committed, so every laptop shares one answer.",
-  "components": {}
+  "components": {
+    "DropdownMenu": {
+      "differences": 1,
+      "agreed": "2026-10-29",
+      "note": "the box's width: the story's menu is 192, the console's Users row menu 224 (the console's ⋯ floor, Pranjal 2026-10-27). The 224 floor and the other action-menu rules live in the new Popover's action-menu variant (Pranjal 2026-10-29: the DropdownMenu additions removed), which measures equal; this closes when the console's ⋯ menus move onto Popover variant=\"action-menu\"."
+    }
+  }
 }

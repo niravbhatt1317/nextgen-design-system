@@ -18,6 +18,34 @@ one in `MISSING-TOKENS.md`, a capability in `CAPABILITIES.md`. This file is for 
 
 ## 2026-10-28
 
+### The ⓘ answers the pointer with its glyph only
+
+**Pranjal**, 2026-10-27: "i button had a white bg hover? thats should not be there. only icon should have hover.
+Update this even in the storybook." `InfoTip` draws nothing behind its glyph on hover, focus or while its explainer is
+open; neutral-40 darkens to neutral-60 and the keyboard keeps its focus ring. A ground read as a pale box, worst on a
+tinted card. Any new ⓘ copies this and never adds a hover background.
+
+### The slate `IconTile` is a step lighter than the slate `Avatar`
+
+**Pranjal**, 2026-10-23, on the fleets' Approvals trays: "it is very dark ... use a lighter bg tone for it". The tile's
+slate is `neutral-20` under `neutral-90` (it was `neutral-30` under `neutral-110`), in both themes. The slate avatar is
+not part of the ruling and keeps its colours, so "tones match Avatar" now holds for every tone but slate.
+
+### Filled tabs are a 40 track with a 32 chip (option C)
+
+**Pranjal**, 2026-10-23: "in secondary tabs why does most of the paces it looks cramped", then "Option c". The chip is
+the regular button's height, 4 in from the track on every side; corners, side padding and the gap between chips are
+unchanged. It supersedes the 2026-09-17 32 / 25 at 3.5 in (rulebook K-Tabs-09; K-Tabs-10 superseded).
+
+### Every ⋯ action menu is at least 224 wide
+
+**Pranjal**, 2026-10-27, on a fleet row menu: "increase the width by a little bit" - 192 left the longest item touching
+the edge. A floor (`mdt-min-w-56`), not a width, so a longer item still widens the menu (his 2026-10-09 ruling). With
+it, from 2026-10-14: an icon on every item, never a "…" on a label, the destructive item last and red after a divider.
+A menu of ticks or choices (a quick filter, Sort) is not an action menu and keeps its own width.
+
+All four are **defaults with no opt-out**, named in their changeset (`small-parts-1028`).
+
 ### Drawer headings are 14/20, and the drawer crumb has no back button
 
 **Pranjal**, ruled in the console on 2026-10-26 and moved into `SheetTitle` (drawer layout) and the

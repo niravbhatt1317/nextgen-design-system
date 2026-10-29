@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Icon } from '../Icon';
 import { Select } from './Select';
 import type { SelectOption, SelectProps } from './Select.types';
+import { TreeSelect } from '../TreeSelect';
+import type { TreeSelectGroup, TreeSelectItem } from '../TreeSelect';
 import { cn } from '@/utils';
 
 /**
@@ -860,6 +862,90 @@ export const Grouped: Story = {
     label: 'Grocery Items',
     grouped: true,
     showPills: true,
+  },
+};
+
+/* the cloud regions the tree was ported with: four geographies, their regions, each region's zones (the console's
+ * discovery-profile catalogue for AWS, as the vendor publishes it) */
+const zones = (id: string, letters: string) =>
+  letters.split('').map((c) => ({ id: id + c, label: id + c }));
+const region = (id: string, label: string, letters: string): TreeSelectItem => ({
+  id,
+  label,
+  description: id,
+  code: id,
+  children: zones(id, letters),
+});
+const geography = (id: string, label: string, items: TreeSelectItem[]): TreeSelectGroup => ({
+  id,
+  label,
+  icon: <Icon name="globe" size={14} aria-hidden />,
+  items,
+});
+const REGIONS: TreeSelectGroup[] = [
+  geography('americas', 'Americas', [
+    region('us-east-1', 'US East (N. Virginia)', 'abcdef'),
+    region('us-east-2', 'US East (Ohio)', 'abc'),
+    region('us-west-1', 'US West (N. California)', 'ac'),
+    region('us-west-2', 'US West (Oregon)', 'abcd'),
+    region('ca-central-1', 'Canada (Central)', 'abd'),
+    region('ca-west-1', 'Canada West (Calgary)', 'abc'),
+    region('sa-east-1', 'South America (São Paulo)', 'abc'),
+  ]),
+  geography('europe', 'Europe', [
+    region('eu-west-1', 'Europe (Ireland)', 'abc'),
+    region('eu-west-2', 'Europe (London)', 'abc'),
+    region('eu-west-3', 'Europe (Paris)', 'abc'),
+    region('eu-central-1', 'Europe (Frankfurt)', 'abc'),
+    region('eu-central-2', 'Europe (Zurich)', 'abc'),
+    region('eu-north-1', 'Europe (Stockholm)', 'abc'),
+    region('eu-south-1', 'Europe (Milan)', 'abc'),
+    region('eu-south-2', 'Europe (Spain)', 'abc'),
+  ]),
+  geography('asia-pacific', 'Asia Pacific', [
+    region('ap-south-1', 'Asia Pacific (Mumbai)', 'abc'),
+    region('ap-south-2', 'Asia Pacific (Hyderabad)', 'abc'),
+    region('ap-southeast-1', 'Asia Pacific (Singapore)', 'abc'),
+    region('ap-southeast-2', 'Asia Pacific (Sydney)', 'abc'),
+    region('ap-southeast-3', 'Asia Pacific (Jakarta)', 'abc'),
+    region('ap-southeast-4', 'Asia Pacific (Melbourne)', 'abc'),
+    region('ap-northeast-1', 'Asia Pacific (Tokyo)', 'acd'),
+    region('ap-northeast-2', 'Asia Pacific (Seoul)', 'abcd'),
+    region('ap-northeast-3', 'Asia Pacific (Osaka)', 'abc'),
+    region('ap-east-1', 'Asia Pacific (Hong Kong)', 'abc'),
+  ]),
+  geography('middle-east-africa', 'Middle East & Africa', [
+    region('me-south-1', 'Middle East (Bahrain)', 'abc'),
+    region('me-central-1', 'Middle East (UAE)', 'abc'),
+    region('il-central-1', 'Israel (Tel Aviv)', 'abc'),
+    region('af-south-1', 'Africa (Cape Town)', 'abc'),
+  ]),
+];
+
+/**
+ * Tree Select: a pick from things that sit in groups, with a level under each -
+ * geographies holding regions holding zones, families holding engines holding
+ * versions. Every level is a checkbox: a group picks all its items at once, an
+ * item is picked whole or narrowed to some of what sits under it, and the
+ * closed field shows each pick as a chip. Search narrows the tree and opens
+ * every group that still has a match. Shown here with the cloud regions it was
+ * ported from (the cloud discovery profile's Provider & connection step).
+ */
+export const TreeSelectField: Story = {
+  name: 'Tree Select',
+  render: function RenderTreeSelect() {
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <TreeSelect
+        groups={REGIONS}
+        value={value}
+        onChange={setValue}
+        label="Region(s)"
+        placeholder="Select region(s)…"
+        searchPlaceholder="Search region name or id…"
+        nouns={{ item: ['region', 'regions'], child: ['zone', 'zones'] }}
+      />
+    );
   },
 };
 

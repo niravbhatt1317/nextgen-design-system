@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { cn } from '@/utils';
+import { Badge } from '../Badge';
 import { KpiCard } from './KpiCard';
 import type { KpiGaugeZone, KpiMetricProps } from './KpiCard.types';
 import { KpiBars, KpiGauge } from './KpiCharts';
@@ -19,6 +21,7 @@ const meta: Meta<KpiMetricProps> = {
           'One metric on one card: a label, a big number, one quiet line of context. It can carry a trend chip, and it has an area kept for a chart. By default it is a plain fact. Clickable is a switch that can be turned on for any card, chip or chart included; then it says so on hover.',
           'Give it `items` instead of one metric and it becomes a group: two or more related metrics sharing one card, split by inset hairlines. Each segment is a whole card with its own switch.',
           'Widths: a plain card has a 174px floor and no ceiling; a chart card no floor and 270 natural; a group is the sum. In a KpiStrip the cards grow evenly until the row is full and the strip scrolls past the fit. Dark mode comes from the theme toggle.',
+          'Two surfaces: `outlined` (the default) is the card on the page, the card ground inside a hairline; `filled` is the card inside a drawer, a grey ground with no edge. A segment whose value is a line of text rather than a number sizes to the line, with no floor in height or width.',
         ].join('\n\n'),
       },
     },
@@ -424,6 +427,116 @@ export const GroupClickable: Story = {
         <p className="mdt-m-0 mdt-text-xs mdt-text-muted-foreground" aria-live="polite">
           {note}
         </p>
+      </div>
+    );
+  },
+};
+
+/**
+ * `variant="filled"`: the card inside a drawer - the neutral-10 ground and no edge - beside the default `outlined`
+ * card on the page, the card ground inside its hairline. Nothing else changes: the corners, the label, the figure,
+ * the supporting line, the chip and the click are the same on both.
+ */
+export const Filled: Story = {
+  render: () => (
+    <Row>
+      <KpiCard label="Total users" value={8200} hint="across all organisations" />
+      <KpiCard variant="filled" label="Total users" value={8200} hint="across all organisations" />
+      <KpiCard
+        variant="filled"
+        label="Active users"
+        value={7640}
+        hint="93% of total"
+        delta={{ label: '3.1%', direction: 'up', tone: 'good' }}
+      />
+    </Row>
+  ),
+};
+
+/** A line of text in a segment, as the drawers' facts cards carry it: 13/500 on 1.5, one line, in the figure's ink or a verdict's. */
+const line = (text: string, ink?: 'success' | 'warning' | 'danger' | 'faint') => (
+  <span
+    className={cn(
+      'mdt-block mdt-truncate mdt-text-[13px] mdt-font-medium mdt-leading-[1.5]',
+      ink === 'faint' && 'mdt-text-faint'
+    )}
+    style={ink && ink !== 'faint' ? { color: `var(--mdt-badge-${ink}-ink)` } : undefined}
+  >
+    {text}
+  </span>
+);
+
+/** A pill on the same line box as the text lines, centred, so it sits level with its neighbours. */
+const pill = (children: React.ReactNode) => (
+  <span className="mdt-flex mdt-h-[1.5em] mdt-items-center mdt-text-[13px]">{children}</span>
+);
+
+/**
+ * A group on the filled ground: the facts card every drawer draws under its identity band. A segment whose value is
+ * a line of text (a node, no hint) sizes to the line: no 98 floor and no 174 width floor, so four fit a 670 drawer
+ * side by side. The first two cards are a run's yield and its misses, each count with a list behind it a click; the
+ * third a profile's facts, with pills on the line. Shown with the discovery run and credential profile it was ported
+ * from.
+ */
+export const FilledGroup: Story = {
+  name: 'Filled Group',
+  render: function FilledGroupStory() {
+    const [note, setNote] = useState('Click a count.');
+    const door = (what: string) => () => {
+      setNote(`${what}: the drawer shows the targets behind it.`);
+    };
+    return (
+      <div className="mdt-flex mdt-w-[670px] mdt-max-w-full mdt-flex-col mdt-gap-2">
+        <KpiCard
+          variant="filled"
+          label="Yield"
+          style={{ width: '100%' }}
+          items={[
+            { label: 'Targets', value: line('1,180'), onClick: door('Targets') },
+            { label: 'Discovered', value: line('402', 'success'), onClick: door('Discovered') },
+            { label: 'New', value: line('23'), onClick: door('New') },
+            { label: 'Updated', value: line('379'), onClick: door('Updated') },
+          ]}
+        />
+        <KpiCard
+          variant="filled"
+          label="Misses and coverage"
+          style={{ width: '100%' }}
+          items={[
+            { label: 'Unreachable', value: line('27', 'warning'), onClick: door('Unreachable') },
+            { label: 'Auth failed', value: line('14', 'danger'), onClick: door('Auth failed') },
+            { label: 'Excluded', value: line('6', 'faint'), onClick: door('Excluded') },
+            { label: 'Coverage', value: line('34%', 'danger') },
+          ]}
+        />
+        <p className="mdt-m-0 mdt-text-xs mdt-text-muted-foreground" aria-live="polite">
+          {note}
+        </p>
+        <KpiCard
+          variant="filled"
+          label="Profile facts"
+          style={{ width: '100%', marginTop: 16 }}
+          items={[
+            { label: 'Type', value: line('SNMP v2c') },
+            {
+              label: 'Status',
+              value: pill(
+                <Badge size="sm" tone="success" dot>
+                  Active
+                </Badge>
+              ),
+            },
+            {
+              label: 'Test status',
+              value: pill(
+                <Badge size="sm" tone="success" dot>
+                  Passed
+                </Badge>
+              ),
+            },
+            { label: 'Secret source', value: line('Local') },
+          ]}
+        />
       </div>
     );
   },

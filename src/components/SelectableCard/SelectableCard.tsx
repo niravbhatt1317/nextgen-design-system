@@ -42,8 +42,41 @@ const LAYOUT: Record<SelectableCardLayout, string> = {
   stack: 'mdt-flex mdt-flex-col mdt-gap-2',
   chips: 'mdt-flex mdt-flex-row mdt-flex-wrap mdt-items-center mdt-gap-2',
   grid: 'mdt-grid mdt-gap-3 mdt-grid-cols-[repeat(auto-fit,minmax(220px,1fr))]',
+  tiles: 'mdt-grid mdt-gap-3 mdt-grid-cols-5',
 };
-const COLUMNS = { 2: 'mdt-grid-cols-2', 3: 'mdt-grid-cols-3' } as const;
+const COLUMNS = {
+  2: 'mdt-grid-cols-2',
+  3: 'mdt-grid-cols-3',
+  4: 'mdt-grid-cols-4',
+  5: 'mdt-grid-cols-5',
+} as const;
+
+/* THE TILE (Ronak 2026-10-15, the console's cloud Provider picker - "there are 10 types and in the future may be comes
+ * more so could we make provider type user friendly, clean and attractive"): the same card re-flowed - the mark on top,
+ * the name and its one faint word centred under it, the dot in the top-right corner (a tile has no title line for it
+ * to sit on). 12 down and 10 across inside, the parts 8 apart, at the console card's SMALL size - the name 13, corners
+ * 10, the dot 15 (its chosen ring 4.5). Each part reads its class from here, so a card that is not a tile reads the
+ * empty set and nothing else changes. */
+const TILE = {
+  card: 'mdt-rounded-[10px] mdt-px-2.5 mdt-py-3',
+  row: 'mdt-flex-col mdt-items-center mdt-gap-2',
+  icon: 'mdt-h-auto [&_svg]:mdt-size-auto',
+  text: 'mdt-w-full mdt-items-center mdt-pr-0 mdt-text-center',
+  title: 'mdt-max-w-full mdt-justify-center mdt-text-[13px] mdt-leading-[1.4]',
+  desc: 'mdt-max-w-full mdt-truncate mdt-leading-[1.45]',
+  control: 'mdt-absolute mdt-right-2.5 mdt-top-2.5 mdt-m-0 mdt-size-[15px]',
+  controlOn: 'mdt-border-[4.5px]',
+};
+const NOT_TILE: Record<keyof typeof TILE, undefined> = {
+  card: undefined,
+  row: undefined,
+  icon: undefined,
+  text: undefined,
+  title: undefined,
+  desc: undefined,
+  control: undefined,
+  controlOn: undefined,
+};
 
 /** The three edges, each a 1px border plus a 0.5px inset ring of the same colour. */
 const EDGE = {
@@ -59,7 +92,7 @@ const innerPress = (event: MouseEvent<HTMLElement>): boolean => {
 };
 
 /** The decorative control: a ring or a box, filled in the ink when chosen. */
-const Control = ({ radio, on }: { radio: boolean; on: boolean }) => (
+const Control = ({ radio, on, className }: { radio: boolean; on: boolean; className?: string | undefined }) => (
   <span
     aria-hidden
     className={cn(
@@ -69,7 +102,8 @@ const Control = ({ radio, on }: { radio: boolean; on: boolean }) => (
       'group-hover:mdt-border-faint',
       radio ? 'mdt-rounded-full' : 'mdt-rounded',
       on && 'mdt-border-foreground group-hover:mdt-border-foreground',
-      on && (radio ? 'mdt-border-[5px]' : 'mdt-bg-foreground')
+      on && (radio ? 'mdt-border-[5px]' : 'mdt-bg-foreground'),
+      className
     )}
   >
     {!radio && on && <Icon name="check" size={12} strokeWidth={2.5} />}
@@ -185,6 +219,7 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
   const on = inRadio ? group.value === value : checked;
   const off = disabled || (group?.disabled ?? false);
   const chip = group?.layout === 'chips';
+  const face = group?.layout === 'tiles' ? TILE : NOT_TILE;
   const id = useId();
   const titleId = `${id}-t`;
   const descId = `${id}-d`;
@@ -222,6 +257,7 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
         on ? EDGE.chosen : [EDGE.rest, EDGE.hover],
         chip && 'mdt-inline-flex mdt-w-auto mdt-flex-row mdt-items-center',
         off && 'mdt-pointer-events-none mdt-opacity-50',
+        face.card,
         className
       )}
       onClick={(event) => {
@@ -242,7 +278,8 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
       <span
         className={cn(
           'mdt-flex mdt-min-w-0 mdt-gap-2',
-          chip ? 'mdt-items-center' : 'mdt-items-start'
+          chip ? 'mdt-items-center' : 'mdt-items-start',
+          face.row
         )}
       >
         {icon !== undefined && (
@@ -250,7 +287,8 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
             aria-hidden
             className={cn(
               'mdt-inline-flex mdt-h-5 mdt-shrink-0 mdt-items-center [&_svg]:mdt-size-4',
-              on ? 'mdt-text-foreground' : 'mdt-text-faint'
+              on ? 'mdt-text-foreground' : 'mdt-text-faint',
+              face.icon
             )}
           >
             {icon}
@@ -259,14 +297,16 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
         <span
           className={cn(
             'mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col mdt-gap-0.5',
-            !chip && 'mdt-pr-1'
+            !chip && 'mdt-pr-1',
+            face.text
           )}
         >
           <span
             id={titleId}
             className={cn(
               'mdt-inline-flex mdt-min-w-0 mdt-items-center mdt-gap-1.5 mdt-text-sm mdt-font-medium mdt-leading-5',
-              chip ? 'mdt-whitespace-nowrap' : 'mdt-flex-wrap'
+              chip ? 'mdt-whitespace-nowrap' : 'mdt-flex-wrap',
+              face.title
             )}
           >
             {title}
@@ -277,12 +317,12 @@ const SelectableCard = forwardRef<HTMLDivElement, SelectableCardProps>(function 
             )}
           </span>
           {hasDesc && (
-            <span id={descId} className="mdt-text-xs mdt-leading-normal mdt-text-faint">
+            <span id={descId} className={cn('mdt-text-xs mdt-leading-normal mdt-text-faint', face.desc)}>
               {description}
             </span>
           )}
         </span>
-        <Control radio={radio} on={on} />
+        <Control radio={radio} on={on} className={cn(face.control, on && radio && face.controlOn)} />
       </span>
       {children !== undefined && children !== null && children !== false && (
         <span className="mdt-mt-auto mdt-flex mdt-min-w-0 mdt-flex-col mdt-gap-1.5 mdt-pt-0.5">
