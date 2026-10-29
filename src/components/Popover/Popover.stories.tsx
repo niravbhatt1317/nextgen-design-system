@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { forwardRef, useState, type ComponentPropsWithoutRef } from 'react';
+import { userEvent, within } from 'storybook/test';
 import { Button } from '../Button';
-import { Input } from '../Input';
-import { Popover, PopoverContent, PopoverTrigger } from './Popover';
+import { Icon } from '../Icon';
+import { Popover, PopoverActionMenu, PopoverContent, PopoverQuickFilter, PopoverTrigger } from './Popover';
 
 const meta: Meta<typeof Popover> = {
   title: 'New Components/Popover',
@@ -13,16 +14,25 @@ const meta: Meta<typeof Popover> = {
     docs: {
       description: {
         component: [
-          'Rich content that floats over the page from a trigger, built on Radix Popover. The part that owns',
-          "**the overlay surface**: its ground is `--mdt-popover`, the colour map's `elevation.surface.overlay`",
-          "- white in light, neutral-150 in dark (the storybook's neutral-150; Pranjal, 2026-09-25/26) - a step",
-          'DARKER than a card, so a menu reads as its own thing on any surface, with the hairline visible on it.',
-          'The ink is `--mdt-popover-foreground`. It carries no private dark rule: the theme comes from the tokens.',
+          'One popover, three variants (Pranjal, 2026-10-29). Pick the variant on `<Popover variant>`:',
           '',
-          'The same frame is exported as `popoverSurface` for the other parts that float - the row menu, a',
-          'select list, the date panel, the filter panel - so they share one ground and one edge.',
+          '- **`card`** (the default) - **the empty card**: the overlay surface and nothing else, for anything a page',
+          '  puts in it. `<PopoverContent>` inside. The Popover as it was, unchanged.',
+          '- **`action-menu`** - **the action menu** (a row\'s or a header\'s ⋯): `<PopoverActionMenu groups danger />`.',
+          '  Its rules are built in: an icon on every item; a divider between groups (any number, or none); at most',
+          '  **one red action**, always **last**, always **under a divider**; at least 224 wide (a longer item widens it).',
+          '- **`quick-filter`** - **the quick filter**, the table toolbar\'s tick menu:',
+          '  `<PopoverQuickFilter heading options value onValueChange />` - the heading naming what it filters, an',
+          '  optional search, a checkbox per value.',
           '',
-          'Replaces the earlier Popover (now `PopoverOld`, under Deprecated) as of 26 September 2026.',
+          'The two menus are menus underneath (the DropdownMenu parts), so they keep the menu\'s keys - arrows, type to',
+          'jump, Escape back to the trigger - and read as a menu to a screen reader.',
+          '',
+          "The surface: `--mdt-popover`, the colour map's `elevation.surface.overlay` - white in light, neutral-150 in",
+          'dark, a step DARKER than a card, with the hairline visible on it. Exported as `popoverSurface` for the other',
+          'parts that float.',
+          '',
+          'Replaces the Popover before it (now `PopoverOld2`, under Deprecated 2) as of 29 October 2026.',
         ].join('\n'),
       },
     },
@@ -35,10 +45,35 @@ const meta: Meta<typeof Popover> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/* the ⋯ trigger as the table's row draws it; it takes the trigger's props and ref, or the menu never hears the click */
+const MoreButton = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<'button'>>((props, ref) => (
+  <button
+    ref={ref}
+    type="button"
+    className="mdt-inline-flex mdt-h-6 mdt-w-6 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90"
+    aria-label="Row actions"
+    {...props}
+  >
+    <Icon name="more-horizontal" size={16} />
+  </button>
+));
+MoreButton.displayName = 'MoreButton';
+
+const noop = () => undefined;
+
+/* a menu open on its first render is placed off screen by the popper, so the menu stories open with a real click a
+   moment after render, as the DropdownMenu stories do */
+const openWith =
+  (name: string) =>
+  async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    await new Promise((r) => setTimeout(r, 150));
+    await userEvent.click(within(canvasElement).getByRole('button', { name }));
+  };
+
 /**
- * Default popover example.
+ * The empty card: the overlay surface, 16 inside, 288 wide unless told otherwise - anything goes in it.
  */
-export const Default: Story = {
+export const EmptyCard: Story = {
   render: () => (
     <Popover>
       <PopoverTrigger asChild>
@@ -46,8 +81,8 @@ export const Default: Story = {
       </PopoverTrigger>
       <PopoverContent>
         <div className="mdt-flex mdt-flex-col mdt-gap-2">
-          <h4 className="mdt-font-medium mdt-leading-none">Dimensions</h4>
-          <p className="mdt-text-sm mdt-text-muted-foreground">Set the dimensions for the layer.</p>
+          <h4 className="mdt-m-0 mdt-text-sm mdt-font-medium">Dimensions</h4>
+          <p className="mdt-m-0 mdt-text-sm mdt-text-muted-foreground">Set the dimensions for the layer.</p>
         </div>
       </PopoverContent>
     </Popover>
@@ -55,8 +90,8 @@ export const Default: Story = {
 };
 
 /**
- * The surface itself: the popover's ground beside the page and a card, so the step reads in both themes. In dark the
- * card is the page colour with an edge (cards are flat), and the popover steps DOWN to neutral-150 with the hairline on it.
+ * The surface itself: the popover's ground beside a card, so the step reads in both themes. In dark the card is the
+ * page colour with an edge (cards are flat), and the popover steps DOWN to neutral-150 with the hairline on it.
  */
 export const TheSurface: Story = {
   render: () => (
@@ -83,303 +118,140 @@ export const TheSurface: Story = {
 };
 
 /**
- * Popover with form inputs.
+ * The action menu as the Users table's row draws it: Edit details · Disable user, then the one red action - Delete user
+ * - last, under its divider.
  */
-export const WithForm: Story = {
-  render: function WithFormComponent() {
-    const [width, setWidth] = useState('100%');
-    const [maxWidth, setMaxWidth] = useState('300px');
-    const [height, setHeight] = useState('25px');
-    const [maxHeight, setMaxHeight] = useState('none');
-
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Open dimensions</Button>
-        </PopoverTrigger>
-        <PopoverContent className="mdt-w-80">
-          <div className="mdt-flex mdt-flex-col mdt-gap-4">
-            <div className="mdt-space-y-2">
-              <h4 className="mdt-font-medium mdt-leading-none">Dimensions</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">
-                Set the dimensions for the layer.
-              </p>
-            </div>
-            <div className="mdt-flex mdt-flex-col mdt-gap-3">
-              <div className="mdt-flex mdt-flex-col mdt-gap-2">
-                <label htmlFor="width" className="mdt-text-sm mdt-font-medium">
-                  Width
-                </label>
-                <Input
-                  id="width"
-                  value={width}
-                  onChange={(e) => {
-                    setWidth(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="mdt-flex mdt-flex-col mdt-gap-2">
-                <label htmlFor="maxWidth" className="mdt-text-sm mdt-font-medium">
-                  Max width
-                </label>
-                <Input
-                  id="maxWidth"
-                  value={maxWidth}
-                  onChange={(e) => {
-                    setMaxWidth(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="mdt-flex mdt-flex-col mdt-gap-2">
-                <label htmlFor="height" className="mdt-text-sm mdt-font-medium">
-                  Height
-                </label>
-                <Input
-                  id="height"
-                  value={height}
-                  onChange={(e) => {
-                    setHeight(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="mdt-flex mdt-flex-col mdt-gap-2">
-                <label htmlFor="maxHeight" className="mdt-text-sm mdt-font-medium">
-                  Max height
-                </label>
-                <Input
-                  id="maxHeight"
-                  value={maxHeight}
-                  onChange={(e) => {
-                    setMaxHeight(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  },
-};
-
-/**
- * Controlled popover - you can control the open state.
- */
-export const Controlled: Story = {
-  render: function ControlledComponent() {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <div className="mdt-flex mdt-flex-col mdt-items-center mdt-gap-4">
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline">Toggle popover</Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <div className="mdt-flex mdt-flex-col mdt-gap-2">
-              <h4 className="mdt-font-medium mdt-leading-none">Controlled Popover</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">
-                This popover&apos;s open state is controlled externally.
-              </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-        <p className="mdt-text-sm mdt-text-muted-foreground">
-          Popover is {open ? 'open' : 'closed'}
-        </p>
-      </div>
-    );
-  },
-};
-
-/**
- * Popover with different alignments.
- */
-export const Alignment: Story = {
+export const ActionMenu: Story = {
+  play: openWith('Row actions'),
   render: () => (
-    <div className="mdt-flex mdt-gap-4">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Start</Button>
-        </PopoverTrigger>
-        <PopoverContent align="start">
-          <p className="mdt-text-sm">Aligned to start</p>
-        </PopoverContent>
-      </Popover>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Center</Button>
-        </PopoverTrigger>
-        <PopoverContent align="center">
-          <p className="mdt-text-sm">Aligned to center</p>
-        </PopoverContent>
-      </Popover>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">End</Button>
-        </PopoverTrigger>
-        <PopoverContent align="end">
-          <p className="mdt-text-sm">Aligned to end</p>
-        </PopoverContent>
-      </Popover>
-    </div>
-  ),
-};
-
-/**
- * Popover with custom side offset.
- */
-export const CustomSideOffset: Story = {
-  render: () => (
-    <div className="mdt-flex mdt-gap-4">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Offset 0</Button>
-        </PopoverTrigger>
-        <PopoverContent sideOffset={0}>
-          <p className="mdt-text-sm">No offset from trigger</p>
-        </PopoverContent>
-      </Popover>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Offset 20</Button>
-        </PopoverTrigger>
-        <PopoverContent sideOffset={20}>
-          <p className="mdt-text-sm">20px offset from trigger</p>
-        </PopoverContent>
-      </Popover>
-    </div>
-  ),
-};
-
-/**
- * Popover with custom width.
- */
-export const CustomWidth: Story = {
-  render: () => (
-    <Popover>
+    <Popover variant="action-menu">
       <PopoverTrigger asChild>
-        <Button variant="outline">Open wide popover</Button>
+        <MoreButton />
       </PopoverTrigger>
-      <PopoverContent className="mdt-w-96">
-        <div className="mdt-flex mdt-flex-col mdt-gap-2">
-          <h4 className="mdt-font-medium mdt-leading-none">Custom Width</h4>
-          <p className="mdt-text-sm mdt-text-muted-foreground">
-            This popover has a custom width of 24rem (384px). You can customize the width by passing
-            a className to PopoverContent.
-          </p>
-        </div>
-      </PopoverContent>
+      <PopoverActionMenu
+        groups={[
+          [
+            { label: 'Edit details', icon: <Icon name="pencil" />, onSelect: noop },
+            { label: 'Disable user', icon: <Icon name="user-x" />, onSelect: noop },
+          ],
+        ]}
+        danger={{ label: 'Delete user', icon: <Icon name="trash-2" />, onSelect: noop }}
+      />
     </Popover>
   ),
 };
 
 /**
- * Example: Settings popover with actions.
+ * More than one divider: each group is split from the next where the page wants it. The red action's divider is the
+ * one that is never left out.
  */
-export const SettingsExample: Story = {
-  render: function SettingsExampleComponent() {
-    const [notifications, setNotifications] = useState(true);
-    const [emails, setEmails] = useState(false);
+export const ActionMenuGroups: Story = {
+  play: openWith('Row actions'),
+  render: () => (
+    <Popover variant="action-menu">
+      <PopoverTrigger asChild>
+        <MoreButton />
+      </PopoverTrigger>
+      <PopoverActionMenu
+        groups={[
+          [
+            { label: 'Edit details', icon: <Icon name="pencil" />, onSelect: noop },
+            { label: 'Duplicate', icon: <Icon name="copy" />, onSelect: noop },
+          ],
+          [
+            { label: 'Export as CSV', icon: <Icon name="download" />, onSelect: noop },
+            { label: 'Copy link', icon: <Icon name="link" />, onSelect: noop },
+          ],
+        ]}
+        danger={{ label: 'Delete team', icon: <Icon name="trash-2" />, onSelect: noop }}
+      />
+    </Popover>
+  ),
+};
 
+/**
+ * No red action: no divider is owed - one group draws none.
+ */
+export const ActionMenuNoDanger: Story = {
+  play: openWith('Row actions'),
+  render: () => (
+    <Popover variant="action-menu">
+      <PopoverTrigger asChild>
+        <MoreButton />
+      </PopoverTrigger>
+      <PopoverActionMenu
+        groups={[
+          [
+            { label: 'Edit details', icon: <Icon name="pencil" />, onSelect: noop },
+            { label: 'Resend invitation', icon: <Icon name="mail" />, onSelect: noop },
+            { label: 'Copy link', icon: <Icon name="link" />, onSelect: noop, disabled: true },
+          ],
+        ]}
+      />
+    </Popover>
+  ),
+};
+
+const STATUS = [
+  { value: 'active', label: 'Active' },
+  { value: 'invited', label: 'Invited' },
+  { value: 'disabled', label: 'Disabled' },
+  { value: 'locked', label: 'Locked' },
+];
+
+/**
+ * The quick filter as the table toolbar draws it: the heading naming what it filters, a checkbox per value, several at
+ * once - a tick does not close it.
+ */
+export const QuickFilter: Story = {
+  play: openWith('Status'),
+  render: function QuickFilterStory() {
+    const [value, setValue] = useState<string[]>(['active']);
     return (
-      <Popover>
+      <Popover variant="quick-filter">
         <PopoverTrigger asChild>
-          <Button variant="outline">Settings</Button>
+          <Button variant="outline" leftIcon={<Icon name="check-circle" />}>
+            Status
+          </Button>
         </PopoverTrigger>
-        <PopoverContent className="mdt-w-80">
-          <div className="mdt-flex mdt-flex-col mdt-gap-4">
-            <div className="mdt-space-y-2">
-              <h4 className="mdt-font-medium mdt-leading-none">Preferences</h4>
-              <p className="mdt-text-sm mdt-text-muted-foreground">
-                Manage your notification settings.
-              </p>
-            </div>
-            <div className="mdt-flex mdt-flex-col mdt-gap-3">
-              <div className="mdt-flex mdt-items-center mdt-justify-between">
-                <label
-                  htmlFor="notifications"
-                  className="mdt-cursor-pointer mdt-text-sm mdt-font-medium"
-                >
-                  Push Notifications
-                </label>
-                <input
-                  type="checkbox"
-                  id="notifications"
-                  checked={notifications}
-                  onChange={(e) => {
-                    setNotifications(e.target.checked);
-                  }}
-                  className="mdt-h-4 mdt-w-4 mdt-cursor-pointer"
-                />
-              </div>
-              <div className="mdt-flex mdt-items-center mdt-justify-between">
-                <label htmlFor="emails" className="mdt-cursor-pointer mdt-text-sm mdt-font-medium">
-                  Email Notifications
-                </label>
-                <input
-                  type="checkbox"
-                  id="emails"
-                  checked={emails}
-                  onChange={(e) => {
-                    setEmails(e.target.checked);
-                  }}
-                  className="mdt-h-4 mdt-w-4 mdt-cursor-pointer"
-                />
-              </div>
-            </div>
-          </div>
-        </PopoverContent>
+        <PopoverQuickFilter heading="Filter by status" options={STATUS} value={value} onValueChange={setValue} />
       </Popover>
     );
   },
 };
 
+const ORGS = [
+  'Acme Corp',
+  'Finserve Bank',
+  'Helios Energy',
+  'Lighthouse Health',
+  'Northwind Retail',
+  'Orbit Logistics',
+  'Summit Insurance',
+].map((name) => ({ value: name.toLowerCase().replace(/\s+/g, '-'), label: name }));
+
 /**
- * Example: User profile popover.
+ * With a search over the values, focused on open (a long list - organizations). Keys typed in the box stay in it.
  */
-export const ProfileExample: Story = {
-  render: () => (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">View Profile</Button>
-      </PopoverTrigger>
-      <PopoverContent className="mdt-w-80">
-        <div className="mdt-flex mdt-flex-col mdt-gap-4">
-          <div className="mdt-flex mdt-items-center mdt-gap-4">
-            <div className="mdt-flex mdt-h-12 mdt-w-12 mdt-items-center mdt-justify-center mdt-rounded-full mdt-bg-primary mdt-text-primary-foreground">
-              JD
-            </div>
-            <div className="mdt-flex mdt-flex-col">
-              <p className="mdt-font-medium">John Doe</p>
-              <p className="mdt-text-sm mdt-text-muted-foreground">john.doe@example.com</p>
-            </div>
-          </div>
-          <div className="mdt-flex mdt-flex-col mdt-gap-2">
-            <Button variant="outline" size="sm">
-              View Profile
-            </Button>
-            <Button variant="outline" size="sm">
-              Edit Profile
-            </Button>
-            <Button variant="outline" size="sm">
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  ),
+export const QuickFilterSearchable: Story = {
+  play: openWith('Organization'),
+  render: function QuickFilterSearchableStory() {
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <Popover variant="quick-filter">
+        <PopoverTrigger asChild>
+          <Button variant="outline" leftIcon={<Icon name="building-2" />}>
+            Organization
+          </Button>
+        </PopoverTrigger>
+        <PopoverQuickFilter
+          heading="Filter by organization"
+          options={ORGS}
+          value={value}
+          onValueChange={setValue}
+          searchable
+        />
+      </Popover>
+    );
+  },
 };
