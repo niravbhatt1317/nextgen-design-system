@@ -22,7 +22,7 @@ const meta: Meta<typeof Tabs> = {
           '| Type | For | Looks |',
           '| --- | --- | --- |',
           "| `underline` (the default) | A drawer band or a page band. | The label 13/500 in the faint ink, the active one 600 in the primary colour, over a 2px line with round ends that sits ON the strip's hairline and is the label's width (12 in from each side of the tab); the tabs flush, so labels read 24 apart; 9 above the label, 11 below; the first label on the content edge. |",
-          "| `filled` | A switch inside a body — a view toggle, a form's mode — where a track reads better than a line. | A 32 track, corners 8, neutral-20, 3 in, holding 26 chips with corners 5, 10 at the sides and 2 between; the active chip white with the label at 500 in the primary colour under a hairline shadow. |",
+          "| `filled` | A switch inside a body — a view toggle, a form's mode — where a track reads better than a line. | A 40 track, corners 8, neutral-20, 4 in, holding 32 chips (the regular button's height) with corners 5, 10 at the sides and 2 between; the active chip white with the label at 500 in the primary colour under a hairline shadow. |",
           '',
           '**Not Tabs.** A sequence is a `Stepper`; a view preference is a `ToggleGroup`; "one of',
           'these" is a Radio strip (K-Tabs-25).',
@@ -41,8 +41,8 @@ const meta: Meta<typeof Tabs> = {
           '| **Set the type once** | On the `TabsList`; every tab inside inherits it. |',
           '',
           "Three calls the rulebook lists as open are built at the console's value: the active",
-          'underline label at 600 (K-Tabs-07), the chip at 26 in the 32 track (K-Tabs-10), the icon',
-          'at 14 with 6 before the label (K-Tabs-13).',
+          'underline label at 600 (K-Tabs-07) and the icon at 14 with 6 before the label (K-Tabs-13).',
+          'The filled chip is settled at 32 in a 40 track (Pranjal, 2026-10-23, option C; K-Tabs-09).',
         ].join('\n'),
       },
     },
@@ -153,17 +153,18 @@ export const Underline: Story = {
 };
 
 /**
- * A switch inside a body. A 32 track, corners 8, neutral-20, 3 in; 26 chips
- * with corners 5, 10 at the sides, 2 between; the active chip white, its label
- * 500 in the primary colour (not bold), under a hairline shadow (K-Tabs-09,
- * 10, 11). The active chip ignores a click (K-Tabs-12).
+ * A switch inside a body. A 40 track, corners 8, neutral-20, 4 in; 32 chips
+ * (the regular button's height) with corners 5, 10 at the sides, 2 between, so
+ * 4 sit above and below each (Pranjal, 2026-10-23, option C); the active chip
+ * white, its label 500 in the primary colour (not bold), under a hairline shadow
+ * (K-Tabs-09, 11). The active chip ignores a click (K-Tabs-12).
  */
 export const Filled: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          'For a switch inside a body — the Source of truth switch, a form’s mode, a view toggle. A 32 track, corners 8, neutral-20, 3 in (K-Tabs-09); 26 chips with corners 5, 10 at the sides, 2 between (K-Tabs-10, built at 26 so the chip sits at exactly 3 · 3); the active chip white with the label at 500 in the primary colour — not bold, the white chip and the colour carry it — under a hairline shadow (K-Tabs-11). Hover tints a chip primary at 4% (K-Tabs-04). Clicking the chip that is already active does nothing (K-Tabs-12).',
+          'For a switch inside a body — the Source of truth switch, a form’s mode, a view toggle. A 40 track, corners 8, neutral-20, 4 in; 32 chips - the height of the regular button - with corners 5, 10 at the sides, 2 between, so the chip sits at exactly 4 · 4 (K-Tabs-09, Pranjal 2026-10-23, option C: "in secondary tabs ... it looks cramped"; it was a 32 track with a 25 chip); the active chip white with the label at 500 in the primary colour — not bold, the white chip and the colour carry it — under a hairline shadow (K-Tabs-11). Hover tints a chip primary at 4% (K-Tabs-04). Clicking the chip that is already active does nothing (K-Tabs-12).',
       },
     },
   },

@@ -103,7 +103,7 @@ export type {
 // Banner — a message that sits in the page and stays there. Shares Toast's six
 // tones and palette on purpose; shares nothing about how it behaves. If you
 // would still need the message after a refresh, it is a Banner.
-export { Banner, bannerVariants } from './Banner';
+export { Banner, bannerVariants, useDismissUntilNew } from './Banner';
 export type {
   BannerProps,
   BannerOwnProps,
@@ -111,6 +111,9 @@ export type {
   BannerTone,
   BannerPlacement,
   BannerActionPlacement,
+  DismissStorage,
+  DismissUntilNewOptions,
+  DismissUntilNewState,
 } from './Banner';
 
 // Breadcrumb — says where you are and offers the way back. Depth, not sequence:
@@ -174,13 +177,15 @@ export type {
   CollapsibleCardOwnProps,
 } from './Card';
 
-// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right
-export { SelectableCard, SelectableCardGroup } from './SelectableCard';
+// SelectableCard - an answer drawn as a card, its radio or checkbox at the top right.
+// PickCard - the made choice folded into one of those cards, with a Change door (Pranjal, 2026-10-19).
+export { SelectableCard, SelectableCardGroup, PickCard } from './SelectableCard';
 export type {
   SelectableCardProps,
   SelectableCardGroupProps,
   SelectableCardType,
   SelectableCardLayout,
+  PickCardProps,
 } from './SelectableCard';
 
 // ActionCard
@@ -399,6 +404,9 @@ export type {
 // Input
 export { Input, InputVariants } from './Input';
 export type { InputProps, InputVariantsType } from './Input';
+// ChipInput - a field that turns typed values into chips: Enter, comma, space or a paste adds; Backspace takes back.
+export { ChipInput } from './Input';
+export type { ChipInputProps } from './Input';
 
 // InputGroup
 export {
@@ -446,6 +454,10 @@ export type { LabelProps, LabelVariantsType, LabelSize } from './Label';
 export { NumberInput } from './NumberInput';
 export type { NumberInputProps } from './NumberInput';
 
+// DurationInput - days, hours and minutes in one box, each number with its unit word, a hairline between (Max runtime).
+export { DurationInput, formatDuration, parseDuration, NO_LIMIT } from './DurationInput';
+export type { DurationInputProps } from './DurationInput';
+
 // OTPInput - a one-time-password field. DEPRECATED 2026-09-15: no replacement;
 // the length, resend and expiry rules belong to the sign-in flow, not here.
 export { OTPInput } from './OTPInput';
@@ -470,13 +482,16 @@ export type {
   PaginationEllipsisProps,
 } from './Pagination';
 
-// Popover
+// Popover - one popover, three variants (2026-10-29): the empty card (PopoverContent), the action menu
+// (PopoverActionMenu, its rules built in) and the quick filter (PopoverQuickFilter).
 export {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
   PopoverClose,
+  PopoverActionMenu,
+  PopoverQuickFilter,
   popoverSurface,
 } from './Popover';
 // PopoverOld — the previous popover. DEPRECATED 2026-09-26: use Popover (the overlay surface, no private dark rule).
@@ -494,7 +509,16 @@ export type {
   PopoverOldCloseProps,
   PopoverOldAnchorProps,
 } from './PopoverOld';
-export type { PopoverProps, PopoverTriggerProps, PopoverContentProps } from './Popover';
+export type {
+  PopoverProps,
+  PopoverTriggerProps,
+  PopoverContentProps,
+  PopoverVariant,
+  PopoverAction,
+  PopoverActionMenuProps,
+  PopoverQuickFilterOption,
+  PopoverQuickFilterProps,
+} from './Popover';
 
 // Progress — value fill with optional baseline and floor markers
 export { Progress, progressVariants } from './Progress';
@@ -516,6 +540,36 @@ export type {
   ResizablePanelProps,
   ResizableHandleProps,
 } from './Resizable';
+
+// RowList — the console's row family (Pranjal, 2026-10-28): the frame a list of rows sits in and its rows - a plain or
+// pressable Row, a pick list's SelectableRow (tick box or radio), a LogRow - plus the compact KeyValueList and the
+// Timeline. A drawer's label · value fact row is SheetField, in a SheetFields stack.
+export {
+  RowList,
+  Row,
+  RowTitle,
+  SelectableRow,
+  LogRow,
+  KeyValueList,
+  KeyValueItem,
+  Timeline,
+  TimelineItem,
+} from './RowList';
+export type {
+  RowListProps,
+  RowListDensity,
+  RowProps,
+  RowState,
+  RowTitleProps,
+  SelectableRowProps,
+  SelectableRowControl,
+  LogRowProps,
+  KeyValueListProps,
+  KeyValueItemProps,
+  TimelineProps,
+  TimelineItemProps,
+  TimelineTone,
+} from './RowList';
 
 // ScrollArea
 export { ScrollArea, ScrollAreaViewport, ScrollBar, ScrollAreaCorner } from './ScrollArea';
@@ -541,6 +595,16 @@ export type {
   SelectSize,
 } from './Select';
 
+// TreeSelect - a pick from a tree in a dropdown: groups that fold, items, and what sits under each item, every level a checkbox
+export { TreeSelect } from './TreeSelect';
+export type {
+  TreeSelectProps,
+  TreeSelectGroup,
+  TreeSelectItem,
+  TreeSelectLeaf,
+  TreeSelectNouns,
+} from './TreeSelect';
+
 // Separator
 export { Separator, separatorVariants } from './Separator';
 export type { SeparatorProps, SeparatorVariants } from './Separator';
@@ -564,6 +628,7 @@ export {
   SheetIdentity,
   SheetSection,
   SheetField,
+  SheetFields,
   SheetNavigation,
   SheetPage,
   SheetNavigationTitle,
@@ -574,6 +639,8 @@ export type {
   SheetIdentityProps,
   SheetSectionProps,
   SheetFieldProps,
+  SheetFieldRatio,
+  SheetFieldsProps,
   SheetNavigationEntry,
   SheetNavigationProps,
   UseSheetNavigationReturn,
@@ -803,6 +870,10 @@ export {
   TableBody,
   TableRow,
   TableCell,
+  // TableGroupRow - a title row between the rows naming the group under it (the Credentials step's types).
+  TableGroupRow,
+  // TableCheckCell - a checkbox as a cell's value, centred in a 28 square that takes the click (the Notify matrix).
+  TableCheckCell,
   TableHead,
   TableSelectionCell,
   TableNumberCell,
@@ -851,6 +922,8 @@ export type {
   TableColGroupProps,
   TableRowProps,
   TableCellProps,
+  TableGroupRowProps,
+  TableCheckCellProps,
   TableHeadProps,
   TableSelectionCellProps,
   TableNumberCellProps,
@@ -997,6 +1070,7 @@ export {
 export type {
   KpiCardProps,
   KpiCardSize,
+  KpiCardVariant,
   KpiSingleCardProps,
   KpiGroupCardProps,
   KpiMetricProps,
@@ -1081,6 +1155,22 @@ export type { InputOld2Props, InputOld2VariantsType } from './InputOld2';
 // TextareaOld2 — the Textarea before 2026-09-17. DEPRECATED 2026-09-22: use Textarea.
 export { TextareaOld2, textareaOld2Variants } from './TextareaOld2';
 export type { TextareaOld2Props, TextareaOld2Variants } from './TextareaOld2';
+// PopoverOld2 — the Popover before 2026-10-29 (the overlay surface only). DEPRECATED 2026-10-29: use Popover.
+export {
+  PopoverOld2,
+  PopoverOld2Trigger,
+  PopoverOld2Content,
+  PopoverOld2Anchor,
+  PopoverOld2Close,
+  popoverOld2Surface,
+} from './PopoverOld2';
+export type {
+  PopoverOld2Props,
+  PopoverOld2ContentProps,
+  PopoverOld2TriggerProps,
+  PopoverOld2CloseProps,
+  PopoverOld2AnchorProps,
+} from './PopoverOld2';
 // SelectOld2 — the Select before 2026-09-17. DEPRECATED 2026-09-22: use Select.
 export { SelectOld2, selectOld2TriggerVariants } from './SelectOld2';
 export type {
@@ -1194,8 +1284,37 @@ export {
 } from './PhoneInput';
 export type { PhoneInputProps, PhoneCountry, PhoneInputValue } from './PhoneInput';
 
+// InputAction - an action inside a field at its right end, behind a border-to-border hairline (Browse, Replace, Copy).
+export { InputAction } from './InputAction';
+// PathBrowserDialog - the centred dialog Browse opens: a store's paths as a tree, Sync now, Use this path.
+export { PathBrowserDialog } from './InputAction';
+export type { InputActionProps, PathBrowserDialogProps, PathBrowserSource } from './InputAction';
+// TreeView - a bordered box of folders that open and shut and items that are picked (the Browse popup's path tree).
+export { TreeView } from './TreeView';
+export type { TreeViewNode, TreeViewProps } from './TreeView';
+// TargetBuilder - a list of targets built one at a time: pick a type, type the value, Add; each row editable in place.
+export { TargetBuilder } from './TargetBuilder';
+export type { TargetBuilderProps, TargetEntry, TargetKind } from './TargetBuilder';
+// KeyValuesBuilder - rows of a picked key and its values typed in as chips (custom ports by protocol, tags by category).
+export { KeyValuesBuilder } from './TargetBuilder';
+export type { KeyValuesBuilderProps, KeyValuesOption, KeyValuesRow } from './TargetBuilder';
+
 // ── Ported from the console, 2026-10-28 (Pranjal: "push everything in storybook now. Dont leave anything") ──────────
 
+// RequiredMark - the red asterisk after the label of a field that must be filled in; every library field draws it.
+export { RequiredMark } from './RequiredMark';
+export type { RequiredMarkProps } from './RequiredMark';
+
+// CopyTip - wraps a copy control: "Copy" under the pointer, "Copied" for 1.4 s after a press (CopyField's button too).
+export { CopyTip } from './CopyField';
+export type { CopyTipProps, CopyTipControl } from './CopyField';
+
+// OverflowTip - mounted once: anything cut with "…" or a line clamp shows its full text in the tooltip on hover.
+export { OverflowTip } from './OverflowTip';
+
+// Slider - one number between two limits: the value on the handle, a ruler, the saved value and a reset, typeable.
+export { Slider } from './Slider';
+export type { SliderProps } from './Slider';
 // Chart - the console Health's hand-drawn charts, each with the one-line hover (ChartTip): columns, a bar list, a
 // status history, a trend line, a histogram against a budget, a heat table and the stacked bars of Module health.
 export {

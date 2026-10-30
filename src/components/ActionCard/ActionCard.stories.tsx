@@ -79,14 +79,14 @@ const meta: Meta<typeof ActionCard> = {
       description: {
         component:
           'One item on a settings page, as a row: a 36px tile, a title with its badge, a line under it, and controls on the right. ' +
-          'Three faces: `default`, the dashed blue `add`, and `edit` for an inline field. ' +
+          'Four faces: `default`, the dashed blue `add`, `edit` for an inline field, and `compact` - a quiet tinted card with a 14 glyph by a 12 title and its line, for inside a dialog or panel (the store endpoint with Sync now in the Browse popup). ' +
           'Give it `onClick` or `href` and the whole card is clickable - open a modal, a drawer, an inline edit, change the content, or go somewhere. ' +
           '`clickable={false}` holds it still. The switch, buttons and menu inside keep working on their own and never trigger the card.',
       },
     },
   },
   argTypes: {
-    variant: { control: 'inline-radio', options: ['default', 'add', 'edit'] },
+    variant: { control: 'inline-radio', options: ['default', 'add', 'edit', 'compact'] },
     title: { control: 'text' },
     description: { control: 'text' },
     dim: { control: 'boolean', description: 'Fade the tile: retired or switched off' },
@@ -119,7 +119,37 @@ export const Playground: Story = {
   ),
 };
 
-/** Every face from the console: add cards, a domain, a setting, and connections in each state. */
+/** The `compact` face as the Browse popup draws it: the store's endpoint and its sync line, Sync now on the right. Press it. */
+const SyncSource = () => {
+  const [syncing, setSyncing] = useState(false);
+  const [synced, setSynced] = useState('moments ago');
+  return (
+    <ActionCard
+      variant="compact"
+      icon={<Icon name="globe" />}
+      title="https://vault.acme.io/v1/secret/metadata?list=true"
+      description={`Synced ${synced} · auto every 10 min`}
+      actions={
+        <Button
+          variant="outline"
+          leftIcon={<Icon name="refresh-cw" size={16} aria-hidden />}
+          disabled={syncing}
+          onClick={() => {
+            setSyncing(true);
+            setTimeout(() => {
+              setSyncing(false);
+              setSynced('just now');
+            }, 700);
+          }}
+        >
+          {syncing ? 'Syncing…' : 'Sync now'}
+        </Button>
+      }
+    />
+  );
+};
+
+/** Every face from the console: add cards, a domain, a setting, connections in each state, and the compact source card. */
 export const AllVariants: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
@@ -219,6 +249,7 @@ export const AllVariants: Story = {
         actions={<MotadataSwitch aria-label="Show Legacy ADFS on the sign-in screen" />}
         menu={<More name="Legacy ADFS" />}
       />
+      <SyncSource />
     </Stack>
   ),
 };

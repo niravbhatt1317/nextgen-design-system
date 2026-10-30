@@ -142,6 +142,41 @@ export interface TableCellProps extends ComponentPropsWithoutRef<'td'> {
   dragging?: boolean | undefined;
 }
 
+/**
+ * Props for TableGroupRow - a title row between a table's rows that names the group under it.
+ */
+export interface TableGroupRowProps extends Omit<ComponentPropsWithoutRef<'tr'>, 'title'> {
+  /** How many columns the row spans - every column the table draws, the lead included. */
+  colSpan: number;
+
+  /** The group's name - "SSH Credentials" - 12/600 in the label ink. */
+  title: ReactNode;
+
+  /**
+   * What follows the name in the faint ink, each part after a " · " - the family and the count:
+   * `['SSH', 3]` reads "SSH Credentials · SSH · 3".
+   */
+  meta?: ReactNode | ReactNode[] | undefined;
+}
+
+/**
+ * Props for TableCheckCell - a checkbox as a cell's value (one of a row's channels, a permission, a yes), centred in
+ * the cell inside a 28 square that takes the whole click.
+ */
+export interface TableCheckCellProps extends Omit<ComponentPropsWithoutRef<'td'>, 'onChange'> {
+  /** The box is ticked. */
+  checked: boolean;
+
+  /** Spoken name of the box, the row and the column together: "Run failure · Email". */
+  label: string;
+
+  /** A click on the square: what the box becomes. */
+  onCheckedChange?: ((checked: boolean) => void) | undefined;
+
+  /** Held: ticked or not as given, and the square refuses the pointer. */
+  disabled?: boolean | undefined;
+}
+
 export interface TableHeadProps extends Omit<ComponentPropsWithoutRef<'th'>, 'onResize'> {
   /** Column key, for the drag and insert machinery. */
   columnKey: string;

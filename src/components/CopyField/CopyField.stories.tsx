@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
+import { Button } from '../Button';
+import { Icon } from '../Icon';
 import { CopyField } from './CopyField';
+import { CopyTip } from './CopyTip';
 
 const meta: Meta<typeof CopyField> = {
   title: 'New Components/CopyField',
@@ -16,6 +19,8 @@ const meta: Meta<typeof CopyField> = {
           'The line is 36 tall on the sunken ground. A long value is cut with an ellipsis and shown whole on hover; the button always copies all of it. `masked` shows the dots instead and still copies the real value - pass `copyable={false}` when it must not.',
           '',
           '**Ported from the console (Pranjal, 2026-10-13)**, which had built it by hand five times: the copy feedback (CopyTip), the one-line field (the SSO drawer), the icon-only copy (SCIM), the label row with its ⓘ (the setup drawers). For a multi-line command or log output, use CodeWell.',
+          '',
+          '**CopyTip** is the copy feedback on its own, for a copy control that is not in a field - the icon-only copy beside an ID in a drawer row, or a "Copy link" button. Wrap the control; a press copies `text` and still runs the control\'s own `onClick`. `hoverTip={false}` for a control that already reads "Copy": the bubble then shows only once it has copied. CopyField\'s own button goes through it, so the two always say the same thing.',
         ].join('\n'),
       },
     },
@@ -77,5 +82,48 @@ export const Variations: Story = {
       <CopyField label="Organization name" value="Acme Health Partners" mono={false} />
       <CopyField value="oneops-entity-8f3a2c" copyLabel="Copy the entity ID" />
     </Stack>
+  ),
+};
+
+/** CopyTip around the icon-only ghost copy: "Copy" under the pointer, "Copied" for 1.4 s after a press. */
+export const CopyTipIconOnly: Story = {
+  name: 'CopyTip · icon only',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div className="mdt-flex mdt-items-center mdt-gap-2 mdt-pt-10 mdt-text-sm mdt-text-foreground">
+      <span className="mdt-font-mono mdt-text-xs">agt-7f3c91e2</span>
+      {/* in its own slot, as the console's code blocks hold it - CopyTip's inline anchor is not a flex item there */}
+      <span>
+        <CopyTip text="agt-7f3c91e2">
+          <Button
+            iconOnly
+            variant="ghost"
+            size="sm"
+            ariaLabel="Copy agent ID"
+            leftIcon={<Icon name="copy" size="sm" aria-hidden />}
+          />
+        </CopyTip>
+      </span>
+    </div>
+  ),
+};
+
+/** CopyTip around buttons that already say "Copy": no bubble under the pointer, "Copied" after a press. */
+export const CopyTipOnAButton: Story = {
+  name: 'CopyTip · on a button that says Copy',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div className="mdt-flex mdt-items-center mdt-gap-3 mdt-pt-10">
+      <CopyTip text="https://login.oneops.example.com/invite/8f3a2c" hoverTip={false}>
+        <Button variant="secondary" leftIcon={<Icon name="copy" size="sm" aria-hidden />}>
+          Copy link
+        </Button>
+      </CopyTip>
+      <CopyTip text="urn:ietf:params:scim:schemas:core:2.0:User" hoverTip={false}>
+        <Button variant="outline" size="sm" leftIcon={<Icon name="copy" size="sm" aria-hidden />}>
+          Copy
+        </Button>
+      </CopyTip>
+    </div>
   ),
 };

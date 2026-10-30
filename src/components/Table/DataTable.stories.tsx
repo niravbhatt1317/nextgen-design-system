@@ -1,10 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { Fragment, useId, useRef, useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
-import { DropdownMenuItem, DropdownMenuSeparator } from '../DropdownMenu';
+import { Checkbox } from '../Checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
 import { Icon } from '../Icon';
+import type { IconName } from '../Icon';
+import { IconTile } from '../IconTile';
+import { Input } from '../Input';
 import {
   Sheet,
   SheetBody,
@@ -15,8 +26,24 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '../Sheet';
-import { Toolbar } from '../Toolbar';
+import { MotadataSwitch } from '../Switch';
+import { Toolbar, ToolbarButton } from '../Toolbar';
 import { DataTable } from './DataTable';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableColGroup,
+  TableCheckCell,
+  TableGroupRow,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSelectAll,
+  TableSelectionCell,
+  TableViewport,
+} from './Table';
+import { TableBlank } from './TableStates';
 import { TableBulkAction, TableBulkSeparator } from './TableBulkBar';
 import { ContactChips, PersonCell, TagList } from './TableCells';
 import { SAMPLE_ROLES, SAMPLE_TEAMS, sampleUsers } from './sampleUsers';
@@ -738,4 +765,406 @@ export const RowsWithAndWithoutActions: Story = {
     await userEvent.click(within(row).getByRole('button', { name: 'Row actions' }));
     await expect(await within(document.body).findByRole('menu')).toBeVisible();
   },
+};
+
+/* ---- WITH GROUP ROWS: the discovery profile's Credentials step (features/discovery-profiles/wizard/CredPicker.jsx),
+ * the table parts composed by hand as the console does - the DataTable knows no group row. The console's own seed
+ * (data.js CRED_TYPES / CRED_LIST) and family marks (credential-profiles CredentialList.jsx FAMILY_ICON). ---- */
+const CRED_TYPES = [
+  { id: 'wmi', name: 'WMI Credentials', short: 'WMI', family: 'WMI' },
+  { id: 'ssh', name: 'SSH Credentials', short: 'SSH', family: 'SSH' },
+  { id: 'powershell', name: 'PowerShell Credentials', short: 'PowerShell', family: 'PowerShell' },
+  { id: 'snmp', name: 'SNMP Credentials', short: 'SNMP', family: 'SNMP' },
+  { id: 'jdbc', name: 'JDBC Credentials', short: 'JDBC', family: 'JDBC' },
+  { id: 'basic', name: 'Basic Auth Credentials', short: 'Basic Auth', family: 'HTTP/HTTPS' },
+  { id: 'apikey', name: 'API Key Credentials', short: 'API Key', family: 'HTTP/HTTPS' },
+  { id: 'jms', name: 'JMS Credentials', short: 'JMS', family: 'JMS' },
+];
+const CREDS = [
+  { ref: 'win-hardware-wmi', type: 'wmi' },
+  { ref: 'linux-prod-discovery', type: 'ssh' },
+  { ref: 'cisco-network-readonly', type: 'ssh' },
+  { ref: 'ec2-bastion-key', type: 'ssh' },
+  { ref: 'win-domain-discovery', type: 'powershell' },
+  { ref: 'win-iis-app-svc', type: 'powershell' },
+  { ref: 'core-switch-readonly', type: 'snmp' },
+  { ref: 'datacenter-v3-authpriv', type: 'snmp' },
+  { ref: 'printer-fleet-public', type: 'snmp' },
+  { ref: 'postgres-prod-readonly', type: 'jdbc' },
+  { ref: 'oracle-erp-svc', type: 'jdbc' },
+  { ref: 'mongodb-prod-ro', type: 'basic' },
+  { ref: 'vcenter-prod', type: 'basic' },
+  { ref: 'splunk-search-token', type: 'apikey' },
+  { ref: 'activemq-prod-broker', type: 'jms' },
+];
+const FAMILY_ICON: Record<string, IconName> = {
+  WMI: 'server',
+  SSH: 'terminal',
+  PowerShell: 'terminal-square',
+  SNMP: 'network',
+  JDBC: 'database',
+  'HTTP/HTTPS': 'globe',
+  JMS: 'layers',
+};
+/* the lead 60, Type 200, Credential the rest of the console's 758 */
+const GROUP_LEAD = 60;
+const GROUP_TYPE_W = 200;
+const GROUP_NAME_W = 758 - GROUP_LEAD - GROUP_TYPE_W;
+const TYPE_GLYPH = <Icon name="tag" />;
+
+function GroupedCredentials() {
+  const [q, setQ] = useState('');
+  const [tf, setTf] = useState<string[]>([]);
+  const [tq, setTq] = useState('');
+  const [selected, setSelected] = useState<string[]>([]);
+  const tqRef = useRef<HTMLInputElement>(null);
+  const ql = q.trim().toLowerCase();
+  const tql = tq.trim().toLowerCase();
+  const typesShown = tql
+    ? CRED_TYPES.filter((t) => [t.short, t.name, t.family].join(' ').toLowerCase().includes(tql))
+    : CRED_TYPES;
+  const typeOf = (id: string) => CRED_TYPES.find((t) => t.id === id);
+  const visible = CREDS.filter((c) => {
+    if (tf.length && !tf.includes(c.type)) return false;
+    const t = typeOf(c.type);
+    return !ql || [c.ref, t?.name, t?.short, t?.family].join(' ').toLowerCase().includes(ql);
+  });
+  const groups = CRED_TYPES.map((t) => ({
+    t,
+    list: visible.filter((c) => c.type === t.id),
+  })).filter((g) => g.list.length > 0);
+  /* the numbers run through the groups */
+  const indexOf = new Map(groups.flatMap((g) => g.list).map((c, i) => [c.ref, i + 1]));
+  const refs = visible.map((c) => c.ref);
+  const picked = refs.filter((r) => selected.includes(r));
+  const allState =
+    refs.length && picked.length === refs.length ? 'all' : picked.length ? 'some' : 'none';
+  const toggle = (ref: string) => {
+    setSelected((p) => (p.includes(ref) ? p.filter((x) => x !== ref) : [...p, ref]));
+  };
+  const toggleAll = () => {
+    setSelected((p) =>
+      allState === 'all' ? p.filter((r) => !refs.includes(r)) : [...new Set([...p, ...refs])]
+    );
+  };
+  const tickType = (id: string) => {
+    setTf((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  };
+  const narrowed = Boolean(ql) || tf.length > 0;
+
+  return (
+    <div className="mdt-flex mdt-w-[760px] mdt-max-w-full mdt-flex-col mdt-gap-3">
+      <div className="mdt-flex mdt-items-center mdt-gap-2">
+        <div className="mdt-min-w-0 mdt-flex-1">
+          <Input
+            size="sm"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+            }}
+            placeholder="Search credentials"
+            startAdornment={<Icon name="search" size={14} />}
+            onClear={() => {
+              setQ('');
+            }}
+            clearLabel="Clear search"
+            aria-label="Search credentials"
+          />
+        </div>
+        <DropdownMenu
+          onOpenChange={(open) => {
+            if (open)
+              window.setTimeout(() => {
+                tqRef.current?.focus();
+              }, 0);
+            else setTq('');
+          }}
+        >
+          <DropdownMenuTrigger asChild>
+            <ToolbarButton
+              icon={TYPE_GLYPH}
+              aria-label="Filter by type"
+              dot={tf.length > 0}
+              activeLabel="type filter applied"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="mdt-w-max mdt-min-w-[240px] mdt-max-w-[380px]"
+          >
+            <div className="mdt-p-1 mdt-pb-2">
+              <Input
+                ref={tqRef}
+                size="sm"
+                className="mdt-rounded-lg"
+                value={tq}
+                onChange={(e) => {
+                  setTq(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                }}
+                placeholder="Search"
+                aria-label="Search type"
+                startAdornment={<Icon name="search" size={14} />}
+                onClear={() => {
+                  setTq('');
+                }}
+                clearLabel="Clear search"
+              />
+            </div>
+            {typesShown.length === 0 ? (
+              <div className="mdt-px-2.5 mdt-py-2 mdt-text-[13px] mdt-text-neutral-60">
+                No matches
+              </div>
+            ) : (
+              typesShown.map((t) => (
+                <DropdownMenuCheckboxItem
+                  key={t.id}
+                  className="mdt-min-h-[34px] mdt-gap-2.5 mdt-pl-2 mdt-pr-2 mdt-text-[13px] mdt-font-medium [&>span:first-child]:mdt-hidden"
+                  checked={tf.includes(t.id)}
+                  onCheckedChange={() => {
+                    tickType(t.id);
+                  }}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <Checkbox
+                    className="mdt-pointer-events-none mdt-border-neutral-40"
+                    checked={tf.includes(t.id)}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                  <span className="mdt-min-w-0 mdt-flex-1 mdt-truncate">{t.short}</span>
+                  <span className="mdt-text-xs mdt-text-muted-foreground">
+                    {CREDS.filter((c) => c.type === t.id).length}
+                  </span>
+                </DropdownMenuCheckboxItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <Table label="Credentials" divider="light" expand={false} docked={false}>
+        <TableViewport
+          tableWidth={758}
+          rowCount={visible.length}
+          hasSelection={selected.length > 0}
+          label="Credentials"
+          className="mdt-max-h-[600px]"
+        >
+          <TableColGroup widths={[GROUP_LEAD, GROUP_NAME_W, GROUP_TYPE_W]} tail={0} />
+          <TableHeader>
+            <tr>
+              <TableSelectAll state={allState} onToggle={toggleAll} />
+              <TableHead columnKey="name" label="Credential" width={GROUP_NAME_W} minWidth={160} />
+              <TableHead
+                columnKey="type"
+                label="Type"
+                width={GROUP_TYPE_W}
+                minWidth={160}
+                glyph={TYPE_GLYPH}
+                filtered={tf.length > 0}
+              />
+            </tr>
+          </TableHeader>
+          <TableBody>
+            {groups.map((g) => (
+              <Fragment key={g.t.id}>
+                <TableGroupRow colSpan={3} title={g.t.name} meta={[g.t.family, g.list.length]} />
+                {g.list.map((c) => {
+                  const on = selected.includes(c.ref);
+                  return (
+                    <TableRow
+                      key={c.ref}
+                      selected={on}
+                      onOpen={() => {
+                        toggle(c.ref);
+                      }}
+                      onToggle={() => {
+                        toggle(c.ref);
+                      }}
+                    >
+                      <TableSelectionCell
+                        index={indexOf.get(c.ref) ?? 0}
+                        selected={on}
+                        label={c.ref}
+                        onToggle={() => {
+                          toggle(c.ref);
+                        }}
+                      />
+                      <TableCell>
+                        <span className="mdt-inline-flex mdt-min-w-0 mdt-items-center mdt-gap-3">
+                          <IconTile
+                            size="md"
+                            shape="square"
+                            tone="blue"
+                            icon={<Icon name={FAMILY_ICON[g.t.family] ?? 'box'} />}
+                          />
+                          <span className="mdt-truncate mdt-text-xs mdt-font-medium mdt-leading-[1.45] mdt-text-foreground">
+                            {c.ref}
+                          </span>
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge shape="square">{g.t.short}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </Fragment>
+            ))}
+          </TableBody>
+        </TableViewport>
+        {visible.length === 0 && (
+          <TableBlank
+            kind="empty"
+            title={narrowed ? 'No credentials match' : 'No credentials yet'}
+            body={
+              narrowed
+                ? 'Try another name, or clear the search and the type filter.'
+                : 'Create one first.'
+            }
+            {...(narrowed
+              ? {
+                  action: 'Clear search and filter',
+                  onAction: () => {
+                    setQ('');
+                    setTf([]);
+                  },
+                }
+              : {})}
+          />
+        )}
+      </Table>
+    </div>
+  );
+}
+
+/**
+ * Group rows: a `TableGroupRow` between the rows names the group under it - the type's name 12/600 in the label ink,
+ * then its family and count in the faint ink, on the sunken ground, 36 tall, across every column. A plain row: it
+ * never hovers, picks or takes focus, and the row numbers run on through the groups. Ported from the discovery
+ * profile's Credentials step - search, the type filter and the picks are live.
+ */
+export const WithGroupRows: Story = {
+  name: 'With Group Rows',
+  render: () => <GroupedCredentials />,
+};
+
+/* ---- WITH CHECKBOX COLUMNS: the discovery profile's Notify matrix (features/discovery-profiles/wizard/NotifyGrid.jsx)
+ * - one row per event, one checkbox column per channel, the table parts composed by hand as the console does. The
+ * console's own rows (data.js NOTIFY_EVENTS) and column widths. ---- */
+const CHANNELS = [
+  { key: 'email', label: 'Email', width: 96 },
+  { key: 'inapp', label: 'In-app', width: 96 },
+  { key: 'webhook', label: 'Webhook', width: 112 },
+];
+const NOTIFY_EVENTS = [
+  { key: 'complete', label: 'Run completion (with findings summary)' },
+  { key: 'failure', label: 'Run failure' },
+  { key: 'timeout', label: 'Run timeout' },
+  { key: 'newdisc', label: 'New discoveries' },
+  { key: 'credspike', label: 'Credential-failure spikes' },
+  { key: 'reminder', label: 'Schedule reminders (upcoming runs)' },
+  { key: 'autoprov', label: 'Auto-provision summaries' },
+];
+/* the three channel columns, then Event takes the rest of the console's 758 */
+const NOTIFY_W = 758;
+const EVENT_W = NOTIFY_W - CHANNELS.reduce((n, c) => n + c.width, 0);
+
+function NotifyMatrix() {
+  const switchId = useId();
+  const [autoProvision, setAutoProvision] = useState(false);
+  const [notify, setNotify] = useState<Record<string, string[]>>({
+    complete: ['email'],
+    failure: ['email', 'inapp'],
+    timeout: ['email'],
+    credspike: ['inapp'],
+  });
+  /* the Auto-provision row only while the switch is on - hidden, not greyed (the house ruling of 2026-10-14) */
+  const rows = NOTIFY_EVENTS.filter((ev) => ev.key !== 'autoprov' || autoProvision);
+  const toggle = (key: string, channel: string) => {
+    setNotify((p) => {
+      const sel = p[key] ?? [];
+      return {
+        ...p,
+        [key]: sel.includes(channel) ? sel.filter((x) => x !== channel) : [...sel, channel],
+      };
+    });
+  };
+
+  return (
+    <div className="mdt-flex mdt-w-[760px] mdt-max-w-full mdt-flex-col mdt-gap-3">
+      <label
+        htmlFor={switchId}
+        className="mdt-flex mdt-items-center mdt-gap-2 mdt-text-[13px] mdt-font-medium mdt-text-neutral-90"
+      >
+        <MotadataSwitch id={switchId} checked={autoProvision} onCheckedChange={setAutoProvision} />
+        Auto-provision findings
+      </label>
+
+      <Table label="Notify" divider="light" expand={false} docked={false}>
+        <TableViewport tableWidth={NOTIFY_W} rowCount={rows.length} label="Notify">
+          <TableColGroup widths={[EVENT_W, ...CHANNELS.map((c) => c.width)]} tail={0} />
+          <TableHeader>
+            <tr>
+              <TableHead columnKey="event" label="Event" width={EVENT_W} />
+              {CHANNELS.map((c) => (
+                <TableHead
+                  key={c.key}
+                  columnKey={c.key}
+                  label={c.label}
+                  width={c.width}
+                  align="center"
+                />
+              ))}
+            </tr>
+          </TableHeader>
+          <TableBody>
+            {rows.map((ev) => {
+              const sel = notify[ev.key] ?? [];
+              const held = ev.key === 'autoprov';
+              return (
+                <TableRow key={ev.key}>
+                  <TableCell>
+                    <span className="mdt-font-medium mdt-text-foreground">{ev.label}</span>
+                    {held && (
+                      <span className="mdt-mt-0.5 mdt-block mdt-text-[color:var(--mdt-badge-warning-ink)]">
+                        Required while auto-provision is on
+                      </span>
+                    )}
+                  </TableCell>
+                  {CHANNELS.map((c) => (
+                    <TableCheckCell
+                      key={c.key}
+                      checked={held || sel.includes(c.key)}
+                      disabled={held}
+                      label={`${ev.label} · ${c.label}`}
+                      onCheckedChange={() => {
+                        toggle(ev.key, c.key);
+                      }}
+                    />
+                  ))}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </TableViewport>
+      </Table>
+    </div>
+  );
+}
+
+/**
+ * Checkbox columns: a `TableCheckCell` per channel after an Event column - the box centred in a 28 square that takes
+ * the whole click, named "<event> · <channel>" for the reader, the headings centred over the boxes. A held row (Auto-
+ * provision summaries, while the switch is on) keeps every box ticked and refuses the pointer, the reason under the
+ * event in the warning ink. Ported from the discovery profile's Schedule & Notify step; the picks are live.
+ */
+export const WithCheckboxColumns: Story = {
+  name: 'With Checkbox Columns',
+  render: () => <NotifyMatrix />,
 };

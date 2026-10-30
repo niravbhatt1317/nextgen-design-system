@@ -31,6 +31,10 @@ export const actionCardVariants = cva(
         add: 'mdt-border-dashed mdt-border-azure-60/45 mdt-bg-transparent',
         /* the field is 32 tall, so the card gives back 8 down to stay the height of its neighbours */
         edit: 'mdt-border-neutral-20 mdt-bg-background mdt-py-2.5',
+        /* the Browse popup's endpoint card (console CredentialForm.jsx PathBrowserModal, Ronak 2026-10-09): the quiet
+         * ground, an 8 corner, 12 across and 10 down, 12 to the control */
+        compact:
+          'mdt-gap-3 mdt-rounded-lg mdt-border-neutral-20 mdt-bg-neutral-10 mdt-px-3 mdt-py-2.5',
       },
       interactive: {
         true: 'hover:mdt-bg-secondary',
@@ -46,6 +50,7 @@ export const actionCardVariants = cva(
 const TILE: Record<ActionCardVariant, string> = {
   default: 'mdt-bg-secondary mdt-text-faint',
   edit: 'mdt-bg-secondary mdt-text-faint',
+  compact: '',
   add: 'mdt-border mdt-border-dashed mdt-border-azure-60/45 mdt-text-azure-60 group-hover:mdt-border-azure-60',
 };
 
@@ -125,6 +130,7 @@ const ActionCard = forwardRef<HTMLDivElement, ActionCardProps>(function ActionCa
     variant !== 'edit' &&
     (onClick !== undefined || (href !== undefined && href !== ''));
 
+  const compact = variant === 'compact';
   const titleTone = variant === 'add' ? 'mdt-text-azure-60' : 'mdt-text-foreground';
   const text = titleText(title);
   let name: ReactNode = text;
@@ -152,12 +158,13 @@ const ActionCard = forwardRef<HTMLDivElement, ActionCardProps>(function ActionCa
     variant === 'edit' ? (
       <div className="mdt-min-w-0 mdt-max-w-sm mdt-flex-1">{children}</div>
     ) : (
-      <div className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col">
+      <div className={cn('mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col', compact && 'mdt-gap-0.5')}>
         <div
           className={cn(
             'mdt-flex mdt-min-w-0 mdt-items-center mdt-gap-2',
-            'mdt-text-sm mdt-font-medium mdt-leading-5',
-            titleTone
+            compact
+              ? 'mdt-text-xs mdt-font-medium mdt-leading-normal mdt-text-neutral-130'
+              : cn('mdt-text-sm mdt-font-medium mdt-leading-5', titleTone)
           )}
         >
           {name}
@@ -178,7 +185,21 @@ const ActionCard = forwardRef<HTMLDivElement, ActionCardProps>(function ActionCa
       className={cn(actionCardVariants({ variant, interactive }), className)}
       {...rest}
     >
-      {icon !== undefined && (
+      {compact ? (
+        /* the glyph leads the two lines, 2 down so it sits on the title's line; 6 to the words */
+        <div className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-items-start mdt-gap-1.5">
+          {icon !== undefined && (
+            <span
+              className="mdt-mt-0.5 mdt-inline-flex mdt-shrink-0 mdt-text-faint [&_svg]:mdt-size-3.5"
+              aria-hidden
+            >
+              {iconAtDrawnSize(icon, 14)}
+            </span>
+          )}
+          {body}
+        </div>
+      ) : null}
+      {!compact && icon !== undefined && (
         <span
           className={cn(
             'mdt-inline-flex mdt-size-9 mdt-shrink-0 mdt-items-center mdt-justify-center mdt-rounded-lg',
@@ -191,7 +212,7 @@ const ActionCard = forwardRef<HTMLDivElement, ActionCardProps>(function ActionCa
           {iconAtDrawnSize(icon, ICON_PX)}
         </span>
       )}
-      {body}
+      {compact ? null : body}
       {(Boolean(actions) || Boolean(menu)) && (
         /* above the stretched target, so these stay their own controls */
         <div className="mdt-relative mdt-z-10 mdt-flex mdt-shrink-0 mdt-items-center mdt-gap-2.5">

@@ -11,8 +11,10 @@ import type {
  * - `default` a settled item: a domain, a connection, a sign-in method.
  * - `add`     the dashed blue card that starts something new ("Add domain").
  * - `edit`    the card held open for inline editing: `children` takes the body.
+ * - `compact` a quiet, tinted card inside a dialog or panel: a 14 glyph (no tile) beside a 12 title and its line,
+ *             a control on the right - the store endpoint with Sync now in the Browse popup.
  */
-export type ActionCardVariant = 'default' | 'add' | 'edit';
+export type ActionCardVariant = 'default' | 'add' | 'edit' | 'compact';
 
 export interface ActionCardProps extends Omit<
   ComponentPropsWithoutRef<'div'>,
@@ -20,7 +22,7 @@ export interface ActionCardProps extends Omit<
 > {
   /** @default 'default' */
   variant?: ActionCardVariant;
-  /** The glyph or logo in the 36px tile on the left. Leave out for no tile. */
+  /** The glyph or logo in the 36px tile on the left (`compact`: a bare 14 glyph by the title). Leave out for no tile. */
   icon?: ReactNode;
   /** The name on the first line. When the card is clickable this is also its accessible name. */
   title?: ReactNode;

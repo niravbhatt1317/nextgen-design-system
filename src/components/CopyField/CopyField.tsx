@@ -1,12 +1,12 @@
 'use client';
 
-import { forwardRef, useEffect, useId, useRef, useState } from 'react';
+import { forwardRef, useId } from 'react';
 import { cn } from '@/utils';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { SecretDots } from '../SecretDots';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 import type { CopyFieldProps } from './CopyField.types';
+import { CopyTip } from './CopyTip';
 
 /* PORTED FROM THE CONSOLE (Pranjal, 2026-10-13). The console built this by hand several times over:
  *
@@ -26,19 +26,10 @@ import type { CopyFieldProps } from './CopyField.types';
  * (ValueField, Branding's ValueField, WashValue, CopyRow); the field is one line (WashValue), not a wrapping box
  * (ValueField); the ground is the sunken step (WashValue and SCIM's panel agree), not neutral-20 at 60%
  * (ValueField); the button is always in view (WashValue, CopyIconTip), not shown on hover (ValueField); "Copied"
- * stays 1.4 s (CopyTip, which every copy now goes through), not the 1.2 s two older comments mention. */
-
-/** How long the tooltip says "Copied" after a press. */
-const COPIED_FOR_MS = 1400;
-
-/** Writes to the clipboard; a refused or blocked clipboard is swallowed, as the console's copyToClipboard does. */
-const writeClipboard = (text: string): void => {
-  try {
-    void navigator.clipboard.writeText(text).catch(() => undefined);
-  } catch {
-    /* clipboard blocked */
-  }
-};
+ * stays 1.4 s (CopyTip, which every copy now goes through), not the 1.2 s two older comments mention.
+ *
+ * Since 2026-10-28 the button goes through the library's CopyTip (the console's own part, ported): one copy mechanism,
+ * the same feedback for a bare copy control as for this field. */
 
 /**
  * CopyField - one line holding a value, with an icon-only copy button at its
@@ -69,26 +60,6 @@ const CopyField = forwardRef<HTMLDivElement, CopyFieldProps>(function CopyField(
   ref
 ) {
   const labelId = useId();
-  const [hover, setHover] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  useEffect(
-    () => () => {
-      clearTimeout(timer.current);
-    },
-    []
-  );
-
-  const copy = (): void => {
-    writeClipboard(value);
-    onCopy?.(value);
-    setCopied(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      setCopied(false);
-    }, COPIED_FOR_MS);
-  };
 
   const hasLabel = label !== undefined && label !== '';
   const buttonName = copyLabel ?? (hasLabel ? `Copy ${label}` : 'Copy');
@@ -135,30 +106,19 @@ const CopyField = forwardRef<HTMLDivElement, CopyFieldProps>(function CopyField(
         )}
 
         {copyable ? (
-          <TooltipProvider>
-            <Tooltip open={copied || hover} onOpenChange={setHover} disableHoverableContent>
-              <TooltipTrigger asChild>
-                <Button
-                  iconOnly
-                  variant="ghost"
-                  size="sm"
-                  ariaLabel={buttonName}
-                  leftIcon={<Icon name="copy" size="sm" aria-hidden />}
-                  onClick={copy}
-                  /* the ghost's hover is the field's own ground; one step up so it shows (console, 2026-10-03) */
-                  className="mdt-shrink-0 hover:mdt-bg-neutral-20"
-                />
-              </TooltipTrigger>
-              <TooltipContent side="top">{copied ? 'Copied' : tip}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <CopyTip text={value} tip={tip} onCopy={onCopy}>
+            <Button
+              iconOnly
+              variant="ghost"
+              size="sm"
+              ariaLabel={buttonName}
+              leftIcon={<Icon name="copy" size="sm" aria-hidden />}
+              /* the ghost's hover is the field's own ground; one step up so it shows (console, 2026-10-03) */
+              className="mdt-shrink-0 hover:mdt-bg-neutral-20"
+            />
+          </CopyTip>
         ) : null}
       </div>
-
-      {/* said once, politely, for a screen reader - the bubble's own copy mounts too late to be announced */}
-      <span className="mdt-sr-only" aria-live="polite">
-        {copied ? 'Copied' : ''}
-      </span>
     </div>
   );
 });
