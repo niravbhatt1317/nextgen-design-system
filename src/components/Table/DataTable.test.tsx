@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { Badge } from '../Badge';
 import { DropdownMenuItem } from '../DropdownMenu';
+import { Sheet, SheetBody, SheetContent, SheetHeader, SheetTitle } from '../Sheet';
 import { DataTable } from './DataTable';
 import { TableBulkAction } from './TableBulkBar';
 import { PersonCell } from './TableCells';
@@ -187,6 +188,25 @@ describe('DataTable', { timeout: 20000 }, () => {
     expect(screen.getByText('Hidden in table')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /^Role$/ }));
     expect(screen.getByRole('columnheader', { name: /Role/ })).toBeInTheDocument();
+  });
+
+  /* Pranjal, 2026-10-27: every ⋯ action menu is at least 224 wide ("increase the width by a little bit") */
+  it('opens the column ⋯ and the row ⋯ at least 224 wide, a floor a longer item can widen', async () => {
+    render(<Users />);
+    await userEvent.click(screen.getByLabelText('Options for Role'));
+    const columnMenu = await screen.findByRole('menu');
+    expect(columnMenu).toHaveClass('mdt-min-w-56');
+    expect(columnMenu).not.toHaveClass('mdt-min-w-48');
+    expect(columnMenu.className).not.toMatch(/(^|\s)mdt-w-/);
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
+    const firstRow = screen.getAllByRole('row')[1] as HTMLElement;
+    await userEvent.click(within(firstRow).getByRole('button', { name: 'Row actions' }));
+    const rowMenu = await screen.findByRole('menu');
+    expect(rowMenu).toHaveClass('mdt-min-w-56');
+    expect(within(rowMenu).getByRole('menuitem', { name: 'Edit details' })).toBeInTheDocument();
   });
 
   it('keeps plain row numbers without selection, and lets the Columns panel hide them', async () => {
@@ -646,5 +666,176 @@ describe('putting a hidden column back in place', { timeout: 20000 }, () => {
     await waitFor(() => {
       expect(plus()).not.toBeInTheDocument();
     });
+  });
+});
+
+/* The console, 2026-10-28: the fleets' Change log has a View button that opens a
+ * list already narrowed to one tag or network zone, as a real filter the person
+ * can edit or clear (Pranjal's pick over filling the search box). */
+describe('an advanced filter the page starts with', { timeout: 20000 }, () => {
+  const ROLES = ['Admin', 'Member', 'Viewer', 'Billing'];
+  const roleKey = { id: 'role', label: 'Role', type: 'pick' as const, options: ROLES };
+  const emailKey = { id: 'email', label: 'Email', type: 'text' as const };
+  const roleIs = (role: string) => ({
+    join: 'and' as const,
+    rows: [{ key: 'role', op: 'is', value: [role] }],
+  });
+  const shownRoles = () =>
+    screen
+      .getAllByRole('cell')
+      .map((c) => c.textContent ?? '')
+      .filter((t) => ROLES.includes(t));
+
+  it('opens narrowed, with the door counting it as applied', () => {
+    render(
+      <Users
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey, emailKey], initial: roleIs('Admin') }}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'More filters, 1 applied' })).toBeInTheDocument();
+    const roles = shownRoles();
+    expect(roles.length).toBeGreaterThan(0);
+    expect(new Set(roles)).toEqual(new Set(['Admin']));
+  });
+
+  it('holds the quick filters, exactly as when a person applies one', () => {
+    render(
+      <Users filters={undefined} advancedFilter={{ keys: [roleKey], initial: roleIs('Admin') }} />
+    );
+    expect(document.querySelector('[data-quick-held="true"]')).not.toBeNull();
+  });
+
+  it('seeds a text key too', () => {
+    const someone = USERS[0]!;
+    render(
+      <Users
+        filters={undefined}
+        advancedFilter={{
+          keys: [roleKey, emailKey],
+          initial: { join: 'and', rows: [{ key: 'email', op: 'contains', value: someone.email }] },
+        }}
+      />
+    );
+    expect(screen.getByText(someone.email)).toBeInTheDocument();
+    expect(screen.getAllByRole('cell').filter((c) => c.textContent?.includes('@'))).toHaveLength(1);
+  });
+
+  it('reads the starting filter once, and starts over only with a new key', () => {
+    const { rerender } = render(
+      <Users
+        key="a"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Admin') }}
+      />
+    );
+    rerender(
+      <Users
+        key="a"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Member') }}
+      />
+    );
+    expect(new Set(shownRoles())).toEqual(new Set(['Admin']));
+    rerender(
+      <Users
+        key="b"
+        filters={undefined}
+        advancedFilter={{ keys: [roleKey], initial: roleIs('Member') }}
+      />
+    );
+    expect(new Set(shownRoles())).toEqual(new Set(['Member']));
+  });
+
+  it('starts empty when the page gives no starting filter', () => {
+    render(<Users filters={undefined} advancedFilter={{ keys: [roleKey] }} />);
+    expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
+    expect(document.querySelector('[data-quick-held="true"]')).toBeNull();
+  });
+});
+
+/* The console, 2026-10-26: every table inside a drawer ignored a row's click (library 2.2.0) - the row's test for
+ * "a click on a control" matched the drawer's own role="dialog" - so the fleets read the click themselves. Enter
+ * always worked. The row now counts only what is inside it. */
+describe('a table inside a side panel', { timeout: 20000 }, () => {
+  function InPanel({ onRowOpen }: { onRowOpen: (u: SampleUser) => void }) {
+    return (
+      <Sheet open>
+        <SheetContent layout="drawer" size="lg" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>Agents running Log shipper</SheetTitle>
+          </SheetHeader>
+          <SheetBody>
+            <Users
+              rows={USERS.slice(0, 5)}
+              isRowInert={undefined}
+              docked={false}
+              maxHeight="none"
+              onRowOpen={onRowOpen}
+            />
+          </SheetBody>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+  const first = USERS[0]!;
+
+  it('opens a row on a mouse click', async () => {
+    const onRowOpen = vi.fn();
+    render(<InPanel onRowOpen={onRowOpen} />);
+    const panel = screen.getByRole('dialog', { name: 'Agents running Log shipper' });
+    await userEvent.click(within(panel).getByText(first.email));
+    expect(onRowOpen).toHaveBeenCalledTimes(1);
+    expect(onRowOpen).toHaveBeenCalledWith(first);
+  });
+
+  it('still opens it on Enter, and leaves the row menu and the checkbox alone', async () => {
+    const onRowOpen = vi.fn();
+    render(<InPanel onRowOpen={onRowOpen} />);
+    const panel = screen.getByRole('dialog', { name: 'Agents running Log shipper' });
+    const row = within(panel).getByText(first.email).closest('tr') as HTMLElement;
+    row.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onRowOpen).toHaveBeenCalledTimes(1);
+    await userEvent.click(within(row).getByRole('button', { name: 'Row actions' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit details' }));
+    await userEvent.click(within(row).getByRole('checkbox', { hidden: true }));
+    expect(onRowOpen).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* Pranjal, 2026-10-27 (the action menu rules): a row with nothing to do shows no ⋯ - the console hid it with its own
+ * data-row-actions="none" mark. The 224 floor is tested with the column ⋯ above. */
+describe('the row ⋯', { timeout: 20000 }, () => {
+  const SIX = USERS.slice(0, 6);
+  /* one answer per row: an item, null, false, an empty fragment, an empty list, a fragment holding only nothing */
+  const answers = (u: SampleUser) =>
+    [
+      <DropdownMenuItem key="e">Edit details</DropdownMenuItem>,
+      null,
+      false,
+      <></>,
+      [],
+      <>
+        {null}
+        {false}
+      </>,
+    ][SIX.indexOf(u)];
+  const rows = () =>
+    Array.from(
+      screen.getByRole('table', { name: 'Users' }).querySelectorAll<HTMLElement>('tbody tr.tbl-row')
+    );
+
+  it('draws no ⋯ on a row whose actions are nothing, and keeps its Action cell', () => {
+    render(<Users rows={SIX} isRowInert={undefined} rowActions={answers} />);
+    const all = rows();
+    expect(all).toHaveLength(6);
+    expect(within(all[0]!).getByRole('button', { name: 'Row actions' })).toBeInTheDocument();
+    for (const tr of all.slice(1)) {
+      expect(within(tr).queryByRole('button', { name: 'Row actions' })).not.toBeInTheDocument();
+    }
+    /* every row still has the same cells, so the columns stay aligned */
+    expect(new Set(all.map((tr) => tr.children.length)).size).toBe(1);
+    expect(screen.getByRole('columnheader', { name: /Action/ })).toBeInTheDocument();
   });
 });

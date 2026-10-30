@@ -1,19 +1,31 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useId, useRef, useState } from 'react';
-import { userEvent, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Badge } from '../Badge';
+import { Button } from '../Button';
 import { Checkbox } from '../Checkbox';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon';
 import { IconTile } from '../IconTile';
 import { Input } from '../Input';
+import {
+  Sheet,
+  SheetBody,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '../Sheet';
 import { MotadataSwitch } from '../Switch';
 import { Toolbar, ToolbarButton } from '../Toolbar';
 import { DataTable } from './DataTable';
@@ -44,8 +56,11 @@ import type { TableColumnDef } from './Table.types';
 const USERS = sampleUsers(26);
 
 /** The Status mark: the eight-spoke loader, the library's own icon. One icon for the
- * column heading and the quick-filter square alike (Pranjal, 2026-09-12). */
-const StatusGlyph = () => <Icon name="loader" />;
+ * column heading and the quick-filter square alike (Pranjal, 2026-09-12). Asked for at
+ * the 14 it is drawn at, as /users hands its own (UsersTable's StatusGlyph, size 14), so
+ * the stroke ladder gives the small-icon line: an unsized Icon is a 20 squeezed to 14,
+ * which keeps the 20's lighter line (the parity check read 1.5 here, 1.75 on /users). */
+const StatusGlyph = () => <Icon name="loader" size={14} />;
 
 const TONE = { Active: 'success', Inactive: 'slate', Invited: 'warning' } as const;
 
@@ -55,7 +70,8 @@ const USER_COLUMNS: TableColumnDef<SampleUser>[] = [
     label: 'Email',
     width: 217,
     sortable: true,
-    cell: (u) => <span className="mdt-text-faint">{u.email}</span>,
+    /* one ink per column, the value's own (the console's rule since 2026-10-15: /users dropped its muted email) */
+    cell: (u) => <span>{u.email}</span>,
   },
   {
     key: 'contact',
@@ -135,6 +151,8 @@ function UsersTable(
               <Icon name={u.status === 'Active' ? 'toggle-left' : 'toggle-right'} size={16} />
               {u.status === 'Active' ? 'Deactivate user' : 'Activate user'}
             </DropdownMenuItem>
+            {/* the destructive item last, red, after a divider (the action-menu rule, Pranjal 2026-10-14) */}
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"
               onSelect={() => {
@@ -435,6 +453,39 @@ export const QuickFiltersDisabledUnderAnAdvancedFilter: Story = {
 };
 
 /**
+ * **The list opens already filtered** (2026-10-28). `advancedFilter.initial` hands the table a filter to start with,
+ * in the same rows the panel builds - here "Role is Admin" and "Source is LDAP". It lands exactly as if the
+ * person had applied it: the door reads "2 applied", the Status square is held, and opening the door shows both rows
+ * ready to edit or clear. Read once, when the table first appears, like `initialQuery`; to start over the page gives
+ * the table a new `key`.
+ *
+ * Asked for by the console: the fleets' Change log has a View button that opens Agents or Collectors narrowed to one
+ * tag or one network zone, as a real filter rather than words in the search box (Pranjal's pick).
+ */
+export const OpensAlreadyFiltered: Story = {
+  name: 'Opens already filtered',
+  args: {
+    filters: undefined,
+    advancedFilter: {
+      keys: [
+        { id: 'name', label: 'Name', type: 'text' },
+        { id: 'email', label: 'Email', type: 'text' },
+        { id: 'status', label: 'Status', type: 'pick', options: ['Active', 'Inactive', 'Invited'] },
+        { id: 'role', label: 'Role', type: 'pick', options: SAMPLE_ROLES },
+        { id: 'source', label: 'Source', type: 'pick', options: ['Manual', 'LDAP', 'SCIM'] },
+      ],
+      initial: {
+        join: 'and',
+        rows: [
+          { key: 'role', op: 'is', value: ['Admin'] },
+          { key: 'source', op: 'is', value: ['LDAP'] },
+        ],
+      },
+    },
+  },
+};
+
+/**
  * **The bar follows the window, not the card** (2026-09-26). This is the table on a page like the console's: a
  * scrolling frame the height of the window, a 60px band pinned at its top, a title and a strip of counts, and the
  * card filling the room under the band - so at rest the card's last rows and its pager sit below the fold, exactly as
@@ -489,6 +540,230 @@ export const SelectedOnALongPage: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(await canvas.findByRole('checkbox', { name: 'Select all on this page' }));
+  },
+};
+
+/* ── The fleets' agent lists (2026-10-28) ── a host over its address and system, a state pill, two plain values and a
+ * count: the shape of the console's Agent Fleet lists (AgentListTable, ModuleHealth), with made-up agents. */
+interface SampleAgent {
+  id: string;
+  host: string;
+  ip: string;
+  os: string;
+  health: 'Online' | 'Degraded' | 'Buffering' | 'Offline';
+  zone: string;
+  version: string;
+  restarts: number;
+}
+const HEALTH_TONE = {
+  Online: 'success',
+  Degraded: 'warning',
+  Buffering: 'info',
+  Offline: 'danger',
+} as const;
+const AGENTS: SampleAgent[] = [
+  ['web-01', '10.20.1.11', 'Ubuntu 22.04', 'Online', 'Retail core', '4.12.0', 0],
+  ['web-02', '10.20.1.12', 'Ubuntu 22.04', 'Degraded', 'Retail core', '4.12.0', 3],
+  ['db-primary', '10.20.4.20', 'RHEL 9', 'Online', 'Data centre east', '4.11.2', 0],
+  ['db-replica', '10.20.4.21', 'RHEL 9', 'Buffering', 'Data centre east', '4.11.2', 1],
+  ['pos-gw-14', '172.16.8.14', 'Windows Server 2022', 'Offline', 'Stores north', '4.10.5', 12],
+  ['pos-gw-15', '172.16.8.15', 'Windows Server 2022', 'Online', 'Stores north', '4.12.0', 0],
+].map(([host, ip, os, health, zone, version, restarts]) => ({
+  id: String(host),
+  host: String(host),
+  ip: String(ip),
+  os: String(os),
+  health: health as SampleAgent['health'],
+  zone: String(zone),
+  version: String(version),
+  restarts: Number(restarts),
+}));
+
+const AGENT_COLUMNS: TableColumnDef<SampleAgent>[] = [
+  {
+    key: 'health',
+    label: 'State',
+    width: 160,
+    cell: (a) => (
+      <Badge tone={HEALTH_TONE[a.health]} dot>
+        {a.health}
+      </Badge>
+    ),
+  },
+  { key: 'zone', label: 'Zone', width: 160, sortable: true, cell: (a) => a.zone },
+  { key: 'version', label: 'Version', width: 160, sortable: true, cell: (a) => a.version },
+  {
+    key: 'restarts',
+    label: 'Restarts',
+    width: 160,
+    sortable: true,
+    sortValue: (a) => a.restarts,
+    /* a figure sits on the left like every column (no right-aligned columns, 2026-09-12); tabular digits line up */
+    cell: (a) => <span className="mdt-tabular-nums">{a.restarts || '-'}</span>,
+  },
+];
+
+/** The host over its address and system: the second line in a flex column under the value, as the console builds it. */
+const agentName = {
+  label: 'Agent',
+  width: 200,
+  sortValue: (a: SampleAgent) => a.host,
+  cell: (a: SampleAgent) => (
+    <div className="mdt-flex mdt-flex-col">
+      <span className="mdt-font-medium">{a.host}</span>
+      <span className="mdt-text-xs mdt-text-neutral-90">
+        {a.ip} · {a.os}
+      </span>
+    </div>
+  ),
+};
+
+function AgentsTable({
+  onRowOpen,
+  rowActions,
+}: {
+  onRowOpen?: (a: SampleAgent) => void;
+  rowActions?: (a: SampleAgent) => React.ReactNode;
+}) {
+  return (
+    <DataTable<SampleAgent>
+      label="Agents"
+      noun="agents"
+      rows={AGENTS}
+      getRowId={(a) => a.id}
+      docked={false}
+      maxHeight="none"
+      onRowOpen={onRowOpen}
+      rowActions={rowActions}
+      search={{
+        placeholder: 'Search by name, zone or version',
+        match: (a, q) =>
+          `${a.host} ${a.ip} ${a.os} ${a.version} ${a.zone}`
+            .toLowerCase()
+            .includes(q.toLowerCase()),
+      }}
+      nameColumn={agentName}
+      columns={AGENT_COLUMNS}
+    />
+  );
+}
+
+/**
+ * **A cell's second line is the middle grey** (Pranjal, 2026-10-28: he picked "Middle grey" for every table's second
+ * line). A cell that stacks a line under its value - the host over its address and system here - draws that line in
+ * neutral-60 in both themes, a step lighter than the value's own grey. The cell writes the line in neutral-90, as
+ * the console's do; the table repaints it, and only inside its own cells.
+ *
+ * **No right-aligned columns.** Restarts is a figure and still sits on the left like every column (the console's
+ * rulebook item 65, 2026-09-12); `mdt-tabular-nums` on the value keeps the digits lined up.
+ */
+export const TwoLineCells: Story = {
+  name: 'Two-line cells and figures',
+  render: () => <AgentsTable />,
+};
+
+function AgentsPanel() {
+  const [opened, setOpened] = useState('');
+  return (
+    <Sheet
+      onOpenChange={(open) => {
+        if (!open) setOpened('');
+      }}
+    >
+      <SheetTrigger asChild>
+        <Button>Agents running Log shipper</Button>
+      </SheetTrigger>
+      <SheetContent layout="drawer" size="lg" aria-describedby={undefined}>
+        <SheetHeader>
+          <SheetTitle>Agents running Log shipper</SheetTitle>
+        </SheetHeader>
+        <SheetBody>
+          <div className="mdt-flex mdt-flex-col mdt-gap-3">
+            <AgentsTable
+              onRowOpen={(a) => {
+                setOpened(a.host);
+              }}
+            />
+            {opened && (
+              <p className="mdt-m-0 mdt-text-sm mdt-text-muted-foreground" role="status">
+                Opened {opened}. The agent&apos;s details open here.
+              </p>
+            )}
+          </div>
+        </SheetBody>
+        <SheetFooter
+          start={
+            <SheetClose asChild>
+              <Button variant="ghost">Close</Button>
+            </SheetClose>
+          }
+        />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+/**
+ * **A row opens on a click inside a side panel too** (fixed 2026-10-28). Up to 2.3.0 a row ignored any click whose
+ * target sat inside `role="dialog"` - meant for a menu or a confirm opened from the row, it also caught the panel
+ * the table itself sat in, so a click on a row in a drawer opened nothing while Enter still did. The row now counts
+ * only what is inside it: its own buttons, links, fields and `data-no-open` parts, and any layer it opened. The
+ * story opens the panel and clicks the first agent; the line under the table says which one opened.
+ */
+export const RowsOpenFromASidePanel: Story = {
+  name: 'Rows open from a side panel',
+  render: () => <AgentsPanel />,
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Agents running Log shipper' })
+    );
+    const panel = await within(document.body).findByRole('dialog', {
+      name: 'Agents running Log shipper',
+    });
+    /* a plain content cell of the first agent: the click lands on the cell itself, nothing inside it */
+    const row = (await within(panel).findByText('web-01')).closest('tr') as HTMLElement;
+    await userEvent.click(within(row).getByText('4.12.0'));
+    await expect(await within(panel).findByRole('status')).toHaveTextContent('Opened web-01');
+  },
+};
+
+/** The stores' gateways are run by the stores team: on this list there is nothing to do with them. */
+const agentActions = (a: SampleAgent) =>
+  a.zone === 'Stores north' ? null : (
+    <>
+      <DropdownMenuItem>
+        <Icon name="rotate-cw" size={16} />
+        Restart agent
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <Icon name="hand" size={16} />
+        Hold the agent and its modules
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive">
+        <Icon name="server-off" size={16} />
+        Retire agent
+      </DropdownMenuItem>
+    </>
+  );
+
+/**
+ * **A row with nothing to do shows no ⋯** (Pranjal, 2026-10-27: "do not ever show view in the three dot ever. row click
+ * already do that. If only view is visible in a table action then remove the full column"). `rowActions` answers
+ * nothing - null, false, an empty fragment or list - for the two store gateways, so their Action cell stays (the
+ * columns keep their line) but holds no ⋯. A page whose rows never have an action leaves `rowActions` out and the
+ * column goes too.
+ *
+ * **Every ⋯ menu is at least 224 wide** (Pranjal, 2026-10-27: "increase the width by a little bit") - the floor, not
+ * the width: a longer item still widens it. The story opens the first agent's menu.
+ */
+export const RowsWithAndWithoutActions: Story = {
+  name: 'Rows with and without actions',
+  render: () => <AgentsTable rowActions={agentActions} />,
+  play: async ({ canvasElement }) => {
+    const row = (await within(canvasElement).findByText('web-01')).closest('tr') as HTMLElement;
+    await userEvent.click(within(row).getByRole('button', { name: 'Row actions' }));
+    await expect(await within(document.body).findByRole('menu')).toBeVisible();
   },
 };
 

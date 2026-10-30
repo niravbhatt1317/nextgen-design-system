@@ -9,7 +9,11 @@ export interface TableSortState {
   direction: TableSortDirection;
 }
 
-/** Horizontal alignment of a column's cells. Numbers sit right. */
+/**
+ * Horizontal alignment of a column's cells. Left for every content column, figures included: NO RIGHT-ALIGNED
+ * COLUMNS (the console's rulebook item 65, 2026-09-12; Pranjal, 2026-10-28, on a right-aligned count: "whats this
+ * faltu space"). `right` stays for a caller who asks for it by name.
+ */
 export type TableAlign = 'left' | 'center' | 'right';
 
 /**
@@ -29,7 +33,8 @@ export interface TableColumnDef<Row> {
   minWidth?: number | undefined;
   /** Clicking the heading sorts by this column. Contact and Action never sort. */
   sortable?: boolean | undefined;
-  /** Where the cell content sits. Numbers go right. */
+  /** Where the cell content sits. Left unless the column says otherwise - a number column too (no right-aligned
+   * columns, 2026-09-12); its value wears `mdt-tabular-nums` so the digits still line up. */
   align?: TableAlign | undefined;
   /** A small glyph before the label, the mark a quick-filter column wears (Status). 14px. */
   glyph?: ReactNode | undefined;

@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Children,
+  Fragment,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/utils';
@@ -74,6 +83,51 @@ const NAME_KEY = '__name';
 /** The Name column's floor when the page declares none: room for a tile and a name. */
 const NAME_MIN = 160;
 const ROWNUM_KEY = '__rownum';
+
+/**
+ * Whether a row's actions draw anything. A ROW WITH NOTHING TO DO SHOWS NO ⋯ (Pranjal, 2026-10-27: "do not ever show
+ * view in the three dot ever. row click already do that. If only view is visible in a table action then remove the
+ * full column"): `rowActions` may answer null, undefined, false, '' or an empty list or fragment for one row; that row
+ * keeps its Action cell, so the columns stay aligned, and draws no ⋯ in it. A page whose rows never have an action
+ * leaves `rowActions` out and gets no column. Fragments are opened up, as Banner opens its actions, because a fragment
+ * is how two items are written.
+ */
+function hasRowActions(node: ReactNode): boolean {
+  return Children.toArray(node).some((child) =>
+    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+      ? hasRowActions(child.props.children)
+      : child !== ''
+  );
+}
+
+/** The frozen Action cell of one row: its ⋯ and the menu it opens, or an empty cell when the row has nothing to do. */
+function RowActionsCell({ frozen, actions }: { frozen: number; actions: ReactNode }) {
+  return (
+    <TableCell frozen={frozen} frozenEdge align="center">
+      {hasRowActions(actions) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="mdt-inline-flex mdt-h-6 mdt-w-6 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90"
+              aria-label="Row actions"
+              tabIndex={-1}
+            >
+              <Icon name="more-horizontal" size={16} />
+            </button>
+          </DropdownMenuTrigger>
+          {/* EVERY ⋯ ACTION MENU IS AT LEAST 224 WIDE (Pranjal, 2026-10-27, on the collector row menu: "increase the
+              width by a little bit"): 192 left «Restart or stop collector» touching the edge. Still the floor, not the
+              width (2026-10-09, Pranjal: "if theres a name which is bigger than the card than increase the width of the
+              card accordingly"): a long item widens the menu instead of being cut off */}
+          <DropdownMenuContent align="start" className="mdt-min-w-56">
+            {actions}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </TableCell>
+  );
+}
 
 /** Whether the row numbers are shown, remembered next to the column layout. */
 function loadNumbers(storageKey: string | undefined): boolean {
@@ -398,7 +452,10 @@ function DataTable<Row>({
   };
   const [ticked, setTicked] = useState<Record<string, Set<string>>>({});
   /* the advanced filter's applied rows, and whether its panel is open (the door toggles it) */
-  const [advanced, setAdvanced] = useState<FilterValue>(EMPTY_FILTER);
+  /* seeded once from the page, like the search box's initialQuery; a new key starts over */
+  const [advanced, setAdvanced] = useState<FilterValue>(
+    () => advancedFilter?.initial ?? EMPTY_FILTER
+  );
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const advancedCount = advancedFilter ? countConditions(advanced) : 0;
   /* the quick filters are held - disabled, not hidden - while an advanced filter is applied (Pranjal, 2026-09-27; the rule is in the header) */
@@ -1238,27 +1295,8 @@ function DataTable<Row>({
                       <TableCell frozen={nameLeft} frozenEdge={!hasActions}>
                         {nameColumn.cell(row)}
                       </TableCell>
-                      {hasActions && (
-                        <TableCell frozen={actionLeft} frozenEdge align="center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className="mdt-inline-flex mdt-h-6 mdt-w-6 mdt-items-center mdt-justify-center mdt-rounded-lg mdt-border-0 mdt-bg-transparent mdt-p-0 mdt-text-faint hover:mdt-bg-neutral-20 hover:mdt-text-neutral-90 data-[state=open]:mdt-bg-neutral-20 data-[state=open]:mdt-text-neutral-90"
-                                aria-label="Row actions"
-                                tabIndex={-1}
-                              >
-                                <Icon name="more-horizontal" size={16} />
-                              </button>
-                            </DropdownMenuTrigger>
-                            {/* 192px is the floor, not the width (2026-10-09, Pranjal: "if theres a name which is bigger
-                                than the card than increase the width of the card accordingly"): a long item widens the
-                                menu instead of being cut off */}
-                            <DropdownMenuContent align="start" className="mdt-min-w-48">
-                              {rowActions(row)}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+                      {rowActions && (
+                        <RowActionsCell frozen={actionLeft} actions={rowActions(row)} />
                       )}
                       {visible.map((c) => (
                         <TableCell

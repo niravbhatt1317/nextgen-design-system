@@ -103,6 +103,21 @@
   border-bottom-color: transparent;
 }
 
+/* A CELL'S SECOND LINE IS THE MIDDLE GREY (Pranjal, 2026-10-28, on a range under a network zone's name: "give the
+   below subtext a lighter color", then picked the middle grey for every table's second line). neutral-60 in both
+   themes - each step carries its own dark value, so nothing here names dark. It was the secondary ink neutral-90
+   (2026-10-15, "never fainter"); neutral-60 sits under the 4.5 contrast rule in light, his pick, measured and shown
+   to him. A cell stacks the line in a flex column under the value - directly, or one level in - in neutral-90, and
+   the table repaints it; only inside a table cell, so a drawer row's hint or a menu's second line keeps its own ink.
+   Ported from the console's global.css (`td { --cell-sub }`), where the rule covered the library table from outside. */
+.tbl-cell {
+  --tbl-cell-sub: hsl(var(--mdt-neutral-60));
+}
+.tbl-cell .mdt-flex-col > * + .mdt-text-neutral-90,
+.tbl-cell .mdt-flex-col > * + * .mdt-text-neutral-90 {
+  color: var(--tbl-cell-sub);
+}
+
 /* rows: hover and selected share one tint; an invited row does not lift */
 .tbl-row:hover > td {
   background: var(--tbl-hover);
@@ -167,11 +182,17 @@
 .tbl-sortmark {
   flex: 0 0 auto;
 }
+/* THE NAME HOLDS STILL (Pranjal, 2026-10-21: "only in those theres a updown jiggle on text whenever i hover on it"): the
+ * heading box lines up by its baseline, and the first part in it gave that baseline. On a quick-filter column that was
+ * the glyph (an icon has no text baseline, so its bottom edge served), and under the pointer the glyph steps aside for
+ * the grip - the name then gave the baseline and the whole name dropped 1.6 px. The name now always gives it, so a
+ * quick-filter heading sits on the same line as every other heading, at rest and under the pointer. */
 .tbl-label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  align-self: baseline;
 }
 .tbl-head[data-movable='true']:hover,
 .tbl-head[data-movable='true']:focus-within,

@@ -422,6 +422,20 @@ const INTERACTIVE =
   'button, a, input, select, textarea, [role="menu"], [role="dialog"], [data-no-open]';
 
 /**
+ * Whether a click that reached the row belongs to something else: a control inside the row, or a layer the row
+ * opened. ONLY WHAT IS INSIDE THE ROW COUNTS (2026-10-28; the console found it 2026-10-26): the test used to walk
+ * past the row, so a table that itself sits in a side panel or a dialog - both `role="dialog"` - matched on its
+ * own container, and a click on any of its rows opened nothing while Enter still did. A menu or a confirm opened
+ * from a row is drawn elsewhere in the page (a portal) yet its clicks still bubble here through React; it is not
+ * inside the row's markup, so it is left alone too.
+ */
+function clickBelongsElsewhere(row: HTMLElement, target: HTMLElement): boolean {
+  if (!row.contains(target)) return true;
+  const control = target.closest(INTERACTIVE);
+  return control !== null && row.contains(control);
+}
+
+/**
  * A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the
  * next row. A click on the row body opens it; clicks on controls inside do not.
  */
@@ -443,7 +457,7 @@ const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(function TableRo
   const handleClick = (e: MouseEvent<HTMLTableRowElement>) => {
     onClick?.(e);
     if (e.defaultPrevented) return;
-    if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
+    if (clickBelongsElsewhere(e.currentTarget, e.target as HTMLElement)) return;
     if (!inert) onOpen?.();
   };
   const handleKey = (e: KeyboardEvent<HTMLTableRowElement>) => {
@@ -754,8 +768,9 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(function Tabl
               <Icon name="more-horizontal" size={14} />
             </button>
           </DropdownMenuTrigger>
-          {/* 192px is the floor, not the width (2026-10-09): a long item widens the menu, as the row menu does */}
-          <DropdownMenuContent align="end" className="mdt-min-w-48">
+          {/* every ⋯ action menu is at least 224 wide (Pranjal, 2026-10-27: "increase the width by a little bit"), the
+              heading's as the row's; the floor, not the width (2026-10-09): a long item widens the menu, as the row menu does */}
+          <DropdownMenuContent align="end" className="mdt-min-w-56">
             {menu}
           </DropdownMenuContent>
         </DropdownMenu>
