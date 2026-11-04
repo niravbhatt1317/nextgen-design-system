@@ -1,5 +1,617 @@
 # Changelog
 
+## 2.4.0
+
+### Minor Changes
+
+- 92b9450: **Changed default: every button corner is 8.** A `<button>` that uses the medium corner (`mdt-rounded-md`, 6px) now
+  gets the full radius, 8px - select and combobox triggers, icon buttons, a banner's close, pager and table buttons.
+  Fields, menus, popovers and cards keep their radii; round buttons stay round. Pranjal, 2026-10-28: "8, library
+  follows". The console has drawn every library button at 8 since September through its own `button.mdt-rounded-md`
+  rule in `global.css`, so the product does not change; the console can delete that rule once it runs this release.
+- 959ced7: `Combobox` gains a type-in mode, `search="field"` (Pranjal, 2026-10-21: "input field itself will act as search …
+  there should not be two different input field for search and shown results").
+
+  **The field itself is the search box; the list only shows results.** There is one input, not a field plus a second
+  search box inside the open list. A click or ArrowDown opens every option; typing narrows them (by label, value or
+  description, ignoring case) and lights the first match, so Enter picks it. Escape, Tab or a click elsewhere closes the
+  list and keeps the last pick; Escape does not reach the drawer or dialog underneath. Reopening shows the whole list
+  again with the pick ticked and its name selected in the field, so typing replaces it.
+  - **One-line and two-line options.** An option without a `description` is one line; with one, the description is the
+    second line ("353 agents").
+  - **The pick reads "label | description".** Closed, the field shows the label, a 1px hairline and the description
+    (`env:staging | 353 agents`), or the label alone for a one-line option. `renderValue` still overrides it.
+  - **`emptyMessage` can be a function of the query** - `(query) => string` - so it can say `No tag matches "prod-eu"`.
+    This works in both modes.
+  - `clearable` shows a clear button at rest when something is picked, and a second one while typing that clears only
+    the typed text. Disabled options are skipped by the arrow keys and cannot be picked. `name` writes the value into a
+    hidden input. In this mode the forwarded ref is the field's `<input role="combobox">`.
+  - **Icons and groups.** An option may carry an `icon` (a flag, the plus on a "New ..." row), drawn before its label in
+    the list and in the picked field, and a `group`: options of one group sit under its heading, in the order given.
+  - `aria-labelledby` names the field when its label is a heading elsewhere on the page. A reopened long list starts
+    scrolled to the pick. The error line wears the Select's alert mark.
+  - New exported type `ComboboxSearch` (`'list' | 'field'`).
+
+  **No default changes.** `search` defaults to `'list'`, which is the Combobox exactly as before: a button with its own
+  search box at the top of the open list.
+
+- 9950f28: Four of the console's hand-made bridges move into the library, so the console can delete them. Three are **changed
+  defaults** - no opt-out, every consumer gets them - and one is a new opt-in size.
+
+  **Changed defaults, named:**
+  - **The dark neutral badge reads in the reading ink.** `--mdt-badge-neutral-ink` in dark goes from `#8e9fbc` (the
+    secondary grey, 4.6:1 on the badge's `#2a3546` fill) to `#cad3e2` (`neutral-130` in dark, 8.2:1). Light already
+    reads `neutral-130`, so the light hierarchy now holds in dark; before, every grey badge in dark looked switched off.
+    Changed in the colour map (`scripts/dark-theme/tokens.cjs`, the badge tier) and regenerated. Pranjal, 2026-10-17:
+    "color still looks dull in badge". Light is unchanged.
+  - **A table's row number reads in the cell's own ink**, like every other column: `neutral-130` (`#1D2B3E`, 14.3:1 on
+    white; `#CAD3E2` in dark), where it was the faint grey (`#8FA0BD`, 2.65:1). Both the number that swaps to a checkbox
+    (`TableSelectionCell`, so every `DataTable`) and the plain one (`TableNumberCell`). **An inert row's number is no
+    longer dimmed to 60% either** - its other columns never were. `TableNumberCellProps.inert` is still accepted and now
+    changes nothing. Pranjal, 2026-10-15: "serial number ... should have a dark color atleast" and "all columns should
+    have same color text".
+  - **A `CollapsibleCard`'s header is even top and bottom, open or shut.** It was 20 top / 0 bottom shut (so its words
+    sat on the card's lower edge) and 20 / 20 open; it is now 16 / 16 in both states at `padding="normal"`, 14 / 14 at
+    `compact`, 0 at `none`, so the title does not move when the card opens. The sides keep the inset (20 / 14 / 0). A
+    shut card with a heading and a sentence grows from 67 to 79px; an open one shrinks by 8px. Only `CollapsibleCard`
+    changes - a `CardHeader` on a plain `Card` keeps its 20.
+
+  **New, opt-in:** `KpiCard size="sm"` - the number at 16/24 and 600 instead of 24 at 500, for a card that sits beside a
+  section's content (Pranjal, 2026-10-15, on the two-column settings pages: "use smaller text so that it doesnt get that
+  much attention just enough to show its there"). Only the number changes. A card holding a chart keeps the 24 figure
+  whatever it is given, on every segment, because the chart is drawn to that size. The card says which it drew in
+  `data-size="md" | "sm"`. Default `md`, so nothing changes until a page asks.
+
+  **New public name:** the type `KpiCardSize` (`'md' | 'sm'`). No new tokens.
+
+  The console bridges these replace, deletable once the console takes this release: `DARK NEUTRAL BADGE INK` and the
+  row-number rule (`.tbl .tbl-num.mdt-text-faint`) in `src/styles/global.css`, `QUIETER FIGURES IN THE TWO COLUMNS` in
+  `src/features/organizations/settings.css` (the pages pass `size="sm"` instead), and the `.sum-card` header padding in
+  `src/features/fleet-new/afm/screens/enroll-flow.css`.
+
+- 5e6139e: Three parts the console built for itself, now in the library (Pranjal, 2026-10-28: "push everything in storybook
+  now. Dont leave anything"). Each was read from its console source and ported as it is - the measurements, colours (as
+  library tokens), behaviour and words; none redesigned.
+  - **`PickCard` (new, SelectableCard folder)** - a choice already made, shown as one card with a "Change" door
+    (Shopify's checkout summary; Pranjal's named element, 2026-10-19). The option card's look - 14 in, 12 corners, the
+    1.5 edge, the 40 tile in the sunken fill - and the whole card is the button: the selector glyph at rest, the
+    underlined "Change" in its place on hover or keyboard focus, the sunken fill on hover. Props: `icon`, `title`,
+    `description`, `onChange`, `changeLabel`. From `features/fleet-new/afm/shell/PickCard.tsx` + `pickCard.css`.
+  - **`Banner placement="strip"` (new placement)** - the page's notice strip: edge to edge, a hairline under it in the
+    tone's own feedback border, at least 44 tall, the glyph 22 in and the actions ending 24 in (the header band's
+    insets); its actions stay on its one row (`actionPlacement` defaults to `inline` on a strip only). From
+    `features/organizations/Strip.jsx` + `strip.css`, as Collector Fleet and Organization detail draw it.
+  - **`useDismissUntilNew` (new hook, Banner folder)** - a notice's ✕ that hides it until something new happens: give
+    it the ids the notice is about; dismissing remembers that set (in `localStorage` unless told otherwise) and the
+    notice returns as soon as an id outside it appears. From Collector Fleet's "A collector isn't placed in a network
+    zone" strip (`cfm/App.tsx`, Pranjal 2026-10-26, option A).
+
+  Also: `SelectableCard`'s three edges moved into a shared file so `PickCard` wears the same ones; `SelectableCard`
+  renders exactly as before. The console's organization mark (`ui/OrgMark.jsx`) was already here - it is `Avatar` with
+  `logo` (#162) - so nothing was added for it.
+
+  The organization card and the "Needs attention" problem row are not components: each is a `Card` composed with
+  `Avatar` / `IconTile` (Pranjal, 2026-10-29: "Problem card, org card, are just card no need for additional component").
+
+  **No default changes.** Every addition is opt-in: `Banner`'s existing placements keep `actionPlacement="auto"`.
+
+  New public names: `PickCard`, `PickCardProps`, `useDismissUntilNew`, `DismissStorage`,
+  `DismissUntilNewOptions`, `DismissUntilNewState`; the `BannerPlacement` type gains `'strip'`. No tokens added.
+
+- 9cf48c8: The console's hand-drawn Health charts move into the library (Pranjal, 2026-10-28: "push everything in storybook
+  now. Dont leave anything"), each ported from its console source in Agent Fleet and Collector Fleet Health, none
+  redesigned.
+
+  **New: a chart palette - ten colour tokens, light and dark.** `--mdt-chart-good`, `--mdt-chart-warn`,
+  `--mdt-chart-crit` (a mark's status), `--mdt-chart-info` (a neutral line), `--mdt-chart-bar` (a count bar) and the
+  `--mdt-chart-s1` to `--mdt-chart-s5` ramp (lighter is better). They are the Health mock's palette that Pranjal asked
+  for on 2026-10-15 ("why are you not using the colors which were given in artifact"), checked for colour-blind readers
+  in both themes; the console has carried them in its own token file since. The dark values are in the colour map
+  (`scripts/theme-dark.cjs`) and regenerated. The palette grows by ten names: no existing ramp step carries these
+  colours (the nearest sit 12 to 54 apart).
+
+  **`KpiGauge` gains two shapes of status** - both opt-in:
+  - `shape="zones"` with `zones`, `min` and `max`: the console Health's headline gauge. The half ring split into its
+    zones, each faint in its status colour, a dot in the full colour where the value sits, the value and its zone's
+    word in the middle ("On target", "Below target"), the ends labelled. Drawn on 120 × 76, shown at the card's 104 × 62.
+  - `tone` and `target` on the half gauge: the fill in a status colour from the chart palette, and a tick at the
+    "good at" line. A toned gauge keeps one decimal (96.4%) and shows its dot even at 0%.
+  - New exported types `KpiGaugeTone` and `KpiGaugeZone`; `KpiGaugeShape` adds `'zones'`.
+
+  **New: `Chart` - seven charts and their one-line hover**, every mark a button or a focusable element:
+  - `ChartTip`: the hover on any chart mark. One line, the mark and its value ("6–24h silent · 10 agents"), never a list
+    or a breakdown - it takes one string, so a second line cannot creep back (Pranjal, 2026-10-28).
+  - `ColumnChart`: one column per group with its count above; `fill`, per-column tones and a dashed `marker`.
+  - `BarList`: rows scaled to the biggest with the count and its share; `current`, tones and an optional `track`.
+  - `StatusBlocks`: one block per period coloured by threshold, with its legend, axis and the lowest period named.
+  - `TrendLine`: a line with its wash, a three-step scale and a hover on every point.
+  - `Histogram`: bars a tenth of a budget wide, the budget's dashed line, red past it; `onPick` hands back a bar's
+    readings.
+  - `HeatTable`: cells shaded against the whole's rate in five steps, with the ramp named under it.
+  - `StackedBars`: Module health - one stacked bar per row on a card, a legend that hides and shows a colour, the scale
+    following what is shown, and an optional column of figures beside the bars.
+
+  **No default changes.** `KpiGauge` without the new props draws exactly as before; its fill's end point is now written
+  to two decimals instead of one (the same drawing to a hundredth of a pixel).
+
+- c23fd8c: Four parts the console built by hand move into the library (Pranjal, 2026-10-28: "push everything in storybook now.
+  Dont leave anything"), each read from its console source and not redesigned.
+  - **`RequiredMark`** (new) - the red asterisk after the label of a field that must be filled in: 3 off the word in the
+    danger red, the star hidden from a screen reader and the word "required" said instead (console `ui/RequiredMark.jsx`,
+    2026-10-22). `announce={false}` keeps the star and drops the word, for a field whose control already says it is
+    required.
+  - **`CopyTip`** (new, in the CopyField family) - wraps any copy control: "Copy" in the library tooltip under the
+    pointer, "Copied" for 1.4 s after a press, never a toast (console `ui/CopyTip.jsx`). `hoverTip={false}` for a button
+    that already reads "Copy"; `text` may be a function read at the press; `onCopy` after every copy. `CopyField`'s own
+    button now goes through it, so the library has one copy mechanism.
+  - **`OverflowTip`** (new) - mounted once near the root: anything cut short with "…" or a line clamp shows its whole
+    text in the library tooltip on hover; text that fits gets nothing; it stands aside inside a tooltip, on a trigger
+    that owns one, and inside `data-no-overflow-tip` (console `ui/OverflowTip.jsx`, 2026-10-15).
+  - **`Slider`** (new) - one number between two limits: the name and its hint (or an ⓘ), a sunken panel with the value
+    riding on the handle, a flat 8px track and a ruler, the limits named under it. `saved` shows where the saved value
+    sits (a yellow mark and a chip that sets it back) and turns the tag the solid ink once moved; `typeable` makes the
+    tag the field; `mark`, `aside`, `folded`, `endsOnRuler`, `hideEnds`, `divided`, `disabled` (console
+    `organizations/settingsKit.jsx` PolicySlider - Security policy, Create organization, both fleets' Policies and
+    Changes). The console's `ui/RangeSlider.jsx` is not what was ported: no page renders it.
+
+  **Changed defaults, named:**
+  - **Select, Combobox (both modes) and FormLabel draw their asterisk 3 off the word, not 4** - every field now renders
+    the one `RequiredMark`, matching the console and Input / Textarea, which were already at 3.
+  - **The asterisk is hidden from a screen reader in every field.** Input, Textarea, Select (single) and
+    Combobox `search="field"` already tell a screen reader through `required` / `aria-required`, so the star is
+    silent there; a Combobox list trigger, a multi Select and FormLabel say "required" after the label instead. A
+    FormLabel's mark was a `<span aria-label="required">`, which most screen readers ignore on a span.
+  - **A field's accessible name no longer ends in "\*"** - Combobox `search="field"` was named "Which tag\*"; it is now
+    "Which tag", with `aria-required` saying the rest.
+  - **`FormDescription` is 12, not 14** - the line under a field, in the muted ink as before, now the size the console
+    draws it (the form ladder's "line 12") and the size of the library's own helper line under Input, Select and
+    Textarea. Its `color` choices are unchanged.
+
+- a4ddccc: InputAction - an action that rides inside a field, at its right end, behind a hairline that runs from the field's top border to its bottom one: a glyph and a word ("Browse", "Replace", "Copy") on a quiet ghost control, 24 tall, 13/500 in the reading ink, the lightest tint under the pointer, faint and not-allowed while off with the reason on hover. It goes in the Input's `endAdornment`. With `copyText` it is a copy action: a click copies the text, then it reads Copied with a check in the success ink for 1.5s (`copiedLabel`, `copiedDuration`). Ported from the console's credential form (Reference path + Browse, Ronak, 2026-10-09). New export only; no default changes.
+
+  PathBrowserDialog - what Browse opens: a centred 560 dialog with the store's path-list endpoint and its sync line on a card with Sync now, the store's paths in a TreeView, the selected path under it, and Cancel · Use this path. It opens on the path already in the field; a store with no path-list API shows a warning in place of the tree. Ported from the console's credential form (PathBrowserModal). Exported with its PathBrowserSource type; it lives beside InputAction until it moves into Dialog as a variant.
+
+  TreeView - a bordered box of folders that open and shut and items that are picked, 19 in a level so a child's glyph sits under its parent's folder; at most 320 tall, then it scrolls, sideways too for a deep tree. Opens the folders down to the picked value on mount; Enter or Space opens or picks; optional item glyph and the item's value in small mono at the row's end. Expansion is uncontrolled (defaultExpanded) or controlled (expanded + onExpandedChange). Split out of the Browse popup's path tree; exported with its TreeViewNode and TreeViewProps types.
+
+  ActionCard - a fourth face, `compact`: a quiet tinted card (neutral-10, 8 corners, 12 across and 10 down) with a bare 14 glyph by a 12/500 title and its 12 line, and a control on the right - the store endpoint with Sync now from the console's Browse popup. PathBrowserDialog now draws its endpoint card with it. Existing faces unchanged.
+
+  NumberInput `unit` - the unit the number counts ("Seconds", "Minutes", "Hours", "Days", "Months") drawn inside the field at its end, behind a hairline that runs border to border, 13 in the faint ink, 11 from the line and 12 from the edge, in place of the stepper; the arrow keys still step and the digits stop 84 short of the edge. A held field shows the lock, not the unit. Story: Input → Number With Unit. Ported from the console's secret-store form (Connection timeout, Path sync interval). New optional prop; no default changes.
+
+  TargetBuilder - a list of targets built one at a time: a dashed add row on the sunken ground (the type picker 240 wide, the value in mono, Add at the field's 32; a block type takes a text area with Add block, a file type a line with Upload), and above it the targets added in one bordered list - the type's square badge (info for targets, danger for exclusions), the value in 12/500 mono cut with an ellipsis, a 16 pencil and bin, the values aligned on one line. The pencil edits in the row (Enter saves, Escape cancels; a block in a text area, Ctrl+Enter saves). Each kind brings its own `validate` (Add and Save refuse a failing value, the message under the field, live) and `warning`. Ported from the console's network discovery profile Target step (Include targets, Exclusions). Exported with its TargetEntry and TargetKind types.
+
+  Field error lines - a message that wraps keeps its alert mark on the first line instead of centred on both (Input, Textarea, NumberInput, DateInput, Select, Combobox): the line is top-aligned and the 12 mark sits 2 down, centred on the 16 line, and never shrinks. One-line errors look as before.
+
+  TableGroupRow - a title row between a table's rows naming the group under it: the name 12/600 in the label ink, then its details in the faint ink (neutral-50) after a " · ", on the sunken ground, 36 tall, one cell across every column (`colSpan`). A plain row - it never hovers, picks, opens or takes focus; the rows of its group keep their own numbers. Ported from the console's discovery profile Credentials step (the credentials grouped by type, Ronak 2026-10-14); the Table story "With Group Rows" is that step - search, the type filter and the picks live. Exported with its TableGroupRowProps.
+
+  DurationInput - days, hours and minutes in ONE box: the Input's frame with its padding given up to three equal segments, a hairline (neutral-30) between them running border to border, each a bare number (the spin arrows hidden) with its unit word after it, 13 in the faint ink - the NumberInput's `unit` three times over; the box takes the field's focus look (primary border, the 3 halo) while any segment holds the caret, the danger border and red halo on an error, the sunken ground while off. The value is one number of minutes. Hours past 23 and minutes past 59 carry over when the box is left or on Enter ("80 minutes → 1 hour 20 minutes" fading in under the box for a moment); the days are clamped at `maxDays` (999 - 1500 typed reads 999). A press on Hours or Minutes (or ArrowDown) drops the DatePicker's time column under it - Hours 0..23, Minutes every `minuteStep` (5), a typed minute off the step in its place - the caret staying put; a pick lands at once. `parseDuration` and `formatDuration` read and write the words the profiles carry ("5 days 4 hours 45 minutes"); text that names no duration ("No limit", or nothing) parses to `null`, never 0, and `formatDuration(null)` writes `NO_LIMIT` ("No limit"). Story: Input → Number with unit group. Ported from the console's discovery profile Schedule & Notify step (Max runtime, Ronak 2026-10-22/23). Exported with its DurationInputProps.
+
+  TableCheckCell - a checkbox as a cell's value: centred in the cell inside a 28 square that takes the whole click, named for the reader by row and column ("Run failure · Email"); held (disabled) it keeps its tick and refuses the pointer. Ported from the console's Notify matrix (the discovery profile's Schedule & Notify step, NotifyGrid.jsx); the Table story "With Checkbox Columns" is that matrix - Event, then Email · In-app · Webhook, the Auto-provision row held while its switch is on. Exported with its TableCheckCellProps.
+
+- a4ddccc: **New: `KeyValuesBuilder` (New Components → TargetBuilder) - rows of a picked key and the values typed for it; and
+  `ChipInput` (New Components → Input) - the field that turns typing into chips.** First drawn as the console's network
+  discovery profile Custom ports (Probing & depth step, `wizard/PortRules.jsx`), Ronak 2026-10-15: "user select the
+  protocols and then add the port and user can also add the multiple port in the single input also user can add the
+  multiple protocols ... it should be in the group so user can understood these are the dependable of each other". Made
+  generic at his word (2026-10-26: "this is not only for the custom port we can use other ways also") - custom ports by
+  protocol, tags by category, addresses by site: only the props change. ChipInput sits with Input, also his call the same
+  day ("that is the part of input").
+
+  `KeyValuesBuilder`:
+  - One group on the sunken ground, a row per key: the key picker (224 wide; an option's `hint` shows after its name -
+    "SSH (22)"), the values field (a `ChipInput`), the bin. The add button (`addLabel`) under the rows.
+  - A key another row holds is left out of the picker; the add button is off while a row has no key or every key is in
+    use; a row's values field is off until it has a key; a lone blank row has no bin.
+  - `validateValue` checks each value (none by default); `mono` draws the values in mono; `keyLabel` / `valuesLabel` name
+    the controls for a screen reader ("Ports for SSH"); `label` and `info` give the group its label and ⓘ.
+
+  `ChipInput`: Enter, a comma or a space adds what is typed; a pasted list adds every value in it; Backspace on an empty
+  field takes the last chip back; a duplicate is dropped; a value `validate` refuses stays in the field with the red edge
+  and the message under it, so nothing typed is lost.
+
+  New public names: `KeyValuesBuilder`, `KeyValuesBuilderProps`, `KeyValuesOption`, `KeyValuesRow`, `ChipInput`,
+  `ChipInputProps`. No new tokens, no changed defaults.
+
+- a4ddccc: KpiCard `variant="filled"` - the drawer's card: the neutral-10 ground and no edge, where `outlined` (the default, unchanged) is the card ground inside the neutral-30 hairline. Everything else is the same on both: the 12px corners, the segments at 12/16, the label 12/500 in neutral-90, the figure, the hairlines between segments 12 clear of the edges in neutral-30, and the click cue (the neutral-20 wash sits one step above the filled ground, so it still shows). A single card or a group takes it alike. Ported from the facts card every drawer draws under its identity band - Users, Service accounts, Teams, Roles, Credential profiles, Secret stores, Discovery profiles and Discovery runs (Ronak, 2026-10-27) - which the console drew by hand on the library card (`background: t.fill; border: none`).
+
+  A text segment sizes to its line: a segment whose value is a node with nothing else on it - no hint, chip or chart - is a line of text, not a figure, so it drops the 98 floor (Pranjal, 2026-09-30, "why is there this empty space in the kpi card in the bottom") and the 174 width floor (Ronak, 2026-10-17, "is this our scrollbar design": four text segments stood 696 wide in a 680 drawer). The console's adapter did both from outside (`.kpi-fit`, `.dp-kpi-tight`, `.cp-kpi-tight`); the card does it now. A number, a string, or any hint keeps both floors, so KPI rows still line up. Stories: KPI Card → Filled, Filled Group.
+
+- 38bc803: `Select` keeps every field and every option on one line (Pranjal, 2026-10-16/17: "we really need to
+  set some standard which you cannot break"). The console drew this with two stylesheet stopgaps; the
+  library now draws it itself, so the console can delete them.
+
+  **This changes defaults.** No prop changes, but every `Select` looks different without any code
+  change:
+  - **The closed single field shows the chosen label only.** An option's `description` used to be
+    mirrored into the closed field under the value, centred; it now shows only in the open list. The
+    value reads from the left on one line and ends in "…" when long. (The old `mdt-truncate` on the
+    value never applied: Radix drops a `className` given to `Select.Value`, so the rule now sits on a
+    span around it.)
+  - **A single option's accessible name is its label only.** The description is announced as the
+    option's description (`aria-describedby`) instead of being part of its name, and type-to-find
+    matches the label only.
+  - **A multi-pick field never grows past its height.** Its picks no longer wrap onto more lines: they
+    stay on one line, a pill shrinks to "…", and the "+N" never shrinks. A pill now takes whatever room
+    the "+N" leaves - it used to stop 64px short of the row's end. "N selected" and the placeholder
+    end in "…" too.
+  - **The open list is at least the field's width and grows to fit its longest option, up to 320px**
+    (or the window less 16px a side). The multi and searchable lists were held to the field's width,
+    so long names wrapped; the single list had no ceiling. A field wider than 320 still gets a list as
+    wide as itself.
+  - **Every option reads from the left on one line**, ending in "…". Multi options are buttons and
+    used to centre their text.
+  - **Option text:** the name is 14/500 in the reading ink (`neutral-130`, was the near-black
+    foreground at 400); the description is 12 in the new `--mdt-option-subtext` ink with 2px above it
+    (was the muted grey, no gap); every option takes 8px above and below, one line or two (was 6).
+
+  **New token:** `--mdt-option-subtext` - `neutral-80` (#5A6D8C, 5.25:1 on white) in light, #7186A8
+  (the dark `neutral-60`, 4.9:1 on the dark list) in dark. Read it as
+  `mdt-text-[hsl(var(--mdt-option-subtext))]`.
+
+  **Markup a page may have leaned on:** the multi trigger's pick row no longer carries `mdt-flex-wrap`;
+  it carries `mdt-select-picks` (a name for the row, no styles), `mdt-flex-nowrap`, `mdt-min-w-0` and
+  `mdt-overflow-hidden`. A description line no longer carries `mdt-text-muted-foreground`. Selectors
+  written against either - the console's `field-check.cjs` finds multi fields by `mdt-flex-wrap` - need
+  updating.
+
+  `SelectOld2` (deprecated) is unchanged.
+
+- 866f405: Every dropdown, list and menu now shows a picked option the same way (Pranjal, 2026-10-21): **the
+  picked row sits on the pale `blue-10` ground with its tick on the right** in the row's own ink; the
+  row under the pointer or the keyboard takes only the grey `neutral-10` ground and **no tick**; a
+  picked row keeps its pale ground under the pointer.
+
+  **This changes defaults.** No prop changes, but these parts look different without any code change:
+  - `Select` — the faint grey tick that appeared on an unpicked row under the pointer is gone (the
+    16px slot stays, so labels do not move). Multi-select picked rows gain the pale ground. The
+    keyboard highlight in the plain single select now takes the grey ground. (A picked row keeps its
+    tick under the pointer in every mode — see the entry below.)
+  - `SelectOld2` (deprecated) — the same three changes.
+  - `Combobox` — the tick moves from the left of the label to the right, and the picked row is pale
+    blue instead of the grey it shared with the highlight.
+  - `DropdownMenuCheckboxItem` — the tick moves from the left to the right (the 32px reserved on the
+    left is now reserved on the right) and a checked row takes the pale ground. The tick stays the
+    row's first child, so a consumer hiding it with `[&>span:first-child]:mdt-hidden` (as
+    `DataTable`'s quick filters do) still hides it — but **a ticked quick-filter row now also wears
+    the pale ground**.
+  - `DropdownMenuRadioItem` — the dot on the left becomes a tick on the right, with the pale ground on
+    the chosen row.
+  - `DataTable` — the Sort menu's active field takes the pale ground; its ↑/↓ stays on the right.
+  - `TablePager` / `TablePagerOld2` — the current rows-per-page option takes the pale ground.
+  - `TableViewMenuOld` (Group by) and `TableViewSwitcherOld` (saved views) — the picked row takes the
+    pale ground; the saved-view tick moves from the left to the right.
+
+  The ground lives in one place, `src/utils/picked-row.ts` (internal, not exported), so the parts
+  cannot drift apart again.
+
+- c15bbe2: The side panel (`Sheet` with `layout="drawer"`) and its breadcrumb catch up with the console (Pranjal,
+  2026-10-26: "make all breadcrumbs in sidedrawer like this only ... Where first or other options will be
+  clickable so no need for back button. Update it in all the sidedrawers", and "actually make the sidedrawer
+  heading to be 14px").
+
+  **Three changed defaults, named - no opt-out, every consumer gets them:**
+  - **The panel title is 14/600 on a 20 line** (was 16/600 on 24). `SheetTitle` inside `layout="drawer"` only;
+    the stack layout's title is unchanged.
+  - **The Breadcrumb's `drawer` form is 14 on a 20 line, every visible gap 12** (its boxes 7 apart, the 14
+    chevron's own inset making up the rest; was 16/24, 10 apart).
+  - **The Breadcrumb's `drawer` form draws no back button and no nick.** It is a real breadcrumb: every step
+    before the last that has an `onSelect` (or an `href`) is the way back - the faint ink at rest, the foreground
+    and an underline (neutral-60, 3 below the text) under the pointer, a 2 outline in the ring colour on keyboard
+    focus - and is named "Back to <step>". Before, only the back button navigated and an item's `onSelect` /
+    `href` were ignored in this form. `onBack` keeps working: it is now what the step before the last does when
+    that step has nothing of its own, and `backLabel` names that step.
+
+  **A fourth changed default - `SheetSection` takes the console's drawer section** (the fleets' agent and collector
+  drawers: `SectionHead` / `Note` / `Rows` / `SectionGap`, Nikhil 2026-10-13, step 309: "remove the dividers"):
+  - the heading row is 24 high at least (was 32), 12 to its action (was 10); the heading 14/600 on its 1.5 line in the
+    title ink, `neutral-150` (was 20 line, `foreground`);
+  - the hint is 12 on a 1.5 line in `neutral-70`, 4 under the heading (was 13/20 in `muted-foreground`, touching it);
+  - the content sits 16 under the heading (was 12);
+  - **sections stand 32 apart with no line between them** (was a hairline with 20 above and below).
+
+  **Panel pages:** a side panel turns into its next page in place, at the same width, under that breadcrumb.
+  - `SheetNavigationTitle` draws the trail with every earlier step a way back to its page (was: a back button,
+    one step at a time). After a push the focus lands on the step before the last.
+  - `useSheetNavigation()` gains `backTo(depth, { force? })` - back to any earlier page, what a trail step does.
+  - `useSheetLeaveGuard` hands its guard a `leave` function (`SheetLeaveGuard`, new type export): call it once the
+    person agrees, and the drawer goes where they asked - one step back, or straight to the trail step they
+    pressed. A guard that ignores it keeps working; `back({ force: true })` still goes one step.
+  - New stories: Drawer "List to page" (the console's Agent Fleet Health "Needs attention": a list whose rows open
+    as pages of the same 720 drawer, Close shared in the footer) and Breadcrumb "Drawer · three steps".
+
+- 028ce01: **A picked row keeps its tick while the pointer is on it** (Nirav, 2026-10-21). This completes the
+  one selection look: the multi-select used to replace a picked row's tick with a 12px X under the
+  pointer, to say that a click there removes the pick.
+
+  **This changes a default.** `Select` and `SelectOld2`, every mode, in any list with picks.
+
+  Taking the tick away under the pointer blanked the "picked" mark on whichever row the mouse was
+  on — so running down a list of five picks blanked each one in turn. That is the same fault this
+  release removed from unpicked rows, with the roles swapped. The pale `blue-10` ground still says
+  "picked" and the row is still a toggle, so **only the cue is gone, not the behaviour**: clicking a
+  picked row still removes it, and the pills in the field keep their own ✕, which is where removal is
+  genuinely the only job that control has.
+
+  If a flow taught people to look for that X in the list, this is the line to read.
+
+  No public name changes. `deselectable` — the internal flag that existed only to switch the X — is
+  removed with it, and it was never exported.
+
+- 19d7cf5: `Popover` is one popover with three variants (Pranjal, 2026-10-29: "create a new popover component with just two
+  variant one will be empty card and another will be action menu popover with the rule that there should be divider,
+  only one red action, and that red cta should be placed below divider and it should always be at bottom"; "divider can
+  be more than one its just divider with red action is mandatory"; "also include quick filter variant as well in
+  popover"). Pick it on `<Popover variant>`:
+  - **`card`** (the default) - the empty card: `<PopoverContent>`, the overlay surface and nothing else. **Unchanged** -
+    every part already on `Popover` (the console's 35, and the library's own Combobox, DateInput, InlineTags, LeftNav,
+    DataTable and its panels) keeps working as it was.
+  - **`action-menu`** (new) - a ⋯ menu: `<PopoverActionMenu groups danger />`. The rules are the component's: an icon on
+    every item (`icon` is required); a divider between groups, as many as the page groups, or none; **at most one red
+    action** (`danger`, a single item), **always last, always under a divider**; a label's trailing "…" is dropped; at
+    least 224 wide, a floor.
+  - **`quick-filter`** (new) - the table toolbar's tick menu: `<PopoverQuickFilter heading options value onValueChange
+searchable />` - the heading naming what it filters, an optional search (the cursor starts in it), a checkbox row per
+    value, several at once, a tick does not close it; as wide as its longest value up to 380.
+
+  The two menus are menus underneath (the DropdownMenu parts), so they keep arrows, type-to-jump, Escape back to the
+  trigger, and `role="menu"` / `menuitem` / `menuitemcheckbox`. Measured against the console: the surface, the Users row
+  menu (box, item, red action, divider) and the Users Status quick filter - 46 properties over 7 frames, all equal.
+
+  **`PopoverOld2` (new, Deprecated 2)** - the Popover as it was before today, frozen for side-by-side review under
+  "Deprecated 2/Popover Old" (`PopoverOld2`, `PopoverOld2Trigger`, `PopoverOld2Content`, `PopoverOld2Anchor`,
+  `PopoverOld2Close`, `popoverOld2Surface`). Nirav sets the removal version.
+
+  New public names: `PopoverActionMenu`, `PopoverQuickFilter`, `PopoverVariant`, `PopoverAction`,
+  `PopoverActionMenuProps`, `PopoverQuickFilterOption`, `PopoverQuickFilterProps`, and the `PopoverOld2` family. No
+  tokens added. No default changes.
+
+- 20300dd: `DataTable`'s quick-filter menu is now headed, the way the Sort menu is headed.
+
+  **This changes a default.** Every quick-filter menu gains a heading whether or not the page asks for
+  one, so a toolbar that has several of them will look different without any code change. The heading
+  defaults to the filter's own `label`, which already reads "Filter by status" — so nothing needs
+  passing to get the sensible text. **Pass `heading: null` to keep the bare menu.**
+
+  `heading?: ReactNode | null` on `DataTableQuickFilter` overrides it with anything else.
+
+  Asked for by the console (`DESIGN-SYSTEM-GAPS.md`, 2026-10-09): the Sort menu carried a "Sort by"
+  label and the quick-filter menu carried nothing, so a page could not say which column a column of
+  ticks belonged to. It had reverse-engineered the name off the square's `aria-label` and redrawn it
+  with a `::before` in `quickFilterHeading.js`, which that fix can now delete.
+
+  The 11px/600/uppercase heading rules Pranjal set on the Sort menu (2026-09-11: "users … other
+  modules sort should look the same") are now one `MENU_HEADING` constant that both menus read, so the
+  two cannot drift apart. The Sort menu's own appearance is unchanged — same string, same rules.
+
+  The heading is a `DropdownMenuLabel`, not a tickable row: the menu's checkbox items, its keyboard
+  handling and its search box are all untouched.
+
+- 1d34de4: **The console's row family joins the library** (Pranjal, 2026-10-28: "push everything in storybook now. Dont leave
+  anything"). Every list that is not a table, on one geometry - ported value for value from the console's
+  `src/ui/RowList.jsx` and its CSS layer, which 32 product files use (Users, Teams, Roles, Service accounts, Access
+  profiles, Organizations, Agent Fleet's Health, Collector Fleet, Credential profiles).
+
+  New, all in **New Components → RowList**:
+  - **`RowList`** - the frame a list of rows sits in: one 1px neutral-20 edge with 8 corners (`bordered={false}` drops
+    it), one separator under every row but the last, the table's three row heights (`density` default 54 / two-line /
+    compact 36).
+  - **`Row`** - one record: `leading`, the text, `actions` at the right end. With `onClick` it is a real button (keyboard,
+    focus ring inside the row, the neutral-10 hover); without, a plain block. `selected` (blue-10), `state` dimmed /
+    disabled, `disabled`. A press or a key inside `actions` never reaches the row.
+  - **`RowTitle`** - a row's name 12/500 over a quiet 11 line, badges beside the name, `mono` for ids; a cut name shows
+    in full on hover.
+  - **`SelectableRow`** - a pick list's row: the whole row is the label of a library Checkbox or Radio, `control="end"`
+    puts the box at the right end (the Add access list), `right` holds a badge or a note.
+  - **`LogRow`** - a log line: a glyph, the message with who or why under it, the time at the right.
+  - **`KeyValueList` / `KeyValueItem`** - a compact key · value summary on the table's type: one label width per list
+    (`labelWidth`, default 150), top-aligned, `separated` lines between rows. The console calls the row `KeyValueRow`; it
+    is `KeyValueItem` here so it cannot be mistaken for `KeyValuesRow`, the KeyValuesBuilder's row data type.
+  - **`Timeline` / `TimelineItem`** - an audit trail: a 7 dot per event on a 1px rail that ends at the last; the dot's
+    `tone` is neutral, success, warning or danger (the console's ok / warn / danger).
+
+  **The fact row is `SheetField`, extended rather than built again.** New, opt-in props: `info` (an InfoTip after the
+  label, named "About <label>", or `infoLabel`), `ratio="3:7"` (the agent About's narrow label beside a wide value),
+  `align="top"`. New export **`SheetFields`**: the stack the rows sit in, 18 apart (rulebook S-98).
+
+  **Changed defaults, named - `SheetField` now draws as the console's fact row:**
+  - **No 32px floor on the row's height.** A text row is as tall as its words (19.5), so a record reads at the console's
+    pitch; a row holding a 32 field is still 32.
+  - **13 / 1.5 type** for the label and the value (was 13 / 20 - half a pixel).
+  - **The value reads in `neutral-150`** (the console's reading ink, `#111C2C` / dark `#CAD3E2`), where it was
+    `foreground` (`#070F1D` / dark `#E3E8F2`).
+  - **The value is a line of items 6 apart that wraps** (text, a quiet word, badges, pills, a control) instead of a
+    block, so "7.4.0 Latest" or two badges sit side by side.
+
+  Nothing in the console uses `SheetField` yet, so no product screen moves.
+
+  **Fact rows follow the Users profile** (Pranjal, 2026-10-28): no gap between the label and the value (`mdt-gap-0`), as `users/ProfileDrawer.jsx` draws them; the fleets' About rows follow the same rule.
+
+- a4ddccc: SelectableCard `layout="tiles"` - the set five to a row at 12 apart (`columns` now takes 4 and 5 too), each card re-flowed around its mark: the mark on top, the name and its one faint word centred under it at the console card's small size (the name 13, corners 10, 12 down and 10 across inside, the parts 8 apart), the dot (15, its chosen ring 4.5) in the top-right corner. A card that is not a tile is untouched. Story: SelectableCard → Logo Tiles - shown with the console's ten providers, the marks each the vendor's own drawing from a CC0 set. Ported from the cloud discovery profile's Provider & connection step (ProviderPicker, Ronak 2026-10-15).
+
+  IconTile `brand` tone - the plate a vendor's mark sits on: white in BOTH themes (the fixed button's fill) under the neutral-20 hairline, a mark given as an `<img alt="">` drawn 32 inside at `size="xl"` (16 / 20 / 24 / 40 at sm / md / lg / 2xl), corners 10 at xl as the console draws them; a vendor with no mark that reads small wears its monogram in black (the ink that stays black in dark, as the plate stays white), 12/600 tracked 0.02em. Existing tones unchanged.
+
+- 113b7c7: Small console rulings move into the library, so the console can delete its stopgaps. All of them are **changed
+  defaults** - no opt-out, every consumer gets them.
+
+  **Changed defaults, named:**
+  - **`InfoTip`: only the glyph answers the pointer.** On hover, keyboard focus and while its explainer is open, the ⓘ
+    no longer draws the sunken step (`--mdt-secondary`) behind its glyph; the glyph alone darkens, neutral-40 to
+    neutral-60, as before. The keyboard focus ring is unchanged. Pranjal, 2026-10-27: "i button had a white bg hover?
+    thats should not be there. only icon should have hover" - the ground read as a white box, worst on a tinted card.
+  - **`InfoTip` shows the help cursor**, the question mark, instead of the pointer (Pranjal, 2026-10-28: every ⓘ
+    shows the help cursor; it replaces the pointer ruled at the #162 port).
+  - **`IconTile tone="slate"` is a step lighter.** The fill goes from `neutral-30` to `neutral-20` and the glyph from
+    `neutral-110` to the secondary ink `neutral-90`, in both themes (light `#ECF1F9` under `#516281`; dark the dark
+    values of the same two steps, `#1D2A3E` under `#8E9FBC`). `slate` is the default tone, so **every IconTile that
+    names no tone changes too**. The slate `Avatar` is not changed, so a slate tile and a slate avatar side by side no
+    longer match. Pranjal, 2026-10-23, on the fleets' Approvals trays: "it is very dark ... use a lighter bg tone for it".
+  - **The filled `Tabs` track is 40 tall and its chip 32** (the regular button's height), 4 in at the sides so 4 sit
+    above and below each chip. It was a 32 track with a 25 chip at 3.5 in. Corners (8 / 5), the 10 at a chip's sides
+    and the 2 between chips are unchanged; every `TabsList type="filled"` grows by 8px. Pranjal, 2026-10-23, option C:
+    "in secondary tabs why does most of the paces it looks cramped" (rulebook K-Tabs-09; K-Tabs-10's 26-in-32 is
+    superseded). The underline type does not change.
+  - **A tab's icon takes the small-icon line.** `TabsTrigger` draws its `icon` at 14, so an `Icon` handed in without a
+    size is now told 14 and the stroke ladder gives it 1.75 - before, it drew the 20's 1.5 squeezed to 14, a lighter
+    line than every other 14 glyph. The same fix #159 made for `Button` and `ToolbarButton`, through the same shared
+    helper; an icon with an explicit size or `strokeWidth` is left as the caller asked. No console tab carries an icon
+    today, so no console page changes.
+  - The table's own ⋯ menus reach 224 in the table request (pranjal/library-2026-10-28-table), not here.
+
+  No new public names, no new tokens. (The action-menu rules - the one red action last under its divider, an icon on
+  every item, the 224 floor - are not written onto `DropdownMenu` here: they are built into the new `Popover`'s
+  action-menu variant, pranjal/library-2026-10-29-popover; Pranjal, 2026-10-29.)
+
+  The console bridges these replace, deletable once the console takes this release:
+  `THE KIND TILE` bridge in `afm/shell/approvals.css` and `cfm/shell/approvals.css`, the
+  `BRIDGE (2026-10-23 ...)` filled-tab rule in `src/styles/global.css`, and, for the table's own two menus, the
+  `EVERY ⋯ ACTION MENU IS AT LEAST 224 WIDE` rule in `src/styles/global.css` (it still covers the console's own `mdt-w-48`
+  menus until those pass `mdt-min-w-56`).
+
+- e74ac4b: **Every `Stepper` changes how it looks and reacts - in all four layouts, and in `DialogSteps`, which draws it.** These
+  are defaults, so nothing opts out. Approved by Pranjal on the Stepper lineup (2026-10-19), built 2026-10-21.
+
+  **Going back keeps your progress.** `reached` - the furthest step got to - now works in `stacked`, `inline` and
+  `underline` too (until now only `vertical` read it, and the others ignored it). Go back from step 4 to step 2 and
+  nothing is undone: step 3 keeps its tick, the line or bar stays filled up to step 4, step 4 shows as _where you left
+  off_ (outlined in primary, its name in full ink), and step 2 keeps its tick inside a "you are here" ring. Leave
+  `reached` out and it is `current`, which draws what a strip always drew.
+
+  **Changed defaults, named:**
+  - **Hover marks only the disc and the name.** A soft halo round the disc and a dashed underline under the name; the
+    grey wash behind the whole step is gone. Keyboard focus now rings the disc, not the whole step.
+  - **Nothing moves when steps become clickable.** A clickable step is now exactly the same box as a plain one - the
+    button lost its padding. Passing `onStepSelect` used to make the strip taller (underline 34 → 38px, inline
+    24 → 32px, stacked 4px more); it no longer does. A page that leaned on that extra height will sit 4-8px tighter.
+  - **A finished step reads as finished.** Its name is now in full ink at regular weight (it was in the same quiet ink
+    as the steps ahead). The current step stays the heaviest; steps ahead, skipped and disabled stay quiet. A
+    description you have been through is in the secondary reading ink (`neutral-90`), one ahead in the quiet ink.
+  - **Clickable reaches further.** With `onStepSelect`, every step up to `reached` is clickable except the one you are
+    on - not only the finished ones. Without `reached` that is still exactly the finished steps. A step set to
+    `skipped` or `disabled` is never clickable; on `vertical` a skipped step used to be.
+  - **`vertical`:** the furthest step is now outlined as where you left off (it was a filled tick, and its `data-state`
+    was `complete` - it is now `reached`). The rail fills down to that step and no further. Locked steps move from the
+    faint ink to the quiet ink, the same as every other layout.
+  - **`inline`:** 12px either side of each chevron (it was 4px plus the button's padding before it, 8px after), 8px
+    between wrapped rows (was 4px), and every label keeps the room its bold version needs, so the step you are on turning
+    bold no longer pushes the steps after it along.
+  - **Screen readers** now hear ", done" after a finished step, ", done, you are here" on one you went back to,
+    ", where you left off", ", skipped" and ", disabled".
+
+  No new public names, no new tokens. Every existing prop still works.
+
+- 7245f3c: **A `DataTable` can now open already filtered.** `advancedFilter` gains one optional field, `initial`: a filter to
+  start with, in the same rows of key · operator · value the More filters panel builds. Asked for by the console
+  (2026-10-28): the fleets' Change log has a View button that opens Agents or Collectors narrowed to one tag or one
+  network zone, as a real filter the person can edit or clear (Pranjal's pick over filling the search box).
+
+  ```tsx
+  advancedFilter={{
+    keys,
+    initial: { join: 'and', rows: [{ key: 'zone', op: 'is', value: ['Retail core'] }] },
+  }}
+  ```
+
+  - **It lands exactly as if the person applied it.** The door reads "1 applied", the quick filters are held, and the
+    panel opens on that row ready to edit or clear.
+  - **Read once, when the table first appears** - the same rule as `initialQuery`. To start over, the page gives the
+    table a new `key`.
+  - **A pick key's value is a list** (`['Retail core']`); a text key's value is the typed string (`'env:prod'`).
+
+  Nothing changes for a table that does not pass `initial`. No new tokens, no changed defaults.
+
+- 7245f3c: Table: **a cell's second line is the middle grey** (Pranjal, 2026-10-28: he picked "Middle grey" for every table's
+  second line, both fleets and IAM / Organizations).
+
+  **This changes a default.** No prop changes, but every `DataTable` cell that stacks a line under its value - a flex
+  column (`mdt-flex-col`) whose later child is, or holds, a `mdt-text-neutral-90` line - now draws that line in
+  `neutral-60` (`#7186A8`) instead of `neutral-90` (`#516381` light, `#8E9FBC` dark). Light measures 3.7:1 on
+  white (dark 5.2:1 on the dark card), under the 4.5 text rule - his pick, measured and shown to him. Only inside a table cell: a drawer row's hint, a menu's or a
+  field's second line keep their own ink. The rule lives in `table.css` (`.tbl-cell { --tbl-cell-sub }`); no token or
+  public name is added. The console's bridge it replaces, deletable once the console takes this release: `A TABLE'S
+SECOND LINE IS THE MIDDLE GREY` (`td { --cell-sub }` and its two selectors) in `src/styles/global.css`.
+
+  Also: `TableAlign` and `TableColumnDef.align` no longer say "numbers sit right". The table never right-aligned on its
+  own (`align` defaults to `left`), and the docs now say so: no right-aligned columns, figures included (the console's
+  rulebook item 65, 2026-09-12). `align="right"` stays for a caller who names it.
+
+  New stories: Table → "Two-line cells and figures" and "Rows open from a side panel".
+
+- beed766: **Every underline `Tabs` strip changes how it looks - option B.** This is a default, so nothing opts out: every
+  `TabsList` of `type="underline"` (the default type), with or without its hairline, draws it. Approved by Pranjal for
+  Agent Fleet on 2026-10-14 ("b is the only valid solution ... keep it for agent fleet first I will get it approved than
+  we will move it to library"), sent to the library on 2026-10-21.
+
+  **Changed defaults, named:**
+  - **Every label sits on the content edge.** The first tab now steps 12px into the margin (an inline-start margin of
+    -12px, its own padding), so the first label starts on the same edge as the text under the strip - it used to sit
+    12px in. Only the first tab's click area goes into the margin; the strip, its hairline and the tabs after the first
+    stay where they were, so the strip is no wider and the hairline does not move. A closable first tab steps out
+    together with its close control. A strip whose container has less than 12px of space before it will have the first
+    tab's click area clipped or touching that edge - every drawer inset (16, 20, 24) and page band (24) has room.
+  - **The active line is the label's width, not the tab's.** The 2px line is now drawn 12px in from each side of the tab,
+    under the label (and its icon and count), instead of across the whole tab, with round ends. On a closable tab it ends
+    36px in, before the close cross. It still sits on the strip's hairline, in the primary colour, and still fades in
+    over 120ms.
+  - **How the line is drawn changed.** It is the tab's `::after` now, not its bottom border. The tab keeps a clear 2px
+    bottom border so its height is exactly what it was; a page that coloured the active tab's `border-bottom-color` to
+    restyle the line will no longer see that colour - restyle the `::after` instead.
+
+  Unchanged: the label sizes and colours, the 24 between labels, the 9 above and 11 below, the bold width each label
+  already holds (choosing a tab still moves nothing), the `filled` type, and every prop. No new public names, no new
+  tokens.
+
+  The console can now delete its stopgap: `src/features/fleet-new/afm/fleet-tabs.css` and the `afm-tabs-b` /
+  `afm-tabs-b-scope` classes in Agent Fleet and Collector Fleet.
+
+- a4ddccc: TreeSelect - a pick from a tree, in a dropdown: groups that fold their items away, the items, and what sits under each item, every level a checkbox. A group's checkbox picks every item under it and its words fold it; an item's words pick it whole and its chevron opens its leaves; a leaf narrows its item to the leaves ticked (the last leaf off drops the item, every leaf on collapses back to the whole). The value is one flat list of ids - an item's id for the whole item, leaf ids for a narrowed one. The search narrows the items by name, line or code and opens every group still holding one; opening the field starts the search afresh and opens the groups that already hold a pick. `nouns` supplies the words it counts with ("2 regions · 6 zones", "6 zones", "No regions selected") and `emptyText` the status line while nothing is picked, so nothing inside knows what it is picking. Built on the library's own parts: the Select trigger (the picks as small square Badges in the code face, "k/N" in blue when narrowed, "+N more" past `maxPills`), a Popover as wide as the field and 320 at least, the Input as the search, the ghost icon Button as the fold, the Checkbox as the pick (the unpicked box on the neutral-40 hairline), Clear all a ghost Button. The rows as the console draws them: 36 tall, 8 in, corners 6, the secondary wash under the pointer; a group's name 11/600 small capitals tracked 0.05em in neutral-90 with a 14 glyph before it and its "picked/all" count in the code face; an item's name 12/500 over its line 11 in the faint ink, its count 11/500 at the right; a leaf's name 12 on a 28 row; the guide lines - the spine 22 in (35 for leaves) on the neutral-20 hairline, a 16 branch into every row, the spine stopping at the last branch. Story: Select → Tree Select - shown with the cloud regions it was ported from. Ported from the cloud discovery profile's Provider & connection step (RegionSelect, Ronak 2026-10-15/16).
+
+### Patch Changes
+
+- 7245f3c: Table: a quick-filter column's heading no longer jumps 1.6 px when the pointer reaches it. The name now gives the
+  heading's baseline in both states (it was the glyph at rest and the name under the pointer), so quick-filter headings
+  also sit on the same line as every other heading. CSS only (`table.css`, `.tbl-label { align-self: baseline }`); no
+  default, token or public name changes.
+- 82012e1: **`Select` honours a controlled value cleared back to nothing.** `SelectPrimitive.Root` took its value through a
+  `&&` spread, which dropped the prop for `null` and `""` exactly as it did for `undefined`. A field that is being
+  controlled and is cleared to `null` therefore left Radix **uncontrolled**, holding its last pick: the trigger read
+  the placeholder correctly, but picking that same option again matched Radix's own state and fired nothing. A form
+  that clears its picker after each entry could not take the same option twice - `TargetBuilder` met this as "you
+  cannot add two targets of the same kind without choosing another kind first".
+
+  The value is now always handed to Radix, with "nothing picked" as the empty string, so this wrapper drives it in
+  both modes - which `currentValue` already decided. No API change, no visual change; two regression tests cover the
+  re-pick and the placeholder.
+
+- 7245f3c: Table: the action menu rules (Pranjal, 2026-10-27).
+  - **Every ⋯ menu is at least 224 wide** - the row ⋯ in `DataTable` and a heading's ⋯ in `TableHead` (were 192,
+    `mdt-min-w-48` → `mdt-min-w-56`). Still a floor, not a width: a longer item widens the menu. His words, on the
+    collector row menu: "increase the width by a little bit". The quick-filter and Sort menus are not action menus and
+    keep their widths.
+  - **A row with nothing to do shows no ⋯.** When `rowActions(row)` answers nothing renderable - `null`, `undefined`,
+    `false`, `''`, an empty list or an empty fragment - that row draws no ⋯; its Action cell stays, so the columns stay
+    aligned. Before, every row drew a ⋯ that opened an empty menu. His words: "do not ever show view in the three dot
+    ever. row click already do that. If only view is visible in a table action then remove the full column" (a page whose
+    rows never have an action leaves `rowActions` out, as before, and gets no column).
+
+  **Changed defaults, named:** both are visible without any code change. No prop, token or public name changes.
+
+  The console bridges these replace, deletable once the console takes this release: `EVERY ⋯ ACTION MENU IS AT LEAST
+224 WIDE` (for the table's menus) and `A ROW WITH NOTHING TO DO SHOWS NO ⋯` (`tr:has([data-row-actions="none"])` and
+  the marks it reads) in `src/styles/global.css`.
+
+- 7245f3c: Table: **a row opens on a click inside a side panel or a dialog.** Up to now a row ignored any click whose target sat
+  inside `role="dialog"` - the test was meant for a menu or a confirm opened from the row, but it walked past the row and
+  also matched the panel the table itself sat in, so every `DataTable` inside a `Sheet` (or any dialog) opened nothing on
+  a click while Enter still worked (found by the console 2026-10-26; Agent Fleet and Collector Fleet read the click
+  themselves until this ships).
+
+  The row now counts only what is inside it: its own buttons, links, fields, menus, dialogs and `data-no-open` parts are
+  left alone as before, and so is anything it opened that is drawn elsewhere in the page (a portaled menu or confirm,
+  whose clicks still bubble through the row). No prop, default, token or public name changes.
+
+  The console workarounds this replaces, deletable once the console takes this release: the `rowClick` / `fired` wrappers
+  marked "A ROW'S CLICK INSIDE A DRAWER" in `afm/screens/health/AgentListTable.tsx`, `afm/screens/health/ModuleHealth.tsx`,
+  `cfm/screens/health/CollectorList.tsx` and `cfm/screens/Unplaced.tsx`.
+
 ## 2.3.0
 
 ### Minor Changes
