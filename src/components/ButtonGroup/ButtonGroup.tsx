@@ -5,6 +5,47 @@ import { forwardRef } from 'react';
 import { cn } from '@/utils';
 import type { ButtonGroupProps } from './ButtonGroup.types';
 
+/** Horizontal buttons joined into one: square where they meet, no border between. */
+const JOINED_ROW = [
+  // First child (button, input, or link)
+  '[&>button:first-child]:mdt-rounded-r-none',
+  '[&>a:first-child]:mdt-rounded-r-none',
+  '[&>input:first-child]:mdt-rounded-r-none',
+  '[&>*:has(input):first-child_input]:mdt-rounded-r-none',
+  // Middle children
+  '[&>button:not(:first-child):not(:last-child)]:mdt-rounded-none',
+  '[&>button:not(:first-child):not(:last-child)]:mdt-border-l-0',
+  '[&>a:not(:first-child):not(:last-child)]:mdt-rounded-none',
+  '[&>a:not(:first-child):not(:last-child)]:mdt-border-l-0',
+  '[&>input:not(:first-child):not(:last-child)]:mdt-rounded-none',
+  '[&>input:not(:first-child):not(:last-child)]:mdt-border-l-0',
+  '[&>*:has(input):not(:first-child):not(:last-child)_input]:mdt-rounded-none',
+  '[&>*:has(input):not(:first-child):not(:last-child)_input]:mdt-border-l-0',
+  // Last child
+  '[&>button:last-child]:mdt-rounded-l-none',
+  '[&>button:last-child]:mdt-border-l-0',
+  '[&>a:last-child]:mdt-rounded-l-none',
+  '[&>a:last-child]:mdt-border-l-0',
+  '[&>input:last-child]:mdt-rounded-l-none',
+  '[&>input:last-child]:mdt-border-l-0',
+  '[&>*:has(input):last-child_input]:mdt-rounded-l-none',
+  '[&>*:has(input):last-child_input]:mdt-border-l-0',
+  // Only child
+  '[&>button:only-child]:mdt-rounded-md',
+  '[&>a:only-child]:mdt-rounded-md',
+  '[&>input:only-child]:mdt-rounded-md',
+  '[&>*:has(input):only-child_input]:mdt-rounded-md',
+];
+
+/**
+ * The console's split button: the same joined row, and the second half wears a hairline so the two read as two
+ * targets (Pranjal 2026-11-05; the console's .split-chevron). The filled button's own ink at 28%, so it follows the theme.
+ */
+const SPLIT_ROW = [
+  ...JOINED_ROW.filter((c) => c !== '[&>button:last-child]:mdt-border-l-0'),
+  '[&>button:last-child]:[border-left:1px_solid_hsl(var(--mdt-primary-foreground)/0.28)]',
+];
+
 /**
  * ButtonGroup variants using Class Variance Authority (CVA)
  * Provides consistent styling for grouped buttons
@@ -27,6 +68,7 @@ export const buttonGroupVariants = cva(
       variant: {
         default: '',
         attached: '',
+        split: '',
       },
       /**
        * Size variant - affects spacing
@@ -51,36 +93,13 @@ export const buttonGroupVariants = cva(
       {
         orientation: 'horizontal',
         variant: 'attached',
-        className: [
-          // First child (button, input, or link)
-          '[&>button:first-child]:mdt-rounded-r-none',
-          '[&>a:first-child]:mdt-rounded-r-none',
-          '[&>input:first-child]:mdt-rounded-r-none',
-          '[&>*:has(input):first-child_input]:mdt-rounded-r-none',
-          // Middle children
-          '[&>button:not(:first-child):not(:last-child)]:mdt-rounded-none',
-          '[&>button:not(:first-child):not(:last-child)]:mdt-border-l-0',
-          '[&>a:not(:first-child):not(:last-child)]:mdt-rounded-none',
-          '[&>a:not(:first-child):not(:last-child)]:mdt-border-l-0',
-          '[&>input:not(:first-child):not(:last-child)]:mdt-rounded-none',
-          '[&>input:not(:first-child):not(:last-child)]:mdt-border-l-0',
-          '[&>*:has(input):not(:first-child):not(:last-child)_input]:mdt-rounded-none',
-          '[&>*:has(input):not(:first-child):not(:last-child)_input]:mdt-border-l-0',
-          // Last child
-          '[&>button:last-child]:mdt-rounded-l-none',
-          '[&>button:last-child]:mdt-border-l-0',
-          '[&>a:last-child]:mdt-rounded-l-none',
-          '[&>a:last-child]:mdt-border-l-0',
-          '[&>input:last-child]:mdt-rounded-l-none',
-          '[&>input:last-child]:mdt-border-l-0',
-          '[&>*:has(input):last-child_input]:mdt-rounded-l-none',
-          '[&>*:has(input):last-child_input]:mdt-border-l-0',
-          // Only child
-          '[&>button:only-child]:mdt-rounded-md',
-          '[&>a:only-child]:mdt-rounded-md',
-          '[&>input:only-child]:mdt-rounded-md',
-          '[&>*:has(input):only-child_input]:mdt-rounded-md',
-        ],
+        className: JOINED_ROW,
+      },
+      // A split button - one main action and its menu
+      {
+        orientation: 'horizontal',
+        variant: 'split',
+        className: SPLIT_ROW,
       },
       // Vertical attached buttons - remove borders between
       {

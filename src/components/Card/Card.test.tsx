@@ -32,7 +32,7 @@ describe('Card', () => {
     it('is filled by default, and filled always keeps its border', () => {
       render(<Card />);
       // White on white measures 1.00 - without the border there is no card.
-      expect(getCard()).toHaveClass('mdt-border-border');
+      expect(getCard()).toHaveClass('mdt-border-neutral-20');
     });
 
     it('gives secondary a fill and no border, because the fill carries it', () => {
@@ -398,5 +398,37 @@ describe('CollapsibleCard', () => {
     await userEvent.click(screen.getByTestId('card-toggle'));
     const controls = screen.getByTestId('card-toggle').getAttribute('aria-controls');
     expect(screen.getByTestId('card-panel')).toHaveAttribute('id', controls);
+  });
+});
+
+describe('the borderless surface and the 16 inset', () => {
+  it('gives borderless a fill and no border, because the fill carries it', () => {
+    render(<Card surface="borderless" />);
+    const card = screen.getByTestId(CARD);
+    expect(card).toHaveClass('mdt-bg-neutral-20');
+    expect(card).toHaveClass('mdt-border-transparent');
+  });
+
+  it('insets every part by 16 at medium', () => {
+    render(
+      <Card padding="medium">
+        <CardHeader heading="Heading" />
+        <CardBody>Body</CardBody>
+        <CardFooter meta="Meta" />
+      </Card>
+    );
+    for (const id of [HEADER, BODY, 'card-footer']) {
+      expect(screen.getByTestId(id)).toHaveClass('mdt-px-4', 'mdt-pb-4');
+    }
+    expect(screen.getByTestId(BODY)).toHaveClass('mdt-pt-4');
+  });
+
+  it('evens a collapsible header at 16 on medium, open or shut', () => {
+    render(
+      <CollapsibleCard header={{ heading: 'Heading' }} padding="medium">
+        Panel
+      </CollapsibleCard>
+    );
+    expect(screen.getByTestId(HEADER)).toHaveClass('mdt-py-4');
   });
 });

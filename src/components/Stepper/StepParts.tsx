@@ -24,12 +24,10 @@ interface StepDiscProps {
   /** The layout's size, edge width and number size. */
   className: ClassValue;
   markSize: 'sm' | 'xs';
-  /** The tick's weight, where a layout draws it heavier. */
-  tickStroke?: number | undefined;
 }
 
 /** The disc: a tick for done, a dash for passed over, the number everywhere else. */
-export const StepDisc = ({ index, model, className, markSize, tickStroke }: StepDiscProps) => {
+export const StepDisc = ({ index, model, className, markSize }: StepDiscProps) => {
   const mark = MARK[model.look];
   return (
     <span
@@ -45,16 +43,7 @@ export const StepDisc = ({ index, model, className, markSize, tickStroke }: Step
       )}
       aria-hidden="true"
     >
-      {mark ? (
-        <Icon
-          name={mark}
-          size={markSize}
-          {...(mark === 'check' && tickStroke !== undefined ? { strokeWidth: tickStroke } : {})}
-          aria-hidden
-        />
-      ) : (
-        index + 1
-      )}
+      {mark ? <Icon name={mark} size={markSize} aria-hidden /> : index + 1}
     </span>
   );
 };

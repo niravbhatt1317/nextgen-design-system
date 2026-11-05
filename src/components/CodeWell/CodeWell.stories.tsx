@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CodeWell } from './CodeWell';
 
 const meta: Meta<typeof CodeWell> = {
-  title: 'Components/CodeWell',
+  title: 'New Components/CodeWell',
   component: CodeWell,
   tags: ['autodocs'],
   parameters: {

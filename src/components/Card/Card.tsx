@@ -30,17 +30,15 @@ import type {
  * why the eyebrow, the heading, the body text and the footer all start on the
  * same vertical line - and why changing it once moves everything together.
  *
- * ## Two different edges
+ * ## One edge colour
  *
- * The card's own outline uses `border`; the lines *inside* it use `muted`, one
- * step lighter. An internal divider that matches the outer edge reads as a
- * second card rather than a seam. A dedicated divider token would say this
- * better - see PLAN.md.
+ * The card's own outline and the lines inside it are the same hairline, neutral-20, the
+ * console's. On a lighter outline, a line drawn from `muted` came out darker than the edge.
  */
 export const cardVariants = cva(
   [
     'mdt-relative mdt-flex mdt-flex-col',
-    'mdt-overflow-hidden mdt-rounded-lg',
+    'mdt-overflow-hidden mdt-rounded-xl',
     'mdt-border mdt-border-solid',
     'mdt-transition-[background-color,border-color,box-shadow] mdt-duration-150',
     // A header sitting straight on top of a footer would otherwise draw the
@@ -58,22 +56,25 @@ export const cardVariants = cva(
   {
     variants: {
       surface: {
+        // A tint with no border: 1.13 light, 1.32 dark against the page, and it still shows on a tinted area.
+        borderless: 'mdt-border-transparent mdt-bg-neutral-20 mdt-text-card-foreground',
         // White on white measures 1.00 against the page. The border IS the shape.
-        filled: 'mdt-border-border mdt-bg-card mdt-text-card-foreground',
-        // 1.14 light, 1.26 dark. The fill carries it, so no border.
+        filled: 'mdt-border-neutral-20 mdt-bg-card mdt-text-card-foreground',
+        // 1.05 light, 1.05 dark: it recedes on purpose, and disappears on a tinted area of its own colour.
         secondary: 'mdt-border-transparent mdt-bg-secondary mdt-text-card-foreground',
-        outline: 'mdt-border-border mdt-bg-transparent mdt-text-card-foreground',
+        outline: 'mdt-border-neutral-20 mdt-bg-transparent mdt-text-card-foreground',
         elevated: 'mdt-border-transparent mdt-bg-card mdt-text-card-foreground mdt-shadow-md',
       },
-      padding: { normal: '', compact: '', none: '' },
+      padding: { normal: '', medium: '', compact: '', none: '' },
     },
     defaultVariants: { surface: 'filled', padding: 'normal' },
   }
 );
 
-/** 20px, 14px, 0 - the three insets, split so each part can use the sides it needs. */
+/** 20px, 16px, 14px, 0 - the four insets, split so each part can use the sides it needs. */
 const PAD: Record<CardPadding, { x: string; top: string; bottom: string }> = {
   normal: { x: 'mdt-px-5', top: 'mdt-pt-5', bottom: 'mdt-pb-5' },
+  medium: { x: 'mdt-px-4', top: 'mdt-pt-4', bottom: 'mdt-pb-4' },
   compact: { x: 'mdt-px-3.5', top: 'mdt-pt-3.5', bottom: 'mdt-pb-3.5' },
   none: { x: 'mdt-px-0', top: 'mdt-pt-0', bottom: 'mdt-pb-0' },
 };
@@ -86,6 +87,7 @@ const PAD: Record<CardPadding, { x: string; top: string; bottom: string }> = {
  */
 const COLLAPSIBLE_HEADER_Y: Record<CardPadding, string> = {
   normal: 'mdt-py-4',
+  medium: 'mdt-py-4',
   compact: 'mdt-py-3.5',
   none: 'mdt-py-0',
 };
@@ -194,7 +196,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderInternalProps>(
           pad.x,
           pad.top,
           plain ? 'mdt-pb-0' : pad.bottom,
-          !plain && 'mdt-border-b mdt-border-solid mdt-border-muted',
+          !plain && 'mdt-border-b mdt-border-solid mdt-border-neutral-20',
           // Nothing after it, so nothing to divide.
           'last:mdt-border-b-0',
           className
@@ -223,7 +225,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderInternalProps>(
           ) : null}
           {supporting !== undefined ? (
             <p
-              className="mdt-m-0 mdt-text-sm mdt-leading-normal mdt-text-muted-foreground"
+              className="mdt-m-0 mdt-text-sm mdt-leading-normal mdt-text-neutral-90"
               data-testid="card-header-supporting"
             >
               {supporting}
@@ -279,7 +281,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
           pad.x,
           plain ? 'mdt-pt-0' : pad.top,
           pad.bottom,
-          !plain && 'mdt-border-t mdt-border-solid mdt-border-muted',
+          !plain && 'mdt-border-t mdt-border-solid mdt-border-neutral-20',
           className
         )}
         data-slot="card-footer"
@@ -287,7 +289,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         {...rest}
       >
         {meta !== undefined ? (
-          <span className="mdt-text-xs mdt-text-muted-foreground" data-testid="card-footer-meta">
+          <span className="mdt-text-xs mdt-text-neutral-60" data-testid="card-footer-meta">
             {meta}
           </span>
         ) : null}

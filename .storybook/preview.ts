@@ -50,8 +50,9 @@ export default {
   parameters: {
     options: {
       // The sidebar's order is Pranjal's (2026-09-22): Foundation and Layout on
-      // top, then New Components - the parts reworked for the console - then
-      // Components, Deprecated 2, Deprecated; the two guides close the list.
+      // top, then New Components - everything new or worked on, by anyone (his rule,
+      // 2026-11-04) - then Components - what nobody has touched since it was added -
+      // then Deprecated 2, Deprecated; the two guides close the list.
       //
       // `order` names the top-level groups; `method` sorts everything it does
       // not name, so a new component still turns up where its name says it

@@ -172,7 +172,7 @@ function IconGalleryComponent() {
 }
 
 const meta: Meta<typeof Icon> = {
-  title: 'Components/Icon',
+  title: 'New Components/Icon',
   component: Icon,
   tags: ['autodocs'],
   parameters: {

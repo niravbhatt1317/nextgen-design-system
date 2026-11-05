@@ -67,6 +67,10 @@ By participating in this project, you agree to maintain a respectful and inclusi
    - `ComponentName.stories.tsx` - Storybook stories
    - `index.ts` - Exports
 
+### Where It Sits in Storybook
+
+A new component, or one you update, sits under `New Components`: if it still sits under `Components`, move it in the same change. A copy that replaces a component takes its name and goes to `New Components`; the previous original is renamed `<Name> Old` and moves to `Deprecated`. `Components` holds only what nobody has touched since it was added. See CLAUDE.md.
+
 ### Component Requirements
 
 - **TypeScript**: All components must be written in TypeScript with strict mode

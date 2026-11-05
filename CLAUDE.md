@@ -34,6 +34,15 @@ first real signal.
 
 ---
 
+## 🗃 Where a component sits in Storybook
+
+Pranjal's rule, 2026-11-04. It applies to everyone, on every change.
+
+- **New or worked on: `New Components`.** A component that is new, or that anyone has updated, sits under `New Components`. If the one you update still sits under `Components`, move it in the same change.
+- **`Components` holds only what nobody has touched since it was added.**
+- **A copy replaces the original.** The copy takes the name, becomes the original and goes to `New Components`. The previous original is renamed `<Name> Old` and moves to `Deprecated`.
+- **A move changes the story's address.** Change the `title`, update its twin in `scripts/parity/twins/`, and run `npm run catalog`.
+
 ## 🗂 Where the console lives, and the one rule about it
 
 Both halves of this work are on this machine, under one parent:

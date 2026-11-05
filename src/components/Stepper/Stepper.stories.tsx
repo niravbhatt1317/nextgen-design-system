@@ -13,7 +13,7 @@ const IMPORT: StepperStep[] = [
 ];
 
 const meta: Meta<typeof Stepper> = {
-  title: 'Components/Stepper',
+  title: 'New Components/Stepper',
   component: Stepper,
   tags: ['autodocs'],
   parameters: {

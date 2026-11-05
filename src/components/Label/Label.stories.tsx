@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Label } from './Label';
 
 const meta: Meta<typeof Label> = {
-  title: 'Components/Label',
+  title: 'New Components/Label',
   component: Label,
   tags: ['autodocs'],
   parameters: {

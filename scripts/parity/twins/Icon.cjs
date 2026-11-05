@@ -17,7 +17,7 @@ module.exports = {
     {
       name: 'rail row glyph · 16, stroke 2, the page ink (the first Settings row)',
       props: PROPS,
-      story: { id: 'components-icon--sizes', select: 'svg[aria-label="Small user icon"]' },
+      story: { id: 'new-components-icon--sizes', select: 'svg[aria-label="Small user icon"]' },
       console: { path: '/users', select: 'nav[aria-label="Settings"] button.snv-row svg' },
       mock: null,
     },
