@@ -7,7 +7,7 @@ import { Input } from '../Input';
 import { Label } from '../Label';
 
 const meta: Meta<typeof Upload> = {
-  title: 'Components/Upload',
+  title: 'New Components/Upload',
   component: Upload,
   tags: ['autodocs'],
   parameters: {

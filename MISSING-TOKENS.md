@@ -533,7 +533,7 @@ it, chosen for the _content_, not the theme. It is built from `mdt-bg-neutral-16
 generated dark block every ramp step flips — `neutral-160` is `#0B1628` in light and `#E3E8F2` in
 dark. So the terminal well renders as a **near-white slab** on the dark page, which is the
 inversion its own comment was written to prevent under the retired `.dark` palette. Measured in
-the gallery, both themes, 2026-09-28; `Components/CodeWell → Surfaces` shows it.
+the gallery, both themes, 2026-09-28; `New Components/CodeWell → Surfaces` shows it.
 
 Nothing in the palette answers this. Every colour token is either a ramp step (flips) or a
 semantic pair (flips by design). `--mdt-white` and `--mdt-black` are the only two the generator

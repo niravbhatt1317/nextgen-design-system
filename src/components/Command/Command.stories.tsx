@@ -15,7 +15,7 @@ import {
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof Command> = {
-  title: 'Components/Command',
+  title: 'New Components/Command',
   component: Command,
   tags: ['autodocs'],
   parameters: {

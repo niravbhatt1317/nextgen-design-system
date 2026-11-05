@@ -10,7 +10,7 @@ import { Icon } from '../Icon';
 import { Button } from '../Button';
 
 const meta: Meta<typeof Combobox> = {
-  title: 'Components/Combobox',
+  title: 'New Components/Combobox',
   component: Combobox,
   tags: ['autodocs'],
   parameters: {

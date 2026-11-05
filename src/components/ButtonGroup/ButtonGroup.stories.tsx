@@ -11,7 +11,7 @@ import {
 import { Icon } from '../Icon';
 
 const meta: Meta<typeof ButtonGroup> = {
-  title: 'Components/ButtonGroup',
+  title: 'New Components/ButtonGroup',
   component: ButtonGroup,
   tags: ['autodocs'],
   parameters: {
@@ -376,13 +376,15 @@ export const ButtonWithDropdown: Story = {
   render: () => (
     <div className="mdt-flex mdt-flex-col mdt-gap-4">
       {/* Split button with dropdown */}
-      <ButtonGroup>
+      <ButtonGroup variant="split">
         <Button>Save Changes</Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="mdt-px-2" aria-label="More save options">
-              <Icon name="chevron-down" size="sm" aria-hidden />
-            </Button>
+            <Button
+              iconOnly
+              ariaLabel="More save options"
+              leftIcon={<Icon name="chevron-down" size={16} aria-hidden />}
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>

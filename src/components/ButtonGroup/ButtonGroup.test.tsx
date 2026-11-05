@@ -68,6 +68,18 @@ describe('ButtonGroup', () => {
     expect(group).toHaveClass('mdt-gap-2');
   });
 
+  it('draws the seam on the second half of a split button', () => {
+    render(
+      <ButtonGroup variant="split" data-testid="button-group">
+        <Button>Save</Button>
+        <Button iconOnly ariaLabel="More" />
+      </ButtonGroup>
+    );
+    const { className } = screen.getByTestId('button-group');
+    expect(className).toContain('border-left:1px_solid');
+    expect(className).not.toContain('[&>button:last-child]:mdt-border-l-0');
+  });
+
   it('applies fullWidth variant', () => {
     render(
       <ButtonGroup fullWidth data-testid="button-group">

@@ -110,16 +110,7 @@
       "area": "AdvancedFilter",
       "summary": "",
       "doc": "",
-      "props": [
-        "open",
-        "onClose",
-        "keys",
-        "value",
-        "onApply",
-        "width",
-        "title",
-        "className"
-      ],
+      "props": ["open", "onClose", "keys", "value", "onApply", "width", "title", "className"],
       "propDocs": "Whether the panel shows. The page owns this, so the door can toggle it. Asked for on Apply, Escape and a press outside. The keys this list can be filtered on. Whatever the page already offers as a quick filter is never one of them. What is applied now. Every open starts from it. Apply, Enter, and Clear all (with an empty filter). The panel's width. 656 from the Figma frame. The heading. \"Filters\" unless the page says otherwise. Extra classes on the panel."
     },
     {
@@ -127,8 +118,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / AdvancedToolbar",
-      "doc": "Components/ButtonGroup AdvancedToolbar",
+      "summary": "Story: New Components/ButtonGroup / AdvancedToolbar",
+      "doc": "New Components/ButtonGroup AdvancedToolbar",
       "props": [],
       "propDocs": ""
     },
@@ -169,12 +160,7 @@
       "area": "AiMark",
       "summary": "**`Toast` still draws this for its `ai` tone**, so it cannot simply go: that has to move first, and nothing has been chosen for it to move to.",
       "doc": "**`Toast` still draws this for its `ai` tone**, so it cannot simply go: that has to move first, and nothing has been chosen for it to move to. This records the intent and the debt in one place rather than letting the component look current while it is on its way out. For the AI treatment in new work, the `Button` `ai` variant and the `ai` tone on `Banner` both supply their own mark. AiMark - the gradient mark that means \"this is AI\". **A mark, not an icon, which is why it is not in the icon set.** Every `<Icon>` is one stroke in `currentColor`, and that is what lets the system size, tint and audit all 1209 of them the same way. This is three colours sweeping across itself and answers to none of it - tinting it would destroy the thing that makes it recognisable. The library's rule is that Lucide is the only *icon* source; a brand mark is the same exception the seventeen kept logos are. **Two of them, each filled or drawn as a line.** `spark` is the general mark; `trio` is three stars at a third of the strength, for a surface that wants a texture rather than a glyph. `appearance=\"line\"` strokes the same outline instead of filling it, for a row where every other glyph is line art - be",
-      "props": [
-        "variant",
-        "appearance",
-        "size",
-        "title"
-      ],
+      "props": ["variant", "appearance", "size", "title"],
       "propDocs": "Which mark. See {@link AiMarkVariant}. Filled, or drawn as a line. See {@link AiMarkAppearance}. Named `appearance` rather than `fill` because an `<svg>` already has a `fill` and shadowing it would make the escape hatch unreachable. How big. Defaults to `sm`, which is 16px - the size it was drawn at. A name, if the mark is carrying meaning on its own. Left off it is `aria-hidden`, which is right almost everywhere: the mark says \"AI\" to somebody who has learnt it and nothing to somebody who has not, so the writing beside it should carry the meaning. Set this only where there is no such writing."
     },
     {
@@ -262,8 +248,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / AllSizes",
-      "doc": "Components/Combobox AllSizes",
+      "summary": "Story: New Components/Combobox / AllSizes",
+      "doc": "New Components/Combobox AllSizes",
       "props": [],
       "propDocs": ""
     },
@@ -352,8 +338,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / AllVariants",
-      "doc": "Components/Combobox AllVariants",
+      "summary": "Story: New Components/Combobox / AllVariants",
+      "doc": "New Components/Combobox AllVariants",
       "props": [],
       "propDocs": ""
     },
@@ -422,8 +408,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / AnInsetPanel",
-      "doc": "Components/Card AnInsetPanel",
+      "summary": "Story: New Components/Card / AnInsetPanel",
+      "doc": "New Components/Card AnInsetPanel",
       "props": [],
       "propDocs": ""
     },
@@ -522,8 +508,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / AsyncDataLoading",
-      "doc": "Components/Combobox AsyncDataLoading",
+      "summary": "Story: New Components/Combobox / AsyncDataLoading",
+      "doc": "New Components/Combobox AsyncDataLoading",
       "props": [],
       "propDocs": ""
     },
@@ -532,8 +518,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / AtTheLimit",
-      "doc": "Components/Upload AtTheLimit",
+      "summary": "Story: New Components/Upload / AtTheLimit",
+      "doc": "New Components/Upload AtTheLimit",
       "props": [],
       "propDocs": ""
     },
@@ -594,13 +580,7 @@
       "area": "Avatar",
       "summary": "AvatarStack - overlapping avatars with a \"+N\" chip for the rest.",
       "doc": "AvatarStack - overlapping avatars with a \"+N\" chip for the rest. Size, shape and the separating ring are applied to every child, so a stack cannot end up with mismatched avatars in it. ```tsx <AvatarStack max={3}> <Avatar name=\"Sarah Johnson\" /> <Avatar name=\"Ravi Patel\" /> <Avatar name=\"Mei Chen\" /> <Avatar name=\"Tom Green\" /> </AvatarStack> ```",
-      "props": [
-        "children",
-        "max",
-        "size",
-        "shape",
-        "className"
-      ],
+      "props": ["children", "max", "size", "shape", "className"],
       "propDocs": "Avatars to stack. Size, shape and ring are applied to each. How many to show before collapsing the rest into a \"+N\" chip.  "
     },
     {
@@ -610,13 +590,7 @@
       "area": "AvatarOld2",
       "summary": "AvatarStackOld2 - overlapping avatars with a \"+N\" chip for the rest.",
       "doc": "AvatarStackOld2 - overlapping avatars with a \"+N\" chip for the rest. Size, shape and the separating ring are applied to every child, so a stack cannot end up with mismatched avatars in it. ```tsx <AvatarStackOld2 max={3}> <AvatarOld2 name=\"Sarah Johnson\" /> <AvatarOld2 name=\"Ravi Patel\" /> <AvatarOld2 name=\"Mei Chen\" /> <AvatarOld2 name=\"Tom Green\" /> </AvatarStackOld2> ```",
-      "props": [
-        "children",
-        "max",
-        "size",
-        "shape",
-        "className"
-      ],
+      "props": ["children", "max", "size", "shape", "className"],
       "propDocs": "Avatars to stack. Size, shape and ring are applied to each. How many to show before collapsing the rest into a \"+N\" chip.  "
     },
     {
@@ -724,8 +698,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / Breakdown",
-      "doc": "Components/Progress Breakdown",
+      "summary": "Story: New Components/Progress / Breakdown",
+      "doc": "New Components/Progress Breakdown",
       "props": [],
       "propDocs": ""
     },
@@ -734,8 +708,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / BreakdownWithoutLegend",
-      "doc": "Components/Progress BreakdownWithoutLegend",
+      "summary": "Story: New Components/Progress / BreakdownWithoutLegend",
+      "doc": "New Components/Progress BreakdownWithoutLegend",
       "props": [],
       "propDocs": ""
     },
@@ -744,8 +718,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / BreakdownWithoutMax",
-      "doc": "Components/Progress BreakdownWithoutMax",
+      "summary": "Story: New Components/Progress / BreakdownWithoutMax",
+      "doc": "New Components/Progress BreakdownWithoutMax",
       "props": [],
       "propDocs": ""
     },
@@ -802,13 +776,7 @@
       "area": "ButtonGroup",
       "summary": "ButtonGroup component for grouping related buttons together.",
       "doc": "ButtonGroup component for grouping related buttons together. Supports both horizontal and vertical orientations, with options for attached (seamless) or separated button layouts. ```tsx // Horizontal attached buttons <ButtonGroup> <Button variant=\"outline\">Left</Button> <Button variant=\"outline\">Middle</Button> <Button variant=\"outline\">Right</Button> </ButtonGroup> // Vertical button group <ButtonGroup orientation=\"vertical\"> <Button variant=\"outline\">Top</Button> <Button variant=\"outline\">Middle</Button> <Button variant=\"outline\">Bottom</Button> </ButtonGroup> // Separated buttons <ButtonGroup variant=\"default\"> <Button>Save</Button> <Button variant=\"outline\">Cancel</Button> </ButtonGroup> ```",
-      "props": [
-        "children",
-        "orientation",
-        "variant",
-        "size",
-        "fullWidth"
-      ],
+      "props": ["children", "orientation", "variant", "size", "fullWidth"],
       "propDocs": "Button elements to group together Orientation of the button group Visual style variant - 'attached': Buttons are seamlessly connected - 'default': Buttons have spacing between them Size variant (affects spacing) Whether the button group should take full width"
     },
     {
@@ -846,8 +814,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / ButtonWithDropdown",
-      "doc": "Components/ButtonGroup ButtonWithDropdown",
+      "summary": "Story: New Components/ButtonGroup / ButtonWithDropdown",
+      "doc": "New Components/ButtonGroup ButtonWithDropdown",
       "props": [],
       "propDocs": ""
     },
@@ -1059,10 +1027,7 @@
       "area": "Checkbox",
       "summary": "Checkbox component for toggleable selection.",
       "doc": "Checkbox component for toggleable selection. ```tsx // Default checkbox <Checkbox id=\"terms\" /> // Card variant <Checkbox id=\"feature\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Enable Feature</div> <div className=\"text-sm text-muted-foreground\"> This will enable the advanced feature. </div> </div> </div> </Checkbox> ```",
-      "props": [
-        "children",
-        "size"
-      ],
+      "props": ["children", "size"],
       "propDocs": "What the checkbox holds: the label of a chip, or the content of a card. Overrides the group's size for this chip alone."
     },
     {
@@ -1082,12 +1047,7 @@
       "area": "Checkbox",
       "summary": "A row of choices that wraps.",
       "doc": "A row of choices that wraps. ## Not connected, on purpose Each chip is its own shape with its own edge, and they wrap onto the next line when the row runs out. That is the opposite of the segmented strip in `Radio`, where the segments are joined into one bar - joined says \"one of these\", and separate says \"as many as you like\". ## It is a group, and it says so `role=\"group\"` with a name, so a screen reader announces what the chips are for before reading them. Each chip inside is a real checkbox: Tab reaches it, Space presses it, and pressing again lets it go. ```tsx <CheckboxGroup variant=\"chip\" label=\"Which of these were affected?\"> <Checkbox value=\"network\">Network</Checkbox> <Checkbox value=\"storage\">Storage</Checkbox> </CheckboxGroup> ```",
-      "props": [
-        "children",
-        "variant",
-        "size",
-        "label"
-      ],
+      "props": ["children", "variant", "size", "label"],
       "propDocs": " Chip height, for a chip group. What the choices are for, read out before the chips themselves. Without it a screen reader announces six checkboxes and no reason for them."
     },
     {
@@ -1234,8 +1194,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / Clearable",
-      "doc": "Components/Combobox Clearable",
+      "summary": "Story: New Components/Combobox / Clearable",
+      "doc": "New Components/Combobox Clearable",
       "props": [],
       "propDocs": ""
     },
@@ -1264,8 +1224,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / Clickable",
-      "doc": "Components/Card Clickable",
+      "summary": "Story: New Components/Card / Clickable",
+      "doc": "New Components/Card Clickable",
       "props": [],
       "propDocs": ""
     },
@@ -1294,8 +1254,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / Clickable",
-      "doc": "Components/Stepper Clickable",
+      "summary": "Story: New Components/Stepper / Clickable",
+      "doc": "New Components/Stepper Clickable",
       "props": [],
       "propDocs": ""
     },
@@ -1314,8 +1274,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / ClickableOrNot",
-      "doc": "Components/Stepper ClickableOrNot",
+      "summary": "Story: New Components/Stepper / ClickableOrNot",
+      "doc": "New Components/Stepper ClickableOrNot",
       "props": [],
       "propDocs": ""
     },
@@ -1404,8 +1364,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / Collapsible",
-      "doc": "Components/Card Collapsible",
+      "summary": "Story: New Components/Card / Collapsible",
+      "doc": "New Components/Card Collapsible",
       "props": [],
       "propDocs": ""
     },
@@ -1434,8 +1394,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / Colors",
-      "doc": "Components/Icon Colors",
+      "summary": "Story: New Components/Icon / Colors",
+      "doc": "New Components/Icon Colors",
       "props": [],
       "propDocs": ""
     },
@@ -1536,10 +1496,7 @@
       "area": "Command",
       "summary": "CommandDialog - Command palette in a dialog.",
       "doc": "CommandDialog - Command palette in a dialog. ```tsx <CommandDialog open={open} onOpenChange={setOpen}> <CommandInput placeholder=\"Search...\" /> <CommandList> <CommandGroup heading=\"Actions\"> <CommandItem>New File</CommandItem> </CommandGroup> </CommandList> </CommandDialog> ```",
-      "props": [
-        "open",
-        "onOpenChange"
-      ],
+      "props": ["open", "onOpenChange"],
       "propDocs": "Whether the dialog is open Callback when the open state changes"
     },
     {
@@ -1734,8 +1691,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / Controlled",
-      "doc": "Components/Combobox Controlled",
+      "summary": "Story: New Components/Combobox / Controlled",
+      "doc": "New Components/Combobox Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1754,8 +1711,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / Controlled",
-      "doc": "Components/Pagination Controlled",
+      "summary": "Story: New Components/Pagination / Controlled",
+      "doc": "New Components/Pagination Controlled",
       "props": [],
       "propDocs": ""
     },
@@ -1874,8 +1831,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / Copyable",
-      "doc": "Components/CodeWell Copyable",
+      "summary": "Story: New Components/CodeWell / Copyable",
+      "doc": "New Components/CodeWell Copyable",
       "props": [],
       "propDocs": ""
     },
@@ -1965,8 +1922,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / CountrySelector",
-      "doc": "Components/Combobox CountrySelector",
+      "summary": "Story: New Components/Combobox / CountrySelector",
+      "doc": "New Components/Combobox CountrySelector",
       "props": [],
       "propDocs": ""
     },
@@ -2005,8 +1962,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / CustomEmptyState",
-      "doc": "Components/Command CustomEmptyState",
+      "summary": "Story: New Components/Command / CustomEmptyState",
+      "doc": "New Components/Command CustomEmptyState",
       "props": [],
       "propDocs": ""
     },
@@ -2055,8 +2012,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / CustomLabels",
-      "doc": "Components/Pagination CustomLabels",
+      "summary": "Story: New Components/Pagination / CustomLabels",
+      "doc": "New Components/Pagination CustomLabels",
       "props": [],
       "propDocs": ""
     },
@@ -2115,8 +2072,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / CustomRenderOption",
-      "doc": "Components/Combobox CustomRenderOption",
+      "summary": "Story: New Components/Combobox / CustomRenderOption",
+      "doc": "New Components/Combobox CustomRenderOption",
       "props": [],
       "propDocs": ""
     },
@@ -2125,8 +2082,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / CustomRenderValue",
-      "doc": "Components/Combobox CustomRenderValue",
+      "summary": "Story: New Components/Combobox / CustomRenderValue",
+      "doc": "New Components/Combobox CustomRenderValue",
       "props": [],
       "propDocs": ""
     },
@@ -2145,8 +2102,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / CustomSize",
-      "doc": "Components/Icon CustomSize",
+      "summary": "Story: New Components/Icon / CustomSize",
+      "doc": "New Components/Icon CustomSize",
       "props": [],
       "propDocs": ""
     },
@@ -2175,8 +2132,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / CustomSvgFromUrl",
-      "doc": "Components/Icon CustomSvgFromUrl",
+      "summary": "Story: New Components/Icon / CustomSvgFromUrl",
+      "doc": "New Components/Icon CustomSvgFromUrl",
       "props": [],
       "propDocs": ""
     },
@@ -2185,8 +2142,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / CustomSvgVariants",
-      "doc": "Components/Icon CustomSvgVariants",
+      "summary": "Story: New Components/Icon / CustomSvgVariants",
+      "doc": "New Components/Icon CustomSvgVariants",
       "props": [],
       "propDocs": ""
     },
@@ -2195,8 +2152,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / CustomTrigger",
-      "doc": "Components/Combobox CustomTrigger",
+      "summary": "Story: New Components/Combobox / CustomTrigger",
+      "doc": "New Components/Combobox CustomTrigger",
       "props": [],
       "propDocs": ""
     },
@@ -2307,15 +2264,7 @@
       "area": "LeftNavOld",
       "summary": "DataLeftNav - the whole navigation from one configuration object.",
       "doc": "DataLeftNav - the whole navigation from one configuration object. `LeftNavOld` is parts; this is what you reach for when the navigation is data rather than markup - which it usually is. Permissions decide what a person sees, a server decides what a plan includes, and neither belongs in JSX. **The configuration is JSON.** Icons are names, not `ReactNode`s, so a whole navigation can come from an API, sit in a database, be diffed in a pull request, or be written by a model - which is the point of this library. `DataDrivenSidebar`, the thing this replaces, took `ReactNode` icons and so could only ever be written by hand in TypeScript. **Two levels, still.** An entry with `items` at the root opens the second level; the same shape inside the second level folds open in place. A third level is not expressible - nesting deeper is ignored rather than honoured, because the alternative is a config that quietly produces a navigation nobody can get back out of. ```tsx <DataLeftNav activeKey={page} onSelect={(key) => { setPage(key); }} config={{ home: { label: 'Go to home', href: '/' }, search: {}, items: [ { key: 'profile', label: 'Profile', icon: 'user', group: 'Personal' }, { key: 'observabili",
-      "props": [
-        "config",
-        "activeKey",
-        "onSelect",
-        "onHome",
-        "initialSection",
-        "footer",
-        "label"
-      ],
+      "props": ["config", "activeKey", "onSelect", "onHome", "initialSection", "footer", "label"],
       "propDocs": "The whole navigation, as data. Which entry is the page being shown. Called with the entry that was chosen. Only for entries that lead to a page. Opening a section and folding a group are the component's own business and are not reported - a product that had to handle those would be reimplementing the navigation to use it. Called when the home control is pressed. Which section to open on. Pinned to the bottom edge. Not part of the config, because it is markup. The panel's accessible name. @default 'Settings'"
     },
     {
@@ -2582,8 +2531,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / DebugSelection",
-      "doc": "Components/Combobox DebugSelection",
+      "summary": "Story: New Components/Combobox / DebugSelection",
+      "doc": "New Components/Combobox DebugSelection",
       "props": [],
       "propDocs": ""
     },
@@ -2592,8 +2541,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / DecorativeIcons",
-      "doc": "Components/Icon DecorativeIcons",
+      "summary": "Story: New Components/Icon / DecorativeIcons",
+      "doc": "New Components/Icon DecorativeIcons",
       "props": [],
       "propDocs": ""
     },
@@ -2682,8 +2631,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Default",
-      "doc": "Components/ButtonGroup Default",
+      "summary": "Story: New Components/ButtonGroup / Default",
+      "doc": "New Components/ButtonGroup Default",
       "props": [],
       "propDocs": ""
     },
@@ -2722,8 +2671,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / Default",
-      "doc": "Components/CodeWell Default",
+      "summary": "Story: New Components/CodeWell / Default",
+      "doc": "New Components/CodeWell Default",
       "props": [],
       "propDocs": ""
     },
@@ -2732,8 +2681,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / Default",
-      "doc": "Components/Combobox Default",
+      "summary": "Story: New Components/Combobox / Default",
+      "doc": "New Components/Combobox Default",
       "props": [],
       "propDocs": ""
     },
@@ -2742,8 +2691,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / Default",
-      "doc": "Components/Command Default",
+      "summary": "Story: New Components/Command / Default",
+      "doc": "New Components/Command Default",
       "props": [],
       "propDocs": ""
     },
@@ -2852,8 +2801,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / Default",
-      "doc": "Components/Icon Default",
+      "summary": "Story: New Components/Icon / Default",
+      "doc": "New Components/Icon Default",
       "props": [],
       "propDocs": ""
     },
@@ -2932,8 +2881,8 @@
       "kind": "story",
       "file": "src/components/Kbd/Kbd.stories.tsx",
       "area": "Kbd",
-      "summary": "Story: Components/Kbd / Default",
-      "doc": "Components/Kbd Default",
+      "summary": "Story: New Components/Kbd / Default",
+      "doc": "New Components/Kbd Default",
       "props": [],
       "propDocs": ""
     },
@@ -2952,8 +2901,8 @@
       "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
-      "summary": "Story: Components/Label / Default",
-      "doc": "Components/Label Default",
+      "summary": "Story: New Components/Label / Default",
+      "doc": "New Components/Label Default",
       "props": [],
       "propDocs": ""
     },
@@ -2982,8 +2931,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / Default",
-      "doc": "Components/Pagination Default",
+      "summary": "Story: New Components/Pagination / Default",
+      "doc": "New Components/Pagination Default",
       "props": [],
       "propDocs": ""
     },
@@ -3022,8 +2971,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / Default",
-      "doc": "Components/Progress Default",
+      "summary": "Story: New Components/Progress / Default",
+      "doc": "New Components/Progress Default",
       "props": [],
       "propDocs": ""
     },
@@ -3062,8 +3011,8 @@
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
       "area": "SecretDots",
-      "summary": "Story: Components/SecretDots / Default",
-      "doc": "Components/SecretDots Default",
+      "summary": "Story: New Components/SecretDots / Default",
+      "doc": "New Components/SecretDots Default",
       "props": [],
       "propDocs": ""
     },
@@ -3152,8 +3101,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / Default",
-      "doc": "Components/Stepper Default",
+      "summary": "Story: New Components/Stepper / Default",
+      "doc": "New Components/Stepper Default",
       "props": [],
       "propDocs": ""
     },
@@ -3384,10 +3333,7 @@
       "area": "_internal",
       "summary": "DeprecationBanner component Displays a warning banner for deprecated components in Storybook.",
       "doc": "DeprecationBanner component Displays a warning banner for deprecated components in Storybook. This component is for internal use in Storybook stories only.",
-      "props": [
-        "componentName",
-        "deprecationInfo"
-      ],
+      "props": ["componentName", "deprecationInfo"],
       "propDocs": "Name of the deprecated component Deprecation information"
     },
     {
@@ -3485,8 +3431,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / Dialog",
-      "doc": "Components/Command Dialog",
+      "summary": "Story: New Components/Command / Dialog",
+      "doc": "New Components/Command Dialog",
       "props": [],
       "propDocs": ""
     },
@@ -3555,11 +3501,7 @@
       "area": "Dialog",
       "summary": "DialogFooter - container for action buttons.",
       "doc": "DialogFooter - container for action buttons.",
-      "props": [
-        "children",
-        "align",
-        "divider"
-      ],
+      "props": ["children", "align", "divider"],
       "propDocs": "How the footer arranges what is in it. `end` puts everything on the right - Cancel then the primary, the rhythm of a decision. `between` pushes the first child to the left and the rest to the right, which is what a step back, a support link or a \"having a problem?\" wants: quiet on one side, the way forward on the other. Draws the rule above it. On by default, because the product always has one. The footer is the only part of a dialog that is separated by a line - the header flows into the body without one. That asymmetry is deliberate: a line above the buttons says \"the reading is over, now decide\"."
     },
     {
@@ -3569,13 +3511,7 @@
       "area": "Dialog",
       "summary": "",
       "doc": "",
-      "props": [
-        "children",
-        "onBack",
-        "backLabel",
-        "counter",
-        "tabs"
-      ],
+      "props": ["children", "onBack", "backLabel", "counter", "tabs"],
       "propDocs": "A way back, shown as an arrow before the title. For a dialog that is one step of something - the second page of a wizard, a detail view opened from a list inside the same dialog. **Not a way out**: the close button is that, and a dialog with two exits that do different things has to make the difference visible, which is why this one is an arrow on the left and close is a cross on the right. What the back control is called. Say where it goes, not that it goes. Where you are, as words - `2 of 5`. For a wizard too long to draw a step strip for, or one whose steps have no names worth showing. With `DialogSteps` above, this is repeating what the strip already says; use one or the other. A row of tabs belonging to this header. Rendered under the title and description, inside the header block, so it stays put when the body scrolls. Tabs that scrolled away with the content would leave somebody unable to switch back without scrolling up."
     },
     {
@@ -3585,9 +3521,7 @@
       "area": "Dialog",
       "summary": "DialogMedia - a picture across the top of a dialog.",
       "doc": "DialogMedia - a picture across the top of a dialog. **The one region with no gutter.** A product shot inset by 16px reads as a picture someone placed in a dialog; the same shot reaching both edges reads as the dialog's own. Every other region pads its contents - this one exists precisely not to. Sits above the header, and rounds its own top corners to match the card it is filling. Below `sm` the dialog is square, so this is too. ```tsx <DialogMedia> <img src={shot} alt=\"\" className=\"mdt-h-40 mdt-w-full mdt-object-cover\" /> </DialogMedia> ```",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": ""
     },
     {
@@ -3627,12 +3561,7 @@
       "area": "Dialog",
       "summary": "DialogSteps - where you are in a dialog that has more than one part.",
       "doc": "DialogSteps - where you are in a dialog that has more than one part. **A preset of `Stepper`, not a second one.** It draws `Stepper`'s `underline` layout, seats it in the dialog's gutter, and stops it shrinking when the body scrolls. Everything about *how a step looks* - the filled disc for settled and the outlined one for live, the tick that replaces the number once a step is behind you, the dash for skipped, the states worked out from `current` - is `Stepper`'s and is the same here as anywhere else in the library. It was briefly its own implementation. Two answers to one question is a defect: the tick would have been fixed in one of them and not the other, and nobody would have known which they were looking at. **The bar under each step is the progress, not a connector between dots.** A row of circles joined by a line says \"these are stations on a route\"; a row of underlined labels says \"these are the parts, and you have done this many\" - which is the question somebody halfway through a form is actually asking. **It forwards no ref**, because `Stepper` takes none - it keeps one of its own to measure with. Nothing needed one; said here so the absence is a decision rather than an o",
-      "props": [
-        "steps",
-        "current",
-        "onStepSelect",
-        "label"
-      ],
+      "props": ["steps", "current", "onStepSelect", "label"],
       "propDocs": "The parts, in order. Which one you are on, zero-based. Everything before it counts as done. Lets a finished step be gone back to. Omit it and none are clickable. Only steps already passed. Jumping ahead to one whose inputs depend on a step you have not filled in is how a form ends up half-complete in an order nobody designed for. The list's accessible name. @default 'Progress'"
     },
     {
@@ -3642,9 +3571,7 @@
       "area": "Dialog",
       "summary": "DialogTitle - the title of the dialog.",
       "doc": "DialogTitle - the title of the dialog.",
-      "props": [
-        "tag"
-      ],
+      "props": ["tag"],
       "propDocs": "A short status beside the title - `Guest`, `Beta`, `Draft`. Passed rather than written inline so the title knows it is there: a tag makes the line taller, and the gap to the description is tightened by 2px to match. A `<Badge>` written straight into `children` looks identical and leaves the spacing wrong."
     },
     {
@@ -3692,8 +3619,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / Disabled",
-      "doc": "Components/Combobox Disabled",
+      "summary": "Story: New Components/Combobox / Disabled",
+      "doc": "New Components/Combobox Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -3772,8 +3699,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / Disabled",
-      "doc": "Components/Pagination Disabled",
+      "summary": "Story: New Components/Pagination / Disabled",
+      "doc": "New Components/Pagination Disabled",
       "props": [],
       "propDocs": ""
     },
@@ -4034,10 +3961,7 @@
       "area": "DropdownMenu",
       "summary": "DropdownMenuItem - single menu item",
       "doc": "DropdownMenuItem - single menu item",
-      "props": [
-        "inset",
-        "variant"
-      ],
+      "props": ["inset", "variant"],
       "propDocs": "Whether to apply inset padding A destructive action (Delete, Revoke, Remove, Cancel) reads red-60 and takes the danger wash under the pointer - the text and its glyph stay red. Never colour a destructive item through className."
     },
     {
@@ -4047,9 +3971,7 @@
       "area": "DropdownMenu",
       "summary": "DropdownMenuLabel - label for a group of items",
       "doc": "DropdownMenuLabel - label for a group of items",
-      "props": [
-        "inset"
-      ],
+      "props": ["inset"],
       "propDocs": "Whether to apply inset padding"
     },
     {
@@ -4129,9 +4051,7 @@
       "area": "DropdownMenu",
       "summary": "DropdownMenuSubTrigger - trigger for opening a submenu",
       "doc": "DropdownMenuSubTrigger - trigger for opening a submenu",
-      "props": [
-        "inset"
-      ],
+      "props": ["inset"],
       "propDocs": "Whether to apply inset padding"
     },
     {
@@ -4173,8 +4093,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / EdgeCases",
-      "doc": "Components/Progress EdgeCases",
+      "summary": "Story: New Components/Progress / EdgeCases",
+      "doc": "New Components/Progress EdgeCases",
       "props": [],
       "propDocs": ""
     },
@@ -4275,12 +4195,7 @@
       "area": "EmptyState",
       "summary": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table.",
       "doc": "EmptyState - an icon tile, a title, one muted line and an optional action, centred, for an empty list anywhere outside a table. It is a status: the words change as a search or a filter empties the list, so a screen reader hears \"No people match\" without moving to it. Override `role` where the state is the only thing on a page that will never change. ```tsx <EmptyState icon=\"users\" title=\"No members yet\" description=\"Add people to give them this team's access.\" /> <EmptyState icon=\"search\" title=\"No people match\" description=\"Nothing here matches the search.\" action={<Button variant=\"outline\" size=\"sm\" onClick={clear}>Clear search</Button>} /> ```",
-      "props": [
-        "icon",
-        "title",
-        "description",
-        "action"
-      ],
+      "props": ["icon", "title", "description", "action"],
       "propDocs": "The glyph in the tile: an icon name from the library's set, or a node of your own. Defaults to `inbox`, as the console's block did. A node is drawn at the tile's 18px whatever size it asks for, so a glyph from another set lands the same as a named one. The headline - what is empty. No full stop (Pranjal, 2026-10-11). One muted line under the title: why it is empty, or what fills it. Optional - \"No attributes tracked yet\" needs nothing more. One control under the text, usually a `Button` - \"Clear search\", \"All organizations\". The console's pages pass an outline or secondary button at `sm`; the state does not pick it for them."
     },
     {
@@ -4288,8 +4203,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / EmptyState",
-      "doc": "Components/Combobox EmptyState",
+      "summary": "Story: New Components/Combobox / EmptyState",
+      "doc": "New Components/Combobox EmptyState",
       "props": [],
       "propDocs": ""
     },
@@ -4338,8 +4253,8 @@
       "kind": "story",
       "file": "src/components/Kbd/Kbd.stories.tsx",
       "area": "Kbd",
-      "summary": "Story: Components/Kbd / Every",
-      "doc": "Components/Kbd Every",
+      "summary": "Story: New Components/Kbd / Every",
+      "doc": "New Components/Kbd Every",
       "props": [],
       "propDocs": ""
     },
@@ -4358,8 +4273,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / EveryFailure",
-      "doc": "Components/Upload EveryFailure",
+      "summary": "Story: New Components/Upload / EveryFailure",
+      "doc": "New Components/Upload EveryFailure",
       "props": [],
       "propDocs": ""
     },
@@ -4418,8 +4333,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / FieldError",
-      "doc": "Components/Upload FieldError",
+      "summary": "Story: New Components/Upload / FieldError",
+      "doc": "New Components/Upload FieldError",
       "props": [],
       "propDocs": ""
     },
@@ -4518,8 +4433,8 @@
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
       "area": "SecretDots",
-      "summary": "Story: Components/SecretDots / FixedLength",
-      "doc": "Components/SecretDots FixedLength",
+      "summary": "Story: New Components/SecretDots / FixedLength",
+      "doc": "New Components/SecretDots FixedLength",
       "props": [],
       "propDocs": ""
     },
@@ -4570,10 +4485,7 @@
       "area": "Form",
       "summary": "Form component that wraps form elements with consistent styling and behavior.",
       "doc": "Form component that wraps form elements with consistent styling and behavior. ```tsx <Form onSubmit={handleSubmit}> <FormField> <FormLabel>Email</FormLabel> <Input type=\"email\" /> </FormField> </Form> ```",
-      "props": [
-        "children",
-        "onSubmit"
-      ],
+      "props": ["children", "onSubmit"],
       "propDocs": "Content to display inside the form Form submit handler"
     },
     {
@@ -4663,9 +4575,7 @@
       "area": "Form",
       "summary": "FormControl component that wraps form input elements.",
       "doc": "FormControl component that wraps form input elements. Provides consistent spacing and styling for form controls. ```tsx <FormControl> <Input type=\"email\" /> </FormControl> ```",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Form control element (Input, Select, etc.)"
     },
     {
@@ -4675,9 +4585,7 @@
       "area": "Form",
       "summary": "FormDescription component for displaying descriptive text for form fields.",
       "doc": "FormDescription component for displaying descriptive text for form fields. ```tsx // Default description <FormDescription> This is your public display name. </FormDescription> // Info description <FormDescription color=\"info\"> Your password must be at least 8 characters. </FormDescription> // Warning description <FormDescription color=\"warning\"> This action cannot be undone. </FormDescription> ```",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the description"
     },
     {
@@ -4727,9 +4635,7 @@
       "area": "Form",
       "summary": "FormField component that wraps individual form fields with consistent spacing.",
       "doc": "FormField component that wraps individual form fields with consistent spacing. ```tsx <FormField> <FormLabel>Username</FormLabel> <Input /> <FormMessage error=\"Username is required\" /> </FormField> ```",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the form field"
     },
     {
@@ -4759,10 +4665,7 @@
       "area": "Form",
       "summary": "FormLabel component for form field labels with optional required indicator.",
       "doc": "FormLabel component for form field labels with optional required indicator. ```tsx // Normal label (default) <FormLabel htmlFor=\"email\">Email Address</FormLabel> // Bold label <FormLabel htmlFor=\"name\" weight=\"bold\">Full Name</FormLabel> // Required label <FormLabel htmlFor=\"password\" required>Password</FormLabel> // Custom color <FormLabel htmlFor=\"info\" color=\"muted\">Optional Field</FormLabel> ```",
-      "props": [
-        "children",
-        "required"
-      ],
+      "props": ["children", "required"],
       "propDocs": "Content to display inside the label Whether the field is required (shows asterisk)"
     },
     {
@@ -4792,10 +4695,7 @@
       "area": "Form",
       "summary": "FormMessage component for displaying error messages and helper text.",
       "doc": "FormMessage component for displaying error messages and helper text. ```tsx // Error message (auto-destructive color) <FormMessage error=\"Email is required\" /> // Helper text <FormMessage>Enter your email address</FormMessage> // Success message <FormMessage color=\"success\">Email is valid</FormMessage> // Warning message <FormMessage color=\"warning\">Password is weak</FormMessage> ```",
-      "props": [
-        "children",
-        "error"
-      ],
+      "props": ["children", "error"],
       "propDocs": "Content to display inside the message Error message to display (takes precedence over children)"
     },
     {
@@ -4883,8 +4783,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / FullWidth",
-      "doc": "Components/ButtonGroup FullWidth",
+      "summary": "Story: New Components/ButtonGroup / FullWidth",
+      "doc": "New Components/ButtonGroup FullWidth",
       "props": [],
       "propDocs": ""
     },
@@ -4993,8 +4893,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / GoingBack",
-      "doc": "Components/Stepper GoingBack",
+      "summary": "Story: New Components/Stepper / GoingBack",
+      "doc": "New Components/Stepper GoingBack",
       "props": [],
       "propDocs": ""
     },
@@ -5103,8 +5003,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / HeaderBodyFooter",
-      "doc": "Components/Card HeaderBodyFooter",
+      "summary": "Story: New Components/Card / HeaderBodyFooter",
+      "doc": "New Components/Card HeaderBodyFooter",
       "props": [],
       "propDocs": ""
     },
@@ -5195,13 +5095,7 @@
       "area": "HoverCard",
       "summary": "HoverCard root component - controls open/close state.",
       "doc": "HoverCard root component - controls open/close state. ```tsx <HoverCard> <HoverCardTrigger>Hover me</HoverCardTrigger> <HoverCardContent> Content shown on hover </HoverCardContent> </HoverCard> ```",
-      "props": [
-        "defaultOpen",
-        "open",
-        "onOpenChange",
-        "openDelay",
-        "closeDelay"
-      ],
+      "props": ["defaultOpen", "open", "onOpenChange", "openDelay", "closeDelay"],
       "propDocs": "The open state of the hover card when it is initially rendered. Use when you do not need to control its open state. The controlled open state of the hover card. Must be used in conjunction with onOpenChange. Event handler called when the open state of the hover card changes. The duration from when the mouse enters the trigger until the hover card opens. The duration from when the mouse leaves the trigger until the hover card closes."
     },
     {
@@ -5211,11 +5105,7 @@
       "area": "HoverCard",
       "summary": "HoverCardArrow - an optional arrow element to render alongside the hover card content.",
       "doc": "HoverCardArrow - an optional arrow element to render alongside the hover card content. ```tsx <HoverCardContent> <HoverCardArrow /> <p>Content with arrow</p> </HoverCardContent> ```",
-      "props": [
-        "className",
-        "width",
-        "height"
-      ],
+      "props": ["className", "width", "height"],
       "propDocs": "Additional CSS class names The width of the arrow in pixels. The height of the arrow in pixels."
     },
     {
@@ -5256,10 +5146,7 @@
       "area": "HoverCard",
       "summary": "HoverCardTrigger - element that triggers the hover card.",
       "doc": "HoverCardTrigger - element that triggers the hover card.",
-      "props": [
-        "children",
-        "asChild"
-      ],
+      "props": ["children", "asChild"],
       "propDocs": "Content to render inside the trigger Change the default rendered element for the one passed as a child, merging their props and behavior."
     },
     {
@@ -5267,8 +5154,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / HowManySteps",
-      "doc": "Components/Stepper HowManySteps",
+      "summary": "Story: New Components/Stepper / HowManySteps",
+      "doc": "New Components/Stepper HowManySteps",
       "props": [],
       "propDocs": ""
     },
@@ -5317,8 +5204,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / IconButtons",
-      "doc": "Components/ButtonGroup IconButtons",
+      "summary": "Story: New Components/ButtonGroup / IconButtons",
+      "doc": "New Components/ButtonGroup IconButtons",
       "props": [],
       "propDocs": ""
     },
@@ -5327,8 +5214,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / IconGallery",
-      "doc": "Components/Icon IconGallery",
+      "summary": "Story: New Components/Icon / IconGallery",
+      "doc": "New Components/Icon IconGallery",
       "props": [],
       "propDocs": ""
     },
@@ -5447,8 +5334,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / InAForm",
-      "doc": "Components/Upload InAForm",
+      "summary": "Story: New Components/Upload / InAForm",
+      "doc": "New Components/Upload InAForm",
       "props": [],
       "propDocs": ""
     },
@@ -5467,8 +5354,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / InANarrowColumn",
-      "doc": "Components/Stepper InANarrowColumn",
+      "summary": "Story: New Components/Stepper / InANarrowColumn",
+      "doc": "New Components/Stepper InANarrowColumn",
       "props": [],
       "propDocs": ""
     },
@@ -5507,8 +5394,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / InAWizard",
-      "doc": "Components/Stepper InAWizard",
+      "summary": "Story: New Components/Stepper / InAWizard",
+      "doc": "New Components/Stepper InAWizard",
       "props": [],
       "propDocs": ""
     },
@@ -5517,8 +5404,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / InButtons",
-      "doc": "Components/Icon InButtons",
+      "summary": "Story: New Components/Icon / InButtons",
+      "doc": "New Components/Icon InButtons",
       "props": [],
       "propDocs": ""
     },
@@ -5547,8 +5434,8 @@
       "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
-      "summary": "Story: Components/Label / InContext",
-      "doc": "Components/Label InContext",
+      "summary": "Story: New Components/Label / InContext",
+      "doc": "New Components/Label InContext",
       "props": [],
       "propDocs": ""
     },
@@ -5557,8 +5444,8 @@
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
       "area": "SecretDots",
-      "summary": "Story: Components/SecretDots / InContext",
-      "doc": "Components/SecretDots InContext",
+      "summary": "Story: New Components/SecretDots / InContext",
+      "doc": "New Components/SecretDots InContext",
       "props": [],
       "propDocs": ""
     },
@@ -5599,16 +5486,7 @@
       "area": "InfoTip",
       "summary": "InfoTip - the ⓘ beside a heading or a label.",
       "doc": "InfoTip - the ⓘ beside a heading or a label. Its explainer opens on hover, on keyboard focus and on a press, in the library Tooltip, optionally with a \"Learn more\" link. ```tsx <InfoTip label=\"About Security policy\">Applies to every user in this organization.</InfoTip> <InfoTip label=\"About SCIM\" learnMore={{ href: '/docs/scim', newTab: true }}> Your identity provider creates, updates and removes users here. </InfoTip> ```",
-      "props": [
-        "label",
-        "children",
-        "learnMore",
-        "side",
-        "align",
-        "maxWidth",
-        "icon",
-        "className"
-      ],
+      "props": ["label", "children", "learnMore", "side", "align", "maxWidth", "icon", "className"],
       "propDocs": "The ⓘ's accessible name: \"About Security policy\". Required - nothing else names it. The explainer. Sentences read from the left. A link at the foot of the explainer. The pointer can travel into the bubble to reach it; from the keyboard, Tab on the open ⓘ moves into it. Which side of the ⓘ the explainer opens on. Near a screen edge it flips by itself. Where along the ⓘ the explainer sits. The widest the explainer grows before it wraps. Another glyph in place of the filled ⓘ, with the same explainer - a warning triangle, say."
     },
     {
@@ -5676,8 +5554,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / InListItems",
-      "doc": "Components/Icon InListItems",
+      "summary": "Story: New Components/Icon / InListItems",
+      "doc": "New Components/Icon InListItems",
       "props": [],
       "propDocs": ""
     },
@@ -5767,9 +5645,7 @@
       "area": "InputGroup",
       "summary": "InputGroup - Container for inputs with addons",
       "doc": "InputGroup - Container for inputs with addons",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "InputGroupInput with optional InputGroupAddon components"
     },
     {
@@ -5777,8 +5653,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / InputGroup",
-      "doc": "Components/ButtonGroup InputGroup",
+      "summary": "Story: New Components/ButtonGroup / InputGroup",
+      "doc": "New Components/ButtonGroup InputGroup",
       "props": [],
       "propDocs": ""
     },
@@ -5789,10 +5665,7 @@
       "area": "InputGroup",
       "summary": "InputGroupAddon - Wrapper for icons (positioned absolutely inside input)",
       "doc": "InputGroupAddon - Wrapper for icons (positioned absolutely inside input)",
-      "props": [
-        "children",
-        "align"
-      ],
+      "props": ["children", "align"],
       "propDocs": "Content to display in the addon (icon, text, button, etc.) Alignment position of the addon - inline-start: Before the input (left side) - inline-end: After the input (right side) - block-start: Above the input - block-end: Below the input"
     },
     {
@@ -5802,10 +5675,7 @@
       "area": "InputGroup",
       "summary": "InputGroupButton - Button addon (attached to input border)",
       "doc": "InputGroupButton - Button addon (attached to input border)",
-      "props": [
-        "children",
-        "align"
-      ],
+      "props": ["children", "align"],
       "propDocs": "Button content Alignment position"
     },
     {
@@ -5825,10 +5695,7 @@
       "area": "InputGroup",
       "summary": "InputGroupText - Text addon (attached to input border)",
       "doc": "InputGroupText - Text addon (attached to input border)",
-      "props": [
-        "children",
-        "align"
-      ],
+      "props": ["children", "align"],
       "propDocs": "Text content to display Alignment position"
     },
     {
@@ -6035,14 +5902,7 @@
       "area": "Item",
       "summary": "Nothing in this library has ever used it, and the rows that do exist — the dropdown's, the command palette's, the table's — each build their own.",
       "doc": "Nothing in this library has ever used it, and the rows that do exist — the dropdown's, the command palette's, the table's — each build their own. A general-purpose row that no specific row is built from is a fifth way to do the thing, not the one way. Item component - a flexible list item for menus, dropdowns, and lists. ```tsx <Item> <UserIcon /> <span>Profile</span> </Item> ```",
-      "props": [
-        "icon",
-        "label",
-        "description",
-        "disabled",
-        "active",
-        "onClick"
-      ],
+      "props": ["icon", "label", "description", "disabled", "active", "onClick"],
       "propDocs": "Icon to display before the label Main label text Secondary description text Whether the item is disabled Whether the item is currently active/selected Click handler"
     },
     {
@@ -6091,8 +5951,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / KeepsItsOwnList",
-      "doc": "Components/Upload KeepsItsOwnList",
+      "summary": "Story: New Components/Upload / KeepsItsOwnList",
+      "doc": "New Components/Upload KeepsItsOwnList",
       "props": [],
       "propDocs": ""
     },
@@ -6147,14 +6007,7 @@
       "area": "KpiCard",
       "summary": "Recent readings as bars, with a base line and a threshold line in the danger colour.",
       "doc": "Recent readings as bars, with a base line and a threshold line in the danger colour.",
-      "props": [
-        "values",
-        "base",
-        "threshold",
-        "baseLabel",
-        "thresholdLabel",
-        "label"
-      ],
+      "props": ["values", "base", "threshold", "baseLabel", "thresholdLabel", "label"],
       "propDocs": "Six or so recent readings, oldest first. The base line. The threshold line, drawn in the danger colour.   Spoken description."
     },
     {
@@ -6174,13 +6027,7 @@
       "area": "KpiCard",
       "summary": "A half ring: a share of a limit, the percent inside, a caption under it.",
       "doc": "A half ring: a share of a limit, the percent inside, a caption under it. `shape=\"ring\"` draws the full health ring.",
-      "props": [
-        "percent",
-        "caption",
-        "label",
-        "shape",
-        "bad"
-      ],
+      "props": ["percent", "caption", "label", "shape", "bad"],
       "propDocs": "0 to 100. The word under the number: \"capacity\". Drawn by the half gauge only; the ring only speaks it. Spoken description; defaults to \"<percent>% <caption>\". `half`: 104 × 62 in the neutral ladder, for a KpiCard's chart area. `ring`: the console Overview's health ring, 150 × 150, in the success green; a thin outer ring at 100%. Ring only: the fill in the danger colour instead of the success green. @default false"
     },
     {
@@ -6190,15 +6037,7 @@
       "area": "KpiCard",
       "summary": "KpiStrip - the row that holds KpiCards.",
       "doc": "KpiStrip - the row that holds KpiCards. Every card keeps its floor, they grow evenly until the row is full, and past the fit the row scrolls sideways instead of squeezing. It bleeds through the page's side margin so a cut card is cut at the page edge. Reachable by keyboard; arrow keys scroll it.",
-      "props": [
-        "children",
-        "inset",
-        "gap",
-        "label",
-        "snap",
-        "className",
-        "style"
-      ],
+      "props": ["children", "inset", "gap", "label", "snap", "className", "style"],
       "propDocs": "The page's side margin the strip bleeds through, so a cut card is cut at the page edge. @default 24  Spoken name of the row (\"Key figures\"). Scrolling stops on a card's left edge. @default false"
     },
     {
@@ -6286,8 +6125,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / Large",
-      "doc": "Components/Pagination Large",
+      "summary": "Story: New Components/Pagination / Large",
+      "doc": "New Components/Pagination Large",
       "props": [],
       "propDocs": ""
     },
@@ -6306,8 +6145,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / LargeDataset",
-      "doc": "Components/Combobox LargeDataset",
+      "summary": "Story: New Components/Combobox / LargeDataset",
+      "doc": "New Components/Combobox LargeDataset",
       "props": [],
       "propDocs": ""
     },
@@ -6316,8 +6155,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / Layouts",
-      "doc": "Components/Stepper Layouts",
+      "summary": "Story: New Components/Stepper / Layouts",
+      "doc": "New Components/Stepper Layouts",
       "props": [],
       "propDocs": ""
     },
@@ -6393,11 +6232,7 @@
       "area": "LeftNavOld",
       "summary": "The part that scrolls, and the only part that changes with the level.",
       "doc": "The part that scrolls, and the only part that changes with the level. **It does not animate the move, and `level` is not doing it secretly.** The first version keyed the inner element on the level, on the assumption that a changed key remounts the subtree and restarts a CSS animation. It does not: measured, React reuses the same DOM node and swaps the contents, so the key bought nothing and the comment explaining it was false. `level` is published as `data-level` instead. A product that wants the panel to slide can drive it from there, where the mechanism is visible rather than implied by a prop that appears to do it.",
-      "props": [
-        "level",
-        "direction",
-        "viewKey"
-      ],
+      "props": ["level", "direction", "viewKey"],
       "propDocs": "Which level is showing. Published as `data-level`, and nothing else. The component does not animate the move. A product that wants it to can hang a transition off `data-level`, where the mechanism is visible. Which way the last move went, from `useLeftNavLevels`. Drives an 8px slip in the direction of travel. Omit it and the list simply appears, which is what a panel that never changes level should do. A name for the view being shown, so React remounts on a change. `level` is not enough on its own: moving between two second-level sections leaves it at 2, and without a remount the animation never replays. `useLeftNavLevels` reports one as `viewKey`."
     },
     {
@@ -6407,10 +6242,7 @@
       "area": "LeftNavOld",
       "summary": "The way out of settings, back to the app.",
       "doc": "The way out of settings, back to the app. **A white disc on a grey panel.** Nothing else in the navigation looks like this: the rows are flat, and this one is a raised object sitting on the surface. That is what separates it from the section back further down - not a different label, a different physics. **A house, not an arrow.** An arrow means \"one step back\" and the section header uses one; a house means the place you started, which is where this actually goes. And it names the destination - \"Go to home\" - because a bare \"Back\" would be the same sentence as the control below it.",
-      "props": [
-        "href",
-        "children"
-      ],
+      "props": ["href", "children"],
       "propDocs": "Where it goes. An anchor with one, a button without. The same rule `PaginationLink` follows: leaving settings is usually a real address worth opening in a new tab, and sometimes it is a router call. What it says. Names the destination, never just \"Back\". @default 'Back to app'"
     },
     {
@@ -6420,13 +6252,7 @@
       "area": "LeftNavOld",
       "summary": "One setting that has pages of its own, folding open in place.",
       "doc": "One setting that has pages of its own, folding open in place. **This is the collapsing thing, not the group heading.** The distinction is the whole point: a group heading labels a run of unrelated settings, while this is one setting whose pages belong to it. Folding the first hides the map; folding the second hides detail you asked for. **A chevron that turns, not one that points sideways.** `LeftNavItem`'s trailing `chevron-right` means \"this opens a second level and the panel will move\". This one points down and rotates, which everywhere else in software means \"this opens underneath\". Two different promises need two different glyphs, or the panel becomes a guessing game.",
-      "props": [
-        "icon",
-        "label",
-        "defaultOpen",
-        "open",
-        "onOpenChange"
-      ],
+      "props": ["icon", "label", "defaultOpen", "open", "onOpenChange"],
       "propDocs": "The glyph on the trigger row. The setting's name. Whether it starts open. @default false Controlled open state. Pass `onOpenChange` with it."
     },
     {
@@ -6436,9 +6262,7 @@
       "area": "LeftNavOld",
       "summary": "Pinned to the bottom edge.",
       "doc": "Pinned to the bottom edge. An account row, a plan, an upgrade.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Nothing of its own - a slot pinned to the bottom edge."
     },
     {
@@ -6448,9 +6272,7 @@
       "area": "LeftNavOld",
       "summary": "A labelled block of items.",
       "doc": "A labelled block of items. A heading, and nothing more. **It does not fold.** The first version let the heading collapse its group, which is the wrong thing to hide behind a control: a heading like \"Compute\" is a label for where you are in a list, and collapsing it takes away the map rather than the detail. What people actually want to fold is one *setting* that has pages of its own - see `LeftNavExpandable`. Two collapsing mechanisms in one panel is one too many, so this one lost.",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "The heading above the group. Omit it for an unlabelled block."
     },
     {
@@ -6460,14 +6282,7 @@
       "area": "LeftNavOld",
       "summary": "One row: a page to open, or a section to descend into.",
       "doc": "One row: a page to open, or a section to descend into. **An anchor with an `href`, a button without** - the same rule `PaginationLink` follows, and for the same reason. A settings page is a real address; a section that opens a second level in place is not. `Item` was the obvious thing to reuse and does not fit: it renders a `div` unless clickable, has no `href`, and cannot express `aria-current`. A nav row that cannot say \"you are here\" to a screen reader is not a nav row. Logged in COMPONENT-GAP.md rather than worked around.",
-      "props": [
-        "href",
-        "icon",
-        "active",
-        "hasChildren",
-        "meta",
-        "disabled"
-      ],
+      "props": ["href", "icon", "active", "hasChildren", "meta", "disabled"],
       "propDocs": "Where it goes. An anchor with one, a button without. The glyph. Always an `<Icon>`; never an inline `<svg>`. Whether this is the page being shown. Renders `aria-current=\"page\"`, which is the part a screen reader hears. The grey pill is the part everyone else sees, and one without the other leaves somebody out. Marks the item as opening a second level. Adds the trailing chevron, and says so to a screen reader: this one does not go to a page, it opens a list. Without that they are indistinguishable until you press one. A count or a status, on the trailing edge. A `Badge`, usually. Dims it and stops it responding."
     },
     {
@@ -6477,9 +6292,7 @@
       "area": "LeftNavOld",
       "summary": "LeftNavOld - the navigation down the left of a settings area.",
       "doc": "LeftNavOld - the navigation down the left of a settings area. **Two levels, and never three.** The root lists everything; an item with its own pages opens a second level in place. Anything that would have been a third level is flattened into the second with groups, because depth is where people get lost - three down, \"back\" has to be pressed an unknown number of times and nobody knows where they are. **Leaving and going up are different acts, and look it.** A settings area that has replaced the app's navigation needs a way out, and a second level needs a way up. Two back arrows stacked in one panel is the mistake this component exists to avoid, so they are separated on every axis available: | | `LeftNavExit` | `LeftNavSection` | | --- | --- | --- | | Where | above the search, pinned | below it, in the scrolling body | | Glyph | `arrow-left`, a long arrow | `chevron-left`, one step | | Says | the destination - \"Back to app\" | where you are - \"Observability\" | | Weight | small and muted, chrome | foreground and medium, a heading | | When | always | only at level 2 | The one that leaves is chrome and never moves. The one that goes up is a heading and belongs to the content under it. `",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "The accessible name. Two navigations on one page must be told apart."
     },
     {
@@ -6489,9 +6302,7 @@
       "area": "LeftNavOld",
       "summary": "The search field, pinned under the exit.",
       "doc": "The search field, pinned under the exit. Sticky because a settings menu is long and the thing people do in a long menu is search it. Scrolling back to the top to find the search field is the failure mode; forty rows is exactly where it starts to bite.",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "The accessible name and the placeholder. @default 'Search'"
     },
     {
@@ -6501,11 +6312,7 @@
       "area": "LeftNavOld",
       "summary": "The header of a second level: where you are, and the way back up.",
       "doc": "The header of a second level: where you are, and the way back up. A heading with a chevron, not a button with a label. The title carries the weight because the question it answers is \"what am I looking at\" - the way back is the small part, and it sits inside the heading rather than above it so it cannot be mistaken for the exit two rows up.",
-      "props": [
-        "title",
-        "onBack",
-        "backLabel"
-      ],
+      "props": ["title", "onBack", "backLabel"],
       "propDocs": "The section you are inside. Answers \"where am I\", not \"how do I leave\". Back to the root list. The back control's accessible name. @default 'Back to all settings'"
     },
     {
@@ -6515,11 +6322,7 @@
       "area": "LeftNav",
       "summary": "",
       "doc": "",
-      "props": [
-        "collapsed",
-        "onToggle",
-        "withDivider"
-      ],
+      "props": ["collapsed", "onToggle", "withDivider"],
       "propDocs": ""
     },
     {
@@ -6567,8 +6370,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / LinksOrButtons",
-      "doc": "Components/Pagination LinksOrButtons",
+      "summary": "Story: New Components/Pagination / LinksOrButtons",
+      "doc": "New Components/Pagination LinksOrButtons",
       "props": [],
       "propDocs": ""
     },
@@ -6737,8 +6540,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / LongContent",
-      "doc": "Components/CodeWell LongContent",
+      "summary": "Story: New Components/CodeWell / LongContent",
+      "doc": "New Components/CodeWell LongContent",
       "props": [],
       "propDocs": ""
     },
@@ -6847,8 +6650,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / ManyFiles",
-      "doc": "Components/Upload ManyFiles",
+      "summary": "Story: New Components/Upload / ManyFiles",
+      "doc": "New Components/Upload ManyFiles",
       "props": [],
       "propDocs": ""
     },
@@ -6877,8 +6680,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / Maskable",
-      "doc": "Components/CodeWell Maskable",
+      "summary": "Story: New Components/CodeWell / Maskable",
+      "doc": "New Components/CodeWell Maskable",
       "props": [],
       "propDocs": ""
     },
@@ -7007,8 +6810,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / MixedVariants",
-      "doc": "Components/ButtonGroup MixedVariants",
+      "summary": "Story: New Components/ButtonGroup / MixedVariants",
+      "doc": "New Components/ButtonGroup MixedVariants",
       "props": [],
       "propDocs": ""
     },
@@ -7063,8 +6866,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / MultipleGroups",
-      "doc": "Components/Command MultipleGroups",
+      "summary": "Story: New Components/Command / MultipleGroups",
+      "doc": "New Components/Command MultipleGroups",
       "props": [],
       "propDocs": ""
     },
@@ -7193,8 +6996,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / Navigation",
-      "doc": "Components/Icon Navigation",
+      "summary": "Story: New Components/Icon / Navigation",
+      "doc": "New Components/Icon Navigation",
       "props": [],
       "propDocs": ""
     },
@@ -7503,8 +7306,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / OneFileDone",
-      "doc": "Components/Upload OneFileDone",
+      "summary": "Story: New Components/Upload / OneFileDone",
+      "doc": "New Components/Upload OneFileDone",
       "props": [],
       "propDocs": ""
     },
@@ -7513,8 +7316,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / OneFileFailed",
-      "doc": "Components/Upload OneFileFailed",
+      "summary": "Story: New Components/Upload / OneFileFailed",
+      "doc": "New Components/Upload OneFileFailed",
       "props": [],
       "propDocs": ""
     },
@@ -7523,8 +7326,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / OneFileUploading",
-      "doc": "Components/Upload OneFileUploading",
+      "summary": "Story: New Components/Upload / OneFileUploading",
+      "doc": "New Components/Upload OneFileUploading",
       "props": [],
       "propDocs": ""
     },
@@ -7533,8 +7336,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / OneImage",
-      "doc": "Components/Upload OneImage",
+      "summary": "Story: New Components/Upload / OneImage",
+      "doc": "New Components/Upload OneImage",
       "props": [],
       "propDocs": ""
     },
@@ -7673,8 +7476,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / Padding",
-      "doc": "Components/Card Padding",
+      "summary": "Story: New Components/Card / Padding",
+      "doc": "New Components/Card Padding",
       "props": [],
       "propDocs": ""
     },
@@ -7715,12 +7518,7 @@
       "area": "PageFrame",
       "summary": "B2t / B3 — the band under the hero.",
       "doc": "B2t / B3 — the band under the hero. A page renders exactly ONE of these, never both as sibling bands: the tab band when the page has tabs, the toolbar band when it does not. A page whose surface is a table always carries a toolbar somewhere — the band when it is tab-less, the first row of the surface when it has tabs. The variant is not only a look: the surface below reads it and sets its own inset from it.",
-      "props": [
-        "variant",
-        "children",
-        "end",
-        "className"
-      ],
+      "props": ["variant", "children", "end", "className"],
       "propDocs": "The right-hand group — count, meta, view actions."
     },
     {
@@ -7730,10 +7528,7 @@
       "area": "PageFrame",
       "summary": "PageFrame — the content column, and the only scroll container on the page.",
       "doc": "PageFrame — the content column, and the only scroll container on the page. The rail beside it never scrolls; the page body never scrolls the whole app. Everything pinned is a `position: sticky` child of THIS element, never a nested scroller of its own. It publishes the sticky ladder as custom properties, so a table inside it docks at `--mdt-thead-top` without being told what the bands are. ```tsx <PageFrame> <PageHeader><Breadcrumb /></PageHeader> <PageHero title=\"Users\" actions={<Button>Invite</Button>}> <KpiStrip /> </PageHero> <PageBand variant=\"toolbar\"><Input placeholder=\"Search\" /></PageBand> <PageSurface><Table /></PageSurface> </PageFrame> ```",
-      "props": [
-        "children",
-        "className"
-      ],
+      "props": ["children", "className"],
       "propDocs": ""
     },
     {
@@ -7743,12 +7538,7 @@
       "area": "PageFrame",
       "summary": "B1 — the header band.",
       "doc": "B1 — the header band. 60 tall, pinned at the top, and always rendered: it is the page's fixed anchor even at a depth where the breadcrumb itself is omitted. It carries the breadcrumb and nothing global — global controls live in the navigation rail. It is the one band that keeps a hairline; the bands below it have none.",
-      "props": [
-        "children",
-        "leading",
-        "dockActions",
-        "className"
-      ],
+      "props": ["children", "leading", "dockActions", "className"],
       "propDocs": "The breadcrumb. Omit at depth &lt; 2 — the band still renders. Sits hard against the rail edge, left of the breadcrumb. Render the hero's action cluster here once the hero has scrolled away. On by default; pass `false` for a page whose actions should leave with it."
     },
     {
@@ -7758,15 +7548,7 @@
       "area": "PageFrame",
       "summary": "B2 — the hero band.",
       "doc": "B2 — the hero band. The page's one H1, its optional badge and supporting line, and an action cluster of one to three buttons ordered least to most emphatic. Banners and the KPI strip go in as children, in that order. It is never pinned. Once you are reading the surface, the surface is what should own the screen — but the action cluster is handed to the header band on the way out, so the page's main verbs never leave view.",
-      "props": [
-        "title",
-        "badge",
-        "subtitle",
-        "actions",
-        "icon",
-        "children",
-        "className"
-      ],
+      "props": ["title", "badge", "subtitle", "actions", "icon", "children", "className"],
       "propDocs": "The page's one H1. One to three buttons, least to most emphatic, primary last. Page banners and the KPI strip, in that order."
     },
     {
@@ -7836,11 +7618,7 @@
       "area": "PageFrame",
       "summary": "B4 — the surface section.",
       "doc": "B4 — the surface section. A natural-height stack riding the page scroll, not a scroller of its own. Its inset comes from whichever band is rendered above it, through a CSS sibling rule rather than a prop, so the two cannot drift: 6 above and 20 below under a toolbar band, 16 on both sides under a tab band.",
-      "props": [
-        "children",
-        "under",
-        "className"
-      ],
+      "props": ["children", "under", "className"],
       "propDocs": "Normally left alone: the surface takes its inset from whichever band is actually rendered above it, through a CSS sibling rule, so the two cannot drift apart. Set it only when the band lives outside this frame."
     },
     {
@@ -7858,8 +7636,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Pagination",
-      "doc": "Components/ButtonGroup Pagination",
+      "summary": "Story: New Components/ButtonGroup / Pagination",
+      "doc": "New Components/ButtonGroup Pagination",
       "props": [],
       "propDocs": ""
     },
@@ -7900,11 +7678,7 @@
       "area": "Pagination",
       "summary": "PaginationLink - one page control.",
       "doc": "PaginationLink - one page control. **An anchor with an `href`, a button without one.** Both kinds of pager are real: `/tickets?page=3` is an address worth having - openable in a new tab, bookmarkable, crawlable - while a table that pages in place has nowhere to go, and its controls are state. Rendering an anchor for both is the version of this that looks fine and is not: an `<a>` with no `href` is neither focusable nor announced as a link, one with `href=\"#\"` navigates, and no anchor can be disabled - which a pager needs at both ends. ```tsx <PaginationLink href=\"/tickets?page=2\">2</PaginationLink> <PaginationLink onClick={() => { goTo(2); }} isActive>2</PaginationLink> ```",
-      "props": [
-        "isActive",
-        "href",
-        "disabled"
-      ],
+      "props": ["isActive", "href", "disabled"],
       "propDocs": "Whether this page is currently active Where this page lives. **Its presence decides what gets rendered.** With an `href` this is an anchor, because the page is a real address: it can be opened in a new tab, bookmarked, and read by a crawler. Without one it is a `button`, because the page is component state and there is nowhere to go. The distinction is not cosmetic. An anchor with no `href` is not focusable and not announced as a link; one with `href=\"#\"` navigates. And an anchor cannot be disabled, which is exactly what a pager needs at both ends. Greys the control out and stops it responding. Real on the button; on the anchor it is `aria-disabled` and removal from the tab order, since HTML has no way to disable a link."
     },
     {
@@ -8077,8 +7851,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / PicksItsOwnImage",
-      "doc": "Components/Upload PicksItsOwnImage",
+      "summary": "Story: New Components/Upload / PicksItsOwnImage",
+      "doc": "New Components/Upload PicksItsOwnImage",
       "props": [],
       "propDocs": ""
     },
@@ -8117,8 +7891,8 @@
       "kind": "story",
       "file": "src/components/Kbd/Kbd.stories.tsx",
       "area": "Kbd",
-      "summary": "Story: Components/Kbd / Platform",
-      "doc": "Components/Kbd Platform",
+      "summary": "Story: New Components/Kbd / Platform",
+      "doc": "New Components/Kbd Platform",
       "props": [],
       "propDocs": ""
     },
@@ -8189,11 +7963,7 @@
       "area": "Popover",
       "summary": "",
       "doc": "",
-      "props": [
-        "open",
-        "onOpenChange",
-        "modal"
-      ],
+      "props": ["open", "onOpenChange", "modal"],
       "propDocs": "The controlled open state of the popover Callback when the open state changes The modality of the popover. When set to true, interaction with outside elements will be disabled"
     },
     {
@@ -8233,10 +8003,7 @@
       "area": "Popover",
       "summary": "The floating panel: the overlay surface, 4 under its trigger, 16 of padding, 288 wide unless told otherwise.",
       "doc": "The floating panel: the overlay surface, 4 under its trigger, 16 of padding, 288 wide unless told otherwise.",
-      "props": [
-        "align",
-        "sideOffset"
-      ],
+      "props": ["align", "sideOffset"],
       "propDocs": "The preferred alignment against the trigger The distance in pixels from the trigger"
     },
     {
@@ -8256,11 +8023,7 @@
       "area": "PopoverOld",
       "summary": "PopoverOld root component - controls the open state.",
       "doc": "PopoverOld root component - controls the open state. ```tsx <PopoverOld> <PopoverOldTrigger>Click me</PopoverOldTrigger> <PopoverOldContent>PopoverOld content</PopoverOldContent> </PopoverOld> ```",
-      "props": [
-        "open",
-        "onOpenChange",
-        "modal"
-      ],
+      "props": ["open", "onOpenChange", "modal"],
       "propDocs": "The controlled open state of the popover Callback when the open state changes The modality of the popover. When set to true, interaction with outside elements will be disabled"
     },
     {
@@ -8290,10 +8053,7 @@
       "area": "PopoverOld",
       "summary": "PopoverOldContent - the content container for the popover.",
       "doc": "PopoverOldContent - the content container for the popover. ```tsx <PopoverOldContent> <div>Your content here</div> </PopoverOldContent> ```",
-      "props": [
-        "align",
-        "sideOffset"
-      ],
+      "props": ["align", "sideOffset"],
       "propDocs": "The preferred alignment against the trigger The distance in pixels from the trigger"
     },
     {
@@ -8341,8 +8101,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Primary",
-      "doc": "Components/ButtonGroup Primary",
+      "summary": "Story: New Components/ButtonGroup / Primary",
+      "doc": "New Components/ButtonGroup Primary",
       "props": [],
       "propDocs": ""
     },
@@ -8483,12 +8243,7 @@
       "area": "Radio",
       "summary": "RadioGroup component for managing a group of radio buttons.",
       "doc": "RadioGroup component for managing a group of radio buttons. ```tsx <RadioGroup defaultValue=\"option1\"> <RadioGroupItem value=\"option1\" id=\"r1\"> Option 1 </RadioGroupItem> </RadioGroup> // As a segmented strip <RadioGroup variant=\"segmented\" defaultValue=\"medium\"> <RadioGroupItem value=\"low\">Low</RadioGroupItem> <RadioGroupItem value=\"medium\">Medium</RadioGroupItem> <RadioGroupItem value=\"high\">High</RadioGroupItem> </RadioGroup> ```",
-      "props": [
-        "children",
-        "variant",
-        "size",
-        "fullWidth"
-      ],
+      "props": ["children", "variant", "size", "fullWidth"],
       "propDocs": "Content to display inside the radio group  Segment height, for a segmented group. Segments share the width equally and the strip fills its column, so it lines up with the fields above and below. Only read when `segmented`."
     },
     {
@@ -8498,10 +8253,7 @@
       "area": "Radio",
       "summary": "RadioGroupItem component for individual radio button items.",
       "doc": "RadioGroupItem component for individual radio button items. ```tsx // Default radio <RadioGroupItem value=\"option1\" id=\"r1\" /> // Card variant <RadioGroupItem value=\"option1\" id=\"r1\" variant=\"card\"> <div className=\"flex items-center justify-between\"> <div> <div className=\"font-medium\">Option 1</div> <div className=\"text-sm text-muted-foreground\">Description</div> </div> </div> </RadioGroupItem> // One segment of a segmented group <RadioGroupItem value=\"low\">Low</RadioGroupItem> ```",
-      "props": [
-        "children",
-        "size"
-      ],
+      "props": ["children", "size"],
       "propDocs": "What the item holds: the label of a segment, or the content of a card. Overrides the group's size for this segment alone."
     },
     {
@@ -8559,8 +8311,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / RefusesWhatItShould",
-      "doc": "Components/Upload RefusesWhatItShould",
+      "summary": "Story: New Components/Upload / RefusesWhatItShould",
+      "doc": "New Components/Upload RefusesWhatItShould",
       "props": [],
       "propDocs": ""
     },
@@ -8569,8 +8321,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / RegisteredVsCustom",
-      "doc": "Components/Icon RegisteredVsCustom",
+      "summary": "Story: New Components/Icon / RegisteredVsCustom",
+      "doc": "New Components/Icon RegisteredVsCustom",
       "props": [],
       "propDocs": ""
     },
@@ -8589,8 +8341,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / Required",
-      "doc": "Components/Combobox Required",
+      "summary": "Story: New Components/Combobox / Required",
+      "doc": "New Components/Combobox Required",
       "props": [],
       "propDocs": ""
     },
@@ -8769,8 +8521,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / Resting",
-      "doc": "Components/Upload Resting",
+      "summary": "Story: New Components/Upload / Resting",
+      "doc": "New Components/Upload Resting",
       "props": [],
       "propDocs": ""
     },
@@ -8881,13 +8633,7 @@
       "area": "ScrollArea",
       "summary": "ScrollArea - A custom scrollable area with styled scrollbars.",
       "doc": "ScrollArea - A custom scrollable area with styled scrollbars. Built on top of Radix UI ScrollArea primitive. ```tsx <ScrollArea className=\"h-[200px] w-[350px] rounded-md border p-4\"> <div>Long content here...</div> </ScrollArea> ```",
-      "props": [
-        "children",
-        "orientation",
-        "type",
-        "scrollHideDelay",
-        "dir"
-      ],
+      "props": ["children", "orientation", "type", "scrollHideDelay", "dir"],
       "propDocs": "Content to be rendered inside the scroll area Scrollbar orientation The type of scrollbar to use - \"auto\": Scrollbars are visible when content is overflowing - \"always\": Scrollbars are always visible - \"scroll\": Scrollbars are visible when scrolling - \"hover\": Scrollbars are visible on hover The delay in milliseconds before scrollbars are hidden (for type=\"scroll\" or \"hover\") The direction of the scroll area"
     },
     {
@@ -8907,9 +8653,7 @@
       "area": "ScrollArea",
       "summary": "ScrollAreaViewport - The viewport element for the scroll area.",
       "doc": "ScrollAreaViewport - The viewport element for the scroll area. Use when you need more control over the viewport styling.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to be rendered inside the viewport"
     },
     {
@@ -8919,9 +8663,7 @@
       "area": "ScrollArea",
       "summary": "ScrollBar - The scrollbar element.",
       "doc": "ScrollBar - The scrollbar element. Can be used for both vertical and horizontal scrolling.",
-      "props": [
-        "orientation"
-      ],
+      "props": ["orientation"],
       "propDocs": "Scrollbar orientation"
     },
     {
@@ -9082,14 +8824,7 @@
       "area": "SelectableCard",
       "summary": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set.",
       "doc": "SelectableCardGroup - a set of option cards: a radio set (one answer, the arrows move it) or a checkbox set. <SelectableCardGroup value={mode} onValueChange={setMode} aria-labelledby=\"mode-label\"> <SelectableCard value=\"replace\" title=\"Replace with an existing profile\" description=\"…\" /> <SelectableCard value=\"remove\" title=\"Remove without replacement\" description=\"…\" /> </SelectableCardGroup>",
-      "props": [
-        "type",
-        "value",
-        "onValueChange",
-        "layout",
-        "columns",
-        "disabled"
-      ],
+      "props": ["type", "value", "onValueChange", "layout", "columns", "disabled"],
       "propDocs": " The chosen card's `value` in a radio set. Called with the picked card's `value` in a radio set.  A grid of 2 to 5 columns. Unset, the grid fits as many 220px columns as it can, and tiles sit five to a row. Holds every card in the set."
     },
     {
@@ -9177,8 +8912,8 @@
       "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
-      "summary": "Story: Components/Label / Semantics",
-      "doc": "Components/Label Semantics",
+      "summary": "Story: New Components/Label / Semantics",
+      "doc": "New Components/Label Semantics",
       "props": [],
       "propDocs": ""
     },
@@ -9187,8 +8922,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Separated",
-      "doc": "Components/ButtonGroup Separated",
+      "summary": "Story: New Components/ButtonGroup / Separated",
+      "doc": "New Components/ButtonGroup Separated",
       "props": [],
       "propDocs": ""
     },
@@ -9199,12 +8934,7 @@
       "area": "Separator",
       "summary": "Separator component for visually dividing content.",
       "doc": "Separator component for visually dividing content. ```tsx // Horizontal separator <Separator /> // Vertical separator <Separator orientation=\"vertical\" /> // Dashed separator with spacing <Separator variant=\"dashed\" spacing=\"md\" /> // Thick separator <Separator thickness=\"thick\" /> // With label (centered) <Separator label=\"OR\" /> // With label (left aligned) <Separator label=\"Continue with\" labelPosition=\"left\" /> // With custom label styling <Separator label=\"OR\" labelClassName=\"font-bold text-primary\" /> ```",
-      "props": [
-        "decorative",
-        "label",
-        "labelPosition",
-        "labelClassName"
-      ],
+      "props": ["decorative", "label", "labelPosition", "labelClassName"],
       "propDocs": "Whether the separator is purely decorative When true, uses role=\"none\", otherwise role=\"separator\" Label to display on the separator (e.g., \"OR\", \"Continue with\") When provided, the separator will be split with the label in between Position of the label on the separator Custom className for the label element"
     },
     {
@@ -9222,8 +8952,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / ServerSideFiltering",
-      "doc": "Components/Combobox ServerSideFiltering",
+      "summary": "Story: New Components/Combobox / ServerSideFiltering",
+      "doc": "New Components/Combobox ServerSideFiltering",
       "props": [],
       "propDocs": ""
     },
@@ -9344,10 +9074,7 @@
       "area": "Sheet",
       "summary": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both).",
       "doc": "SheetBand - the full-bleed strip directly under the drawer header, for level-3 tabs OR a stepper (never both). Pinned: it does not scroll with the body. THE HAIRLINE UNDER THE BAND IS THE BAND'S CALL (Pranjal, 2026-09-25): \"when we are using underline steppers variant we dont need a bottom border in sidedrawers only for non underline stepper variants we will be using the bottom border.\" The line is drawn, and taken away when the band holds the underline stepper - its own bars are the line - or a tab strip that carries its own hairline (one line, never two), however deep the caller wrapped it. Tabs without their hairline, an identity strip and the compact progress stepper keep it. `hairline={false}` switches it off for any other reason. A stepper wraps itself in 12 of vertical padding (`mdt-py-3`) in the band, as the console's StepsBand does.",
-      "props": [
-        "children",
-        "hairline"
-      ],
+      "props": ["children", "hairline"],
       "propDocs": "The hairline under the band. `true` lets the band decide: the line is drawn, except when the band holds the underline stepper or a tab strip with its own hairline. `false` switches it off for any other band that wants no line."
     },
     {
@@ -9357,9 +9084,7 @@
       "area": "Sheet",
       "summary": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls.",
       "doc": "SheetBody - the drawer frame's content: everything between the header (and band) and the footer, and the only part that scrolls. 20 above and below, the frame's inset at the sides.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": ""
     },
     {
@@ -9409,11 +9134,7 @@
       "area": "Sheet",
       "summary": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right.",
       "doc": "SheetField - one label · value row of a drawer, half and half: the label in the slate ink on the left, the value (13/500) or its control on the right. The same row reads a record and edits it. <SheetField label=\"Email\">sarah.johnson@company.com</SheetField> <SheetField label=\"Job title\" htmlFor=\"job\"><Input id=\"job\" defaultValue=\"HR Coordinator\" /></SheetField>",
-      "props": [
-        "label",
-        "htmlFor",
-        "children"
-      ],
+      "props": ["label", "htmlFor", "children"],
       "propDocs": "The label on the left, in the slate ink. Ties the label to a control on the right, so a press on the label focuses it. The value or the control on the right."
     },
     {
@@ -9423,10 +9144,7 @@
       "area": "Sheet",
       "summary": "SheetFooter - container for action buttons.",
       "doc": "SheetFooter - container for action buttons. Three parts (the console's O9 footer): `start` pinned left - the escape, or a destructive action - a spacer the footer owns, then the children as the end group - the supporting action and the primary verb. Without `start` the children sit right-aligned as before. In the drawer frame it is pinned under the body with a hairline over it.",
-      "props": [
-        "children",
-        "start"
-      ],
+      "props": ["children", "start"],
       "propDocs": "The end group (right): the supporting action, then the primary verb. The start group (left): the escape (Cancel / Close) or a destructive action. When set, the footer is one row - start, a spacer, then the children - in any layout."
     },
     {
@@ -9436,11 +9154,7 @@
       "area": "Sheet",
       "summary": "SheetHeader - container for title and description.",
       "doc": "SheetHeader - container for title and description. In the drawer frame it is the console's header row: the title (or a crumb) left, then the `actions`, then the ✕ - all centred on the row, 60 high at least so a wrapping title grows it instead of clipping, a hairline under it.",
-      "props": [
-        "children",
-        "actions",
-        "showClose"
-      ],
+      "props": ["children", "actions", "showClose"],
       "propDocs": "Controls at the right end of the header row, before the close - a ⋮ menu, say. Drawer layout only. Whether the header row carries the close (✕), centred on the title. Drawer layout only."
     },
     {
@@ -9450,14 +9164,7 @@
       "area": "Sheet",
       "summary": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles).",
       "doc": "SheetIdentity - the identity block an object drawer opens with: the mark, the name and its status, the quiet lines under them, and Edit / ⋯ at the top right (the console's IdentityBand, Users and Access profiles). <SheetIdentity mark={<IconTile icon={<Icon name=\"key-round\" />} tone=\"blue\" size=\"xl\" />} name=\"Helpdesk Access\" status={<Badge tone=\"success\" dot>Active</Badge>} lines={[['IT Support, Security Team', 'Teams'], ['Created by Natasha Manglore', '12 Aug 2026']]} actions={<Button variant=\"outline\" size=\"sm\">Edit</Button>} />",
-      "props": [
-        "mark",
-        "name",
-        "status",
-        "lines",
-        "actions",
-        "children"
-      ],
+      "props": ["mark", "name", "status", "lines", "actions", "children"],
       "propDocs": "The mark on the left: an IconTile, an Avatar, a logo. The object's name, 16/600, truncated on one line. A Badge beside the name: Active, Tenant owner. The lines under the name, in the quiet ink. A line given as an array is split by short hairlines: `['IT Support, Security Team', 'Teams']`. Controls at the top right: Edit, the ⋯ menu. What sits under the identity row: a strip of key facts, say."
     },
     {
@@ -9467,11 +9174,7 @@
       "area": "Sheet",
       "summary": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back.",
       "doc": "SheetNavigation - pages inside one drawer: press Edit and the drawer's content becomes the edit page, its header shows the path (\"User management › Edit details\"), and back brings the previous page back. Generic: any page can push any other, as deep as it needs. Put it inside `SheetContent`; it starts over at `root` every time the drawer opens, because the content unmounts when it closes. <SheetContent layout=\"drawer\"> <SheetNavigation root={{ id: 'view', title: 'User management' }}> <SheetHeader><SheetTitle><SheetNavigationTitle /></SheetTitle></SheetHeader> <SheetPage id=\"view\"><ProfileView /></SheetPage> <SheetPage id=\"edit\"><EditForm /></SheetPage> </SheetNavigation> </SheetContent> // anywhere inside: const { push, back } = useSheetNavigation(); // push({ id: 'edit', title: 'Edit details' })",
-      "props": [
-        "root",
-        "onPageChange",
-        "children"
-      ],
+      "props": ["root", "onPageChange", "children"],
       "propDocs": "The page the drawer opens on. Called with the new current page and the whole stack after every push, back and reset."
     },
     {
@@ -9501,10 +9204,7 @@
       "area": "Sheet",
       "summary": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page.",
       "doc": "SheetPage - one page of a SheetNavigation: its children render only while it is the current page. A page brings its own SheetBand, SheetBody and SheetFooter.",
-      "props": [
-        "id",
-        "children"
-      ],
+      "props": ["id", "children"],
       "propDocs": "Matches a SheetNavigationEntry's id."
     },
     {
@@ -9524,12 +9224,7 @@
       "area": "Sheet",
       "summary": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content.",
       "doc": "SheetSection - a titled section of a drawer's body: a 14/600 heading with an action at its right end, an optional hint, then the content. Sections that follow one another are split by a hairline, never by a card inside a drawer. <SheetSection title=\"Access details\" hint=\"Set how long guest users can access your organization\"> <SheetField label=\"Access started\">Apr 1, 2026</SheetField> </SheetSection>",
-      "props": [
-        "title",
-        "hint",
-        "action",
-        "children"
-      ],
+      "props": ["title", "hint", "action", "children"],
       "propDocs": "The heading, 14/600. One quiet line under the heading. A control at the right end of the heading row: Add, Edit."
     },
     {
@@ -9559,9 +9254,7 @@
       "area": "Sidebar",
       "summary": "The navigation this library ships is `LeftNav`.",
       "doc": "The navigation this library ships is `LeftNav`. This one predates it and speaks a different visual language - a `muted` fill for the selected row with no leading indicator, 20px icons, rows that size to their content rather than to a fixed rhythm, and no sunken panel behind any of it. Neither is broken; they are from different moments, and shipping both means products get two navigations that do not read as siblings. It stays for now because `LeftNav` does not yet do two things this does: collapse to a rail of icons, and render itself from a configuration object. The second is being built; the first is logged and not scheduled. Do not build on it. When the app-navigation arrangement of `LeftNav` lands, this goes. Sidebar component for navigation and content organization. ```tsx <Sidebar> <SidebarHeader>IT Operations...</SidebarHeader> <SidebarSearch placeholder=\"Search...\" /> <SidebarContent> <SidebarSection> <SidebarItem icon={<Icon />}>Dashboard</SidebarItem> </SidebarSection> </SidebarContent> <SidebarFooter>Customize sidebar</SidebarFooter> </Sidebar> ```",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the sidebar"
     },
     {
@@ -9571,11 +9264,7 @@
       "area": "Sidebar",
       "summary": "SidebarCollapse component for expandable/collapsible sections.",
       "doc": "SidebarCollapse component for expandable/collapsible sections.",
-      "props": [
-        "title",
-        "defaultOpen",
-        "children"
-      ],
+      "props": ["title", "defaultOpen", "children"],
       "propDocs": "Title of the collapsible section Whether the section is open by default Content to display when expanded"
     },
     {
@@ -9585,9 +9274,7 @@
       "area": "Sidebar",
       "summary": "SidebarContent component for scrollable sidebar content.",
       "doc": "SidebarContent component for scrollable sidebar content.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the sidebar content"
     },
     {
@@ -9597,11 +9284,7 @@
       "area": "Sidebar",
       "summary": "SidebarFooter component for the bottom section of the sidebar.",
       "doc": "SidebarFooter component for the bottom section of the sidebar.",
-      "props": [
-        "children",
-        "icon",
-        "showBorder"
-      ],
+      "props": ["children", "icon", "showBorder"],
       "propDocs": "Content to display inside the sidebar footer Optional icon to display before the text Whether to show top border"
     },
     {
@@ -9611,14 +9294,7 @@
       "area": "Sidebar",
       "summary": "SidebarHeader component for the top section of the sidebar.",
       "doc": "SidebarHeader component for the top section of the sidebar.",
-      "props": [
-        "children",
-        "icon",
-        "popoverContent",
-        "open",
-        "onOpenChange",
-        "showBorder"
-      ],
+      "props": ["children", "icon", "popoverContent", "open", "onOpenChange", "showBorder"],
       "propDocs": "Content to display inside the sidebar header Optional icon to display in the header Optional popover content to show when chevron is clicked Whether the popover is open (controlled) Callback when popover open state changes Whether to show bottom border"
     },
     {
@@ -9628,14 +9304,7 @@
       "area": "Sidebar",
       "summary": "SidebarItem component for individual navigation items.",
       "doc": "SidebarItem component for individual navigation items.",
-      "props": [
-        "children",
-        "active",
-        "icon",
-        "action",
-        "nested",
-        "variant"
-      ],
+      "props": ["children", "active", "icon", "action", "nested", "variant"],
       "propDocs": "Content to display inside the sidebar item Whether the item is currently active/selected Optional icon to display before the text Optional action icons/buttons to display on the right (shown on hover) Whether this item is nested under a parent item Visual variant of the item"
     },
     {
@@ -9645,10 +9314,7 @@
       "area": "Sidebar",
       "summary": "SidebarLabel component for section labels.",
       "doc": "SidebarLabel component for section labels.",
-      "props": [
-        "children",
-        "action"
-      ],
+      "props": ["children", "action"],
       "propDocs": "Content to display inside the sidebar label Optional action icons/buttons to display on the right"
     },
     {
@@ -9678,10 +9344,7 @@
       "area": "Sidebar",
       "summary": "SidebarSearch component for search functionality.",
       "doc": "SidebarSearch component for search functionality.",
-      "props": [
-        "shortcut",
-        "onSearch"
-      ],
+      "props": ["shortcut", "onSearch"],
       "propDocs": "Keyboard shortcut to display (e.g., \"⌘K\") Callback when search value changes"
     },
     {
@@ -9691,9 +9354,7 @@
       "area": "Sidebar",
       "summary": "SidebarSection component for grouping sidebar items.",
       "doc": "SidebarSection component for grouping sidebar items.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the sidebar section"
     },
     {
@@ -9721,8 +9382,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / Simple",
-      "doc": "Components/Command Simple",
+      "summary": "Story: New Components/Command / Simple",
+      "doc": "New Components/Command Simple",
       "props": [],
       "propDocs": ""
     },
@@ -9741,8 +9402,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / SizeLarge",
-      "doc": "Components/Combobox SizeLarge",
+      "summary": "Story: New Components/Combobox / SizeLarge",
+      "doc": "New Components/Combobox SizeLarge",
       "props": [],
       "propDocs": ""
     },
@@ -9751,8 +9412,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / SizeMedium",
-      "doc": "Components/Combobox SizeMedium",
+      "summary": "Story: New Components/Combobox / SizeMedium",
+      "doc": "New Components/Combobox SizeMedium",
       "props": [],
       "propDocs": ""
     },
@@ -9801,8 +9462,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Sizes",
-      "doc": "Components/ButtonGroup Sizes",
+      "summary": "Story: New Components/ButtonGroup / Sizes",
+      "doc": "New Components/ButtonGroup Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -9831,8 +9492,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / Sizes",
-      "doc": "Components/Icon Sizes",
+      "summary": "Story: New Components/Icon / Sizes",
+      "doc": "New Components/Icon Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -9881,8 +9542,8 @@
       "kind": "story",
       "file": "src/components/Label/Label.stories.tsx",
       "area": "Label",
-      "summary": "Story: Components/Label / Sizes",
-      "doc": "Components/Label Sizes",
+      "summary": "Story: New Components/Label / Sizes",
+      "doc": "New Components/Label Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -9911,8 +9572,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / Sizes",
-      "doc": "Components/Progress Sizes",
+      "summary": "Story: New Components/Progress / Sizes",
+      "doc": "New Components/Progress Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -9921,8 +9582,8 @@
       "kind": "story",
       "file": "src/components/SecretDots/SecretDots.stories.tsx",
       "area": "SecretDots",
-      "summary": "Story: Components/SecretDots / Sizes",
-      "doc": "Components/SecretDots Sizes",
+      "summary": "Story: New Components/SecretDots / Sizes",
+      "doc": "New Components/SecretDots Sizes",
       "props": [],
       "propDocs": ""
     },
@@ -10001,8 +9662,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / SizeSmall",
-      "doc": "Components/Combobox SizeSmall",
+      "summary": "Story: New Components/Combobox / SizeSmall",
+      "doc": "New Components/Combobox SizeSmall",
       "props": [],
       "propDocs": ""
     },
@@ -10051,8 +9712,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / Small",
-      "doc": "Components/Pagination Small",
+      "summary": "Story: New Components/Pagination / Small",
+      "doc": "New Components/Pagination Small",
       "props": [],
       "propDocs": ""
     },
@@ -10123,9 +9784,7 @@
       "area": "Spinner",
       "summary": "Spinner - Loading indicator component A versatile spinner component for indicating loading states with the following features: - Multiple color variants (default, primary, secondary, accent) - Multiple size variants (sm, md, lg) - CSS animation-based spinning - SVG-based for crisp rendering at all sizes - Accessible with proper ARIA attributes ```tsx // Basic usage <Spinner /> // With variant and size <Spinner variant=\"primary\" size=\"lg\" /> // With custom label <Spinner aria-label=\"Loading data...\" /> ```",
       "doc": "Spinner - Loading indicator component A versatile spinner component for indicating loading states with the following features: - Multiple color variants (default, primary, secondary, accent) - Multiple size variants (sm, md, lg) - CSS animation-based spinning - SVG-based for crisp rendering at all sizes - Accessible with proper ARIA attributes ```tsx // Basic usage <Spinner /> // With variant and size <Spinner variant=\"primary\" size=\"lg\" /> // With custom label <Spinner aria-label=\"Loading data...\" /> ```",
-      "props": [
-        "className"
-      ],
+      "props": ["className"],
       "propDocs": "Custom class name to apply to the spinner"
     },
     {
@@ -10145,11 +9804,7 @@
       "area": "Stack",
       "summary": "Stack component for consistent vertical or horizontal spacing between elements.",
       "doc": "Stack component for consistent vertical or horizontal spacing between elements. ```tsx // Vertical stack with medium gap <Stack> <div>Item 1</div> <div>Item 2</div> <div>Item 3</div> </Stack> // Horizontal stack with large gap <Stack direction=\"horizontal\" gap=\"lg\"> <Button>Cancel</Button> <Button>Save</Button> </Stack> // Centered stack <Stack align=\"center\" justify=\"center\"> <Icon /> <Text>Centered Content</Text> </Stack> // Stack with dividers <Stack divider> <div>Section 1</div> <div>Section 2</div> </Stack> ```",
-      "props": [
-        "children",
-        "as",
-        "dividerClassName"
-      ],
+      "props": ["children", "as", "dividerClassName"],
       "propDocs": "Content to display inside the stack Render the stack as a different HTML element Custom className for the divider elements"
     },
     {
@@ -10177,8 +9832,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / Stacked",
-      "doc": "Components/Progress Stacked",
+      "summary": "Story: New Components/Progress / Stacked",
+      "doc": "New Components/Progress Stacked",
       "props": [],
       "propDocs": ""
     },
@@ -10197,8 +9852,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / States",
-      "doc": "Components/Stepper States",
+      "summary": "Story: New Components/Stepper / States",
+      "doc": "New Components/Stepper States",
       "props": [],
       "propDocs": ""
     },
@@ -10259,10 +9914,7 @@
       "area": "_internal",
       "summary": "StatusBadge component Displays a status badge for components in Storybook.",
       "doc": "StatusBadge component Displays a status badge for components in Storybook. This component is for internal use in Storybook stories only.",
-      "props": [
-        "status",
-        "message"
-      ],
+      "props": ["status", "message"],
       "propDocs": "Component status type Additional message to display in tooltip"
     },
     {
@@ -10360,8 +10012,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / StrokeLadder",
-      "doc": "Components/Icon StrokeLadder",
+      "summary": "Story: New Components/Icon / StrokeLadder",
+      "doc": "New Components/Icon StrokeLadder",
       "props": [],
       "propDocs": ""
     },
@@ -10370,8 +10022,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / StrokeWidth",
-      "doc": "Components/Icon StrokeWidth",
+      "summary": "Story: New Components/Icon / StrokeWidth",
+      "doc": "New Components/Icon StrokeWidth",
       "props": [],
       "propDocs": ""
     },
@@ -10440,8 +10092,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / Surfaces",
-      "doc": "Components/Card Surfaces",
+      "summary": "Story: New Components/Card / Surfaces",
+      "doc": "New Components/Card Surfaces",
       "props": [],
       "propDocs": ""
     },
@@ -10450,8 +10102,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / Surfaces",
-      "doc": "Components/CodeWell Surfaces",
+      "summary": "Story: New Components/CodeWell / Surfaces",
+      "doc": "New Components/CodeWell Surfaces",
       "props": [],
       "propDocs": ""
     },
@@ -10482,14 +10134,7 @@
       "area": "Table",
       "summary": "Table - the card that holds a list: rows, a bulk bar and a pager.",
       "doc": "Table - the card that holds a list: rows, a bulk bar and a pager. ```tsx <Table label=\"Users\"> <TableViewport tableWidth={1637} maxHeight={600}> <TableColGroup widths={[60, 200, 100, 217, 200]} /> <TableHeader>…</TableHeader> <TableBody>…</TableBody> </TableViewport> <TablePager … /> </Table> ```",
-      "props": [
-        "label",
-        "divider",
-        "docked",
-        "expand",
-        "dockOffset",
-        "children"
-      ],
+      "props": ["label", "divider", "docked", "expand", "dockOffset", "children"],
       "propDocs": "Spoken name of the table. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. The card becomes the page. `true` squares the corners, drops the side edges, grows the first and last cell inset from 16 to 24 and lets the rows scroll inside the card, with the header and pager pinned. A number from 0 to 1 is the in-between while the page scrolls the card up to its dock line; the page decides when, the table only decides how it looks. The page also sets the card's height once docked (`style.height`). Let the table drive its own morph from the page scroll. **On by default.** The table takes the full height under the page’s dock line WHATEVER it holds, so it expands on scroll even holding a single row, and its pager stays on screen instead of floating up under a short list. (Pranjal’s rule, and his default since 2026-09-10.) It needs a scrolling ancestor and a dock line to aim at. Inside a `PageFrame` both are already there. With neither — a table in a drawer, a modal or a card — nothing happens: it stays an ordinary card and keeps its own max height, so the default is safe wherever the table lands. Give the table a `docked` value instead and the page keep"
     },
     {
@@ -10509,13 +10154,7 @@
       "area": "Table",
       "summary": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load.",
       "doc": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load. An icon, a title, one line, one button. CENTRED IN WHAT YOU CAN SEE (Pranjal, 2026-09-28: \"in empty state why are not showing it in the middle of the table its hiding at the bottom a little getting cutoff as well. It should be in the middle based on the view port. as in table viewport.\"). The page-filling card is as tall as the room under the dock line, so at rest its foot sits below the window; a fixed 300px block under an ever-growing viewport landed at that foot, half off screen. Now the block takes the card's whole body (300 at least - a card with no page to fill looks as before), and the part of it hidden below the window becomes bottom padding, so the message sits in the middle of the visible table and moves back to the true middle as the page scrolls the card up.",
-      "props": [
-        "kind",
-        "title",
-        "body",
-        "action",
-        "onAction"
-      ],
+      "props": ["kind", "title", "body", "action", "onAction"],
       "propDocs": "Titles and lines default to the Users wording."
     },
     {
@@ -10525,13 +10164,7 @@
       "area": "TableOld2",
       "summary": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load.",
       "doc": "The three blank states, centred in the visible card: nothing yet, nothing found, could not load. An icon, a title, one line, one button.",
-      "props": [
-        "kind",
-        "title",
-        "body",
-        "action",
-        "onAction"
-      ],
+      "props": ["kind", "title", "body", "action", "onAction"],
       "propDocs": "Titles and lines default to the Users wording."
     },
     {
@@ -10571,10 +10204,7 @@
       "area": "Table",
       "summary": "One action in the bar: a 32px text button with a 16px icon.",
       "doc": "One action in the bar: a 32px text button with a 16px icon.",
-      "props": [
-        "icon",
-        "danger"
-      ],
+      "props": ["icon", "danger"],
       "propDocs": "A destructive action is red."
     },
     {
@@ -10584,9 +10214,7 @@
       "area": "TableOld",
       "summary": "One action on the bar.",
       "doc": "One action on the bar. A component rather than a plain `Button` because the bar is inverted, and a `ghost` Button renders dark text - invisible on it. Products should not have to know that; they should have something that is simply the right shape.",
-      "props": [
-        "icon"
-      ],
+      "props": ["icon"],
       "propDocs": "The glyph, before the label."
     },
     {
@@ -10596,10 +10224,7 @@
       "area": "TableOld2",
       "summary": "One action in the bar: a 32px text button with a 16px icon.",
       "doc": "One action in the bar: a 32px text button with a 16px icon.",
-      "props": [
-        "icon",
-        "danger"
-      ],
+      "props": ["icon", "danger"],
       "propDocs": "A destructive action is red."
     },
     {
@@ -10609,11 +10234,7 @@
       "area": "Table",
       "summary": "The dark pill that appears once rows are picked.",
       "doc": "The dark pill that appears once rows are picked. It sits 62px above the card's end - the pager strip plus a 12px gap - over the last row, and reads its count aloud as it changes. The count is plain words: the selector glyph before it and the \"Choose what to select\" popover it opened went on 2026-09-26 (Pranjal). WHERE IT HANGS FROM (2026-09-26). On a real page the card runs past the bottom of the window: the console's Users page fills the card to the room under its dock line, so at rest its last rows and its pager sit below the fold, and a bar hung 62px above the card's end landed 135px below the fold - invisible until the page was scrolled. The console's own bar had always been `position: sticky; bottom: 62px` against the page, and that is what Pranjal expects: pick rows, the bar is there at the bottom of the window. So the bar hangs from a 0px-tall hook laid out at the card's end (`order` puts it last whatever the markup order, so a hand-built table may still write it before the pager). The hook is sticky at the bottom of whatever scrolls the card - the page, a drawer's body - so the bar pins 62px above that edge while the card runs past it, and rides up with the card once the ca",
-      "props": [
-        "count",
-        "onClear",
-        "children"
-      ],
+      "props": ["count", "onClear", "children"],
       "propDocs": "How many rows are picked. The bar is not rendered at zero."
     },
     {
@@ -10623,12 +10244,7 @@
       "area": "TableOld",
       "summary": "TableBulkBarOld - what you can do with the rows you have selected.",
       "doc": "TableBulkBarOld - what you can do with the rows you have selected. **It sits alongside the toolbar rather than replacing it.** Replacing was the first instinct - selecting rows changes what the controls above are for - and it is wrong, because a selection deliberately survives filtering. Building a selection across two searches is a thing people do, and hiding the search box the moment they tick a row makes it impossible. **It is an inverted surface**, which is what separates it from the table rather than a border would. The table is a field of white rows; a bar that matches them has to shout with weight or colour to be noticed, and one that inverts is simply somewhere else. **The count is announced.** A bar that appears silently is invisible to anyone not watching that part of the screen, and the number is the whole point - \"delete\" means something very different at 3 than at 300. Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "count",
-        "onClear",
-        "label",
-        "children"
-      ],
+      "props": ["count", "onClear", "label", "children"],
       "propDocs": "How many rows are selected. At zero the bar renders nothing. Called to drop the selection. Omit it and no Clear control appears. What the bar says instead of \"3 selected\". For when rows are not rows - \"3 tickets\", \"3 files\". The default counts without naming, which is right when the noun is obvious from the table. The actions, usually `TableBulkActionOld`."
     },
     {
@@ -10638,12 +10254,7 @@
       "area": "TableOld2",
       "summary": "The dark pill that appears once rows are picked.",
       "doc": "The dark pill that appears once rows are picked. It sits inside the card, 13px above the pager, and reads its count aloud as it changes.",
-      "props": [
-        "count",
-        "onScope",
-        "onClear",
-        "children"
-      ],
+      "props": ["count", "onScope", "onClear", "children"],
       "propDocs": "How many rows are picked. The bar is not rendered at zero. \"N selected\" opens the scope menu."
     },
     {
@@ -10693,12 +10304,7 @@
       "area": "Table",
       "summary": "",
       "doc": "",
-      "props": [
-        "frozen",
-        "frozenEdge",
-        "align",
-        "dragging"
-      ],
+      "props": ["frozen", "frozenEdge", "align", "dragging"],
       "propDocs": "Stays put while the table scrolls sideways; the value is its left offset in px. The last frozen cell draws the boundary line while scrolled. The column is being dragged: dims to 40%."
     },
     {
@@ -10708,12 +10314,7 @@
       "area": "TableOld",
       "summary": "TableCellOld component - A table data cell.",
       "doc": "TableCellOld component - A table data cell. ```tsx <TableCellOld>Ada Lovelace</TableCellOld> <TableCellOld align=\"right\">1,204.00</TableCellOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "align",
-        "indent",
-        "columnKey",
-        "frozen"
-      ],
+      "props": ["align", "indent", "columnKey", "frozen"],
       "propDocs": "Which edge the content sits against. Numbers belong on the right. Indents the content, for a row nested under a parent. Use it on the first cell only - indenting every cell shifts the whole row and breaks the column alignment that makes a table readable. Which column this cell belongs to. Emitted as `data-column-key`. Reordering measures the header row to work out where a dragged column would land, and it needs to know which cell is which - position alone is not enough once things start moving. Pins this column to the left edge while the table scrolls sideways. `true` pins it as the first frozen column. Pass an index to pin more than one - `frozen={1}` is the second, and it sits at the measured width of the first rather than at a width you have to work out yourself. Put it on the same column in every row, header included, or the column will pin in some rows and not others. Needs the table to actually scroll horizontally - a table narrower than its container has nothing to pin against. Like the row's `sticky`, the edge only asserts itself once something has slid underneath: at rest a frozen column looks like any other."
     },
     {
@@ -10723,12 +10324,7 @@
       "area": "TableOld2",
       "summary": "",
       "doc": "",
-      "props": [
-        "frozen",
-        "frozenEdge",
-        "align",
-        "dragging"
-      ],
+      "props": ["frozen", "frozenEdge", "align", "dragging"],
       "propDocs": "Stays put while the table scrolls sideways; the value is its left offset in px. The last frozen cell draws the boundary line while scrolled. The column is being dragged: dims to 40%."
     },
     {
@@ -10738,12 +10334,7 @@
       "area": "Table",
       "summary": "A checkbox as a cell's value - one of a row's channels, a permission, a yes - centred in the cell inside a 28 square that takes the whole click, named for the reader by row and column (\"Run failure · Email\").",
       "doc": "A checkbox as a cell's value - one of a row's channels, a permission, a yes - centred in the cell inside a 28 square that takes the whole click, named for the reader by row and column (\"Run failure · Email\"). Held (`disabled`) it keeps its tick and refuses the pointer. Ported from the console's Notify matrix (the discovery profile's Schedule & Notify step, NotifyGrid.jsx, 2026-10-15). ```tsx <TableCheckCell checked={on} label=\"Run failure · Email\" onCheckedChange={setOn} /> ```",
-      "props": [
-        "checked",
-        "label",
-        "onCheckedChange",
-        "disabled"
-      ],
+      "props": ["checked", "label", "onCheckedChange", "disabled"],
       "propDocs": "The box is ticked. Spoken name of the box, the row and the column together: \"Run failure · Email\". A click on the square: what the box becomes. Held: ticked or not as given, and the square refuses the pointer."
     },
     {
@@ -10753,10 +10344,7 @@
       "area": "Table",
       "summary": "One `<col>` per visible column, plus the elastic tail when a table still draws one (`tail` 0 draws none - the DataTable hides it since 2026-09-23; the primitive keeps the 60 default for hand-built tables and tests).",
       "doc": "One `<col>` per visible column, plus the elastic tail when a table still draws one (`tail` 0 draws none - the DataTable hides it since 2026-09-23; the primitive keeps the 60 default for hand-built tables and tests).",
-      "props": [
-        "tail",
-        "widths"
-      ],
+      "props": ["tail", "widths"],
       "propDocs": "The elastic tail's width; the gutter unless the table has spare to fill. Widths in px, one per column, in display order. The 60px tail is added."
     },
     {
@@ -10766,10 +10354,7 @@
       "area": "TableOld2",
       "summary": "One `<col>` per visible column plus the 60px elastic tail.",
       "doc": "One `<col>` per visible column plus the 60px elastic tail.",
-      "props": [
-        "tail",
-        "widths"
-      ],
+      "props": ["tail", "widths"],
       "propDocs": "The elastic tail's width; the gutter unless the table has spare to fill. Widths in px, one per column, in display order. The 60px tail is added."
     },
     {
@@ -10866,11 +10451,7 @@
       "area": "TableOld",
       "summary": "TableExpandTriggerOld component - the disclosure control for a row that reveals child rows beneath it.",
       "doc": "TableExpandTriggerOld component - the disclosure control for a row that reveals child rows beneath it. Deliberately a separate control you place in a cell rather than a prop on `TableRowOld`. Where the chevron belongs differs from table to table, and the component has no business owning your tree state. ```tsx <TableCellOld> <TableExpandTriggerOld expanded={open} onToggle={toggle} label=\"Show entries\" /> </TableCellOld> ```",
-      "props": [
-        "expanded",
-        "onToggle",
-        "label"
-      ],
+      "props": ["expanded", "onToggle", "label"],
       "propDocs": "Whether the row this controls is currently open. Called when the control is used. What a screen reader says. There is no visible text - it is a chevron."
     },
     {
@@ -10880,12 +10461,7 @@
       "area": "TableOld",
       "summary": "TableFilterChipsOld - what is currently narrowing the table.",
       "doc": "TableFilterChipsOld - what is currently narrowing the table. **A filter you cannot see is a bug report.** A table showing four rows out of two hundred, with the reason hidden inside a panel, is the single most common way people conclude their data is missing. The chips are the answer to \"why am I not seeing it\". `TagPill` rather than `Badge`, deliberately: a tag is something a person put there and can take away, a badge is something the system applied. These are the former, and they carry the remove control to prove it. **Each chip names its attribute.** \"Open\" alone is ambiguous the moment two attributes share a value; \"Status: Open\" never is. **Known gap:** `TagPill` hardcodes `aria-label=\"Remove\"` on its cross, so a screen reader hears \"Remove\" once per chip with nothing to tell them apart. The chip's own text carries the answer visually, but not to anyone listening. Naming that control needs a prop on `TagPill`; it cannot be fixed from here. `ToolbarButton` carries a count instead (ruling of 4 September 2026).",
-      "props": [
-        "filters",
-        "labelFor",
-        "onRemove",
-        "onClear"
-      ],
+      "props": ["filters", "labelFor", "onRemove", "onClear"],
       "propDocs": "The active filters. Turns an attribute key into the name a person would recognise. Called with the attribute whose chip was removed. Adds a Clear all control, shown only past one filter. With a single chip it would be a second way to do what the chip's own cross already does, sitting right beside it."
     },
     {
@@ -10923,11 +10499,7 @@
       "area": "Table",
       "summary": "A title row between a table's rows, naming the group under it: the name 12/600 in the label ink, then its details in the faint ink (neutral-50, #8FA0BD - the console's, not the library's muted grey) after a \" · \", on the sunken ground, 36 tall, one cell across every column.",
       "doc": "A title row between a table's rows, naming the group under it: the name 12/600 in the label ink, then its details in the faint ink (neutral-50, #8FA0BD - the console's, not the library's muted grey) after a \" · \", on the sunken ground, 36 tall, one cell across every column. A plain row - it never hovers, picks, opens or takes focus; the rows of its group keep their own numbers, counted through the groups. Ported from the console (Ronak, 2026-10-14): the discovery profile's Credentials step groups its credentials by type - \"you can add the separator one row with title between the rows. so user can understood this is for this types\". ```tsx <TableGroupRow colSpan={3} title=\"SSH Credentials\" meta={['SSH', 3]} /> ```",
-      "props": [
-        "colSpan",
-        "title",
-        "meta"
-      ],
+      "props": ["colSpan", "title", "meta"],
       "propDocs": "How many columns the row spans - every column the table draws, the lead included. The group's name - \"SSH Credentials\" - 12/600 in the label ink. What follows the name in the faint ink, each part after a \" · \" - the family and the count: `['SSH', 3]` reads \"SSH Credentials · SSH · 3\"."
     },
     {
@@ -10937,13 +10509,7 @@
       "area": "TableOld",
       "summary": "TableGroupRowOld component - a heading row that spans the whole table.",
       "doc": "TableGroupRowOld component - a heading row that spans the whole table. Grouping was the commonest structure across the reference tables. Pass `onToggle` to make the group collapsible; leave it off and no control is rendered at all, rather than a dead one. ```tsx <TableGroupRowOld colSpan={4} count={12} expanded={open} onToggle={toggle}> Mobile App </TableGroupRowOld> ```",
-      "props": [
-        "colSpan",
-        "count",
-        "expanded",
-        "onToggle",
-        "toggleLabel"
-      ],
+      "props": ["colSpan", "count", "expanded", "onToggle", "toggleLabel"],
       "propDocs": "How many columns the group header spans. Set it to the number of columns in the table, or the heading will not reach across it. How many rows are in the group. Rendered after the label, quietly. Whether the group is open. Leave `onToggle` off for a group that is always open - the control is then not rendered at all, rather than rendered dead. Called when the disclosure control is used. Omit for a static group. What a screen reader says for the disclosure control. Falls back to \"Toggle group\" when the label is not plain text."
     },
     {
@@ -11133,13 +10699,7 @@
       "area": "Table",
       "summary": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
       "doc": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
-      "props": [
-        "shown",
-        "total",
-        "noun",
-        "loading",
-        "onMore"
-      ],
+      "props": ["shown", "total", "noun", "loading", "onMore"],
       "propDocs": ""
     },
     {
@@ -11149,13 +10709,7 @@
       "area": "TableOld2",
       "summary": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
       "doc": "The other footer: a count and a \"Load more\" button that the table also presses as you scroll near the bottom.",
-      "props": [
-        "shown",
-        "total",
-        "noun",
-        "loading",
-        "onMore"
-      ],
+      "props": ["shown", "total", "noun", "loading", "onMore"],
       "propDocs": ""
     },
     {
@@ -11205,11 +10759,7 @@
       "area": "Table",
       "summary": "A plain row number, for a table without selection: it never becomes a checkbox.",
       "doc": "A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel.",
-      "props": [
-        "index",
-        "inert",
-        "frozen"
-      ],
+      "props": ["index", "inert", "frozen"],
       "propDocs": "An invited person. Accepted and ignored: the number reads in the cell's own ink on every row, an inert one included, because its other columns are not dimmed either (Pranjal, 2026-10-15: \"all columns should have same color text\"). It used to dim the number to 60%."
     },
     {
@@ -11219,11 +10769,7 @@
       "area": "TableOld2",
       "summary": "A plain row number, for a table without selection: it never becomes a checkbox.",
       "doc": "A plain row number, for a table without selection: it never becomes a checkbox. Hide it from the Columns panel.",
-      "props": [
-        "index",
-        "inert",
-        "frozen"
-      ],
+      "props": ["index", "inert", "frozen"],
       "propDocs": "An invited person: the number is dimmed."
     },
     {
@@ -11233,9 +10779,7 @@
       "area": "Table",
       "summary": "",
       "doc": "",
-      "props": [
-        "frozen"
-      ],
+      "props": ["frozen"],
       "propDocs": ""
     },
     {
@@ -11245,9 +10789,7 @@
       "area": "TableOld2",
       "summary": "",
       "doc": "",
-      "props": [
-        "frozen"
-      ],
+      "props": ["frozen"],
       "propDocs": ""
     },
     {
@@ -11257,14 +10799,7 @@
       "area": "TableOld",
       "summary": "TableOld component - Root table element.",
       "doc": "TableOld component - Root table element. ```tsx <TableOld density=\"condensed\" striped stickyHeader> <TableHeaderOld> <TableRowOld> <TableHeadOld sortable sortOrder=\"ascend\" onSort={sortByName}>Name</TableHeadOld> <TableHeadOld align=\"right\">Amount</TableHeadOld> </TableRowOld> </TableHeaderOld> <TableBodyOld> <TableRowOld selected> <TableCellOld>Ada Lovelace</TableCellOld> <TableCellOld align=\"right\">1,204.00</TableCellOld> </TableRowOld> </TableBodyOld> </TableOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "density",
-        "striped",
-        "stickyHeader",
-        "maxHeight",
-        "containerClassName",
-        "layout"
-      ],
+      "props": ["density", "striped", "stickyHeader", "maxHeight", "containerClassName", "layout"],
       "propDocs": "Row height and cell padding. Zebra-stripe alternate body rows. Off by default. A single subtle row divider carries the structure in most tables, and stripes compete with the data for attention - but long, dense tables genuinely read better with them. Keep the header row visible while the body scrolls. Becomes necessary the moment a table is tall enough that the column titles scroll out of view. **Needs `maxHeight` to do anything.** Sticky positions against the nearest scrolling ancestor, and without a height the table's own scroll container never scrolls, so the header has nothing to stick within. Caps the table's height and makes it scroll internally. This is what `stickyHeader` and a sticky summary row pin against. Accepts anything CSS does - `'24rem'`, `'50vh'`, `400`. Classes for the scroll container that wraps the table. This is the element that actually clips, so a border radius has to go here rather than on a wrapper of your own - put it outside and the sticky header paints straight over the rounded corner. How column widths are decided. Use `fixed` for a table whose rows appear and disappear - collapsing a group in an `auto` table visibly resizes every column, because the b"
     },
     {
@@ -11274,14 +10809,7 @@
       "area": "TableOld2",
       "summary": "Kept for side-by-side review while products move across; the removal version is the design owner's to set.",
       "doc": "Kept for side-by-side review while products move across; the removal version is the design owner's to set. Frozen: it takes no further work. TableOld2 - the card that holds a list: rows, a bulk bar and a pager. ```tsx <TableOld2 label=\"Users\"> <TableViewportOld2 tableWidth={1637} maxHeight={600}> <TableColGroupOld2 widths={[60, 200, 100, 217, 200]} /> <TableHeaderOld2>…</TableHeaderOld2> <TableBodyOld2>…</TableBodyOld2> </TableViewportOld2> <TablePagerOld2 … /> </TableOld2> ```",
-      "props": [
-        "label",
-        "divider",
-        "docked",
-        "expand",
-        "dockOffset",
-        "children"
-      ],
+      "props": ["label", "divider", "docked", "expand", "dockOffset", "children"],
       "propDocs": "Spoken name of the table. Row lines: neutral-30 as proposed, or the lighter neutral-20 the console draws today. The card becomes the page. `true` squares the corners, drops the side edges, grows the first and last cell inset from 16 to 24 and lets the rows scroll inside the card, with the header and pager pinned. A number from 0 to 1 is the in-between while the page scrolls the card up to its dock line; the page decides when, the table only decides how it looks. The page also sets the card's height once docked (`style.height`). Let the table drive its own morph from the page scroll. **On by default.** The table takes the full height under the page’s dock line WHATEVER it holds, so it expands on scroll even holding a single row, and its pager stays on screen instead of floating up under a short list. (Pranjal’s rule, and his default since 2026-09-10.) It needs a scrolling ancestor and a dock line to aim at. Inside a `PageFrame` both are already there. With neither — a table in a drawer, a modal or a card — nothing happens: it stays an ordinary card and keeps its own max height, so the default is safe wherever the table lands. Give the table a `docked` value instead and the page keep"
     },
     {
@@ -11349,13 +10877,7 @@
       "area": "Table",
       "summary": "A row.",
       "doc": "A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the next row. A click on the row body opens it; clicks on controls inside do not.",
-      "props": [
-        "selected",
-        "inert",
-        "onOpen",
-        "onToggle",
-        "onArrow"
-      ],
+      "props": ["selected", "inert", "onOpen", "onToggle", "onArrow"],
       "propDocs": "The row is picked. An invited person: muted, not selectable, does not open. Enter, or a click on the row body. Space. `extend` is true with Shift held. Move focus to the row above or below with the arrow keys."
     },
     {
@@ -11365,12 +10887,7 @@
       "area": "TableOld",
       "summary": "TableRowOld component - A table row.",
       "doc": "TableRowOld component - A table row. ```tsx <TableRowOld selected> <TableCellOld>Cell</TableCellOld> </TableRowOld> ``` Users table. This earlier family stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "selected",
-        "sticky",
-        "interactive",
-        "summary"
-      ],
+      "props": ["selected", "sticky", "interactive", "summary"],
       "propDocs": "Marks the row as selected. A selected row always wins over a stripe - the stripe is simply not applied to it - so selection stays readable in a striped table. Pins the row to the top or bottom of the scroll area. Needs `maxHeight` on the table, same as `stickyHeader`. The row picks up a shadow only while there is content scrolled underneath it, so a pinned total sitting at the true end of the data stays flat. Whether the row responds to hover. Body rows offer hover feedback by default, because most of them are targets. A row that is not a record should say so: an expanded detail panel, a spacer, a row holding a chart. Hover feedback on one of those says \"click me\" about something that does nothing. A `summary` row already opts out on its own. This is the same thing for every other case, and it exists because the alternative - a `hover:bg-transparent` override at the call site - relies on knowing what the row set in the first place. Leave it unset for the default: on for body rows, off everywhere else. Marks the row as a total or subtotal. `TableFooterOld` already treats its rows this way, so this is for a summary that sits somewhere else - at the top of the table, or at the foot of"
     },
     {
@@ -11380,13 +10897,7 @@
       "area": "TableOld2",
       "summary": "A row.",
       "doc": "A row. Focusable: Space picks it, Enter opens it, the arrow keys move to the next row. A click on the row body opens it; clicks on controls inside do not.",
-      "props": [
-        "selected",
-        "inert",
-        "onOpen",
-        "onToggle",
-        "onArrow"
-      ],
+      "props": ["selected", "inert", "onOpen", "onToggle", "onArrow"],
       "propDocs": "The row is picked. An invited person: muted, not selectable, does not open. Enter, or a click on the row body. Space. `extend` is true with Shift held. Move focus to the row above or below with the arrow keys."
     },
     {
@@ -11396,15 +10907,7 @@
       "area": "TableOld2",
       "summary": "What a select-all should take: this page, every row that matches, or a number you type.",
       "doc": "What a select-all should take: this page, every row that matches, or a number you type. Opened from the header chevron and from the bulk bar's count.",
-      "props": [
-        "open",
-        "onOpenChange",
-        "anchor",
-        "pageCount",
-        "allCount",
-        "noun",
-        "onApply"
-      ],
+      "props": ["open", "onOpenChange", "anchor", "pageCount", "allCount", "noun", "onApply"],
       "propDocs": "Selectable rows on this page. Selectable rows matching the search and filters, across pages. What the table calls its rows: \"users\"."
     },
     {
@@ -11414,11 +10917,7 @@
       "area": "Table",
       "summary": "The header's checkbox: it selects this page, and only this page.",
       "doc": "The header's checkbox: it selects this page, and only this page. The small chevron that hung off its right edge and opened the \"Choose what to select\" popover (this page / all matching / a number) went on 2026-09-26 (Pranjal), here and in the bulk bar alike. The box keeps its slot and its geometry.",
-      "props": [
-        "state",
-        "onToggle",
-        "frozen"
-      ],
+      "props": ["state", "onToggle", "frozen"],
       "propDocs": "none, some or all of the selectable rows on the page are picked. The box selects this page, and only this page."
     },
     {
@@ -11428,12 +10927,7 @@
       "area": "TableOld2",
       "summary": "The header's checkbox and the chevron that opens the scope menu.",
       "doc": "The header's checkbox and the chevron that opens the scope menu.",
-      "props": [
-        "state",
-        "onToggle",
-        "onScope",
-        "frozen"
-      ],
+      "props": ["state", "onToggle", "onScope", "frozen"],
       "propDocs": "none, some or all of the selectable rows on the page are picked. Opens the scope menu."
     },
     {
@@ -11443,14 +10937,7 @@
       "area": "Table",
       "summary": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
       "doc": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
-      "props": [
-        "index",
-        "selected",
-        "inert",
-        "label",
-        "onToggle",
-        "frozen"
-      ],
+      "props": ["index", "selected", "inert", "label", "onToggle", "frozen"],
       "propDocs": "The row number shown at rest. An invited person: number only, no checkbox. Spoken name for the checkbox: \"Select Sarah Johnson\"."
     },
     {
@@ -11460,14 +10947,7 @@
       "area": "TableOld2",
       "summary": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
       "doc": "The first cell of a row: its number at rest, a checkbox on hover, focus, or once anything is picked.",
-      "props": [
-        "index",
-        "selected",
-        "inert",
-        "label",
-        "onToggle",
-        "frozen"
-      ],
+      "props": ["index", "selected", "inert", "label", "onToggle", "frozen"],
       "propDocs": "The row number shown at rest. An invited person: number only, no checkbox. Spoken name for the checkbox: \"Select Sarah Johnson\"."
     },
     {
@@ -11477,10 +10957,7 @@
       "area": "Table",
       "summary": "Five grey rows while the list loads.",
       "doc": "Five grey rows while the list loads. Bars fall where the content will.",
-      "props": [
-        "widths",
-        "rows"
-      ],
+      "props": ["widths", "rows"],
       "propDocs": "One width per visible column, so the bars line up under the headings."
     },
     {
@@ -11490,10 +10967,7 @@
       "area": "TableOld2",
       "summary": "Five grey rows while the list loads.",
       "doc": "Five grey rows while the list loads. Bars fall where the content will.",
-      "props": [
-        "widths",
-        "rows"
-      ],
+      "props": ["widths", "rows"],
       "propDocs": "One width per visible column, so the bars line up under the headings."
     },
     {
@@ -11553,9 +11027,7 @@
       "area": "TableOld",
       "summary": "TableToolbarOld - the controls that act on the whole table.",
       "doc": "TableToolbarOld - the controls that act on the whole table. The line between this and `TableColumnMenuOld` is what each one acts on. The column menu asks \"what about this column\"; the toolbar asks \"what should this table show at all\" - search, filters, sorting, grouping, which columns exist. **It is a shell, not a set of controls.** Four product teams need the same spacing, the same alignment and the same wrap behaviour, and completely different buttons - a service desk needs a priority quick-filter, a billing table does not. Fixing the contents here would be wrong in three of the four cases; fixing the arrangement is right in all of them. Put the searching and filtering first and the view controls in `TableToolbarActionsOld`, which pushes them to the trailing edge. ```tsx <TableToolbarOld> <Input type=\"search\" aria-label=\"Search tickets\" /> <Button variant=\"outline\" size=\"sm\">Filters</Button> <TableToolbarActionsOld> <TableSortMenuOld ... /> <TableViewMenuOld ... /> </TableToolbarActionsOld> </TableToolbarOld> ``` controls instead (ruling of 4 September 2026). This strip stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "What a screen reader calls the group. A page can hold more than one table, and \"TableOld controls\" three times over identifies none of them."
     },
     {
@@ -11662,14 +11134,7 @@
       "area": "Tabs",
       "summary": "Tabs root component - controls the tab state and behavior.",
       "doc": "Tabs root component - controls the tab state and behavior. ```tsx <Tabs defaultValue=\"about\"> <TabsList> <TabsTrigger value=\"about\">About</TabsTrigger> <TabsTrigger value=\"grants\" count={3}>Grants</TabsTrigger> </TabsList> <TabsContent value=\"about\">…</TabsContent> <TabsContent value=\"grants\">…</TabsContent> </Tabs> <Tabs defaultValue=\"manual\"> <TabsList type=\"filled\"> <TabsTrigger value=\"manual\">Manual</TabsTrigger> <TabsTrigger value=\"ldap\">LDAP</TabsTrigger> </TabsList> </Tabs> ```",
-      "props": [
-        "defaultValue",
-        "value",
-        "onValueChange",
-        "orientation",
-        "dir",
-        "activationMode"
-      ],
+      "props": ["defaultValue", "value", "onValueChange", "orientation", "dir", "activationMode"],
       "propDocs": "The value of the tab that should be active when initially rendered. Use when you do not need to control the state of the tabs. The controlled value of the tab that should be active. Must be used in conjunction with onValueChange. Event handler called when the value changes. Not called for a tab that is already selected: the active tab ignores a click (K-Tabs-12). The orientation of the tabs. The direction of navigation between tabs. Whether a tab is selected as soon as it is focused (automatic) or only on Enter or Space (manual)."
     },
     {
@@ -11679,9 +11144,7 @@
       "area": "Tabs",
       "summary": "TabsAdd - the control that makes a new tab (K-Tabs-22): a 32 square with a 16 plus at the end of the list.",
       "doc": "TabsAdd - the control that makes a new tab (K-Tabs-22): a 32 square with a 16 plus at the end of the list. Not a tab itself, so it takes no part in arrow-key travel between tabs.",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "What a screen reader says. There is no visible text - it is a plus."
     },
     {
@@ -11691,9 +11154,7 @@
       "area": "TabsOld2",
       "summary": "TabsAddOld2 - the control that makes a new tab.",
       "doc": "TabsAddOld2 - the control that makes a new tab. Sits at the end of the list, the way Notion and ClickUp put it. Not a tab itself: it does not take part in arrow-key navigation between tabs, because it does not select anything.",
-      "props": [
-        "label"
-      ],
+      "props": ["label"],
       "propDocs": "What a screen reader says. There is no visible text - it is a plus."
     },
     {
@@ -11703,9 +11164,7 @@
       "area": "Tabs",
       "summary": "TabsContent - the panel for one tab.",
       "doc": "TabsContent - the panel for one tab. No spacing of its own: the surface it sits in decides - a drawer body puts 20 under the strip, a page surface 16 (S-16) - exactly as the console, which has no panel element at all.",
-      "props": [
-        "value"
-      ],
+      "props": ["value"],
       "propDocs": "The value of the tab that this content belongs to."
     },
     {
@@ -11715,9 +11174,7 @@
       "area": "TabsOld2",
       "summary": "TabsContentOld2 - content panel for each tab.",
       "doc": "TabsContentOld2 - content panel for each tab.",
-      "props": [
-        "value"
-      ],
+      "props": ["value"],
       "propDocs": "The value of the tab that this content belongs to."
     },
     {
@@ -11727,12 +11184,7 @@
       "area": "Tabs",
       "summary": "TabsList - the strip (underline) or the track (filled).",
       "doc": "TabsList - the strip (underline) or the track (filled). Its `type` is handed to every trigger inside, so it is written once.",
-      "props": [
-        "type",
-        "variant",
-        "fullWidth",
-        "hairline"
-      ],
+      "props": ["type", "variant", "fullWidth", "hairline"],
       "propDocs": "Which of the two types the strip draws. Every trigger inside inherits it, so it is set once here and never repeated on the tabs. The older name for `type`; prefer `type`. Stretches each tab to share the width equally. Underline only: the strip's own hairline (neutral-30), which a drawer band closes with. A page band has none - pass `false` and the tabs stretch to the band, the active 2px line as its last 2px (B-23)."
     },
     {
@@ -11742,10 +11194,7 @@
       "area": "TabsOld2",
       "summary": "TabsListOld2 - container for tab triggers.",
       "doc": "TabsListOld2 - container for tab triggers.",
-      "props": [
-        "variant",
-        "fullWidth"
-      ],
+      "props": ["variant", "fullWidth"],
       "propDocs": "Visual style variant Whether the tabs should take full width of container"
     },
     {
@@ -11755,14 +11204,7 @@
       "area": "TabsOld2",
       "summary": "Kept for side-by-side review while products move across; the removal version is the design owner's to set.",
       "doc": "Kept for side-by-side review while products move across; the removal version is the design owner's to set. Frozen: it takes no further work. Tabs root component - controls the tab state and behavior. ```tsx <TabsOld2 defaultValue=\"tab1\"> <TabsListOld2> <TabsTriggerOld2 value=\"tab1\">Tab 1</TabsTriggerOld2> <TabsTriggerOld2 value=\"tab2\">Tab 2</TabsTriggerOld2> </TabsListOld2> <TabsContentOld2 value=\"tab1\">Content 1</TabsContentOld2> <TabsContentOld2 value=\"tab2\">Content 2</TabsContentOld2> </TabsOld2> ```",
-      "props": [
-        "defaultValue",
-        "value",
-        "onValueChange",
-        "orientation",
-        "dir",
-        "activationMode"
-      ],
+      "props": ["defaultValue", "value", "onValueChange", "orientation", "dir", "activationMode"],
       "propDocs": "The value of the tab that should be active when initially rendered. Use when you do not need to control the state of the tabs. The controlled value of the tab that should be active. Must be used in conjunction with onValueChange. Event handler called when the value changes. The orientation of the tabs. The direction of navigation between tabs. When true, keyboard navigation will loop from last tab to first, and vice versa."
     },
     {
@@ -11916,13 +11358,7 @@
       "area": "Textarea",
       "summary": "Textarea component with support for labels, error states, and character counting.",
       "doc": "Textarea component with support for labels, error states, and character counting. ```tsx // Basic textarea <Textarea placeholder=\"Enter your message...\" /> // With label and error <Textarea label=\"Message\" error=\"Message is required\" placeholder=\"Enter your message\" /> // With character count <Textarea label=\"Bio\" maxLength={200} placeholder=\"Tell us about yourself\" /> ```",
-      "props": [
-        "error",
-        "label",
-        "helperText",
-        "locked",
-        "wrapperClassName"
-      ],
+      "props": ["error", "label", "helperText", "locked", "wrapperClassName"],
       "propDocs": "Error message to display below the textarea Label text for the textarea Helper text displayed below the textarea A held field (Pranjal, 2026-09-17): disabled, with a lock inside at the right - 14 like the search glyph, 12 from the edge, in the disabled text colour - and the value truncating before it. For a value something else owns (a directory, a fixed identity); the label above stays plain. Wrapper className for the container div"
     },
     {
@@ -11942,12 +11378,7 @@
       "area": "TextareaOld2",
       "summary": "Kept for side-by-side review while products move across; the removal version is the design owner's to set.",
       "doc": "Kept for side-by-side review while products move across; the removal version is the design owner's to set. Frozen: it takes no further work. TextareaOld2 component with support for labels, error states, and character counting. ```tsx // Basic textarea <TextareaOld2 placeholder=\"Enter your message...\" /> // With label and error <TextareaOld2 label=\"Message\" error=\"Message is required\" placeholder=\"Enter your message\" /> // With character count <TextareaOld2 label=\"Bio\" maxLength={200} placeholder=\"Tell us about yourself\" /> ```",
-      "props": [
-        "error",
-        "label",
-        "helperText",
-        "wrapperClassName"
-      ],
+      "props": ["error", "label", "helperText", "wrapperClassName"],
       "propDocs": "Error message to display below the textarea Label text for the textarea Helper text displayed below the textarea Wrapper className for the container div"
     },
     {
@@ -12005,8 +11436,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / TheHeaderLine",
-      "doc": "Components/Card TheHeaderLine",
+      "summary": "Story: New Components/Card / TheHeaderLine",
+      "doc": "New Components/Card TheHeaderLine",
       "props": [],
       "propDocs": ""
     },
@@ -12196,15 +11627,7 @@
       "area": "Toast",
       "summary": "The promotional toast - an announcement rather than a report.",
       "doc": "The promotional toast - an announcement rather than a report. The other six tones say what just happened. This one says what is new, so it is a different shape: room for a picture, a paragraph rather than a line, and a way to act on it. It deliberately does not take a tone. An announcement is not good news or bad news, and tinting it would make it argue with the six that are. Everything here is our own tokens - the card surface, the border, the radius and the type all come from the same places a Card or a Dialog would use, so it reads as part of this system rather than a borrowed one.",
-      "props": [
-        "title",
-        "description",
-        "media",
-        "action",
-        "closable",
-        "onClose",
-        "className"
-      ],
+      "props": ["title", "description", "media", "action", "closable", "onClose", "className"],
       "propDocs": "The line beside the megaphone. The paragraph under the picture. Anything to show above the text - an `img`, a `video`, a gradient. It is sized and clipped for you; pass the element, not a URL. One call to action, below the text. Optional - leave it out for news. Shows the dismiss cross. @default true Called by the dismiss cross."
     },
     {
@@ -12274,11 +11697,7 @@
       "area": "ToggleGroup",
       "summary": "ToggleGroupItem - individual toggle button within a ToggleGroup.",
       "doc": "ToggleGroupItem - individual toggle button within a ToggleGroup. ```tsx <ToggleGroupItem value=\"bold\" aria-label=\"Toggle bold\"> <BoldIcon /> </ToggleGroupItem> // With text <ToggleGroupItem value=\"option1\">Option 1</ToggleGroupItem> // With icon and text <ToggleGroupItem value=\"grid\"> <GridIcon /> Grid View </ToggleGroupItem> ```",
-      "props": [
-        "value",
-        "variant",
-        "size"
-      ],
+      "props": ["value", "variant", "size"],
       "propDocs": "The unique value for this item Visual style variant (overrides parent) Size variant (overrides parent)"
     },
     {
@@ -12376,8 +11795,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / Tones",
-      "doc": "Components/Progress Tones",
+      "summary": "Story: New Components/Progress / Tones",
+      "doc": "New Components/Progress Tones",
       "props": [],
       "propDocs": ""
     },
@@ -12388,10 +11807,7 @@
       "area": "Toolbar",
       "summary": "Toolbar - the strip above a list: search, filters, then sort and columns on the right.",
       "doc": "Toolbar - the strip above a list: search, filters, then sort and columns on the right. ```tsx <Toolbar label=\"User controls\"> <Input size=\"sm\" placeholder=\"Search by name or email\" startAdornment={<Icon name=\"search\" size={14} />} /> <ToolbarButton icon={<Icon name=\"funnel\" />} count={2} onClick={openDrawer}>Filters</ToolbarButton> <ToolbarButton icon={<Icon name=\"check-circle\" />} dot aria-label=\"Status\" /> <ToolbarSpacer /> <ToolbarSection> <ToolbarButton icon={<Icon name=\"arrow-up-down\" />} aria-label=\"Sort\" /> <ToolbarButton icon={<Icon name=\"columns\" />} aria-label=\"Columns\" /> </ToolbarSection> </Toolbar> ```",
-      "props": [
-        "children",
-        "label"
-      ],
+      "props": ["children", "label"],
       "propDocs": "The controls. Put the right-hand run in a ToolbarSection after a ToolbarSpacer. The strip's spoken name. @default 'Toolbar'"
     },
     {
@@ -12399,8 +11815,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Toolbar",
-      "doc": "Components/ButtonGroup Toolbar",
+      "summary": "Story: New Components/ButtonGroup / Toolbar",
+      "doc": "New Components/ButtonGroup Toolbar",
       "props": [],
       "propDocs": ""
     },
@@ -12431,9 +11847,7 @@
       "area": "ToolbarOld",
       "summary": "ToolbarOld component for displaying search, filters, and action buttons.",
       "doc": "ToolbarOld component for displaying search, filters, and action buttons. ```tsx <ToolbarOld> <ToolbarOldSection> <ToolbarSearch placeholder=\"Search...\" /> </ToolbarOldSection> <ToolbarOldSection> <ToolbarButton>Filters</ToolbarButton> <ToolbarButton>New</ToolbarButton> </ToolbarOldSection> </ToolbarOld> ``` `ToolbarButton` controls. This general-purpose strip stays only for side-by-side comparison until the removal pull request.",
-      "props": [
-        "children"
-      ],
+      "props": ["children"],
       "propDocs": "Content to display inside the toolbar"
     },
     {
@@ -12483,9 +11897,7 @@
       "area": "Tooltip",
       "summary": "Tooltip - holds the open state.",
       "doc": "Tooltip - holds the open state. `instant` drops the wait, for chips and counters that reveal a value.",
-      "props": [
-        "instant"
-      ],
+      "props": ["instant"],
       "propDocs": "No wait at all. For chips and counters that reveal a value."
     },
     {
@@ -12544,12 +11956,7 @@
       "area": "Tooltip",
       "summary": "TooltipProvider - wraps the app, or a component that brings its own bubbles.",
       "doc": "TooltipProvider - wraps the app, or a component that brings its own bubbles. 100ms before a bubble opens; neighbours within 300ms open at once. ```tsx <TooltipProvider> <Tooltip> <TooltipTrigger>Hover me</TooltipTrigger> <TooltipContent>Tooltip text</TooltipContent> </Tooltip> </TooltipProvider> ```",
-      "props": [
-        "children",
-        "delayDuration",
-        "skipDelayDuration",
-        "disableHoverableContent"
-      ],
+      "props": ["children", "delayDuration", "skipDelayDuration", "disableHoverableContent"],
       "propDocs": "How long the pointer rests on a trigger before the bubble opens. Moving to a neighbouring trigger within this many ms opens it at once. Close as soon as the pointer leaves the trigger, instead of letting it travel into the bubble (a scrolling list needs the travel)."
     },
     {
@@ -12559,12 +11966,7 @@
       "area": "TooltipOld",
       "summary": "TooltipProviderOld - wraps your app or component tree to provide tooltip functionality.",
       "doc": "TooltipProviderOld - wraps your app or component tree to provide tooltip functionality. Must be placed at the root of components using tooltips. ```tsx <TooltipProviderOld> <TooltipOld> <TooltipTriggerOld>Hover me</TooltipTriggerOld> <TooltipContentOld>TooltipOld text</TooltipContentOld> </TooltipOld> </TooltipProviderOld> ```",
-      "props": [
-        "children",
-        "delayDuration",
-        "skipDelayDuration",
-        "disableHoverableContent"
-      ],
+      "props": ["children", "delayDuration", "skipDelayDuration", "disableHoverableContent"],
       "propDocs": "Content wrapped by the provider The duration from when the mouse enters a tooltip trigger until the tooltip opens. Prevents the tooltip from opening when in keyboard navigation mode. Disables the hover card"
     },
     {
@@ -12667,8 +12069,8 @@
       "kind": "story",
       "file": "src/components/CodeWell/CodeWell.stories.tsx",
       "area": "CodeWell",
-      "summary": "Story: Components/CodeWell / TruncatedSecret",
-      "doc": "Components/CodeWell TruncatedSecret",
+      "summary": "Story: New Components/CodeWell / TruncatedSecret",
+      "doc": "New Components/CodeWell TruncatedSecret",
       "props": [],
       "propDocs": ""
     },
@@ -12677,8 +12079,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / TryIt",
-      "doc": "Components/Upload TryIt",
+      "summary": "Story: New Components/Upload / TryIt",
+      "doc": "New Components/Upload TryIt",
       "props": [],
       "propDocs": ""
     },
@@ -12727,8 +12129,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / TypeInLongList",
-      "doc": "Components/Combobox TypeInLongList",
+      "summary": "Story: New Components/Combobox / TypeInLongList",
+      "doc": "New Components/Combobox TypeInLongList",
       "props": [],
       "propDocs": ""
     },
@@ -12737,8 +12139,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / TypeInOneLine",
-      "doc": "Components/Combobox TypeInOneLine",
+      "summary": "Story: New Components/Combobox / TypeInOneLine",
+      "doc": "New Components/Combobox TypeInOneLine",
       "props": [],
       "propDocs": ""
     },
@@ -12747,8 +12149,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / TypeInTwoLine",
-      "doc": "Components/Combobox TypeInTwoLine",
+      "summary": "Story: New Components/Combobox / TypeInTwoLine",
+      "doc": "New Components/Combobox TypeInTwoLine",
       "props": [],
       "propDocs": ""
     },
@@ -12797,8 +12199,8 @@
       "kind": "story",
       "file": "src/components/Kbd/Kbd.stories.tsx",
       "area": "Kbd",
-      "summary": "Story: Components/Kbd / Usage",
-      "doc": "Components/Kbd Usage",
+      "summary": "Story: New Components/Kbd / Usage",
+      "doc": "New Components/Kbd Usage",
       "props": [],
       "propDocs": ""
     },
@@ -13227,8 +12629,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / VariantOutline",
-      "doc": "Components/Combobox VariantOutline",
+      "summary": "Story: New Components/Combobox / VariantOutline",
+      "doc": "New Components/Combobox VariantOutline",
       "props": [],
       "propDocs": ""
     },
@@ -13317,8 +12719,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / Vertical",
-      "doc": "Components/ButtonGroup Vertical",
+      "summary": "Story: New Components/ButtonGroup / Vertical",
+      "doc": "New Components/ButtonGroup Vertical",
       "props": [],
       "propDocs": ""
     },
@@ -13347,8 +12749,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / Vertical",
-      "doc": "Components/Stepper Vertical",
+      "summary": "Story: New Components/Stepper / Vertical",
+      "doc": "New Components/Stepper Vertical",
       "props": [],
       "propDocs": ""
     },
@@ -13387,8 +12789,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / VerticalStates",
-      "doc": "Components/Stepper VerticalStates",
+      "summary": "Story: New Components/Stepper / VerticalStates",
+      "doc": "New Components/Stepper VerticalStates",
       "props": [],
       "propDocs": ""
     },
@@ -13407,8 +12809,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / VerticalWithIcons",
-      "doc": "Components/ButtonGroup VerticalWithIcons",
+      "summary": "Story: New Components/ButtonGroup / VerticalWithIcons",
+      "doc": "New Components/ButtonGroup VerticalWithIcons",
       "props": [],
       "propDocs": ""
     },
@@ -13467,8 +12869,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / WhenSomethingGoesWrong",
-      "doc": "Components/Stepper WhenSomethingGoesWrong",
+      "summary": "Story: New Components/Stepper / WhenSomethingGoesWrong",
+      "doc": "New Components/Stepper WhenSomethingGoesWrong",
       "props": [],
       "propDocs": ""
     },
@@ -13837,8 +13239,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / WithDescriptions",
-      "doc": "Components/Combobox WithDescriptions",
+      "summary": "Story: New Components/Combobox / WithDescriptions",
+      "doc": "New Components/Combobox WithDescriptions",
       "props": [],
       "propDocs": ""
     },
@@ -13857,8 +13259,8 @@
       "kind": "story",
       "file": "src/components/Stepper/Stepper.stories.tsx",
       "area": "Stepper",
-      "summary": "Story: Components/Stepper / WithDescriptions",
-      "doc": "Components/Stepper WithDescriptions",
+      "summary": "Story: New Components/Stepper / WithDescriptions",
+      "doc": "New Components/Stepper WithDescriptions",
       "props": [],
       "propDocs": ""
     },
@@ -13867,8 +13269,8 @@
       "kind": "story",
       "file": "src/components/ButtonGroup/ButtonGroup.stories.tsx",
       "area": "ButtonGroup",
-      "summary": "Story: Components/ButtonGroup / WithDisabled",
-      "doc": "Components/ButtonGroup WithDisabled",
+      "summary": "Story: New Components/ButtonGroup / WithDisabled",
+      "doc": "New Components/ButtonGroup WithDisabled",
       "props": [],
       "propDocs": ""
     },
@@ -13877,8 +13279,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / WithDisabledItems",
-      "doc": "Components/Command WithDisabledItems",
+      "summary": "Story: New Components/Command / WithDisabledItems",
+      "doc": "New Components/Command WithDisabledItems",
       "props": [],
       "propDocs": ""
     },
@@ -13887,8 +13289,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / WithDisabledOptions",
-      "doc": "Components/Combobox WithDisabledOptions",
+      "summary": "Story: New Components/Combobox / WithDisabledOptions",
+      "doc": "New Components/Combobox WithDisabledOptions",
       "props": [],
       "propDocs": ""
     },
@@ -13927,8 +13329,8 @@
       "kind": "story",
       "file": "src/components/Pagination/Pagination.stories.tsx",
       "area": "Pagination",
-      "summary": "Story: Components/Pagination / WithEllipsis",
-      "doc": "Components/Pagination WithEllipsis",
+      "summary": "Story: New Components/Pagination / WithEllipsis",
+      "doc": "New Components/Pagination WithEllipsis",
       "props": [],
       "propDocs": ""
     },
@@ -13937,8 +13339,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / WithError",
-      "doc": "Components/Combobox WithError",
+      "summary": "Story: New Components/Combobox / WithError",
+      "doc": "New Components/Combobox WithError",
       "props": [],
       "propDocs": ""
     },
@@ -14217,8 +13619,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / WithLabel",
-      "doc": "Components/Combobox WithLabel",
+      "summary": "Story: New Components/Combobox / WithLabel",
+      "doc": "New Components/Combobox WithLabel",
       "props": [],
       "propDocs": ""
     },
@@ -14307,8 +13709,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / WithLabels",
-      "doc": "Components/Progress WithLabels",
+      "summary": "Story: New Components/Progress / WithLabels",
+      "doc": "New Components/Progress WithLabels",
       "props": [],
       "propDocs": ""
     },
@@ -14337,8 +13739,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / WithLegend",
-      "doc": "Components/Progress WithLegend",
+      "summary": "Story: New Components/Progress / WithLegend",
+      "doc": "New Components/Progress WithLegend",
       "props": [],
       "propDocs": ""
     },
@@ -14367,8 +13769,8 @@
       "kind": "story",
       "file": "src/components/Progress/Progress.stories.tsx",
       "area": "Progress",
-      "summary": "Story: Components/Progress / WithMarkers",
-      "doc": "Components/Progress WithMarkers",
+      "summary": "Story: New Components/Progress / WithMarkers",
+      "doc": "New Components/Progress WithMarkers",
       "props": [],
       "propDocs": ""
     },
@@ -14377,8 +13779,8 @@
       "kind": "story",
       "file": "src/components/Card/Card.stories.tsx",
       "area": "Card",
-      "summary": "Story: Components/Card / WithMedia",
-      "doc": "Components/Card WithMedia",
+      "summary": "Story: New Components/Card / WithMedia",
+      "doc": "New Components/Card WithMedia",
       "props": [],
       "propDocs": ""
     },
@@ -14587,8 +13989,8 @@
       "kind": "story",
       "file": "src/components/Combobox/Combobox.stories.tsx",
       "area": "Combobox",
-      "summary": "Story: Components/Combobox / WithSearchCallback",
-      "doc": "Components/Combobox WithSearchCallback",
+      "summary": "Story: New Components/Combobox / WithSearchCallback",
+      "doc": "New Components/Combobox WithSearchCallback",
       "props": [],
       "propDocs": ""
     },
@@ -14597,8 +13999,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / WithSelection",
-      "doc": "Components/Command WithSelection",
+      "summary": "Story: New Components/Command / WithSelection",
+      "doc": "New Components/Command WithSelection",
       "props": [],
       "propDocs": ""
     },
@@ -14607,8 +14009,8 @@
       "kind": "story",
       "file": "src/components/Command/Command.stories.tsx",
       "area": "Command",
-      "summary": "Story: Components/Command / WithShortcuts",
-      "doc": "Components/Command WithShortcuts",
+      "summary": "Story: New Components/Command / WithShortcuts",
+      "doc": "New Components/Command WithShortcuts",
       "props": [],
       "propDocs": ""
     },
@@ -14637,8 +14039,8 @@
       "kind": "story",
       "file": "src/components/Icon/Icon.stories.tsx",
       "area": "Icon",
-      "summary": "Story: Components/Icon / WithStatusColors",
-      "doc": "Components/Icon WithStatusColors",
+      "summary": "Story: New Components/Icon / WithStatusColors",
+      "doc": "New Components/Icon WithStatusColors",
       "props": [],
       "propDocs": ""
     },
@@ -14797,8 +14199,8 @@
       "kind": "story",
       "file": "src/components/Upload/Upload.stories.tsx",
       "area": "Upload",
-      "summary": "Story: Components/Upload / YouOwnTheList",
-      "doc": "Components/Upload YouOwnTheList",
+      "summary": "Story: New Components/Upload / YouOwnTheList",
+      "doc": "New Components/Upload YouOwnTheList",
       "props": [],
       "propDocs": ""
     }

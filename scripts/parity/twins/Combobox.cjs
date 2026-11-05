@@ -16,14 +16,14 @@ module.exports = {
     {
       name: 'the required mark (RequiredMark: danger red, 3 off the word)',
       props: ['color', 'marginLeft', 'fontWeight'],
-      story: { id: 'components-combobox--required', select: 'label [data-slot="required-mark"]' },
+      story: { id: 'new-components-combobox--required', select: 'label [data-slot="required-mark"]' },
       console: CONSOLE,
       mock: null,
     },
     {
       name: 'the hidden word "required" after it',
       props: ['position', 'width', 'height', 'overflow', 'whiteSpace'],
-      story: { id: 'components-combobox--required', select: 'label [data-slot="required-mark"] + .mdt-sr-only' },
+      story: { id: 'new-components-combobox--required', select: 'label [data-slot="required-mark"] + .mdt-sr-only' },
       console: { ...CONSOLE, select: `${CONSOLE.select} + .mdt-sr-only` },
       mock: null,
     },

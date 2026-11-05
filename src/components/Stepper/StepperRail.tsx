@@ -43,9 +43,6 @@ const LABEL_INK: Record<StepLook, string> = {
 /** The rail's disc: 24 across, a 1.5px edge, a 12px number. */
 const DISC_SIZE = 'mdt-h-6 mdt-w-6 mdt-border-[1.5px] mdt-text-xs';
 
-/** The rail draws its tick heavier, so it holds up beside the 14px labels. */
-const TICK_STROKE = 2.5;
-
 /** The row: disc, then the text, 12px apart - the same box whether or not it is a button. */
 const ROW = 'mdt-w-full mdt-items-start mdt-gap-3 mdt-text-left';
 
@@ -54,13 +51,7 @@ type StepperRailProps = Omit<StepperProps, 'layout' | 'responsive'>;
 /** The disc, then the label over its description. */
 const railBody = (step: StepperStep, index: number, model: StepModel): ReactNode => (
   <>
-    <StepDisc
-      index={index}
-      model={model}
-      className={DISC_SIZE}
-      markSize="xs"
-      tickStroke={TICK_STROKE}
-    />
+    <StepDisc index={index} model={model} className={DISC_SIZE} markSize="xs" />
     <span className="mdt-flex mdt-min-w-0 mdt-flex-1 mdt-flex-col mdt-gap-0.5 mdt-pt-0.5">
       <StepLabel
         label={step.label}

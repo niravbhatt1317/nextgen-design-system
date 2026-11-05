@@ -162,7 +162,7 @@ history.
 deliberately does **not** follow the theme, and `neutral-160` flips to `#E3E8F2`,
 so the well renders as a near-white slab. Written up in `MISSING-TOKENS.md` under
 _"A surface that does not follow the theme"_ — it needs a token, not a guess.
-`Components/CodeWell → Surfaces` in dark shows it.
+`New Components/CodeWell → Surfaces` in dark shows it.
 
 **2. `Select` nests a button inside a button.** Its many-value field renders an
 option button inside the trigger button — invalid HTML, and the inner control is

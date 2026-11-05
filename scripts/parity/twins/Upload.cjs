@@ -1,18 +1,30 @@
-/* Parity twins: the library's Upload beside the console's one library Upload - an organisation's Branding tab
- * (features/organizations/BrandingTab.jsx: AssetSlot's empty state is <Upload kind="image">). The seed marks both
- * workspace slots as set, so the page shows the SET tile; the slot's Clear button (in-memory only) empties the Logo
- * slot and the dropzone appears. Reached from the org detail page through the Branding tab. */
+/* Parity twins: the library's Upload beside the console's library Upload at rest - Users › Invite users › Import users
+ * (features/users/CsvImport.jsx: <Upload kind="file"> imported from the package). Repaired 2026-11-05.
+ *
+ * Until then this twin read the dropzone from an organisation's Branding tab. That route is gone: Branding was redesigned
+ * into features/organizations/BrandingStudio.jsx, whose logo and favicon close-up cards (.bs-zc__act) and .bs-drop are that
+ * page's own drawing, not this part. There is no Clear button and no [data-slot="upload-box"] on the tab any more, and the
+ * comment in BrandingTab.jsx that still names <Upload kind="image"> is out of date.
+ *
+ * The story is Resting, not Picks its own image: no console screen passes kind="image" today. `kind` only decides what
+ * replaces the box once a file is chosen, so the box measured here is the same in both.
+ * The console's other library Uploads: credential-profiles/dialogs.jsx, credential-profiles/storeDialogs.jsx,
+ * esm/ServicePoliciesPage.jsx.
+ *
+ * The tile in the box is not read here: it is the library's IconTile in slate, and IconTile's twin owns it. */
 const PROPS = [
   'backgroundColor', 'color', 'borderTopWidth', 'borderTopColor', 'borderTopLeftRadius',
   'paddingTop', 'paddingLeft', 'fontSize', 'fontWeight',
 ];
 const BOX = '[data-slot="upload-box"]';
-const openBranding = async (page) => {
-  /* the organisation page's band is the library Tabs since 2026-09-26 (PageScaffold TabBand): [role=tab], not .kit-tab */
-  await page.locator('[role="tablist"] [role="tab"]', { hasText: /branding/i }).first().click();
-  await page.waitForTimeout(600);
-  await page.getByRole('button', { name: /^clear$/i }).first().click();
-  await page.waitForSelector(BOX, { timeout: 8000 });
+const SENTENCE = `${BOX} > span > span:nth-child(2)`;
+const SECOND_LINE = `${BOX} > span > span:nth-child(3)`;
+const STORY = 'new-components-upload--resting';
+const openImportUsers = async (page) => {
+  await page.getByRole('button', { name: /invite users/i }).first().click();
+  await page.waitForSelector('[role=dialog]', { timeout: 10000 });
+  await page.locator('[role=dialog]').getByText('Import users', { exact: true }).first().click();
+  await page.waitForSelector(BOX, { timeout: 10000 });
   await page.waitForTimeout(400);
 };
 
@@ -20,17 +32,32 @@ module.exports = {
   component: 'Upload',
   frames: [
     {
-      name: 'the image dropzone at rest (dashed edge one step darker than the card, the page ground)',
+      name: 'the dropzone at rest (dashed edge one step darker than the card, the page ground)',
       props: [...PROPS, 'borderTopStyle'],
-      story: { id: 'components-upload--picks-its-own-image', select: BOX },
-      console: { path: '/organizations/org_msp', open: openBranding, select: BOX },
+      story: { id: STORY, select: BOX },
+      console: { path: '/users', open: openImportUsers, select: BOX },
       mock: null,
     },
     {
-      name: 'the resting words inside the dropzone',
+      /* the column that holds the tile and the words: what it reads is inherited, so the words have frames of their own */
+      name: 'the resting layer around the words',
       props: PROPS,
-      story: { id: 'components-upload--picks-its-own-image', select: `${BOX} > span` },
-      console: { path: '/organizations/org_msp', open: openBranding, select: `${BOX} > span` },
+      story: { id: STORY, select: `${BOX} > span` },
+      console: { path: '/users', open: openImportUsers, select: `${BOX} > span` },
+      mock: null,
+    },
+    {
+      name: 'the sentence inside the dropzone',
+      props: PROPS,
+      story: { id: STORY, select: SENTENCE },
+      console: { path: '/users', open: openImportUsers, select: SENTENCE },
+      mock: null,
+    },
+    {
+      name: 'the second line inside the dropzone',
+      props: [...PROPS, 'opacity'],
+      story: { id: STORY, select: SECOND_LINE },
+      console: { path: '/users', open: openImportUsers, select: SECOND_LINE },
       mock: null,
     },
   ],

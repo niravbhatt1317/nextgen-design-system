@@ -3,30 +3,35 @@ import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 /**
  * How the card separates itself from what is behind it.
  *
+ * - `borderless` a tint with no border, for a block that should stand out without an
+ *               edge. 1.13 light and 1.32 dark against the page, and it still shows on
+ *               a tinted area. A neutral pill is the same colour in light, so it melts in.
  * - `filled`    the default. A white card on a white page measures 1.00, so the
  *               border is not decoration - it is the only thing giving the card
  *               a shape. It cannot be removed.
- * - `secondary` a quiet block inside a busier area. The fill carries it at 1.14
- *               light and 1.26 dark, so it needs no border; adding one draws a
- *               hard edge around something meant to recede.
+ * - `secondary` a quiet block inside a busier area. The fill carries it at 1.05
+ *               in both themes, so it needs no border; adding one draws a hard edge
+ *               around something meant to recede. On a tinted area of its own colour
+ *               it disappears.
  * - `outline`   border only, no fill. For sitting on an already-tinted area,
  *               where a white card reads as a patch stuck on top.
  * - `elevated`  a shadow instead of a border, for anything you pick up and move.
- *               In dark it lifts by making the *surface* lighter rather than the
- *               shadow darker - a shadow on a near-black page is invisible.
+ *               In dark a faint ring gives it its edge, because a shadow on a
+ *               near-black page hardly shows.
  */
-export type CardSurface = 'filled' | 'secondary' | 'outline' | 'elevated';
+export type CardSurface = 'borderless' | 'filled' | 'secondary' | 'outline' | 'elevated';
 
 /**
  * The inset shared by every part, so the eyebrow, the heading, the body text and
  * the footer all start on the same vertical line.
  *
  * - `normal`  20px. The default.
+ * - `medium`  16px, for cards that repeat in a stack.
  * - `compact` 14px, for Kanban columns, sidebars and long lists.
  * - `none`    zero, for content that brings its own spacing - a full-bleed
  *             image, or a table that must reach the edges.
  */
-export type CardPadding = 'normal' | 'compact' | 'none';
+export type CardPadding = 'normal' | 'medium' | 'compact' | 'none';
 
 export interface CardOwnProps {
   /** How the card separates itself from the page. @default 'filled' */

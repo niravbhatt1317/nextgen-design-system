@@ -26,9 +26,10 @@ export interface ButtonGroupProps extends HTMLAttributes<HTMLDivElement>, Button
    * Visual style variant
    * - 'attached': Buttons are seamlessly connected
    * - 'default': Buttons have spacing between them
+   * - 'split': One filled action and its menu, joined, with a hairline seam between them
    * @default 'attached'
    */
-  variant?: 'attached' | 'default';
+  variant?: 'attached' | 'default' | 'split';
 
   /**
    * Size variant (affects spacing)

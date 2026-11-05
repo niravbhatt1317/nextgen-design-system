@@ -28,7 +28,7 @@ import { usePlatform } from './usePlatform';
  * a dialog's primary button, and a trial of five more.
  */
 const meta: Meta<typeof Kbd> = {
-  title: 'Components/Kbd',
+  title: 'New Components/Kbd',
   component: Kbd,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

@@ -3,7 +3,7 @@ import { SecretDots } from './SecretDots';
 import { Label } from '../Label';
 
 const meta: Meta<typeof SecretDots> = {
-  title: 'Components/SecretDots',
+  title: 'New Components/SecretDots',
   component: SecretDots,
   tags: ['autodocs'],
   parameters: {
