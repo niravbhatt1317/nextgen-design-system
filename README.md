@@ -1,6 +1,8 @@
 # NextGen Design System
 
 A React component library owned by the design team, built so that **AI-generated UI comes out
+
+[![NextGen Design System on StartupScores](https://startupscores.com/badge/nextgen-design-system.svg?style=shield&v=combo&theme=dark)](https://startupscores.com/open-source/nextgen-design-system)
 on-system by default**.
 
 Most design systems are written for people to read. This one is written for a machine to consume
